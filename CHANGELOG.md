@@ -7,7 +7,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](https://github.com/netgrif/application-engine/commits/v6.3.0)
 
-## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2023-05-09)
+## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2023-05-26)
 
 ### Fixed
 
@@ -27,12 +27,13 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](h
 - [NAE-1861] Requesting unknown endpoint ends with Stackoverflow
 - [NAE-1875] Namespace functions cause memory leak
 - [NAE-1868] Process role refresh
+- [NAE-1723] EventLog classes are not resolved correctly after search in MongoDB collection
 
 ### Changed
 
 - [NAE-1638] Elasticsearch executor shutdown
 - [NAE-1762] Public view URL encoding
-- [NAE-1865] - Grid rendering performance improvement
+- [NAE-1865] Grid rendering performance improvement
 
 ### Added
 

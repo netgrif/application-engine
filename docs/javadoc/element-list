@@ -24,8 +24,10 @@ com.netgrif.application.engine.configuration.groovy
 com.netgrif.application.engine.configuration.ldap
 com.netgrif.application.engine.configuration.logging
 com.netgrif.application.engine.configuration.properties
+com.netgrif.application.engine.configuration.properties.enumeration
 com.netgrif.application.engine.configuration.quartz
 com.netgrif.application.engine.configuration.security
+com.netgrif.application.engine.configuration.security.filter
 com.netgrif.application.engine.configuration.security.interfaces
 com.netgrif.application.engine.configuration.security.jwt
 com.netgrif.application.engine.elastic.domain
@@ -42,6 +44,7 @@ com.netgrif.application.engine.event.listeners
 com.netgrif.application.engine.eventoutcomes
 com.netgrif.application.engine.export.configuration
 com.netgrif.application.engine.export.domain
+com.netgrif.application.engine.export.service
 com.netgrif.application.engine.export.service.interfaces
 com.netgrif.application.engine.history.domain.baseevent
 com.netgrif.application.engine.history.domain.baseevent.repository
@@ -49,6 +52,7 @@ com.netgrif.application.engine.history.domain.caseevents
 com.netgrif.application.engine.history.domain.caseevents.repository
 com.netgrif.application.engine.history.domain.dataevents
 com.netgrif.application.engine.history.domain.dataevents.repository
+com.netgrif.application.engine.history.domain.impersonationevents
 com.netgrif.application.engine.history.domain.petrinetevents
 com.netgrif.application.engine.history.domain.petrinetevents.repository
 com.netgrif.application.engine.history.domain.taskevents
@@ -57,6 +61,14 @@ com.netgrif.application.engine.history.domain.userevents
 com.netgrif.application.engine.history.service
 com.netgrif.application.engine.history.service.listener
 com.netgrif.application.engine.history.web
+com.netgrif.application.engine.impersonation.domain
+com.netgrif.application.engine.impersonation.domain.repository
+com.netgrif.application.engine.impersonation.exceptions
+com.netgrif.application.engine.impersonation.service
+com.netgrif.application.engine.impersonation.service.interfaces
+com.netgrif.application.engine.impersonation.web
+com.netgrif.application.engine.impersonation.web.requestbodies
+com.netgrif.application.engine.impersonation.web.responsebodies
 com.netgrif.application.engine.importer.model
 com.netgrif.application.engine.importer.service
 com.netgrif.application.engine.importer.service.throwable
@@ -72,6 +84,11 @@ com.netgrif.application.engine.mail
 com.netgrif.application.engine.mail.domain
 com.netgrif.application.engine.mail.interfaces
 com.netgrif.application.engine.mail.throwables
+com.netgrif.application.engine.manager.service
+com.netgrif.application.engine.manager.service.interfaces
+com.netgrif.application.engine.manager.web
+com.netgrif.application.engine.manager.web.body.request
+com.netgrif.application.engine.manager.web.body.response
 com.netgrif.application.engine.migration
 com.netgrif.application.engine.orgstructure.groups
 com.netgrif.application.engine.orgstructure.groups.config
@@ -123,6 +140,10 @@ com.netgrif.application.engine.settings.service
 com.netgrif.application.engine.settings.web
 com.netgrif.application.engine.startup
 com.netgrif.application.engine.utils
+com.netgrif.application.engine.validation.domain
+com.netgrif.application.engine.validation.models
+com.netgrif.application.engine.validation.service
+com.netgrif.application.engine.validation.service.interfaces
 com.netgrif.application.engine.workflow.domain
 com.netgrif.application.engine.workflow.domain.eventoutcomes
 com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes

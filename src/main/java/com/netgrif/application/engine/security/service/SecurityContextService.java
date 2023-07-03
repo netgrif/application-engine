@@ -4,6 +4,7 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * */
 @Slf4j
 @Service
-public class SecurityContextService implements ISecurityContextService{
+public class SecurityContextService implements ISecurityContextService {
 
     /**
      * List containing user IDs that's state was changed during an action
@@ -27,7 +28,6 @@ public class SecurityContextService implements ISecurityContextService{
         this.cachedTokens = ConcurrentHashMap.newKeySet();
     }
 
-    @Autowired
     protected IUserService userService;
 
     /**
@@ -96,5 +96,11 @@ public class SecurityContextService implements ISecurityContextService{
             return ((LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId().equals(loggedUser.getId());
         else
             return false;
+    }
+
+    @Autowired
+    @Lazy
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
     }
 }
