@@ -126,12 +126,11 @@ class PetriNetServiceTest {
         assert user.processRoles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
 
-        Thread.sleep(2000)  //Elastic Index
         petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
         assert petriNetRepository.count() == processCount
-        assert caseRepository.findAllByProcessIdentifier(testNetOptional.getNet().getImportId()).size() == 0
         Thread.sleep(2000)
         assert elasticPetriNetRepository.findByStringId(testNet.stringId) == null
+        assert caseRepository.findAllByProcessIdentifier(testNetOptional.getNet().getImportId()).size() == 0
         assert taskRepository.count() == taskCount
         assert processRoleRepository.count() == processRoleCount
         user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
