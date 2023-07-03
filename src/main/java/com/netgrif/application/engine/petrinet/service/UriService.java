@@ -18,12 +18,7 @@ import java.util.stream.StreamSupport;
  */
 @Service
 public class UriService implements IUriService {
-
-
-    private static final String DEFAULT_ROOT_URI = "/";
-
-    private static final String DEFAULT_ROOT_NAME = "root";
-
+    
     private static final int FIRST_LEVEL = 0;
     private final UriNodeRepository uriNodeRepository;
     private final UriProperties uriProperties;
@@ -155,11 +150,11 @@ public class UriService implements IUriService {
         UriNode newParent = getOrCreate(destUri, null);
         UriNode oldParent = findById(node.getParentId());
 
-        if (destUri.indexOf(DEFAULT_ROOT_URI) != 0) {
-            destUri = DEFAULT_ROOT_URI + destUri;
+        if (destUri.indexOf(uriProperties.getSeparator()) != 0) {
+            destUri = uriProperties.getSeparator() + destUri;
         }
         String oldNodePath = node.getUriPath();
-        String newNodePath = destUri + (destUri.equals(DEFAULT_ROOT_URI) ? "" : uriProperties.getSeparator()) + node.getName();
+        String newNodePath = destUri + (destUri.equals(uriProperties.getSeparator()) ? "" : uriProperties.getSeparator()) + node.getName();
         node.setUriPath(newNodePath);
         node.setParentId(newParent.getId());
         node.setLevel(newParent.getLevel() + 1);
@@ -218,16 +213,16 @@ public class UriService implements IUriService {
      */
     @Override
     public UriNode getOrCreate(String uri, UriContentType contentType) {
-        if (!uri.startsWith(DEFAULT_ROOT_URI)) {
-            uri = DEFAULT_ROOT_URI + uri;
+        if (!uri.startsWith(uriProperties.getSeparator())) {
+            uri = uriProperties.getSeparator() + uri;
         }
 
         LinkedList<UriNode> uriNodeList = new LinkedList<>();
         String[] uriComponents = uri.split(uriProperties.getSeparator());
         if (uriComponents.length == 0) {
-            uriComponents = new String[]{DEFAULT_ROOT_URI};
+            uriComponents = new String[]{uriProperties.getSeparator()};
         } else {
-            uriComponents[0] = DEFAULT_ROOT_URI;
+            uriComponents[0] = uriProperties.getSeparator();
         }
         StringBuilder uriBuilder = new StringBuilder();
         int pathLength = uriComponents.length;
@@ -267,12 +262,12 @@ public class UriService implements IUriService {
      */
     @Override
     public UriNode createDefault() {
-        UriNode uriNode = uriNodeRepository.findByUriPath(DEFAULT_ROOT_URI);
+        UriNode uriNode = uriNodeRepository.findByUriPath(uriProperties.getSeparator());
         if (uriNode == null) {
             uriNode = new UriNode();
-            uriNode.setName(DEFAULT_ROOT_NAME);
+            uriNode.setName(uriProperties.getName());
             uriNode.setLevel(FIRST_LEVEL);
-            uriNode.setUriPath(DEFAULT_ROOT_URI);
+            uriNode.setUriPath(uriProperties.getSeparator());
             uriNode.setParentId(null);
             uriNode.addContentType(UriContentType.DEFAULT);
             uriNode = uriNodeRepository.save(uriNode);

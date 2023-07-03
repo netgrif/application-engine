@@ -251,6 +251,10 @@
 		<id>menu_name</id>
 		<title name="name">Name of the item</title>
 		<desc name="name_desc">Will be shown in the menu</desc>
+		<action trigger="set">
+			name: f.menu_name;
+			changeCaseProperty "title" about { name.value }
+		</action>
 	</data>
 	<data type="text" immediate="true">
 		<id>tab_icon</id>

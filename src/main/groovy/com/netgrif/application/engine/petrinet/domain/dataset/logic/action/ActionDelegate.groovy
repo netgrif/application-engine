@@ -1711,9 +1711,9 @@ class ActionDelegate {
          title         : { cl ->
              item = workflowService.findOne(item.stringId)
              def value = cl()
-             item.setTitle(value as String)
-             item.dataSet[PREFERENCE_ITEM_FIELD_MENU_NAME].value = (value instanceof I18nString) ? value : new I18nString(value as String)
-             workflowService.save(item)
+             setData("item_settings", item, [
+                     (PREFERENCE_ITEM_FIELD_MENU_NAME): ["type": "i18n", "value": new I18nString(value)]
+             ])
          }]
 
     }
@@ -1818,8 +1818,8 @@ class ActionDelegate {
         uriService.getOrCreate(nodePath, UriContentType.CASE)
 
         assignTask(newItemTask)
-        I18nString newName = body.name ? body.name : (body.filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString)
-        String newIcon = body.icon ? body.icon : "filter_alt"
+        I18nString newName = body.name ?: (body.filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString)
+        String newIcon = body.icon ?: "filter_alt"
         def setDataMap = [
                 (PREFERENCE_ITEM_FIELD_MENU_NAME)    : [
                         "type" : "i18n",
@@ -1988,16 +1988,16 @@ class ActionDelegate {
         }
     }
 
-    Case duplicateMenuItem(Case originItem, I18nString newTitle, String newIdentifier = null) {
+    Case duplicateMenuItem(Case originItem, I18nString newTitle, String newIdentifier) {
         if (!newIdentifier) {
             throw new IllegalArgumentException("View item identifier is null!")
+        }
+        if (newTitle == null || newTitle.defaultValue == "") {
+            throw new IllegalArgumentException("Default title is empty")
         }
         String sanitizedIdentifier = sanitize(newIdentifier)
         if (findMenuItem(sanitizedIdentifier)) {
             throw new IllegalArgumentException("View item identifier $sanitizedIdentifier is not unique!")
-        }
-        if (newTitle == null || newTitle.defaultValue == "") {
-            throw new IllegalArgumentException("Default title is empty")
         }
 
         originItem = workflowService.populateUriNodeId(originItem)
@@ -2316,12 +2316,12 @@ class ActionDelegate {
     void updateMultichoiceWithCurrentNode(MultichoiceMapField field, UriNode node) {
         List<String> splitPathList = splitUriPath(node.uriPath)
 
-        change field value { splitPathList }
         change field options { findOptionsBasedOnSelectedNode(node, splitPathList) }
+        change field value { splitPathList }
     }
 
     List<String> splitUriPath(String uri) {
-        String rootUri = "/"
+        String rootUri = uriService.getUriSeparator()
         String[] splitPath = uri.split(uriService.getUriSeparator())
         if (splitPath.length == 0 && uri == rootUri) {
             splitPath = [rootUri]
@@ -2354,7 +2354,7 @@ class ActionDelegate {
     }
 
     String getCorrectedUri(String uncheckedUri) {
-        String rootUri = "/"
+        String rootUri = uriService.getUriSeparator()
         if (uncheckedUri == "") {
             return rootUri
         }

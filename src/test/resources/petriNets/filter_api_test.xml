@@ -141,6 +141,8 @@
 					changeMenuItem item allowedRoles { ["role_2": "filter_api_test"] }
 					changeMenuItem item uri { uri.value }
 					changeMenuItem item title { title.value }
+					changeMenuItem item caseDefaultHeaders { "meta-title,meta-title,meta-title" }
+					changeMenuItem item taskDefaultHeaders { "meta-title,meta-title,meta-title" }
 				</action>
 			</actions>
 		</event>

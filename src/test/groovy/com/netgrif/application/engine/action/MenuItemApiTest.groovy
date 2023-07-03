@@ -45,6 +45,8 @@ class MenuItemApiTest {
     private static final String PREFERENCE_ITEM_FIELD_NODE_PATH = "nodePath"
     private static final String PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE= "duplicate_new_title"
     private static final String PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER = "duplicate_view_identifier"
+    private static final String PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS = "case_default_headers"
+    private static final String PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS = "task_default_headers"
 
     @Autowired
     private TestHelper testHelper
@@ -139,6 +141,8 @@ class MenuItemApiTest {
 
         assert item.dataSet[PREFERENCE_ITEM_FIELD_NAME].value.toString() == "CHANGED FILTER"
         assert item.dataSet[PREFERENCE_ITEM_FIELD_ALLOWED_ROLES].options.entrySet()[0].key.contains("role_2")
+        assert item.dataSet[PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS].value == "meta-title,meta-title,meta-title"
+        assert item.dataSet[PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS].value == "meta-title,meta-title,meta-title"
         assert item.uriNodeId == newUri.id
 
         assert filter.dataSet["filter"].allowedNets == ["filter"]
