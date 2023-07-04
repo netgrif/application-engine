@@ -329,7 +329,7 @@ class MenuItemApiTest {
         assert workflowService.findOne(leafItemId) != null
 
         workflowService.deleteCase(testFolder)
-
+        sleep(2000)
         netgrifFolder = workflowService.findOne(netgrifFolderId)
         assert !netgrifFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options.containsKey(testFolder.stringId)
         assertThrows(IllegalArgumentException.class, () -> {
