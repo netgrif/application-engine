@@ -29,6 +29,7 @@ import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.FrontAction
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
@@ -491,6 +492,14 @@ class ActionDelegate {
         }
         ChangedField changedField = new ChangedField(field.stringId)
         changedField.addAttribute("validations", compiled.collect { it.getLocalizedValidation(LocaleContextHolder.locale) })
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, changedField)
+        this.outcomes.add(outcome)
+    }
+
+    def frontAction(Field field, String actionName, Map<String, Object> args = null) {
+        ChangedField changedField = new ChangedField(field.stringId)
+        changedField.addAttribute("action", new FrontAction(actionName, args))
         SetDataEventOutcome outcome = createSetDataEventOutcome()
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
