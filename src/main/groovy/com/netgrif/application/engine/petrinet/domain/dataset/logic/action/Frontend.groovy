@@ -24,7 +24,7 @@ class Frontend {
 
     def methodMissing(String name, Object args) {
         ChangedField changedField = new ChangedField(FRONTEND_ACTIONS_KEY)
-        changedField.addAttribute(ACTION, new FrontAction(name, args))
+        changedField.addAttribute(ACTION, Collections.singletonList(new FrontAction(name, args)))
         SetDataEventOutcome outcome = new SetDataEventOutcome(this.useCase, this.task.orElse(null))
         outcome.addChangedField(FRONTEND_ACTIONS_KEY, changedField)
         this.outcomes.add(outcome)
