@@ -11,5 +11,5 @@ public class FrontAction {
 
     private String id;
 
-    private Map<String, Object> args;
+    private Object args;
 }

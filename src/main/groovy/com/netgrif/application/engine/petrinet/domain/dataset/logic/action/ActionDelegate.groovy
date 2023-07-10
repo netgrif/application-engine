@@ -188,6 +188,8 @@ class ActionDelegate {
     @Autowired
     IHistoryService historyService
 
+    Frontend Frontend
+
     /**
      * Reference of case and task in which current action is taking place.
      */
@@ -206,6 +208,7 @@ class ActionDelegate {
         this.initFieldsMap(action.fieldIds)
         this.initTransitionsMap(action.transitionIds)
         this.outcomes = new ArrayList<>()
+        this.Frontend = new Frontend(this.useCase, this.task, this.outcomes)
     }
 
     def initFieldsMap(Map<String, String> fieldIds) {
@@ -220,43 +223,43 @@ class ActionDelegate {
         }
     }
 
-    def copyBehavior(Field field, Transition transition) {
+    def copyBehavior(Field field, Transition transition, Case useCase = this.useCase) {
         if (!useCase.hasFieldBehavior(field.stringId, transition.stringId)) {
             useCase.dataSet.get(field.stringId).addBehavior(transition.stringId, transition.dataSet.get(field.stringId).behavior)
         }
     }
 
-    def visible = { Field field, Transition trans ->
-        copyBehavior(field, trans)
+    def visible = { Field field, Transition trans, Case useCase = this.useCase ->
+        copyBehavior(field, trans, useCase)
         useCase.dataSet.get(field.stringId).makeVisible(trans.stringId)
     }
 
-    def editable = { Field field, Transition trans ->
-        copyBehavior(field, trans)
+    def editable = { Field field, Transition trans, Case useCase = this.useCase ->
+        copyBehavior(field, trans, useCase)
         useCase.dataSet.get(field.stringId).makeEditable(trans.stringId)
     }
 
-    def required = { Field field, Transition trans ->
-        copyBehavior(field, trans)
+    def required = { Field field, Transition trans, Case useCase = this.useCase ->
+        copyBehavior(field, trans, useCase)
         useCase.dataSet.get(field.stringId).makeRequired(trans.stringId)
     }
 
-    def optional = { Field field, Transition trans ->
-        copyBehavior(field, trans)
+    def optional = { Field field, Transition trans, Case useCase = this.useCase ->
+        copyBehavior(field, trans, useCase)
         useCase.dataSet.get(field.stringId).makeOptional(trans.stringId)
     }
 
-    def hidden = { Field field, Transition trans ->
-        copyBehavior(field, trans)
+    def hidden = { Field field, Transition trans, Case useCase = this.useCase ->
+        copyBehavior(field, trans, useCase)
         useCase.dataSet.get(field.stringId).makeHidden(trans.stringId)
     }
 
-    def forbidden = { Field field, Transition trans ->
-        copyBehavior(field, trans)
+    def forbidden = { Field field, Transition trans, Case useCase = this.useCase ->
+        copyBehavior(field, trans, useCase)
         useCase.dataSet.get(field.stringId).makeForbidden(trans.stringId)
     }
 
-    def initial = { Field field, Transition trans ->
+    def initial = { Field field, Transition trans, Case useCase = this.useCase ->
         useCase.petriNet.transitions.get(trans.stringId).dataSet.get(field.stringId).behavior
     }
 
@@ -332,6 +335,8 @@ class ActionDelegate {
                                     behaviorClosureResult = behavior(field, trans)
                                     saveFieldBehavior(field, trans, (behavior == initial) ? behaviorClosureResult as Set : null)
                                 }
+                            } else if (trans instanceof Task) {
+                                saveFieldBehaviorWithTask(field, trans, behavior, behaviorClosureResult)
                             } else {
                                 throw new IllegalArgumentException("Invalid call of make method. Method call should contain a list of transitions.")
                             }
@@ -348,6 +353,8 @@ class ActionDelegate {
                         } else {
                             throw new IllegalArgumentException("Invalid call of make method. Method call should contain specific transition (transitions) or keyword \'transitions\'.")
                         }
+                    } else if (transitionObject instanceof Task) {
+                        saveFieldBehaviorWithTask(field, transitionObject, behavior, behaviorClosureResult)
                     } else {
                         throw new IllegalArgumentException("Invalid call of make method. Method call should contain specific transition (transitions) or keyword \'transitions\'.")
                     }
@@ -414,6 +421,10 @@ class ActionDelegate {
                                         saveFieldBehavior(field, trans, (behavior == initial) ? behaviorClosureResult as Set : null)
                                     }
                                 }
+                            } else if (trans instanceof Task) {
+                                fields.forEach { field ->
+                                    saveFieldBehaviorWithTask(field, trans, behavior, behaviorClosureResult)
+                                }
                             } else {
                                 throw new IllegalArgumentException("Invalid call of make method. Method call should contain a list of transitions.")
                             }
@@ -432,6 +443,10 @@ class ActionDelegate {
                         } else {
                             throw new IllegalArgumentException("Invalid call of make method. Method call should contain specific transition (transitions) or keyword \'transitions\'.")
                         }
+                    } else if (transitionObject instanceof Task) {
+                        fields.forEach { field ->
+                            saveFieldBehaviorWithTask(field, transitionObject, behavior, behaviorClosureResult)
+                        }
                     } else {
                         throw new IllegalArgumentException("Invalid call of make method. Method call should contain specific transition (transitions) or keyword \'transitions\'.")
                     }
@@ -440,11 +455,41 @@ class ActionDelegate {
         }]
     }
 
-    protected SetDataEventOutcome createSetDataEventOutcome() {
-        return new SetDataEventOutcome(this.useCase, this.task.orElse(null))
+    def makeInterProcess(List<String> fieldIds, Closure behavior) {
+        def behaviorClosureResult
+        [on: { List<String> taskIds ->
+            [when: { Closure condition ->
+                if (condition()) {
+                    if (taskIds instanceof List<?>) {
+                        taskIds.each { taskId ->
+                            if (taskId instanceof String) {
+                                fieldIds.each { fieldId ->
+                                    Task task = findTask(taskId)
+                                    Field<?> field = getFieldOfTask(taskId, fieldId)
+                                    saveFieldBehaviorWithTask(field, task, behavior, behaviorClosureResult)
+                                }
+                            } else {
+                                throw new IllegalArgumentException("Invalid call of make method. Method call should contain a list of task IDs.")
+                            }
+                        }
+                    }
+                }
+            }]
+        }]
     }
 
-    def saveFieldBehavior(Field field, Transition trans, Set<FieldBehavior> initialBehavior) {
+    protected void saveFieldBehaviorWithTask(Field<?> field, Task task, Closure behavior, def behaviorClosureResult) {
+        Case aCase = workflowService.findOne(task.caseId)
+        Transition transition = aCase.getPetriNet().getTransition(task.getTransitionId())
+        behaviorClosureResult = behavior(field, transition, aCase)
+        saveFieldBehavior(field, transition, (behavior == initial) ? behaviorClosureResult as Set : null, aCase, Optional.of(task))
+    }
+
+    protected SetDataEventOutcome createSetDataEventOutcome(Case useCase = this.useCase, Optional<Task> task = this.task) {
+        return new SetDataEventOutcome(useCase, task.orElse(null))
+    }
+
+    def saveFieldBehavior(Field field, Transition trans, Set<FieldBehavior> initialBehavior, Case useCase = this.useCase, Optional<Task> task = this.task) {
         Map<String, Set<FieldBehavior>> fieldBehavior = useCase.dataSet.get(field.stringId).behavior
         if (initialBehavior != null)
             fieldBehavior.put(trans.stringId, initialBehavior)
@@ -452,7 +497,7 @@ class ActionDelegate {
         ChangedField changedField = new ChangedField(field.stringId)
         changedField.addAttribute("type", field.type.name)
         changedField.addBehavior(fieldBehavior)
-        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        SetDataEventOutcome outcome = createSetDataEventOutcome(useCase, task)
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
     }
@@ -1950,4 +1995,9 @@ class ActionDelegate {
         }
     }
 
+    Field<?> getFieldOfTask(String taskId, String fieldId) {
+        Task task = taskService.findOne(taskId)
+        Case taskCase = workflowService.findOne(task.caseId)
+        return taskCase.getPetriNet().getDataSet().get(fieldId)
+    }
 }
