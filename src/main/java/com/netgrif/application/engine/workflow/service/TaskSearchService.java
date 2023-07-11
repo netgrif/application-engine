@@ -11,6 +11,7 @@ import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchReque
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -102,6 +103,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     private Predicate buildSingleQuery(TaskSearchRequest request, LoggedUser user, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
 
+        buildStringIdQuery(request, builder);
         buildRoleQuery(request, builder);
         buildCaseQuery(request, builder);
         buildTitleQuery(request, builder);
@@ -115,6 +117,18 @@ public class TaskSearchService extends MongoSearchService<Task> {
             return null;
         else
             return builder;
+    }
+
+    private void buildStringIdQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.stringId == null || request.stringId.isEmpty()) {
+            return;
+        }
+
+        query.and(
+                constructPredicateTree(
+                        request.stringId.stream().map(this::stringIdQuery).collect(Collectors.toList()),
+                        BooleanBuilder::or)
+        );
     }
 
     private void buildRoleQuery(TaskSearchRequest request, BooleanBuilder query) {
@@ -131,6 +145,10 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
     public Predicate roleQuery(String role) {
         return QTask.task.roles.containsKey(role);
+    }
+
+    public Predicate stringIdQuery(String id) {
+        return QTask.task._id.eq(new ObjectId(id));
     }
 
     public Predicate userRefQuery(String userId) {

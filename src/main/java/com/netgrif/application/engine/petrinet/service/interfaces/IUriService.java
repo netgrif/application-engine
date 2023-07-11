@@ -72,14 +72,6 @@ public interface IUriService {
     UriNode move(UriNode node, String destUri);
 
     /**
-     * Creates new UriNode from PetriNet identifier, or retrieves existing one
-     * @param petriNet to be used for creating UriNode
-     * @param contentType to decide the content type of UriNode
-     * @return the UriNode that was created or modified
-     * */
-    UriNode getOrCreate(PetriNet petriNet, UriContentType contentType);
-
-    /**
      * Creates new UriNode from URI path, or retrieves existing one
      * @param uri to be used for creating UriNode
      * @param contentType to decide the content type of UriNode
@@ -92,4 +84,9 @@ public interface IUriService {
      * @return the UriNode that was created or modified
      * */
     UriNode createDefault();
+
+    /**
+     * Returns configured uri separator
+     * */
+    String getUriSeparator();
 }

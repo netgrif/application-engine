@@ -135,7 +135,9 @@ public class ElasticCase {
     public void update(ElasticCase useCase) {
         version++;
         lastModified = useCase.getLastModified();
-        uriNodeId = useCase.getUriNodeId();
+        if (useCase.getUriNodeId() != null) {
+            uriNodeId = useCase.getUriNodeId();
+        }
         title = useCase.getTitle();
         taskIds = useCase.getTaskIds();
         taskMongoIds = useCase.getTaskMongoIds();
