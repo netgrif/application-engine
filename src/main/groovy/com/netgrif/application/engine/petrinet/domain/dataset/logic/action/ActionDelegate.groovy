@@ -489,7 +489,7 @@ class ActionDelegate {
      * @param list of field IDs which behaviour will be changed
      * @param behavior one of initial, visible, editable, required, optional, hidden, forbidden
      */
-    def makeInterProcess(List<String> fieldIds, Closure behavior) {
+    def makeInTask(List<String> fieldIds, Closure behavior) {
         def behaviorClosureResult
         [on: { List<String> taskIds ->
             [when: { Closure condition ->
