@@ -508,55 +508,55 @@ class ActionDelegate {
         return new SetDataEventOutcome(useCase, task.orElse(null))
     }
 
-    def saveFieldBehavior(Field field, Transition trans, Set<FieldBehavior> initialBehavior, Case useCase = this.useCase, Optional<Task> task = this.task) {
-        Map<String, Set<FieldBehavior>> fieldBehavior = useCase.dataSet.get(field.stringId).behavior
+    def saveFieldBehavior(Field field, Transition trans, Set<FieldBehavior> initialBehavior, Case targetCase = this.useCase, Optional<Task> targetTask = this.task) {
+        Map<String, Set<FieldBehavior>> fieldBehavior = targetCase.dataSet.get(field.stringId).behavior
         if (initialBehavior != null)
             fieldBehavior.put(trans.stringId, initialBehavior)
 
         ChangedField changedField = new ChangedField(field.stringId)
         changedField.addAttribute("type", field.type.name)
         changedField.addBehavior(fieldBehavior)
-        SetDataEventOutcome outcome = createSetDataEventOutcome(useCase, task)
+        SetDataEventOutcome outcome = createSetDataEventOutcome(targetCase, targetTask)
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
     }
 
-    def saveChangedChoices(ChoiceField field) {
-        useCase.dataSet.get(field.stringId).choices = field.choices
+    def saveChangedChoices(ChoiceField field, Case targetCase = this.useCase, Optional<Task> targetTask = this.task) {
+        targetCase.dataSet.get(field.stringId).choices = field.choices
         ChangedField changedField = new ChangedField(field.stringId)
         changedField.addAttribute("choices", field.choices.collect { it.getTranslation(LocaleContextHolder.locale) })
-        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        SetDataEventOutcome outcome = createSetDataEventOutcome(targetCase, targetTask)
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
     }
 
-    def saveChangedAllowedNets(CaseField field) {
-        useCase.dataSet.get(field.stringId).allowedNets = field.allowedNets
+    def saveChangedAllowedNets(CaseField field, Case targetCase = this.useCase, Optional<Task> targetTask = this.task) {
+        targetCase.dataSet.get(field.stringId).allowedNets = field.allowedNets
         ChangedField changedField = new ChangedField(field.stringId)
         changedField.addAttribute("allowedNets", field.allowedNets)
-        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        SetDataEventOutcome outcome = createSetDataEventOutcome(targetCase, targetTask)
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
     }
 
-    def saveChangedOptions(MapOptionsField field) {
-        useCase.dataSet.get(field.stringId).options = field.options
+    def saveChangedOptions(MapOptionsField field, Case targetCase = this.useCase, Optional<Task> targetTask = this.task) {
+        targetCase.dataSet.get(field.stringId).options = field.options
         ChangedField changedField = new ChangedField(field.stringId)
         changedField.addAttribute("options", field.options.collectEntries { key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)] })
-        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        SetDataEventOutcome outcome = createSetDataEventOutcome(targetCase, targetTask)
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
     }
 
-    def saveChangedValidation(Field field) {
-        useCase.dataSet.get(field.stringId).validations = field.validations
+    def saveChangedValidation(Field field, Case targetCase = this.useCase, Optional<Task> targetTask = this.task) {
+        targetCase.dataSet.get(field.stringId).validations = field.validations
         List<Validation> compiled = field.validations.collect { it.clone() }
         compiled.findAll { it instanceof DynamicValidation }.collect { (DynamicValidation) it }.each {
-            it.compiledRule = dataValidationExpressionEvaluator.compile(useCase, it.expression)
+            it.compiledRule = dataValidationExpressionEvaluator.compile(targetCase, it.expression)
         }
         ChangedField changedField = new ChangedField(field.stringId)
         changedField.addAttribute("validations", compiled.collect { it.getLocalizedValidation(LocaleContextHolder.locale) })
-        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        SetDataEventOutcome outcome = createSetDataEventOutcome(targetCase, targetTask)
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
     }
@@ -623,12 +623,27 @@ class ActionDelegate {
         return page.content.collect { it.stringId }
     }
 
-    def change(Field field) {
+    def change(String fieldId, String caseId, String taskId = null) {
+        Case targetCase
+        if (caseId != null) {
+            targetCase = workflowService.findOne(caseId)
+        } else {
+            targetCase = useCase
+        }
+        Task targetTask = null
+        if (taskId != null) {
+            targetTask = taskService.findOne(taskId)
+        }
+        Field field = targetCase.getPetriNet().getDataSet().get(fieldId)
+        change(field, targetCase, Optional.of(targetTask))
+    }
+
+    def change(Field field, Case targetCase = this.useCase, Optional<Task> targetTask = this.task) {
         [about      : { cl -> // TODO: deprecated
-            changeFieldValue(field, cl)
+            changeFieldValue(field, cl, targetCase, targetTask)
         },
          value      : { cl ->
-             changeFieldValue(field, cl)
+            changeFieldValue(field, cl, targetCase, targetTask)
          },
          choices    : { cl ->
              if (!(field instanceof MultichoiceField || field instanceof EnumerationField))
@@ -647,7 +662,7 @@ class ActionDelegate {
              } else {
                  field.setChoicesFromStrings(values as Set<String>)
              }
-             saveChangedChoices(field)
+             saveChangedChoices(field, targetCase, targetTask)
          },
          allowedNets: { cl ->
              if (!(field instanceof CaseField)) // TODO make this work with FilterField as well
@@ -665,7 +680,7 @@ class ActionDelegate {
              } else {
                  return
              }
-             saveChangedAllowedNets(field)
+             saveChangedAllowedNets(field, targetCase, targetTask)
          },
          options    : { cl ->
              if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField
@@ -687,7 +702,7 @@ class ActionDelegate {
                      options.each { it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String)) }
                      field.setOptions(newOptions)
                  }
-                 saveChangedOptions(field)
+                 saveChangedOptions(field, targetCase, targetTask)
              } else if (field instanceof ChoiceField) {
                  field = (ChoiceField) field
                  if (options.every { it.getValue() instanceof I18nString }) {
@@ -699,17 +714,17 @@ class ActionDelegate {
                      options.each { it -> newChoices.add(new I18nString(it.getValue() as String)) }
                      field.setChoices(newChoices)
                  }
-                 saveChangedChoices(field)
+                 saveChangedChoices(field, targetCase, targetTask)
              }
 
          },
          validations: { cl ->
-             changeFieldValidations(field, cl)
+             changeFieldValidations(field, cl, targetCase, targetTask)
          }
         ]
     }
 
-    void changeFieldValue(Field field, def cl) {
+    void changeFieldValue(Field field, def cl, Case targetCase = this.useCase, Optional<Task> targetTask = this.task) {
         def value = cl()
         if (value instanceof Closure) {
             if (value == initValueOfField) {
@@ -719,17 +734,17 @@ class ActionDelegate {
                 return
             }
         }
-        if (value == null && useCase.dataSet.get(field.stringId).value != null) {
-            if (field instanceof FileListField && task.isPresent()) {
+        if (value == null && targetCase.dataSet.get(field.stringId).value != null) {
+            if (field instanceof FileListField && targetTask.isPresent()) {
                 field.value.namesPaths.forEach(namePath -> {
-                    dataService.deleteFileByName(task.get().stringId, field.stringId, namePath.name)
+                    dataService.deleteFileByName(targetTask.get().stringId, field.stringId, namePath.name)
                 })
             }
-            if (field instanceof FileField && task.isPresent()) {
-                dataService.deleteFile(task.get().stringId, field.stringId)
+            if (field instanceof FileField && targetTask.isPresent()) {
+                dataService.deleteFile(targetTask.get().stringId, field.stringId)
             }
             field.clearValue()
-            saveChangedValue(field)
+            saveChangedValue(field, targetCase)
         }
         if (value != null) {
             if (field instanceof CaseField) {
@@ -745,10 +760,10 @@ class ActionDelegate {
                 value = new UserListFieldValue(users)
             }
             field.value = value
-            saveChangedValue(field)
+            saveChangedValue(field, targetCase)
         }
 
-        useCase = dataService.applyFieldConnectedChanges(useCase, field)
+        targetCase = dataService.applyFieldConnectedChanges(targetCase, field)
         ChangedField changedField = new ChangedField(field.stringId)
         if (field instanceof I18nField) {
             changedField.attributes.put("value", value)
@@ -756,16 +771,17 @@ class ActionDelegate {
             changedField.addAttribute("value", value)
         }
         changedField.addAttribute("type", field.type.name)
-        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        SetDataEventOutcome outcome = createSetDataEventOutcome(targetCase, targetTask)
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
     }
 
-    def saveChangedValue(Field field) {
-        useCase.dataSet.get(field.stringId).value = field.value
+    def saveChangedValue(Field field, Case targetCase = useCase) {
+        targetCase.dataSet.get(field.stringId).value = field.value
+        workflowService.save(targetCase)
     }
 
-    void changeFieldValidations(Field field, def cl) {
+    void changeFieldValidations(Field field, def cl, Case targetCase = this.useCase, Optional<Task> targetTask = this.task) {
         def valid = cl()
         if (valid == UNCHANGED_VALUE)
             return
@@ -784,7 +800,7 @@ class ActionDelegate {
             }
         }
         field.validations = newValidations
-        saveChangedValidation(field)
+        saveChangedValidation(field, targetCase, targetTask)
     }
 
     def always = { return ALWAYS_GENERATE }
