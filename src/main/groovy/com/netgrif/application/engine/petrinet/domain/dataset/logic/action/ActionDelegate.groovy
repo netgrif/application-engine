@@ -625,17 +625,17 @@ class ActionDelegate {
 
     def change(String fieldId, String caseId, String taskId = null) {
         Case targetCase
-        if (caseId != null) {
-            targetCase = workflowService.findOne(caseId)
-        } else {
-            targetCase = useCase
+        if (caseId == null) {
+            throw new IllegalArgumentException("Case ID cannot be null when setting data between processes.")
         }
+        targetCase = workflowService.findOne(caseId)
         Task targetTask = null
         if (taskId != null) {
             targetTask = taskService.findOne(taskId)
         }
         Field field = targetCase.getPetriNet().getDataSet().get(fieldId)
         change(field, targetCase, Optional.of(targetTask))
+        workflowService.save(targetCase)
     }
 
     def change(Field field, Case targetCase = this.useCase, Optional<Task> targetTask = this.task) {
@@ -778,7 +778,6 @@ class ActionDelegate {
 
     def saveChangedValue(Field field, Case targetCase = useCase) {
         targetCase.dataSet.get(field.stringId).value = field.value
-        workflowService.save(targetCase)
     }
 
     void changeFieldValidations(Field field, def cl, Case targetCase = this.useCase, Optional<Task> targetTask = this.task) {
