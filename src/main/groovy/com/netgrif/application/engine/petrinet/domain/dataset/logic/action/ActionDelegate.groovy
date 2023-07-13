@@ -474,6 +474,21 @@ class ActionDelegate {
         }]
     }
 
+    /**
+     * Changes behavior of given fields (given by field IDs) on given tasks (given by task IDs)  containing given fields if certain condition is being met.
+     * <br>
+     * Example 1:
+     * <pre>
+     *     taskRef: f.taskRef_0;
+     *     def taskIds = [taskRef.value[0]] as List
+     *     makeInterProcess ["field_Id"], editable on taskIds when {true}
+     *
+     * </pre>
+     * This code will change the behavior of fields <i>text</i> and <i>anotherText</i> to <i>visible</i> on given transition when field's <i>condition</i> value is equal to <i>true</i>.
+     *
+     * @param list of field IDs which behaviour will be changed
+     * @param behavior one of initial, visible, editable, required, optional, hidden, forbidden
+     */
     def makeInterProcess(List<String> fieldIds, Closure behavior) {
         def behaviorClosureResult
         [on: { List<String> taskIds ->
