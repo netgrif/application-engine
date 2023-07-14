@@ -1559,7 +1559,7 @@ class ActionDelegate {
 
     /**
      * deletes filter instance
-     * Note: do not call this method if given instance is referenced in any preference_item instance todo zjednodit na case
+     * Note: do not call this method if given instance is referenced in any preference_item instance
      * @param filter
      * @return
      */
@@ -1702,14 +1702,13 @@ class ActionDelegate {
          },
          uri           : { cl ->
              def uri = cl() as String
-             if (item.stringId == useCase.stringId) {
-                 moveMenuItem(useCase, uri)
-             } else {
-                 moveMenuItem(workflowService.findOne(item.stringId), uri)
+             def aCase = useCase
+             if (item.stringId != useCase.stringId) {
+                 aCase = workflowService.findOne(item.stringId)
              }
+             moveMenuItem(aCase, uri)
          },
          title         : { cl ->
-             item = workflowService.findOne(item.stringId)
              def value = cl()
              setData("item_settings", item, [
                      (PREFERENCE_ITEM_FIELD_MENU_NAME): ["type": "i18n", "value": new I18nString(value)]
@@ -1799,7 +1798,7 @@ class ActionDelegate {
     Case createMenuItem(MenuItemBody body) {
         String sanitizedIdentifier = sanitize(body.identifier)
 
-        if (findMenuItem(sanitizedIdentifier)) {
+        if (existsMenuItem(sanitizedIdentifier)) {
             throw new IllegalArgumentException("Menu item identifier $sanitizedIdentifier is not unique!")
         }
 
@@ -1868,7 +1867,9 @@ class ActionDelegate {
         return workflowService.findOne(menuItemCase.stringId)
     }
 
-    private String sanitize(String input) {
+
+
+    protected String sanitize(String input) {
         return Normalizer.normalize(input.trim(), Normalizer.Form.NFD)
                 .replaceAll("[^\\p{ASCII}]", "")
                 .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
@@ -1876,7 +1877,7 @@ class ActionDelegate {
                 .toLowerCase()
     }
 
-    private String createNodePath(String uri, String identifier) {
+    protected String createNodePath(String uri, String identifier) {
         if (uri == uriService.getUriSeparator()) {
             return uri + identifier
         } else {
@@ -1884,7 +1885,7 @@ class ActionDelegate {
         }
     }
 
-    private Case getOrCreateFolderItem(String uri) {
+    protected Case getOrCreateFolderItem(String uri) {
         UriNode node = uriService.getOrCreate(uri, UriContentType.CASE)
         MenuItemBody body = new MenuItemBody(new I18nString(node.name),"folder")
         return getOrCreateFolderRecursive(node, body)
@@ -1996,7 +1997,7 @@ class ActionDelegate {
             throw new IllegalArgumentException("Default title is empty")
         }
         String sanitizedIdentifier = sanitize(newIdentifier)
-        if (findMenuItem(sanitizedIdentifier)) {
+        if (existsMenuItem(sanitizedIdentifier)) {
             throw new IllegalArgumentException("View item identifier $sanitizedIdentifier is not unique!")
         }
 
@@ -2150,6 +2151,10 @@ class ActionDelegate {
         return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.menu_item_identifier.textValue.keyword:\"$menuItemIdentifier\"" as String)
     }
 
+    boolean existsMenuItem(String menuItemIdentifier) {
+        return findMenuItem(menuItemIdentifier)
+    }
+
     /**
      * find menu item by uri and name in default group
      * @param uri
@@ -2254,7 +2259,7 @@ class ActionDelegate {
     }
 
     Map<String, Case> createMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles, Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
-        if (findMenuItem(id)) {
+        if (existsMenuItem(id)) {
             log.info("$id menu exists")
             return
         }
@@ -2267,7 +2272,7 @@ class ActionDelegate {
     }
 
     Map<String, Case> createTaskMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles, Case group = null, List<String> defaultHeaders = []) {
-        if (findMenuItem(id)) {
+        if (existsMenuItem(id)) {
             log.info("$id menu exists")
             return
         }
