@@ -2152,7 +2152,7 @@ class ActionDelegate {
     }
 
     boolean existsMenuItem(String menuItemIdentifier) {
-        return findMenuItem(menuItemIdentifier)
+        return countCasesElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND dataSet.menu_item_identifier.fulltextValue.keyword:\"$menuItemIdentifier\"") > 0
     }
 
     /**
@@ -2224,6 +2224,12 @@ class ActionDelegate {
         request.query = query
         List<Case> result = elasticCaseService.search([request], userService.system.transformToLoggedUser(), pageable, LocaleContextHolder.locale, false).content
         return result
+    }
+
+    long countCasesElastic(String query) {
+        CaseSearchRequest request = new CaseSearchRequest()
+        request.query = query
+        return elasticCaseService.count([request], userService.system.transformToLoggedUser(), LocaleContextHolder.locale, false)
     }
 
     @Deprecated
