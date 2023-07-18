@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Component {
     @Getter
@@ -39,5 +40,10 @@ public class Component {
         this(name);
         this.properties = properties;
         this.optionIcons = optionIcons;
+    }
+
+    @Override
+    public Component clone() {
+        return new Component(this.name, new HashMap<>(this.properties), this.optionIcons == null ? new ArrayList<>() : this.optionIcons.stream().map(Icon::clone).collect(Collectors.toList()));
     }
 }

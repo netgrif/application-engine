@@ -37,4 +37,9 @@ class Expression {
     MetaClass getMetaClass() {
         return this.metaClass
     }
+
+    @Override
+     Expression clone() {
+        return new Expression(this.definition)
+    }
 }

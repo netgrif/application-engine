@@ -4,19 +4,19 @@ import com.netgrif.application.engine.petrinet.domain.I18nString
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class MultichoiceMapField extends MapOptionsField<I18nString, Set<String>> {
+class MultichoiceMapField extends MapOptionsField<I18nString, LinkedHashSet<String>> {
 
     MultichoiceMapField() {
         super()
-        this.defaultValue = new HashSet<>()
+        this.defaultValue = new LinkedHashSet<>()
     }
 
     MultichoiceMapField(Map<String, I18nString> choices) {
         super(choices)
-        this.defaultValue = new HashSet<>()
+        this.defaultValue = new LinkedHashSet<>()
     }
 
-    MultichoiceMapField(Map<String, I18nString> choices, Set<String> defaultValues) {
+    MultichoiceMapField(Map<String, I18nString> choices, LinkedHashSet<String> defaultValues) {
         this(choices)
         this.defaultValue = defaultValues
     }
@@ -37,12 +37,12 @@ class MultichoiceMapField extends MapOptionsField<I18nString, Set<String>> {
     }
 
     @Override
-    Set<String> getDefaultValue() {
+    LinkedHashSet<String> getDefaultValue() {
         return super.getDefaultValue() as Set<String>
     }
 
     @Override
-    void setDefaultValue(Set<String> defaultValue) {
+    void setDefaultValue(LinkedHashSet<String> defaultValue) {
         super.setDefaultValue(defaultValue)
     }
 
