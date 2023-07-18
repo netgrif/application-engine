@@ -5,7 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](https://github.com/netgrif/application-engine/commits/v6.3.0)
+Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.1](https://github.com/netgrif/application-engine/commits/v6.3.1)
+
+## [6.3.1](https://github.com/netgrif/application-engine/releases/tag/v6.3.1) (2023-07-18)
+
+### Fixed
+
+- [NAE-1807] Reference in Arc is not cloned properly
+- [NAE-1836] Actions cache is broken (for multiple versions of the same process)
+- [NAE-1864] Deleting process version removes instances of all versions of the same process
+- [NAE-1870] Indeterministic order in multichoice and multichoice map values
+
+### Added
+
+- [NAE-1891] Make URL function
+
 
 ## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2023-05-09)
 
