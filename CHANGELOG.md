@@ -20,7 +20,6 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.1](h
 
 - [NAE-1891] Make URL function
 
-
 ## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2023-05-26)
 
 ### Fixed
@@ -125,7 +124,6 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.1](h
 - [NAE-1693] TaskController deleteFile endpoint lacks data about tasks
 - [NAE-1714] Parameter processIdentifier in class CaseSearchRequest
 
-
 ## [6.2.1](https://github.com/netgrif/application-engine/releases/tag/v6.2.1) (2022-09-15)
 
 ### Fixed
@@ -141,7 +139,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.1](h
 - [NAE-1691] Default value number field after the change behavior
 - [NAE-1694] ProcessRoleService.findByImportId doesn't return list of process roles
 - [NAE-1699] Create/upload event action is loaded only from the cache
-- [NAE-1702] LdapUser unique dn 
+- [NAE-1702] LdapUser unique dn
 
 ### Changed
 
