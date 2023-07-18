@@ -769,7 +769,7 @@ public class DataService implements IDataService {
                 value = !(node.get("value") == null || node.get("value").isNull()) && node.get("value").asBoolean();
                 break;
             case "multichoice":
-                value = parseMultichoiceFieldValues(node).stream().map(I18nString::new).collect(Collectors.toSet());
+                value = parseMultichoiceFieldValues(node).stream().map(I18nString::new).collect(Collectors.toCollection(LinkedHashSet::new));
                 break;
             case "multichoice_map":
                 value = parseMultichoiceFieldValues(node);
@@ -856,7 +856,7 @@ public class DataService implements IDataService {
 
     private Set<String> parseMultichoiceFieldValues(ObjectNode node) {
         ArrayNode arrayNode = (ArrayNode) node.get("value");
-        HashSet<String> set = new HashSet<>();
+        HashSet<String> set = new LinkedHashSet<>();
         arrayNode.forEach(item -> set.add(item.asText()));
         return set;
     }

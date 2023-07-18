@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Slf4j
@@ -54,5 +55,17 @@ public class DataEvent extends BaseEvent {
         } else {
             this.getPostActions().add(action);
         }
+    }
+
+    @Override
+    public DataEvent clone() {
+        DataEvent clone = new DataEvent();
+        clone.setId(this.getId());
+        clone.setTitle(this.getTitle() == null ? null : this.getTitle().clone());
+        clone.setMessage(this.getMessage() == null ? null : this.getMessage().clone());
+        clone.setPreActions(this.getPreActions() == null ? null : getPreActions().stream().map(Action::clone).collect(Collectors.toList()));
+        clone.setPostActions(this.getPostActions() == null ? null : getPostActions().stream().map(Action::clone).collect(Collectors.toList()));
+        clone.setType(this.type);
+        return clone;
     }
 }
