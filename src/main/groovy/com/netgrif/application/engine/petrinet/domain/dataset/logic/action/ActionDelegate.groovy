@@ -1414,14 +1414,16 @@ class ActionDelegate {
     }
 
     /**
-     * create filter instance of type Case, to create a menu item call {@link #createMenuItem()}
-     * @param title
-     * @param query
-     * @param icon
-     * @param allowedNets
-     * @param visibility "private" or "public"
-     * @param filterMetadata
-     * @return
+     * Creates filter instance of type {@value DefaultFiltersRunner#FILTER_TYPE_CASE}
+     *
+     * @param title filter case title
+     * @param query elastic query for the view
+     * @param icon filter case icon
+     * @param allowedNets List of process identifiers
+     * @param visibility Possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
+     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
+     *
+     * @return created {@link Case} instance of filter
      */
     @NamedVariant
     Case createCaseFilter(def title, String query, List<String> allowedNets,
@@ -1430,14 +1432,16 @@ class ActionDelegate {
     }
 
     /**
-     * create filter instance of type Task, to create a menu item call {@link #createMenuItem()}
-     * @param title
-     * @param query
-     * @param icon
-     * @param allowedNets
-     * @param visibility "private" or "public"
-     * @param filterMetadata
-     * @return
+     * Creates filter instance of type {@value DefaultFiltersRunner#FILTER_TYPE_TASK}
+     *
+     * @param title filter case title
+     * @param query elastic query for the view
+     * @param icon filter case icon
+     * @param allowedNets List of process identifiers
+     * @param visibility Possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
+     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
+     *
+     * @return created {@link Case} instance of filter
      */
     @NamedVariant
     Case createTaskFilter(def title, String query, List<String> allowedNets,
@@ -1446,15 +1450,17 @@ class ActionDelegate {
     }
 
     /**
-     * create filter instance, to create a menu item call {@link #createMenuItem()}
-     * @param title
-     * @param query
-     * @param icon
-     * @param type "Case" or "Task"
-     * @param allowedNets
-     * @param visibility "private" or "public"
-     * @param filterMetadata
-     * @return
+     * Creates filter instance.
+     *
+     * @param title filter case title
+     * @param query elastic query for the view
+     * @param type Filter type. Possible values: {@value DefaultFiltersRunner#FILTER_TYPE_CASE} or {@value DefaultFiltersRunner#FILTER_TYPE_TASK}
+     * @param icon filter case icon
+     * @param allowedNets List of process identifiers
+     * @param visibility Possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
+     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
+     *
+     * @return created {@link Case} instance of filter
      */
     @NamedVariant
     Case createFilter(def title, String query, String type, List<String> allowedNets,
@@ -1488,11 +1494,24 @@ class ActionDelegate {
     }
 
     /**
-     * Change filter instance attribute; query, visibility ("public"/"private"), title, allowedNets, filterMetadata or uri
-     * if filter is referenced within a menu item, reload said menu item using
-     * changeMenuItem item filter { filter }
-     * @param filter
-     * @return
+     * Changes data of provided filter instance. These attributes can be changed:
+     * <ul>
+     * <li> <code>changeFilter filter query { "processIdentifier:"my_process_id" }</code>
+     * <li> <code>changeFilter filter visibility { "private" }</code>
+     * <li> <code>changeFilter filter allowedNets { ["my_process_id1","my_process_id2"] }</code>
+     * <li> <pre>changeFilter filter filterMetadata { [
+     "searchCategories"       : [],
+     "predicateMetadata"      : [],
+     "filterType"             : "Case",
+     "defaultSearchCategories": true,
+     "inheritAllowedNets"     : false
+ ] }</pre>
+     * <li> <code>changeFilter filter title { new I18nString("New title") }</code>
+     * <li> <code>changeFilter filter title { "New title" }</code>
+     * <li> <code>changeFilter filter icon { "filter_alt" }</code>
+     * <li> <code>changeFilter filter uri { "/my_node1/my_node2" }</code>
+     * </ul>
+     * @param filter {@link Case} instance of filter
      */
     def changeFilter(Case filter) {
         [query         : { cl ->
@@ -1668,7 +1687,21 @@ class ActionDelegate {
     }
 
     /**
-     * todo
+     * Creates item in menu with given parameters
+     *
+     * @param uri resource where the item is located in
+     * @param identifier unique identifier of item
+     * @param name displayed label in menu and tab
+     * @param icon displayed icon in menu and tab
+     * @param filter Case instance of filter.xml
+     * @param allowedRoles Map of roles, which have access to the item. Key is role_id in XML and value is process
+     * identifier where the role exists
+     * @param bannedRoles Map of roles, which don't have access to the item. Key is role_id in XML and value is process
+     * identifier where the role exists
+     * @param caseDefaultHeaders List of headers displayed in case view
+     * @param taskDefaultHeaders List of headers displayed in task view
+     *
+     * @return created Case of preference_item
      * */
     @NamedVariant
     Case createMenuItem(String uri, String identifier, def name, String icon = "filter_none", Case filter = null,
@@ -1689,11 +1722,20 @@ class ActionDelegate {
     }
 
     /**
-     * change menu item attribute allowedRoles, bannedRoles or uri
-     * usage:
-     *       changeMenuItem item allowedRoles { newRoles }
-     * @param item
-     * @return
+     * Changes data of provided preference_item instance. These attributes can be changed:
+     * <ul>
+     * <li> <code>changeMenuItem item allowedRoles { ["role_1":"my_process_id"] }</code>
+     * <li> <code>changeMenuItem item bannedRoles { ["role_1":"my_process_id"] }</code>
+     * <li> <code>changeMenuItem item caseDefaultHeaders { ["meta-title","meta-visualId"] }</code>
+     * <li> <code>changeMenuItem item taskDefaultHeaders { ["meta-title","meta-caseId"] }</code>
+     * <li> <code>changeMenuItem item filter { filterCase }</code>
+     * <li> <code>changeMenuItem item uri { "/my_node1/my_node2" }</code>
+     * <li> <code>changeMenuItem item title { new I18nString("New title") }</code>
+     * <li> <code>changeMenuItem item title { "New title" }</code>
+     * <li> <code>changeMenuItem item menuIcon { "filter_alt" }</code>
+     * <li> <code>changeMenuItem item tabIcon { "filter_none" }</code>
+     * </ul>
+     * @param item {@link Case} instance of preference_item.xml
      */
     def changeMenuItem(Case item) {
         [allowedRoles  : { cl ->
@@ -1831,7 +1873,27 @@ class ActionDelegate {
     }
 
     /**
-     * todo
+     * Creates filter and preference_item instances with given parameters.
+     *
+     * @param uri resource where the item is located in
+     * @param itemIdentifier unique identifier of item
+     * @param itemAndFilterName displayed label in menu and tab
+     * @param filterQuery elastic query for filter
+     * @param filterType type of filter. Possible values: {@value DefaultFiltersRunner#FILTER_TYPE_CASE} or
+     * {@value DefaultFiltersRunner#FILTER_TYPE_TASK}
+     * @param filterVisibility possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or
+     * {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
+     * @param filterAllowedNets List of allowed nets. Element of list is process identifier
+     * @param itemAndFilterIcon displayed icon in menu and tab
+     * @param itemAllowedRoles Map of roles, which have access to the item. Key is role_id in XML and value is process
+     * identifier where the role exists
+     * @param itemBannedRoles Map of roles, which don't have access to the item. Key is role_id in XML and value is process
+     * identifier where the role exists
+     * @param itemCaseDefaultHeaders List of headers displayed in case view
+     * @param itemTaskDefaultHeaders List of headers displayed in task view
+     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
+     *
+     * @return created {@link Case} instance of preference_item
      * */
     @NamedVariant
     Case createFilterInMenu(String uri, String itemIdentifier, def itemAndFilterName, String filterQuery,
@@ -1917,8 +1979,6 @@ class ActionDelegate {
         return workflowService.findOne(menuItemCase.stringId)
     }
 
-
-
     protected String sanitize(String input) {
         return Normalizer.normalize(input.trim(), Normalizer.Form.NFD)
                 .replaceAll("[^\\p{ASCII}]", "")
@@ -2000,6 +2060,14 @@ class ActionDelegate {
         return folder
     }
 
+    /**
+     * Changes location of menu item. If non-existing location is provided, the new location is created and then the
+     * item is moved. Cyclic destination path is forbidden (f.e. from <code>"/my_node"</code> to
+     * <code>"/my_node/my_node2"</code>
+     *
+     * @param item Instance of preference_item to be moved
+     * @param destUri destination path where the item will be moved. F.e. <code>"/my_new_node"</code>
+     * */
     void moveMenuItem(Case item, String destUri) {
         if (isCyclicNodePath(item, destUri)) {
             throw new IllegalArgumentException("Cyclic path not supported. Destination path: ${destUri}")
@@ -2039,6 +2107,16 @@ class ActionDelegate {
         }
     }
 
+    /**
+     * Duplicates menu item. It creates new preference_item instance with the same {@link Case#dataSet} as the provided
+     * item instance. The only difference is in title, menu_item_identifier and associations
+     *
+     * @param originItem Menu item instance, which is duplicated
+     * @param newTitle Title of menu item, that is displayed in menu and tab. Cannot be empty or null.
+     * @param newIdentifier unique menu item identifier
+     *
+     * @return duplicated {@link Case} instance of preference_item
+     * */
     Case duplicateMenuItem(Case originItem, I18nString newTitle, String newIdentifier) {
         if (!newIdentifier) {
             throw new IllegalArgumentException("View item identifier is null!")
@@ -2183,24 +2261,34 @@ class ActionDelegate {
     }
 
     /**
-     * find filter by uri and title
-     * @param uri
-     * @param name
-     * @return
+     * Finds filter by name
+     *
+     * @param name Title of the filter
+     *
+     * @return found filter instance. Can be null
      */
     Case findFilter(String name) {
         return findCaseElastic("processIdentifier:$FilterRunner.FILTER_PETRI_NET_IDENTIFIER AND title.keyword:\"$name\"" as String)
     }
 
     /**
-     * find menu item by unique identifier
-     * @param name
-     * @return
+     * Finds menu item by unique identifier
+     *
+     * @param menuItemIdentifier unique menu item identifier
+     *
+     * @return found preference_item instance. Can be null
      */
     Case findMenuItem(String menuItemIdentifier) {
         return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.menu_item_identifier.textValue.keyword:\"$menuItemIdentifier\"" as String)
     }
 
+    /**
+     * Checks the menu item existence.
+     *
+     * @param menuItemIdentifier unique menu item identifier
+     *
+     * @return true if the item exists
+     * */
     boolean existsMenuItem(String menuItemIdentifier) {
         return countCasesElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND dataSet.menu_item_identifier.fulltextValue.keyword:\"$menuItemIdentifier\"") > 0
     }
@@ -2246,10 +2334,11 @@ class ActionDelegate {
     }
 
     /**
-     * Retrieve filter case from preference_filter_item case
-     * @param item
-     * todo
-     * @return
+     * Retrieves filter case from preference_item {@link Case}
+     *
+     * @param item preference_item instance
+     *
+     * @return found filter instance. If not found, <code>null</code> is returned
      */
     Case getFilterFromMenuItem(Case item) {
         String filterId = (item.dataSet[PREFERENCE_ITEM_FIELD_FILTER_CASE].value as List)[0] as String
@@ -2381,7 +2470,21 @@ class ActionDelegate {
     }
 
     /**
-     * todo
+     * Creates or updates menu item with given identifier.
+     *
+     * @param uri resource where the item is located in
+     * @param identifier unique identifier of item
+     * @param name displayed label in menu and tab
+     * @param icon displayed icon in menu and tab
+     * @param filter Case instance of filter.xml
+     * @param allowedRoles Map of roles, which have access to the item. Key is role_id in XML and value is process
+     * identifier where the role exists
+     * @param bannedRoles Map of roles, which don't have access to the item. Key is role_id in XML and value is process
+     * identifier where the role exists
+     * @param caseDefaultHeaders List of headers displayed in case view
+     * @param taskDefaultHeaders List of headers displayed in task view
+     *
+     * @return created or updated menu item instance
      * */
     Case createOrUpdateMenuItem(String uri, String identifier, def name, String icon = "filter_none", Case filter = null,
                                 Map<String, String> allowedRoles = [:], Map<String, String> bannedRoles = [:],
@@ -2396,7 +2499,29 @@ class ActionDelegate {
     }
 
     /**
-     * todo
+     * Creates or updates menu item with given identifier along with the filter instance. It's safe to use on existing
+     * menu item instance, that doesn't contain filter. In such case, missing filter will be created with provided
+     * parameters.
+     *
+     * @param uri resource where the item is located in
+     * @param itemIdentifier unique identifier of item
+     * @param itemAndFilterName displayed label in menu and tab
+     * @param filterQuery elastic query for filter
+     * @param filterType type of filter. Possible values: {@value DefaultFiltersRunner#FILTER_TYPE_CASE} or
+     * {@value DefaultFiltersRunner#FILTER_TYPE_TASK}
+     * @param filterVisibility possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or
+     * {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
+     * @param filterAllowedNets List of allowed nets. Element of list is process identifier
+     * @param itemAndFilterIcon displayed icon in menu and tab
+     * @param itemAllowedRoles Map of roles, which have access to the item. Key is role_id in XML and value is process
+     * identifier where the role exists
+     * @param itemBannedRoles Map of roles, which don't have access to the item. Key is role_id in XML and value is process
+     * identifier where the role exists
+     * @param itemCaseDefaultHeaders List of headers displayed in case view
+     * @param itemTaskDefaultHeaders List of headers displayed in task view
+     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
+     *
+     * @return created or updated menu item instance along with the actual filter
      * */
     Case createOrUpdateMenuItemAndFilter(String uri, String itemIdentifier, def itemAndFilterName, String filterQuery,
                                          String filterType, String filterVisibility, List<String> filterAllowedNets = [],
@@ -2428,7 +2553,21 @@ class ActionDelegate {
     }
 
     /**
-     * todo
+     * Updates existing menu item with provided values.
+     *
+     * @param uri resource where the item is located in
+     * @param identifier unique identifier of item
+     * @param name displayed label in menu and tab
+     * @param icon displayed icon in menu and tab
+     * @param filter Case instance of filter.xml
+     * @param allowedRoles Map of roles, which have access to the item. Key is role_id in XML and value is process
+     * identifier where the role exists
+     * @param bannedRoles Map of roles, which don't have access to the item. Key is role_id in XML and value is process
+     * identifier where the role exists
+     * @param caseDefaultHeaders List of headers displayed in case view
+     * @param taskDefaultHeaders List of headers displayed in task view
+     *
+     * @return updated menu item instance
      * */
     Case updateMenuItem(Case item, String uri, String identifier, def name, String icon = "filter_none", Case filter = null,
                         Map<String, String> allowedRoles = [:], Map<String, String> bannedRoles = [:],
