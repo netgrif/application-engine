@@ -2322,7 +2322,7 @@ class ActionDelegate {
             log.info("$id menu exists")
             return null
         }
-        Case filter = createCaseFilter(title, query, allowedNets, icon, "private")
+        Case filter = createCaseFilter(title, query, allowedNets, icon, DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE)
         Case menu = createMenuItem(uri, id, filter, roles, bannedRoles, group, defaultHeaders)
         return [
                 "filter"  : filter,
@@ -2336,7 +2336,7 @@ class ActionDelegate {
             log.info("$id menu exists")
             return null
         }
-        Case filter = createTaskFilter(title, query, allowedNets, icon, "private")
+        Case filter = createTaskFilter(title, query, allowedNets, icon, DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE)
         Case menu = createMenuItem(uri, id, filter, roles, [:], group, defaultHeaders)
         return [
                 "filter"  : filter,

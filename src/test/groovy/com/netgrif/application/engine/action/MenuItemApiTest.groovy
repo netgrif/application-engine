@@ -38,8 +38,10 @@ class MenuItemApiTest {
     private static final String PREFERENCE_ITEM_FIELD_PARENT_ID = "parentId"
     private static final String PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS= "childItemIds"
     private static final String PREFERENCE_ITEM_FIELD_HAS_CHILDREN= "hasChildren"
+    private static final String PREFERENCE_ITEM_FIELD_FILTER_CASE = "filter_case"
     private static final String PREFERENCE_ITEM_FIELD_IDENTIFIER = "menu_item_identifier"
     private static final String PREFERENCE_ITEM_FIELD_ALLOWED_ROLES = "allowed_roles"
+    private static final String PREFERENCE_ITEM_FIELD_BANNED_ROLES = "banned_roles"
     private static final String PREFERENCE_ITEM_FIELD_NAME = "menu_name"
     private static final String PREFERENCE_ITEM_FIELD_ICON = "menu_icon"
     private static final String PREFERENCE_ITEM_FIELD_NODE_PATH = "nodePath"
@@ -94,9 +96,14 @@ class MenuItemApiTest {
         item = workflowService.populateUriNodeId(item)
         UriNode leafNode = uriService.findByUri("/netgrif/test/new_menu_item")
         assert item.uriNodeId == uriService.findByUri("/netgrif/test").id
-        assert item.dataSet[PREFERENCE_ITEM_FIELD_ICON].value == "filter_alt"
-        assert item.dataSet[PREFERENCE_ITEM_FIELD_NAME].value.toString() == "FILTER"
+        assert item.dataSet[PREFERENCE_ITEM_FIELD_ICON].value == "device_hub"
+        assert item.dataSet[PREFERENCE_ITEM_FIELD_NAME].value == new I18nString("FILTER")
         assert item.dataSet[PREFERENCE_ITEM_FIELD_IDENTIFIER].value.toString() == "new_menu_item"
+        assert (item.dataSet[PREFERENCE_ITEM_FIELD_FILTER_CASE].value as List)[0] == filter.stringId
+        assert item.dataSet[PREFERENCE_ITEM_FIELD_ALLOWED_ROLES].options.containsKey("role_1:filter_api_test")
+        assert item.dataSet[PREFERENCE_ITEM_FIELD_BANNED_ROLES].options.containsKey("role_2:filter_api_test")
+        assert item.dataSet[PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS].value == "meta-title,meta-title"
+        assert item.dataSet[PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS].value == "meta-title,meta-title"
 
         assert filter.dataSet["filter"].filterMetadata["filterType"] == "Case"
         assert filter.dataSet["filter"].allowedNets == ["filter", "preference_item"]
@@ -306,7 +313,6 @@ class MenuItemApiTest {
                 "allowed_nets": "filter,preference_item",
                 "query": "processIdentifier:filter OR processIdentifier:preference_item",
                 "type": "Case",
-                "group": null,
                 "identifier": identifier,
                 "icon": "device_hub",
                 "create_filter_and_menu": "0"
