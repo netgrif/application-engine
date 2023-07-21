@@ -30,7 +30,6 @@ import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FrontAction
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
@@ -420,7 +419,7 @@ class ActionDelegate {
      * @param list of fields which behaviour will be changed
      * @param behavior one of initial, visible, editable, required, optional, hidden, forbidden
      */
-    def make(List<Field> fields, Closure behavior) {
+    def make(List<?> fields, Closure behavior) {
         def behaviorClosureResult
 
         [on: { Object transitionObject ->
@@ -429,7 +428,7 @@ class ActionDelegate {
                     if (transitionObject instanceof Transition) {
                         fields.forEach { field ->
                             behaviorClosureResult = behavior(field, transitionObject)
-                            saveFieldBehavior(field, transitionObject, (behavior == initial) ? behaviorClosureResult as Set : null)
+                            saveFieldBehavior(field as Field, transitionObject, (behavior == initial) ? behaviorClosureResult as Set : null)
                         }
                     } else if (transitionObject instanceof List<?>) {
                         transitionObject.each { trans ->
@@ -437,12 +436,22 @@ class ActionDelegate {
                                 fields.each { field ->
                                     if (trans.dataSet.containsKey(field.stringId)) {
                                         behaviorClosureResult = behavior(field, trans)
-                                        saveFieldBehavior(field, trans, (behavior == initial) ? behaviorClosureResult as Set : null)
+                                        saveFieldBehavior(field as Field, trans, (behavior == initial) ? behaviorClosureResult as Set : null)
                                     }
                                 }
                             } else if (trans instanceof Task) {
                                 fields.forEach { field ->
-                                    saveFieldBehaviorWithTask(field, trans, behavior, behaviorClosureResult)
+                                    saveFieldBehaviorWithTask(field as Field<?>, trans, behavior, behaviorClosureResult)
+                                }
+                            } else if (trans instanceof String) {
+                                fields.each { fieldId ->
+                                    if (fieldId instanceof String) {
+                                        Task task = findTask(trans as String)
+                                        Field<?> field = getFieldOfTask(trans as String, fieldId as String)
+                                        saveFieldBehaviorWithTask(field, task, behavior, behaviorClosureResult)
+                                    } else {
+                                        throw new IllegalArgumentException("Invalid call of make method. If 'on' attribute represents list of task IDs, then field attribute should represent field IDs.")
+                                    }
                                 }
                             } else {
                                 throw new IllegalArgumentException("Invalid call of make method. Method call should contain a list of transitions.")
@@ -455,7 +464,7 @@ class ActionDelegate {
                                 fields.each { field ->
                                     if (trans.dataSet.containsKey(field.stringId)) {
                                         behaviorClosureResult = behavior(field, trans)
-                                        saveFieldBehavior(field, trans, (behavior == initial) ? behaviorClosureResult as Set : null)
+                                        saveFieldBehavior(field as Field, trans, (behavior == initial) ? behaviorClosureResult as Set : null)
                                     }
                                 }
                             }
@@ -468,44 +477,6 @@ class ActionDelegate {
                         }
                     } else {
                         throw new IllegalArgumentException("Invalid call of make method. Method call should contain specific transition (transitions) or keyword \'transitions\'.")
-                    }
-                }
-            }]
-        }]
-    }
-
-    /**
-     * Changes behavior of given fields (given by field IDs) on given tasks (given by task IDs)  containing given fields if certain condition is being met.
-     * <br>
-     * Example 1:
-     * <pre>
-     *     taskRef: f.taskRef_0;
-     *     def taskIds = [taskRef.value[0]] as List
-     *     makeInterProcess ["field_Id"], editable on taskIds when {true}
-     *
-     * </pre>
-     * This code will change the behavior of fields <i>text</i> and <i>anotherText</i> to <i>visible</i> on given transition when field's <i>condition</i> value is equal to <i>true</i>.
-     *
-     * @param list of field IDs which behaviour will be changed
-     * @param behavior one of initial, visible, editable, required, optional, hidden, forbidden
-     */
-    def makeInTask(List<String> fieldIds, Closure behavior) {
-        def behaviorClosureResult
-        [on: { List<String> taskIds ->
-            [when: { Closure condition ->
-                if (condition()) {
-                    if (taskIds instanceof List<?>) {
-                        taskIds.each { taskId ->
-                            if (taskId instanceof String) {
-                                fieldIds.each { fieldId ->
-                                    Task task = findTask(taskId)
-                                    Field<?> field = getFieldOfTask(taskId, fieldId)
-                                    saveFieldBehaviorWithTask(field, task, behavior, behaviorClosureResult)
-                                }
-                            } else {
-                                throw new IllegalArgumentException("Invalid call of make method. Method call should contain a list of task IDs.")
-                            }
-                        }
                     }
                 }
             }]
@@ -527,7 +498,7 @@ class ActionDelegate {
         Map<String, Set<FieldBehavior>> fieldBehavior = targetCase.dataSet.get(field.stringId).behavior
         if (initialBehavior != null)
             fieldBehavior.put(trans.stringId, initialBehavior)
-
+        saveTargetCase(targetCase)
         ChangedField changedField = new ChangedField(field.stringId)
         changedField.addAttribute("type", field.type.name)
         changedField.addBehavior(fieldBehavior)
@@ -538,6 +509,7 @@ class ActionDelegate {
 
     def saveChangedChoices(ChoiceField field, Case targetCase = this.useCase, Optional<Task> targetTask = this.task) {
         targetCase.dataSet.get(field.stringId).choices = field.choices
+        saveTargetCase(targetCase)
         ChangedField changedField = new ChangedField(field.stringId)
         changedField.addAttribute("choices", field.choices.collect { it.getTranslation(LocaleContextHolder.locale) })
         SetDataEventOutcome outcome = createSetDataEventOutcome(targetCase, targetTask)
@@ -547,6 +519,7 @@ class ActionDelegate {
 
     def saveChangedAllowedNets(CaseField field, Case targetCase = this.useCase, Optional<Task> targetTask = this.task) {
         targetCase.dataSet.get(field.stringId).allowedNets = field.allowedNets
+        saveTargetCase(targetCase)
         ChangedField changedField = new ChangedField(field.stringId)
         changedField.addAttribute("allowedNets", field.allowedNets)
         SetDataEventOutcome outcome = createSetDataEventOutcome(targetCase, targetTask)
@@ -556,6 +529,7 @@ class ActionDelegate {
 
     def saveChangedOptions(MapOptionsField field, Case targetCase = this.useCase, Optional<Task> targetTask = this.task) {
         targetCase.dataSet.get(field.stringId).options = field.options
+        saveTargetCase(targetCase)
         ChangedField changedField = new ChangedField(field.stringId)
         changedField.addAttribute("options", field.options.collectEntries { key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)] })
         SetDataEventOutcome outcome = createSetDataEventOutcome(targetCase, targetTask)
@@ -565,6 +539,7 @@ class ActionDelegate {
 
     def saveChangedValidation(Field field, Case targetCase = this.useCase, Optional<Task> targetTask = this.task) {
         targetCase.dataSet.get(field.stringId).validations = field.validations
+        saveTargetCase(targetCase)
         List<Validation> compiled = field.validations.collect { it.clone() }
         compiled.findAll { it instanceof DynamicValidation }.collect { (DynamicValidation) it }.each {
             it.compiledRule = dataValidationExpressionEvaluator.compile(targetCase, it.expression)
@@ -650,7 +625,6 @@ class ActionDelegate {
         }
         Field field = targetCase.getPetriNet().getDataSet().get(fieldId)
         change(field, targetCase, Optional.of(targetTask))
-        workflowService.save(targetCase)
     }
 
     def change(Field field, Case targetCase = this.useCase, Optional<Task> targetTask = this.task) {
@@ -791,8 +765,15 @@ class ActionDelegate {
         this.outcomes.add(outcome)
     }
 
+    def saveTargetCase(Case targetCase) {
+        if (targetCase != useCase) {
+            workflowService.save(targetCase)
+        }
+    }
+
     def saveChangedValue(Field field, Case targetCase = useCase) {
         targetCase.dataSet.get(field.stringId).value = field.value
+        saveTargetCase(targetCase)
     }
 
     void changeFieldValidations(Field field, def cl, Case targetCase = this.useCase, Optional<Task> targetTask = this.task) {
@@ -2456,5 +2437,15 @@ class ActionDelegate {
         Task task = taskService.findOne(taskId)
         Case taskCase = workflowService.findOne(task.caseId)
         return taskCase.getPetriNet().getDataSet().get(fieldId)
+    }
+
+    def test2() {
+        def taskId = ""
+        def caseId = ""
+        change "enumeration_map", caseId, taskId options {
+            ["david": "David",
+             "eve": "Eve",
+             "felix": "Felix"]
+        }
     }
 }

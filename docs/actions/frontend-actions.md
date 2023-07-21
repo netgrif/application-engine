@@ -15,11 +15,11 @@ Example:
     <id>data_set_event</id>
     <actions phase="post">
         <action id="action_0">
-            Frontend.redirec("login")
+            Frontend.redirect("login")
         </action>
     </actions>
 </event>
 ```
 
-This code is sent to frontend as an attribute of `changedField` object, then frontend parses it 
+This code is sent to frontend as an attribute of `outcome` object, then frontend parses it 
 and calls the required action.

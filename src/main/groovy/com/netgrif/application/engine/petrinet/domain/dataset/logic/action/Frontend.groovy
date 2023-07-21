@@ -9,9 +9,6 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes
 
 class Frontend {
 
-    private static final String FRONTEND_ACTIONS_KEY = "_frontend_actions"
-    private static final String ACTION = "action"
-
     Case useCase
     Optional<Task> task
     List<EventOutcome> outcomes
@@ -23,10 +20,8 @@ class Frontend {
     }
 
     def methodMissing(String name, Object args) {
-        ChangedField changedField = new ChangedField(FRONTEND_ACTIONS_KEY)
-        changedField.addAttribute(ACTION, Collections.singletonList(new FrontAction(name, args)))
         SetDataEventOutcome outcome = new SetDataEventOutcome(this.useCase, this.task.orElse(null))
-        outcome.addChangedField(FRONTEND_ACTIONS_KEY, changedField)
+        outcome.addFrontAction(new FrontAction(name, args))
         this.outcomes.add(outcome)
     }
 }
