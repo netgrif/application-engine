@@ -2438,14 +2438,4 @@ class ActionDelegate {
         Case taskCase = workflowService.findOne(task.caseId)
         return taskCase.getPetriNet().getDataSet().get(fieldId)
     }
-
-    def test2() {
-        def taskId = ""
-        def caseId = ""
-        change "enumeration_map", caseId, taskId options {
-            ["david": "David",
-             "eve": "Eve",
-             "felix": "Felix"]
-        }
-    }
 }
