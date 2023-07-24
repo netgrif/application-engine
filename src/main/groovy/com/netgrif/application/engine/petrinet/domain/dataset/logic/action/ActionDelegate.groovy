@@ -333,6 +333,13 @@ class ActionDelegate {
      *
      *     make text, visible on transitions when { condition.value == true }
      * </pre>
+     *
+     * Example 4:
+     * <pre>
+     *     taskRef: f.taskRef_0;
+     *     def taskIds = [taskRef.value[0]] as List
+     *     make ["referenced_text"], editable on taskIds when { true }
+     * </pre>
      * This code will change the field <i>text</i> behaviour to <i>visible</i> on each transition that contains the field <i>text</i> when field's <i>condition</i> value is equal to <i>true</i>.
      * @param field which behaviour will be changed
      * @param behavior one of initial, visible, editable, required, optional, hidden, forbidden
