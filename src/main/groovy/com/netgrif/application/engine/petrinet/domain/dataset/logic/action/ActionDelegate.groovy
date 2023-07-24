@@ -334,12 +334,6 @@ class ActionDelegate {
      *     make text, visible on transitions when { condition.value == true }
      * </pre>
      *
-     * Example 4:
-     * <pre>
-     *     taskRef: f.taskRef_0;
-     *     def taskIds = [taskRef.value[0]] as List
-     *     make ["referenced_text"], editable on taskIds when { true }
-     * </pre>
      * This code will change the field <i>text</i> behaviour to <i>visible</i> on each transition that contains the field <i>text</i> when field's <i>condition</i> value is equal to <i>true</i>.
      * @param field which behaviour will be changed
      * @param behavior one of initial, visible, editable, required, optional, hidden, forbidden
@@ -422,7 +416,21 @@ class ActionDelegate {
      *
      *     make [text, anotherText], visible on transitions when { condition.value == true }
      * </pre>
-     * This code will change the behavior of fields <i>text</i> and <i>anotherText</i> to <i>visible</i> on each transition that contains given fields when field's <i>condition</i> value is equal to <i>true</i>.
+     *
+     * Example 4:
+     * <pre>
+     *     taskRef: f.taskRef_0;
+     *     def taskIds = [taskRef.value[0]] as List
+     *     make ["referenced_text"], editable on taskIds when { true }
+     * </pre>
+     *
+     * Example 5:
+     * <pre>
+     *     taskRef: f.taskRef_0;
+     *     def tasks = [taskService.findOne(taskRef_0.value[0])] as List
+     *     def field = getFieldOfTask(tasks[0].stringId, "referenced_text")
+     *     make [field], editable on tasks when { true }
+     * </pre>
      * @param list of fields which behaviour will be changed
      * @param behavior one of initial, visible, editable, required, optional, hidden, forbidden
      */
