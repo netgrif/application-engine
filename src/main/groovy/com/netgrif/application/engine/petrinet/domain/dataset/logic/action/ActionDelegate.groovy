@@ -2435,21 +2435,21 @@ class ActionDelegate {
 
     @Deprecated
     Case createOrUpdateCaseMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles = [:], Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
-        return createOrUpdateMenuItemAndFilter(uri, id, title, query, DefaultFiltersRunner.FILTER_TYPE_CASE, "private",
-                allowedNets, icon, roles, bannedRoles, defaultHeaders)
+        return createOrUpdateMenuItemAndFilter(uri, id, title, query, DefaultFiltersRunner.FILTER_TYPE_CASE,
+                DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, allowedNets, icon, roles, bannedRoles, defaultHeaders)
     }
 
     @Deprecated
     Case createOrUpdateTaskMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles = [:], Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
-        return createOrUpdateMenuItemAndFilter(uri, id, title, query, DefaultFiltersRunner.FILTER_TYPE_TASK, "private",
-                allowedNets, icon, roles, bannedRoles, defaultHeaders)
+        return createOrUpdateMenuItemAndFilter(uri, id, title, query, DefaultFiltersRunner.FILTER_TYPE_TASK,
+                DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, allowedNets, icon, roles, bannedRoles, defaultHeaders)
     }
 
     @Deprecated
     Case createOrUpdateMenuItem(String id, String uri, String type, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles = [:], Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
         Case menuItem = findMenuItem(sanitize(id))
         if (!menuItem) {
-            Case filter = createFilter(title, query, type, allowedNets, icon, "private", null)
+            Case filter = createFilter(title, query, type, allowedNets, icon, DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, null)
             createUri(uri, UriContentType.DEFAULT)
 
             return createMenuItem(uri, id, title, icon, filter, roles, bannedRoles)
