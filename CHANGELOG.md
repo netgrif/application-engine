@@ -11,6 +11,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.4.0](h
 
 ### Added
 - [NAE-1901] Taskref list rendering update
+- [NAE-1497] Frontend Actions
 
 ## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2023-05-26)
 
