@@ -1953,8 +1953,8 @@ class ActionDelegate {
                         "value": nodePath
                 ],
                 (PREFERENCE_ITEM_FIELD_PARENT_ID)    : [
-                        "type" : "text",
-                        "value": parentItemCase?.stringId
+                        "type" : "caseRef",
+                        "value": parentItemCase ? [parentItemCase.stringId] : []
                 ],
                 (PREFERENCE_ITEM_FIELD_FILTER_CASE)    : [
                         "type" : "caseRef",
@@ -2002,9 +2002,6 @@ class ActionDelegate {
     }
 
     protected Case getOrCreateFolderRecursive(UriNode node, MenuItemBody body, Case childFolderCase = null) {
-        if (node.level < 1) {
-            return null
-        }
         Case folder = findFolderCase(node)
         if (folder != null) {
             if (childFolderCase != null) {
@@ -2075,16 +2072,16 @@ class ActionDelegate {
 
         List<Case> casesToSave = new ArrayList<>()
 
-        String parentId = item.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value
-        if (parentId != null) {
-            Case oldParent = removeChildItemFromParent(parentId, item)
+        List<String> parentIdList = item.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value as ArrayList<String>
+        if (parentIdList != null && parentIdList.size() > 0) {
+            Case oldParent = removeChildItemFromParent(parentIdList[0], item)
             casesToSave.add(oldParent)
         }
 
         UriNode destNode = uriService.getOrCreate(destUri, UriContentType.CASE)
         Case newParent = getOrCreateFolderItem(destNode.uriPath)
         if (newParent != null) {
-            item.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value = newParent.stringId
+            item.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value = [newParent.stringId] as ArrayList
             newParent = appendChildCaseId(newParent, item.stringId)
             casesToSave.add(newParent)
         } else {
@@ -2173,7 +2170,7 @@ class ActionDelegate {
         dataService.setData(newItemTask, ImportHelper.populateDataset(updatedDataSet))
         finishTask(newItemTask)
 
-        String parentId = originItem.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value
+        String parentId = (originItem.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value as ArrayList).get(0)
         if (parentId) {
             Case parent = workflowService.findOne(parentId)
             appendChildCaseIdAndSave(parent, duplicated.stringId)
@@ -2182,7 +2179,7 @@ class ActionDelegate {
     }
 
     private List<Case> updateNodeInChildrenFoldersRecursive(Case parentFolder) {
-        List<String> childItemIds = parentFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options?.collect { it.key }
+        List<String> childItemIds = parentFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value as List<String>
         if (childItemIds == null || childItemIds.isEmpty()) {
             return new ArrayList<Case>()
         }
@@ -2218,7 +2215,7 @@ class ActionDelegate {
 
     private Case removeChildItemFromParent(String folderId, Case childItem) {
         Case parentFolder = workflowService.findOne(folderId)
-        parentFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options.remove(childItem.stringId)
+        (parentFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value as List).remove(childItem.stringId)
         parentFolder.dataSet[PREFERENCE_ITEM_FIELD_HAS_CHILDREN].value = hasChildren(parentFolder)
         workflowService.save(parentFolder)
     }
@@ -2229,7 +2226,7 @@ class ActionDelegate {
     }
 
     private boolean hasChildren(Case folderItem) {
-        Map children = folderItem.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options
+        List children = folderItem.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value as List
         return children != null && children.size() > 0
     }
 
@@ -2239,11 +2236,11 @@ class ActionDelegate {
     }
 
     private Case appendChildCaseId(Case folderCase, String childItemCaseId) {
-        Map<String, I18nString> childIds = folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options
+        List<String> childIds = folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value as ArrayList<String>
         if (childIds == null) {
-            folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options = [(childItemCaseId): new I18nString()]
+            folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value = [childItemCaseId] as ArrayList
         } else {
-            folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options = childIds + [(childItemCaseId): new I18nString()]
+            folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value = childIds + [childItemCaseId] as ArrayList
         }
 
         folderCase.dataSet[PREFERENCE_ITEM_FIELD_HAS_CHILDREN].value = hasChildren(folderCase)
@@ -2252,7 +2249,7 @@ class ActionDelegate {
     }
     
     private Case initializeParentId(Case childFolderCase, String parentFolderCaseId) {
-        childFolderCase.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value = parentFolderCaseId
+        childFolderCase.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value = [parentFolderCaseId] as ArrayList
         return workflowService.save(childFolderCase)
     }
 

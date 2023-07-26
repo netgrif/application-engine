@@ -120,12 +120,12 @@ class MenuItemApiTest {
 
         assert testFolder != null && testNode != null
         assert testFolder.uriNodeId == testNode.id
-        assert testFolder.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value == netgrifFolder.stringId
-        assert testFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options.keySet().contains(item.stringId)
-        assert item.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value == testFolder.stringId
+        assert testFolder.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value == [netgrifFolder.stringId]
+        assert (testFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value as ArrayList).contains(item.stringId)
+        assert item.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value == [testFolder.stringId]
         assert netgrifFolder.uriNodeId == netgrifNode.id
-        assert netgrifFolder.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value == null
-        assert netgrifFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options.keySet().contains(testFolder.stringId)
+        assert netgrifFolder.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value == []
+        assert (netgrifFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value as ArrayList).contains(testFolder.stringId)
     }
 
     @Test
@@ -194,7 +194,7 @@ class MenuItemApiTest {
         Case folderCase = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${PREFERENCE_ITEM_FIELD_NODE_PATH}.textValue:\"/netgrif2\"", PageRequest.of(0, 1))[0]
 
         assert viewCase.uriNodeId == node.id
-        Set<String> childIds = folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options.keySet()
+        ArrayList<String> childIds = folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value as ArrayList<String>
         assert childIds.contains(viewId) && childIds.size() == 2
 
 
@@ -220,7 +220,7 @@ class MenuItemApiTest {
 
         folderCase = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${PREFERENCE_ITEM_FIELD_NODE_PATH}.textValue:\"/netgrif/test3\"", PageRequest.of(0, 1))[0]
         Case folderCase2 = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${PREFERENCE_ITEM_FIELD_NODE_PATH}.textValue:\"/netgrif\"", PageRequest.of(0, 1))[0]
-        assert folderCase != null && folderCase.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value == folderCase2.stringId
+        assert folderCase != null && folderCase.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value == [folderCase2.stringId]
 
         folderCase = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${PREFERENCE_ITEM_FIELD_NODE_PATH}.textValue:\"/netgrif/test3/netgrif2\"", PageRequest.of(0, 1))[0]
         assert folderCase != null
@@ -230,7 +230,7 @@ class MenuItemApiTest {
         assert folderCase.uriNodeId == node.id
         assert folderCase.dataSet[PREFERENCE_ITEM_FIELD_NODE_PATH].value == "/netgrif/test3/netgrif2"
 
-        childIds = folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options.keySet()
+        childIds = folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value as ArrayList<String>
         assert childIds.size() == 2
 
         folderCase = workflowService.findOne(childIds[0])
@@ -251,7 +251,7 @@ class MenuItemApiTest {
         Case apiCase = createMenuItem(starterUri, "new_menu_item")
         String itemId = apiCase.dataSet["menu_stringId"].value
         Case origin = workflowService.findOne(itemId)
-        Case testFolder = workflowService.findOne(origin.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value as String)
+        Case testFolder = workflowService.findOne((origin.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value as ArrayList<String>)[0])
 
         String newTitle = "New title"
         String newIdentifier = "new_identifier"
@@ -293,7 +293,7 @@ class MenuItemApiTest {
         assert duplicated.dataSet[PREFERENCE_ITEM_FIELD_NAME].value == new I18nString(newTitle)
         assert duplicated.dataSet[PREFERENCE_ITEM_FIELD_IDENTIFIER].value == newIdentifier
         assert duplicated.dataSet[PREFERENCE_ITEM_FIELD_NODE_PATH].value == "/netgrif/" + newIdentifier
-        assert duplicated.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options == [:]
+        assert duplicated.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value == []
         assert duplicated.dataSet[PREFERENCE_ITEM_FIELD_HAS_CHILDREN].value == false
         assert duplicated.activePlaces["initialized"] == 1
     }
@@ -327,17 +327,17 @@ class MenuItemApiTest {
         String leafItemId = apiCase.dataSet["menu_stringId"].value
 
         Case testFolder = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${PREFERENCE_ITEM_FIELD_NODE_PATH}.textValue:\"/netgrif/test\"", PageRequest.of(0, 1))[0]
-        String netgrifFolderId = testFolder.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value
+        String netgrifFolderId = (testFolder.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value as ArrayList<String>)[0]
 
         Case netgrifFolder = workflowService.findOne(netgrifFolderId)
-        assert netgrifFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options.containsKey(testFolder.stringId)
+        assert (netgrifFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value as ArrayList).contains(testFolder.stringId)
         assert workflowService.findOne(testFolder.stringId) != null
         assert workflowService.findOne(leafItemId) != null
 
         workflowService.deleteCase(testFolder)
         sleep(2000)
         netgrifFolder = workflowService.findOne(netgrifFolderId)
-        assert !netgrifFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options.containsKey(testFolder.stringId)
+        assert !(netgrifFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value as ArrayList).contains(testFolder.stringId)
         assertThrows(IllegalArgumentException.class, () -> {
             workflowService.findOne(testFolder.stringId)
         })
