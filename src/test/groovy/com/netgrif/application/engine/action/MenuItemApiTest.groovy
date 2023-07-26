@@ -111,12 +111,13 @@ class MenuItemApiTest {
         assert filter.dataSet["filter_type"].value == "Case"
         assert leafNode != null
 
-        Case testFolder = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${PREFERENCE_ITEM_FIELD_NODE_PATH}.textValue:\"/netgrif/test\"", PageRequest.of(0, 1))[0]
+        Case testFolder = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${PREFERENCE_ITEM_FIELD_NODE_PATH}.textValue.keyword:\"/netgrif/test\"", PageRequest.of(0, 1))[0]
         testFolder = workflowService.populateUriNodeId(testFolder)
-        Case netgrifFolder = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${PREFERENCE_ITEM_FIELD_NODE_PATH}.textValue:\"/netgrif\"", PageRequest.of(0, 1))[0]
+        Case netgrifFolder = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${PREFERENCE_ITEM_FIELD_NODE_PATH}.textValue.keyword:\"/netgrif\"", PageRequest.of(0, 1))[0]
         netgrifFolder = workflowService.populateUriNodeId(netgrifFolder)
         UriNode testNode = uriService.findByUri("/netgrif")
         UriNode netgrifNode = uriService.getRoot()
+        Case rootFolder = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${PREFERENCE_ITEM_FIELD_NODE_PATH}.textValue.keyword:\"/\"", PageRequest.of(0, 1))[0]
 
         assert testFolder != null && testNode != null
         assert testFolder.uriNodeId == testNode.id
@@ -124,8 +125,10 @@ class MenuItemApiTest {
         assert (testFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value as ArrayList).contains(item.stringId)
         assert item.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value == [testFolder.stringId]
         assert netgrifFolder.uriNodeId == netgrifNode.id
-        assert netgrifFolder.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value == []
+        assert netgrifFolder.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value == [rootFolder.stringId]
         assert (netgrifFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value as ArrayList).contains(testFolder.stringId)
+        assert rootFolder.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value == []
+        assert (rootFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value as ArrayList).contains(netgrifFolder.stringId)
     }
 
     @Test
