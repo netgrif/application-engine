@@ -377,16 +377,21 @@ public class WorkflowService implements IWorkflowService {
 
         taskService.deleteTasksByPetriNetId(net.getStringId());
         CaseSearchRequest request = new CaseSearchRequest();
-        request.process = Collections.singletonList(new CaseSearchRequest.PetriNet(net.getIdentifier(), net.getStringId()));
-
-        long pageCount = (elasticCaseService.count(Collections.singletonList(request), userService.getLoggedOrSystem().transformToLoggedUser(), Locale.getDefault(), false) / 100) + 1;
+        CaseSearchRequest.PetriNet netRequest = new CaseSearchRequest.PetriNet();
+        netRequest.processId = net.getStringId();
+        request.process = Collections.singletonList(netRequest);
+        long countCases = elasticCaseService.count(Collections.singletonList(request), userService.getLoggedOrSystem().transformToLoggedUser(), Locale.getDefault(), false);
+        log.info("[" + net.getStringId() + "]: User " + userService.getLoggedOrSystem().getStringId() + " is deleting " + countCases + " cases of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
+        long pageCount = (countCases / 100) + 1;
         LongStream.range(0, pageCount)
                 .forEach(i -> elasticCaseService.search(
-                        Collections.singletonList(request),
-                        userService.getLoggedOrSystem().transformToLoggedUser(),
-                        PageRequest.of((int) i, 100),
-                        Locale.getDefault(),
-                        false).getContent().forEach(this::deleteCase));
+                                Collections.singletonList(request),
+                                userService.getLoggedOrSystem().transformToLoggedUser(),
+                                PageRequest.of((int) i, 100),
+                                Locale.getDefault(),
+                                false)
+                        .getContent()
+                        .forEach(this::deleteCase));
     }
 
     @Override

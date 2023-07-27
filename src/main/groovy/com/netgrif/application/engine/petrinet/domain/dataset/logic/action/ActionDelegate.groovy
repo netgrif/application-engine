@@ -9,6 +9,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IRegistrationServi
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
+import com.netgrif.application.engine.configuration.PublicViewProperties
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
@@ -186,6 +187,9 @@ class ActionDelegate {
 
     @Autowired
     IHistoryService historyService
+
+    @Autowired
+    PublicViewProperties publicViewProperties
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -1941,4 +1945,7 @@ class ActionDelegate {
         }
     }
 
+    String makeUrl(String publicViewUrl = publicViewProperties.url, String identifier) {
+        return "${publicViewUrl}/${Base64.getEncoder().encodeToString(identifier.bytes)}" as String
+    }
 }

@@ -5,7 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](https://github.com/netgrif/application-engine/commits/v6.3.0)
+Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.1](https://github.com/netgrif/application-engine/commits/v6.3.1)
+
+## [6.3.1](https://github.com/netgrif/application-engine/releases/tag/v6.3.1) (2023-07-18)
+
+### Fixed
+
+- [NAE-1807] Reference in Arc is not cloned properly
+- [NAE-1836] Actions cache is broken (for multiple versions of the same process)
+- [NAE-1864] Deleting process version removes instances of all versions of the same process
+- [NAE-1870] Indeterministic order in multichoice and multichoice map values
+
+### Added
+
+- [NAE-1891] Make URL function
 
 ## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2023-05-26)
 
@@ -111,7 +124,6 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](h
 - [NAE-1693] TaskController deleteFile endpoint lacks data about tasks
 - [NAE-1714] Parameter processIdentifier in class CaseSearchRequest
 
-
 ## [6.2.1](https://github.com/netgrif/application-engine/releases/tag/v6.2.1) (2022-09-15)
 
 ### Fixed
@@ -127,7 +139,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](h
 - [NAE-1691] Default value number field after the change behavior
 - [NAE-1694] ProcessRoleService.findByImportId doesn't return list of process roles
 - [NAE-1699] Create/upload event action is loaded only from the cache
-- [NAE-1702] LdapUser unique dn 
+- [NAE-1702] LdapUser unique dn
 
 ### Changed
 
