@@ -9,6 +9,7 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import org.springframework.data.elasticsearch.annotations.Document;
 
 @Component
 @Slf4j
@@ -38,14 +39,37 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IElasticIndexService template
 
+
     @Override
     void run(String... args) throws Exception {
         if (drop) {
-            log.info("Dropping Elasticsearch database [${url}:${port}/${clusterName}]")
-            template.deleteIndex(ElasticCase.class)
-            template.deleteIndex(ElasticTask.class)
-            template.deleteIndex(UriNode.class)
+            log.info("Dropping Elasticsearch database [${url}:${port}/${clusterName}]");
+
+            String elasticCaseIndexName = getIndexNameFromClass(ElasticCase.class);
+            if (template.indexExists(elasticCaseIndexName)) {
+                template.deleteIndex(elasticCaseIndexName);
+            }
+
+            String elasticTaskIndexName = getIndexNameFromClass(ElasticTask.class);
+            if (template.indexExists(elasticTaskIndexName)) {
+                template.deleteIndex(elasticTaskIndexName);
+            }
+
+            String uriNodeIndexName = getIndexNameFromClass(UriNode.class);
+            if (template.indexExists(uriNodeIndexName)) {
+                template.deleteIndex(uriNodeIndexName);
+            }
+
+            template.getAllDynamicIndexes().forEach(indexName -> {
+                if (template.indexExists(indexName)) {
+                    log.info("Deleting dynamic index {}", indexName);
+                    template.deleteIndex(indexName);
+                } else {
+                    log.warn("Index {} does not exist, skipping deletion.", indexName);
+                }
+            });
         }
+
         if (!template.indexExists(caseIndex)) {
             log.info "Creating Elasticsearch case index [${caseIndex}]"
             template.createIndex(ElasticCase.class)
@@ -71,4 +95,13 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
         log.info("Updating Elasticsearch uri mapping [${uriProperties.index}]")
         template.putMapping(UriNode.class)
     }
+
+    public String getIndexNameFromClass(Class<?> clazz) {
+        Document documentAnnotation = clazz.getAnnotation(Document.class);
+        if (documentAnnotation != null) {
+            return documentAnnotation.indexName();
+        }
+        throw new IllegalArgumentException("The provided class does not have a Document annotation.");
+    }
+
 }

@@ -1,17 +1,16 @@
 package com.netgrif.application.engine.petrinet.service;
 
 import com.netgrif.application.engine.configuration.properties.UriProperties;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.UriContentType;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -29,6 +28,10 @@ public class UriService implements IUriService {
     private static final int FIRST_LEVEL = 0;
     private final UriNodeRepository uriNodeRepository;
     private final UriProperties uriProperties;
+
+
+    @Autowired
+    private IElasticIndexService indexService;
 
     public UriService(UriNodeRepository uriNodeRepository, UriProperties uriProperties) {
         this.uriNodeRepository = uriNodeRepository;
@@ -155,7 +158,9 @@ public class UriService implements IUriService {
 
         node.setParentId(newParent.getId());
         node.setUriPath(destUri + uriProperties.getSeparator() + node.getName());
-        return uriNodeRepository.save(node);
+        node = uriNodeRepository.save(node);
+        indexService.evictCache(node.getId());
+        return node;
     }
 
     /**
@@ -214,7 +219,16 @@ public class UriService implements IUriService {
             uriNodeList.add(uriNode);
             parent = uriNode;
         }
-        return uriNodeList.getLast();
+
+        UriNode node = uriNodeList.getLast();
+        if (node.getParentId() != null) {
+            UriNode root = getRoot();
+            if (Objects.equals(node.getParentId(), root.getId())) {
+                indexService.createIndex(node);
+                indexService.evictAllCaches();
+            }
+        }
+        return node;
     }
 
     /**

@@ -6,6 +6,7 @@ import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchReques
 import com.netgrif.application.engine.workflow.domain.Case;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
@@ -26,4 +27,12 @@ public interface IElasticCaseService {
     void remove(String caseId);
 
     void removeByPetriNetId(String processId);
+
+    void remove(String caseId, String uriNodeId);
+
+    void removeByPetriNetId(String processId, String uriNodeId);
+
+    List<ElasticCase> findAllByStringIdOrId(String stringId, String elasticId, IndexCoordinates indexCoordinates);
+
+    long countByLastModified(Case useCase, long timestamp);
 }

@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow.web;
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
+import com.netgrif.application.engine.elastic.domain.IndexAwareElasticSearchRequest;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
@@ -16,6 +17,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateCaseBody;
+import com.netgrif.application.engine.workflow.web.requestbodies.IndexAwareApiCaseSearchRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.*;
 import com.querydsl.core.types.Predicate;
 import io.swagger.v3.oas.annotations.Operation;
@@ -113,6 +115,27 @@ public class WorkflowController {
                 .search2(predicate, pageable, assembler)).withRel("search2");
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
+        return resources;
+    }
+
+    @Operation(summary = "Generic case search on Elasticsearch database", security = {@SecurityRequirement(name = "BasicAuth")})
+    @PostMapping(value = "/case/search_index", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public PagedModel<CaseResource> searchByIndex(@RequestBody IndexAwareApiCaseSearchRequest searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
+        LoggedUser user = (LoggedUser) auth.getPrincipal();
+        IndexAwareElasticSearchRequest elasticRequest;
+        if (searchBody.getSearchAll()) {
+            elasticRequest = IndexAwareElasticSearchRequest.all();
+        } else {
+            elasticRequest = IndexAwareElasticSearchRequest.ofMenuItems(searchBody.getMenuItemIds());
+        }
+        elasticRequest.addAll(searchBody.getBody());
+        Page<Case> cases = elasticCaseService.search(elasticRequest, user, pageable, locale, operation == MergeFilterOperation.AND);
+
+        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
+                .searchByIndex(searchBody, operation, pageable, assembler, auth, locale)).withRel("search_index");
+
+        PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
+        ResourceLinkAssembler.addLinks(resources, ElasticCase.class, selfLink.getRel().toString());
         return resources;
     }
 

@@ -4,15 +4,20 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
+import com.netgrif.application.engine.elastic.domain.IndexAwareElasticSearchRequest;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.application.engine.startup.SystemUserRunner;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import org.bson.types.ObjectId;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.slf4j.Logger;
@@ -20,21 +25,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.*;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHitSupport;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.data.elasticsearch.core.query.Order;
+import org.springframework.data.elasticsearch.core.query.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
+import static java.util.Map.entry;
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
 @Service
@@ -46,19 +49,29 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     private IWorkflowService workflowService;
 
+    private Executor executors;
+
     @Value("${spring.data.elasticsearch.index.case}")
     private String caseIndex;
 
     @Autowired
     private ElasticsearchRestTemplate template;
 
-    private Executor executors;
+
+    @Autowired
+    private IElasticIndexService indexService;
 
     @Autowired
     private IPetriNetService petriNetService;
 
     @Autowired
     private IElasticCasePrioritySearch iElasticCasePrioritySearch;
+
+    @Autowired
+    private SystemUserRunner systemUserRunner;
+
+//    @Autowired
+//    private IImpersonationElasticFilterService impersonationElasticFilterService;
 
     @Autowired
     public ElasticCaseService(ElasticCaseRepository repository, ElasticsearchRestTemplate template, Executor executors) {
@@ -75,61 +88,92 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     @Override
     public void remove(String caseId) {
+        log.warn("calling remove(String caseId): Use remove(String caseId, String uriNodeId) instead");
         executors.execute(caseId, () -> {
-            repository.deleteAllByStringId(caseId);
+            template.delete(getQueryForProperty("stringId", caseId),
+                    ElasticCase.class,
+                    IndexCoordinates.of(indexService.getAllDynamicIndexes().toArray(new String[0])));
             log.info("[" + caseId + "]: Case \"" + caseId + "\" deleted");
+        });
+    }
+
+    @Override
+    public void remove(String caseId, String uriNodeId) {
+        executors.execute(caseId, () -> {
+            template.delete(caseId, IndexCoordinates.of(getIndex(uriNodeId)));
+            log.info("[" + caseId + "][" + uriNodeId + "]: Case \"" + caseId + "\" deleted");
         });
     }
 
     @Override
     public void removeByPetriNetId(String processId) {
         executors.execute(processId, () -> {
-            repository.deleteAllByProcessId(processId);
-            log.info("[" + processId + "]: All cases of Petri Net with id \"" + processId + "\" deleted");
+            PetriNet net = petriNetService.get(new ObjectId(processId));
+            template.delete(getQueryForProperty("processId", processId), ElasticCase.class, IndexCoordinates.of(getIndex(net.getUriNodeId())));
+            log.info("[" + processId + "][" + net.getUriNodeId() + "]: All cases of Petri Net with id \"" + processId + "\" deleted");
         });
     }
 
     @Override
-    public void index(ElasticCase useCase) {
-        executors.execute(useCase.getStringId(), () -> {
-            try {
-                ElasticCase elasticCase = repository.findByStringId(useCase.getStringId());
-                if (elasticCase == null) {
-                    repository.save(useCase);
-                } else {
-                    elasticCase.update(useCase);
-                    repository.save(elasticCase);
-                }
-                log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
-            } catch (InvalidDataAccessApiUsageException ignored) {
-                log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" has duplicates, will be reindexed");
-                repository.deleteAllByStringId(useCase.getStringId());
-                repository.save(useCase);
-                log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
-            }
+    public void removeByPetriNetId(String processId, String uriNodeId) {
+        executors.execute(processId, () -> {
+            template.delete(getQueryForProperty("processId", processId), ElasticCase.class, IndexCoordinates.of(getIndex(uriNodeId)));
+            log.info("[" + processId + "][" + uriNodeId + "]: All cases of Petri Net with id \"" + processId + "\" deleted");
         });
     }
 
-    @Override
+  @Override
     public void indexNow(ElasticCase useCase) {
         index(useCase);
     }
 
     @Override
-    public Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
-        if (requests == null) {
-            throw new IllegalArgumentException("Request can not be null!");
-        }
+    public void index(ElasticCase useCase) {
+        executors.execute(useCase.getStringId(), () -> {
+            // stringId might not be indexed fast enough to prevent duplicity,
+            // we need to be able to search based on a case property that is indexed immediately: id
+            useCase.setId(useCase.getStringId());
+            String index = getIndex(useCase.getUriNodeId());
+            IndexCoordinates allIndexes = IndexCoordinates.of(getAllIndexes().toArray(new String[0]));
+            log.debug("[" + useCase.getStringId() + "] Indexing case in " + index);
 
-        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
-        pageable = resolveUnmappedSortAttributes(pageable);
-        NativeSearchQuery query = buildQuery(requests, loggedOrImpersonated, pageable, locale, isIntersection);
+            List<ElasticCase> existing = findAllByStringIdOrId(useCase.getStringId(), useCase.getStringId(), allIndexes);
+            if (existing.size() == 1) {
+                ElasticCase oneExisting = existing.get(0);
+                String oneExistingIndex = getIndex(oneExisting.getUriNodeId());
+                oneExisting.update(useCase);
+                if (!oneExistingIndex.equals(index)) {
+                    template.delete(oneExisting.getId(), IndexCoordinates.of(oneExistingIndex));
+                }
+            } else if (existing.size() > 1) {
+                // delete by id does not support multiple indexes in IndexCoordinates
+                existing.forEach(esCase -> template.delete(esCase.getId(), IndexCoordinates.of(getIndex(esCase.getUriNodeId()))));
+            }
+            doIndex(useCase, index);
+            log.debug("[" + useCase.getStringId() + "] Indexed case in " + index);
+        });
+    }
+
+    protected void doIndex(ElasticCase useCase, String index) {
+        IndexQuery indexQuery = new IndexQueryBuilder()
+                .withId(useCase.getId())
+                .withObject(useCase)
+                .build();
+        template.index(indexQuery, IndexCoordinates.of(index));
+    }
+
+
+    @Override
+    public Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+        IndexCoordinates indexCoordinates = validateRequestAndExtractIndexCoords(requests);
+
+        NativeSearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
         List<Case> casePage;
         long total;
         if (query != null) {
-            SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class, IndexCoordinates.of(caseIndex));
+            SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class, indexCoordinates);
             Page<ElasticCase> indexedCases = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
-            casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
+            casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).distinct().collect(Collectors.toList()));
             total = indexedCases.getTotalElements();
         } else {
             casePage = Collections.emptyList();
@@ -140,15 +184,65 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     @Override
+    public List<ElasticCase> findAllByStringIdOrId(String stringId, String elasticId, IndexCoordinates indexCoordinates) {
+        NativeSearchQuery query = getQueryForProperties(Map.ofEntries(
+                entry("stringId", stringId),
+                entry("_id", elasticId)
+        ), 0, 100, false);
+        SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class, indexCoordinates);
+        Page<ElasticCase> indexedCases = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
+        return indexedCases.getContent();
+    }
+
+    @Override
+    public long countByLastModified(Case useCase, long timestamp) {
+        IndexCoordinates index = IndexCoordinates.of(getIndex(useCase.getUriNodeId()));
+        NativeSearchQuery query = getQueryForProperties(Map.ofEntries(
+                entry("stringId", useCase.getStringId()),
+                entry("lastModified", timestamp)
+        ), 0, 100, true);
+        return template.count(query, ElasticCase.class, index);
+    }
+
+    protected NativeSearchQuery getQueryForProperty(String property, String value) {
+        return getQueryForProperty(property, value, 0, 100);
+    }
+
+    protected NativeSearchQuery getQueryForProperty(String property, String value, int page, int size) {
+        NativeSearchQueryBuilder builder = new NativeSearchQueryBuilder();
+        BoolQueryBuilder caseIdQuery = boolQuery();
+        caseIdQuery.must(termQuery(property, value));
+        return builder
+                .withQuery(caseIdQuery)
+                .withPageable(PageRequest.of(page, size))
+                .build();
+    }
+
+    protected NativeSearchQuery getQueryForProperties(Map<String, Object> props, int page, int size, boolean intersection) {
+        NativeSearchQueryBuilder builder = new NativeSearchQueryBuilder();
+        List<BoolQueryBuilder> queries = props.entrySet().stream().map(entry -> {
+            BoolQueryBuilder query = boolQuery();
+            query.must(termQuery(entry.getKey(), entry.getValue()));
+            return query;
+        }).collect(Collectors.toList());
+        BinaryOperator<BoolQueryBuilder> reductionOperator = intersection ? BoolQueryBuilder::must : BoolQueryBuilder::should;
+        return builder
+                .withQuery(queries.stream().reduce(new BoolQueryBuilder(), reductionOperator))
+                .withPageable(PageRequest.of(page, size))
+                .build();
+    }
+
+    @Override
     public long count(List<CaseSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
         if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
-        NativeSearchQuery query = buildQuery(requests, loggedOrImpersonated, new FullPageRequest(), locale, isIntersection);
+        IndexCoordinates indexCoordinates = validateRequestAndExtractIndexCoords(requests);
+
+        NativeSearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
-            return template.count(query, ElasticCase.class);
+            return template.count(query, ElasticCase.class, indexCoordinates);
         } else {
             return 0;
         }
@@ -180,18 +274,23 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     private BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, LoggedUser user, Locale locale) {
         BoolQueryBuilder query = boolQuery();
-
-        buildViewPermissionQuery(query, user);
-        buildPetriNetQuery(request, user, query);
+//        if (user.isImpersonating()) {
+//            addImpersonationAllowedProcessesConstraint(query, user);
+//        }
+        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        if (!loggedOrImpersonated.getId().equals(systemUserRunner.getLoggedSystem().getId())) {
+            buildViewPermissionQuery(query, loggedOrImpersonated);
+        }
+        buildPetriNetQuery(request, loggedOrImpersonated, query);
         buildAuthorQuery(request, query);
         buildTaskQuery(request, query);
         buildRoleQuery(request, query);
         buildDataQuery(request, query);
         buildFullTextQuery(request, query);
-        buildStringQuery(request, query, user);
+        buildStringQuery(request, query, loggedOrImpersonated);
         buildCaseIdQuery(request, query);
         buildUriNodeIdQuery(request, query);
-        boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
+        boolean resultAlwaysEmpty = buildGroupQuery(request, loggedOrImpersonated, locale, query);
 
         // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch
 
@@ -200,6 +299,10 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         else
             return query;
     }
+
+//    private void addImpersonationAllowedProcessesConstraint(BoolQueryBuilder query, LoggedUser user) {
+//        impersonationElasticFilterService.addImpersonationAllowedProcessesConstraint(query, user);
+//    }
 
     private void buildPetriNetQuery(CaseSearchRequest request, LoggedUser user, BoolQueryBuilder query) {
         if (request.process == null || request.process.isEmpty()) {
@@ -452,9 +555,52 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         return false;
     }
 
-    private Pageable resolveUnmappedSortAttributes(Pageable pageable) {
+    private Pageable resolveUnmappedSortAttributes(Pageable pageable) { //TODO: unuse ?? delete?
         List<Sort.Order> modifiedOrders = new ArrayList<>();
         pageable.getSort().iterator().forEachRemaining(order -> modifiedOrders.add(new Order(order.getDirection(), order.getProperty()).withUnmappedType("keyword")));
         return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()).withSort(Sort.by(modifiedOrders));
     }
+
+    protected String getIndex(String uriNodeId) {
+        return indexService.getIndex(uriNodeId);
+    }
+
+    protected List<String> getAllIndexes() {
+        return indexService.getAllIndexes();
+    }
+
+    protected List<String> getIndexes(IndexAwareElasticSearchRequest request) {
+        List<String> result = new ArrayList<>();
+        if (request.getIndexNames() != null && !request.getIndexNames().isEmpty()) {
+            if (request.doQueryAll()) {
+                result.addAll(indexService.getAllDynamicIndexes());
+            } else {
+                result.addAll(request.getIndexNames());
+            }
+        }
+        if (request.getMenuItemIds() != null) {
+            result.addAll(request.getMenuItemIds().stream().map(indexService::getIndexByMenuItemId).collect(Collectors.toList()));
+        }
+        return result;
+    }
+
+    /**
+     * validates request for nullability, collects requested indexes into IndexCoordinates
+     * @param requests List<CaseSearchRequest> | IndexAwareSearchRequest
+     * @return indexCoordinates
+     */
+    protected IndexCoordinates validateRequestAndExtractIndexCoords(List<CaseSearchRequest> requests) {
+        if (requests == null) {
+            throw new IllegalArgumentException("Request can not be null!");
+        }
+        List<String> indexes;
+        if (requests instanceof IndexAwareElasticSearchRequest) {
+            indexes = getIndexes((IndexAwareElasticSearchRequest) requests);
+        } else {
+            indexes = getAllIndexes();
+        }
+        return IndexCoordinates.of(indexes.toArray(new String[0]));
+    }
+
+
 }
