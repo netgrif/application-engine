@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.startup
 
+import com.netgrif.application.engine.configuration.ElasticsearchConfiguration
 import com.netgrif.application.engine.configuration.properties.UriProperties
 import com.netgrif.application.engine.elastic.domain.ElasticCase
 import com.netgrif.application.engine.elastic.domain.ElasticTask
@@ -9,7 +10,7 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import org.springframework.data.elasticsearch.annotations.Document;
+
 
 @Component
 @Slf4j
@@ -39,27 +40,23 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IElasticIndexService template
 
+    @Autowired
+    private ElasticsearchConfiguration properties
+
 
     @Override
     void run(String... args) throws Exception {
         if (drop) {
             log.info("Dropping Elasticsearch database [${url}:${port}/${clusterName}]");
-
-            String elasticCaseIndexName = getIndexNameFromClass(ElasticCase.class);
-            if (template.indexExists(elasticCaseIndexName)) {
-                template.deleteIndex(elasticCaseIndexName);
+            if (!template.indexExists(caseIndex)) {
+                template.deleteIndex(ElasticCase.class)
             }
-
-            String elasticTaskIndexName = getIndexNameFromClass(ElasticTask.class);
-            if (template.indexExists(elasticTaskIndexName)) {
-                template.deleteIndex(elasticTaskIndexName);
+            if (!template.indexExists(taskIndex)) {
+                template.deleteIndex(ElasticTask.class)
             }
-
-            String uriNodeIndexName = getIndexNameFromClass(UriNode.class);
-            if (template.indexExists(uriNodeIndexName)) {
-                template.deleteIndex(uriNodeIndexName);
+            if (!template.indexExists(uriProperties.index)) {
+                template.deleteIndex(UriNode.class)
             }
-
             template.getAllDynamicIndexes().forEach(indexName -> {
                 if (template.indexExists(indexName)) {
                     log.info("Deleting dynamic index {}", indexName);
@@ -68,6 +65,7 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
                     log.warn("Index {} does not exist, skipping deletion.", indexName);
                 }
             });
+            template.evictAllCaches();
         }
 
         if (!template.indexExists(caseIndex)) {
@@ -96,12 +94,5 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
         template.putMapping(UriNode.class)
     }
 
-    public String getIndexNameFromClass(Class<?> clazz) {
-        Document documentAnnotation = clazz.getAnnotation(Document.class);
-        if (documentAnnotation != null) {
-            return documentAnnotation.indexName();
-        }
-        throw new IllegalArgumentException("The provided class does not have a Document annotation.");
-    }
 
 }

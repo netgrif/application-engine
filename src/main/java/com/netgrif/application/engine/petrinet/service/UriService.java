@@ -29,7 +29,6 @@ public class UriService implements IUriService {
     private final UriNodeRepository uriNodeRepository;
     private final UriProperties uriProperties;
 
-
     @Autowired
     private IElasticIndexService indexService;
 

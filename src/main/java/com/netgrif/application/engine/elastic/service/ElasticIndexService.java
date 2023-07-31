@@ -94,7 +94,7 @@ public class ElasticIndexService implements IElasticIndexService {
     @Override
     @Cacheable("caseIndexDynamic")
     public List<String> getAllDynamicIndexes() {
-        List<UriNode> root = uriService.findByLevel(FIRST_LEVEL); // root might not exist yet (if called from within a runner)
+        List<UriNode> root = uriService.findByLevel(FIRST_LEVEL);
         if (root.isEmpty()) {
             return Collections.emptyList();
         }
