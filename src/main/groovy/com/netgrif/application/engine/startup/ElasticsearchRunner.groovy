@@ -48,23 +48,27 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
     void run(String... args) throws Exception {
         if (drop) {
             log.info("Dropping Elasticsearch database [${url}:${port}/${clusterName}]");
-            if (!template.indexExists(caseIndex)) {
+            if (template.indexExists(caseIndex)) {
                 template.deleteIndex(ElasticCase.class)
             }
-            if (!template.indexExists(taskIndex)) {
+            if (template.indexExists(taskIndex)) {
                 template.deleteIndex(ElasticTask.class)
             }
-            if (!template.indexExists(uriProperties.index)) {
+            try {
+                template.getAllDynamicIndexes().forEach(indexName -> {
+                    if (template.indexExists(indexName)) {
+                        log.info("Deleting dynamic index {}", indexName);
+                        template.deleteIndex(indexName);
+                    } else {
+                        log.warn("Index {} does not exist, skipping deletion.", indexName);
+                    }
+                })
+            } catch (Exception e){
+                log.warn("Index {} does not exist, skipping deletion.", e.message);
+            }
+            if (template.indexExists(uriProperties.index)) {
                 template.deleteIndex(UriNode.class)
             }
-            template.getAllDynamicIndexes().forEach(indexName -> {
-                if (template.indexExists(indexName)) {
-                    log.info("Deleting dynamic index {}", indexName);
-                    template.deleteIndex(indexName);
-                } else {
-                    log.warn("Index {} does not exist, skipping deletion.", indexName);
-                }
-            });
             template.evictAllCaches();
         }
 

@@ -45,18 +45,12 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     private static final Logger log = LoggerFactory.getLogger(ElasticCaseService.class);
 
-    private ElasticCaseRepository repository;
-
     private IWorkflowService workflowService;
 
     private Executor executors;
 
-    @Value("${spring.data.elasticsearch.index.case}")
-    private String caseIndex;
-
     @Autowired
     private ElasticsearchRestTemplate template;
-
 
     @Autowired
     private IElasticIndexService indexService;
@@ -74,8 +68,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 //    private IImpersonationElasticFilterService impersonationElasticFilterService;
 
     @Autowired
-    public ElasticCaseService(ElasticCaseRepository repository, ElasticsearchRestTemplate template, Executor executors) {
-        this.repository = repository;
+    public ElasticCaseService(ElasticsearchRestTemplate template, Executor executors) {
         this.template = template;
         this.executors = executors;
     }
