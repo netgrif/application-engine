@@ -566,7 +566,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         List<String> result = new ArrayList<>();
         if (request.getIndexNames() != null && !request.getIndexNames().isEmpty()) {
             if (request.doQueryAll()) {
-                result.addAll(indexService.getAllDynamicIndexes());
+                result.addAll(indexService.getAllIndexes());
             } else {
                 result.addAll(request.getIndexNames());
             }

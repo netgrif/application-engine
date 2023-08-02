@@ -123,7 +123,7 @@ public class WorkflowController {
     public PagedModel<CaseResource> searchByIndex(@RequestBody IndexAwareApiCaseSearchRequest searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         IndexAwareElasticSearchRequest elasticRequest;
-        if (searchBody.getSearchAll()) {
+        if (searchBody.getSearchAll() || searchBody.getMenuItemIds() == null || searchBody.getMenuItemIds().isEmpty()) {
             elasticRequest = IndexAwareElasticSearchRequest.all();
         } else {
             elasticRequest = IndexAwareElasticSearchRequest.ofMenuItems(searchBody.getMenuItemIds());

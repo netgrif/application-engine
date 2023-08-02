@@ -5,6 +5,7 @@ import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchReques
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.util.Optional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,7 +48,7 @@ public class IndexAwareElasticSearchRequest extends ArrayList<CaseSearchRequest>
     }
 
     public static IndexAwareElasticSearchRequest ofMenuItems(List<String> menuItemIds) {
-        return new IndexAwareElasticSearchRequest(Collections.unmodifiableList(menuItemIds), null);
+        return new IndexAwareElasticSearchRequest(Collections.unmodifiableList(Optional.ofNullable(menuItemIds).orElse(Collections.emptyList())), null);
     }
 
     public boolean doQueryAll() {
