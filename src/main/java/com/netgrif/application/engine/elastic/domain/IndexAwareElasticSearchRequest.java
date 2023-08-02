@@ -5,16 +5,11 @@ import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchReques
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.util.Optional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @NoArgsConstructor
 public class IndexAwareElasticSearchRequest extends ArrayList<CaseSearchRequest> implements List<CaseSearchRequest> {
-
-    public static final String QUERY_ALL_INDEXES = "_all_";
 
     /**
      * taskIds of task "view" in preference_menu_item (by default part of URL)
@@ -30,28 +25,33 @@ public class IndexAwareElasticSearchRequest extends ArrayList<CaseSearchRequest>
     @Setter
     private List<String> indexNames;
 
-    private IndexAwareElasticSearchRequest(List<String> menuItemIds, List<String> indexNames) {
+    @Getter
+    @Setter
+    private boolean allIndex;
+
+    private IndexAwareElasticSearchRequest(List<String> menuItemIds, List<String> indexNames, Boolean allIndex) {
         this.menuItemIds = menuItemIds;
         this.indexNames = indexNames;
+        this.allIndex = Objects.requireNonNullElse(allIndex, false);
     }
 
     public static IndexAwareElasticSearchRequest all() {
-        return new IndexAwareElasticSearchRequest(null, Collections.singletonList(QUERY_ALL_INDEXES));
+        return new IndexAwareElasticSearchRequest(null, null, true);
     }
 
     public static IndexAwareElasticSearchRequest ofIndex(String indexName) {
-        return new IndexAwareElasticSearchRequest(null, Collections.singletonList(indexName));
+        return new IndexAwareElasticSearchRequest(null, Collections.singletonList(indexName), false);
     }
 
     public static IndexAwareElasticSearchRequest ofIndexes(List<String> indexNames) {
-        return new IndexAwareElasticSearchRequest(null, Collections.unmodifiableList(indexNames));
+        return new IndexAwareElasticSearchRequest(null, Collections.unmodifiableList(indexNames), false);
     }
 
     public static IndexAwareElasticSearchRequest ofMenuItems(List<String> menuItemIds) {
-        return new IndexAwareElasticSearchRequest(Collections.unmodifiableList(Optional.ofNullable(menuItemIds).orElse(Collections.emptyList())), null);
+        return new IndexAwareElasticSearchRequest(Collections.unmodifiableList(Optional.ofNullable(menuItemIds).orElse(Collections.emptyList())), null, false);
     }
 
     public boolean doQueryAll() {
-        return this.indexNames != null && !this.indexNames.isEmpty() && this.indexNames.get(0).equals(QUERY_ALL_INDEXES);
+        return this.allIndex;
     }
 }

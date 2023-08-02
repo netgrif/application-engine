@@ -115,7 +115,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         });
     }
 
-  @Override
+    @Override
     public void indexNow(ElasticCase useCase) {
         index(useCase);
     }
@@ -565,11 +565,10 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     protected List<String> getIndexes(IndexAwareElasticSearchRequest request) {
         List<String> result = new ArrayList<>();
         if (request.getIndexNames() != null && !request.getIndexNames().isEmpty()) {
-            if (request.doQueryAll()) {
-                result.addAll(indexService.getAllIndexes());
-            } else {
-                result.addAll(request.getIndexNames());
-            }
+            result.addAll(request.getIndexNames());
+        }
+        if (request.doQueryAll()) {
+            result.addAll(indexService.getAllIndexes());
         }
         if (request.getMenuItemIds() != null) {
             result.addAll(request.getMenuItemIds().stream().map(indexService::getIndexByMenuItemId).collect(Collectors.toList()));
