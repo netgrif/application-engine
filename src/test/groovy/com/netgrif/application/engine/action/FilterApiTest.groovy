@@ -1,8 +1,10 @@
 package com.netgrif.application.engine.action
 
-
+import com.netgrif.application.engine.ReindexRetryHelper
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
+import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.UriContentType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
@@ -20,6 +22,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
@@ -51,6 +56,9 @@ class FilterApiTest {
 
     @Autowired
     private INextGroupService nextGroupService
+
+    @Autowired
+    IElasticCaseService elasticCaseService
 
     @BeforeEach
     void before() {
@@ -135,6 +143,17 @@ class FilterApiTest {
     void testFindFilter() {
         Case caze = createMenuItem()
         Case filter = getFilter(caze)
+
+        ReindexRetryHelper<Page<Case>> caseSearchHelper = new ReindexRetryHelper<>();
+
+        def caseReq = new CaseSearchRequest()
+        caseReq.stringId = [filter.getStringId()]
+        Page<Case> cases = caseSearchHelper.execute(
+                () -> elasticCaseService.search([caseReq], userService.getLoggedOrSystem().transformToLoggedUser(), PageRequest.of(0, 1), LocaleContextHolder.locale, false),
+                resultList -> resultList.size() != 0
+        )
+
+        assert cases.size() != 0
 
         caze = setData(caze, [
                 "find_filter": "0"
