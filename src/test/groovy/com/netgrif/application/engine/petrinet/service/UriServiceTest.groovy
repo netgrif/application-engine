@@ -52,7 +52,6 @@ class UriServiceTest {
     }
 
     @Test
-    @Disabled("Fix test")
     void getRootsTest() {
         UriNode root = uriService.getRoot()
         assert root.getParentId() == null
