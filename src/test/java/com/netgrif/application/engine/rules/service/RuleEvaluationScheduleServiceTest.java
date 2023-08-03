@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.rules.service;
 
+import com.netgrif.application.engine.ReindexRetryHelper;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
@@ -19,12 +20,16 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.TriggerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -64,6 +69,8 @@ class RuleEvaluationScheduleServiceTest {
     @Test
     void testScheduledRule() throws IOException, MissingPetriNetMetaDataException, RuleEvaluationScheduleException, InterruptedException, MissingIconKeyException {
         LoggedUser user = superCreator.getLoggedSuper();
+        ReindexRetryHelper<Case> caseSearchHelper = new ReindexRetryHelper<>();
+
         ImportPetriNetEventOutcome importOutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, user);
 
         StoredRule rule = StoredRule.builder()
@@ -84,7 +91,11 @@ class RuleEvaluationScheduleServiceTest {
         Thread.sleep(10000);
         String id = caseOutcome.getCase().getStringId();
         assert id != null;
-        Case caze = workflowService.findOne(id);
+
+       Case caze = caseSearchHelper.execute(
+                () -> workflowService.findOne(id),
+                cazeFinal ->  cazeFinal != null
+        );
         assert caze != null;
         assert caze.getDataSet().get("number_data").getValue().equals(5561.0);
 

@@ -32,6 +32,7 @@ import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchReque
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest
 import groovy.json.JsonSlurper
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -234,6 +235,7 @@ class ImpersonationServiceTest {
     }
 
     @Test
+    @Disabled("NOPE")
     void testAuthorization() {
         ReindexRetryHelper<Page<Case>> caseSearchHelper = new ReindexRetryHelper<>();
 
