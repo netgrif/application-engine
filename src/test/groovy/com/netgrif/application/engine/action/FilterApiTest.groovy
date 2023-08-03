@@ -196,7 +196,12 @@ class FilterApiTest {
     }
 
     def setData(Case caze, Map<String, String> dataSet) {
+        ReindexRetryHelper<Task> caseHelper = new ReindexRetryHelper<>()
         ReindexRetryHelper<Task> taskHelper = new ReindexRetryHelper<>()
+        caze = caseHelper.execute(
+                () -> workflowService.findOne(caze.stringId),
+                task -> caze.tasks[0].task != null
+        )
         String taskId = caze.tasks[0].task
         Task task = taskHelper.execute(
                 () -> taskService.findOne(taskId),
