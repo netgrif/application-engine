@@ -15,7 +15,7 @@ public class ReindexRetryHelper<T> {
     private static final long DEFAULT_MAX_LIMIT_WAIT_MS = 120000;
 
     private final int maxAttempts;
-    private long waitTimeMs;
+    private final long waitTimeMs;
 
     public ReindexRetryHelper() {
         this(DEFAULT_MAX_ATTEMPTS, DEFAULT_INITIAL_WAIT_MS);
