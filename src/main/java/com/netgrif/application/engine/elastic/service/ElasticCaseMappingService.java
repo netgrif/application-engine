@@ -102,8 +102,8 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformI18nField(com.netgrif.application.engine.workflow.domain.DataField dataField, com.netgrif.application.engine.petrinet.domain.dataset.I18nField netField) {
-        Set<String> keys = netField.getValue().getTranslations().keySet();
-        Set<String> values = new HashSet<>(netField.getValue().getTranslations().values());
+        Set<String> keys = ((I18nString)dataField.getValue()).getTranslations().keySet();
+        Set<String> values = new HashSet<>(((I18nString)dataField.getValue()).getTranslations().values());
         values.add(((I18nString) dataField.getValue()).getDefaultValue());
         return Optional.of(new I18nField(keys, values));
     }
