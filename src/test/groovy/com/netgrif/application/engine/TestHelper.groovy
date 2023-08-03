@@ -79,6 +79,7 @@ class TestHelper {
         elasticTaskRepository.deleteAll()
         elasticCaseRepository.deleteAll()
         uriNodeRepository.deleteAll()
+        elasticIndexService.evictAllCaches();
         userRepository.deleteAll()
         roleRepository.deleteAll()
         roleService.clearCache()
@@ -86,7 +87,6 @@ class TestHelper {
         actionsCacheService.clearFunctionCache()
         actionsCacheService.clearNamespaceFunctionCache()
         petriNetService.evictAllCaches()
-        elasticIndexService.evictAllCaches();
 
 
         defaultRoleRunner.run()

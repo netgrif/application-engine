@@ -1,11 +1,10 @@
 package com.netgrif.application.engine.elastic
 
 import com.netgrif.application.engine.MockService
+import com.netgrif.application.engine.ReindexRetryHelper
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.elastic.domain.ElasticCase
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
-import com.netgrif.application.engine.elastic.domain.ElasticTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
@@ -41,6 +40,8 @@ import java.sql.Timestamp
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.util.function.Predicate
+import java.util.function.Supplier
 
 @SpringBootTest()
 @ActiveProfiles(["test"])
@@ -96,15 +97,6 @@ class DataSearchRequestTest {
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
-//        template.deleteIndex(ElasticCase.class)
-        template.createIndex(ElasticCase.class)
-        template.putMapping(ElasticCase.class)
-
-//        template.deleteIndex(ElasticTask.class)
-        template.createIndex(ElasticTask.class)
-        template.putMapping(ElasticTask.class)
-
-        repository.deleteAll()
 
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
@@ -226,14 +218,19 @@ class DataSearchRequestTest {
 
     @Test
     void testDatSearchRequests() {
+        ReindexRetryHelper<Page<Case>> helper = new ReindexRetryHelper<>()
+
         testCases.each { testCase ->
-            CaseSearchRequest request = new CaseSearchRequest()
-            request.data = new HashMap<>()
-            request.data.put(testCase.getKey(), testCase.getValue())
+            CaseSearchRequest request = new CaseSearchRequest();
+            request.data = new HashMap<>();
+            request.data.put(testCase.getKey(), testCase.getValue());
 
-            log.info(String.format("Testing %s == %s", testCase.getKey(), testCase.getValue()))
+            log.info(String.format("Testing %s == %s", testCase.getKey(), testCase.getValue()));
 
-            Page<Case> result = searchService.search([request] as List, mockService.mockLoggedUser(), PageRequest.of(0, 100), null, false)
+            Supplier<Page<Case>> searchOperation = () -> searchService.search([request] as List, mockService.mockLoggedUser(), PageRequest.of(0, 100), null, false)
+            Predicate<Page<Case>> resultTest = result -> result.size() == 1
+
+            Page<Case> result = helper.execute(searchOperation, resultTest)
             assert result.size() == 1
         }
     }
