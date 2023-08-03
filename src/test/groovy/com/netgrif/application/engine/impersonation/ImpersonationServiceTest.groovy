@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.impersonation
 
+import com.netgrif.application.engine.ReindexRetryHelper
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.IUser
@@ -9,6 +10,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
+import com.netgrif.application.engine.impersonation.service.ImpersonationAuthorizationService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.petrinet.domain.I18nString
@@ -35,6 +37,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletRequest
@@ -232,16 +235,32 @@ class ImpersonationServiceTest {
 
     @Test
     void testAuthorization() {
-        def config = setup()
-        sleep(4000) // elastic
+        ReindexRetryHelper<Page<Case>> caseSearchHelper = new ReindexRetryHelper<>();
+
+        Case config = setup()
+        def caseReq = new CaseSearchRequest()
+        caseReq.stringId = [config.getStringId()]
+        Page<Case> cases = caseSearchHelper.execute(
+                () -> elasticCaseService.search([caseReq], userService.loggedUser.transformToLoggedUser(), PageRequest.of(0, 1), LocaleContextHolder.locale, false),
+                resultList -> resultList.size() != 0
+        )
+
+        assert cases.size() != 0
 
         def logged = userService.loggedUser.transformToLoggedUser()
         assert impersonationAuthorizationService.canImpersonate(logged, config.stringId)
         assert impersonationAuthorizationService.canImpersonateUser(logged, user2.stringId)
 
-        config.dataSet["valid_to"].value = LocalDateTime.now().minusMinutes(1)
+        def date = LocalDateTime.now().minusMinutes(1)
+        config.dataSet["valid_to"].value = date
         workflowService.save(config)
-        sleep(4000)
+
+        Page<Case> cases2 = caseSearchHelper.execute(
+                () -> elasticCaseService.search([caseReq], userService.loggedUser.transformToLoggedUser(), PageRequest.of(0, 1), LocaleContextHolder.locale, false),
+                resultList -> resultList.getContent().first().dataSet["valid_to"].value == date
+        )
+
+        assert cases2.size() != 0
 
         assert !impersonationAuthorizationService.canImpersonate(logged, config.stringId)
         assert !impersonationAuthorizationService.canImpersonateUser(logged, user2.stringId)
@@ -295,8 +314,8 @@ class ImpersonationServiceTest {
         assert json["impersonated"] == null
     }
 
-    def setup(List<String> roles = null, List<String> auths = null) {
-        def config = createConfigCase(user2, user1.stringId, roles, auths)
+    Case setup(List<String> roles = null, List<String> auths = null) {
+        Case config = createConfigCase(user2, user1.stringId, roles, auths)
         SecurityContextHolder.getContext().setAuthentication(auth1)
         return config
     }

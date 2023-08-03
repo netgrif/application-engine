@@ -3,6 +3,7 @@ package com.netgrif.application.engine.export.service
 import com.netgrif.application.engine.ReindexRetryHelper
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest
 import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
@@ -22,6 +23,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -57,6 +61,9 @@ class ExportServiceTest {
 
     @Autowired
     private IExportService exportService
+
+    @Autowired
+    private IElasticTaskService elasticTaskService;
 
     PetriNet testNet
     Case mainCase
@@ -138,8 +145,9 @@ class ExportServiceTest {
     @Test
     @Order(1)
     void testTaskElasticExport() {
-        ReindexRetryHelper<String> helperForExportTask = new ReindexRetryHelper<>();
-        ReindexRetryHelper<Task> helperForTask = new ReindexRetryHelper<>();
+        ReindexRetryHelper<String> helperForExportTask = new ReindexRetryHelper<>()
+        ReindexRetryHelper<Task> helperForTask = new ReindexRetryHelper<>()
+        ReindexRetryHelper<Long> export = new ReindexRetryHelper<>()
 
         String exportTask = helperForExportTask.execute(
                 () -> mainCase.tasks.find { it.transition == "t4" }.task,
@@ -159,9 +167,12 @@ class ExportServiceTest {
         taskRequest.process = [new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(processId)] as List
         taskRequest.transitionId = ["t4"] as List
 
-        sleep(9000)
+        export.execute(
+                () -> elasticTaskService.count([taskRequest], userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), LocaleContextHolder.getLocale(), false),
+                result -> result == 10
+        )
 
-        actionDelegate.exportTasksToFile([taskRequest],"src/test/resources/csv/task_elastic_export.csv",null, userService.findByEmail("super@netgrif.com", false).transformToLoggedUser())
+        actionDelegate.exportTasksToFile([taskRequest], "src/test/resources/csv/task_elastic_export.csv", null, userService.findByEmail("super@netgrif.com", false).transformToLoggedUser())
         File csvFile = new File("src/test/resources/csv/task_elastic_export.csv")
         int pocet = ((taskRepository.count(QTask.task.processId.eq(processId).and(QTask.task.transitionId.eq("t4"))) as int) + 1)
         assert csvFile.readLines().size() == pocet
