@@ -13,7 +13,9 @@ import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
+import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Disabled
@@ -50,6 +52,9 @@ class FilterApiTest {
 
     @Autowired
     private IDataService dataService
+
+    @Autowired
+    protected ITaskService taskService;
 
     @Autowired
     private IUriService uriService
@@ -96,12 +101,12 @@ class FilterApiTest {
         Case caze = createMenuItem()
         def newUri = uriService.getOrCreate("netgrif/test_new", UriContentType.DEFAULT)
         caze = setData(caze, [
-                "uri": newUri.uriPath,
-                "title": "CHANGED FILTER",
-                "allowed_nets": "filter",
-                "query": "processIdentifier:filter",
-                "type": "Case",
-                "icon": "",
+                "uri"                   : newUri.uriPath,
+                "title"                 : "CHANGED FILTER",
+                "allowed_nets"          : "filter",
+                "query"                 : "processIdentifier:filter",
+                "type"                  : "Case",
+                "icon"                  : "",
                 "change_filter_and_menu": "0"
         ])
         Case item = getMenuItem(caze)
@@ -165,14 +170,14 @@ class FilterApiTest {
     Case createMenuItem() {
         Case caze = getCase()
         caze = setData(caze, [
-                "uri": "netgrif/test",
-                "title": "FILTER",
-                "allowed_nets": "filter,preference_filter_item",
-                "query": "processIdentifier:filter OR processIdentifier:preference_filter_item",
-                "type": "Case",
-                "group": null,
-                "identifier": "new_menu_item",
-                "icon": "device_hub",
+                "uri"                   : "netgrif/test",
+                "title"                 : "FILTER",
+                "allowed_nets"          : "filter,preference_filter_item",
+                "query"                 : "processIdentifier:filter OR processIdentifier:preference_filter_item",
+                "type"                  : "Case",
+                "group"                 : null,
+                "identifier"            : "new_menu_item",
+                "icon"                  : "device_hub",
                 "create_filter_and_menu": "0"
         ])
         return caze
@@ -191,7 +196,13 @@ class FilterApiTest {
     }
 
     def setData(Case caze, Map<String, String> dataSet) {
-        dataService.setData(caze.tasks[0].task, ImportHelper.populateDataset(dataSet.collectEntries {
+        ReindexRetryHelper<Task> taskHelper = new ReindexRetryHelper<>()
+        String taskId = caze.tasks[0].task
+        Task task = taskHelper.execute(
+                () -> taskService.findOne(taskId),
+                task -> task != null
+        )
+        dataService.setData(task, ImportHelper.populateDataset(dataSet.collectEntries {
             [(it.key): (["value": it.value, "type": "text"])]
         }))
         return workflowService.findOne(caze.stringId)
