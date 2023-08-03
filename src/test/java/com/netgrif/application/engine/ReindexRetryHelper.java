@@ -10,8 +10,9 @@ import java.util.function.Supplier;
 @Profile("test")
 public class ReindexRetryHelper<T> {
 
-    private static final int DEFAULT_MAX_ATTEMPTS = 5;
-    private static final long DEFAULT_INITIAL_WAIT_MS = 1000;
+    private static final int DEFAULT_MAX_ATTEMPTS = 10;
+    private static final long DEFAULT_INITIAL_WAIT_MS = 5000;
+    private static final long DEFAULT_MAX_LIMIT_WAIT_MS = 120000;
 
     private final int maxAttempts;
     private long waitTimeMs;
@@ -41,6 +42,9 @@ public class ReindexRetryHelper<T> {
                 log.debug("Operation failed on attempt number {}. Retrying in {} ms", attempt + 1, waitTime);
                 Thread.sleep(waitTime);
                 waitTime *= 2;
+                if(waitTime > DEFAULT_MAX_LIMIT_WAIT_MS){
+                    waitTime = DEFAULT_MAX_LIMIT_WAIT_MS;
+                }
             }
 
             attempt++;
