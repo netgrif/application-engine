@@ -105,6 +105,9 @@ class ActionDelegate {
     private static final String PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE= "duplicate_new_title"
     private static final String PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER = "duplicate_view_identifier"
     private static final String PREFERENCE_ITEM_FIELD_DUPLICATE_RESET_CHILD_ITEM_IDS = "duplicate_reset_childItemIds"
+    private static final String PREFERENCE_ITEM_FIELD_REQUIRE_TITLE_IN_CREATION = "case_require_title_in_creation"
+    private static final String PREFERENCE_ITEM_FIELD_USE_CUSTOM_VIEW = "use_custom_view"
+    private static final String PREFERENCE_ITEM_FIELD_CUSTOM_VIEW_SELECTOR = "custom_view_selector"
     private static final String PREFERENCE_ITEM_SETTINGS_TRANS_ID = "item_settings"
 
     private static final String FILTER_FIELD_I18N_FILTER_NAME = "i18n_filter_name"
@@ -1594,16 +1597,19 @@ class ActionDelegate {
     @Deprecated
     Case createMenuItem(String uri, String identifier, Case filter, String groupName, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
         MenuItemBody body = new MenuItemBody(
-                filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
-                null,
                 uri,
                 identifier,
-                filter,
-                caseDefaultHeaders,
-                taskDefaultHeaders,
-                collectRolesForPreferenceItem(allowedRoles),
-                collectRolesForPreferenceItem(bannedRoles)
+                filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
+                null
         )
+        body.setFilter(filter)
+        body.setCaseDefaultHeaders(caseDefaultHeaders)
+        body.setTaskDefaultHeaders(taskDefaultHeaders)
+        body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
+        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
+        body.setUseCustomView(false)
+        body.setCaseRequireTitleInCreation(true)
+
         return createMenuItem(body)
     }
 
@@ -1620,16 +1626,19 @@ class ActionDelegate {
     @Deprecated
     Case createMenuItem(String uri, String identifier, Case filter, String groupName, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
         MenuItemBody body = new MenuItemBody(
-                filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
-                null,
                 uri,
                 identifier,
-                filter,
-                caseDefaultHeaders,
-                taskDefaultHeaders,
-                collectRolesForPreferenceItem(allowedRoles),
-                collectRolesForPreferenceItem(bannedRoles)
+                filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
+                null
         )
+        body.setFilter(filter)
+        body.setCaseDefaultHeaders(caseDefaultHeaders)
+        body.setTaskDefaultHeaders(taskDefaultHeaders)
+        body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
+        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
+        body.setUseCustomView(false)
+        body.setCaseRequireTitleInCreation(true)
+
         return createMenuItem(body)
     }
 
@@ -1647,16 +1656,19 @@ class ActionDelegate {
     @Deprecated
     Case createMenuItem(String uri, String identifier, Case filter, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], Case group = null, List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
         MenuItemBody body = new MenuItemBody(
-                filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
-                null,
                 uri,
                 identifier,
-                filter,
-                caseDefaultHeaders,
-                taskDefaultHeaders,
-                collectRolesForPreferenceItem(allowedRoles),
-                collectRolesForPreferenceItem(bannedRoles)
+                filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
+                null
         )
+        body.setFilter(filter)
+        body.setCaseDefaultHeaders(caseDefaultHeaders)
+        body.setTaskDefaultHeaders(taskDefaultHeaders)
+        body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
+        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
+        body.setUseCustomView(false)
+        body.setCaseRequireTitleInCreation(true)
+
         return createMenuItem(body)
     }
 
@@ -1673,16 +1685,19 @@ class ActionDelegate {
     @Deprecated
     Case createMenuItem(String uri, String identifier, Case filter, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], Case group = null, List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
         MenuItemBody body = new MenuItemBody(
-                filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
-                null,
                 uri,
                 identifier,
-                filter,
-                caseDefaultHeaders,
-                taskDefaultHeaders,
-                collectRolesForPreferenceItem(allowedRoles),
-                collectRolesForPreferenceItem(bannedRoles)
+                filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
+                null
         )
+        body.setFilter(filter)
+        body.setCaseDefaultHeaders(caseDefaultHeaders)
+        body.setTaskDefaultHeaders(taskDefaultHeaders)
+        body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
+        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
+        body.setUseCustomView(false)
+        body.setCaseRequireTitleInCreation(true)
+
         return createMenuItem(body)
     }
 
@@ -1708,16 +1723,19 @@ class ActionDelegate {
                         Map<String, String> allowedRoles = [:], Map<String, String> bannedRoles = [:],
                         List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
         MenuItemBody body = new MenuItemBody(
-                (name instanceof I18nString) ? name : new I18nString(name as String),
-                icon,
                 uri,
                 identifier,
-                filter,
-                caseDefaultHeaders,
-                taskDefaultHeaders,
-                collectRolesForPreferenceItem(allowedRoles),
-                collectRolesForPreferenceItem(bannedRoles)
+                (name instanceof I18nString) ? name : new I18nString(name as String),
+                icon
         )
+        body.setFilter(filter)
+        body.setCaseDefaultHeaders(caseDefaultHeaders)
+        body.setTaskDefaultHeaders(taskDefaultHeaders)
+        body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
+        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
+        body.setUseCustomView(false)
+        body.setCaseRequireTitleInCreation(true)
+
         return createMenuItem(body)
     }
 
@@ -1906,6 +1924,28 @@ class ActionDelegate {
         return menuItem
     }
 
+    /**
+     * Creates filter and preference_item instances with given parameters.
+     *
+     * @param body configuration class for menu item creation
+     * @param filterQuery elastic query for filter
+     * @param filterType type of filter. Possible values: {@value DefaultFiltersRunner#FILTER_TYPE_CASE} or
+     * {@value DefaultFiltersRunner#FILTER_TYPE_TASK}
+     * @param filterVisibility possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or
+     * {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
+     * @param filterAllowedNets List of allowed nets. Element of list is process identifier
+     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
+     *
+     * @return created {@link Case} instance of preference_item
+     * */
+    Case createFilterInMenu(MenuItemBody body, String filterQuery, String filterType, String filterVisibility,
+                            List<String> filterAllowedNets = [], def filterMetadata = null) {
+        Case filter = createFilter(body.name, filterQuery, filterType, filterAllowedNets, body.icon, filterVisibility, filterMetadata)
+        body.filter = filter
+        Case menuItem = createMenuItem(body)
+        return menuItem
+    }
+
     Case createMenuItem(MenuItemBody body) {
         String sanitizedIdentifier = sanitize(body.identifier)
 
@@ -1962,15 +2002,27 @@ class ActionDelegate {
                 ],
                 (PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS): [
                         "type" : "text",
-                        "value": body.caseDefaultHeaders.join(',')
+                        "value": body.caseDefaultHeaders?.join(',')
                 ],
                 (PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS): [
                         "type" : "text",
-                        "value": body.taskDefaultHeaders.join(',')
+                        "value": body.taskDefaultHeaders?.join(',')
                 ],
                 (PREFERENCE_ITEM_FIELD_IDENTIFIER)     : [
                         "type" : "text",
                         "value": sanitizedIdentifier
+                ],
+                (PREFERENCE_ITEM_FIELD_REQUIRE_TITLE_IN_CREATION)     : [
+                        "type" : "boolean",
+                        "value": body.caseRequireTitleInCreation
+                ],
+                (PREFERENCE_ITEM_FIELD_USE_CUSTOM_VIEW)     : [
+                        "type" : "boolean",
+                        "value": body.useCustomView
+                ],
+                (PREFERENCE_ITEM_FIELD_CUSTOM_VIEW_SELECTOR)     : [
+                        "type" : "text",
+                        "value": body.customViewSelector
                 ],
         ]
         setData(newItemTask, setDataMap)
