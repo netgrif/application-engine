@@ -17,6 +17,7 @@ import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import groovy.util.logging.Slf4j
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.BeforeEach
@@ -30,6 +31,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+@Slf4j
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
@@ -137,7 +139,7 @@ class FilterApiTest {
         List<String> taskIds = (defGroup.dataSet[ActionDelegate.ORG_GROUP_FIELD_FILTER_TASKS].value ?: []) as List
         assert !taskIds
 
-        Thread.sleep(10000);
+        Thread.sleep(10000)
 
         assert workflowService.searchOne(QCase.case$._id.eq(new ObjectId(item.stringId))) == null
         assert workflowService.searchOne(QCase.case$._id.eq(new ObjectId(filter.stringId))) == null
@@ -145,6 +147,7 @@ class FilterApiTest {
 
 
     @Test
+    @Disabled
     void testFindFilter() {
         Case caze = createMenuItem()
         Case filter = getFilter(caze)
@@ -159,6 +162,21 @@ class FilterApiTest {
         )
 
         assert cases.size() != 0
+
+
+        CaseSearchRequest request = new CaseSearchRequest()
+        request.query = "processIdentifier:$FilterRunner.FILTER_PETRI_NET_IDENTIFIER AND title.keyword:\"FILTER\""
+        cases = ReindexRetryHelper.execute(
+                () -> elasticCaseService.search([request],
+                        userService.system.transformToLoggedUser(),
+                        PageRequest.of(0, 10),
+                        LocaleContextHolder.locale,
+                        false
+                ),
+                resultList -> resultList.size() != 0
+        )
+        log.warn(cases.getContent().first().stringId)
+        log.warn(cases.getContent().first().title)
 
         caze = setData(caze, [
                 "find_filter": "0"

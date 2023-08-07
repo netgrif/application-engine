@@ -2,7 +2,6 @@ package com.netgrif.application.engine.elastic.service;
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
-import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
 import com.netgrif.application.engine.elastic.domain.IndexAwareElasticSearchRequest;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
@@ -23,7 +22,6 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
@@ -125,7 +123,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         executors.execute(useCase.getStringId(), () -> {
             // stringId might not be indexed fast enough to prevent duplicity,
             // we need to be able to search based on a case property that is indexed immediately: id
-            useCase.setId(useCase.getStringId());
+//            useCase.setId(useCase.getStringId());
             String index = getIndex(useCase.getUriNodeId());
             IndexCoordinates allIndexes = IndexCoordinates.of(getAllIndexes().toArray(new String[0]));
             log.debug("[" + useCase.getStringId() + "] Indexing case in " + index);
@@ -149,7 +147,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     protected void doIndex(ElasticCase useCase, String index) {
         IndexQuery indexQuery = new IndexQueryBuilder()
-                .withId(useCase.getId())
+//                .withId(useCase.getId()) //TODO: ON ?
                 .withObject(useCase)
                 .build();
         template.index(indexQuery, IndexCoordinates.of(index));
@@ -166,7 +164,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         if (query != null) {
             SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class, indexCoordinates);
             Page<ElasticCase> indexedCases = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
-            casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).distinct().collect(Collectors.toList()));
+            casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
             total = indexedCases.getTotalElements();
         } else {
             casePage = Collections.emptyList();
