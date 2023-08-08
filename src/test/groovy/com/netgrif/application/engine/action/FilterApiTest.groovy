@@ -147,7 +147,7 @@ class FilterApiTest {
 
 
     @Test
-    @Disabled
+//    @Disabled
     void testFindFilter() {
         Case caze = createMenuItem()
         Case filter = getFilter(caze)

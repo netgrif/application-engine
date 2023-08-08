@@ -164,7 +164,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         if (query != null) {
             SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class, indexCoordinates);
             Page<ElasticCase> indexedCases = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
-            casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
+            casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).distinct().collect(Collectors.toList()));
             total = indexedCases.getTotalElements();
         } else {
             casePage = Collections.emptyList();
