@@ -1806,6 +1806,24 @@ class ActionDelegate {
              setData(PREFERENCE_ITEM_SETTINGS_TRANS_ID, item, [
                      (PREFERENCE_ITEM_FIELD_TAB_ICON): ["type": "text", "value": value]
              ])
+         },
+         requireTitleInCreation: { cl ->
+             def value = cl()
+             setData(PREFERENCE_ITEM_SETTINGS_TRANS_ID, item, [
+                     (PREFERENCE_ITEM_FIELD_REQUIRE_TITLE_IN_CREATION): ["type": "boolean", "value": value]
+             ])
+         },
+         useCustomView: { cl ->
+             def value = cl()
+             setData(PREFERENCE_ITEM_SETTINGS_TRANS_ID, item, [
+                     (PREFERENCE_ITEM_FIELD_USE_CUSTOM_VIEW): ["type": "boolean", "value": value]
+             ])
+         },
+         customViewSelector: { cl ->
+             def value = cl()
+             setData(PREFERENCE_ITEM_SETTINGS_TRANS_ID, item, [
+                     (PREFERENCE_ITEM_FIELD_CUSTOM_VIEW_SELECTOR): ["type": "text", "value": value]
+             ])
          }]
 
     }
@@ -1972,58 +1990,19 @@ class ActionDelegate {
         String newIcon = body.icon ?: "filter_none"
         String filterId = body.filter?.stringId
         def setDataMap = [
-                (PREFERENCE_ITEM_FIELD_MENU_NAME)    : [
-                        "type" : "i18n",
-                        "value": newName
-                ],
-                (PREFERENCE_ITEM_FIELD_MENU_ICON)    : [
-                        "type" : "text",
-                        "value": newIcon
-                ],
-                (PREFERENCE_ITEM_FIELD_TAB_NAME)    : [
-                        "type" : "i18n",
-                        "value": newName
-                ],
-                (PREFERENCE_ITEM_FIELD_TAB_ICON)    : [
-                        "type" : "text",
-                        "value": newIcon
-                ],
-                (PREFERENCE_ITEM_FIELD_NODE_PATH)    : [
-                        "type" : "text",
-                        "value": nodePath
-                ],
-                (PREFERENCE_ITEM_FIELD_PARENT_ID)    : [
-                        "type" : "caseRef",
-                        "value": parentItemCase ? [parentItemCase.stringId] : []
-                ],
-                (PREFERENCE_ITEM_FIELD_FILTER_CASE)    : [
-                        "type" : "caseRef",
-                        "value": filterId ? [filterId] : []
-                ],
-                (PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS): [
-                        "type" : "text",
-                        "value": body.caseDefaultHeaders?.join(',')
-                ],
-                (PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS): [
-                        "type" : "text",
-                        "value": body.taskDefaultHeaders?.join(',')
-                ],
-                (PREFERENCE_ITEM_FIELD_IDENTIFIER)     : [
-                        "type" : "text",
-                        "value": sanitizedIdentifier
-                ],
-                (PREFERENCE_ITEM_FIELD_REQUIRE_TITLE_IN_CREATION)     : [
-                        "type" : "boolean",
-                        "value": body.caseRequireTitleInCreation
-                ],
-                (PREFERENCE_ITEM_FIELD_USE_CUSTOM_VIEW)     : [
-                        "type" : "boolean",
-                        "value": body.useCustomView
-                ],
-                (PREFERENCE_ITEM_FIELD_CUSTOM_VIEW_SELECTOR)     : [
-                        "type" : "text",
-                        "value": body.customViewSelector
-                ],
+                (PREFERENCE_ITEM_FIELD_MENU_NAME): ["type" : "i18n", "value": newName],
+                (PREFERENCE_ITEM_FIELD_MENU_ICON): ["type" : "text", "value": newIcon],
+                (PREFERENCE_ITEM_FIELD_TAB_NAME): ["type" : "i18n", "value": newName],
+                (PREFERENCE_ITEM_FIELD_TAB_ICON): ["type" : "text", "value": newIcon],
+                (PREFERENCE_ITEM_FIELD_NODE_PATH): ["type" : "text", "value": nodePath],
+                (PREFERENCE_ITEM_FIELD_PARENT_ID): ["type" : "caseRef", "value": parentItemCase ? [parentItemCase.stringId] : []],
+                (PREFERENCE_ITEM_FIELD_FILTER_CASE): ["type" : "caseRef", "value": filterId ? [filterId] : []],
+                (PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS): ["type" : "text", "value": body.caseDefaultHeaders?.join(',')],
+                (PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS): ["type" : "text", "value": body.taskDefaultHeaders?.join(',')],
+                (PREFERENCE_ITEM_FIELD_IDENTIFIER): ["type" : "text", "value": sanitizedIdentifier],
+                (PREFERENCE_ITEM_FIELD_REQUIRE_TITLE_IN_CREATION): ["type" : "boolean", "value": body.caseRequireTitleInCreation],
+                (PREFERENCE_ITEM_FIELD_USE_CUSTOM_VIEW): ["type" : "boolean", "value": body.useCustomView],
+                (PREFERENCE_ITEM_FIELD_CUSTOM_VIEW_SELECTOR): ["type" : "text", "value": body.customViewSelector],
         ]
         setData(newItemTask, setDataMap)
         finishTask(newItemTask)
@@ -2538,13 +2517,14 @@ class ActionDelegate {
     Case createOrUpdateMenuItem(String uri, String identifier, def name, String icon = "filter_none", Case filter = null,
                                 Map<String, String> allowedRoles = [:], Map<String, String> bannedRoles = [:],
                                 List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
-        Case item = findMenuItem(sanitize(identifier))
-        if (item) {
-            return updateMenuItem(item, uri, identifier, name, icon, filter, allowedRoles, bannedRoles,
-                    caseDefaultHeaders, taskDefaultHeaders)
-        } else {
-            return createMenuItem(uri, identifier, name, icon, filter, allowedRoles, bannedRoles, caseDefaultHeaders, taskDefaultHeaders)
-        }
+        MenuItemBody body = new MenuItemBody(uri, identifier, name, icon)
+        body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
+        body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
+        body.setCaseDefaultHeaders(caseDefaultHeaders)
+        body.setTaskDefaultHeaders(taskDefaultHeaders)
+        body.setFilter(filter)
+
+        return createOrUpdateMenuItem(body)
     }
 
     /**
@@ -2577,7 +2557,51 @@ class ActionDelegate {
                                          String itemAndFilterIcon = "filter_none", Map<String, String> itemAllowedRoles = [:],
                                          Map<String, String> itemBannedRoles = [:], List<String> itemCaseDefaultHeaders = [],
                                          List<String> itemTaskDefaultHeaders = [], def filterMetadata = null) {
-        Case item = findMenuItem(sanitize(itemIdentifier))
+        MenuItemBody body = new MenuItemBody(uri, itemIdentifier, itemAndFilterName, itemAndFilterIcon)
+        body.allowedRoles = collectRolesForPreferenceItem(itemAllowedRoles)
+        body.bannedRoles = collectRolesForPreferenceItem(itemBannedRoles)
+        body.caseDefaultHeaders = itemCaseDefaultHeaders
+        body.taskDefaultHeaders = itemTaskDefaultHeaders
+
+        return createOrUpdateMenuItemAndFilter(body, filterQuery, filterType, filterVisibility, filterAllowedNets,
+                filterMetadata)
+    }
+
+    /**
+     * Creates or updates menu item with given identifier.
+     *
+     * @param body data for menu item
+     *
+     * @return created or updated menu item instance
+     * */
+    Case createOrUpdateMenuItem(MenuItemBody body) {
+        Case item = findMenuItem(sanitize(body.identifier))
+        if (item) {
+            return updateMenuItem(item, body)
+        } else {
+            return createMenuItem(body)
+        }
+    }
+
+    /**
+     * Creates or updates menu item with given identifier along with the filter instance. It's safe to use on existing
+     * menu item instance, that doesn't contain filter. In such case, missing filter will be created with provided
+     * parameters.
+     *
+     * @param body data for menu item
+     * @param filterQuery elastic query for filter
+     * @param filterType type of filter. Possible values: {@value DefaultFiltersRunner#FILTER_TYPE_CASE} or
+     * {@value DefaultFiltersRunner#FILTER_TYPE_TASK}
+     * @param filterVisibility possible values: {@value DefaultFiltersRunner#FILTER_VISIBILITY_PRIVATE} or
+     * {@value DefaultFiltersRunner#FILTER_VISIBILITY_PUBLIC}
+     * @param filterAllowedNets List of allowed nets. Element of list is process identifier
+     * @param filterMetadata metadata for filter. If no value is provided, then default value is used: {@link #defaultFilterMetadata(String)}
+     *
+     * @return created or updated menu item instance along with the actual filter
+     * */
+    Case createOrUpdateMenuItemAndFilter(MenuItemBody body, String filterQuery, String filterType, String filterVisibility,
+                                         List<String> filterAllowedNets = [], def filterMetadata = null) {
+        Case item = findMenuItem(sanitize(body.identifier))
         if (item) {
             Case filter = getFilterFromMenuItem(item)
             if (filter) {
@@ -2585,53 +2609,81 @@ class ActionDelegate {
                 changeFilter filter visibility { filterVisibility }
                 changeFilter filter allowedNets { filterAllowedNets }
                 changeFilter filter filterMetadata { filterMetadata ?: defaultFilterMetadata(filterType) }
-                changeFilter filter title { itemAndFilterName }
-                changeFilter filter icon { itemAndFilterIcon }
+                changeFilter filter title { body.name }
+                changeFilter filter icon { body.icon }
             } else {
-                filter = createFilter(itemAndFilterName, filterQuery, filterType, filterAllowedNets, itemAndFilterIcon,
+                body.filter = createFilter(body.name, filterQuery, filterType, filterAllowedNets, body.icon,
                         filterVisibility, filterMetadata)
             }
 
-            return updateMenuItem(item, uri, itemIdentifier, itemAndFilterName, itemAndFilterIcon, filter,
-                    itemAllowedRoles, itemBannedRoles, itemCaseDefaultHeaders, itemTaskDefaultHeaders)
+            return updateMenuItem(item, body)
         } else {
-            return createFilterInMenu(uri, itemIdentifier, itemAndFilterName, filterQuery, filterType, filterVisibility,
-                    filterAllowedNets, itemAndFilterIcon, itemAllowedRoles, itemBannedRoles, itemCaseDefaultHeaders,
-                    itemTaskDefaultHeaders, filterMetadata)
+            return createFilterInMenu(body, filterQuery, filterType, filterVisibility, filterAllowedNets, filterMetadata)
+        }
+    }
+
+    /**
+     * Creates menu item or ignores it if already exists
+     *
+     * @param body configuration class for menu item
+     *
+     * @return created or existing menu item instance
+     * */
+    Case createOrIgnoreMenuItem(MenuItemBody body) {
+        Case item = findMenuItem(body.identifier)
+        if (!item) {
+            return createMenuItem(body)
+        } else {
+            return item
+        }
+    }
+
+    /**
+     * Creates menu item or ignores it if already exists. If existing item does not contain filter, the filter instance
+     * is created by provided parameters.
+     *
+     * @param body configuration class for menu item
+     *
+     * @return created or existing menu item instance
+     * */
+    Case createOrIgnoreMenuItemAndFilter(MenuItemBody body, String filterQuery, String filterType, String filterVisibility,
+                                         List<String> filterAllowedNets = [], def filterMetadata = null) {
+        Case item = findMenuItem(body.identifier)
+        if (!item) {
+            return createFilterInMenu(body, filterQuery, filterType, filterVisibility, filterAllowedNets, filterMetadata)
+        } else {
+            Case filter = getFilterFromMenuItem(item)
+            if (!filter) {
+                filter = createFilter(body.name, filterQuery, filterType, filterAllowedNets, body.icon, filterVisibility,
+                        filterMetadata)
+                changeMenuItem item filter { filter }
+                return workflowService.findOne(item.stringId)
+            } else {
+                return item
+            }
         }
     }
 
     /**
      * Updates existing menu item with provided values.
      *
-     * @param uri resource where the item is located in
-     * @param identifier unique identifier of item
-     * @param name displayed label in menu and tab
-     * @param icon displayed icon in menu and tab
-     * @param filter Case instance of filter.xml
-     * @param allowedRoles Map of roles, which have access to the item. Key is role_id in XML and value is process
-     * identifier where the role exists
-     * @param bannedRoles Map of roles, which don't have access to the item. Key is role_id in XML and value is process
-     * identifier where the role exists
-     * @param caseDefaultHeaders List of headers displayed in case view
-     * @param taskDefaultHeaders List of headers displayed in task view
+     * @param item Menu item instance to be updated
+     * @param body data to update in menu item instance
      *
      * @return updated menu item instance
      * */
-    Case updateMenuItem(Case item, String uri, String identifier, def name, String icon = "filter_none", Case filter = null,
-                        Map<String, String> allowedRoles = [:], Map<String, String> bannedRoles = [:],
-                        List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
-        changeMenuItem item allowedRoles { allowedRoles }
-        changeMenuItem item bannedRoles { bannedRoles }
-        changeMenuItem item caseDefaultHeaders { caseDefaultHeaders.join(",") }
-        changeMenuItem item taskDefaultHeaders { taskDefaultHeaders.join(",") }
-        if (filter) {
-            changeMenuItem item filter { filter }
+    Case updateMenuItem(Case item, MenuItemBody body) {
+        changeMenuItem item allowedRoles { body.allowedRoles }
+        changeMenuItem item bannedRoles { body.bannedRoles }
+        changeMenuItem item caseDefaultHeaders { body.caseDefaultHeaders?.join(",") }
+        changeMenuItem item taskDefaultHeaders { body.taskDefaultHeaders?.join(",") }
+        if (body.filter) {
+            changeMenuItem item filter { body.filter }
         }
-        changeMenuItem item uri { uri }
-        changeMenuItem item title { name }
-        changeMenuItem item menuIcon { icon }
-        changeMenuItem item tabIcon { icon }
+        changeMenuItem item uri { body.uri }
+        changeMenuItem item title { body.name }
+        changeMenuItem item menuIcon { body.icon }
+        changeMenuItem item tabIcon { body.icon }
 
         return workflowService.findOne(item.stringId)
     }
