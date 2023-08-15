@@ -1933,7 +1933,7 @@ class ActionDelegate {
      * */
     Case createFilterInMenu(MenuItemBody body, String filterQuery, String filterType, String filterVisibility,
                             List<String> filterAllowedNets = [], def filterMetadata = null) {
-        Case filter = createFilter(body.menuName, filterQuery, filterType, filterAllowedNets, body.icon, filterVisibility, filterMetadata)
+        Case filter = createFilter(body.menuName, filterQuery, filterType, filterAllowedNets, body.menuIcon, filterVisibility, filterMetadata)
         body.filter = filter
         Case menuItem = createMenuItem(body)
         return menuItem
@@ -2546,9 +2546,9 @@ class ActionDelegate {
                 changeFilter filter allowedNets { filterAllowedNets }
                 changeFilter filter filterMetadata { filterMetadata ?: defaultFilterMetadata(filterType) }
                 changeFilter filter title { body.menuName }
-                changeFilter filter icon { body.icon }
+                changeFilter filter icon { body.menuIcon }
             } else {
-                body.filter = createFilter(body.menuName, filterQuery, filterType, filterAllowedNets, body.icon,
+                body.filter = createFilter(body.menuName, filterQuery, filterType, filterAllowedNets, body.menuIcon,
                         filterVisibility, filterMetadata)
             }
 
@@ -2590,7 +2590,7 @@ class ActionDelegate {
         } else {
             Case filter = getFilterFromMenuItem(item)
             if (!filter) {
-                filter = createFilter(body.menuName, filterQuery, filterType, filterAllowedNets, body.icon, filterVisibility,
+                filter = createFilter(body.menuName, filterQuery, filterType, filterAllowedNets, body.menuIcon, filterVisibility,
                         filterMetadata)
                 changeMenuItem item filter { filter }
                 return workflowService.findOne(item.stringId)

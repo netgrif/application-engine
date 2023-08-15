@@ -25,7 +25,8 @@ public class MenuItemBody {
     // generic attributes
     private I18nString menuName;
     private I18nString tabName;
-    private String icon;
+    private String menuIcon = "filter_none";
+    private String tabIcon;
     private String uri;
     private String identifier;
     private Case filter;
@@ -64,13 +65,15 @@ public class MenuItemBody {
     public MenuItemBody(I18nString name, String icon) {
         this.menuName = name;
         this.tabName = name;
-        this.icon = icon;
+        this.menuIcon = icon;
+        this.tabIcon = icon;
     }
 
-    public MenuItemBody(I18nString menuName, I18nString tabName, String icon) {
+    public MenuItemBody(I18nString menuName, I18nString tabName, String menuIcon, String tabIcon) {
         this.menuName = menuName;
         this.tabName = tabName;
-        this.icon = icon;
+        this.menuIcon = menuIcon;
+        this.tabIcon = tabIcon;
     }
 
     public MenuItemBody(String uri, String identifier, I18nString name, String icon) {
@@ -78,15 +81,17 @@ public class MenuItemBody {
         this.identifier = identifier;
         this.menuName = name;
         this.tabName = name;
-        this.icon = icon;
+        this.menuIcon = icon;
+        this.tabIcon = icon;
     }
 
-    public MenuItemBody(String uri, String identifier, I18nString menuName, I18nString tabName, String icon) {
+    public MenuItemBody(String uri, String identifier, I18nString menuName, I18nString tabName, String menuIcon, String tabIcon) {
         this.uri = uri;
         this.identifier = identifier;
         this.menuName = menuName;
         this.tabName = tabName;
-        this.icon = icon;
+        this.menuIcon = menuIcon;
+        this.tabIcon = tabIcon;
     }
 
     public MenuItemBody(String uri, String identifier, String name, String icon) {
@@ -94,15 +99,17 @@ public class MenuItemBody {
         this.identifier = identifier;
         this.menuName = new I18nString(name);
         this.tabName = new I18nString(name);
-        this.icon = icon;
+        this.menuIcon = icon;
+        this.tabIcon = icon;
     }
 
-    public MenuItemBody(String uri, String identifier, String menuName, String tabName, String icon) {
+    public MenuItemBody(String uri, String identifier, String menuName, String tabName, String menuIcon, String tabIcon) {
         this.uri = uri;
         this.identifier = identifier;
         this.menuName = new I18nString(menuName);
         this.tabName = new I18nString(tabName);
-        this.icon = icon;
+        this.menuIcon = menuIcon;
+        this.tabIcon = tabIcon;
     }
 
     public String getIdentifier() {
@@ -150,7 +157,6 @@ public class MenuItemBody {
         Map<String, Map<String, Object>> dataSet = new LinkedHashMap<>();
 
         // GENERIC
-        String newIcon = this.icon != null ? this.icon : "filter_none";
         ArrayList<String> filterIdCaseRefValue = new ArrayList<>();
         if (this.filter != null) {
             filterIdCaseRefValue.add(this.filter.getStringId());
@@ -167,9 +173,9 @@ public class MenuItemBody {
             putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID, FieldType.CASE_REF, parentIdCaseRef);
         }
         putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME, FieldType.I18N, this.menuName);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_ICON, FieldType.TEXT, newIcon);
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_ICON, FieldType.TEXT, this.menuIcon);
         putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TAB_NAME, FieldType.I18N, this.tabName);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TAB_ICON, FieldType.TEXT, newIcon);
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TAB_ICON, FieldType.TEXT, this.tabIcon);
         if (this.identifier != null) {
             putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_IDENTIFIER, FieldType.TEXT, this.getIdentifier());
         }
