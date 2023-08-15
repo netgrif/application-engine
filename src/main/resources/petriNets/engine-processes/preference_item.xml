@@ -1187,7 +1187,6 @@
 					<behavior>forbidden</behavior>
 					<action trigger="set">
 						filterCaseRef: f.filter_case,
-						tab_name: f.tab_name,
 						menu_name: f.menu_name;
 
 						if (filterCaseRef.value == null || filterCaseRef.value == []) {
@@ -1195,8 +1194,9 @@
 						}
 
 						def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
-						change tab_name value {return filterCase.dataSet["i18n_filter_name"].value}
-						change menu_name value {return filterCase.dataSet["i18n_filter_name"].value}
+						if (!menu_name.value) {
+							change menu_name value {return filterCase.dataSet["i18n_filter_name"].value}
+						}
 					</action>
 				</logic>
 			</dataRef>

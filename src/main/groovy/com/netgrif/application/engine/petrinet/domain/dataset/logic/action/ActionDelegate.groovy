@@ -52,6 +52,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.menu.MenuItemBody
+import com.netgrif.application.engine.workflow.domain.menu.MenuItemConstants
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.*
@@ -83,32 +84,6 @@ import java.util.stream.Collectors
 class ActionDelegate {
 
     static final Logger log = LoggerFactory.getLogger(ActionDelegate)
-
-    private static final String PREFERENCE_ITEM_FIELD_NEW_FILTER_ID = "new_filter_id"
-    private static final String PREFERENCE_ITEM_FIELD_REMOVE_OPTION = "remove_option"
-    private static final String PREFERENCE_ITEM_FIELD_FILTER_CASE = "filter_case"
-    private static final String PREFERENCE_ITEM_FIELD_PARENT_ID = "parentId"
-    private static final String PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS= "childItemIds"
-    private static final String PREFERENCE_ITEM_FIELD_HAS_CHILDREN= "hasChildren"
-    private static final String PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS = "case_default_headers"
-    private static final String PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS = "task_default_headers"
-    private static final String PREFERENCE_ITEM_FIELD_IDENTIFIER = "menu_item_identifier"
-    private static final String PREFERENCE_ITEM_FIELD_APPEND_MENU_ITEM = "append_menu_item_stringId"
-    private static final String PREFERENCE_ITEM_FIELD_ALLOWED_ROLES = "allowed_roles"
-    private static final String PREFERENCE_ITEM_FIELD_BANNED_ROLES = "banned_roles"
-    private static final String PREFERENCE_ITEM_FIELD_MENU_NAME = "menu_name"
-    private static final String PREFERENCE_ITEM_FIELD_MENU_ICON = "menu_icon"
-    private static final String PREFERENCE_ITEM_FIELD_TAB_NAME = "tab_name"
-    private static final String PREFERENCE_ITEM_FIELD_TAB_ICON = "tab_icon"
-    private static final String PREFERENCE_ITEM_FIELD_NODE_PATH = "nodePath"
-    private static final String PREFERENCE_ITEM_FIELD_NODE_NAME = "nodeName"
-    private static final String PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE= "duplicate_new_title"
-    private static final String PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER = "duplicate_view_identifier"
-    private static final String PREFERENCE_ITEM_FIELD_DUPLICATE_RESET_CHILD_ITEM_IDS = "duplicate_reset_childItemIds"
-    private static final String PREFERENCE_ITEM_FIELD_REQUIRE_TITLE_IN_CREATION = "case_require_title_in_creation"
-    private static final String PREFERENCE_ITEM_FIELD_USE_CUSTOM_VIEW = "use_custom_view"
-    private static final String PREFERENCE_ITEM_FIELD_CUSTOM_VIEW_SELECTOR = "custom_view_selector"
-    private static final String PREFERENCE_ITEM_SETTINGS_TRANS_ID = "item_settings"
 
     private static final String FILTER_FIELD_I18N_FILTER_NAME = "i18n_filter_name"
 
@@ -1757,27 +1732,27 @@ class ActionDelegate {
      */
     def changeMenuItem(Case item) {
         [allowedRoles  : { cl ->
-            updateMenuItemRoles(item, cl as Closure, PREFERENCE_ITEM_FIELD_ALLOWED_ROLES)
+            updateMenuItemRoles(item, cl as Closure, MenuItemConstants.PREFERENCE_ITEM_FIELD_ALLOWED_ROLES.attributeId)
         },
          bannedRoles   : { cl ->
-             updateMenuItemRoles(item, cl as Closure, PREFERENCE_ITEM_FIELD_BANNED_ROLES)
+             updateMenuItemRoles(item, cl as Closure, MenuItemConstants.PREFERENCE_ITEM_FIELD_BANNED_ROLES.attributeId)
          },
          caseDefaultHeaders: { cl ->
              String defaultHeaders = cl() as String
-             setData(PREFERENCE_ITEM_SETTINGS_TRANS_ID, item, [
-                     (PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS): ["type": "text", "value": defaultHeaders]
+             setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
+                     (MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS.attributeId): ["type": "text", "value": defaultHeaders]
              ])
          },
          taskDefaultHeaders: { cl ->
              String defaultHeaders = cl() as String
-             setData(PREFERENCE_ITEM_SETTINGS_TRANS_ID, item, [
-                     (PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS): ["type": "text", "value": defaultHeaders]
+             setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
+                     (MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS.attributeId): ["type": "text", "value": defaultHeaders]
              ])
          },
          filter        : { cl ->
              def filter = cl() as Case
              setData("change_filter", item, [
-                     (PREFERENCE_ITEM_FIELD_NEW_FILTER_ID): ["type": "text", "value": filter.stringId]
+                     (MenuItemConstants.PREFERENCE_ITEM_FIELD_NEW_FILTER_ID.attributeId): ["type": "text", "value": filter.stringId]
              ])
          },
          uri           : { cl ->
@@ -1791,38 +1766,38 @@ class ActionDelegate {
          title         : { cl ->
              def value = cl()
              I18nString newName = (value instanceof I18nString) ? value : new I18nString(value as String)
-             setData(PREFERENCE_ITEM_SETTINGS_TRANS_ID, item, [
-                     (PREFERENCE_ITEM_FIELD_MENU_NAME): ["type": "i18n", "value": newName]
+             setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
+                     (MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME.attributeId): ["type": "i18n", "value": newName]
              ])
          },
          menuIcon         : { cl ->
              def value = cl()
-             setData(PREFERENCE_ITEM_SETTINGS_TRANS_ID, item, [
-                     (PREFERENCE_ITEM_FIELD_MENU_ICON): ["type": "text", "value": value]
+             setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
+                     (MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_ICON.attributeId): ["type": "text", "value": value]
              ])
          },
          tabIcon         : { cl ->
              def value = cl()
-             setData(PREFERENCE_ITEM_SETTINGS_TRANS_ID, item, [
-                     (PREFERENCE_ITEM_FIELD_TAB_ICON): ["type": "text", "value": value]
+             setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
+                     (MenuItemConstants.PREFERENCE_ITEM_FIELD_TAB_ICON.attributeId): ["type": "text", "value": value]
              ])
          },
          requireTitleInCreation: { cl ->
              def value = cl()
-             setData(PREFERENCE_ITEM_SETTINGS_TRANS_ID, item, [
-                     (PREFERENCE_ITEM_FIELD_REQUIRE_TITLE_IN_CREATION): ["type": "boolean", "value": value]
+             setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
+                     (MenuItemConstants.PREFERENCE_ITEM_FIELD_REQUIRE_TITLE_IN_CREATION.attributeId): ["type": "boolean", "value": value]
              ])
          },
          useCustomView: { cl ->
              def value = cl()
-             setData(PREFERENCE_ITEM_SETTINGS_TRANS_ID, item, [
-                     (PREFERENCE_ITEM_FIELD_USE_CUSTOM_VIEW): ["type": "boolean", "value": value]
+             setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
+                     (MenuItemConstants.PREFERENCE_ITEM_FIELD_USE_CUSTOM_VIEW.attributeId): ["type": "boolean", "value": value]
              ])
          },
          customViewSelector: { cl ->
              def value = cl()
-             setData(PREFERENCE_ITEM_SETTINGS_TRANS_ID, item, [
-                     (PREFERENCE_ITEM_FIELD_CUSTOM_VIEW_SELECTOR): ["type": "text", "value": value]
+             setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
+                     (MenuItemConstants.PREFERENCE_ITEM_FIELD_CUSTOM_VIEW_SELECTOR.attributeId): ["type": "text", "value": value]
              ])
          }]
 
@@ -1958,7 +1933,7 @@ class ActionDelegate {
      * */
     Case createFilterInMenu(MenuItemBody body, String filterQuery, String filterType, String filterVisibility,
                             List<String> filterAllowedNets = [], def filterMetadata = null) {
-        Case filter = createFilter(body.name, filterQuery, filterType, filterAllowedNets, body.icon, filterVisibility, filterMetadata)
+        Case filter = createFilter(body.menuName, filterQuery, filterType, filterAllowedNets, body.icon, filterVisibility, filterMetadata)
         body.filter = filter
         Case menuItem = createMenuItem(body)
         return menuItem
@@ -1972,39 +1947,22 @@ class ActionDelegate {
         }
 
         Case parentItemCase = getOrCreateFolderItem(body.uri)
-        I18nString newName = body.name ?: (body.filter?.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString)
+        I18nString newName = body.menuName ?: (body.filter?.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString)
 
         Case menuItemCase = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, newName?.defaultValue)
         menuItemCase.setUriNodeId(uriService.findByUri(body.uri).id)
-        menuItemCase.dataSet[PREFERENCE_ITEM_FIELD_ALLOWED_ROLES].options = body.allowedRoles
-        menuItemCase.dataSet[PREFERENCE_ITEM_FIELD_BANNED_ROLES].options = body.bannedRoles
+        menuItemCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_ALLOWED_ROLES.attributeId].options = body.allowedRoles
+        menuItemCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_BANNED_ROLES.attributeId].options = body.bannedRoles
         if (parentItemCase != null) {
             parentItemCase = appendChildCaseIdAndSave(parentItemCase, menuItemCase.stringId)
         }
         menuItemCase = workflowService.save(menuItemCase)
-        Task newItemTask = findTask { it._id.eq(new ObjectId(menuItemCase.tasks.find { it.transition == "initialize" }.task)) }
+        Task newItemTask = findTask { it._id.eq(new ObjectId(menuItemCase.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)) }
         String nodePath = createNodePath(body.uri, sanitizedIdentifier)
         uriService.getOrCreate(nodePath, UriContentType.CASE)
 
-        assignTask(newItemTask)
-        String newIcon = body.icon ?: "filter_none"
-        String filterId = body.filter?.stringId
-        def setDataMap = [
-                (PREFERENCE_ITEM_FIELD_MENU_NAME): ["type" : "i18n", "value": newName],
-                (PREFERENCE_ITEM_FIELD_MENU_ICON): ["type" : "text", "value": newIcon],
-                (PREFERENCE_ITEM_FIELD_TAB_NAME): ["type" : "i18n", "value": newName],
-                (PREFERENCE_ITEM_FIELD_TAB_ICON): ["type" : "text", "value": newIcon],
-                (PREFERENCE_ITEM_FIELD_NODE_PATH): ["type" : "text", "value": nodePath],
-                (PREFERENCE_ITEM_FIELD_PARENT_ID): ["type" : "caseRef", "value": parentItemCase ? [parentItemCase.stringId] : []],
-                (PREFERENCE_ITEM_FIELD_FILTER_CASE): ["type" : "caseRef", "value": filterId ? [filterId] : []],
-                (PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS): ["type" : "text", "value": body.caseDefaultHeaders?.join(',')],
-                (PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS): ["type" : "text", "value": body.taskDefaultHeaders?.join(',')],
-                (PREFERENCE_ITEM_FIELD_IDENTIFIER): ["type" : "text", "value": sanitizedIdentifier],
-                (PREFERENCE_ITEM_FIELD_REQUIRE_TITLE_IN_CREATION): ["type" : "boolean", "value": body.caseRequireTitleInCreation],
-                (PREFERENCE_ITEM_FIELD_USE_CUSTOM_VIEW): ["type" : "boolean", "value": body.useCustomView],
-                (PREFERENCE_ITEM_FIELD_CUSTOM_VIEW_SELECTOR): ["type" : "text", "value": body.customViewSelector],
-        ]
-        setData(newItemTask, setDataMap)
+        newItemTask = assignTask(newItemTask)
+        setData(newItemTask, body.toDataSet(parentItemCase.stringId, nodePath))
         finishTask(newItemTask)
 
         return workflowService.findOne(menuItemCase.stringId)
@@ -2042,7 +2000,7 @@ class ActionDelegate {
             return folder
         }
 
-        folder = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, body.name.toString())
+        folder = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, body.menuName.toString())
         folder.setUriNodeId(node.parentId)
         if (childFolderCase != null) {
             folder = appendChildCaseIdAndSave(folder, childFolderCase.stringId)
@@ -2050,31 +2008,9 @@ class ActionDelegate {
         } else {
             folder = workflowService.save(folder)
         }
-        Task newItemTask = findTask { it._id.eq(new ObjectId(folder.tasks.find { it.transition == "initialize" }.task)) }
+        Task newItemTask = findTask { it._id.eq(new ObjectId(folder.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)) }
         assignTask(newItemTask)
-        def setDataMap = [
-                (PREFERENCE_ITEM_FIELD_MENU_NAME)    : [
-                        "type" : "i18n",
-                        "value": body.name
-                ],
-                (PREFERENCE_ITEM_FIELD_MENU_ICON)    : [
-                        "type" : "text",
-                        "value": body.icon
-                ],
-                (PREFERENCE_ITEM_FIELD_TAB_NAME)    : [
-                        "type" : "i18n",
-                        "value": body.name
-                ],
-                (PREFERENCE_ITEM_FIELD_TAB_ICON)    : [
-                        "type" : "text",
-                        "value": body.icon
-                ],
-                (PREFERENCE_ITEM_FIELD_NODE_PATH)    : [
-                        "type" : "text",
-                        "value": node.uriPath
-                ],
-        ]
-        setData(newItemTask, setDataMap)
+        setData(newItemTask, body.toDataSet(null, node.uriPath))
         finishTask(newItemTask)
 
         folder = workflowService.findOne(folder.stringId)
@@ -2103,7 +2039,7 @@ class ActionDelegate {
 
         List<Case> casesToSave = new ArrayList<>()
 
-        List<String> parentIdList = item.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value as ArrayList<String>
+        List<String> parentIdList = item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value as ArrayList<String>
         if (parentIdList != null && parentIdList.size() > 0) {
             Case oldParent = removeChildItemFromParent(parentIdList[0], item)
             casesToSave.add(oldParent)
@@ -2112,11 +2048,11 @@ class ActionDelegate {
         UriNode destNode = uriService.getOrCreate(destUri, UriContentType.CASE)
         Case newParent = getOrCreateFolderItem(destNode.uriPath)
         if (newParent != null) {
-            item.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value = [newParent.stringId] as ArrayList
+            item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value = [newParent.stringId] as ArrayList
             newParent = appendChildCaseId(newParent, item.stringId)
             casesToSave.add(newParent)
         } else {
-            item.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value = null
+            item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value = null
         }
 
         item.uriNodeId = destNode.id
@@ -2169,30 +2105,30 @@ class ActionDelegate {
         String newNodePath = createNodePath(node.uriPath, sanitizedIdentifier)
         uriService.getOrCreate(newNodePath, UriContentType.CASE)
 
-        Task newItemTask = findTask { it._id.eq(new ObjectId(duplicated.tasks.find { it.transition == "initialize" }.task)) }
+        Task newItemTask = findTask { it._id.eq(new ObjectId(duplicated.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)) }
         Map updatedDataSet = [
-                (PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE): [
+                (MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE.attributeId): [
                         "value": null,
                         "type": "text"
                 ],
-                (PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER): [
+                (MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER.attributeId): [
                         "value": null,
                         "type": "text"
                 ],
-                (PREFERENCE_ITEM_FIELD_MENU_NAME): [
+                (MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME.attributeId): [
                         "value": newTitle,
                         "type": "i18n"
                 ],
-                (PREFERENCE_ITEM_FIELD_TAB_NAME): [
+                (MenuItemConstants.PREFERENCE_ITEM_FIELD_TAB_NAME.attributeId): [
                         "value": newTitle,
                         "type": "i18n"
                 ],
-                (PREFERENCE_ITEM_FIELD_NODE_PATH): [
+                (MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId): [
                         "value": newNodePath,
                         "type": "text"
                 ],
                 // Must be reset by button, because we have the same dataSet reference between originItem and duplicated
-                (PREFERENCE_ITEM_FIELD_DUPLICATE_RESET_CHILD_ITEM_IDS): [
+                (MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_RESET_CHILD_ITEM_IDS.attributeId): [
                         "value": 0,
                         "type": "button"
                 ],
@@ -2201,7 +2137,7 @@ class ActionDelegate {
         dataService.setData(newItemTask, ImportHelper.populateDataset(updatedDataSet))
         finishTask(newItemTask)
 
-        String parentId = (originItem.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value as ArrayList).get(0)
+        String parentId = (originItem.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value as ArrayList).get(0)
         if (parentId) {
             Case parent = workflowService.findOne(parentId)
             appendChildCaseIdAndSave(parent, duplicated.stringId)
@@ -2210,7 +2146,7 @@ class ActionDelegate {
     }
 
     private List<Case> updateNodeInChildrenFoldersRecursive(Case parentFolder) {
-        List<String> childItemIds = parentFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value as List<String>
+        List<String> childItemIds = parentFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as List<String>
         if (childItemIds == null || childItemIds.isEmpty()) {
             return new ArrayList<Case>()
         }
@@ -2219,7 +2155,7 @@ class ActionDelegate {
 
         List<Case> casesToSave = new ArrayList<>()
         for (child in children) {
-            UriNode parentNode = uriService.getOrCreate(parentFolder.getFieldValue(PREFERENCE_ITEM_FIELD_NODE_PATH) as String, UriContentType.CASE)
+            UriNode parentNode = uriService.getOrCreate(parentFolder.getFieldValue(MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId) as String, UriContentType.CASE)
             child.uriNodeId = parentNode.id
             child = resolveAndHandleNewNodePath(child, parentNode.uriPath)
 
@@ -2233,7 +2169,7 @@ class ActionDelegate {
     private Case resolveAndHandleNewNodePath(Case folderItem, String destUri) {
         String newNodePath = resolveNewNodePath(folderItem, destUri)
         UriNode newNode = uriService.getOrCreate(newNodePath, UriContentType.CASE)
-        folderItem.dataSet[PREFERENCE_ITEM_FIELD_NODE_PATH].value = newNode.uriPath
+        folderItem.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId].value = newNode.uriPath
 
         return folderItem
     }
@@ -2241,23 +2177,23 @@ class ActionDelegate {
     private String resolveNewNodePath(Case folderItem, String destUri) {
         return destUri +
                 uriService.getUriSeparator() +
-                folderItem.getFieldValue(PREFERENCE_ITEM_FIELD_IDENTIFIER) as String
+                folderItem.getFieldValue(MenuItemConstants.PREFERENCE_ITEM_FIELD_IDENTIFIER.attributeId) as String
     }
 
     private Case removeChildItemFromParent(String folderId, Case childItem) {
         Case parentFolder = workflowService.findOne(folderId)
-        (parentFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value as List).remove(childItem.stringId)
-        parentFolder.dataSet[PREFERENCE_ITEM_FIELD_HAS_CHILDREN].value = hasChildren(parentFolder)
+        (parentFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as List).remove(childItem.stringId)
+        parentFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_HAS_CHILDREN.attributeId].value = hasChildren(parentFolder)
         workflowService.save(parentFolder)
     }
 
     private boolean isCyclicNodePath(Case folderItem, String destUri) {
-        String oldNodePath = folderItem.getFieldValue(PREFERENCE_ITEM_FIELD_NODE_PATH)
+        String oldNodePath = folderItem.getFieldValue(MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId)
         return destUri.contains(oldNodePath)
     }
 
     private boolean hasChildren(Case folderItem) {
-        List children = folderItem.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value as List
+        List children = folderItem.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as List
         return children != null && children.size() > 0
     }
 
@@ -2267,20 +2203,20 @@ class ActionDelegate {
     }
 
     private Case appendChildCaseId(Case folderCase, String childItemCaseId) {
-        List<String> childIds = folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value as ArrayList<String>
+        List<String> childIds = folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as ArrayList<String>
         if (childIds == null) {
-            folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value = [childItemCaseId] as ArrayList
+            folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value = [childItemCaseId] as ArrayList
         } else {
-            folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].value = childIds + [childItemCaseId] as ArrayList
+            folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value = childIds + [childItemCaseId] as ArrayList
         }
 
-        folderCase.dataSet[PREFERENCE_ITEM_FIELD_HAS_CHILDREN].value = hasChildren(folderCase)
+        folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_HAS_CHILDREN.attributeId].value = hasChildren(folderCase)
 
         return folderCase
     }
     
     private Case initializeParentId(Case childFolderCase, String parentFolderCaseId) {
-        childFolderCase.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value = [parentFolderCaseId] as ArrayList
+        childFolderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value = [parentFolderCaseId] as ArrayList
         return workflowService.save(childFolderCase)
     }
 
@@ -2334,7 +2270,7 @@ class ActionDelegate {
 
     Case findMenuItemByUriAndIdentifier(String uri, String identifier) {
         String nodePath = createNodePath(uri, identifier)
-        return findCaseElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND dataSet.${PREFERENCE_ITEM_FIELD_NODE_PATH}.textValue.keyword:\"$nodePath\"")
+        return findCaseElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND dataSet.${MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId}.textValue.keyword:\"$nodePath\"")
     }
 
     /**
@@ -2369,7 +2305,7 @@ class ActionDelegate {
      * @return found filter instance. If not found, <code>null</code> is returned
      */
     Case getFilterFromMenuItem(Case item) {
-        String filterId = (item.dataSet[PREFERENCE_ITEM_FIELD_FILTER_CASE].value as List)[0] as String
+        String filterId = (item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_FILTER_CASE.attributeId].value as List)[0] as String
         return filterId ? workflowService.findOne(filterId) : null
     }
 
@@ -2609,10 +2545,10 @@ class ActionDelegate {
                 changeFilter filter visibility { filterVisibility }
                 changeFilter filter allowedNets { filterAllowedNets }
                 changeFilter filter filterMetadata { filterMetadata ?: defaultFilterMetadata(filterType) }
-                changeFilter filter title { body.name }
+                changeFilter filter title { body.menuName }
                 changeFilter filter icon { body.icon }
             } else {
-                body.filter = createFilter(body.name, filterQuery, filterType, filterAllowedNets, body.icon,
+                body.filter = createFilter(body.menuName, filterQuery, filterType, filterAllowedNets, body.icon,
                         filterVisibility, filterMetadata)
             }
 
@@ -2654,7 +2590,7 @@ class ActionDelegate {
         } else {
             Case filter = getFilterFromMenuItem(item)
             if (!filter) {
-                filter = createFilter(body.name, filterQuery, filterType, filterAllowedNets, body.icon, filterVisibility,
+                filter = createFilter(body.menuName, filterQuery, filterType, filterAllowedNets, body.icon, filterVisibility,
                         filterMetadata)
                 changeMenuItem item filter { filter }
                 return workflowService.findOne(item.stringId)
@@ -2673,19 +2609,8 @@ class ActionDelegate {
      * @return updated menu item instance
      * */
     Case updateMenuItem(Case item, MenuItemBody body) {
-        changeMenuItem item allowedRoles { body.allowedRoles }
-        changeMenuItem item bannedRoles { body.bannedRoles }
-        changeMenuItem item caseDefaultHeaders { body.caseDefaultHeaders?.join(",") }
-        changeMenuItem item taskDefaultHeaders { body.taskDefaultHeaders?.join(",") }
-        if (body.filter) {
-            changeMenuItem item filter { body.filter }
-        }
-        changeMenuItem item uri { body.uri }
-        changeMenuItem item title { body.name }
-        changeMenuItem item menuIcon { body.icon }
-        changeMenuItem item tabIcon { body.icon }
-
-        return workflowService.findOne(item.stringId)
+        def outcome = setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, body.toDataSet())
+        return outcome.case
     }
 
     static Map defaultFilterMetadata(String type) {
