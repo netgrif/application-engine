@@ -3,9 +3,25 @@
 	<initials>PRI</initials>
 	<title>Preference Item</title>
 	<icon>check_box_outline_blank</icon>
-	<defaultRole>true</defaultRole>
+	<defaultRole>false</defaultRole>
 	<anonymousRole>false</anonymousRole>
 	<transitionRole>false</transitionRole>
+	<roleRef>
+		<id>system</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>admin</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
 	<caseEvents>
 		<event type="delete">
 			<id>preference_item_delete</id>
@@ -20,15 +36,19 @@
 		<id>system</id>
 		<title>System</title>
 	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
 	<function scope="process" name="removeItemChildCases">
 		{ com.netgrif.application.engine.workflow.domain.Case useCase ->
 
-			def childCaseIds = useCase.dataSet['childItemIds'].options?.keySet() as List
+			def childCaseIds = useCase.dataSet['childItemIds'].value
 			if (childCaseIds == null || childCaseIds.isEmpty()) {
 				return
 			}
 
-			removeChildItemFromParent(useCase.dataSet['parentId'].value, useCase)
+			removeChildItemFromParent(useCase.dataSet['parentId'].value[0], useCase)
 
 			def childCases = workflowService.findAllById(childCaseIds)
 			async.run {
@@ -98,9 +118,12 @@
 		}
 	</function>
 
-	<data type="text">
+	<data type="caseRef">
 		<id>parentId</id>
 		<title/>
+		<allowedNets>
+			<allowedNet>preference_item</allowedNet>
+		</allowedNets>
 	</data>
 	<data type="text">
 		<id>move_previous_dest_uri</id>
@@ -177,8 +200,15 @@
 		<title name="duplicate_view_identifier">View identifier</title>
 		<desc name="duplicate_view_identifier_desc">Must be unique</desc>
 	</data>
-	<data type="enumeration_map">
+	<data type="caseRef" immediate="true">
 		<id>childItemIds</id>
+		<title/>
+		<allowedNets>
+			<allowedNet>preference_item</allowedNet>
+		</allowedNets>
+	</data>
+	<data type="taskRef">
+		<id>childItemForms</id>
 		<title/>
 	</data>
 	<data type="boolean" immediate="true">
@@ -192,7 +222,7 @@
 			hasChildren: f.hasChildren,
 			childItemIds: f.childItemIds;
 
-			change childItemIds options { [:] }
+			change childItemIds value { [] }
 			change hasChildren value { false }
 		</action>
 	</data>
@@ -247,13 +277,25 @@
 			<name>htmltextarea</name>
 		</component>
 	</data>
+	<data type="enumeration">
+		<id>menu_name_as_visible</id>
+		<title name="name">Name of the item</title>
+		<desc name="name_desc">Is shown in the menu</desc>
+		<component>
+			<name>autocomplete</name>
+		</component>
+	</data>
 	<data type="i18n" immediate="true">
 		<id>menu_name</id>
 		<title name="name">Name of the item</title>
 		<desc name="name_desc">Will be shown in the menu</desc>
 		<action trigger="set">
+			menu_name_as_visible: f.menu_name_as_visible,
 			name: f.menu_name;
+
 			changeCaseProperty "title" about { name.value }
+			change menu_name_as_visible choices { [name.value] }
+			change menu_name_as_visible value { name.value }
 		</action>
 	</data>
 	<data type="text" immediate="true">
@@ -489,6 +531,10 @@
 			filterTaskRef: f.current_filter_preview,
 			filterCaseRef: f.filter_case;
 
+			if (filterCaseRef.value == null || filterCaseRef.value == []) {
+				return
+			}
+
 			def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
 			change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
 
@@ -538,9 +584,9 @@
 		<id>case_view_search_type</id>
 		<title name="case_view_search_type">Search type for case view</title>
 		<options>
-			<option name="hidden" key="hidden">Hidden</option>
-			<option name="fulltext" key="fulltext">Fulltext</option>
-			<option name="fulltext_advanced" key="fulltext_advanced">Fulltext and advanced</option>
+			<option key="hidden" name="hidden">Hidden</option>
+			<option key="fulltext" name="fulltext">Fulltext</option>
+			<option key="fulltext_advanced" name="fulltext_advanced">Fulltext and advanced</option>
 		</options>
 		<init>fulltext_advanced</init>
 	</data>
@@ -620,9 +666,9 @@
 		<id>case_headers_mode</id>
 		<title name="headers_mode">Header mode</title>
 		<options>
-			<option name="sort" key="sort">Sort</option>
-			<option name="search" key="search">Search</option>
-			<option name="edit" key="edit">Edit</option>
+			<option key="sort" name="sort">Sort</option>
+			<option key="search" name="search">Search</option>
+			<option key="edit" name="edit">Edit</option>
 		</options>
 		<init>sort,edit,search</init>
 		<action trigger="set">
@@ -644,9 +690,9 @@
 		<id>case_headers_default_mode</id>
 		<title name="headers_default_mode">Default header mode</title>
 		<options>
-			<option name="sort" key="sort">Sort</option>
-			<option name="search" key="search">Search</option>
-			<option name="edit" key="edit">Edit</option>
+			<option key="sort" name="sort">Sort</option>
+			<option key="search" name="search">Search</option>
+			<option key="edit" name="edit">Edit</option>
 		</options>
 		<init>sort</init>
 	</data>
@@ -654,9 +700,9 @@
 		<id>case_headers_options_holder</id>
 		<title/>
 		<options>
-			<option name="sort" key="sort">Sort</option>
-			<option name="search" key="search">Search</option>
-			<option name="edit" key="edit">Edit</option>
+			<option key="sort" name="sort">Sort</option>
+			<option key="search" name="search">Search</option>
+			<option key="edit" name="edit">Edit</option>
 		</options>
 	</data>
 	<data type="boolean" immediate="true">
@@ -799,9 +845,9 @@
 		<id>task_view_search_type</id>
 		<title name="task_view_search_type">Search type for task view</title>
 		<options>
-			<option name="hidden" key="hidden">Hidden</option>
-			<option name="fulltext" key="fulltext">Fulltext</option>
-			<option name="fulltext_advanced" key="fulltext_advanced">Fulltext and advanced</option>
+			<option key="hidden" name="hidden">Hidden</option>
+			<option key="fulltext" name="fulltext">Fulltext</option>
+			<option key="fulltext_advanced" name="fulltext_advanced">Fulltext and advanced</option>
 		</options>
 		<init>fulltext_advanced</init>
 	</data>
@@ -809,8 +855,8 @@
 		<id>task_headers_mode</id>
 		<title name="headers_mode">Header mode</title>
 		<options>
-			<option name="sort" key="sort">Sort</option>
-			<option name="edit" key="edit">Edit</option>
+			<option key="sort" name="sort">Sort</option>
+			<option key="edit" name="edit">Edit</option>
 		</options>
 		<init>sort,edit</init>
 		<action trigger="set">
@@ -832,8 +878,8 @@
 		<id>task_headers_default_mode</id>
 		<title name="headers_default_mode">Default header mode</title>
 		<options>
-			<option name="sort" key="sort">Sort</option>
-			<option name="edit" key="edit">Edit</option>
+			<option key="sort" name="sort">Sort</option>
+			<option key="edit" name="edit">Edit</option>
 		</options>
 		<init>sort</init>
 	</data>
@@ -841,8 +887,8 @@
 		<id>task_headers_options_holder</id>
 		<title/>
 		<options>
-			<option name="sort" key="sort">Sort</option>
-			<option name="edit" key="edit">Edit</option>
+			<option key="sort" name="sort">Sort</option>
+			<option key="edit" name="edit">Edit</option>
 		</options>
 	</data>
 	<data type="boolean" immediate="true">
@@ -877,6 +923,88 @@
 		<id>task_show_more_menu</id>
 		<title name="task_show_more_menu">Show more menu for task item?</title>
 		<init>true</init>
+	</data>
+	<data type="button">
+		<id>order_down</id>
+		<title/>
+		<placeholder>south</placeholder>
+		<component>
+			<name>icon</name>
+			<property key="stretch">true</property>
+		</component>
+		<action trigger="set">
+			parentId: f.parentId;
+
+			def parentCase = workflowService.findOne(parentId.value[0])
+			def taskId = useCase.tasks.find { it.transition == "row_for_ordering" }.task
+			def taskRefValue = parentCase.dataSet['childItemForms'].value
+			int taskRefValueSize = taskRefValue.size()
+			def caseRefValue = parentCase.dataSet['childItemIds'].value
+			int caseRefValueSize = caseRefValue.size()
+
+			int idxInTaskRef = taskRefValue.indexOf(taskId)
+			if (idxInTaskRef &lt; taskRefValueSize - 1) {
+				Collections.swap(taskRefValue, idxInTaskRef, idxInTaskRef + 1)
+			}
+
+			int idxInCaseRef = caseRefValue.indexOf(useCase.stringId)
+			if (idxInCaseRef &lt; caseRefValueSize - 1) {
+				Collections.swap(caseRefValue, idxInCaseRef, idxInCaseRef + 1)
+			}
+
+			setData("children_order", parentCase, [
+			        "childItemForms" : [
+			                "value" : taskRefValue,
+							"type" : "taskRef"
+			        ],
+					"childItemIds" : [
+					        "value" : caseRefValue,
+							"type" : "caseRef"
+					]
+			])
+		</action>
+	</data>
+	<data type="button">
+		<id>order_up</id>
+		<title/>
+		<placeholder>north</placeholder>
+		<component>
+			<name>icon</name>
+			<property key="stretch">true</property>
+		</component>
+		<action trigger="set">
+			parentId: f.parentId;
+
+			def parentCase = workflowService.findOne(parentId.value[0])
+			def taskId = useCase.tasks.find { it.transition == "row_for_ordering" }.task
+			def taskRefValue = parentCase.dataSet['childItemForms'].value
+			def caseRefValue = parentCase.dataSet['childItemIds'].value
+
+			int idxInTaskRef = taskRefValue.indexOf(taskId)
+			if (idxInTaskRef > 0) {
+				Collections.swap(taskRefValue, idxInTaskRef - 1, idxInTaskRef)
+			} else {
+				return
+			}
+
+			int idxInCaseRef = caseRefValue.indexOf(useCase.stringId)
+			if (idxInCaseRef > 0) {
+				Collections.swap(caseRefValue, idxInCaseRef - 1, idxInCaseRef)
+			} else {
+				return
+			}
+
+			setData("children_order", parentCase, [
+					"childItemForms" : [
+							"value" : taskRefValue,
+							"type" : "taskRef"
+					],
+					"childItemIds" : [
+							"value" : caseRefValue,
+							"type" : "caseRef"
+					]
+			])
+		</action>
 	</data>
 
 	<!-- I18NS -->
@@ -1042,6 +1170,15 @@
 		<y>220</y>
 		<label>initialize [await sync]</label>
 		<icon>hourglass_empty</icon>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>view</id>
 			<dataRef>
@@ -1050,12 +1187,16 @@
 					<behavior>forbidden</behavior>
 					<action trigger="set">
 						filterCaseRef: f.filter_case,
-						tab_name: f.tab_name,
 						menu_name: f.menu_name;
 
+						if (filterCaseRef.value == null || filterCaseRef.value == []) {
+							return
+						}
+
 						def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
-						change tab_name value {return filterCase.dataSet["i18n_filter_name"].value}
-						change menu_name value {return filterCase.dataSet["i18n_filter_name"].value}
+						if (!menu_name.value) {
+							change menu_name value {return filterCase.dataSet["i18n_filter_name"].value}
+						}
 					</action>
 				</logic>
 			</dataRef>
@@ -1068,6 +1209,16 @@
 		<y>100</y>
 		<label name="item_settings">Item settings</label>
 		<icon>settings</icon>
+		<assignPolicy>auto</assignPolicy>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>pre_general</id>
 			<cols>4</cols>
@@ -1581,9 +1732,19 @@
 	<transition>
 		<id>move_item</id>
 		<x>580</x>
-		<y>140</y>
+		<y>100</y>
 		<label name="move_item">Move item</label>
 		<icon>move_down</icon>
+		<assignPolicy>auto</assignPolicy>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>move</id>
 			<cols>4</cols>
@@ -1655,9 +1816,19 @@
 	<transition>
 		<id>duplicate_item</id>
 		<x>580</x>
-		<y>300</y>
+		<y>340</y>
 		<label name="duplicate_item">Duplicate item</label>
 		<icon>content_copy</icon>
+		<assignPolicy>auto</assignPolicy>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>duplicate</id>
 			<cols>4</cols>
@@ -2263,6 +2434,135 @@
 			</dataRef>
 		</dataGroup>
 	</transition>
+	<transition>
+		<id>children_order</id>
+		<x>580</x>
+		<y>220</y>
+		<label>Manage item order</label>
+		<icon>low_priority</icon>
+		<assignPolicy>auto</assignPolicy>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>children_order_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>childItemForms</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="get">
+						forms: f.childItemForms,
+						ids: f.childItemIds;
+
+						def orderedTaskIds = ids.value?.collect { id -> workflowService.findOne(id).tasks.find { it.transition == "row_for_ordering" }.task }
+						change forms value { orderedTaskIds }
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>row_for_ordering</id>
+		<x>741</x>
+		<y>219</y>
+		<label>Row for ordering [referenced]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>row_for_ordering_0</id>
+			<cols>6</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>menu_item_identifier</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>menu_name_as_visible</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>order_down</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>1</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>order_up</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>5</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>1</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>finish</id>
+			<title></title>
+		</event>
+		<event type="delegate">
+			<id>delegate</id>
+			<title></title>
+		</event>
+	</transition>
 
 	<!-- PLACES-->
 	<place>
@@ -2323,6 +2623,13 @@
 		<type>read</type>
 		<sourceId>initialized</sourceId>
 		<destinationId>change_filter</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a13</id>
+		<type>read</type>
+		<sourceId>initialized</sourceId>
+		<destinationId>children_order</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 </document>

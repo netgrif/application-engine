@@ -512,7 +512,7 @@ public final class FieldFactory {
     }
 
     public Field buildImmediateField(Case useCase, String fieldId) {
-        Field field = useCase.getPetriNet().getDataSet().get(fieldId);
+        Field field = useCase.getPetriNet().getDataSet().get(fieldId).clone();
         resolveDataValues(field, useCase, fieldId);
         resolveAttributeValues(field, useCase, fieldId);
         return field;
