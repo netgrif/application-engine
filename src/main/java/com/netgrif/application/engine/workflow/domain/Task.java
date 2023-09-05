@@ -23,13 +23,16 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Document
 @AllArgsConstructor
 @Builder(builderMethodName = "with")
-public class Task {
+public class Task implements Serializable {
+
+    private static final long serialVersionUID = -7112277728921547546L;
 
     @Id
     @Builder.Default

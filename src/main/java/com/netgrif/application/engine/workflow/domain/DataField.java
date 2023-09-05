@@ -14,11 +14,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class DataField implements Referencable {
+public class DataField implements Referencable, Serializable {
+
+    private static final long serialVersionUID = 3287600516604188694L;
 
     @Getter
     private Map<String, Set<FieldBehavior>> behavior;
