@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic;
 
-class FrontAction {
+class FrontAction implements Serializable {
+
+    private static final long serialVersionUID = 3815234444390109824L;
 
     private String id;
 

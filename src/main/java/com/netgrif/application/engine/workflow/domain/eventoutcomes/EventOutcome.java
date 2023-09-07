@@ -4,11 +4,14 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FrontAction;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public abstract class EventOutcome {
+public abstract class EventOutcome implements Serializable {
+
+    private static final long serialVersionUID = 5228218326436828485L;
 
 //    todo doplnenie referencie na event po implementácii event loggingu
 

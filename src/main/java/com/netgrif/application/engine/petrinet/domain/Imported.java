@@ -1,6 +1,10 @@
 package com.netgrif.application.engine.petrinet.domain;
 
-public abstract class Imported {
+import java.io.Serializable;
+
+public abstract class Imported implements Serializable {
+
+    private static final long serialVersionUID = -2708949961379974800L;
 
     protected String importId;
 
