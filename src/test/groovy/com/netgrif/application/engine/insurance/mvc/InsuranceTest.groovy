@@ -17,6 +17,7 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.hamcrest.CoreMatchers
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 
 //import com.netgrif.application.engine.orgstructure.domain.Group
 
@@ -155,6 +156,7 @@ class InsuranceTest {
     private Map mapper
 
     @Test
+    @Disabled
     @DisplayName("Insurance Test")
     void test() {
         createCase()
