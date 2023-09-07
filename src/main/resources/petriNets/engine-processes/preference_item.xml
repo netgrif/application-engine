@@ -3,7 +3,7 @@
 	<initials>PRI</initials>
 	<title>Preference Item</title>
 	<icon>check_box_outline_blank</icon>
-	<defaultRole>false</defaultRole>
+	<defaultRole>true</defaultRole>
 	<anonymousRole>false</anonymousRole>
 	<transitionRole>false</transitionRole>
 	<roleRef>
@@ -19,6 +19,14 @@
 		<caseLogic>
 			<create>true</create>
 			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>default</id>
+		<caseLogic>
+			<create>false</create>
+			<delete>false</delete>
 			<view>true</view>
 		</caseLogic>
 	</roleRef>
