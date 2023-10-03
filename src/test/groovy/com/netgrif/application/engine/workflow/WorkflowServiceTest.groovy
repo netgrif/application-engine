@@ -1,8 +1,6 @@
 package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.elastic.domain.ElasticCase
-import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -42,9 +40,6 @@ class WorkflowServiceTest {
 
     @Autowired
     private SuperCreator superCreator
-
-    @Autowired
-    private ElasticCaseRepository elasticCaseRepository
 
     private def stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
@@ -105,14 +100,9 @@ class WorkflowServiceTest {
         assert testNet.getNet() != null
 
         def net = testNet.getNet()
-        Thread.sleep(2000)
         Case aCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('sk')).getCase()
-        Thread.sleep(2000)
         assert aCase.title.equals("Slovenský preklad")
-        assert workflowService.findOne(aCase.stringId).uriNodeId == null
-        Thread.sleep(2000)
-        ElasticCase aCaseElastic = elasticCaseRepository.findByStringId(aCase.stringId)
-        assert aCaseElastic.uriNodeId == net.uriNodeId
+        assert workflowService.findOne(aCase.stringId).uriNodeId == net.uriNodeId
 
         Case enCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('en')).getCase()
         assert enCase.title.equals("English translation")

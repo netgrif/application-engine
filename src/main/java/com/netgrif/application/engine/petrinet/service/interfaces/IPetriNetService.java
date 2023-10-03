@@ -104,7 +104,5 @@ public interface IPetriNetService {
 
     List<String> getExistingPetriNetIdentifiersFromIdentifiersList(List<String> identifiers);
 
-    PetriNet populateUriNodeId(PetriNet petriNet);
-
     PetriNetImportReference getNetFromCase(String caseId);
 }

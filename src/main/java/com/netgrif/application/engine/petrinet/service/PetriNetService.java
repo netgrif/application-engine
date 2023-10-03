@@ -185,7 +185,7 @@ public class PetriNetService implements IPetriNetService {
     @Override
     @Deprecated
     public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author, uriService.getRoot().getId());
+        return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author, uriService.getRoot().getStringId());
     }
 
     @Override
@@ -196,7 +196,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, releaseType, author, uriService.getRoot().getId());
+        return importPetriNet(xmlFile, releaseType, author, uriService.getRoot().getStringId());
     }
 
     @Override
@@ -541,12 +541,5 @@ public class PetriNetService implements IPetriNetService {
             throw new NullPointerException();
         }
         return obj;
-    }
-
-    @Override
-    public PetriNet populateUriNodeId(PetriNet petriNet) {
-        String uriNodeId = elasticPetriNetService.findUriNodeId(petriNet);
-        petriNet.setUriNodeId(uriNodeId);
-        return petriNet;
     }
 }

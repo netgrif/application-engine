@@ -283,7 +283,6 @@ public class WorkflowService implements IWorkflowService {
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
         LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
-        petriNet = petriNetService.populateUriNodeId(petriNet);
         int rulesExecuted;
         Case useCase = new Case(petriNet);
         useCase.populateDataSet(initValueExpressionEvaluator);
@@ -482,12 +481,6 @@ public class WorkflowService implements IWorkflowService {
 
         LongStream.range(0L, fields.size()).forEach(l -> fields.get((int) l).setOrder(l));
         return fields;
-    }
-
-    public Case populateUriNodeId(Case aCase) {
-        String uriNodeId = elasticCaseService.findUriNodeId(aCase);
-        aCase.setUriNodeId(uriNodeId);
-        return aCase;
     }
 
     private void setImmediateDataFieldsReadOnly(Case useCase) {
