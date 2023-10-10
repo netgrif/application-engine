@@ -89,6 +89,10 @@ public class Transition extends Node {
     @Setter
     private String defaultRoleId;
 
+    @Getter
+    @Setter
+    private Map<String, String> tags;
+
     public Transition() {
         super();
         dataSet = new LinkedHashMap<>();
@@ -102,6 +106,7 @@ public class Transition extends Node {
         finishPolicy = FinishPolicy.MANUAL;
         events = new HashMap<>();
         assignedUserPolicy = new HashMap<>();
+        tags = new HashMap<>();
     }
 
     public void addDataSet(String field, Set<FieldBehavior> behavior, Map<DataEventType, DataEvent> events, FieldLayout layout, Component component){
@@ -263,6 +268,7 @@ public class Transition extends Node {
         clone.setFinishPolicy(finishPolicy);
         clone.setEvents(this.events == null ? null : events.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
         clone.setAssignedUserPolicy(new HashMap<>(assignedUserPolicy));
+        clone.setTags(new HashMap<>(this.tags));
         clone.setDefaultRoleId(defaultRoleId);
         return clone;
     }

@@ -36,6 +36,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     public static final String ROLE = "role";
     public static final String DATA = "data";
+    public static final String TAGS = "tags";
     public static final String PETRINET_IDENTIFIER = "identifier";
     public static final String PETRINET_ID = "id";
     public static final String PETRINET = "petriNet";
@@ -72,6 +73,9 @@ public class CaseSearchService extends MongoSearchService<Case> {
         }
         if (requestQuery.containsKey(DATA)) {
             builder.and(data(requestQuery.get(DATA)));
+        }
+        if (requestQuery.containsKey(TAGS)) {
+            builder.and(tags(requestQuery.get(TAGS)));
         }
         if (requestQuery.containsKey(CASE_ID)) {
             builder.and(caseId(requestQuery.get(CASE_ID)));
@@ -223,6 +227,25 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 }
             } else {
                 predicates.add(QCase.case$.dataSet.get((String) k).value.eq(v));
+            }
+        });
+        BooleanBuilder builder = new BooleanBuilder();
+        predicates.forEach(builder::and);
+        return builder;
+    }
+
+    public Predicate tags(Object tags) {
+        if (!(tags instanceof Map)) {
+            throw new IllegalArgumentException("Unsupported class " + tags.getClass().getName());
+        }
+        Map tagsQueries = (Map) tags;
+
+        List<BooleanExpression> predicates = new ArrayList<>();
+        (tagsQueries).forEach((k, v) -> {
+            if (k instanceof String && v instanceof String) {
+                predicates.add(QCase.case$.tags.get((String) k).eq((String) v));
+            } else {
+                throw new IllegalArgumentException("Unsupported class in key or value tags element (" + k.getClass().getName() + "," + v.getClass().getName() + ")");
             }
         });
         BooleanBuilder builder = new BooleanBuilder();
