@@ -4,7 +4,6 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
@@ -111,6 +110,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
         buildProcessQuery(request, builder);
         buildFullTextQuery(request, builder);
         buildTransitionQuery(request, builder);
+        buildTagsQuery(request, builder);
         boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, builder);
 
         if (resultAlwaysEmpty)
@@ -284,5 +284,21 @@ public class TaskSearchService extends MongoSearchService<Task> {
                 )
         );
         return false;
+    }
+
+    private void buildTagsQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.tags == null || request.tags.isEmpty()) {
+            return;
+        }
+
+        query.and(
+                constructPredicateTree(
+                        request.tags.entrySet().stream().map(entry -> this.tagQuery(entry.getKey(), entry.getValue())).collect(Collectors.toList()),
+                        BooleanBuilder::and)
+        );
+    }
+
+    public Predicate tagQuery(String key, String value) {
+        return QTask.task.tags.get(key).eq(value);
     }
 }
