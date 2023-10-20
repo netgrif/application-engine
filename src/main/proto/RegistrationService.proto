@@ -1,0 +1,33 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package com.netgrif.pluginlibrary.register;
+
+enum MessageStatus {
+  OK = 0;
+  NOT_OK = 1;
+}
+
+message Method {
+  string name = 1;
+  repeated string args = 2;
+}
+
+message EntryPoint {
+  string identifier = 1;
+  repeated Method methods = 2;
+}
+
+message RegistrationRequest {
+  string identifier = 1;
+  string url = 2;
+  repeated EntryPoint entryPoints = 3;
+}
+
+message ResponseMessage {
+  MessageStatus status = 1;
+  string message = 2;
+}
+
+service RegistrationService {
+  rpc register(RegistrationRequest) returns (ResponseMessage);
+}
