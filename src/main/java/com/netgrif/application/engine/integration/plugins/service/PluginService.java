@@ -1,22 +1,31 @@
 package com.netgrif.application.engine.integration.plugins.service;
 
+import com.google.protobuf.ByteString;
 import com.netgrif.application.engine.integration.plugins.domain.Plugin;
 import com.netgrif.application.engine.integration.plugins.properties.PluginRegistrationConfigProperties;
 import com.netgrif.application.engine.integration.plugins.repository.PluginRepository;
+import com.netgrif.pluginlibrary.core.*;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public final class PluginService implements IPluginService {
+public class PluginService implements IPluginService {
     private final PluginRepository pluginRepository;
     private final PluginRegistrationConfigProperties properties;
     private Server server;
@@ -44,6 +53,26 @@ public final class PluginService implements IPluginService {
         }
         pluginRepository.save(plugin);
         log.info("Plugin with identifier \"" + plugin.getIdentifier() + "\" was registered.");
+    }
+
+    @Override
+    public Object call(String pluginId, String entryPoint, String method, Serializable... args) {
+        Plugin plugin = pluginRepository.findByIdentifier(pluginId);
+        if (plugin == null) {
+            throw new IllegalArgumentException("Plugin with identifier \"" + pluginId + "\" cannot be found");
+        }
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(plugin.getUrl(), (int) plugin.getPort())
+                .usePlaintext()
+                .build();
+        List<ByteString> argBytes = Arrays.stream(args).map(arg -> ByteString.copyFrom(SerializationUtils.serialize(arg))).collect(Collectors.toList());
+        ExecutionServiceGrpc.ExecutionServiceBlockingStub stub = ExecutionServiceGrpc.newBlockingStub(channel);
+        ExecutionResponse responseMessage = stub.execute(ExecutionRequest.newBuilder()
+                .setEntryPoint(entryPoint)
+                .setMethod(method)
+                .addAllArgs(argBytes)
+                .build());
+        channel.shutdown();
+        return SerializationUtils.deserialize(responseMessage.getResponse().toByteArray());
     }
 
     @Override

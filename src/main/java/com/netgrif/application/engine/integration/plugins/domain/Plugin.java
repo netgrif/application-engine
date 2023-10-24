@@ -16,6 +16,7 @@ public class Plugin {
     private ObjectId _id;
     private String identifier;
     private String url;
+    private long port;
     private Map<String, EntryPoint> entryPoints;
 
     public Plugin() {

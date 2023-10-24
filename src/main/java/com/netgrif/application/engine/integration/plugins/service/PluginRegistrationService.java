@@ -3,37 +3,53 @@ package com.netgrif.application.engine.integration.plugins.service;
 import com.netgrif.application.engine.integration.plugins.domain.EntryPoint;
 import com.netgrif.application.engine.integration.plugins.domain.Method;
 import com.netgrif.application.engine.integration.plugins.domain.Plugin;
-import com.netgrif.pluginlibrary.core.MessageStatus;
-import com.netgrif.pluginlibrary.core.RegistrationRequest;
-import com.netgrif.pluginlibrary.core.RegistrationServiceGrpc;
-import com.netgrif.pluginlibrary.core.ResponseMessage;
+import com.netgrif.pluginlibrary.core.*;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
 public final class PluginRegistrationService extends RegistrationServiceGrpc.RegistrationServiceImplBase {
     private final IPluginService pluginService;
 
     @Override
-    public void register(RegistrationRequest request, StreamObserver<ResponseMessage> responseObserver) {
-        ResponseMessage response;
+    public void register(RegistrationRequest request, StreamObserver<RegistrationResponse> responseObserver) {
+        RegistrationResponse response;
         try {
             pluginService.register(convert(request));
-            response = ResponseMessage.newBuilder()
+            response = RegistrationResponse.newBuilder()
                     .setStatus(MessageStatus.OK)
                     .setMessage("Plugin with identifier \"" + request.getIdentifier() + "\" was successfully registered.")
                     .build();
         } catch (IllegalArgumentException e) {
-            response = ResponseMessage.newBuilder()
+            response = RegistrationResponse.newBuilder()
                     .setStatus(MessageStatus.NOT_OK)
                     .setMessage("Plugin with identifier \"" + request.getIdentifier() + "\" failed to register. " + e.getMessage())
+                    .build();
+        }
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void unregister(UnRegistrationRequest request, StreamObserver<UnRegistrationResponse> responseObserver) {
+        UnRegistrationResponse response;
+        try {
+            pluginService.unregister(request.getIdentifier());
+            response = UnRegistrationResponse.newBuilder()
+                    .setStatus(MessageStatus.OK)
+                    .setMessage("Plugin with identifier \"" + request.getIdentifier() + "\" was successfully unregistered.")
+                    .build();
+        } catch (IllegalArgumentException e) {
+            response = UnRegistrationResponse.newBuilder()
+                    .setStatus(MessageStatus.NOT_OK)
+                    .setMessage("Plugin with identifier \"" + request.getIdentifier() + "\" failed to unregister. " + e.getMessage())
                     .build();
         }
         responseObserver.onNext(response);
@@ -44,6 +60,7 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
         Plugin plugin = new Plugin();
         plugin.setIdentifier(request.getIdentifier());
         plugin.setUrl(request.getUrl());
+        plugin.setPort(request.getPort());
         plugin.setEntryPoints(request.getEntryPointsList().stream().map(entryPoint -> {
             EntryPoint ep = new EntryPoint();
             ep.setIdentifier(entryPoint.getIdentifier());

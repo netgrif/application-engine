@@ -8,6 +8,5 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "nae.plugin.registration")
 public class PluginRegistrationConfigProperties {
-    private String url;
     private int port;
 }

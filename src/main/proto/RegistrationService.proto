@@ -20,14 +20,25 @@ message EntryPoint {
 message RegistrationRequest {
   string identifier = 1;
   string url = 2;
-  repeated EntryPoint entryPoints = 3;
+  int64 port = 3;
+  repeated EntryPoint entryPoints = 4;
 }
 
-message ResponseMessage {
+message UnRegistrationRequest {
+  string identifier = 1;
+}
+
+message RegistrationResponse {
+  MessageStatus status = 1;
+  string message = 2;
+}
+
+message UnRegistrationResponse {
   MessageStatus status = 1;
   string message = 2;
 }
 
 service RegistrationService {
-  rpc register(RegistrationRequest) returns (ResponseMessage);
+  rpc register(RegistrationRequest) returns (RegistrationResponse);
+  rpc unregister(UnRegistrationRequest) returns (UnRegistrationResponse);
 }
