@@ -8,6 +8,7 @@ import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.SerializationUtils;
 
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -20,40 +21,31 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
 
     @Override
     public void register(RegistrationRequest request, StreamObserver<RegistrationResponse> responseObserver) {
-        RegistrationResponse response;
         try {
             pluginService.register(convert(request));
-            response = RegistrationResponse.newBuilder()
-                    .setStatus(MessageStatus.OK)
+            RegistrationResponse response = RegistrationResponse.newBuilder()
                     .setMessage("Plugin with identifier \"" + request.getIdentifier() + "\" was successfully registered.")
                     .build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
         } catch (IllegalArgumentException e) {
-            response = RegistrationResponse.newBuilder()
-                    .setStatus(MessageStatus.NOT_OK)
-                    .setMessage("Plugin with identifier \"" + request.getIdentifier() + "\" failed to register. " + e.getMessage())
-                    .build();
+            responseObserver.onError(e);
         }
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
     }
 
     @Override
     public void unregister(UnRegistrationRequest request, StreamObserver<UnRegistrationResponse> responseObserver) {
-        UnRegistrationResponse response;
         try {
             pluginService.unregister(request.getIdentifier());
-            response = UnRegistrationResponse.newBuilder()
-                    .setStatus(MessageStatus.OK)
+            UnRegistrationResponse response = UnRegistrationResponse.newBuilder()
                     .setMessage("Plugin with identifier \"" + request.getIdentifier() + "\" was successfully unregistered.")
                     .build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
         } catch (IllegalArgumentException e) {
-            response = UnRegistrationResponse.newBuilder()
-                    .setStatus(MessageStatus.NOT_OK)
-                    .setMessage("Plugin with identifier \"" + request.getIdentifier() + "\" failed to unregister. " + e.getMessage())
-                    .build();
+            responseObserver.onError(e);
         }
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
+
     }
 
     private Plugin convert(RegistrationRequest request) {
@@ -67,7 +59,7 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
             ep.setMethods(entryPoint.getMethodsList().stream().map(method -> {
                 Method mth = new Method();
                 mth.setName(method.getName());
-                mth.setArgs(method.getArgsList());
+                mth.setArgs(method.getArgsList().stream().map(arg -> (Class<?>) SerializationUtils.deserialize(arg.toByteArray())).collect(Collectors.toList()));
                 return mth;
             }).collect(Collectors.toMap(Method::getName, Function.identity())));
             return ep;

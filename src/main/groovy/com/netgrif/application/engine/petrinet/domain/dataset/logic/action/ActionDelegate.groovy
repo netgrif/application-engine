@@ -1954,7 +1954,7 @@ class ActionDelegate {
         return "${publicViewUrl}/${Base64.getEncoder().encodeToString(identifier.bytes)}" as String
     }
 
-    def callPlugin(String plugin, String method, Object... args) {
-
+    def callPlugin(String plugin, String entryPoint, String method, Serializable... args) {
+        return pluginService.call(plugin, entryPoint, method, args)
     }
 }

@@ -71,7 +71,7 @@ public class PluginService implements IPluginService {
                 .setMethod(method)
                 .addAllArgs(argBytes)
                 .build());
-        channel.shutdown();
+        channel.shutdownNow();
         return SerializationUtils.deserialize(responseMessage.getResponse().toByteArray());
     }
 
