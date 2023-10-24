@@ -1,6 +1,6 @@
 syntax = "proto3";
 option java_multiple_files = true;
-package com.netgrif.pluginlibrary.register;
+package com.netgrif.pluginlibrary.core;
 
 enum MessageStatus {
   OK = 0;

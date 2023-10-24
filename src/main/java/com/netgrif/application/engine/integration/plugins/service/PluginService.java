@@ -1,16 +1,40 @@
 package com.netgrif.application.engine.integration.plugins.service;
 
 import com.netgrif.application.engine.integration.plugins.domain.Plugin;
+import com.netgrif.application.engine.integration.plugins.properties.PluginRegistrationConfigProperties;
 import com.netgrif.application.engine.integration.plugins.repository.PluginRepository;
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.io.IOException;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public final class PluginService implements IPluginService {
     private final PluginRepository pluginRepository;
+    private final PluginRegistrationConfigProperties properties;
+    private Server server;
+    @PostConstruct
+    public void startServer() throws IOException {
+        server = ServerBuilder
+                .forPort(properties.getPort())
+                .addService(new PluginRegistrationService(this))
+                .build();
+        server.start();
+        log.info("[gRPC Server] - Started on port " + properties.getPort());
+    }
+
+    @PreDestroy
+    public void stopServer() {
+        server.shutdown();
+        log.info("[gRPC Server] - Started on port " + properties.getPort());
+    }
 
     @Override
     public void register(Plugin plugin) {

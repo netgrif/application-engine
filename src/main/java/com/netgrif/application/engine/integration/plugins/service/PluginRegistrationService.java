@@ -1,50 +1,25 @@
-package com.netgrif.application.engine.integration.plugins.registration;
+package com.netgrif.application.engine.integration.plugins.service;
 
 import com.netgrif.application.engine.integration.plugins.domain.EntryPoint;
 import com.netgrif.application.engine.integration.plugins.domain.Method;
 import com.netgrif.application.engine.integration.plugins.domain.Plugin;
-import com.netgrif.application.engine.integration.plugins.properties.PluginRegistrationConfigProperties;
-import com.netgrif.application.engine.integration.plugins.service.IPluginService;
-import com.netgrif.pluginlibrary.register.MessageStatus;
-import com.netgrif.pluginlibrary.register.RegistrationRequest;
-import com.netgrif.pluginlibrary.register.RegistrationServiceGrpc;
-import com.netgrif.pluginlibrary.register.ResponseMessage;
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
+import com.netgrif.pluginlibrary.core.MessageStatus;
+import com.netgrif.pluginlibrary.core.RegistrationRequest;
+import com.netgrif.pluginlibrary.core.RegistrationServiceGrpc;
+import com.netgrif.pluginlibrary.core.ResponseMessage;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import java.io.IOException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public final class PluginRegistrationServer extends RegistrationServiceGrpc.RegistrationServiceImplBase {
-
-    private final PluginRegistrationConfigProperties properties;
+public final class PluginRegistrationService extends RegistrationServiceGrpc.RegistrationServiceImplBase {
     private final IPluginService pluginService;
-    private Server server;
-
-    @PostConstruct
-    public void startServer() throws IOException {
-        server = ServerBuilder
-                .forPort(properties.getPort())
-                .addService(this).build();
-        server.start();
-        log.info("[gRPC Server] - Started on port " + properties.getPort());
-    }
-
-    @PreDestroy
-    public void stopServer() {
-        server.shutdown();
-        log.info("[gRPC Server] - Started on port " + properties.getPort());
-    }
 
     @Override
     public void register(RegistrationRequest request, StreamObserver<ResponseMessage> responseObserver) {
