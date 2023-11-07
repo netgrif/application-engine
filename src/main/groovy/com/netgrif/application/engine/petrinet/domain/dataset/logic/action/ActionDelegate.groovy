@@ -20,8 +20,6 @@ import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.history.service.IHistoryService
 import com.netgrif.application.engine.importer.service.FieldFactory
-import com.netgrif.application.engine.integration.plugins.service.IPluginService
-import com.netgrif.application.engine.integration.plugins.service.PluginService
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
 import com.netgrif.application.engine.mail.interfaces.IMailService
@@ -192,9 +190,6 @@ class ActionDelegate {
 
     @Autowired
     PublicViewProperties publicViewProperties
-
-    @Autowired
-    IPluginService pluginService
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -1952,9 +1947,5 @@ class ActionDelegate {
 
     String makeUrl(String publicViewUrl = publicViewProperties.url, String identifier) {
         return "${publicViewUrl}/${Base64.getEncoder().encodeToString(identifier.bytes)}" as String
-    }
-
-    def callPlugin(String plugin, String entryPoint, String method, Serializable... args) {
-        return pluginService.call(plugin, entryPoint, method, args)
     }
 }

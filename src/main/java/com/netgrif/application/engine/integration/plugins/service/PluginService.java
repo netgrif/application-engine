@@ -1,14 +1,11 @@
 package com.netgrif.application.engine.integration.plugins.service;
 
 import com.google.protobuf.ByteString;
-import com.netgrif.application.engine.integration.plugin.PluginInjector;
+import com.netgrif.application.engine.integration.plugin.injector.PluginInjector;
 import com.netgrif.application.engine.integration.plugins.domain.Plugin;
 import com.netgrif.application.engine.integration.plugins.properties.PluginRegistrationConfigProperties;
 import com.netgrif.application.engine.integration.plugins.repository.PluginRepository;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate;
 import com.netgrif.pluginlibrary.core.*;
-import groovy.lang.GroovyObject;
-import groovy.lang.MetaClass;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
@@ -16,7 +13,6 @@ import io.grpc.ServerBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -58,7 +54,7 @@ public class PluginService implements IPluginService {
             log.warn("Plugin with identifier \"" + plugin.getIdentifier() + "\" has already been registered. Plugin will be activated.");
         }
         pluginRepository.save(plugin);
-        pluginInjector.inject(plugin, this);
+        pluginInjector.inject(plugin);
         log.info("Plugin with identifier \"" + plugin.getIdentifier() + "\" was registered.");
     }
 
