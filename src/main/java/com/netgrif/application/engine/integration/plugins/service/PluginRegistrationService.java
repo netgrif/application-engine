@@ -34,10 +34,10 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
     }
 
     @Override
-    public void unregister(UnRegistrationRequest request, StreamObserver<UnRegistrationResponse> responseObserver) {
+    public void deactivate(DeactivationRequest request, StreamObserver<DeactivationResponse> responseObserver) {
         try {
-            pluginService.unregister(request.getIdentifier());
-            UnRegistrationResponse response = UnRegistrationResponse.newBuilder()
+            pluginService.deactivate(request.getIdentifier());
+            DeactivationResponse response = DeactivationResponse.newBuilder()
                     .setMessage("Plugin with identifier \"" + request.getIdentifier() + "\" was successfully unregistered.")
                     .build();
             responseObserver.onNext(response);
@@ -53,6 +53,7 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
         plugin.setIdentifier(request.getIdentifier());
         plugin.setUrl(request.getUrl());
         plugin.setPort(request.getPort());
+        plugin.setActive(true);
         plugin.setEntryPoints(request.getEntryPointsList().stream().map(entryPoint -> {
             EntryPoint ep = new EntryPoint();
             ep.setIdentifier(entryPoint.getIdentifier());

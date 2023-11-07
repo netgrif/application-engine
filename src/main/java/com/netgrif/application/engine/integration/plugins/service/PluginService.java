@@ -76,13 +76,14 @@ public class PluginService implements IPluginService {
     }
 
     @Override
-    public void unregister(String identifier) {
+    public void deactivate(String identifier) {
         Plugin existingPlugin = pluginRepository.findByIdentifier(identifier);
         if (existingPlugin == null) {
-            throw new IllegalArgumentException("Plugin with identifier \"" + identifier + "\" cannot be unregistered. Plugin with this identifier does not exist.");
+            throw new IllegalArgumentException("Plugin with identifier \"" + identifier + "\" cannot be deactivated. Plugin with this identifier does not exist.");
         }
-        pluginRepository.delete(existingPlugin);
-        log.info("Plugin with identifier \"" + identifier + "\" was unregistered.");
+        existingPlugin.setActive(false);
+        pluginRepository.save(existingPlugin);
+        log.info("Plugin with identifier \"" + identifier + "\" was deactivated.");
     }
 
 

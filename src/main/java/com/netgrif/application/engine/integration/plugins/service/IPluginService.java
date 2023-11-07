@@ -9,5 +9,5 @@ public interface IPluginService {
 
     Object call(String pluginId, String entryPoint, String method, Serializable... args);
 
-    void unregister(String identifier);
+    void deactivate(String identifier);
 }

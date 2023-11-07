@@ -17,6 +17,7 @@ public class Plugin {
     private String identifier;
     private String url;
     private long port;
+    private boolean active;
     private Map<String, EntryPoint> entryPoints;
 
     public Plugin() {

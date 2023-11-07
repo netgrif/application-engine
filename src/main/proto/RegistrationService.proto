@@ -20,7 +20,7 @@ message RegistrationRequest {
   repeated EntryPoint entryPoints = 4;
 }
 
-message UnRegistrationRequest {
+message DeactivationRequest {
   string identifier = 1;
 }
 
@@ -28,11 +28,11 @@ message RegistrationResponse {
   string message = 1;
 }
 
-message UnRegistrationResponse {
+message DeactivationResponse {
   string message = 1;
 }
 
 service RegistrationService {
   rpc register(RegistrationRequest) returns (RegistrationResponse);
-  rpc unregister(UnRegistrationRequest) returns (UnRegistrationResponse);
+  rpc deactivate(DeactivationRequest) returns (DeactivationResponse);
 }
