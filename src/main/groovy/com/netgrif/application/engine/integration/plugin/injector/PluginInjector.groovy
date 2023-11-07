@@ -4,7 +4,6 @@ import com.netgrif.application.engine.configuration.ApplicationContextProvider
 import com.netgrif.application.engine.integration.plugins.domain.Plugin
 import com.netgrif.application.engine.integration.plugins.service.PluginService
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
-import com.netgrif.pluginlibrary.core.EntryPoint
 import groovy.util.logging.Slf4j
 import org.springframework.stereotype.Component
 
@@ -12,14 +11,8 @@ import org.springframework.stereotype.Component
 @Slf4j
 class PluginInjector {
 
-    private final ActionDelegate actionDelegate
-
-    PluginInjector(ActionDelegate actionDelegate) {
-        this.actionDelegate = actionDelegate
-    }
-
     void inject(Plugin plugin) {
-        MetaClass actionDelegateMeta = actionDelegate.metaClass
+        MetaClass actionDelegateMeta = ActionDelegate.metaClass
         PluginMeta pluginMeta = new PluginMeta()
         plugin.entryPoints.each {ep ->
             EntryPointMeta entryPointMeta = new EntryPointMeta()
