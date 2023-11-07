@@ -38,7 +38,7 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
         try {
             pluginService.deactivate(request.getIdentifier());
             DeactivationResponse response = DeactivationResponse.newBuilder()
-                    .setMessage("Plugin with identifier \"" + request.getIdentifier() + "\" was successfully unregistered.")
+                    .setMessage("Plugin with identifier \"" + request.getIdentifier() + "\" was successfully deactivated.")
                     .build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
