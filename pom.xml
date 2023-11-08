@@ -5,7 +5,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine</artifactId>
-    <version>6.3.1</version>
+    <version>6.3.2</version>
     <packaging>jar</packaging>
 
     <name>NETGRIF Application Engine</name>
@@ -19,10 +19,12 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
     <organization>
         <name>NETGRIF, s.r.o.</name>
         <url>https://netgrif.com</url>
     </organization>
+
     <developers>
         <developer>
             <name>Netgrif</name>
@@ -31,11 +33,13 @@
             <organizationUrl>https://netgrif.com</organizationUrl>
         </developer>
     </developers>
+
     <scm>
         <connection>scm:git:git://github.com/netgrif/application-engine.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/netgrif/application-engine.git</developerConnection>
         <url>https://github.com/netgrif/application-engine</url>
     </scm>
+
     <issueManagement>
         <system>GitHub</system>
         <url>https://github.com/netgrif/application-engine/issues</url>

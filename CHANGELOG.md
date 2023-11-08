@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.1](https://github.com/netgrif/application-engine/commits/v6.3.1)
+Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.2](https://github.com/netgrif/application-engine/commits/v6.3.2)
+
+## [6.3.2](https://github.com/netgrif/application-engine/releases/tag/v6.3.1) (2023-11-08)
+
+### Fixed
+
+- [NAE-1910] Event log is missing change in case's active places
 
 ## [6.3.1](https://github.com/netgrif/application-engine/releases/tag/v6.3.1) (2023-07-18)
 
