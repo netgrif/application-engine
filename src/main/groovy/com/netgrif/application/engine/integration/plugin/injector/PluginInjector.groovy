@@ -17,9 +17,9 @@ class PluginInjector {
             ep.value.methods.each { m ->
                 entryPointMetaClass[m.value.name] << { Serializable... args ->
                     PluginService pluginService = ApplicationContextProvider.getBean("pluginService") as PluginService
-                    return pluginService.call(plugin.identifier, ep.value.identifier, m.value.name, args)}
+                    return pluginService.call(plugin.identifier, ep.value.name, m.value.name, args)}
             }
-            pluginMetaClass[ep.value.identifier] = new EntryPointMeta()
+            pluginMetaClass[ep.value.name] = new EntryPointMeta()
         }
         actionDelegateMeta[plugin.name] = new PluginMeta()
     }

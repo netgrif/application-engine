@@ -7,7 +7,7 @@ import java.util.Map;
 
 @Data
 public class EntryPoint {
-    private String identifier;
+    private String name;
     private Map<String, Method> methods;
     public EntryPoint() {
         this.methods = new LinkedHashMap<>();

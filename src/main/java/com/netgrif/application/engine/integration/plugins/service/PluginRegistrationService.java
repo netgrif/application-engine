@@ -57,7 +57,7 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
         plugin.setActive(true);
         plugin.setEntryPoints(request.getEntryPointsList().stream().map(entryPoint -> {
             EntryPoint ep = new EntryPoint();
-            ep.setIdentifier(entryPoint.getIdentifier());
+            ep.setName(entryPoint.getName());
             ep.setMethods(entryPoint.getMethodsList().stream().map(method -> {
                 Method mth = new Method();
                 mth.setName(method.getName());
@@ -65,7 +65,7 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
                 return mth;
             }).collect(Collectors.toMap(Method::getName, Function.identity())));
             return ep;
-        }).collect(Collectors.toMap(EntryPoint::getIdentifier, Function.identity())));
+        }).collect(Collectors.toMap(EntryPoint::getName, Function.identity())));
         return plugin;
     }
 }
