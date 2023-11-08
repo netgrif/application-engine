@@ -9,15 +9,16 @@ message Method {
 }
 
 message EntryPoint {
-  string identifier = 1;
+  string name = 1;
   repeated Method methods = 2;
 }
 
 message RegistrationRequest {
   string identifier = 1;
-  string url = 2;
-  int64 port = 3;
-  repeated EntryPoint entryPoints = 4;
+  string name = 2;
+  string url = 3;
+  int64 port = 4;
+  repeated EntryPoint entryPoints = 5;
 }
 
 message DeactivationRequest {

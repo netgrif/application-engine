@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 public class PluginService implements IPluginService {
     private final PluginRepository pluginRepository;
     private final PluginRegistrationConfigProperties properties;
-    private final PluginInjector pluginInjector;
     private Server server;
     @PostConstruct
     public void startServer() throws IOException {
@@ -52,9 +51,10 @@ public class PluginService implements IPluginService {
         Plugin existingPlugin = pluginRepository.findByIdentifier(plugin.getIdentifier());
         if (existingPlugin != null) {
             log.warn("Plugin with identifier \"" + plugin.getIdentifier() + "\" has already been registered. Plugin will be activated.");
+            plugin.set_id(existingPlugin.get_id());
         }
         pluginRepository.save(plugin);
-        pluginInjector.inject(plugin);
+        PluginInjector.inject(plugin);
         log.info("Plugin with identifier \"" + plugin.getIdentifier() + "\" was registered.");
     }
 

@@ -15,6 +15,7 @@ public class Plugin {
     @Id
     private ObjectId _id;
     private String identifier;
+    private String name;
     private String url;
     private long port;
     private boolean active;

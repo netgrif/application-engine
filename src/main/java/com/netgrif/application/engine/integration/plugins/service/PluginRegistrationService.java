@@ -51,6 +51,7 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
     private Plugin convert(RegistrationRequest request) {
         Plugin plugin = new Plugin();
         plugin.setIdentifier(request.getIdentifier());
+        plugin.setName(request.getName());
         plugin.setUrl(request.getUrl());
         plugin.setPort(request.getPort());
         plugin.setActive(true);

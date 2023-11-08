@@ -7,7 +7,6 @@ import com.netgrif.application.engine.integration.plugins.domain.Plugin
 import com.netgrif.application.engine.integration.plugins.service.PluginService
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 
-
 class PluginInjector {
 
     static void inject(Plugin plugin) {
@@ -22,6 +21,6 @@ class PluginInjector {
             }
             pluginMetaClass[ep.value.identifier] = new EntryPointMeta()
         }
-        actionDelegateMeta[plugin.identifier] = new PluginMeta()
+        actionDelegateMeta[plugin.name] = new PluginMeta()
     }
 }
