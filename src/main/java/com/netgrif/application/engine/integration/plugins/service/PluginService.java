@@ -55,7 +55,11 @@ public class PluginService implements IPluginService {
         }
         pluginRepository.save(plugin);
         PluginInjector.inject(plugin);
-        log.info("Plugin with identifier \"" + plugin.getIdentifier() + "\" was registered.");
+        if (existingPlugin != null) {
+            log.info("Plugin with identifier \"" + plugin.getIdentifier() + "\" was activated.");
+        } else {
+            log.info("Plugin with identifier \"" + plugin.getIdentifier() + "\" was registered.");
+        }
     }
 
     @Override
