@@ -13,6 +13,10 @@ import org.springframework.util.SerializationUtils;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of {@link com.netgrif.pluginlibrary.core.RegistrationServiceGrpc.RegistrationServiceImplBase}. This
+ * serves as gRPC controller, that provides remotely executable functions.
+ * */
 @Slf4j
 @Service
 @RequiredArgsConstructor

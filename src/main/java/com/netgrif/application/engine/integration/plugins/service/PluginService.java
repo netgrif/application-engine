@@ -23,6 +23,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Base service that manages gRPC server on application startup, registers, activates and deactivates plugins, sends
+ * plugin execution requests to desired plugin.
+ * */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -30,6 +34,7 @@ public class PluginService implements IPluginService {
     private final PluginRepository pluginRepository;
     private final PluginRegistrationConfigProperties properties;
     private Server server;
+
     @PostConstruct
     public void startServer() throws IOException {
         server = ServerBuilder
@@ -43,9 +48,12 @@ public class PluginService implements IPluginService {
     @PreDestroy
     public void stopServer() {
         server.shutdown();
-        log.info("[gRPC Server] - Started on port " + properties.getPort());
+        log.info("[gRPC Server] - Sopped server on port " + properties.getPort());
     }
 
+    /**
+     * @param plugin - plugin to be registered, or if already registered, then activate
+     * */
     @Override
     public void register(Plugin plugin) {
         Plugin existingPlugin = pluginRepository.findByIdentifier(plugin.getIdentifier());
@@ -62,6 +70,13 @@ public class PluginService implements IPluginService {
         }
     }
 
+    /**
+     * @param pluginId ID of plugin that contains the method that should be executed
+     * @param entryPoint name of entry point in plugin that contains the method that should be executed
+     * @param method name of method that should be executed
+     * @param args arguments to send to plugin method. All args should be the exact type of method input arguments type (not superclass, or subclass)
+     * @return the returned object of the executed plugin method
+     * */
     @Override
     public Object call(String pluginId, String entryPoint, String method, Serializable... args) {
         Plugin plugin = pluginRepository.findByIdentifier(pluginId);
@@ -82,6 +97,9 @@ public class PluginService implements IPluginService {
         return SerializationUtils.deserialize(responseMessage.getResponse().toByteArray());
     }
 
+    /**
+     * @param identifier Identifier of plugin, that should be deactivated.
+     * */
     @Override
     public void deactivate(String identifier) {
         Plugin existingPlugin = pluginRepository.findByIdentifier(identifier);
