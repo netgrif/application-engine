@@ -63,7 +63,7 @@ public abstract class AbstractAuthorizationService {
         for (Map.Entry<RolePermission, Boolean> permission : role.getValue().entrySet()) {
             Boolean permissionValue = permission.getValue();
             if (aggregatePermissions.containsKey(permission.getKey())) {
-                permissionValue = aggregatePermissions.get(permission.getKey()) || permissionValue;
+                permissionValue = aggregatePermissions.get(permission.getKey()) && permissionValue;
             }
             aggregatePermissions.put(permission.getKey(), permissionValue);
         }

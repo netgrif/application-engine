@@ -118,8 +118,9 @@ public class RegistrationService implements IRegistrationService {
         User user;
         if (userRepository.existsByEmail(newUser.email)) {
             user = userRepository.findByEmail(newUser.email);
-            if (user.isActive())
+            if (user.isActive()) {
                 return null;
+            }
             log.info("Renewing old user [" + newUser.email + "]");
         } else {
             user = new User(newUser.email, null, User.UNKNOWN, User.UNKNOWN);
@@ -135,10 +136,10 @@ public class RegistrationService implements IRegistrationService {
             user.setProcessRoles(new HashSet<>(processRole.findByIds(newUser.processRoles)));
         }
         userService.addDefaultRole(user);
-        user =  userRepository.save(user);
+        user = userRepository.save(user);
 
         if (newUser.groups != null && !newUser.groups.isEmpty()) {
-            for (String group : newUser.groups){
+            for (String group : newUser.groups) {
                 groupService.addUser((IUser) user, group);
             }
         }
@@ -151,8 +152,9 @@ public class RegistrationService implements IRegistrationService {
         String email = decodeToken(registrationRequest.token)[0];
         log.info("Registering user " + email);
         RegisteredUser user = userRepository.findByEmail(email);
-        if (user == null)
+        if (user == null) {
             return null;
+        }
 
         user.setName(registrationRequest.name);
         user.setSurname(registrationRequest.surname);
@@ -186,9 +188,9 @@ public class RegistrationService implements IRegistrationService {
     public RegisteredUser recover(String email, String newPassword) {
         log.info("Recovering user " + email);
         User user = userRepository.findByEmail(email);
-        if (user == null)
+        if (user == null) {
             return null;
-
+        }
         user.setState(UserState.ACTIVE);
         user.setPassword(newPassword);
         encodeUserPassword(user);
@@ -205,9 +207,23 @@ public class RegistrationService implements IRegistrationService {
 
     @Override
     public String[] decodeToken(String token) throws InvalidUserTokenException {
-        String[] parts = new String(Base64.getDecoder().decode(token)).split(":");
-        if (parts.length != 2 || !parts[0].contains("@"))
+        if (token == null || token.isEmpty()) {
             throw new InvalidUserTokenException(token);
+        }
+        byte[] decodedBytes;
+
+        try {
+            decodedBytes = Base64.getDecoder().decode(token);
+        } catch (IllegalArgumentException exception) {
+            throw new InvalidUserTokenException(token);
+        }
+        String decodedString = new String(decodedBytes);
+        String[] parts = decodedString.split(":");
+
+        if (parts.length != 2 || !parts[0].contains("@")) {
+            throw new InvalidUserTokenException(token);
+        }
+
         return parts;
     }
 

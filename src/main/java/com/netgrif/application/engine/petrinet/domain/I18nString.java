@@ -97,4 +97,13 @@ public class I18nString {
                 (this.defaultValue == null ? that.defaultValue == null : this.defaultValue.equals(that.defaultValue)) &&
                 this.translations.equals(that.translations);
     }
+
+    @Override
+    public I18nString clone() {
+        I18nString clone = new I18nString();
+        clone.setKey(this.key);
+        clone.setDefaultValue(this.defaultValue);
+        clone.setTranslations(new HashMap<>(this.translations));
+        return clone;
+    }
 }

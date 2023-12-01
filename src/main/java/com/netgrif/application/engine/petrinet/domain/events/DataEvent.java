@@ -58,14 +58,14 @@ public class DataEvent extends BaseEvent {
         }
     }
 
+    @Override
     public DataEvent clone() {
-        DataEvent cloned = new DataEvent(this.getId());
-        cloned.type = this.type;
-        cloned.setTitle(this.getTitle());
-        cloned.setMessage(this.getMessage());
-        // TODO: release/7.0.0
-        cloned.setPreActions(this.getPreActions());
-        cloned.setPostActions(this.getPostActions());
-        return cloned;
+        DataEvent clone = new DataEvent(this.getId());
+        clone.setTitle(this.getTitle() == null ? null : this.getTitle().clone());
+        clone.setMessage(this.getMessage() == null ? null : this.getMessage().clone());
+        clone.setPreActions(this.getPreActions() == null ? null : getPreActions().stream().map(Action::clone).collect(Collectors.toList()));
+        clone.setPostActions(this.getPostActions() == null ? null : getPostActions().stream().map(Action::clone).collect(Collectors.toList()));
+        clone.setType(this.type);
+        return clone;
     }
 }

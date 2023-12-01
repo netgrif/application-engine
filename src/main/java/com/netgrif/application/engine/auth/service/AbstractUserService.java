@@ -54,13 +54,13 @@ public abstract class AbstractUserService implements IUserService {
     }
 
     @Override
-    public void assignAuthority(String userId, String authorityId) {
+    public IUser assignAuthority(String userId, String authorityId) {
         IUser user = resolveById(userId, true);
         Authority authority = authorityService.getOne(authorityId);
         user.addAuthority(authority);
         authority.addUser(user);
 
-        save(user);
+        return save(user);
     }
 
     @Override

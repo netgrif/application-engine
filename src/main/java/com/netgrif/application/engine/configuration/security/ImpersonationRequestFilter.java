@@ -4,6 +4,9 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
 import com.netgrif.application.engine.impersonation.domain.repository.ImpersonatorRepository;
 import lombok.extern.slf4j.Slf4j;
+import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -20,10 +23,10 @@ import java.util.Optional;
 @Slf4j
 public class ImpersonationRequestFilter extends OncePerRequestFilter {
 
-    private final ImpersonatorRepository impersonatorRepository;
+    private final IImpersonationService impersonationService;
 
-    public ImpersonationRequestFilter(ImpersonatorRepository impersonatorRepository) {
-        this.impersonatorRepository = impersonatorRepository;
+    public ImpersonationRequestFilter(IImpersonationService impersonationService) {
+        this.impersonationService = impersonationService;
     }
 
     @Override
@@ -46,9 +49,9 @@ public class ImpersonationRequestFilter extends OncePerRequestFilter {
             if (!loggedUser.isImpersonating()) {
                 return;
             }
-            Optional<Impersonator> imp = impersonatorRepository.findById(loggedUser.getId());
+            Optional<Impersonator> imp = impersonationService.findImpersonator(loggedUser.getId());
             if (loggedUser.isImpersonating() && (imp.isEmpty() || !isValid(imp.get()))) {
-                imp.ifPresent(impersonatorRepository::delete);
+                imp.ifPresent(imper -> impersonationService.removeImpersonator(loggedUser.getId()));
                 logout(servletRequest, servletResponse);
             }
         } catch (Exception e) {
@@ -59,8 +62,7 @@ public class ImpersonationRequestFilter extends OncePerRequestFilter {
     protected void handleImpersonated(LoggedUser loggedUser, HttpServletRequest servletRequest) {
         try {
             log.debug("Filtering request " + servletRequest.getRequestURI() + ", " + loggedUser.getUsername());
-            impersonatorRepository.findByImpersonatedId(loggedUser.getId()).ifPresent(impersonatorRepository::delete);
-
+            impersonationService.removeImpersonatorByImpersonated(loggedUser.getId());
         } catch (Exception e) {
             log.error("Failed to resolve impersonators for " + loggedUser.getUsername() + ", " + e.getMessage(), e);
         }

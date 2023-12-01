@@ -22,6 +22,8 @@ public interface IWorkflowService {
 
     Case findOne(String caseId);
 
+    Case findOneNoNet(String caseId);
+
     List<Case> findAllById(List<String> ids);
 
     Page<Case> getAll(Pageable pageable);

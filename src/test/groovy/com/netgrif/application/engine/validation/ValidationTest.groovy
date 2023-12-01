@@ -755,7 +755,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        // TODO: release/7.0.0 should fail with 3.3.2020?
+        // TODO: release/7.0.0 should fail with 3.3.2020? yes from 6.4.0
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
             importHelper.setTaskData(task.getStringId(), new DataSet(["date04": new DateField(rawValue: LocalDate.of(2020, 3, 4))]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()

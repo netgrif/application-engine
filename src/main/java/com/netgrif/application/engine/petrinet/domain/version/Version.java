@@ -48,4 +48,13 @@ public class Version {
             patch += 1;
         }
     }
+
+    @Override
+    public Version clone() {
+        Version clone = new Version();
+        clone.setMajor(this.major);
+        clone.setMinor(this.minor);
+        clone.setPatch(this.patch);
+        return clone;
+    }
 }

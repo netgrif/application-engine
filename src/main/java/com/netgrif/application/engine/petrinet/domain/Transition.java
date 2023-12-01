@@ -20,6 +20,7 @@ import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.lucene.analysis.CharArrayMap;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.*;
@@ -220,5 +221,30 @@ public class Transition extends Node {
                 })
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    @Override
+    public Transition clone() {
+        Transition clone = new Transition();
+        clone.setTitle(this.getTitle() == null ? null : this.getTitle().clone());
+        clone.setPosition(this.getPosition().getX(), this.getPosition().getY());
+        clone.setImportId(this.importId);
+        clone.setDataGroups(this.dataGroups == null ? null : dataGroups.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y.clone(), LinkedHashMap::new)));
+        clone.setDataSet(this.dataSet == null ? null : dataSet.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y.clone(), LinkedHashMap::new)));
+        clone.setRoles(this.roles == null ? null : roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
+        clone.setNegativeViewRoles(new ArrayList<>(negativeViewRoles));
+        clone.setUserRefs(this.userRefs == null ? null : userRefs.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
+        clone.setTriggers(this.triggers == null ? null : triggers.stream().map(Trigger::clone).collect(Collectors.toList()));
+        clone.setLayout(this.layout == null ? null : layout.clone());
+        clone.setPriority(priority);
+        clone.setAssignPolicy(assignPolicy);
+        clone.setAssignedUserPolicy(assignedUserPolicy);
+        clone.setIcon(icon);
+        clone.setDataFocusPolicy(dataFocusPolicy);
+        clone.setFinishPolicy(finishPolicy);
+        clone.setEvents(this.events == null ? null : events.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
+        clone.setAssignedUserPolicy(new HashMap<>(assignedUserPolicy));
+        clone.setDefaultRoleId(defaultRoleId);
+        return clone;
     }
 }

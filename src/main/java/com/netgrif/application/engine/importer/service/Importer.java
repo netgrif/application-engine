@@ -501,6 +501,9 @@ public class Importer {
         if (arc.getReference() != null) {
             arc.getReference().setType((places.containsKey(arc.getReference().getReference())) ? Type.PLACE : Type.DATA);
         }
+        if (importArc.getBreakpoint() != null) {
+            importArc.getBreakpoint().forEach(position -> arc.getBreakpoints().add(new Position(position.getX(), position.getY())));
+        }
 
         net.addArc(arc);
     }
@@ -1039,7 +1042,7 @@ public class Importer {
         }
         place.setTokens(importPlace.getTokens());
         place.setPosition(importPlace.getX(), importPlace.getY());
-        place.setTitle(toI18NString(importPlace.getLabel()));
+        place.setTitle(importPlace.getLabel() != null ? toI18NString(importPlace.getLabel()) : new I18nString(""));
 
         net.addPlace(place);
         places.put(importPlace.getId(), place);

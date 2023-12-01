@@ -88,4 +88,10 @@ public class DataRef {
     private boolean isBehaviorSet(FieldBehavior behavior) {
         return behavior.equals(this.behavior.getBehavior());
     }
+
+    public DataRef clone() {
+        DataRef cloned = new DataRef();
+        // TODO: release/7.0.0 implement
+        return cloned;
+    }
 }
