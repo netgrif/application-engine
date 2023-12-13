@@ -7,7 +7,7 @@ public class ExecutorMaxSizeHashMap extends MaxSizeHashMap<ExecutorService> {
 
     private final long threadShutdownTimeout;
 
-    ExecutorMaxSizeHashMap(long maxSize, long threadShutdownTimeout) {
+    public ExecutorMaxSizeHashMap(long maxSize, long threadShutdownTimeout) {
         super(16, maxSize, eldest -> {
             try {
                 eldest.shutdown();
