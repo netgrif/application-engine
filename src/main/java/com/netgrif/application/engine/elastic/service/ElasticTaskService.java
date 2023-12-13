@@ -50,19 +50,19 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
 
     private static final Logger log = LoggerFactory.getLogger(ElasticTaskService.class);
 
-    private ElasticTaskRepository repository;
-    private ITaskService taskService;
-    private ElasticsearchRestTemplate template;
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    protected ElasticTaskRepository repository;
+    protected ITaskService taskService;
+    protected ElasticsearchRestTemplate template;
+    protected ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Value("${spring.data.elasticsearch.index.task}")
-    private String taskIndex;
+    protected String taskIndex;
 
     @Autowired
-    private ElasticsearchRestTemplate elasticsearchTemplate;
+    protected ElasticsearchRestTemplate elasticsearchTemplate;
 
     @Autowired
-    private IPetriNetService petriNetService;
+    protected IPetriNetService petriNetService;
 
     @Autowired
     public ElasticTaskService(ElasticTaskRepository repository, ElasticsearchRestTemplate template) {
@@ -76,12 +76,12 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         this.taskService = taskService;
     }
 
-    private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
+    protected Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title", 1f,
             "caseTitle", 1f
     );
 
-    private Map<String, Float> caseTitledMap = ImmutableMap.of(
+    protected Map<String, Float> caseTitledMap = ImmutableMap.of(
             "caseTitle", 1f
     );
 
@@ -178,7 +178,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         }
     }
 
-    private NativeSearchQuery buildQuery(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+    protected NativeSearchQuery buildQuery(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
         List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
@@ -202,7 +202,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
                 .build();
     }
 
-    private BoolQueryBuilder buildSingleQuery(ElasticTaskSearchRequest request, LoggedUser user, Locale locale) {
+    protected BoolQueryBuilder buildSingleQuery(ElasticTaskSearchRequest request, LoggedUser user, Locale locale) {
         if (request == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
@@ -271,7 +271,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
      * }]
      * }
      */
-    private void buildCaseQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+    protected void buildCaseQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.useCase == null || request.useCase.isEmpty()) {
             return;
         }
@@ -286,7 +286,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
      * @return query for ID if only ID is present. Query for title if only title is present.
      * If both are present an ID query is returned. If neither are present null is returned.
      */
-    private QueryBuilder caseRequestQuery(TaskSearchCaseRequest caseRequest) {
+    protected QueryBuilder caseRequestQuery(TaskSearchCaseRequest caseRequest) {
         if (caseRequest.id != null) {
             return termQuery("caseId", caseRequest.id);
         } else if (caseRequest.title != null) {
@@ -309,7 +309,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
      * ]
      * }
      */
-    private void buildTitleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+    protected void buildTitleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.title == null || request.title.isEmpty()) {
             return;
         }
@@ -330,7 +330,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
      * <p>
      * Tasks assigned to user with id 1 OR 2
      */
-    private void buildUserQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+    protected void buildUserQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.user == null || request.user.isEmpty()) {
             return;
         }
@@ -357,7 +357,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
      * ]
      * }
      */
-    private void buildProcessQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+    protected void buildProcessQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.process == null || request.process.isEmpty()) {
             return;
         }
@@ -375,7 +375,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     /**
      * Full text search on fields defined by {@link #fullTextFields()}.
      */
-    private void buildFullTextQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+    protected void buildFullTextQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.fullText == null || request.fullText.isEmpty()) {
             return;
         }
@@ -398,7 +398,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
      * ]
      * }
      */
-    private void buildTransitionQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+    protected void buildTransitionQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.transitionId == null || request.transitionId.isEmpty()) {
             return;
         }
@@ -412,7 +412,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     /**
      * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a>
      */
-    private void buildStringQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
+    protected void buildStringQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
         if (request.query == null || request.query.isEmpty()) {
             return;
         }
