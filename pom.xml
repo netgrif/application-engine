@@ -413,13 +413,6 @@
             <version>2.2.0-rc2</version>
         </dependency>
 
-        <!-- Dev tools -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
         <!-- OpenAPI 3 / Swagger Docs -->
         <dependency>
             <groupId>org.springdoc</groupId>
