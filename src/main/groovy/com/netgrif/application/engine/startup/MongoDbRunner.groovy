@@ -5,7 +5,14 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
+import org.springframework.data.mapping.context.MappingContext
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.index.IndexOperations
+import org.springframework.data.mongodb.core.index.IndexResolver
+import org.springframework.data.mongodb.core.index.MongoPersistentEntityIndexResolver
+import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.data.mongodb.core.mapping.MongoPersistentEntity
+import org.springframework.data.mongodb.core.mapping.MongoPersistentProperty
 import org.springframework.stereotype.Component
 
 @Component
@@ -32,6 +39,9 @@ class MongoDbRunner extends AbstractOrderedCommandLineRunner {
     @Value('${spring.data.mongodb.drop}')
     private boolean dropDatabase
 
+    @Value('${spring.data.mongodb.runner-ensure-index}')
+    private boolean resolveIndexesOnStartup
+
     @Override
     void run(String... strings) throws Exception {
         if (dropDatabase) {
@@ -41,5 +51,20 @@ class MongoDbRunner extends AbstractOrderedCommandLineRunner {
                 log.info("Droppiung Mongo database ${uri}")
             mongoTemplate.getDb().drop()
         }
+        if (resolveIndexesOnStartup) {
+            resolveIndexes()
+        }
+    }
+
+    void resolveIndexes() {
+        MappingContext<? extends MongoPersistentEntity<?>, MongoPersistentProperty> mappingContext = mongoTemplate.getConverter().getMappingContext()
+        IndexResolver resolver = new MongoPersistentEntityIndexResolver(mappingContext)
+        mappingContext.getPersistentEntities()
+                .stream()
+                .filter(it -> it.isAnnotationPresent(Document.class))
+                .forEach(it -> {
+                    IndexOperations indexOps = mongoTemplate.indexOps(it.getType());
+                    resolver.resolveIndexFor(it.getType()).forEach(indexOps::ensureIndex);
+                })
     }
 }
