@@ -98,6 +98,10 @@ class Action {
         this.transitionIds = transitionIds
     }
 
+    void setId(ObjectId id) {
+        this.id = id
+    }
+
     @Override
     String toString() {
         return "[$trigger] $definition"
@@ -123,6 +127,7 @@ class Action {
     @Override
     Action clone() {
         Action clone = new Action()
+        clone.setId(this.getId())
         clone.setTrigger(this.trigger)
         clone.setDefinition(this.definition)
         clone.setImportId(this.importId)
