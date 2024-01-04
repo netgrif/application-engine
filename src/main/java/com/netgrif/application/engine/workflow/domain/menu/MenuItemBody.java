@@ -28,6 +28,7 @@ public class MenuItemBody {
     private String menuIcon = "filter_none";
     private String tabIcon;
     private String uri;
+    private String nicePath;
     private String identifier;
     private Case filter;
     private Map<String, I18nString> allowedRoles;
@@ -173,6 +174,7 @@ public class MenuItemBody {
             putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID, FieldType.CASE_REF, parentIdCaseRef);
         }
         putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME, FieldType.I18N, this.menuName);
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_NICE_PATH, FieldType.TEXT, this.nicePath);
         putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_ICON, FieldType.TEXT, this.menuIcon);
         putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TAB_NAME, FieldType.I18N, this.tabName);
         putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TAB_ICON, FieldType.TEXT, this.tabIcon);

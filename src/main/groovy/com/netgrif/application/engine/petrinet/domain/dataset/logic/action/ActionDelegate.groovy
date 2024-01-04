@@ -2027,6 +2027,8 @@ class ActionDelegate {
         menuItemCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_BANNED_ROLES.attributeId].options = body.bannedRoles
         if (parentItemCase != null) {
             parentItemCase = appendChildCaseIdAndSave(parentItemCase, menuItemCase.stringId)
+            String newNicePath = parentItemCase.getFieldValue("nicePath") != null ? parentItemCase.getFieldValue("nicePath") + "/" + body.menuName : "/" + body.menuName
+            body.setNicePath(newNicePath)
         }
         menuItemCase = workflowService.save(menuItemCase)
         Task newItemTask = findTask { it._id.eq(new ObjectId(menuItemCase.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)) }

@@ -256,6 +256,10 @@
 			</actions>
 		</event>
 	</data>
+	<data type="text" immediate="true">
+		<id>nicePath</id>
+		<title name="nicePath">Item displayable URI</title>
+	</data>
 
 	<!-- GENERAL CONFIGURATION DATA -->
 	<data type="text" immediate="true">

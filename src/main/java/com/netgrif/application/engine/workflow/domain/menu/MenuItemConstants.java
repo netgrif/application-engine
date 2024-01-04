@@ -25,6 +25,7 @@ public enum MenuItemConstants {
     PREFERENCE_ITEM_FIELD_USE_TAB_ICON ("use_tab_icon"),
     PREFERENCE_ITEM_FIELD_TAB_ICON ("tab_icon"),
     PREFERENCE_ITEM_FIELD_NODE_PATH ("nodePath"),
+    PREFERENCE_ITEM_FIELD_NICE_PATH ("nicePath"),
     PREFERENCE_ITEM_FIELD_NODE_NAME ("nodeName"),
     PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE ("duplicate_new_title"),
     PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER ("duplicate_view_identifier"),
