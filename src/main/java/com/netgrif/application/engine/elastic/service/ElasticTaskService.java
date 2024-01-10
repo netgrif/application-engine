@@ -2,9 +2,7 @@ package com.netgrif.application.engine.elastic.service;
 
 import com.google.common.collect.ImmutableMap;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
-import com.netgrif.application.engine.elastic.domain.ElasticTask;
-import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository;
+import com.netgrif.application.engine.elastic.domain.*;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -23,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -37,9 +34,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
@@ -50,10 +45,8 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
 
     private static final Logger log = LoggerFactory.getLogger(ElasticTaskService.class);
 
-    protected ElasticTaskRepository repository;
     protected ITaskService taskService;
     protected ElasticsearchRestTemplate template;
-    protected ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Value("${spring.data.elasticsearch.index.task}")
     protected String taskIndex;
@@ -62,11 +55,13 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     protected ElasticsearchRestTemplate elasticsearchTemplate;
 
     @Autowired
+    private ElasticTaskQueueManager elasticTaskQueueManager;
+
+    @Autowired
     protected IPetriNetService petriNetService;
 
     @Autowired
-    public ElasticTaskService(ElasticTaskRepository repository, ElasticsearchRestTemplate template) {
-        this.repository = repository;
+    public ElasticTaskService(ElasticsearchRestTemplate template) {
         this.template = template;
     }
 
@@ -97,52 +92,25 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
 
     @Override
     public void remove(String taskId) {
-        executor.execute(() -> {
-            try {
-                repository.deleteAllByStringId(taskId);
-                log.info("[?]: Task \"" + taskId + "\" deleted");
-            } catch (RuntimeException e) {
-                log.error("Elastic executor was killed before finish: " + e.getMessage());
-            }
-        });
+        ElasticTask task = new ElasticTask();
+        task.setTaskId(taskId);
+        elasticTaskQueueManager.scheduleOperation(new ElasticTaskJob(ElasticJob.REMOVE, task));
     }
 
     @Override
     public void removeByPetriNetId(String petriNetId) {
-        executor.execute(() -> {
-            try {
-                repository.deleteAllByProcessId(petriNetId);
-                log.info("[" + petriNetId + "]: All tasks of Petri Net with id \"" + petriNetId + "\" deleted");
-            } catch (RuntimeException e) {
-                log.error("Elastic executor was killed before finish: " + e.getMessage());
-            }
-        });
+        elasticTaskQueueManager.removeTasksByProcess(petriNetId);
+    }
+
+    @Override
+    public Future<ElasticTask> scheduleTaskIndexing(ElasticTask task) {
+        return elasticTaskQueueManager.scheduleOperation(new ElasticTaskJob(ElasticJob.INDEX, task));
     }
 
     @Async
     @Override
     public void index(ElasticTask task) {
-        executor.execute(() -> {
-            try {
-                ElasticTask elasticTask = repository.findByStringId(task.getStringId());
-
-                if (elasticTask == null) {
-                    repository.save(task);
-                } else {
-                    elasticTask.update(task);
-                    repository.save(elasticTask);
-                }
-
-                log.debug("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" [" + task.getStringId() + "] indexed");
-            } catch (InvalidDataAccessApiUsageException e) {
-                log.debug("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" has duplicates, will be reindexed");
-                repository.deleteAllByStringId(task.getStringId());
-                repository.save(task);
-                log.debug("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" indexed");
-            } catch (RuntimeException e) {
-                log.error("Elastic executor was killed before finish: " + e.getMessage());
-            }
-        });
+        elasticTaskQueueManager.scheduleOperation(new ElasticTaskJob(ElasticJob.INDEX, task));
     }
 
     @Override
@@ -156,8 +124,8 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         List<Task> taskPage;
         long total;
         if (query != null) {
-            SearchHits<ElasticTask> hits = elasticsearchTemplate.search(query, ElasticTask.class,  IndexCoordinates.of(taskIndex));
-            Page<ElasticTask> indexedTasks = (Page)SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
+            SearchHits<ElasticTask> hits = elasticsearchTemplate.search(query, ElasticTask.class, IndexCoordinates.of(taskIndex));
+            Page<ElasticTask> indexedTasks = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             taskPage = taskService.findAllById(indexedTasks.get().map(ElasticTask::getStringId).collect(Collectors.toList()));
             total = indexedTasks.getTotalElements();
         } else {
