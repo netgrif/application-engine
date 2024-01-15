@@ -9,8 +9,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 public class ElasticTaskExecutorConfiguration {
 
-    @Autowired
-    protected ElasticTaskExecutorProperties elasticTaskExecutorProperties;
+    protected final ElasticTaskExecutorProperties elasticTaskExecutorProperties;
+
+    public ElasticTaskExecutorConfiguration(ElasticTaskExecutorProperties elasticTaskExecutorProperties) {
+        this.elasticTaskExecutorProperties = elasticTaskExecutorProperties;
+    }
 
     @Bean("elasticTaskExecutor")
     public ThreadPoolTaskExecutor taskExecutor() {

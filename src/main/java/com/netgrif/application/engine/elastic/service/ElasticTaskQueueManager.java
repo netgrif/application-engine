@@ -142,13 +142,22 @@ public class ElasticTaskQueueManager {
 
     public void removeTasksByProcess(String processId) {
         List<ElasticTask> tasks = repository.findAllByProcessId(processId);
-        tasks.forEach(task->{
+        tasks.forEach(task -> {
             try {
                 ElasticTaskJob job = new ElasticTaskJob(ElasticJob.REMOVE, task);
                 Future<ElasticTask> totok = scheduleOperation(job);
                 totok.get(30, TimeUnit.SECONDS);
-            } catch (ExecutionException | InterruptedException | TimeoutException e) {
-                log.error("Elastic executor was killed before finish: {}", e.getMessage());
+            } catch (ExecutionException e) {
+                log.error("[ExecutionException] Elastic executor was killed before finish: {}", e.getMessage());
+                log.error(e.toString());
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                log.error("[InterruptedException] Elastic executor was killed before finish: {}", e.getMessage());
+                log.error(e.toString());
+                throw new RuntimeException(e);
+            } catch (TimeoutException e) {
+                log.error("[TimeoutException] Elastic executor was killed before finish: {}", e.getMessage());
+                log.error(e.toString());
                 throw new RuntimeException(e);
             }
         });
