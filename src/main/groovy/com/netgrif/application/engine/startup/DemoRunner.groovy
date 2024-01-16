@@ -3,6 +3,7 @@ package com.netgrif.application.engine.startup
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
+import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
@@ -46,5 +47,6 @@ class DemoRunner extends AbstractOrderedCommandLineRunner {
     @Override
     void run(String... args) throws Exception {
         // Code what is written here DO NOT COMMIT!
+        helper.createCase("Test", helper.createNet("nae_1546.xml", VersionType.MAJOR).get())
     }
 }
