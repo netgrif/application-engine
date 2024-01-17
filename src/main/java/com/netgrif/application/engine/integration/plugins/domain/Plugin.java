@@ -5,7 +5,6 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -13,7 +12,7 @@ import java.util.Map;
 @Document
 public class Plugin {
     @Id
-    private ObjectId _id;
+    private ObjectId id;
     private String identifier;
     private String name;
     private String url;

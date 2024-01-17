@@ -7,6 +7,7 @@ import com.netgrif.pluginlibrary.core.*;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.SerializationUtils;
 
@@ -20,6 +21,11 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(
+        value = "nae.plugin.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
 public final class PluginRegistrationService extends RegistrationServiceGrpc.RegistrationServiceImplBase {
     private final IPluginService pluginService;
 

@@ -3,7 +3,7 @@ package com.netgrif.application.engine.integration.plugins.service;
 import com.google.protobuf.ByteString;
 import com.netgrif.application.engine.integration.plugin.injector.PluginInjector;
 import com.netgrif.application.engine.integration.plugins.domain.Plugin;
-import com.netgrif.application.engine.integration.plugins.properties.PluginRegistrationConfigProperties;
+import com.netgrif.application.engine.integration.plugins.properties.PluginConfigProperties;
 import com.netgrif.application.engine.integration.plugins.repository.PluginRepository;
 import com.netgrif.pluginlibrary.core.*;
 import io.grpc.ManagedChannel;
@@ -13,6 +13,7 @@ import io.grpc.ServerBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -30,9 +31,14 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(
+        value = "nae.plugin.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
 public class PluginService implements IPluginService {
     private final PluginRepository pluginRepository;
-    private final PluginRegistrationConfigProperties properties;
+    private final PluginConfigProperties properties;
     private Server server;
 
     @PostConstruct
@@ -59,7 +65,7 @@ public class PluginService implements IPluginService {
         Plugin existingPlugin = pluginRepository.findByIdentifier(plugin.getIdentifier());
         if (existingPlugin != null) {
             log.warn("Plugin with identifier \"" + plugin.getIdentifier() + "\" has already been registered. Plugin will be activated.");
-            plugin.set_id(existingPlugin.get_id());
+            plugin.setId(existingPlugin.getId());
         }
         pluginRepository.save(plugin);
         PluginInjector.inject(plugin);
