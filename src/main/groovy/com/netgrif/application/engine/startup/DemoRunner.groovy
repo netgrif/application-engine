@@ -47,6 +47,5 @@ class DemoRunner extends AbstractOrderedCommandLineRunner {
     @Override
     void run(String... args) throws Exception {
         // Code what is written here DO NOT COMMIT!
-        helper.createCase("Test", helper.createNet("nae_1546.xml", VersionType.MAJOR).get())
     }
 }
