@@ -1,0 +1,39 @@
+
+syntax = "proto3";
+option java_multiple_files = true;
+package com.netgrif.pluginlibrary.core;
+
+message Method {
+  string name = 1;
+  repeated bytes args = 2;
+}
+
+message EntryPoint {
+  string name = 1;
+  repeated Method methods = 2;
+}
+
+message RegistrationRequest {
+  string identifier = 1;
+  string name = 2;
+  string url = 3;
+  int64 port = 4;
+  repeated EntryPoint entryPoints = 5;
+}
+
+message DeactivationRequest {
+  string identifier = 1;
+}
+
+message RegistrationResponse {
+  string message = 1;
+}
+
+message DeactivationResponse {
+  string message = 1;
+}
+
+service RegistrationService {
+  rpc register(RegistrationRequest) returns (RegistrationResponse);
+  rpc deactivate(DeactivationRequest) returns (DeactivationResponse);
+}
