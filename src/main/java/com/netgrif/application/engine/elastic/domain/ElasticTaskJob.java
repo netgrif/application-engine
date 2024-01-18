@@ -9,10 +9,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ElasticTaskJob {
 
-    private ElasticJob typeJob;
+    private ElasticJob jobType;
 
     private ElasticTask task;
 
+    public String getTaskId() {
+        return getTask().getTaskId();
+    }
 }
 
 

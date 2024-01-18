@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PreDestroy;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.*;
 
@@ -37,7 +38,7 @@ public class ElasticTaskQueueManager {
             throw new IllegalArgumentException("Task id cannot be null");
         }
 
-        String taskId = task.getTask().getTaskId();
+        String taskId = task.getTaskId();
         log.debug("Scheduling operation for task: {}", taskId);
 
         CompletableFuture<ElasticTask> future = new CompletableFuture<>();
@@ -51,11 +52,16 @@ public class ElasticTaskQueueManager {
         };
 
         BlockingQueue<Runnable> queue = taskQueues.computeIfAbsent(taskId, k -> new LinkedBlockingQueue<>());
-        queue.add(taskWrapper);
+        try {
+            queue.add(taskWrapper);
+        } catch (Exception e) {
+            log.error("Queue error:" + e.getMessage());
+            throw e;
+        }
 
         if (activeTasks.add(taskId)) {
             log.debug("Task {} is ready for processing. Submitting to executor.", taskId);
-            elasticTaskExecutor.submit(queue.poll());
+            elasticTaskExecutor.submit(Objects.requireNonNull(queue.poll()));
         } else {
             log.debug("Task {} is queued for processing.", taskId);
         }
@@ -64,22 +70,22 @@ public class ElasticTaskQueueManager {
 
     private ElasticTask processTask(ElasticTaskJob task) {
         try {
-            log.debug("Processing task: {}", task.getTask().getTaskId());
-            switch (task.getTypeJob()) {
+            log.debug("Processing task: {}", task.getTaskId());
+            switch (task.getJobType()) {
                 case INDEX:
                     return indexTaskWorker(task.getTask());
                 case REMOVE:
                     return removeTaskWorker(task.getTask());
                 default:
-                    log.warn("Unknown task type for task: {}", task.getTask().getTaskId());
-                    return null;
+                    log.warn("Unknown job type for task: {}", task.getTaskId());
+                    throw new IllegalArgumentException("Unknown job type: " + task.getJobType());
             }
         } catch (Exception e) {
-            log.error("Error processing task {}: {}", task.getTask().getTaskId(), e.getMessage(), e);
+            log.error("Error processing task {}: {}", task.getTaskId(), e.getMessage(), e);
             throw e;
         } finally {
-            activeTasks.remove(task.getTask().getTaskId());
-            scheduleNextTask(task.getTask().getTaskId());
+            activeTasks.remove(task.getTaskId());
+            scheduleNextTask(task.getTaskId());
         }
     }
 
@@ -133,7 +139,7 @@ public class ElasticTaskQueueManager {
         log.debug("Remove task [{}] in thread [{}]", task.getTaskId(), Thread.currentThread().getName());
         try {
             log.debug("[{}]: Task \"{}\" [{}] removed", task.getCaseId(), task.getTitle(), task.getStringId());
-            return repository.deleteAllByTaskId(task.getTaskId());
+            return repository.deleteAllByTaskId(task.getStringId());
         } catch (RuntimeException e) {
             log.error("Elastic executor was killed before finish: {}", e.getMessage());
         }
@@ -142,23 +148,28 @@ public class ElasticTaskQueueManager {
 
     public void removeTasksByProcess(String processId) {
         List<ElasticTask> tasks = repository.findAllByProcessId(processId);
+        long maxWaitTime = 30;
+        long baseWaitTime = 1;
+
         tasks.forEach(task -> {
-            try {
-                ElasticTaskJob job = new ElasticTaskJob(ElasticJob.REMOVE, task);
-                Future<ElasticTask> totok = scheduleOperation(job);
-                totok.get(30, TimeUnit.SECONDS);
-            } catch (ExecutionException e) {
-                log.error("[ExecutionException] Elastic executor was killed before finish: {}", e.getMessage());
-                log.error(e.toString());
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                log.error("[InterruptedException] Elastic executor was killed before finish: {}", e.getMessage());
-                log.error(e.toString());
-                throw new RuntimeException(e);
-            } catch (TimeoutException e) {
-                log.error("[TimeoutException] Elastic executor was killed before finish: {}", e.getMessage());
-                log.error(e.toString());
-                throw new RuntimeException(e);
+            ElasticTaskJob job = new ElasticTaskJob(ElasticJob.REMOVE, task);
+            CompletableFuture<ElasticTask> removeJobFuture = CompletableFuture.supplyAsync(() -> processTask(job), elasticTaskExecutor);
+
+            long waitTime = baseWaitTime;
+            while (true) {
+                try {
+                    removeJobFuture.get(waitTime, TimeUnit.SECONDS);
+                    break;
+                } catch (TimeoutException e) {
+                    if (waitTime >= maxWaitTime) {
+                        log.error("Timeout: Task {} did not complete within {} seconds", task.getTaskId(), maxWaitTime);
+                        break;
+                    }
+                    waitTime *= 2;
+                } catch (InterruptedException | ExecutionException e) {
+                    log.error("Exception during task execution: {}", e.getMessage(), e);
+                    break;
+                }
             }
         });
     }
