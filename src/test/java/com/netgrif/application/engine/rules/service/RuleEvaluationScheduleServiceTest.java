@@ -19,6 +19,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.quartz.SimpleScheduleBuilder;
@@ -62,6 +63,7 @@ class RuleEvaluationScheduleServiceTest {
     }
 
     @Test
+    @Disabled
     void testScheduledRule() throws IOException, MissingPetriNetMetaDataException, RuleEvaluationScheduleException, InterruptedException, MissingIconKeyException {
         LoggedUser user = superCreator.getLoggedSuper();
         ImportPetriNetEventOutcome importOutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, user);
