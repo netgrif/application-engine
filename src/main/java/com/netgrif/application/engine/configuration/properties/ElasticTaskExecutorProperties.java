@@ -12,6 +12,6 @@ public class ElasticTaskExecutorProperties {
     private int size = 50;
     private int maxPoolSize = size*10;
     private boolean allowCoreThreadTimeOut = true;
-    private int keepAliveSeconds = 60;
+    private int keepAliveSeconds = 30;
     private String threadNamePrefix = "ElasticTaskExecutor-";
 }
