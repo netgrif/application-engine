@@ -36,6 +36,7 @@ public enum MenuItemConstants {
     PREFERENCE_ITEM_FIELD_CREATE_CASE_BUTTON_TITLE ("create_case_button_title"),
     PREFERENCE_ITEM_FIELD_CREATE_CASE_BUTTON_ICON ("create_case_button_icon"),
     PREFERENCE_ITEM_FIELD_BANNED_NETS_IN_CREATION ("case_banned_nets_in_creation"),
+    PREFERENCE_ITEM_FIELD_SHOW_CREATE_CASE_BUTTON ("show_create_case_button"),
     PREFERENCE_ITEM_FIELD_CASE_SHOW_MORE_MENU ("case_show_more_menu"),
     PREFERENCE_ITEM_FIELD_CASE_ALLOW_HEADER_TABLE_MODE ("case_allow_header_table_mode"),
     PREFERENCE_ITEM_FIELD_CASE_HEADERS_MODE ("case_headers_mode"),
@@ -55,7 +56,6 @@ public enum MenuItemConstants {
     // TRANSITIONS
     PREFERENCE_ITEM_SETTINGS_TRANS_ID ("item_settings"),
     PREFERENCE_ITEM_FIELD_INIT_TRANS_ID ("initialize");
-
     @Getter
     private final String attributeId;
 
