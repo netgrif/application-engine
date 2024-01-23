@@ -343,7 +343,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     private static BooleanExpression caseIdString(String caseId) {
-        return QCase.case$._id.eq(new ObjectId(caseId));
+        return caseId.equals("") ? QCase.case$._id.isNull() :  QCase.case$._id.eq(new ObjectId(caseId));
     }
 
     public Predicate group(Object query, LoggedUser user, Locale locale) {

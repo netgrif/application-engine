@@ -630,6 +630,11 @@
 		</action>
 	</data>
 	<data type="boolean" immediate="true">
+		<id>show_create_case_button</id>
+		<title name="show_create_case_button">Show create case button?</title>
+		<init>true</init>
+	</data>
+	<data type="boolean" immediate="true">
 		<id>case_require_title_in_creation</id>
 		<title name="case_require_title_in_creation">Require title input in case creation?</title>
 		<init>true</init>
@@ -1055,6 +1060,7 @@
 		<i18nString name="case_require_title_in_creation">Vyžadovať názov inštancii pri vytváraní?</i18nString>
 		<i18nString name="case_banned_nets_in_creation">Zakázané siete pri vytváraní</i18nString>
 		<i18nString name="case_banned_nets_in_creation_desc">Uveďte identifikátory procesov oddelené čiarkou. Napríklad: mynet1,mynet2</i18nString>
+		<i18nString name="show_create_case_button">Zobraziť tlačidlo na vytvorenie prípadu?</i18nString>
 		<i18nString name="case_show_more_menu">Zobrazovať menu pre prípadovú položku?</i18nString>
 		<i18nString name="sort">Zoraďovanie</i18nString>
 		<i18nString name="search">Vyhľadávanie</i18nString>
@@ -1153,6 +1159,7 @@
 		<i18nString name="case_require_title_in_creation">Erforde den Titel beim erzeugen von Fällen?</i18nString>
 		<i18nString name="case_banned_nets_in_creation">Ausgeschlossene Prozesse</i18nString>
 		<i18nString name="case_banned_nets_in_creation_desc">Trenne die Prozessidentifikatoren mit einer Komma. z.B.: netz1,netz2</i18nString>
+		<i18nString name="show_create_case_button">Schaltfläche „Fall erstellen“ anzeigen?</i18nString>
 		<i18nString name="case_show_more_menu">"Erweiterte Optionen" Taste bei einzelnen Fällen anzeigen</i18nString>
 		<i18nString name="merge_filters">Mit dem Basisfilter kombinieren?</i18nString>
 		<i18nString name="task_view_search_type">Suchmodus im Aufgabenansicht</i18nString>
@@ -1945,7 +1952,22 @@
 					<x>0</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>3</cols>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>show_create_case_button</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
