@@ -100,6 +100,10 @@ class Action implements Serializable{
         this.transitionIds = transitionIds
     }
 
+    void setId(ObjectId id) {
+        this.id = id
+    }
+
     @Override
     String toString() {
         return "[$trigger] $definition"
@@ -125,6 +129,7 @@ class Action implements Serializable{
     @Override
     Action clone() {
         Action clone = new Action()
+        clone.setId(new ObjectId(this.getId().toString()))
         clone.setTrigger(this.trigger)
         clone.setDefinition(this.definition)
         clone.setImportId(this.importId)
