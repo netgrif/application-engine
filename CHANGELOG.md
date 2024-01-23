@@ -7,10 +7,11 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.4.0](https://github.com/netgrif/application-engine/commits/v6.4.0)
 
-## [6.4.0](https://github.com/netgrif/application-engine/releases/tag/v6.4.0) (2023-12-13) 
+## [6.4.0](https://github.com/netgrif/application-engine/releases/tag/v6.4.0) (2024-01-23) 
 
 ### Fixed
 - [NAE-1908] NAE-1906 Improvements
+- [NAE-1937] Fix the problem with empty string in filter
 
 ### Added
 - [NAE-1901] Taskref list rendering update
@@ -18,6 +19,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.4.0](h
 - [NAE-1916] Serializable core objects
 - [NAE-1918] Tags on process resources
 - [NAE-1929] Data field type list of strings
+- [NAE-1936] Disable create case button using menu items
 
 ## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2023-05-26)
 
