@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.service
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.auth.domain.Author
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
@@ -8,18 +9,20 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
+import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.PetriNetSearch
 import com.netgrif.application.engine.petrinet.domain.UriContentType
 import com.netgrif.application.engine.petrinet.domain.UriNode
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
-import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
@@ -31,8 +34,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
+
+import java.time.LocalDateTime
 
 @Disabled
 @ExtendWith(SpringExtension.class)
@@ -41,6 +48,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class PetriNetServiceTest {
 
     public static final String NET_FILE = "process_delete_test.xml"
+    public static final String NET_SEARCH_FILE = "process_search_test.xml"
     public static final String CUSTOMER_USER_MAIL = "customer@netgrif.com"
 
     @Autowired
@@ -159,5 +167,52 @@ class PetriNetServiceTest {
 
         List<PetriNet> petriNets = petriNetService.findAllByUriNodeId(myNode.id)
         assert petriNets.size() == 2
+    }
+
+    @Test
+    void processSearch() {
+        long processCount = petriNetRepository.count()
+
+        petriNetService.importPetriNet(stream(NET_SEARCH_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+
+        assert petriNetRepository.count() == processCount + 2
+
+        PetriNetSearch search = new PetriNetSearch();
+        assert petriNetService.search(search, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == processCount + 2;
+
+        PetriNetSearch search1 = new PetriNetSearch();
+        search1.setIdentifier("processSearchTest");
+        assert petriNetService.search(search1, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
+
+        PetriNetSearch search2 = new PetriNetSearch();
+        search2.setTitle("Process Search Test");
+        assert petriNetService.search(search2, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
+
+        PetriNetSearch search3 = new PetriNetSearch();
+        search3.setDefaultCaseName("Process Search Case Name");
+        assert petriNetService.search(search3, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
+
+        PetriNetSearch search4 = new PetriNetSearch();
+        search4.setInitials("PST");
+        assert petriNetService.search(search4, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
+
+
+        PetriNetSearch search5 = new PetriNetSearch();
+        Author author = new Author();
+        author.setEmail(superCreator.getLoggedSuper().getEmail());
+        search5.setAuthor(author);
+        assert petriNetService.search(search5, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 2;
+
+
+        PetriNetSearch search6 = new PetriNetSearch();
+        search6.setVersion(new Version(1,0,0));
+        assert petriNetService.search(search6, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == processCount + 2;
+
+        PetriNetSearch search7 = new PetriNetSearch();
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("test", "test");
+        search7.setTags(map);
+        assert petriNetService.search(search7, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
     }
 }
