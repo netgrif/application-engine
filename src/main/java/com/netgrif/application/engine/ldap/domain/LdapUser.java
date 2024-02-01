@@ -18,7 +18,7 @@ import java.util.Set;
 @ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapUser extends User {
 
-    @Indexed(unique = true)
+    @Indexed
     private String dn;
 
     private String commonName;

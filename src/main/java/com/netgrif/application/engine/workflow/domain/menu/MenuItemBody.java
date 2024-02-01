@@ -41,6 +41,7 @@ public class MenuItemBody {
     private String createCaseButtonTitle;
     private String createCaseButtonIcon = "add";
     private boolean caseRequireTitleInCreation = true;
+    private boolean showCreateCaseButton = true;
     private String bannedNetsInCreation;
     private boolean caseShowMoreMenu = false;
     private boolean caseAllowHeaderTableMode = true;
@@ -195,6 +196,8 @@ public class MenuItemBody {
                 this.createCaseButtonIcon);
         putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_REQUIRE_TITLE_IN_CREATION, FieldType.BOOLEAN,
                 this.caseRequireTitleInCreation);
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_SHOW_CREATE_CASE_BUTTON, FieldType.BOOLEAN,
+                this.showCreateCaseButton);
         putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_BANNED_NETS_IN_CREATION, FieldType.TEXT,
                 this.bannedNetsInCreation);
         putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_SHOW_MORE_MENU, FieldType.BOOLEAN,
