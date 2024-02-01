@@ -16,7 +16,6 @@ public interface IElasticTaskService {
 
     Map<String, Float> fullTextFields();
 
-    @Async
     void index(ElasticTask task);
 
     void indexNow(ElasticTask task);
