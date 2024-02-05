@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+          xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/netgrif/petriflow/NAE-1946/petriflow.schema.xsd">
     <id>remote_file_field_net</id>
     <initials>TST</initials>
     <title>Test</title>
@@ -9,8 +9,7 @@
         <id>file</id>
         <title>Remote File</title>
         <placeholder>Remote file</placeholder>
-        <init>test-file.txt:https://netgrif.com</init>
-        <remote/>
+        <remote>MINIO</remote>
     </data>
     <transition>
         <id>task</id>
@@ -20,7 +19,7 @@
         <dataRef>
             <id>file</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
     </transition>

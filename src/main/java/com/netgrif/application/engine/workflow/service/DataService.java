@@ -22,6 +22,7 @@ import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.storage.StorageResolverService;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataField;
@@ -53,7 +54,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.*;
@@ -95,6 +95,9 @@ public class DataService implements IDataService {
 
     @Autowired
     protected IValidationService validation;
+
+    @Autowired
+    private StorageResolverService storageResolverService;
 
     @Value("${nae.image.preview.scaling.px:400}")
     protected int imageScale;
@@ -320,7 +323,7 @@ public class DataService implements IDataService {
     }
 
     private boolean hasRequiredComponentProperty(Component component, String propertyName, String propertyValue) {
-        return  component != null
+        return component != null
                 && component.getProperties() != null
                 && component.getProperties().containsKey(propertyName)
                 && component.getProperties().get(propertyName).equals(propertyValue);
@@ -431,7 +434,7 @@ public class DataService implements IDataService {
         }
 
         try {
-            return new FileFieldInputStream(field.isRemote() ? download(fileField.get().getPath()) :
+            return new FileFieldInputStream(field.isRemote() ? download(field) :
                     new FileInputStream(fileField.get().getPath()), name);
         } catch (IOException e) {
             log.error("Getting file failed: ", e);
@@ -452,7 +455,7 @@ public class DataService implements IDataService {
             if (forPreview) {
                 return getFilePreview(field, useCase);
             } else {
-                return new FileFieldInputStream(field, field.isRemote() ? download(field.getValue().getPath()) :
+                return new FileFieldInputStream(field, field.isRemote() ? download(field) :
                         new FileInputStream(field.getValue().getPath()));
             }
         } catch (IOException e) {
@@ -525,7 +528,7 @@ public class DataService implements IDataService {
 
     private File getRemoteFile(FileField field) throws IOException {
         File file;
-        InputStream is = download(field.getValue().getPath());
+        InputStream is = download(field);
         file = File.createTempFile(field.getStringId(), "pdf");
         file.deleteOnExit();
         FileOutputStream fos = new FileOutputStream(file);
@@ -534,9 +537,22 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public InputStream download(String url) throws IOException {
-        URL connection = new URL(url);
-        return new BufferedInputStream(connection.openStream());
+    public InputStream download(FileField field) throws IOException {
+        try {
+            return storageResolverService.resolve(field.getRemote()).get(field.getValue().getPath());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("File cannot be saved");
+        }
+    }
+
+    @Override
+    public InputStream download(FileListField field) throws IOException {
+        try {
+            return null;
+//            return storageResolverService.resolve(field.getRemote()).get(field.getValue())); TODO not implemented
+        } catch (Exception e) {
+            throw new IllegalArgumentException("File cannot be saved");
+        }
     }
 
     @Override
@@ -636,7 +652,17 @@ public class DataService implements IDataService {
     }
 
     protected boolean upload(Case useCase, FileField field, MultipartFile multipartFile) {
-        throw new UnsupportedOperationException("Upload new file to the remote storage is not implemented yet.");
+        try {
+            if (useCase.getDataSet().get(field.getStringId()).getValue() != null) {
+                // TODO delete fileu new File(field.getFilePath(useCase.getStringId())).delete();
+                useCase.getDataSet().get(field.getStringId()).setValue(null);
+            }
+            field.setValue(multipartFile.getOriginalFilename());
+            field.getValue().setPath(useCase.getStringId() + "-" + field.getStringId());
+            return storageResolverService.resolve(field.getRemote()).upload(useCase.getStringId() + "-" + field.getStringId(), multipartFile).etag() != null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected boolean upload(Case useCase, FileListField field, MultipartFile[] multipartFiles) {

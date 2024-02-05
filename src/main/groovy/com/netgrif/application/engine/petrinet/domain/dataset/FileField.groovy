@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document
 class FileField extends Field<FileFieldValue> {
 
-    private Boolean remote
+    private String remote
 
     FileField() {
         super()
@@ -61,11 +61,15 @@ class FileField extends Field<FileFieldValue> {
         return this.getValue().getPreviewPath(caseId, getStringId())
     }
 
+    String getRemote(){
+        return this.remote
+    }
+
     boolean isRemote() {
         return this.remote
     }
 
-    void setRemote(boolean remote) {
+    void setRemote(String remote) {
         this.remote = remote
     }
 

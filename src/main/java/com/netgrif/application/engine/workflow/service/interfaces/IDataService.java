@@ -42,7 +42,9 @@ public interface IDataService {
 
     FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name);
 
-    InputStream download(String url) throws IOException;
+    InputStream download(FileField field) throws IOException;
+
+    InputStream download(FileListField field) throws IOException;
 
     SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile);
 

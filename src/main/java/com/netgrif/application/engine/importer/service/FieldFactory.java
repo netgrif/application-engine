@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.importer.service;
 
-import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
@@ -42,9 +41,6 @@ public final class FieldFactory {
 
     @Autowired
     private IDataValidator dataValidator;
-
-    @Autowired
-    private IUserService userService;
 
     @Autowired
     private IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
@@ -144,7 +140,7 @@ public final class FieldFactory {
             field.setFormat(format);
         }
         if (data.getView() != null) {
-            log.warn("Data attribute [view] in field [" + field.getImportId()  + "] is deprecated.");
+            log.warn("Data attribute [view] in field [" + field.getImportId() + "] is deprecated.");
             View view = viewFactory.buildView(data);
             field.setComponent(new Component(view.getValue()));
         }
@@ -382,7 +378,7 @@ public final class FieldFactory {
 
     private FileField buildFileField(Data data) {
         FileField fileField = new FileField();
-        fileField.setRemote(data.getRemote() != null);
+        fileField.setRemote(data.getRemote());
         setDefaultValue(fileField, data, defaultValue -> {
             if (defaultValue != null) {
                 fileField.setDefaultValue(defaultValue);
@@ -393,7 +389,7 @@ public final class FieldFactory {
 
     private FileListField buildFileListField(Data data) {
         FileListField fileListField = new FileListField();
-        fileListField.setRemote(data.getRemote() != null);
+        fileListField.setRemote(data.getRemote());
         setDefaultValues(fileListField, data, defaultValues -> {
             if (defaultValues != null && !defaultValues.isEmpty()) {
                 fileListField.setDefaultValue(defaultValues);
@@ -607,7 +603,7 @@ public final class FieldFactory {
     public static Set<String> parseMultichoiceMapValue(Case useCase, String fieldId) {
         Object values = useCase.getFieldValue(fieldId);
         if (values instanceof ArrayList) {
-            return (Set<String>) ((ArrayList) values).stream().map(val -> val.toString()).collect(Collectors.toCollection( LinkedHashSet::new ));
+            return (Set<String>) ((ArrayList) values).stream().map(val -> val.toString()).collect(Collectors.toCollection(LinkedHashSet::new));
         } else {
             return (Set<String>) values;
         }

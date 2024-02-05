@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
 class FileListField extends Field<FileListFieldValue> {
-    private Boolean remote
+    private String remote
 
     FileListField() {
         super()
@@ -66,11 +66,15 @@ class FileListField extends Field<FileListFieldValue> {
         return FileListFieldValue.getPath(caseId, getStringId(), name)
     }
 
+    String getRemote() {
+        return this.remote
+    }
+
     boolean isRemote() {
         return this.remote
     }
 
-    void setRemote(boolean remote) {
+    void setRemote(String remote) {
         this.remote = remote
     }
 
