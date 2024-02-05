@@ -22,7 +22,7 @@ import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.storage.StorageResolverService;
+import com.netgrif.application.engine.files.StorageResolverService;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataField;
