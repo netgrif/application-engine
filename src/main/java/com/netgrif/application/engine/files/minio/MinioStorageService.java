@@ -13,7 +13,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 @Service
-public class MinioStorageService implements IStorageService  {
+public class MinioStorageService implements IStorageService {
 
     @Autowired
     MinioClient minioClient;
@@ -23,8 +23,8 @@ public class MinioStorageService implements IStorageService  {
 
 
     @Override
-    public String getType(){
-        return  "MINIO";
+    public String getType() {
+        return "MINIO";
     }
 
     @Override
@@ -39,12 +39,16 @@ public class MinioStorageService implements IStorageService  {
 
     @Override
     public ObjectWriteResponse upload(String name, MultipartFile file) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        return minioClient.putObject(PutObjectArgs
-                .builder()
-                .bucket(properties.getBucketName())
-                .object(name)
-                .stream(file.getInputStream(), file.getSize(), -1)
-                .build());
+        try (InputStream stream = file.getInputStream()) {
+            return minioClient.putObject(PutObjectArgs
+                    .builder()
+                    .bucket(properties.getBucketName())
+                    .object(name)
+                    .stream(stream, -1, properties.getPartSize())
+                    .build());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("File cannot be save", e);
+        }
     }
 
     @Override

@@ -14,6 +14,7 @@ public class MinioProperties {
     private String user;
     private String password;
     private String bucketName;
+    private long partSize = 5242880L;
 
 }
 

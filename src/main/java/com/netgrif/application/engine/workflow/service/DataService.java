@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.files.StorageResolverService;
 import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
 import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
@@ -22,7 +23,6 @@ import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.files.StorageResolverService;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataField;
@@ -658,19 +658,27 @@ public class DataService implements IDataService {
                 useCase.getDataSet().get(field.getStringId()).setValue(null);
             }
             field.setValue(multipartFile.getOriginalFilename());
-            field.getValue().setPath(useCase.getStringId() + "-" + field.getStringId());
-            return storageResolverService.resolve(field.getRemote()).upload(useCase.getStringId() + "-" + field.getStringId(), multipartFile).etag() != null;
+            field.getValue().setPath(useCase.getStringId() + "-" + field.getStringId() + "-" + multipartFile.getOriginalFilename());
+            useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
+            return storageResolverService.resolve(field.getRemote()).upload(useCase.getStringId() + "-" + field.getStringId() + "-" + multipartFile.getOriginalFilename(), multipartFile).etag() != null;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     protected boolean upload(Case useCase, FileListField field, MultipartFile[] multipartFiles) {
+
         throw new UnsupportedOperationException("Upload new files to the remote storage is not implemented yet.");
     }
 
     protected boolean deleteRemote(Case useCase, FileField field) {
-        throw new UnsupportedOperationException("Delete file from the remote storage is not implemented yet.");
+        try {
+            useCase.getDataSet().get(field.getStringId()).setValue(null);
+            storageResolverService.resolve(field.getRemote()).delete(field.getValue().getPath());
+            return true;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("File cannot be saved");
+        }
     }
 
     protected boolean deleteRemote(Case useCase, FileListField field, String name) {
