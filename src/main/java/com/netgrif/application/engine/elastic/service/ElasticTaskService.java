@@ -119,7 +119,6 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         });
     }
 
-    @Async
     @Override
     public void index(ElasticTask task) {
         executor.execute(() -> {

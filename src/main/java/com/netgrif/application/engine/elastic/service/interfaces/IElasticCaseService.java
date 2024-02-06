@@ -14,7 +14,6 @@ import java.util.Map;
 
 public interface IElasticCaseService {
 
-    @Async
     void index(ElasticCase useCase);
 
     void indexNow(ElasticCase useCase);
