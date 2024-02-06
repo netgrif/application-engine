@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic
 
+import com.netgrif.application.engine.petrinet.domain.ChangedField
+
 class CaseChangedFields implements Serializable {
 
     private static final long serialVersionUID = 2299918326436821185L;

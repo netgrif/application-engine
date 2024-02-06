@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic
 
+import com.netgrif.application.engine.petrinet.domain.ChangedField
+
 class ChangedFieldByFileFieldContainer extends ChangedFieldContainer {
 
     private Map<String, Map<String, Object>> changedFields

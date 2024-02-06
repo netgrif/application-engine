@@ -28,7 +28,6 @@ import com.netgrif.application.engine.pdf.generator.config.PdfResource
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.dataset.*
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation

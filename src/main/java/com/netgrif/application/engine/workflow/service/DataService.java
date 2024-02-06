@@ -15,7 +15,6 @@ import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
@@ -232,7 +231,7 @@ public class DataService implements IDataService {
                 dataField.setValue(newValue);
                 dataField.setLastModified(LocalDateTime.now());
                 ChangedField changedField = new ChangedField();
-                changedField.setId(fieldId);
+                changedField.id = fieldId;
                 changedField.addAttribute("value", newValue);
                 List<String> allowedNets = parseAllowedNetsValue(entry.getValue());
                 if (allowedNets != null) {
