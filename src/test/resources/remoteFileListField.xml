@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-    <id>remote_file_field_net</id>
+          xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/netgrif/petriflow/NAE-1946/petriflow.schema.xsd">
+    <id>remote_file_list_field_net</id>
     <initials>TST</initials>
-    <title>Test</title>
+    <title>Remote file list field test</title>
     <defaultRole>true</defaultRole>
     <data type="fileList">
         <id>fileList</id>
         <title>Remote File List</title>
         <placeholder>Remote file list</placeholder>
-        <init>test-file.txt:https://netgrif.com,test-file-list.txt:https://netgrif.com</init>
-        <remote/>
+        <remote>MINIO</remote>
     </data>
     <transition>
         <id>task</id>
@@ -20,7 +19,7 @@
         <dataRef>
             <id>fileList</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
     </transition>

@@ -61,7 +61,7 @@ class FileField extends Field<FileFieldValue> {
         return this.getValue().getPreviewPath(caseId, getStringId())
     }
 
-    String getRemote(){
+    String getRemote() {
         return this.remote
     }
 

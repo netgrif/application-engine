@@ -21,7 +21,6 @@ public class MinioStorageService implements IStorageService {
     @Autowired
     MinioProperties properties;
 
-
     @Override
     public String getType() {
         return "MINIO";
