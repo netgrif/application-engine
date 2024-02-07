@@ -35,4 +35,9 @@ public class Author {
                 ", fullName='" + fullName + '\'' +
                 '}';
     }
+
+    @Override
+    public Author clone() {
+        return new Author(this.id, this.email, this.fullName);
+    }
 }

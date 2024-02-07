@@ -120,7 +120,7 @@ public class Arc extends PetriNetObject {
         clone.setBreakpoints(this.breakpoints);
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);
-        clone.setReference(this.reference);
+        clone.setReference(this.reference == null ? null : this.reference.clone());
         return clone;
     }
 }

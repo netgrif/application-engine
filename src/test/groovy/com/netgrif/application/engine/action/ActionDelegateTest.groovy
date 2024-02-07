@@ -6,6 +6,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
+import com.netgrif.application.engine.configuration.PublicViewProperties
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
@@ -19,6 +20,8 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 import javax.mail.internet.MimeMessage
+
+import static java.util.Base64.*
 
 @SpringBootTest
 @ActiveProfiles(["test"])
@@ -36,6 +39,9 @@ class ActionDelegateTest {
 
     @Autowired
     private IUserService userService
+
+    @Autowired
+    private PublicViewProperties publicViewProperties
 
     @BeforeEach
     void before() {
@@ -99,5 +105,12 @@ class ActionDelegateTest {
         smtpServer.stop()
     }
 
-
+    @Test
+    void makeUrlAction() {
+        final String identifier = "identifier"
+        final String url = "test.public.url/${getEncoder().encodeToString(identifier.bytes)}"
+        assert actionDelegate.makeUrl(identifier) == url
+        assert actionDelegate.makeUrl(publicViewProperties.url, identifier) == url
+        assert actionDelegate.makeUrl("test.netgrif.com/public", "identifier") == "test.netgrif.com/public/${getEncoder().encodeToString(identifier.bytes)}"
+    }
 }
