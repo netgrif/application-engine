@@ -1,8 +1,6 @@
 package com.netgrif.application.engine.elastic.service;
 
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.domain.BooleanField;
 import com.netgrif.application.engine.elastic.domain.ButtonField;
 import com.netgrif.application.engine.elastic.domain.DateField;
@@ -18,7 +16,6 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -27,14 +24,10 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class ElasticCaseMappingService implements IElasticCaseMappingService {
-
-    @Autowired
-    private IUserService userService;
 
     @Override
     public ElasticCase transform(Case useCase) {
