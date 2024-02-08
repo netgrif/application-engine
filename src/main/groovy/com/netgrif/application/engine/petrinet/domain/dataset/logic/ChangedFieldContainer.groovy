@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.netgrif.application.engine.petrinet.domain.ChangedField
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class ChangedFieldContainer implements Serializable {

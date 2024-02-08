@@ -1,20 +1,22 @@
-package com.netgrif.application.engine.petrinet.domain;
+package com.netgrif.application.engine.petrinet.domain.dataset.logic;
 
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.querydsl.core.annotations.QueryExclude;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.*;
 
+@Data
 @QueryExclude
 public class ChangedField implements Serializable {
 
     private static final long serialVersionUID = 5299918326436828485L;
 
-    public String id;
-    public List<TaskPair> changedOn;
-    public Map<String, Object> attributes;
+    private String id;
+    private List<TaskPair> changedOn;
+    private Map<String, Object> attributes;
 
     public ChangedField() {
         attributes = new HashMap<>();
@@ -65,25 +67,6 @@ public class ChangedField implements Serializable {
     public Map<String, Object> getAttributes() {
         return attributes;
     }
-
-//    public ObjectNode toJson() {
-//        ObjectNode node = JsonNodeFactory.instance.objectNode()
-//        if (!behavior.isEmpty()) {
-//            ObjectNode b = JsonNodeFactory.instance.objectNode()
-//            behavior.each { trans, behav -> b.set(trans, behaviorToJson(trans)) }
-//            node.set("behavior", b)
-//        }
-//        if (this.value != null)
-//            node.put("value", value)
-//
-//        return node
-//    }
-//
-//    private ObjectNode behaviorToJson(String trans) {
-//        ObjectNode node = JsonNodeFactory.instance.objectNode()
-//        behavior.get(trans).each { behav -> node.put(behav.toString(), true) }
-//        return node
-//    }
 
     public boolean equals(Object o) {
         if (getClass() != o.getClass()) {
