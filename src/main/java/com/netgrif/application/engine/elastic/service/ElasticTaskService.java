@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.domain.*;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
+import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
@@ -184,6 +185,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         buildProcessQuery(request, query);
         buildFullTextQuery(request, query);
         buildTransitionQuery(request, query);
+        buildTagsQuery(request, query);
         buildStringQuery(request, query, user);
         boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
 
@@ -375,6 +377,19 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         request.transitionId.forEach(transitionId -> transitionQuery.should(termQuery("transitionId", transitionId)));
 
         query.filter(transitionQuery);
+    }
+
+    private void buildTagsQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+        if (request.tags == null || request.tags.isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder tagsQuery = boolQuery();
+        for (Map.Entry<String, String> field : request.tags.entrySet()) {
+            tagsQuery.must(termQuery("tags." + field.getKey(), field.getValue()));
+        }
+
+        query.filter(tagsQuery);
     }
 
     /**

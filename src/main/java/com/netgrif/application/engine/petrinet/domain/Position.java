@@ -3,7 +3,11 @@ package com.netgrif.application.engine.petrinet.domain;
 import lombok.Getter;
 import lombok.Setter;
 
-public class Position {
+import java.io.Serializable;
+
+public class Position implements Serializable {
+
+    private static final long serialVersionUID = 4514035625907226577L;
 
     @Getter
     @Setter

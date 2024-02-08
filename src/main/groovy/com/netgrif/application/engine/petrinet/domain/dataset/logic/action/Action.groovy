@@ -6,7 +6,9 @@ import com.querydsl.core.annotations.QueryType
 import org.bson.types.ObjectId
 
 
-class Action {
+class Action implements Serializable{
+
+    private static final long serialVersionUID = 3687481049847555522L;
 
     private String importId;
 

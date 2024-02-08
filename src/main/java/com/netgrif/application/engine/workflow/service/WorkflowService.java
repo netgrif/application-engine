@@ -495,17 +495,7 @@ public class WorkflowService implements IWorkflowService {
 
         useCase.getImmediateDataFields().forEach(fieldId -> {
             try {
-                Field field = fieldFactory.buildImmediateField(useCase, fieldId);
-                Field clone = field.clone();
-                if (field.getValue() != null) {
-                    if (field.getType() == FieldType.TEXT) {
-                        clone.setValue(field.getValue().toString());
-                    } else {
-                        clone.setValue(field.getValue());
-                    }
-                } else {
-                    clone.setValue(null);
-                }
+                Field clone = fieldFactory.buildImmediateField(useCase, fieldId);
                 immediateData.add(clone);
             } catch (Exception e) {
                 log.error("Could not built immediate field [" + fieldId + "]");

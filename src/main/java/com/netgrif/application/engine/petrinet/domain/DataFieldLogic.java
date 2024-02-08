@@ -11,11 +11,14 @@ import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
 
-public class DataFieldLogic {
+public class DataFieldLogic implements Serializable {
+
+    private static final long serialVersionUID = 6561411252131004710L;
 
     @Getter
     @Setter
