@@ -24,8 +24,8 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
     private static final String FILTER_FILE_NAME = "engine-processes/filter.xml"
     public static final String FILTER_PETRI_NET_IDENTIFIER = "filter"
 
-    private static final String PREFERRED_FILTER_ITEM_FILE_NAME = "engine-processes/preference_filter_item.xml"
-    public static final String PREFERRED_FILTER_ITEM_NET_IDENTIFIER = "preference_filter_item"
+    private static final String PREFERRED_ITEM_FILE_NAME = "engine-processes/preference_item.xml"
+    public static final String PREFERRED_ITEM_NET_IDENTIFIER = "preference_item"
 
     private static final String EXPORT_FILTER_FILE_NAME = "engine-processes/export_filters.xml"
     private static final String EXPORT_NET_IDENTIFIER = "export_filters"
@@ -36,7 +36,7 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
     @Override
     void run(String... args) throws Exception {
         createFilterNet()
-        createPreferenceFilterItemNet()
+        createPreferenceItemNet()
         createImportFiltersNet()
         createExportFiltersNet()
     }
@@ -45,8 +45,8 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
         importProcess("Petri net for filters", FILTER_PETRI_NET_IDENTIFIER, FILTER_FILE_NAME)
     }
 
-    Optional<PetriNet> createPreferenceFilterItemNet() {
-        importProcess("Petri net for filter preferences", PREFERRED_FILTER_ITEM_NET_IDENTIFIER, PREFERRED_FILTER_ITEM_FILE_NAME)
+    Optional<PetriNet> createPreferenceItemNet() {
+        importProcess("Petri net for filter preferences", PREFERRED_ITEM_NET_IDENTIFIER, PREFERRED_ITEM_FILE_NAME)
     }
 
     Optional<PetriNet> createImportFiltersNet() {

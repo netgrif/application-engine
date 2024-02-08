@@ -1,0 +1,2328 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>preference_item</id>
+	<initials>PRI</initials>
+	<title>Preference Item</title>
+	<icon>check_box_outline_blank</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<caseEvents>
+		<event type="delete">
+			<id>preference_item_delete</id>
+			<actions phase="pre">
+				<action id="0">
+					removeItemChildCases(useCase)
+				</action>
+			</actions>
+		</event>
+	</caseEvents>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<function scope="process" name="removeItemChildCases">
+		{ com.netgrif.application.engine.workflow.domain.Case useCase ->
+
+			def childCaseIds = useCase.dataSet['childItemIds'].options?.keySet() as List
+			if (childCaseIds == null || childCaseIds.isEmpty()) {
+				return
+			}
+
+			removeChildItemFromParent(useCase.dataSet['parentId'].value, useCase)
+
+			def childCases = workflowService.findAllById(childCaseIds)
+			async.run {
+				childCases.each {
+					workflowService.deleteCase(it)
+				}
+			}
+		}
+	</function>
+	<function scope="process" name="updateFilterAutocompleteOptions">
+		{
+			com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
+			com.netgrif.application.engine.petrinet.domain.dataset.TaskField previewTaskRef,
+			com.netgrif.application.engine.petrinet.domain.dataset.CaseField selectedFilterRef,
+			com.netgrif.application.engine.petrinet.domain.dataset.ButtonField updateBtn,
+			com.netgrif.application.engine.petrinet.domain.Transition trans,
+			boolean taskTypeOnly
+			->
+			if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
+				change previewTaskRef value {
+					return [findTask({it.caseId.eq(filterAutocomplete.value).and(it.transitionId.eq("view_filter"))}).stringId]
+				}
+				make updateBtn,editable on trans when { true }
+			} else {
+				change filterAutocomplete options {
+					def findAllPredicate
+					if (taskTypeOnly) {
+						findAllPredicate = { filterCase ->
+							!selectedFilterRef.value.contains(filterCase.stringId) &amp;&amp;
+							filterCase.dataSet["filter_type"].value == "Task"
+						}
+					} else {
+						findAllPredicate = { filterCase -> !selectedFilterRef.value.contains(filterCase.stringId) }
+					}
+					return findFilters(filterAutocomplete.value != null ? filterAutocomplete.value : "")
+							.findAll(findAllPredicate)
+							.collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
+				}
+				change previewTaskRef value { [] }
+				make updateBtn,visible on trans when { true }
+			}
+		}
+	</function>
+	<function scope="process" name="updateOptionsBasedOnValue">
+		{
+			com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField toBeUpdated,
+			com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField valueSelector,
+			com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField optionsHolder
+			->
+			def existingOptions = optionsHolder.options
+			def selectedValues = valueSelector.value
+			def newOptions = [:]
+
+			if (selectedValues != null) {
+				existingOptions.each { key, value ->
+					if (selectedValues.contains(key)) {
+						newOptions.put(key, value)
+					}
+				}
+			}
+
+			if (!newOptions.containsKey(toBeUpdated.value)) {
+				change toBeUpdated value { null }
+			}
+
+			change toBeUpdated options { newOptions }
+		}
+	</function>
+
+	<data type="text">
+		<id>parentId</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>move_previous_dest_uri</id>
+		<title/>
+	</data>
+	<data type="multichoice_map">
+		<id>move_dest_uri</id>
+		<title name="move_dest_uri">Destination URI</title>
+		<desc name="move_dest_uri_desc">List of nodes representing destination URI</desc>
+		<component>
+			<name>autocomplete</name>
+		</component>
+		<action trigger="get">
+			moveDestUri: f.move_dest_uri;
+
+			String uriNodeId = elasticCaseService.findUriNodeId(useCase)
+			def node = uriService.findById(uriNodeId)
+			updateMultichoiceWithCurrentNode(moveDestUri, node)
+		</action>
+		<action trigger="set">
+			prevDestUri: f.move_previous_dest_uri,
+			moveDestUri: f.move_dest_uri;
+
+			String newUri = moveDestUri.value.join("/")
+			newUri = newUri.replace("//","/")
+
+			String corrected = getCorrectedUri(newUri)
+
+			if (corrected == newUri) {
+				def node = uriService.findByUri(newUri)
+				change moveDestUri options { findOptionsBasedOnSelectedNode(node) }
+			} else {
+				change moveDestUri value { splitUriPath(corrected) }
+			}
+		</action>
+	</data>
+	<data type="text">
+		<id>move_dest_uri_new_node</id>
+		<title name="move_dest_uri_new_node">New node to be added</title>
+		<desc name="move_dest_uri_new_node_desc">Enter new node name</desc>
+	</data>
+	<data type="button">
+		<id>move_add_node</id>
+		<title/>
+		<placeholder name="move_add_node">Add</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<action trigger="set">
+			newNodeName: f.move_dest_uri_new_node,
+			selectedUri: f.move_dest_uri;
+
+			if (newNodeName.value == null || newNodeName.value == "") {
+				return
+			}
+
+			String prefixUri = selectedUri.value.join("/")
+			prefixUri = prefixUri.replace("//","/")
+
+			String newUri = prefixUri + uriService.getUriSeparator() + newNodeName.value
+			def newNode = uriService.getOrCreate(newUri, com.netgrif.application.engine.petrinet.domain.UriContentType.CASE)
+
+			change selectedUri value { splitUriPath(newNode.uriPath) }
+
+			change newNodeName value { null }
+		</action>
+	</data>
+	<data type="i18n">
+		<id>duplicate_new_title</id>
+		<title name="duplicate_new_title">Title of duplicated view</title>
+	</data>
+	<data type="text">
+		<id>duplicate_view_identifier</id>
+		<title name="duplicate_view_identifier">View identifier</title>
+		<desc name="duplicate_view_identifier_desc">Must be unique</desc>
+	</data>
+	<data type="enumeration_map">
+		<id>childItemIds</id>
+		<title/>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>hasChildren</id>
+		<title/>
+	</data>
+	<data type="button">
+		<id>duplicate_reset_childItemIds</id>
+		<title/>
+		<action trigger="set">
+			hasChildren: f.hasChildren,
+			childItemIds: f.childItemIds;
+
+			change childItemIds options { [:] }
+			change hasChildren value { false }
+		</action>
+	</data>
+	<data type="text" immediate="true">
+		<id>menu_item_identifier</id>
+		<title name="menu_item_identifier">Menu item identifier</title>
+	</data>
+	<data type="text" immediate="true">
+		<id>nodePath</id>
+		<title name="nodePath">Item URI</title>
+		<event type="set">
+			<id>0</id>
+			<actions phase="post">
+				<action>
+					nodePath: f.nodePath,
+					menu_item_identifier: f.menu_item_identifier;
+
+					change menu_item_identifier value {
+						def idx = nodePath.value.lastIndexOf(uriService.getUriSeparator())
+						return nodePath.value.substring(idx + 1)
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<!-- GENERAL CONFIGURATION DATA -->
+	<data type="text" immediate="true">
+		<id>menu_icon</id>
+		<title name="icon_identifier">Menu icon identifier</title>
+		<desc name="icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
+		<action trigger="set">
+			icon: f.this,
+			iconPreview: f.menu_icon_preview;
+
+			changeCaseProperty "icon" about { icon.value; }
+
+			if (icon.value == "") {
+				change iconPreview value {<![CDATA["""<span></span>"""]]>}
+				return;
+			}
+
+			change iconPreview value {
+				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + icon.value + <![CDATA["""</span>"""]]>
+			}
+		</action>
+	</data>
+	<data type="text">
+		<id>menu_icon_preview</id>
+		<title name="icon_preview">Menu icon preview</title>
+		<component>
+			<name>htmltextarea</name>
+		</component>
+	</data>
+	<data type="i18n" immediate="true">
+		<id>menu_name</id>
+		<title name="name">Name of the item</title>
+		<desc name="name_desc">Will be shown in the menu</desc>
+		<action trigger="set">
+			name: f.menu_name;
+			changeCaseProperty "title" about { name.value }
+		</action>
+	</data>
+	<data type="text" immediate="true">
+		<id>tab_icon</id>
+		<title name="tab_icon">Tab icon identifier</title>
+		<desc name="tab_icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
+		<action trigger="set">
+			icon: f.this,
+			iconPreview: f.tab_icon_preview;
+
+			if (icon.value == "") {
+				change iconPreview value {<![CDATA["""<span></span>"""]]>}
+				return;
+			}
+
+			change iconPreview value {
+				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + icon.value + <![CDATA["""</span>"""]]>
+			}
+		</action>
+	</data>
+	<data type="text">
+		<id>tab_icon_preview</id>
+		<title>Tab icon preview</title>
+		<component>
+			<name>htmltextarea</name>
+		</component>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>use_tab_icon</id>
+		<title name="display_tab_icon">Display tab icon?</title>
+		<init>true</init>
+	</data>
+	<data type="i18n" immediate="true">
+		<id>tab_name</id>
+		<title name="tab_name">Name of the item</title>
+		<desc name="tab_name_desc">Will be shown in tab</desc>
+	</data>
+	<data type="button">
+		<id>add_allowed_roles</id>
+		<title/>
+		<placeholder name="allow_roles">Allow view for roles</placeholder>
+		<action trigger="set">
+			allowedRoles: f.allowed_roles,
+			processesAvailable: f.processes_available,
+			rolesAvailable: f.roles_available;
+
+			change allowedRoles options {return configurableMenuService.addSelectedRoles(allowedRoles, processesAvailable, rolesAvailable)}
+
+			change rolesAvailable value {[]}
+			change rolesAvailable options {[:]}
+			change processesAvailable value {null}
+		</action>
+	</data>
+	<data type="button">
+		<id>remove_allowed_roles</id>
+		<title/>
+		<placeholder name="remove_from_allowed_roles">Remove from allowed roles</placeholder>
+		<action trigger="set">
+			allowedRoles: f.allowed_roles,
+			processesAvailable: f.processes_available,
+			rolesAvailable: f.roles_available;
+
+			change allowedRoles options {return configurableMenuService.removeSelectedRoles(allowedRoles)}
+
+			change allowedRoles value {[]}
+			change rolesAvailable value {[]}
+			change rolesAvailable options {[:]}
+			change processesAvailable value {null}
+		</action>
+	</data>
+	<data type="button">
+		<id>add_banned_roles</id>
+		<title/>
+		<placeholder name="ban_roles">Ban view for roles</placeholder>
+		<action trigger="set">
+			bannedRoles: f.banned_roles,
+			processesAvailable: f.processes_available,
+			rolesAvailable: f.roles_available;
+
+			change bannedRoles options {return configurableMenuService.addSelectedRoles(bannedRoles, processesAvailable, rolesAvailable)}
+
+			change rolesAvailable value {[]}
+			change rolesAvailable options {[:]}
+			change processesAvailable value {null}
+		</action>
+	</data>
+	<data type="button">
+		<id>remove_banned_roles</id>
+		<title/>
+		<placeholder name="remove_from_banned_roles">Remove from banned roles</placeholder>
+		<action trigger="set">
+			bannedRoles: f.banned_roles,
+			processesAvailable: f.processes_available,
+			rolesAvailable: f.roles_available;
+
+			change bannedRoles options { return configurableMenuService.removeSelectedRoles(bannedRoles) }
+
+			change bannedRoles value { [] }
+			change rolesAvailable value { [] }
+			change rolesAvailable options { [:] }
+			change processesAvailable value { null }
+		</action>
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>processes_available</id>
+		<title name="available_processes">Your processes</title>
+		<desc name="available_processes_desc">Select a process containing roles you wish to add to allowed or banned roles lists.</desc>
+		<action trigger="get">
+			processes: f.this;
+
+			change processes options { return configurableMenuService.getNetsByAuthorAsMapOptions(loggedUser(), org.springframework.context.i18n.LocaleContextHolder.locale) }
+		</action>
+		<action trigger="set">
+			processes: f.this,
+			allowedRoles: f.allowed_roles,
+			bannedRoles: f.banned_roles,
+			rolesAvailable: f.roles_available;
+
+			if (processes.value != null) {
+				change rolesAvailable options { return configurableMenuService.getAvailableRolesFromNet(processes, allowedRoles, bannedRoles) }
+			} else {
+				change rolesAvailable options { [:] }
+			}
+			change rolesAvailable value { [] }
+		</action>
+	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>roles_available</id>
+		<title name="available_roles">Available roles from selected process</title>
+	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>allowed_roles</id>
+		<title name="roles_allowed">Allowed roles</title>
+		<desc name="roles_allowed_desc">List of roles allowed to view this menu entry.</desc>
+		<options>
+			<init dynamic="true">[:]</init>
+		</options>
+	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>banned_roles</id>
+		<title name="roles_banned">Banned roles</title>
+		<desc name="roles_banned_desc">List of roles not allowed to view this menu entry.</desc>
+		<options>
+			<init dynamic="true">[:]</init>
+		</options>
+	</data>
+	<data type="taskRef">
+		<id>selected_filter_preview</id>
+		<title/>
+	</data>
+	<data type="taskRef">
+		<id>current_filter_preview</id>
+		<title/>
+	</data>
+	<data type="i18n">
+		<id>filter_header</id>
+		<title/>
+		<init name="filter_header">Current filter</init>
+		<component>
+			<name>divider</name>
+		</component>
+	</data>
+	<data type="text">
+		<id>new_filter_id</id>
+		<title/>
+	</data>
+	<data type="enumeration_map">
+		<id>filter_autocomplete_selection</id>
+		<title name="filter_autocomplete_selection">Select new filter</title>
+		<component>
+			<name>autocomplete_dynamic</name>
+		</component>
+		<action trigger="set">
+			trans: t.item_settings,
+			useCustomView: f.use_custom_view,
+			filterAutocomplete: f.this,
+			filter_case: f.filter_case,
+			update_filter: f.update_filter,
+			previewTaskRef: f.selected_filter_preview;
+
+			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans, false)
+
+			make update_filter,hidden on trans when { useCustomView.value }
+		</action>
+		<action trigger="get">
+			trans: t.item_settings,
+			useCustomView: f.use_custom_view,
+			filterAutocomplete: f.this,
+			filter_case: f.filter_case,
+			update_filter: f.update_filter,
+			previewTaskRef: f.selected_filter_preview;
+
+			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans, false)
+
+			make update_filter,hidden on trans when { useCustomView.value }
+		</action>
+	</data>
+	<data type="button">
+		<id>update_filter</id>
+		<title/>
+		<placeholder name="update_filter">Update view with selected filter</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<action trigger="set">
+			trans: t.item_settings,
+			update_filter: f.update_filter,
+			filter_case: f.filter_case,
+			filterAutocomplete: f.filter_autocomplete_selection;
+
+			change filter_case value { [filterAutocomplete.value] }
+			change filterAutocomplete value { "" }
+			make update_filter,visible on trans when { true }
+		</action>
+	</data>
+	<data type="caseRef">
+		<id>filter_case</id>
+		<title/>
+		<action trigger="set">
+			additionalFilterCase: f.additional_filter_case,
+			additionalAutocomplete: f.additional_filter_autocomplete_selection,
+			additionalUpdate: f.update_additional_filter,
+			additionalFilterPreview: f.selected_additional_filter_preview,
+			mergeFilters: f.merge_filters,
+			filterHeader: f.filter_header,
+			currentAdditionalFilterPreview: f.current_additional_filter_preview,
+			taskSettingsTrans: t.task_view_settings,
+			settingsTrans: t.item_settings,
+			caseViewHeader: f.case_view_header,
+			caseViewSettingsTaskRef: f.case_view_settings_taskRef,
+			taskViewHeader: f.task_view_header,
+			taskViewSettingsTaskRef: f.task_view_settings_taskRef,
+			filterTaskRef: f.current_filter_preview,
+			filterCaseRef: f.filter_case;
+
+			def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+			change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+
+			if (filterCase.dataSet["filter_type"].value == "Case") {
+				make caseViewHeader,editable on settingsTrans when { true }
+				make caseViewSettingsTaskRef,editable on settingsTrans when { true }
+
+				make additionalAutocomplete,editable on taskSettingsTrans when { true }
+				make additionalUpdate,visible on taskSettingsTrans when { true }
+				make additionalFilterPreview,visible on taskSettingsTrans when { true }
+				make mergeFilters,visible on taskSettingsTrans when { true }
+				make filterHeader,visible on taskSettingsTrans when { true }
+				make currentAdditionalFilterPreview,visible on taskSettingsTrans when { true }
+			} else {
+				make caseViewHeader,hidden on settingsTrans when { true }
+				make caseViewSettingsTaskRef,hidden on settingsTrans when { true }
+
+				make additionalAutocomplete,hidden on taskSettingsTrans when { true }
+				make additionalUpdate,hidden on taskSettingsTrans when { true }
+				make additionalFilterPreview,hidden on taskSettingsTrans when { true }
+				make mergeFilters,hidden on taskSettingsTrans when { true }
+				make filterHeader,hidden on taskSettingsTrans when { true }
+				make currentAdditionalFilterPreview,hidden on taskSettingsTrans when { true }
+			}
+			make taskViewHeader,editable on settingsTrans when { true }
+			make taskViewSettingsTaskRef,editable on settingsTrans when { true }
+
+			change additionalFilterCase value { [] }
+		</action>
+		<allowedNets>
+			<allowedNet>filter</allowedNet>
+		</allowedNets>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>use_custom_view</id>
+		<title name="use_custom_view">Use custom view?</title>
+		<init>false</init>
+	</data>
+	<data type="text" immediate="true">
+		<id>custom_view_selector</id>
+		<title name="custom_view_selector">Custom view configuration selector</title>
+		<desc name="custom_view_selector_desc">Example: "demo-tabbed-views"</desc>
+	</data>
+
+	<!-- CASE VIEW CONFIGURATION DATA -->
+	<data type="enumeration_map" immediate="true">
+		<id>case_view_search_type</id>
+		<title name="case_view_search_type">Search type for case view</title>
+		<options>
+			<option name="hidden" key="hidden">Hidden</option>
+			<option name="fulltext" key="fulltext">Fulltext</option>
+			<option name="fulltext_advanced" key="fulltext_advanced">Fulltext and advanced</option>
+		</options>
+		<init>fulltext_advanced</init>
+	</data>
+	<data type="text" immediate="true">
+		<id>create_case_button_title</id>
+		<title name="create_case_button_title">"New case" button title</title>
+	</data>
+	<data type="text">
+		<id>create_case_button_icon_preview</id>
+		<title name="create_case_button_icon_preview">Icon preview</title>
+		<init><![CDATA[<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">add</span>]]></init>
+		<component>
+			<name>htmltextarea</name>
+		</component>
+	</data>
+	<data type="text" immediate="true">
+		<id>create_case_button_icon</id>
+		<title name="create_case_button_icon">"New case" button icon identifier</title>
+		<init>add</init>
+		<action trigger="set">
+			create_case_button_icon_preview: f.create_case_button_icon_preview,
+			create_case_button_icon: f.create_case_button_icon;
+
+
+			if (create_case_button_icon.value == "") {
+				change create_case_button_icon_preview value {<![CDATA["""<span></span>"""]]>}
+				return;
+			}
+
+			change create_case_button_icon_preview value {
+				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + create_case_button_icon.value + <![CDATA["""</span>"""]]>
+			}
+		</action>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>case_require_title_in_creation</id>
+		<title name="case_require_title_in_creation">Require title input in case creation?</title>
+		<init>true</init>
+	</data>
+	<data type="text" immediate="true">
+		<id>case_banned_nets_in_creation</id>
+		<title name="case_banned_nets_in_creation">Banned processes for creation</title>
+		<desc name="case_banned_nets_in_creation_desc">Write down process identifiers separated by comma. Example: mynet1,mynet2</desc>
+		<action trigger="set">
+			bannedNets: f.this;
+
+			String trimmed = bannedNets.value?.replaceAll("\\s","")
+			if (bannedNets.value != trimmed) {
+				change bannedNets value { trimmed }
+			}
+		</action>
+	</data>
+	<data type="i18n">
+		<id>case_view_header</id>
+		<title/>
+		<init name="case_view_header">Case view</init>
+		<component>
+			<name>divider</name>
+		</component>
+	</data>
+	<data type="taskRef">
+		<id>case_view_settings_taskRef</id>
+		<title/>
+		<init>case_view_settings</init>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>case_show_more_menu</id>
+		<title name="case_show_more_menu">Show more menu for case item?</title>
+		<init>false</init>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>case_allow_header_table_mode</id>
+		<title name="allow_header_table_mode">Allow table mode for headers?</title>
+		<init>true</init>
+	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>case_headers_mode</id>
+		<title name="headers_mode">Header mode</title>
+		<options>
+			<option name="sort" key="sort">Sort</option>
+			<option name="search" key="search">Search</option>
+			<option name="edit" key="edit">Edit</option>
+		</options>
+		<init>sort,edit,search</init>
+		<action trigger="set">
+			headersMode: f.case_headers_mode,
+			defaultMode: f.case_headers_default_mode,
+			holder: f.case_headers_options_holder;
+
+			updateOptionsBasedOnValue(defaultMode, headersMode, holder)
+		</action>
+		<action trigger="get">
+			headersMode: f.case_headers_mode,
+			defaultMode: f.case_headers_default_mode,
+			holder: f.case_headers_options_holder;
+
+			updateOptionsBasedOnValue(defaultMode, headersMode, holder)
+		</action>
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>case_headers_default_mode</id>
+		<title name="headers_default_mode">Default header mode</title>
+		<options>
+			<option name="sort" key="sort">Sort</option>
+			<option name="search" key="search">Search</option>
+			<option name="edit" key="edit">Edit</option>
+		</options>
+		<init>sort</init>
+	</data>
+	<data type="enumeration_map">
+		<id>case_headers_options_holder</id>
+		<title/>
+		<options>
+			<option name="sort" key="sort">Sort</option>
+			<option name="search" key="search">Search</option>
+			<option name="edit" key="edit">Edit</option>
+		</options>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>case_is_header_mode_changeable</id>
+		<title name="is_header_mode_changeable">Can header mode be changed?</title>
+		<init>true</init>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>use_case_default_headers</id>
+		<title name="case_default_headers">Use custom default headers?</title>
+		<init>true</init>
+	</data>
+	<data type="text" immediate="true">
+		<id>case_default_headers</id>
+		<title name="default_headers">Set default headers</title>
+		<desc name="default_headers_desc">Example: "meta-title,meta-visualId"</desc>
+		<action trigger="set">
+			defaultHeaders: f.this;
+
+			String trimmed = defaultHeaders.value?.replaceAll("\\s","")
+			if (defaultHeaders.value != trimmed) {
+				change defaultHeaders value { trimmed }
+			}
+		</action>
+	</data>
+
+	<!-- TASK VIEW CONFIGURATION DATA -->
+	<data type="taskRef">
+		<id>selected_additional_filter_preview</id>
+		<title/>
+	</data>
+	<data type="taskRef">
+		<id>current_additional_filter_preview</id>
+		<title/>
+	</data>
+	<data type="enumeration_map">
+		<id>additional_filter_autocomplete_selection</id>
+		<title name="filter_autocomplete_selection">Select new filter</title>
+		<component>
+			<name>autocomplete_dynamic</name>
+		</component>
+		<action trigger="set">
+			trans: t.task_view_settings,
+			filterAutocomplete: f.this,
+			filterCase: f.additional_filter_case,
+			updateFilter: f.update_additional_filter,
+			previewTaskRef: f.selected_additional_filter_preview;
+
+			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filterCase, updateFilter, trans, true)
+		</action>
+		<action trigger="get">
+			trans: t.task_view_settings,
+			filterAutocomplete: f.this,
+			filterCase: f.additional_filter_case,
+			updateFilter: f.update_additional_filter,
+			previewTaskRef: f.selected_additional_filter_preview;
+
+			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filterCase, updateFilter, trans, true)
+		</action>
+	</data>
+	<data type="button">
+		<id>update_additional_filter</id>
+		<title/>
+		<placeholder name="update_filter">Update view with selected filter</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<action trigger="set">
+			trans: t.task_view_settings,
+			updateFilter: f.update_additional_filter,
+			filterCase: f.additional_filter_case,
+			filterAutocomplete: f.additional_filter_autocomplete_selection;
+
+			change filterCase value { [filterAutocomplete.value] }
+			change filterAutocomplete value { "" }
+			make updateFilter,visible on trans when { true }
+		</action>
+	</data>
+	<data type="button">
+		<id>remove_additional_filter</id>
+		<title/>
+		<placeholder name="remove_additional_filter">Remove additional filter</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<action trigger="set">
+			filterCase: f.additional_filter_case;
+
+			change filterCase value { [] }
+		</action>
+	</data>
+	<data type="caseRef">
+		<id>additional_filter_case</id>
+		<title/>
+		<action trigger="set">
+			taskViewTrans: t.task_view_settings,
+			mergeFilters: f.merge_filters,
+			filterHeader: f.filter_header,
+			filterTaskRef: f.current_additional_filter_preview,
+			removeButton: f.remove_additional_filter,
+			filterCaseRef: f.additional_filter_case;
+
+			if (filterCaseRef.value[0] == null) {
+				make mergeFilters,hidden on taskViewTrans when { true }
+				make filterHeader,hidden on taskViewTrans when { true }
+				make removeButton,hidden on taskViewTrans when { true }
+				change filterTaskRef value { [] }
+				return
+			}
+
+			def filterCase = findCase({ it._id.eq(filterCaseRef.value[0]) })
+			change filterTaskRef value { return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId] }
+			make mergeFilters,editable on taskViewTrans when { true }
+			make filterHeader,visible on taskViewTrans when { true }
+			make removeButton,editable on taskViewTrans when { true }
+		</action>
+		<allowedNets>
+			<allowedNet>filter</allowedNet>
+		</allowedNets>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>merge_filters</id>
+		<title name="merge_filters">Merge with base filter?</title>
+		<init>true</init>
+	</data>
+	<data type="taskRef">
+		<id>task_view_settings_taskRef</id>
+		<title/>
+		<init>task_view_settings</init>
+	</data>
+	<data type="i18n">
+		<id>task_view_header</id>
+		<title/>
+		<init name="task_view_header">Task view</init>
+		<component>
+			<name>divider</name>
+		</component>
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>task_view_search_type</id>
+		<title name="task_view_search_type">Search type for task view</title>
+		<options>
+			<option name="hidden" key="hidden">Hidden</option>
+			<option name="fulltext" key="fulltext">Fulltext</option>
+			<option name="fulltext_advanced" key="fulltext_advanced">Fulltext and advanced</option>
+		</options>
+		<init>fulltext_advanced</init>
+	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>task_headers_mode</id>
+		<title name="headers_mode">Header mode</title>
+		<options>
+			<option name="sort" key="sort">Sort</option>
+			<option name="edit" key="edit">Edit</option>
+		</options>
+		<init>sort,edit</init>
+		<action trigger="set">
+			headersMode: f.task_headers_mode,
+			defaultMode: f.task_headers_default_mode,
+			holder: f.task_headers_options_holder;
+
+			updateOptionsBasedOnValue(defaultMode, headersMode, holder)
+		</action>
+		<action trigger="get">
+			headersMode: f.case_headers_mode,
+			defaultMode: f.case_headers_default_mode,
+			holder: f.case_headers_options_holder;
+
+			updateOptionsBasedOnValue(defaultMode, headersMode, holder)
+		</action>
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>task_headers_default_mode</id>
+		<title name="headers_default_mode">Default header mode</title>
+		<options>
+			<option name="sort" key="sort">Sort</option>
+			<option name="edit" key="edit">Edit</option>
+		</options>
+		<init>sort</init>
+	</data>
+	<data type="enumeration_map">
+		<id>task_headers_options_holder</id>
+		<title/>
+		<options>
+			<option name="sort" key="sort">Sort</option>
+			<option name="edit" key="edit">Edit</option>
+		</options>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>task_is_header_mode_changeable</id>
+		<title name="is_header_mode_changeable">Can header mode be changed?</title>
+		<init>true</init>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>task_allow_header_table_mode</id>
+		<title name="allow_header_table_mode">Allow table mode for headers?</title>
+		<init>true</init>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>use_task_default_headers</id>
+		<title name="use_default_headers">Use custom default headers?</title>
+		<init>true</init>
+	</data>
+	<data type="text" immediate="true">
+		<id>task_default_headers</id>
+		<title name="task_default_headers">Set default headers</title>
+		<desc name="task_default_headers_desc">Example: "meta-title,meta-user"</desc>
+		<action trigger="set">
+			defaultHeaders: f.this;
+
+			String trimmed = defaultHeaders.value?.replaceAll("\\s","")
+			if (defaultHeaders.value != trimmed) {
+				change defaultHeaders value { trimmed }
+			}
+		</action>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>task_show_more_menu</id>
+		<title name="task_show_more_menu">Show more menu for task item?</title>
+		<init>true</init>
+	</data>
+
+	<!-- I18NS -->
+	<i18n locale="sk">
+		<i18nString name="icon_preview">Náhľad ikony</i18nString>
+		<i18nString name="icon_identifier">Identifikátor ikony</i18nString>
+		<i18nString name="icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
+		<i18nString name="allow_roles">Pridaj k povoleným roliam</i18nString>
+		<i18nString name="remove_from_allowed_roles">Odstráň z povolených rolí</i18nString>
+		<i18nString name="ban_roles">Pridaj k zakázaným roliam</i18nString>
+		<i18nString name="remove_from_banned_roles">Odstráň zo zakázaných rolí</i18nString>
+		<i18nString name="available_processes">Vaše procesy</i18nString>
+		<i18nString name="available_processes_desc">Vyberte proces obsahujúci roly ktoré chcete pridať do zoznamu povolených alebo zakázaných rolí.</i18nString>
+		<i18nString name="available_roles">Dostupné roly</i18nString>
+		<i18nString name="create_case_button_title">Názov tlačidla "Nová inštancia"</i18nString>
+		<i18nString name="create_case_button_icon">Identifikátor ikony tlačidla "Nová inštancia"</i18nString>
+		<i18nString name="create_case_button_icon_preview">Náhľad ikony</i18nString>
+		<i18nString name="default_headers">Predvolené hlavičky</i18nString>
+		<i18nString name="default_headers_desc">Napríklad: "meta-title,meta-visualId"</i18nString>
+		<i18nString name="filter_autocomplete_selection">Zvoľte nový filter</i18nString>
+		<i18nString name="move_dest_uri">Cieľové URI</i18nString>
+		<i18nString name="duplicate_new_title">Názov duplikovanej položky</i18nString>
+		<i18nString name="duplicate_view_identifier">Identifikátor duplikovanej položky</i18nString>
+		<i18nString name="duplicate_view_identifier_desc">Musí byť jedinečný</i18nString>
+		<i18nString name="name">Názov položky</i18nString>
+		<i18nString name="name_desc">Bude zobrazený v menu</i18nString>
+		<i18nString name="tab_icon">Identifikátor ikony v karte</i18nString>
+		<i18nString name="tab_icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
+		<i18nString name="display_tab_icon">Zobraziť ikonu v karte?</i18nString>
+		<i18nString name="tab_name">Názov položky</i18nString>
+		<i18nString name="tab_name_desc">Bude zobrazený v karte</i18nString>
+		<i18nString name="update_filter">Aktualizovať zobrazenie s vybraným filtrom</i18nString>
+		<i18nString name="use_custom_view">Použiť vlastné zobrazenie?</i18nString>
+		<i18nString name="custom_view_selector">Konfiguračný identifikátor vlastného zobrazenia</i18nString>
+		<i18nString name="custom_view_selector_desc">Napríklad: "demo-tabbed-views"</i18nString>
+		<i18nString name="case_view_search_type">Typ vyhľadávania prípadov</i18nString>
+		<i18nString name="hidden">Skryté</i18nString>
+		<i18nString name="fulltext">Fulltext</i18nString>
+		<i18nString name="fulltext_advanced">Fulltext a rozšírené</i18nString>
+		<i18nString name="case_require_title_in_creation">Vyžadovať názov inštancii pri vytváraní?</i18nString>
+		<i18nString name="case_banned_nets_in_creation">Zakázané siete pri vytváraní</i18nString>
+		<i18nString name="case_banned_nets_in_creation_desc">Uveďte identifikátory procesov oddelené čiarkou. Napríklad: mynet1,mynet2</i18nString>
+		<i18nString name="case_show_more_menu">Zobrazovať menu pre prípadovú položku?</i18nString>
+		<i18nString name="sort">Zoraďovanie</i18nString>
+		<i18nString name="search">Vyhľadávanie</i18nString>
+		<i18nString name="edit">Upravovanie</i18nString>
+		<i18nString name="merge_filters">Zjednotiť filter so základným filtrom?</i18nString>
+		<i18nString name="task_view_search_type">Typ vyhľadávania úloh</i18nString>
+		<i18nString name="headers_mode">Mód hlavičiek</i18nString>
+		<i18nString name="headers_default_mode">Predvolený mód hlavičiek</i18nString>
+		<i18nString name="is_header_mode_changeable">Môže byť mód hlavičiek zmenený?</i18nString>
+		<i18nString name="allow_header_table_mode">Povoliť tabuľkový mód pre hlavičky?</i18nString>
+		<i18nString name="use_default_headers">Použiť vlastné predvolené hlavičky?</i18nString>
+		<i18nString name="task_default_headers">Predvolené hlavičky</i18nString>
+		<i18nString name="task_default_headers_desc">Napríklad: "meta-title,meta-user"</i18nString>
+		<i18nString name="task_show_more_menu">Zobrazovať menu pre úlohovú položku?</i18nString>
+		<i18nString name="item_settings">Nastavenie položky</i18nString>
+		<i18nString name="roles_management_title">Roly</i18nString>
+		<i18nString name="filter_update_title">Filter</i18nString>
+		<i18nString name="move_item">Presunúť položku</i18nString>
+		<i18nString name="move_item_finish">Presunúť</i18nString>
+		<i18nString name="duplicate_item">Duplikovať položku</i18nString>
+		<i18nString name="duplicate_item_finish">Duplikovať</i18nString>
+		<i18nString name="additional_filter_update">Dodatočný filter</i18nString>
+		<i18nString name="filter_header">Súčasný filter</i18nString>
+		<i18nString name="case_view_header">Zobrazenie prípadov</i18nString>
+		<i18nString name="task_view_header">Zobrazenie úloh</i18nString>
+		<i18nString name="roles_allowed">Povolené roly</i18nString>
+		<i18nString name="roles_allowed_desc">Zoznam povolených rolí, ktoré môžu zobraziť túto položku</i18nString>
+		<i18nString name="roles_banned">Zakázané roly</i18nString>
+		<i18nString name="roles_banned_desc">Zoznam zakázaných rolí, ktoré nemôžu zobraziť túto položku</i18nString>
+		<i18nString name="item_settings_general">Všeobecné</i18nString>
+		<i18nString name="menu_item_identifier">Identifikátor položky</i18nString>
+		<i18nString name="remove_additional_filter">Odstrániť dodatočný filter</i18nString>
+		<i18nString name="nodePath">URI položky</i18nString>
+		<i18nString name="move_dest_uri_new_node">Nový uzol</i18nString>
+		<i18nString name="move_dest_uri_new_node_desc">Uveďte názov uzlu, ktorý chcete pridať</i18nString>
+		<i18nString name="move_dest_uri_desc">Zoznam uzlov reprezentujúce cieľovú URI</i18nString>
+		<i18nString name="move_add_node">Pridať</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="icon_preview">Ikonevorschau</i18nString>
+		<i18nString name="icon_identifier">Ikone ID</i18nString>
+		<i18nString name="icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
+		<i18nString name="allow_roles">Zu zulässigen Rollen hinzufügen</i18nString>
+		<i18nString name="remove_from_allowed_roles">Aus zulässigen Rollen entfernen</i18nString>
+		<i18nString name="ban_roles">Zu verbotenen Rollen hinzufügen</i18nString>
+		<i18nString name="remove_from_banned_roles">Aus verbotenen Rollen entfernen</i18nString>
+		<i18nString name="available_processes">Ihre Prozesse</i18nString>
+		<i18nString name="available_processes_desc">Wählen Sie einen Prozess mit Rollen aus, die Sie zu Listen mit zulässigen oder verbotenen Rollen hinzufügen möchten.</i18nString>
+		<i18nString name="available_roles">Verfügbare Rollen</i18nString>
+		<i18nString name="create_case_button_title">Schaltflächentitel "Neuer Fall"</i18nString>
+		<i18nString name="create_case_button_icon">Ikone ID</i18nString>
+		<i18nString name="create_case_button_icon_preview">Ikonevorschau</i18nString>
+		<i18nString name="default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
+		<i18nString name="filter_autocomplete_selection">Neue Filter auswählen</i18nString>
+		<i18nString name="default_headers_desc">Beispiel: "meta-title,meta-visualId"</i18nString>
+		<i18nString name="tab_icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
+		<i18nString name="custom_view_selector_desc">Beispiel: "demo-tabbed-views"</i18nString>
+		<i18nString name="hidden">Versteckt</i18nString>
+		<i18nString name="fulltext">Einfacher Suchmodus</i18nString>
+		<i18nString name="sort">Sortieren</i18nString>
+		<i18nString name="search">Suchen</i18nString>
+		<i18nString name="edit">Bearbeiten</i18nString>
+		<i18nString name="headers_mode">Kopfzeilenmodus</i18nString>
+		<i18nString name="headers_default_mode">Standardkopfzeilenmodus</i18nString>
+		<i18nString name="is_header_mode_changeable">Erlaube Änderung des Kopfzeilenmodus?</i18nString>
+		<i18nString name="allow_header_table_mode">Erlaube Tabellenmodus?</i18nString>
+		<i18nString name="use_default_headers">Eigene Kopfzeilen verwenden?</i18nString>
+		<i18nString name="task_default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
+		<i18nString name="task_default_headers_desc">Beispiel: "meta-title,meta-user"</i18nString>
+		<i18nString name="roles_management_title">Rollen</i18nString>
+		<i18nString name="filter_update_title">Filter</i18nString>
+		<i18nString name="additional_filter_update">Zusätzlicher Filter</i18nString>
+		<i18nString name="filter_header">Aktueller Filter</i18nString>
+		<i18nString name="roles_allowed">Zulässige Rollen</i18nString>
+		<i18nString name="item_settings_general">Allgemein</i18nString>
+		<i18nString name="menu_item_identifier">Identifikationsnummer des Menüeintrages</i18nString>
+		<i18nString name="remove_additional_filter">Zusatzfilter entfernen</i18nString>
+		<i18nString name="nodePath">Menüeintrag-URI</i18nString>
+		<i18nString name="move_dest_uri_new_node">Neuer Knoten</i18nString>
+		<i18nString name="move_add_node">Hinzufügen</i18nString>
+		<i18nString name="move_dest_uri">Ziel URI</i18nString>
+		<i18nString name="duplicate_new_title">Titel der kopierten Ansicht</i18nString>
+		<i18nString name="duplicate_view_identifier">Identifikator der kopierten Ansicht</i18nString>
+		<i18nString name="duplicate_view_identifier_desc">Muss einzigartig sein</i18nString>
+		<i18nString name="name">Titel des Eintrages</i18nString>
+		<i18nString name="name_desc">Wird im Menü angezeigt</i18nString>
+		<i18nString name="tab_icon">Ikonen Identifikator der Registerkarte</i18nString>
+		<i18nString name="display_tab_icon">Zeige die Registerkarte Ikone an?</i18nString>
+		<i18nString name="tab_name">Titel der Registerkarte</i18nString>
+		<i18nString name="tab_name_desc">Wird in der Registerkarte angezeigt</i18nString>
+		<i18nString name="update_filter">Aktualisiere die Ansicht mit dem ausgewählten Filter</i18nString>
+		<i18nString name="use_custom_view">Eigener Ansicht anwenden?</i18nString>
+		<i18nString name="custom_view_selector">Konfigurationsidentifikator der eigenen Ansicht</i18nString>
+		<i18nString name="case_view_search_type">Suchmodus im Fallansicht</i18nString>
+		<i18nString name="fulltext_advanced">Einfacher und erweiterter Suchmodus</i18nString>
+		<i18nString name="case_require_title_in_creation">Erforde den Titel beim erzeugen von Fällen?</i18nString>
+		<i18nString name="case_banned_nets_in_creation">Ausgeschlossene Prozesse</i18nString>
+		<i18nString name="case_banned_nets_in_creation_desc">Trenne die Prozessidentifikatoren mit einer Komma. z.B.: netz1,netz2</i18nString>
+		<i18nString name="case_show_more_menu">"Erweiterte Optionen" Taste bei einzelnen Fällen anzeigen</i18nString>
+		<i18nString name="merge_filters">Mit dem Basisfilter kombinieren?</i18nString>
+		<i18nString name="task_view_search_type">Suchmodus im Aufgabenansicht</i18nString>
+		<i18nString name="task_show_more_menu">"Erweiterte Optionen" Taste bei einzelnen Aufgaben anzeigen</i18nString>
+		<i18nString name="item_settings">Menüeintrageinstellungen</i18nString>
+		<i18nString name="move_item">Menüeintrag verschieben</i18nString>
+		<i18nString name="move_item_finish">verschieben</i18nString>
+		<i18nString name="duplicate_item">Menüeintrag duplizieren</i18nString>
+		<i18nString name="duplicate_item_finish">duplizieren</i18nString>
+		<i18nString name="case_view_header">Fallansicht</i18nString>
+		<i18nString name="task_view_header">Aufgabenansicht</i18nString>
+		<i18nString name="roles_allowed_desc">Rollen mit Zugriff auf diesen Menüeintrag</i18nString>
+		<i18nString name="roles_banned">Verbotene Rollen</i18nString>
+		<i18nString name="roles_banned_desc">Rollen, für die wird den Menüeintrag ausgeblendet</i18nString>
+		<i18nString name="move_dest_uri_new_node_desc">Nächste URI-Teil angeben</i18nString>
+		<i18nString name="move_dest_uri_desc">Teile der Ziel URI</i18nString>
+	</i18n>
+
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>initialize</id>
+		<x>340</x>
+		<y>220</y>
+		<label>initialize [await sync]</label>
+		<icon>hourglass_empty</icon>
+		<dataGroup>
+			<id>view</id>
+			<dataRef>
+				<id>filter_case</id>
+				<logic>
+					<behavior>forbidden</behavior>
+					<action trigger="set">
+						filterCaseRef: f.filter_case,
+						tab_name: f.tab_name,
+						menu_name: f.menu_name;
+
+						def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+						change tab_name value {return filterCase.dataSet["i18n_filter_name"].value}
+						change menu_name value {return filterCase.dataSet["i18n_filter_name"].value}
+					</action>
+				</logic>
+			</dataRef>
+		</dataGroup>
+	</transition>
+
+	<transition>
+		<id>item_settings</id>
+		<x>460</x>
+		<y>100</y>
+		<label name="item_settings">Item settings</label>
+		<icon>settings</icon>
+		<dataGroup>
+			<id>pre_general</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>menu_item_identifier</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>nodePath</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>general_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<title name="item_settings_general">General</title>
+			<dataRef>
+				<id>menu_name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>menu_icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>menu_icon_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>tab_name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>use_tab_icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							trans: t.this,
+							iconPreview: f.tab_icon_preview,
+							icon: f.tab_icon,
+							useIcon: f.use_tab_icon;
+
+							make iconPreview,visible on trans when { useIcon.value }
+							make icon,editable on trans when { useIcon.value }
+
+							make iconPreview,hidden on trans when { !useIcon.value }
+							make icon,hidden on trans when { !useIcon.value }
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>tab_icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>tab_icon_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>use_custom_view</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							trans: t.this,
+							caseHeader: f.case_view_header,
+							caseTaskRef: f.case_view_settings_taskRef,
+							taskHeader: f.task_view_header,
+							taskTaskRef: f.task_view_settings_taskRef,
+
+							useTabIcon: f.use_tab_icon,
+							tabIconPreview: f.tab_icon_preview,
+							tabName: f.tab_name,
+							tabIcon: f.tab_icon,
+							filterSelection: f.filter_autocomplete_selection,
+							updateFilter: f.update_filter,
+							selectedFilterPreview: f.selected_filter_preview,
+							currentFilterHeader: f.filter_header,
+							currentFilterPreview: f.current_filter_preview,
+
+							use: f.use_custom_view,
+							selector: f.custom_view_selector;
+
+							make selector,editable on trans when { use.value }
+							make selector,visible on trans when { !use.value }
+
+							make caseHeader,visible on trans when { !use.value }
+							make caseHeader,hidden on trans when { use.value }
+							make caseTaskRef,editable on trans when { !use.value }
+							make caseTaskRef,hidden on trans when { use.value }
+
+							make taskHeader,visible on trans when { !use.value }
+							make taskHeader,hidden on trans when { use.value }
+							make taskTaskRef,editable on trans when { !use.value }
+							make taskTaskRef,hidden on trans when { use.value }
+
+							make useTabIcon,editable on trans when { !use.value }
+							make useTabIcon,hidden on trans when { use.value }
+							make tabIconPreview,visible on trans when { !use.value }
+							make tabIconPreview,hidden on trans when { use.value }
+							make tabName,editable on trans when { !use.value }
+							make tabName,hidden on trans when { use.value }
+							make tabIcon,editable on trans when { !use.value }
+							make tabIcon,hidden on trans when { use.value }
+							make filterSelection,editable on trans when { !use.value }
+							make filterSelection,hidden on trans when { use.value }
+							make updateFilter,visible on trans when { !use.value }
+							make updateFilter,hidden on trans when { use.value }
+							make selectedFilterPreview,visible on trans when { !use.value }
+							make selectedFilterPreview,hidden on trans when { use.value }
+							make currentFilterHeader,visible on trans when { !use.value }
+							make currentFilterHeader,hidden on trans when { use.value }
+							make currentFilterPreview,visible on trans when { !use.value }
+							make currentFilterPreview,hidden on trans when { use.value }
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>custom_view_selector</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>roles_management</id>
+			<cols>5</cols>
+			<layout>grid</layout>
+			<title name="roles_management_title">Roles</title>
+			<dataRef>
+				<id>processes_available</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>2</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>roles_available</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>2</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>add_allowed_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>allowed_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>remove_allowed_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>add_banned_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>banned_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>remove_banned_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>filter_update</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<title name="filter_update_title">Filter</title>
+			<dataRef>
+				<id>filter_autocomplete_selection</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>update_filter</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>selected_filter_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>current_filter</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>filter_header</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>current_filter_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>case_view_settings_dataGroup</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>case_view_header</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>case_view_settings_taskRef</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>task_view_settings_dataGroup</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>task_view_header</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>task_view_settings_taskRef</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+
+	<transition>
+		<id>move_item</id>
+		<x>580</x>
+		<y>140</y>
+		<label name="move_item">Move item</label>
+		<icon>move_down</icon>
+		<dataGroup>
+			<id>move</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>move_dest_uri</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>move_dest_uri_new_node</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>move_add_node</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>finish</id>
+			<actions phase="pre">
+				<action>
+					dest: f.move_dest_uri;
+
+					if (dest.value == null || dest.value == []) {
+						throw new IllegalArgumentException("URI must not be empty!")
+					}
+
+					String newUri = dest.value.join("/")
+					newUri = newUri.replace("//","/")
+
+					changeMenuItem useCase uri { newUri }
+				</action>
+			</actions>
+			<title name="move_item_finish">Move</title>
+		</event>
+	</transition>
+
+	<transition>
+		<id>duplicate_item</id>
+		<x>580</x>
+		<y>300</y>
+		<label name="duplicate_item">Duplicate item</label>
+		<icon>content_copy</icon>
+		<dataGroup>
+			<id>duplicate</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>duplicate_new_title</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>duplicate_view_identifier</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>finish</id>
+			<actions phase="pre">
+				<action>
+					identifier: f.duplicate_view_identifier,
+					title: f.duplicate_new_title;
+
+					duplicateMenuItem(useCase, title.value, identifier.value)
+				</action>
+			</actions>
+			<title name="duplicate_item_finish">Duplicate</title>
+		</event>
+	</transition>
+
+	<transition>
+		<id>change_filter</id>
+		<x>460</x>
+		<y>340</y>
+		<label>[Change filter]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataRef>
+			<id>new_filter_id</id>
+			<logic>
+				<behavior>editable</behavior>
+				<behavior>required</behavior>
+			</logic>
+			<event type="set">
+				<id>set_event_0</id>
+				<actions phase="post">
+					<action>
+						new_filter_id: f.new_filter_id,
+						filterTaskRef: f.current_filter_preview,
+						filterCaseRef: f.filter_case;
+
+						change filterCaseRef value { [new_filter_id.value] }
+						def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+						change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+					</action>
+				</actions>
+			</event>
+		</dataRef>
+	</transition>
+
+	<transition>
+		<id>case_view_settings</id>
+		<x>340</x>
+		<y>100</y>
+		<label>Case view settings [referenced]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>case_view_dataGroup</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>case_view_search_type</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>case_show_more_menu</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>create_case_button_title</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>create_case_button_icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>create_case_button_icon_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>case_require_title_in_creation</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>case_banned_nets_in_creation</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>case_view_headers</id>
+			<cols>5</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>case_is_header_mode_changeable</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+					<action trigger="set">
+						trans: t.this,
+						isChangeable: f.case_is_header_mode_changeable,
+						mode: f.case_headers_mode,
+						defaultMode: f.case_headers_default_mode;
+
+						make mode,editable on trans when { isChangeable.value }
+						make mode,required on trans when { isChangeable.value }
+						make defaultMode,editable on trans when { isChangeable.value }
+						make defaultMode,required on trans when { isChangeable.value }
+
+						make mode,hidden on trans when { !isChangeable.value }
+						make mode,optional on trans when { !isChangeable.value }
+						make defaultMode,hidden on trans when { !isChangeable.value }
+						make defaultMode,optional on trans when { !isChangeable.value }
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>case_allow_header_table_mode</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>case_headers_mode</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>case_headers_default_mode</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>use_case_default_headers</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="set">
+						trans: t.this,
+						use: f.use_case_default_headers,
+						headers: f.case_default_headers;
+
+						make headers,editable on trans when { use.value }
+						make headers,visible on trans when { !use.value }
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>case_default_headers</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+
+	<transition>
+		<id>task_view_settings</id>
+		<x>340</x>
+		<y>340</y>
+		<label>Task view settings [referenced]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>task_view_dataGroup</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>task_view_search_type</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>task_show_more_menu</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>task_view_headers</id>
+			<cols>5</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>task_is_header_mode_changeable</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+					<action trigger="set">
+						trans: t.this,
+						isChangeable: f.task_is_header_mode_changeable,
+						mode: f.task_headers_mode,
+						defaultMode: f.task_headers_default_mode;
+
+						make mode,editable on trans when { isChangeable.value }
+						make mode,required on trans when { isChangeable.value }
+						make defaultMode,editable on trans when { isChangeable.value }
+						make defaultMode,required on trans when { isChangeable.value }
+
+						make mode,hidden on trans when { !isChangeable.value }
+						make mode,optional on trans when { !isChangeable.value }
+						make defaultMode,hidden on trans when { !isChangeable.value }
+						make defaultMode,optional on trans when { !isChangeable.value }
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>task_allow_header_table_mode</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>task_headers_mode</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>task_headers_default_mode</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>use_task_default_headers</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="set">
+						trans: t.this,
+						use: f.use_task_default_headers,
+						headers: f.task_default_headers;
+
+						make headers,editable on trans when { use.value }
+						make headers,visible on trans when { !use.value }
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>task_default_headers</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>additional_filter_update</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<title name="additional_filter_update">Additional filter</title>
+			<dataRef>
+				<id>additional_filter_autocomplete_selection</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>update_additional_filter</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>selected_additional_filter_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>current_additional_filter</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>filter_header</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>current_additional_filter_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>merge_filters</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>remove_additional_filter</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+
+	<!-- PLACES-->
+	<place>
+		<id>uninitialized</id>
+		<x>220</x>
+		<y>220</y>
+		<label>uninitialized</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>initialized</id>
+		<x>460</x>
+		<y>220</y>
+		<label>initialized</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+
+	<!-- ARCS-->
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>uninitialized</sourceId>
+		<destinationId>initialize</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>read</type>
+		<sourceId>initialized</sourceId>
+		<destinationId>item_settings</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a8</id>
+		<type>regular</type>
+		<sourceId>initialize</sourceId>
+		<destinationId>initialized</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a9</id>
+		<type>read</type>
+		<sourceId>initialized</sourceId>
+		<destinationId>move_item</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a10</id>
+		<type>read</type>
+		<sourceId>initialized</sourceId>
+		<destinationId>duplicate_item</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a12</id>
+		<type>read</type>
+		<sourceId>initialized</sourceId>
+		<destinationId>change_filter</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

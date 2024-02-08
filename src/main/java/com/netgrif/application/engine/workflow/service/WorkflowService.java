@@ -484,6 +484,12 @@ public class WorkflowService implements IWorkflowService {
         return fields;
     }
 
+    public Case populateUriNodeId(Case aCase) {
+        String uriNodeId = elasticCaseService.findUriNodeId(aCase);
+        aCase.setUriNodeId(uriNodeId);
+        return aCase;
+    }
+
     private void setImmediateDataFieldsReadOnly(Case useCase) {
         List<Field> immediateData = new ArrayList<>();
 

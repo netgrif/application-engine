@@ -84,4 +84,9 @@ public interface IUriService {
      * @return the UriNode that was created or modified
      * */
     UriNode createDefault();
+
+    /**
+     * Returns configured uri separator
+     * */
+    String getUriSeparator();
 }
