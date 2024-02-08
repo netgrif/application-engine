@@ -1,23 +1,28 @@
-package com.netgrif.application.engine.petrinet.domain.dataset;
+package com.netgrif.application.engine.petrinet.domain.dataset
 
 class UserListFieldValue {
 
-    private List<UserFieldValue> userValues;
+    private Set<UserFieldValue> userValues
 
-    UserListFieldValue(List<UserFieldValue> userValues) {
-        this.userValues = userValues;
+    UserListFieldValue() {
+        this.userValues = new LinkedHashSet<>()
     }
 
-    List<UserFieldValue> getUserValues() {
-        return userValues;
+    UserListFieldValue(Collection<UserFieldValue> userValues) {
+        this()
+        this.userValues = new LinkedHashSet<>(userValues)
     }
 
-    void setUserValues(List<UserFieldValue> userValues) {
-        this.userValues = userValues;
+    LinkedHashSet<UserFieldValue> getUserValues() {
+        return userValues
+    }
+
+    void setUserValues(Collection<UserFieldValue> userValues) {
+        this.userValues = new LinkedHashSet<>(userValues)
     }
 
     @Override
     String toString() {
-        return userValues.toString();
+        return userValues.toString()
     }
 }

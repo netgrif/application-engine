@@ -1,7 +1,10 @@
 package com.netgrif.application.engine.security.service;
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -14,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * */
 @Slf4j
 @Service
-public class SecurityContextService implements ISecurityContextService{
+public class SecurityContextService implements ISecurityContextService {
 
     /**
      * List containing user IDs that's state was changed during an action
@@ -24,6 +27,8 @@ public class SecurityContextService implements ISecurityContextService{
     protected SecurityContextService() {
         this.cachedTokens = ConcurrentHashMap.newKeySet();
     }
+
+    protected IUserService userService;
 
     /**
      * Saves token to the cache if the state of context object was changed and needs to be updated
@@ -40,7 +45,23 @@ public class SecurityContextService implements ISecurityContextService{
      * */
     @Override
     public void reloadSecurityContext(LoggedUser loggedUser) {
+        reloadSecurityContext(loggedUser, false);
+    }
+
+    /**
+     * Reloads the security context according to currently logged user from database
+     * @param loggedUser the user whose context needs to be reloaded
+     * */
+    @Override
+    public void forceReloadSecurityContext(LoggedUser loggedUser) {
+        reloadSecurityContext(loggedUser, true);
+    }
+
+    private void reloadSecurityContext(LoggedUser loggedUser, boolean forceRefresh) {
         if (isUserLogged(loggedUser) && cachedTokens.contains(loggedUser.getId())) {
+            if (forceRefresh) {
+                loggedUser = userService.findById(loggedUser.getId(), false).transformToLoggedUser();
+            }
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedUser, SecurityContextHolder.getContext().getAuthentication().getCredentials(), loggedUser.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(token);
             clearToken(loggedUser.getId());
@@ -75,5 +96,11 @@ public class SecurityContextService implements ISecurityContextService{
             return ((LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId().equals(loggedUser.getId());
         else
             return false;
+    }
+
+    @Autowired
+    @Lazy
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
     }
 }

@@ -49,7 +49,7 @@ public interface IUserService {
 
     void addDefaultAuthorities(IUser user);
 
-    void assignAuthority(String userId, String authorityId);
+    IUser assignAuthority(String userId, String authorityId);
 
     IUser getLoggedOrSystem();
 

@@ -309,6 +309,16 @@
 		</action>
  	</data>
 
+<data type="text" immediate="true">
+		<id>default_headers</id>
+		<title name="default_headers">Set default headers</title>
+	</data>
+  
+<data type="multichoice_map">
+		<id>allowed_nets</id>
+		<title name="allowed_nets">Allowed nets</title>
+	</data>
+
 <!--	<data type="boolean">-->
 <!--		<id>use_i18n</id>-->
 <!--		<title>Translate menu item title?</title>-->
@@ -350,6 +360,7 @@
 		<i18nString name="create_case_button_title">Názov tlačidla "Nová inštancia"</i18nString>
 		<i18nString name="create_case_button_icon">Identifikátor ikony tlačidla "Nová inštancia"</i18nString>
 		<i18nString name="create_case_button_icon_preview">Náhľad ikony</i18nString>
+		<i18nString name="default_headers">Predvolené hlavičky</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="menu_item_title">Menüpunkttitel</i18nString>
@@ -374,6 +385,7 @@
 		<i18nString name="create_case_button_title">Schaltflächentitel "Neuer Fall"</i18nString>
 		<i18nString name="create_case_button_icon">Ikone ID</i18nString>
 		<i18nString name="create_case_button_icon_preview">Ikonevorschau</i18nString>
+		<i18nString name="default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
 	</i18n>
 	<!-- TRANSITIONS -->
 	<transition>
@@ -861,6 +873,21 @@
 					<y>5</y>
 					<rows>1</rows>
 					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>default_headers</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>6</y>
+					<rows>1</rows>
+					<cols>4</cols>
 					<offset>0</offset>
 					<template>material</template>
 					<appearance>outline</appearance>

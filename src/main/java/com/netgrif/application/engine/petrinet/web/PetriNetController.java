@@ -155,6 +155,7 @@ public class PetriNetController {
         return new TransactionsResource(net.getTransactions().values(), netId, locale);
     }
 
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Download process model", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{netId}/file", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public FileSystemResource getNetFile(@PathVariable("netId") String netId, @RequestParam(value = "title", required = false) String title, Authentication auth, HttpServletResponse response) {
@@ -197,6 +198,12 @@ public class PetriNetController {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         asyncRunner.execute(() -> this.service.deletePetriNet(decodedProcessId, user));
         return MessageResource.successMessage("Petri net " + decodedProcessId + " is being deleted");
+    }
+
+    @Operation(summary = "Get net by case id", security = {@SecurityRequirement(name = "BasicAuth")})
+    @GetMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
+    public PetriNetImportReference getOne(@PathVariable("id") String caseId) {
+            return service.getNetFromCase(decodeUrl(caseId));
     }
 
     public static String decodeUrl(String s1) {
