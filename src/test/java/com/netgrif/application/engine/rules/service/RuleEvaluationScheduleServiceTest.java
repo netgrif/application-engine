@@ -64,7 +64,7 @@ class RuleEvaluationScheduleServiceTest {
     }
 
     @Test
-    @Disabled("RuleEvaluationScheduleServiceTest.testScheduledRule:89")
+    @Disabled
     void testScheduledRule() throws IOException, MissingPetriNetMetaDataException, RuleEvaluationScheduleException, InterruptedException, MissingIconKeyException {
         LoggedUser user = superCreator.getLoggedSuper();
         ImportPetriNetEventOutcome importOutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, user);

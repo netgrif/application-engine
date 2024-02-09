@@ -69,4 +69,6 @@ public class CaseSearchRequest {
 
         public String email;
     }
+
+    public Map<String, String> tags;
 }

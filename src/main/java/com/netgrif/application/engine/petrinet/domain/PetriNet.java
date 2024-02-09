@@ -139,6 +139,10 @@ public class PetriNet extends PetriNetObject {
     @Setter
     private String importXmlPath;
 
+    @Getter
+    @Setter
+    private Map<String, String> tags;
+
     public PetriNet() {
         this._id = new ObjectId();
         this.identifier = "Default";
@@ -161,6 +165,7 @@ public class PetriNet extends PetriNetObject {
         permissions = new HashMap<>();
         userRefs = new HashMap<>();
         functions = new LinkedList<>();
+        tags = new HashMap<>();
     }
 
     public void addPlace(Place place) {
@@ -441,6 +446,7 @@ public class PetriNet extends PetriNetObject {
         clone.setUserRefs(this.userRefs == null ? null : this.userRefs.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
         this.getNegativeViewRoles().forEach(clone::addNegativeViewRole);
         this.getFunctions().forEach(clone::addFunction);
+        clone.setTags(new HashMap<>(this.tags));
         return clone;
     }
 }

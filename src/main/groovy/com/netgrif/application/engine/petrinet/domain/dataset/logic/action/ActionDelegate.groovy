@@ -185,7 +185,7 @@ class ActionDelegate {
     @Autowired
     PublicViewProperties publicViewProperties
 
-    Frontend Frontend
+    FrontendActionOutcome Frontend
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -205,7 +205,7 @@ class ActionDelegate {
         this.initFieldsMap(action.fieldIds)
         this.initTransitionsMap(action.transitionIds)
         this.outcomes = new ArrayList<>()
-        this.Frontend = new Frontend(this.useCase, this.task, this.outcomes)
+        this.Frontend = new FrontendActionOutcome(this.useCase, this.task, this.outcomes)
     }
 
     def initFieldsMap(Map<String, String> fieldIds) {

@@ -833,6 +833,9 @@ public class DataService implements IDataService {
                 value = parseListStringValues(node);
                 // TODO 29.9.2020: validate task ref value? is such feature desired?
                 break;
+            case "stringCollection":
+                value = parseListStringValues(node);
+                break;
             case "userList":
                 if (node.get("value") == null) {
                     value = null;
