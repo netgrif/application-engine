@@ -5,15 +5,61 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](https://github.com/netgrif/application-engine/commits/v6.3.0)
+Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.2](https://github.com/netgrif/application-engine/commits/v6.3.2)
 
-## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2023-03-24)
+## [6.4.0](https://github.com/netgrif/application-engine/releases/tag/v6.4.0) (2024-01-23)
+
+### Fixed
+- [NAE-1908] NAE-1906 Improvements
+- [NAE-1937] Fix the problem with empty string in filter
+
+### Added
+- [NAE-1901] Taskref list rendering update
+- [NAE-1497] Frontend Actions
+- [NAE-1916] Serializable core objects
+- [NAE-1918] Tags on process resources
+- [NAE-1929] Data field type list of strings
+- [NAE-1936] Disable create case button using menu items
+
+## [6.3.3](https://github.com/netgrif/application-engine/releases/tag/v6.3.3) (2024-01-19)
+
+### Fixed
+
+- [NAE-1930] Modify Annotation in LdapUser Class for Indexing
+- [NAE-1931] Implementation of Index Re-Creation after MongoDB Database Drop
+- [NAE-1934] Remove devtools dependency
+- [NAE-1938] Slow Indexing of Elastic Tasks
+
+### Added
+
+- [NAE-1932] Enhancement of Redis Connector to Support Authentication
+
+## [6.3.2](https://github.com/netgrif/application-engine/releases/tag/v6.3.2) (2023-11-08)
+
+### Fixed
+
+- [NAE-1910] Event log is missing change in case's active places
+
+## [6.3.1](https://github.com/netgrif/application-engine/releases/tag/v6.3.1) (2023-07-18)
+
+### Fixed
+
+- [NAE-1807] Reference in Arc is not cloned properly
+- [NAE-1836] Actions cache is broken (for multiple versions of the same process)
+- [NAE-1864] Deleting process version removes instances of all versions of the same process
+- [NAE-1870] Indeterministic order in multichoice and multichoice map values
+
+### Added
+
+- [NAE-1891] Make URL function
+
+## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2023-05-26)
 
 ### Fixed
 
 - [NAE-1761] LoggedUser circular dependency
 - [NAE-1798] UserRefs resolves everytime when case is saved
-- [NAE-1757] Multi-choice and enumeration options not working 
+- [NAE-1757] Multi-choice and enumeration options not working
 - [NAE-1759] Update documentation of public views, PDF generator and user list
 - [NAE-1805] Data fields validations are not run on backend
 - [NAE-1811] Process delete does not delete ldap group roles
@@ -25,11 +71,15 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](h
 - [NAE-1853] Passwords loaded from environment variables are shown in application logs
 - [NAE-1860] Assigning authority to a user via REST API ends up with error
 - [NAE-1861] Requesting unknown endpoint ends with Stackoverflow
+- [NAE-1875] Namespace functions cause memory leak
+- [NAE-1868] Process role refresh
+- [NAE-1723] EventLog classes are not resolved correctly after search in MongoDB collection
 
 ### Changed
 
 - [NAE-1638] Elasticsearch executor shutdown
 - [NAE-1762] Public view URL encoding
+- [NAE-1865] Grid rendering performance improvement
 
 ### Added
 
@@ -39,6 +89,16 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](h
 - [NAE-1793] Security filter for HTTP headers validation
 - [NAE-1794] Configurable security headers
 - [NAE-1833] Configuration priority search
+- [NAE-1722] Set default view headers with the CreateMenuItem action method
+- [NAE-1874] Filtering users based on roles when selecting users for UserListField
+- [NAE-1703] Dashboard
+- [NAE-1678] User impersonation
+
+## [6.2.9](https://github.com/netgrif/application-engine/releases/tag/v6.2.9) (2023-05-04)
+
+### Added
+
+- [NAE-1865] Grid rendering performance improvement
 
 ## [6.2.8](https://github.com/netgrif/application-engine/releases/tag/v6.2.8) (2023-03-22)
 
@@ -97,7 +157,6 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](h
 - [NAE-1693] TaskController deleteFile endpoint lacks data about tasks
 - [NAE-1714] Parameter processIdentifier in class CaseSearchRequest
 
-
 ## [6.2.1](https://github.com/netgrif/application-engine/releases/tag/v6.2.1) (2022-09-15)
 
 ### Fixed
@@ -113,7 +172,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](h
 - [NAE-1691] Default value number field after the change behavior
 - [NAE-1694] ProcessRoleService.findByImportId doesn't return list of process roles
 - [NAE-1699] Create/upload event action is loaded only from the cache
-- [NAE-1702] LdapUser unique dn 
+- [NAE-1702] LdapUser unique dn
 
 ### Changed
 

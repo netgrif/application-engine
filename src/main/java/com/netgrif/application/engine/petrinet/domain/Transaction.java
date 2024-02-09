@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,5 +48,13 @@ public class Transaction extends PetriNetObject {
     @Override
     public String toString() {
         return title.getDefaultValue();
+    }
+
+    @Override
+    public Transaction clone() {
+        Transaction clone = new Transaction();
+        clone.setTransitions(new ArrayList<>(transitions));
+        clone.setTitle(this.title == null ? null : title.clone());
+        return clone;
     }
 }

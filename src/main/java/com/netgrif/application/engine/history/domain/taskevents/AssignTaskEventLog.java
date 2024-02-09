@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode(callSuper = true)
 public class AssignTaskEventLog extends TaskEventLog {
 
+
     public AssignTaskEventLog() {
         super();
     }

@@ -12,15 +12,12 @@ import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.UriContentType;
-import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.security.service.EncryptionService;
@@ -114,9 +111,6 @@ public class WorkflowService implements IWorkflowService {
     @Autowired
     private IHistoryService historyService;
 
-    @Autowired
-    private IUriService uriService;
-
     protected IElasticCaseService elasticCaseService;
 
     @Autowired
@@ -163,7 +157,8 @@ public class WorkflowService implements IWorkflowService {
     public List<Case> findAllById(List<String> ids) {
         return repository.findAllBy_idIn(ids).stream()
                 .filter(Objects::nonNull)
-                .sorted(Ordering.explicit(ids).onResultOf(Case::getStringId))
+                .sorted(Ordering.explicit(ids)
+                .onResultOf(Case::getStringId))
                 .map(caze -> {
                     caze.setPetriNet(petriNetService.get(caze.getPetriNetObjectId()));
                     decryptDataSet(caze);
@@ -288,6 +283,7 @@ public class WorkflowService implements IWorkflowService {
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
         LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
+        petriNet = petriNetService.populateUriNodeId(petriNet);
         int rulesExecuted;
         Case useCase = new Case(petriNet);
         useCase.populateDataSet(initValueExpressionEvaluator);
@@ -295,8 +291,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.setAuthor(loggedOrImpersonated.transformToAuthor());
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(makeTitle.apply(useCase));
-        UriNode uriNode = uriService.getOrCreate(petriNet, UriContentType.CASE);
-        useCase.setUriNodeId(uriNode.getId());
+        useCase.setUriNodeId(petriNet.getUriNodeId());
 
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
         outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty()));
@@ -376,16 +371,21 @@ public class WorkflowService implements IWorkflowService {
 
         taskService.deleteTasksByPetriNetId(net.getStringId());
         CaseSearchRequest request = new CaseSearchRequest();
-        request.process = Collections.singletonList(new CaseSearchRequest.PetriNet(net.getIdentifier(), net.getStringId()));
-
-        long pageCount = (elasticCaseService.count(Collections.singletonList(request), userService.getLoggedOrSystem().transformToLoggedUser(), Locale.getDefault(), false) / 100) + 1;
+        CaseSearchRequest.PetriNet netRequest = new CaseSearchRequest.PetriNet();
+        netRequest.processId = net.getStringId();
+        request.process = Collections.singletonList(netRequest);
+        long countCases = elasticCaseService.count(Collections.singletonList(request), userService.getLoggedOrSystem().transformToLoggedUser(), Locale.getDefault(), false);
+        log.info("[" + net.getStringId() + "]: User " + userService.getLoggedOrSystem().getStringId() + " is deleting " + countCases + " cases of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
+        long pageCount = (countCases / 100) + 1;
         LongStream.range(0, pageCount)
                 .forEach(i -> elasticCaseService.search(
-                        Collections.singletonList(request),
-                        userService.getLoggedOrSystem().transformToLoggedUser(),
-                        PageRequest.of((int) i, 100),
-                        Locale.getDefault(),
-                        false).getContent().forEach(this::deleteCase));
+                                Collections.singletonList(request),
+                                userService.getLoggedOrSystem().transformToLoggedUser(),
+                                PageRequest.of((int) i, 100),
+                                Locale.getDefault(),
+                                false)
+                        .getContent()
+                        .forEach(this::deleteCase));
     }
 
     @Override
@@ -484,22 +484,18 @@ public class WorkflowService implements IWorkflowService {
         return fields;
     }
 
+    public Case populateUriNodeId(Case aCase) {
+        String uriNodeId = elasticCaseService.findUriNodeId(aCase);
+        aCase.setUriNodeId(uriNodeId);
+        return aCase;
+    }
+
     private void setImmediateDataFieldsReadOnly(Case useCase) {
         List<Field> immediateData = new ArrayList<>();
 
         useCase.getImmediateDataFields().forEach(fieldId -> {
             try {
-                Field field = fieldFactory.buildImmediateField(useCase, fieldId);
-                Field clone = field.clone();
-                if (field.getValue() != null) {
-                    if (field.getType() == FieldType.TEXT) {
-                        clone.setValue(field.getValue().toString());
-                    } else {
-                        clone.setValue(field.getValue());
-                    }
-                } else {
-                    clone.setValue(null);
-                }
+                Field clone = fieldFactory.buildImmediateField(useCase, fieldId);
                 immediateData.add(clone);
             } catch (Exception e) {
                 log.error("Could not built immediate field [" + fieldId + "]");

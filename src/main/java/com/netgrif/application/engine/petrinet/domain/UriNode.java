@@ -9,6 +9,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 
 @AllArgsConstructor
@@ -69,8 +70,9 @@ public class UriNode {
     }
 
     public void addContentType(UriContentType contentType) {
-        if (contentTypes == null)
+        if (contentTypes == null) {
             contentTypes = new HashSet<>();
+        }
         contentTypes.add(contentType);
     }
 

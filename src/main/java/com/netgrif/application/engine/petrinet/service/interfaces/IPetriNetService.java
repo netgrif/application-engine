@@ -25,10 +25,17 @@ import java.util.*;
 
 public interface IPetriNetService {
 
+    PetriNet clone(ObjectId petriNetId);
+
     @Deprecated
     ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
+    @Deprecated
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+
     ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
     Optional<PetriNet> save(PetriNet petriNet);
 
@@ -38,7 +45,9 @@ public interface IPetriNetService {
 
     List<PetriNet> getByIdentifier(String identifier);
 
-    List<PetriNet> findAllByUri(String uri);
+    List<PetriNet> findAllByUriNodeId(String uriNodeId);
+
+    List<PetriNet> findAllById(List<String> ids);
 
     PetriNet getNewestVersionByIdentifier(String identifier);
 
@@ -89,13 +98,13 @@ public interface IPetriNetService {
 
     List<PetriNet> get(List<String> petriNetIds);
 
-    PetriNet clone(ObjectId petriNetId);
-
     void deletePetriNet(String id, LoggedUser loggedUser);
 
     void runActions(List<Action> actions, PetriNet petriNet);
 
     List<String> getExistingPetriNetIdentifiersFromIdentifiersList(List<String> identifiers);
+
+    PetriNet populateUriNodeId(PetriNet petriNet);
 
     PetriNetImportReference getNetFromCase(String caseId);
 }

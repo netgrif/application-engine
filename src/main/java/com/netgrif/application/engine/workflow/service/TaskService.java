@@ -742,6 +742,7 @@ public class TaskService implements ITaskService {
                 .caseId(useCase.get_id().toString())
                 .transitionId(transition.getImportId())
                 .layout(transition.getLayout())
+                .tags(transition.getTags())
                 .caseColor(useCase.getColor())
                 .caseTitle(useCase.getTitle())
                 .priority(transition.getPriority())

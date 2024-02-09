@@ -13,9 +13,6 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 public class CreateCaseEventLog extends CaseEventLog {
 
-    @Field("activePlaces")
-    private Map<String, Integer> activePlaces;
-
     @Field("dataSetValues")
     private Map<String, DataField> dataSetValues;
 
@@ -25,16 +22,7 @@ public class CreateCaseEventLog extends CaseEventLog {
 
     public CreateCaseEventLog(Case useCase, EventPhase eventPhase) {
         super(useCase, eventPhase);
-        this.activePlaces = useCase.getActivePlaces();
         this.dataSetValues = useCase.getDataSet();
-    }
-
-    public Map<String, Integer> getActivePlaces() {
-        return activePlaces;
-    }
-
-    public void setActivePlaces(Map<String, Integer> places) {
-        this.activePlaces = places;
     }
 
     public Map<String, DataField> getDataSetValues() {

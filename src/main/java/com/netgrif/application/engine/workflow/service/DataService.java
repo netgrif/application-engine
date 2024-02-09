@@ -299,7 +299,7 @@ public class DataService implements IDataService {
                         resource.setParentTaskId(taskId);
                     }
                     resources.add(resource);
-                    if (field.getType() == FieldType.TASK_REF) {
+                    if (field.getType() == FieldType.TASK_REF && shouldResolveTaskRefData(field, transition.getDataSet().get(field.getStringId()))) {
                         resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(dataFieldId), locale, collectedTaskIds, level));
                     }
                 }
@@ -308,6 +308,22 @@ public class DataService implements IDataService {
         }
         outcome.setData(resultDataGroups);
         return outcome;
+    }
+
+    private boolean shouldResolveTaskRefData(Field<?> field, DataFieldLogic dataRef) {
+        if (dataRef.getComponent() != null) {
+            return hasRequiredComponentProperty(dataRef.getComponent(), "resolve_data", "true");
+        } else if (field.getComponent() != null) {
+            return hasRequiredComponentProperty(field.getComponent(), "resolve_data", "true");
+        }
+        return true;
+    }
+
+    private boolean hasRequiredComponentProperty(Component component, String propertyName, String propertyValue) {
+        return  component != null
+                && component.getProperties() != null
+                && component.getProperties().containsKey(propertyName)
+                && component.getProperties().get(propertyName).equals(propertyValue);
     }
 
     private List<DataGroup> collectTaskRefDataGroups(TaskField taskRefField, Locale locale, Set<String> collectedTaskIds, int level) {
@@ -769,7 +785,7 @@ public class DataService implements IDataService {
                 value = !(node.get("value") == null || node.get("value").isNull()) && node.get("value").asBoolean();
                 break;
             case "multichoice":
-                value = parseMultichoiceFieldValues(node).stream().map(I18nString::new).collect(Collectors.toSet());
+                value = parseMultichoiceFieldValues(node).stream().map(I18nString::new).collect(Collectors.toCollection(LinkedHashSet::new));
                 break;
             case "multichoice_map":
                 value = parseMultichoiceFieldValues(node);
@@ -817,6 +833,9 @@ public class DataService implements IDataService {
                 value = parseListStringValues(node);
                 // TODO 29.9.2020: validate task ref value? is such feature desired?
                 break;
+            case "stringCollection":
+                value = parseListStringValues(node);
+                break;
             case "userList":
                 if (node.get("value") == null) {
                     value = null;
@@ -856,7 +875,7 @@ public class DataService implements IDataService {
 
     private Set<String> parseMultichoiceFieldValues(ObjectNode node) {
         ArrayNode arrayNode = (ArrayNode) node.get("value");
-        HashSet<String> set = new HashSet<>();
+        HashSet<String> set = new LinkedHashSet<>();
         arrayNode.forEach(item -> set.add(item.asText()));
         return set;
     }

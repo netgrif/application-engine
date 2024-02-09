@@ -4,13 +4,13 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -102,6 +102,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     private Predicate buildSingleQuery(TaskSearchRequest request, LoggedUser user, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
 
+        buildStringIdQuery(request, builder);
         buildRoleQuery(request, builder);
         buildCaseQuery(request, builder);
         buildTitleQuery(request, builder);
@@ -109,12 +110,25 @@ public class TaskSearchService extends MongoSearchService<Task> {
         buildProcessQuery(request, builder);
         buildFullTextQuery(request, builder);
         buildTransitionQuery(request, builder);
+        buildTagsQuery(request, builder);
         boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, builder);
 
         if (resultAlwaysEmpty)
             return null;
         else
             return builder;
+    }
+
+    private void buildStringIdQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.stringId == null || request.stringId.isEmpty()) {
+            return;
+        }
+
+        query.and(
+                constructPredicateTree(
+                        request.stringId.stream().map(this::stringIdQuery).collect(Collectors.toList()),
+                        BooleanBuilder::or)
+        );
     }
 
     private void buildRoleQuery(TaskSearchRequest request, BooleanBuilder query) {
@@ -131,6 +145,10 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
     public Predicate roleQuery(String role) {
         return QTask.task.roles.containsKey(role);
+    }
+
+    public Predicate stringIdQuery(String id) {
+        return QTask.task._id.eq(new ObjectId(id));
     }
 
     public Predicate userRefQuery(String userId) {
@@ -266,5 +284,21 @@ public class TaskSearchService extends MongoSearchService<Task> {
                 )
         );
         return false;
+    }
+
+    private void buildTagsQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.tags == null || request.tags.isEmpty()) {
+            return;
+        }
+
+        query.and(
+                constructPredicateTree(
+                        request.tags.entrySet().stream().map(entry -> this.tagQuery(entry.getKey(), entry.getValue())).collect(Collectors.toList()),
+                        BooleanBuilder::and)
+        );
+    }
+
+    public Predicate tagQuery(String key, String value) {
+        return QTask.task.tags.get(key).eq(value);
     }
 }
