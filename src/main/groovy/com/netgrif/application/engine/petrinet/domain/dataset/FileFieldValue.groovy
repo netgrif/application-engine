@@ -44,7 +44,11 @@ class FileFieldValue implements Serializable {
         return "${fileStorageConfiguration.getStoragePath()}/${caseId}-${fieldId}-${name}"
     }
 
-    String getPreviewPath(String caseId, String fieldId) {
+    //    TODO stored in mongo?
+    String getPreviewPath(String caseId, String fieldId, boolean isRemote) {
+        if (isRemote) {
+            return "${caseId}-${fieldId}-${name}.file_preview"
+        }
         FileStorageConfiguration fileStorageConfiguration = ApplicationContextProvider.getBean("fileStorageConfiguration") as FileStorageConfiguration
         return "${fileStorageConfiguration.getStoragePath()}/file_preview/${caseId}-${fieldId}-${name}"
     }

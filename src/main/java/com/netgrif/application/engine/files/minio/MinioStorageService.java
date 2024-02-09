@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.files.minio;
 
 import com.netgrif.application.engine.files.interfaces.IStorageService;
+import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
 import io.minio.*;
 import io.minio.errors.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,27 +28,43 @@ public class MinioStorageService implements IStorageService {
     }
 
     @Override
-    public InputStream get(String name) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        return minioClient.getObject(
-                GetObjectArgs.builder()
-                        .bucket(properties.getBucketName())
-                        .object(name)
-                        .build()
-        );
+    public InputStream get(String name) {
+        try {
+            return minioClient.getObject(
+                    GetObjectArgs.builder()
+                            .bucket(properties.getBucketName())
+                            .object(name)
+                            .build()
+            );
+        } catch (ErrorResponseException e) {
+            if (e.response().code() == 404) {
+                return null;
+            } else {
+                throw new EventNotExecutableException("File cannot be get", e);
+            }
+        } catch (ServerException | InsufficientDataException | IOException | NoSuchAlgorithmException |
+                 InvalidKeyException | InvalidResponseException | XmlParserException | InternalException e) {
+            throw new EventNotExecutableException("File cannot be get", e);
+        }
     }
 
     @Override
-    public ObjectWriteResponse upload(String name, MultipartFile file) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public ObjectWriteResponse upload(String name, MultipartFile file) {
         try (InputStream stream = file.getInputStream()) {
-            return minioClient.putObject(PutObjectArgs
-                    .builder()
-                    .bucket(properties.getBucketName())
-                    .object(name)
-                    .stream(stream, -1, properties.getPartSize())
-                    .build());
+            return this.upload(name, stream);
         } catch (Exception e) {
-            throw new IllegalArgumentException("File cannot be save", e);
+            throw new EventNotExecutableException("File cannot be save", e);
         }
+    }
+
+    @Override
+    public ObjectWriteResponse upload(String name, InputStream stream) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        return minioClient.putObject(PutObjectArgs
+                .builder()
+                .bucket(properties.getBucketName())
+                .object(name)
+                .stream(stream, -1, properties.getPartSize())
+                .build());
     }
 
     @Override

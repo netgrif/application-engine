@@ -21,6 +21,9 @@
             <logic>
                 <behavior>editable</behavior>
             </logic>
+            <component>
+                <name>preview</name>
+            </component>
         </dataRef>
     </transition>
 </document>

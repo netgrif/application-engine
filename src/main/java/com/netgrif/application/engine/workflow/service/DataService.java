@@ -474,16 +474,35 @@ public class DataService implements IDataService {
     }
 
     private FileFieldInputStream getFilePreview(FileField field, Case useCase) throws IOException {
+        if (field.isRemote()) {
+            IStorageService storageService = storageResolverService.resolve(field.getRemote());
+            InputStream stream = storageService.get(field.getFilePreviewPath(useCase.getStringId()));
+            if (stream != null) {
+                return new FileFieldInputStream(field, stream);
+            }
+            File file = getRemoteFile(field);
+            byte[] bytes = generateFilePreviewToStream(file).toByteArray();
+            InputStream inputStream = new ByteArrayInputStream(bytes);
+            try {
+                storageService.upload(field.getFilePreviewPath(useCase.getStringId()), inputStream);
+                return new FileFieldInputStream(field, inputStream);
+            } catch (Exception e) {
+                throw new EventNotExecutableException("File preview cannot be saved", e);
+            }
+
+        }
+
         File localPreview = new File(field.getFilePreviewPath(useCase.getStringId()));
         if (localPreview.exists()) {
             return new FileFieldInputStream(field, new FileInputStream(localPreview));
         }
-        File file;
-        if (field.isRemote()) {
-            file = getRemoteFile(field);
-        } else {
-            file = new File(field.getValue().getPath());
-        }
+        File file = new File(field.getValue().getPath());
+        ByteArrayOutputStream os = generateFilePreviewToStream(file);
+        saveFilePreview(localPreview, os);
+        return new FileFieldInputStream(field, new ByteArrayInputStream(os.toByteArray()));
+    }
+
+    private ByteArrayOutputStream generateFilePreviewToStream(File file) throws IOException {
         int dot = file.getName().lastIndexOf(".");
         FileFieldDataType fileType = FileFieldDataType.resolveType((dot == -1) ? "" : file.getName().substring(dot + 1));
         BufferedImage image = getBufferedImageFromFile(file, fileType);
@@ -492,8 +511,7 @@ public class DataService implements IDataService {
         }
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ImageIO.write(image, !fileType.extension.equals(FileFieldDataType.PDF.extension) ? fileType.extension : FileFieldDataType.JPG.extension, os);
-        saveFilePreview(localPreview, os);
-        return new FileFieldInputStream(field, new ByteArrayInputStream(os.toByteArray()));
+        return os;
     }
 
     private void saveFilePreview(File localPreview, ByteArrayOutputStream os) throws IOException {
@@ -530,7 +548,7 @@ public class DataService implements IDataService {
     private File getRemoteFile(FileField field) throws IOException {
         File file;
         InputStream is = download(field);
-        file = File.createTempFile(field.getStringId(), "pdf");
+        file = File.createTempFile(field.getStringId(), ".pdf");
         file.deleteOnExit();
         FileOutputStream fos = new FileOutputStream(file);
         IOUtils.copy(is, fos);
@@ -538,21 +556,13 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public InputStream download(FileField field) throws IOException {
-        try {
-            return storageResolverService.resolve(field.getRemote()).get(field.getValue().getPath());
-        } catch (Exception e) {
-            throw new IllegalArgumentException("File cannot be saved");
-        }
+    public InputStream download(FileField field) {
+        return storageResolverService.resolve(field.getRemote()).get(field.getValue().getPath());
     }
 
     @Override
-    public InputStream download(FileListField field, FileFieldValue fieldValue) throws IOException {
-        try {
-            return storageResolverService.resolve(field.getRemote()).get(fieldValue.getPath());
-        } catch (Exception e) {
-            throw new IllegalArgumentException("File cannot be saved");
-        }
+    public InputStream download(FileListField field, FileFieldValue fieldValue) {
+        return storageResolverService.resolve(field.getRemote()).get(fieldValue.getPath());
     }
 
     @Override
@@ -694,6 +704,7 @@ public class DataService implements IDataService {
     protected boolean deleteRemote(Case useCase, FileField field) {
         try {
             storageResolverService.resolve(field.getRemote()).delete(field.getValue().getPath());
+            storageResolverService.resolve(field.getRemote()).delete(field.getValue().getPreviewPath(useCase.getStringId(), field.getStringId(), field.isRemote()));
             return true;
         } catch (Exception e) {
             log.error(e.getMessage());

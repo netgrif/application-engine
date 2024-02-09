@@ -52,13 +52,14 @@ class FileField extends Field<FileFieldValue> {
      * @return path to the saved file
      */
     String getFilePath(String caseId) {
-        if (this.remote)
+        if (isRemote()) {
             return this.getValue().getPath()
+        }
         return this.getValue().getPath(caseId, getStringId())
     }
 
     String getFilePreviewPath(String caseId) {
-        return this.getValue().getPreviewPath(caseId, getStringId())
+        return this.getValue().getPreviewPath(caseId, getStringId(), isRemote())
     }
 
     String getRemote() {
