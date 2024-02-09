@@ -173,8 +173,11 @@ class PetriNetServiceTest {
     void processSearch() {
         long processCount = petriNetRepository.count()
 
-        petriNetService.importPetriNet(stream(NET_SEARCH_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+
+        def user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
+        assert user != null
         petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        petriNetService.importPetriNet(stream(NET_SEARCH_FILE), VersionType.MAJOR, user.transformToLoggedUser())
 
         assert petriNetRepository.count() == processCount + 2
 
@@ -200,9 +203,9 @@ class PetriNetServiceTest {
 
         PetriNetSearch search5 = new PetriNetSearch();
         Author author = new Author();
-        author.setEmail(superCreator.getLoggedSuper().getEmail());
+        author.setEmail(user.getEmail());
         search5.setAuthor(author);
-        assert petriNetService.search(search5, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 2;
+        assert petriNetService.search(search5, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
 
 
         PetriNetSearch search6 = new PetriNetSearch();
@@ -214,5 +217,16 @@ class PetriNetServiceTest {
         map.put("test", "test");
         search7.setTags(map);
         assert petriNetService.search(search7, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
+
+        PetriNetSearch search8 = new PetriNetSearch();
+        HashMap<String, String> mapTags = new HashMap<String, String>();
+        mapTags.put("test", "test");
+        search8.setTags(mapTags);
+        search8.setIdentifier("processSearchTest");
+        search8.setTitle("Process Search Test");
+        search8.setDefaultCaseName("Process Search Case Name");
+        search8.setInitials("PST");
+        search8.setAuthor(author);
+        assert petriNetService.search(search8, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
     }
 }

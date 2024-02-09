@@ -48,6 +48,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
         PetriNetSearch requestQuery = new PetriNetSearch();
         Author authorQuery = new Author();
         authorQuery.setEmail(author.getEmail());
+        requestQuery.setAuthor(authorQuery);
         List<PetriNetReference> nets = this.petriNetService.search(requestQuery, loggedAuthor, new FullPageRequest(), locale).getContent();
 
         Map<String, I18nString> options = new HashMap<>();
