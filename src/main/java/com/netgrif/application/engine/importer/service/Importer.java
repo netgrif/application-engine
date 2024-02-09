@@ -189,6 +189,7 @@ public class Importer {
         net.setDefaultRoleEnabled(document.isDefaultRole() != null && document.isDefaultRole());
         net.setAnonymousRoleEnabled(document.isAnonymousRole() != null && document.isAnonymousRole());
 
+
         document.getRole().forEach(this::createRole);
         document.getData().forEach(this::createDataSet);
         document.getTransaction().forEach(this::createTransaction);
@@ -216,6 +217,9 @@ public class Importer {
             net.setDefaultCaseNameExpression(new Expression(document.getCaseName().getValue()));
         } else {
             net.setDefaultCaseName(toI18NString(document.getCaseName()));
+        }
+        if (document.getTags() != null) {
+            net.setTags(this.buildTagsMap(document.getTags().getTag()));
         }
 
         return Optional.of(net);
@@ -490,6 +494,10 @@ public class Importer {
         transition.setImportId(importTransition.getId());
         transition.setTitle(importTransition.getLabel() != null ? toI18NString(importTransition.getLabel()) : new I18nString(""));
         transition.setPosition(importTransition.getX(), importTransition.getY());
+        if (importTransition.getTags() != null) {
+            transition.setTags(this.buildTagsMap(importTransition.getTags().getTag()));
+        }
+
         if (importTransition.getLayout() != null) {
             transition.setLayout(new TaskLayout(importTransition));
         }
@@ -1296,5 +1304,15 @@ public class Importer {
         }
         if (!missingMetaData.isEmpty())
             throw new MissingPetriNetMetaDataException(missingMetaData);
+    }
+
+    protected Map<String, String> buildTagsMap(List<Tag> tagsList) {
+        Map<String, String> tags = new HashMap<>();
+        if (tagsList != null) {
+            tagsList.forEach(tag -> {
+                tags.put(tag.getKey(), tag.getValue());
+            });
+        }
+        return tags;
     }
 }

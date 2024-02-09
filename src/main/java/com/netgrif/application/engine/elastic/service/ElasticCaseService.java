@@ -154,6 +154,19 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         }
     }
 
+    public String findUriNodeId(Case aCase) {
+        if (aCase == null) {
+            return null;
+        }
+        ElasticCase elasticCase = repository.findByStringId(aCase.getStringId());
+        if (elasticCase == null) {
+            log.warn("[" + aCase.getStringId() + "] Case with id [" + aCase.getStringId() + "] is not indexed.");
+            return null;
+        }
+
+        return elasticCase.getUriNodeId();
+    }
+
     private NativeSearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
         List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
 
@@ -191,6 +204,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         buildStringQuery(request, query, user);
         buildCaseIdQuery(request, query);
         buildUriNodeIdQuery(request, query);
+        buildTagsQuery(request, query);
         boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
 
         // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch
@@ -352,6 +366,19 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         }
 
         query.filter(dataQuery);
+    }
+
+    private void buildTagsQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+        if (request.tags == null || request.tags.isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder tagsQuery = boolQuery();
+        for (Map.Entry<String, String> field : request.tags.entrySet()) {
+            tagsQuery.must(termQuery("tags." + field.getKey(), field.getValue()));
+        }
+
+        query.filter(tagsQuery);
     }
 
     private void buildFullTextQuery(CaseSearchRequest request, BoolQueryBuilder query) {

@@ -2,12 +2,15 @@ package com.netgrif.application.engine.petrinet.domain;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 @Data
-public class I18nString {
+public class I18nString implements Serializable {
+
+    private static final long serialVersionUID = 3815235231390109824L;
 
     private String defaultValue;
 
@@ -88,5 +91,14 @@ public class I18nString {
         return (this.key == null ? that.key == null : this.key.equals(that.key)) &&
                 (this.defaultValue == null ? that.defaultValue == null : this.defaultValue.equals(that.defaultValue)) &&
                 this.translations.equals(that.translations);
+    }
+
+    @Override
+    public I18nString clone() {
+        I18nString clone = new I18nString();
+        clone.setKey(this.key);
+        clone.setDefaultValue(this.defaultValue);
+        clone.setTranslations(new HashMap<>(this.translations));
+        return clone;
     }
 }

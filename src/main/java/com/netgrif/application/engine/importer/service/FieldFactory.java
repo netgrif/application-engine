@@ -107,6 +107,9 @@ public final class FieldFactory {
             case I_18_N:
                 field = buildI18nField(data, importer);
                 break;
+            case STRING_COLLECTION:
+                field = buildStringCollectionField(data, importer);
+                break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
@@ -155,6 +158,16 @@ public final class FieldFactory {
         setEncryption(field, data);
 
         dataValidator.checkDeprecatedAttributes(data);
+        return field;
+    }
+
+    private StringCollectionField buildStringCollectionField(Data data, Importer importer) {
+        StringCollectionField field = new StringCollectionField();
+        setDefaultValues(field, data, defaultValues -> {
+            if (defaultValues != null) {
+                field.setDefaultValue(defaultValues);
+            }
+        });
         return field;
     }
 
@@ -236,7 +249,7 @@ public final class FieldFactory {
         setFieldOptions(field, data, importer);
         setDefaultValues(field, data, init -> {
             if (init != null && !init.isEmpty()) {
-                field.setDefaultValue(new HashSet<>(init));
+                field.setDefaultValue(new LinkedHashSet<>(init));
             }
         });
         return field;
@@ -512,7 +525,7 @@ public final class FieldFactory {
     }
 
     public Field buildImmediateField(Case useCase, String fieldId) {
-        Field field = useCase.getPetriNet().getDataSet().get(fieldId);
+        Field field = useCase.getPetriNet().getDataSet().get(fieldId).clone();
         resolveDataValues(field, useCase, fieldId);
         resolveAttributeValues(field, useCase, fieldId);
         return field;
@@ -585,7 +598,7 @@ public final class FieldFactory {
     public static Set<I18nString> parseMultichoiceValue(Case useCase, String fieldId) {
         Object values = useCase.getFieldValue(fieldId);
         if (values instanceof ArrayList) {
-            return (Set<I18nString>) ((ArrayList) values).stream().map(val -> new I18nString(val.toString())).collect(Collectors.toSet());
+            return (Set<I18nString>) ((ArrayList) values).stream().map(val -> new I18nString(val.toString())).collect(Collectors.toCollection(LinkedHashSet::new));
         } else {
             return (Set<I18nString>) values;
         }
@@ -594,7 +607,7 @@ public final class FieldFactory {
     public static Set<String> parseMultichoiceMapValue(Case useCase, String fieldId) {
         Object values = useCase.getFieldValue(fieldId);
         if (values instanceof ArrayList) {
-            return (Set<String>) ((ArrayList) values).stream().map(val -> val.toString()).collect(Collectors.toSet());
+            return (Set<String>) ((ArrayList) values).stream().map(val -> val.toString()).collect(Collectors.toCollection( LinkedHashSet::new ));
         } else {
             return (Set<String>) values;
         }

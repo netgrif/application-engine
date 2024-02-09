@@ -35,6 +35,7 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
+    @Transient
     private String uriNodeId;
 
     @Getter
@@ -139,6 +140,10 @@ public class PetriNet extends PetriNetObject {
     @Setter
     private String importXmlPath;
 
+    @Getter
+    @Setter
+    private Map<String, String> tags;
+
     public PetriNet() {
         this._id = new ObjectId();
         this.identifier = "Default";
@@ -161,6 +166,7 @@ public class PetriNet extends PetriNetObject {
         permissions = new HashMap<>();
         userRefs = new HashMap<>();
         functions = new LinkedList<>();
+        tags = new HashMap<>();
     }
 
     public void addPlace(Place place) {
@@ -406,17 +412,17 @@ public class PetriNet extends PetriNetObject {
         clone.setIdentifier(this.identifier);
         clone.setUriNodeId(this.uriNodeId);
         clone.setInitials(this.initials);
-        clone.setTitle(this.title);
+        clone.setTitle(this.title.clone());
         clone.setDefaultRoleEnabled(this.defaultRoleEnabled);
-        clone.setDefaultCaseName(this.defaultCaseName);
-        clone.setDefaultCaseNameExpression(this.defaultCaseNameExpression);
+        clone.setDefaultCaseName(this.defaultCaseName == null ? null : this.defaultCaseName.clone());
+        clone.setDefaultCaseNameExpression(this.defaultCaseNameExpression == null ? null : this.defaultCaseNameExpression.clone());
         clone.setIcon(this.icon);
         clone.setCreationDate(this.creationDate);
-        clone.setVersion(this.version);
-        clone.setAuthor(this.author);
-        clone.setTransitions(this.transitions);
-        clone.setRoles(this.roles);
-        clone.setTransactions(this.transactions);
+        clone.setVersion(this.version == null ? null : this.version.clone());
+        clone.setAuthor(this.author == null ? null : this.author.clone());
+        clone.setTransitions(this.transitions == null ? null : this.transitions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
+        clone.setRoles(this.roles == null ? null : this.roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
+        clone.setTransactions(this.transactions == null ? null : this.transactions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
         clone.setImportXmlPath(this.importXmlPath);
         clone.setImportId(this.importId);
         clone.setObjectId(this._id);
@@ -435,12 +441,13 @@ public class PetriNet extends PetriNetObject {
                         .collect(Collectors.toList())))
         );
         clone.initializeArcs();
-        clone.setCaseEvents(this.caseEvents);
-        clone.setProcessEvents(this.processEvents);
-        clone.setPermissions(this.permissions);
-        clone.setUserRefs(this.userRefs);
+        clone.setCaseEvents(this.caseEvents == null ? null : this.caseEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
+        clone.setProcessEvents(this.processEvents == null ? null : this.processEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
+        clone.setPermissions(this.permissions == null ? null : this.permissions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
+        clone.setUserRefs(this.userRefs == null ? null : this.userRefs.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
         this.getNegativeViewRoles().forEach(clone::addNegativeViewRole);
         this.getFunctions().forEach(clone::addFunction);
+        clone.setTags(new HashMap<>(this.tags));
         return clone;
     }
 }

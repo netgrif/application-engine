@@ -74,7 +74,7 @@ public class QuartzConfiguration {
             properties.setProperty("org.quartz.jobStore.mongoUri", uri);
         }
         properties.setProperty("org.quartz.jobStore.dbName", db);
-        properties.setProperty("org.quartz.jobStore.class", "com.novemberain.quartz.mongodb.MongoDBJobStore");
+        properties.setProperty("org.quartz.jobStore.class", "com.netgrif.quartz.mongodb.MongoDBJobStore");
         properties.setProperty("spring.quartz.properties.org.quartz.jobStore.isClustered", "false");
         properties.setProperty("org.quartz.jobStore.isClustered", "true");
         properties.setProperty("org.quartz.threadPool.threadCount", "1");

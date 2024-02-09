@@ -5,7 +5,9 @@ import com.netgrif.application.engine.workflow.domain.Task
 import com.querydsl.core.annotations.QueryExclude
 
 @QueryExclude
-class ChangedField {
+class ChangedField implements Serializable{
+
+    private static final long serialVersionUID = 5299918326436828485L;
 
     String id
     List<TaskPair> changedOn
@@ -101,7 +103,10 @@ class ChangedField {
         return attributes as String
     }
 
-    class TaskPair {
+    class TaskPair implements Serializable {
+
+        private static final long serialVersionUID = 5299918326444428485L;
+
         String taskId
         String transition
 

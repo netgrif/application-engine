@@ -97,6 +97,8 @@ public class ElasticCase {
     @Field(type = Keyword)
     private Set<String> negativeViewUsers;
 
+    private Map<String, String> tags;
+
     /**
      * Data that is stored in the elasticsearch database.
      *
@@ -128,6 +130,7 @@ public class ElasticCase {
         negativeViewRoles = new HashSet<>(useCase.getNegativeViewRoles());
         viewUsers = new HashSet<>(useCase.getViewUsers());
         negativeViewUsers = new HashSet<>(useCase.getNegativeViewUsers());
+        tags = new HashMap<>(useCase.getTags());
 
         dataSet = new HashMap<>();
     }
@@ -135,7 +138,9 @@ public class ElasticCase {
     public void update(ElasticCase useCase) {
         version++;
         lastModified = useCase.getLastModified();
-        uriNodeId = useCase.getUriNodeId();
+        if (useCase.getUriNodeId() != null) {
+            uriNodeId = useCase.getUriNodeId();
+        }
         title = useCase.getTitle();
         taskIds = useCase.getTaskIds();
         taskMongoIds = useCase.getTaskMongoIds();
@@ -145,6 +150,7 @@ public class ElasticCase {
         negativeViewRoles = useCase.getNegativeViewRoles();
         viewUsers = useCase.getViewUsers();
         negativeViewUsers = useCase.getNegativeViewUsers();
+        tags = useCase.getTags();
 
         dataSet = useCase.getDataSet();
     }
