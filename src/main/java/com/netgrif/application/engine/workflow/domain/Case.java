@@ -157,6 +157,10 @@ public class Case implements Serializable {
     @Setter
     private List<String> negativeViewUsers;
 
+    @Getter
+    @Setter
+    private Map<String, String> tags;
+
     protected Case() {
         _id = new ObjectId();
         activePlaces = new HashMap<>();
@@ -174,6 +178,7 @@ public class Case implements Serializable {
         viewUsers = new LinkedList<>();
         negativeViewRoles = new LinkedList<>();
         negativeViewUsers = new ArrayList<>();
+        tags = new HashMap<>();
     }
 
     public Case(PetriNet petriNet) {
@@ -188,6 +193,7 @@ public class Case implements Serializable {
         negativeViewRoles.addAll(petriNet.getNegativeViewRoles());
         icon = petriNet.getIcon();
         userRefs = petriNet.getUserRefs();
+        tags = new HashMap<>(petriNet.getTags());
 
         permissions = petriNet.getPermissions().entrySet().stream()
                 .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))

@@ -10,6 +10,7 @@ import lombok.Data;
 import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -73,6 +74,8 @@ public class Task {
 
     private Map<String, Boolean> assignedUserPolicy;
 
+    private Map<String, String> tags;
+
     public Task(com.netgrif.application.engine.workflow.domain.Task task, Locale locale) {
         this._id = task.getObjectId();
         this.caseId = task.getCaseId();
@@ -100,6 +103,7 @@ public class Task {
         this.cancelTitle = task.getTranslatedEventTitle(EventType.CANCEL, locale);
         this.delegateTitle = task.getTranslatedEventTitle(EventType.DELEGATE, locale);
         this.assignedUserPolicy = task.getAssignedUserPolicy();
+        this.tags = task.getTags();
     }
 
     public Task(ElasticTask entity) {

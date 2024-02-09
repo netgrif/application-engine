@@ -192,6 +192,11 @@ public class Task implements Serializable {
 
     private Map<String, Integer> consumedTokens = new HashMap<>();
 
+    @Getter
+    @Setter
+    @Builder.Default
+    private Map<String, String> tags = new HashMap<>();
+
     public Task() {
     }
 

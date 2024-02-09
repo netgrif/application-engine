@@ -1,19 +1,17 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
-
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FrontAction
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 
-class Frontend {
+class FrontendActionOutcome {
 
     Case useCase
     Optional<Task> task
     List<EventOutcome> outcomes
 
-    Frontend(Case useCase, Optional<Task> task, List<EventOutcome> outcomes) {
+    FrontendActionOutcome(Case useCase, Optional<Task> task, List<EventOutcome> outcomes) {
         this.useCase = useCase
         this.task = task
         this.outcomes = outcomes
