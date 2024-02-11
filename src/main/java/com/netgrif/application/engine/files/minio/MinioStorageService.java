@@ -19,6 +19,8 @@ import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
+import static com.netgrif.application.engine.files.StorageType.MINIO;
+
 @Slf4j
 @Service
 public class MinioStorageService implements IStorageService {
@@ -31,8 +33,7 @@ public class MinioStorageService implements IStorageService {
 
     @Override
     public String getType() {
-//        TODO enum
-        return "MINIO";
+        return MINIO.getType();
     }
 
     @Override
