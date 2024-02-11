@@ -1,23 +1,20 @@
 package com.netgrif.application.engine.files.interfaces;
 
-import io.minio.ObjectWriteResponse;
-import io.minio.errors.*;
+import com.netgrif.application.engine.files.throwable.BadRequestException;
+import com.netgrif.application.engine.files.throwable.RemoteStorageException;
+import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 public interface IStorageService {
     String getType();
 
-    InputStream get(String name);
+    InputStream get(String name) throws BadRequestException, ServiceErrorException;
 
-    ObjectWriteResponse upload(String name, MultipartFile file) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+    boolean upload(String name, MultipartFile file) throws RemoteStorageException;
 
-    ObjectWriteResponse upload(String name, InputStream stream) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+    boolean upload(String name, InputStream stream) throws RemoteStorageException;
 
-    void delete(String name) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+    void delete(String name) throws RemoteStorageException;
 }

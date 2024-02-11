@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.application.engine.files.throwable.RemoteStorageException;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -12,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
@@ -35,13 +35,13 @@ public interface IDataService {
 
     FileFieldInputStream getFileByTaskAndName(String taskId, String fieldId, String name);
 
-    FileFieldInputStream getFileByCase(String caseId, Task task,  String fieldId, boolean forPreview);
+    FileFieldInputStream getFileByCase(String caseId, Task task, String fieldId, boolean forPreview);
 
     FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name);
 
-    InputStream download(FileField field);
+    InputStream download(FileField field) throws RemoteStorageException;
 
-    InputStream download(FileListField field, FileFieldValue name);
+    InputStream download(FileListField field, FileFieldValue name) throws RemoteStorageException;
 
     SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile);
 
