@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnProperty(
         value = "nae.minio.enabled",
-        matchIfMissing = true,
         havingValue = "true"
 )
 @ConfigurationProperties(prefix = "nae.minio")

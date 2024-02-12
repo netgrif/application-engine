@@ -26,7 +26,6 @@ import static com.netgrif.application.engine.files.StorageType.MINIO;
 @Service
 @ConditionalOnProperty(
         value = "nae.minio.enabled",
-        matchIfMissing = true,
         havingValue = "true"
 )
 public class MinioStorageService implements IStorageService {
