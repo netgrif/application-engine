@@ -8,7 +8,7 @@ import lombok.Data;
 public class TransitionImportReference extends Node {
 
     public TransitionImportReference(Transition transition) {
-        this.setPosition(transition.getPosition().getX(), transition.getPosition().getY());
+        this.setPosition(transition.getPosition());
         this.setTitle(transition.getTitle());
         this.setObjectId(transition.getObjectId());
         this.setImportId(transition.getImportId());
