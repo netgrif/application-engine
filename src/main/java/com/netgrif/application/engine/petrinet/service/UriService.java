@@ -156,11 +156,11 @@ public class UriService implements IUriService {
         String oldNodePath = node.getUriPath();
         String newNodePath = destUri + (destUri.equals(uriProperties.getSeparator()) ? "" : uriProperties.getSeparator()) + node.getName();
         node.setUriPath(newNodePath);
-        node.setParentId(newParent.getId());
+        node.setParentId(newParent.getStringId());
         node.setLevel(newParent.getLevel() + 1);
 
-        oldParent.getChildrenId().remove(node.getId());
-        newParent.getChildrenId().add(node.getId());
+        oldParent.getChildrenId().remove(node.getStringId());
+        newParent.getChildrenId().add(node.getStringId());
 
         List<UriNode> childrenToSave = new ArrayList<>();
         if (!node.getChildrenId().isEmpty()) {
@@ -236,14 +236,14 @@ public class UriService implements IUriService {
                 uriNode.setName(uriComponents[i]);
                 uriNode.setLevel(i);
                 uriNode.setUriPath(uriBuilder.toString());
-                uriNode.setParentId(parent != null ? parent.getId() : null);
+                uriNode.setParentId(parent != null ? parent.getStringId() : null);
             }
             if (i == pathLength - 1 && contentType != null) {
                 uriNode.addContentType(contentType);
             }
             uriNode = uriNodeRepository.save(uriNode);
             if (parent != null) {
-                parent.getChildrenId().add(uriNode.getId());
+                parent.getChildrenId().add(uriNode.getStringId());
                 uriNodeRepository.save(parent);
             }
             if (i > 0) {

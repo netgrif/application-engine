@@ -1616,7 +1616,7 @@ class ActionDelegate {
          uri           : { cl ->
              filter = workflowService.findOne(filter.stringId)
              def uri = cl() as String
-             filter.setUriNodeId(uriService.findByUri(uri).id)
+             filter.setUriNodeId(uriService.findByUri(uri).stringId)
              workflowService.save(filter)
          }]
     }
@@ -2022,7 +2022,7 @@ class ActionDelegate {
         I18nString newName = body.menuName ?: (body.filter?.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString)
 
         Case menuItemCase = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, newName?.defaultValue)
-        menuItemCase.setUriNodeId(uriService.findByUri(body.uri).id)
+        menuItemCase.setUriNodeId(uriService.findByUri(body.uri).stringId)
         menuItemCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_ALLOWED_ROLES.attributeId].options = body.allowedRoles
         menuItemCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_BANNED_ROLES.attributeId].options = body.bannedRoles
         if (parentItemCase != null) {
@@ -2127,7 +2127,7 @@ class ActionDelegate {
             item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value = null
         }
 
-        item.uriNodeId = destNode.id
+        item.uriNodeId = destNode.stringId
         item = resolveAndHandleNewNodePath(item, destNode.uriPath)
         casesToSave.add(item)
 
@@ -2164,8 +2164,6 @@ class ActionDelegate {
         if (existsMenuItem(sanitizedIdentifier)) {
             throw new IllegalArgumentException("View item identifier $sanitizedIdentifier is not unique!")
         }
-
-        originItem = workflowService.populateUriNodeId(originItem)
 
         Case duplicated = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, newTitle.defaultValue)
         duplicated.uriNodeId = originItem.uriNodeId
@@ -2228,7 +2226,7 @@ class ActionDelegate {
         List<Case> casesToSave = new ArrayList<>()
         for (child in children) {
             UriNode parentNode = uriService.getOrCreate(parentFolder.getFieldValue(MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId) as String, UriContentType.CASE)
-            child.uriNodeId = parentNode.id
+            child.uriNodeId = parentNode.stringId
             child = resolveAndHandleNewNodePath(child, parentNode.uriPath)
 
             casesToSave.add(child)
@@ -2337,7 +2335,7 @@ class ActionDelegate {
      */
     Case findMenuItem(String uri, String name) {
         UriNode uriNode = uriService.findByUri(uri)
-        return findCaseElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND title.keyword:\"$name\" AND uriNodeId:\"$uriNode.id\"")
+        return findCaseElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND title.keyword:\"$name\" AND uriNodeId:\"$uriNode.stringId\"")
     }
 
     Case findMenuItemByUriAndIdentifier(String uri, String identifier) {
