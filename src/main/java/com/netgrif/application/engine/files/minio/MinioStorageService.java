@@ -11,6 +11,7 @@ import io.minio.RemoveObjectArgs;
 import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +24,11 @@ import static com.netgrif.application.engine.files.StorageType.MINIO;
 
 @Slf4j
 @Service
+@ConditionalOnProperty(
+        value = "nae.minio.enabled",
+        matchIfMissing = true,
+        havingValue = "true"
+)
 public class MinioStorageService implements IStorageService {
 
     @Autowired
