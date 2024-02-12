@@ -11,11 +11,14 @@ import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
 
-public class DataFieldLogic {
+public class DataFieldLogic implements Serializable {
+
+    private static final long serialVersionUID = 6561411252131004710L;
 
     @Getter
     @Setter
@@ -89,5 +92,15 @@ public class DataFieldLogic {
 
     public boolean layoutExist() {
         return this.layout != null;
+    }
+
+    @Override
+    public DataFieldLogic clone() {
+        DataFieldLogic clone = new DataFieldLogic();
+        clone.setBehavior(new HashSet<>(this.behavior));
+        clone.setLayout(this.layout == null ? null : this.layout.clone());
+        clone.setEvents(this.events == null ? null : this.events.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
+        clone.setComponent(this.component == null ? null : this.component.clone());
+        return clone;
     }
 }

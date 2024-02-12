@@ -54,13 +54,13 @@ public abstract class AbstractUserService implements IUserService {
     }
 
     @Override
-    public void assignAuthority(String userId, String authorityId) {
+    public IUser assignAuthority(String userId, String authorityId) {
         IUser user = resolveById(userId, true);
         Authority authority = authorityService.getOne(authorityId);
         user.addAuthority(authority);
         authority.addUser(user);
 
-        save(user);
+        return save(user);
     }
 
     @Override
@@ -80,7 +80,14 @@ public abstract class AbstractUserService implements IUserService {
         return save(user);
     }
 
+    /**
+     * @deprecated use {@link AbstractUserService#removeRole(IUser, ProcessRole)} instead
+     * @param user
+     * @param roleStringId
+     * @return
+     */
     @Override
+    @Deprecated(since = "6.2.0")
     public IUser removeRole(IUser user, String roleStringId) {
         return removeRole(user, processRoleService.findByImportId(roleStringId));
     }

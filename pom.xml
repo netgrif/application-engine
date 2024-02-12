@@ -5,7 +5,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine</artifactId>
-    <version>6.2.0-SNAPSHOT</version>
+    <version>6.4.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>NETGRIF Application Engine</name>
@@ -19,10 +19,12 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
     <organization>
         <name>NETGRIF, s.r.o.</name>
         <url>https://netgrif.com</url>
     </organization>
+
     <developers>
         <developer>
             <name>Netgrif</name>
@@ -31,11 +33,13 @@
             <organizationUrl>https://netgrif.com</organizationUrl>
         </developer>
     </developers>
+
     <scm>
         <connection>scm:git:git://github.com/netgrif/application-engine.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/netgrif/application-engine.git</developerConnection>
         <url>https://github.com/netgrif/application-engine</url>
     </scm>
+
     <issueManagement>
         <system>GitHub</system>
         <url>https://github.com/netgrif/application-engine/issues</url>
@@ -44,7 +48,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.0</version>
+        <version>2.7.8</version>
         <relativePath/>
     </parent>
 
@@ -61,6 +65,32 @@
         <sonar.organization>netgrif-oss</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>oss.snapshots</id>
+            <name>OSSRH SNAPSHOT</name>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>mvnrepository1</id>
+            <url>https://maven.imagej.net/content/repositories/public/</url>
+        </repository>
+        <repository>
+            <id>mvnrepository2</id>
+            <url>https://repo.spring.io/plugins-release/</url>
+        </repository>
+        <repository>
+            <id>mulesoft</id>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
+        </repository>
+    </repositories>
 
     <dependencyManagement>
         <dependencies>
@@ -85,6 +115,12 @@
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils</artifactId>
                 <version>1.9.4</version>
+            </dependency>
+            <!-- PDF SVG-->
+            <dependency>
+                <groupId>xalan</groupId>
+                <artifactId>xalan</artifactId>
+                <version>2.7.2</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -270,6 +306,11 @@
             <type>pom</type>
         </dependency>
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.7</version>
+        </dependency>
+        <dependency>
             <groupId>de.rototor.pdfbox</groupId>
             <artifactId>graphics2d</artifactId>
             <version>0.32</version>
@@ -330,9 +371,8 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>3.18.2</version>
+            <version>3.19.6</version>
         </dependency>
-
 
         <!-- Drools -->
         <dependency>
@@ -394,16 +434,9 @@
             <version>2.3.2</version>
         </dependency>
         <dependency>
-            <groupId>com.novemberain</groupId>
-            <artifactId>quartz-mongodb</artifactId>
-            <version>2.2.0-rc2</version>
-        </dependency>
-
-        <!-- Dev tools -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
+            <groupId>com.netgrif</groupId>
+            <artifactId>quartz-mongodb-connector</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <!-- OpenAPI 3 / Swagger Docs -->
@@ -433,11 +466,6 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.session</groupId>
-            <artifactId>spring-session</artifactId>
-            <version>2.0.0.M2</version>
         </dependency>
         <dependency>
             <groupId>xmlunit</groupId>
@@ -499,21 +527,6 @@
             <version>2.13.2</version>
         </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>mvnrepository1</id>
-            <url>https://maven.imagej.net/content/repositories/public/</url>
-        </repository>
-        <repository>
-            <id>mvnrepository2</id>
-            <url>https://repo.spring.io/plugins-release/</url>
-        </repository>
-        <repository>
-            <id>mulesoft</id>
-            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
-        </repository>
-    </repositories>
 
     <build>
         <resources>

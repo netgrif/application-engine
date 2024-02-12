@@ -46,10 +46,10 @@ public class ElasticController {
     @Autowired
     private ReindexingTask reindexingTask;
 
-    @Value("${spring.data.elasticsearch.reindex-size}")
+    @Value("${spring.data.elasticsearch.reindexExecutor.size:20}")
     private int pageSize;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Reindex specified cases",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})

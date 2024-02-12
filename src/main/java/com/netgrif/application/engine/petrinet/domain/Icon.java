@@ -30,4 +30,13 @@ public class Icon {
         this.value = value;
         this.type = type;
     }
+
+    @Override
+    public Icon clone() {
+        Icon clone = new Icon();
+        clone.setKey(this.key);
+        clone.setValue(this.value);
+        clone.setType(this.type);
+        return clone;
+    }
 }

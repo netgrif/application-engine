@@ -6,6 +6,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
 import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.service.ProcessRoleService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.*
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
 import org.springframework.beans.factory.annotation.Autowired
@@ -45,6 +46,12 @@ class TestHelper {
     private FilterRunner filterRunner
     @Autowired
     private FinisherRunner finisherRunner
+    @Autowired
+    private ImpersonationRunner impersonationRunner
+    @Autowired
+    private UriRunner uriRunner
+    @Autowired
+    private IPetriNetService petriNetService
 
     void truncateDbs() {
         template.db.drop()
@@ -57,12 +64,15 @@ class TestHelper {
         actionsCacheService.clearActionCache()
         actionsCacheService.clearFunctionCache()
         actionsCacheService.clearNamespaceFunctionCache()
+        petriNetService.evictAllCaches()
 
         defaultRoleRunner.run()
         anonymousRoleRunner.run()
         systemUserRunner.run()
+        uriRunner.run()
         groupRunner.run()
         filterRunner.run()
+        impersonationRunner.run()
         superCreator.run()
         finisherRunner.run()
     }

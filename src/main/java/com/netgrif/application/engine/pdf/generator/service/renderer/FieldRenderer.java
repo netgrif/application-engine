@@ -12,9 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Data
-public abstract class FieldRenderer<T> extends Renderer {
-
-    T field;
+public abstract class FieldRenderer extends Renderer {
     PdfField helperField;
 
     public abstract void renderValue(PdfField field, int lineCounter) throws IOException;

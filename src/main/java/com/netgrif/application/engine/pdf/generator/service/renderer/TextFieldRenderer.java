@@ -7,7 +7,7 @@ import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.FieldBu
 import java.io.IOException;
 import java.util.List;
 
-public class TextFieldRenderer extends FieldRenderer<TextFieldRenderer> {
+public class TextFieldRenderer extends FieldRenderer {
 
     public void setFieldParams(PdfField field) {
         helperField = new PdfTextField(field.getFieldId(), field.getLabel(), field.getValues(), field.getType(),

@@ -18,6 +18,7 @@ public class CaseSearchRequest {
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<PetriNet> process;
 
+    @Deprecated(since = "6.3.0")
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<String> processIdentifier;
 
@@ -94,6 +95,12 @@ public class CaseSearchRequest {
     public static class PetriNet {
 
         public String identifier;
+
+        public String processId;
+
+        public PetriNet(String identifier) {
+            this.identifier = identifier;
+        }
     }
 
     @Data
@@ -107,4 +114,6 @@ public class CaseSearchRequest {
 
         public String email;
     }
+
+    public Map<String, String> tags;
 }

@@ -12,10 +12,16 @@ import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class DataField implements Referencable {
+public class DataField implements Referencable, Serializable {
+
+    private static final long serialVersionUID = 3287600516604188694L;
 
     @Getter
     private Map<String, Set<FieldBehavior>> behavior;
@@ -42,6 +48,10 @@ public class DataField implements Referencable {
     @Setter
     @JsonIgnore
     private String encryption;
+
+    @Getter
+    @Setter
+    private LocalDateTime lastModified;
 
     @Getter
     @Setter

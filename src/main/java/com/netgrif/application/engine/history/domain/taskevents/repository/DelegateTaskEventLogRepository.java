@@ -8,9 +8,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
+@Deprecated(since = "6.3.0")
 public interface DelegateTaskEventLogRepository extends MongoRepository<DelegateTaskEventLog, ObjectId> {
 
     List<DelegateTaskEventLog> findAllByTaskId(ObjectId taskId);
 
-    List<DelegateTaskEventLog> findAllByTaskIdAndDelegatee(ObjectId taskId, Long delegateeId);
+    List<DelegateTaskEventLog> findAllByTaskIdAndDelegate(ObjectId taskId, Long delegateId);
 }

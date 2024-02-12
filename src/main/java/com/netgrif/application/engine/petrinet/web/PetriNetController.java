@@ -1,10 +1,12 @@
 package com.netgrif.application.engine.petrinet.web;
 
+import com.netgrif.application.engine.AsyncRunner;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -70,7 +72,10 @@ public class PetriNetController {
     @Autowired
     private StringToVersionConverter converter;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @Autowired
+    private AsyncRunner asyncRunner;
+
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Import new process",
             description = "Caller must have the ADMIN role. Imports an entirely new process or a new version of an existing process.",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -82,17 +87,12 @@ public class PetriNetController {
     @PostMapping(value = "/import", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> importPetriNet(
             @RequestParam(value = "file", required = true) MultipartFile multipartFile,
+            @RequestParam(value = "uriNodeId", required = true) String uriNodeId,
             @RequestParam(value = "meta", required = false) String releaseType,
             Authentication auth, Locale locale) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
-            File file = new File(fileStorageConfiguration.getStorageArchived() + multipartFile.getOriginalFilename());
-            file.createNewFile();
-            FileOutputStream fout = new FileOutputStream(file);
-            fout.write(multipartFile.getBytes());
-            String release = releaseType == null ? "major" : releaseType;
-
-            ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(new FileInputStream(file), release, (LoggedUser) auth.getPrincipal());
-            fout.close();
+            VersionType release = releaseType == null ? VersionType.MAJOR : VersionType.valueOf(releaseType.trim().toUpperCase());
+            ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(multipartFile.getInputStream(), release, (LoggedUser) auth.getPrincipal(), uriNodeId);
             return EventOutcomeWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully",
                     LocalisedEventOutcomeFactory.from(importPetriNetOutcome, locale));
         } catch (IOException e) {
@@ -156,6 +156,7 @@ public class PetriNetController {
         return new TransactionsResource(net.getTransactions().values(), netId, locale);
     }
 
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Download process model", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{netId}/file", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public FileSystemResource getNetFile(@PathVariable("netId") String netId, @RequestParam(value = "title", required = false) String title, Authentication auth, HttpServletResponse response) {
@@ -196,8 +197,14 @@ public class PetriNetController {
             return MessageResource.errorMessage("Deleting Petri net " + processId + " failed!");
         }
         LoggedUser user = (LoggedUser) auth.getPrincipal();
-        this.service.deletePetriNet(decodedProcessId, user);
-        return MessageResource.successMessage("Petri net " + decodedProcessId + " was deleted");
+        asyncRunner.execute(() -> this.service.deletePetriNet(decodedProcessId, user));
+        return MessageResource.successMessage("Petri net " + decodedProcessId + " is being deleted");
+    }
+
+    @Operation(summary = "Get net by case id", security = {@SecurityRequirement(name = "BasicAuth")})
+    @GetMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
+    public PetriNetImportReference getOne(@PathVariable("id") String caseId) {
+            return service.getNetFromCase(decodeUrl(caseId));
     }
 
     public static String decodeUrl(String s1) {
