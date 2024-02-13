@@ -4,12 +4,14 @@ import com.netgrif.application.engine.petrinet.domain.VersionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.io.Serializable;
+
 import static com.netgrif.application.engine.petrinet.domain.VersionType.MAJOR;
 import static com.netgrif.application.engine.petrinet.domain.VersionType.MINOR;
 
 @Data
 @AllArgsConstructor
-public class Version {
+public class Version implements Serializable {
 
     /**
      * @deprecated since 6.0.3 - please use {@link #LATEST} instead
@@ -18,6 +20,7 @@ public class Version {
     public static final String NEWEST = "^";
 
     public static final String LATEST = "latest";
+    private static final long serialVersionUID = -4714902376220642455L;
 
     private long major;
 

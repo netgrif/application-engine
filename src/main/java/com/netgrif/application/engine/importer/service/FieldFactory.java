@@ -107,6 +107,9 @@ public final class FieldFactory {
             case I_18_N:
                 field = buildI18nField(data, importer);
                 break;
+            case STRING_COLLECTION:
+                field = buildStringCollectionField(data, importer);
+                break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
@@ -155,6 +158,16 @@ public final class FieldFactory {
         setEncryption(field, data);
 
         dataValidator.checkDeprecatedAttributes(data);
+        return field;
+    }
+
+    private StringCollectionField buildStringCollectionField(Data data, Importer importer) {
+        StringCollectionField field = new StringCollectionField();
+        setDefaultValues(field, data, defaultValues -> {
+            if (defaultValues != null) {
+                field.setDefaultValue(defaultValues);
+            }
+        });
         return field;
     }
 
@@ -512,7 +525,7 @@ public final class FieldFactory {
     }
 
     public Field buildImmediateField(Case useCase, String fieldId) {
-        Field field = useCase.getPetriNet().getDataSet().get(fieldId);
+        Field field = useCase.getPetriNet().getDataSet().get(fieldId).clone();
         resolveDataValues(field, useCase, fieldId);
         resolveAttributeValues(field, useCase, fieldId);
         return field;

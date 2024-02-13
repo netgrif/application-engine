@@ -9,12 +9,18 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Configuration
 @EnableWebMvc
+@ConditionalOnProperty(
+        value = "nae.openapi.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
 public class OpenApiConfiguration {
 
     @Value("${project.version}")

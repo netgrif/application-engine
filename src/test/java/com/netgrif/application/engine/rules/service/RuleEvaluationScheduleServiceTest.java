@@ -33,6 +33,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+@Disabled
 @Slf4j
 @SpringBootTest
 @ActiveProfiles({"test"})

@@ -4,7 +4,9 @@ import com.google.common.collect.ImmutableMap;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.domain.*;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
+import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
+import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
@@ -184,6 +186,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         buildProcessQuery(request, query);
         buildFullTextQuery(request, query);
         buildTransitionQuery(request, query);
+        buildTagsQuery(request, query);
         buildStringQuery(request, query, user);
         boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
 
@@ -377,6 +380,19 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         query.filter(transitionQuery);
     }
 
+    private void buildTagsQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+        if (request.tags == null || request.tags.isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder tagsQuery = boolQuery();
+        for (Map.Entry<String, String> field : request.tags.entrySet()) {
+            tagsQuery.must(termQuery("tags." + field.getKey(), field.getValue()));
+        }
+
+        query.filter(tagsQuery);
+    }
+
     /**
      * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a>
      */
@@ -408,8 +424,8 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         if (request.group == null || request.group.isEmpty())
             return false;
 
-        Map<String, Object> processQuery = new HashMap<>();
-        processQuery.put("group", request.group);
+        PetriNetSearch processQuery = new PetriNetSearch();
+        processQuery.setGroup(request.group);
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
         if (groupProcesses.size() == 0)
             return true;

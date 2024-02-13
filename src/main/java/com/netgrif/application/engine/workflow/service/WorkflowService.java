@@ -12,15 +12,12 @@ import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.UriContentType;
-import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.security.service.EncryptionService;
@@ -113,9 +110,6 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     private IHistoryService historyService;
-
-    @Autowired
-    private IUriService uriService;
 
     protected IElasticCaseService elasticCaseService;
 
@@ -296,8 +290,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.setAuthor(loggedOrImpersonated.transformToAuthor());
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(makeTitle.apply(useCase));
-        UriNode uriNode = uriService.getOrCreate(petriNet, UriContentType.CASE);
-        useCase.setUriNodeId(uriNode.getId());
+        useCase.setUriNodeId(petriNet.getUriNodeId());
 
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
         outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty()));
@@ -495,17 +488,7 @@ public class WorkflowService implements IWorkflowService {
 
         useCase.getImmediateDataFields().forEach(fieldId -> {
             try {
-                Field field = fieldFactory.buildImmediateField(useCase, fieldId);
-                Field clone = field.clone();
-                if (field.getValue() != null) {
-                    if (field.getType() == FieldType.TEXT) {
-                        clone.setValue(field.getValue().toString());
-                    } else {
-                        clone.setValue(field.getValue());
-                    }
-                } else {
-                    clone.setValue(null);
-                }
+                Field clone = fieldFactory.buildImmediateField(useCase, fieldId);
                 immediateData.add(clone);
             } catch (Exception e) {
                 log.error("Could not built immediate field [" + fieldId + "]");
