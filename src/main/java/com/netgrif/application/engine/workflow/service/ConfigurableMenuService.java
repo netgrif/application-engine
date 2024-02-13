@@ -1,9 +1,11 @@
 package com.netgrif.application.engine.workflow.service;
 
+import com.netgrif.application.engine.auth.domain.Author;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.User;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
@@ -43,8 +45,10 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     @Override
     public Map<String, I18nString> getNetsByAuthorAsMapOptions(User author, Locale locale){
         LoggedUser loggedAuthor = author.transformToLoggedUser();
-        Map<String, Object> requestQuery = new HashMap<>();
-        requestQuery.put("author.email", author.getEmail());
+        PetriNetSearch requestQuery = new PetriNetSearch();
+        Author authorQuery = new Author();
+        authorQuery.setEmail(author.getEmail());
+        requestQuery.setAuthor(authorQuery);
         List<PetriNetReference> nets = this.petriNetService.search(requestQuery, loggedAuthor, new FullPageRequest(), locale).getContent();
 
         Map<String, I18nString> options = new HashMap<>();

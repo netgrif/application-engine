@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.web;
 
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
@@ -69,7 +70,7 @@ public class PublicPetriNetController {
 
     @Operation(summary = "Search processes")
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<PetriNetReferenceResource> searchPetriNets(@RequestBody Map<String, Object> criteria, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
+    public PagedModel<PetriNetReferenceResource> searchPetriNets(@RequestBody PetriNetSearch criteria, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
         Page<PetriNetReference> nets = petriNetService.search(criteria, userService.getAnonymousLogged(), pageable, locale);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicPetriNetController.class)
                 .searchPetriNets(criteria, pageable, assembler, locale)).withRel("search");
