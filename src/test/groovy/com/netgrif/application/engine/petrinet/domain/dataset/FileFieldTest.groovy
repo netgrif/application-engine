@@ -74,7 +74,7 @@ class FileFieldTest {
     private WebApplicationContext context
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
 
     @Autowired
     private SuperCreator superCreator
@@ -91,7 +91,7 @@ class FileFieldTest {
     }
 
     PetriNet getNet() {
-        def netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/remoteFileField.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        def netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/remoteFileField.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert netOptional.getNet() != null
         return netOptional.getNet()
     }
