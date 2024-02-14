@@ -10,7 +10,6 @@ import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public interface IElasticCaseService {
 
@@ -26,4 +25,6 @@ public interface IElasticCaseService {
     void remove(String caseId);
 
     void removeByPetriNetId(String processId);
+
+    String findUriNodeId(Case aCase);
 }

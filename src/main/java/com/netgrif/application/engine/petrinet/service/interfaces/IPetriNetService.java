@@ -30,7 +30,12 @@ public interface IPetriNetService {
     @Deprecated
     ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
+    @Deprecated
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+
     ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
     Optional<PetriNet> save(PetriNet petriNet);
 
@@ -40,7 +45,9 @@ public interface IPetriNetService {
 
     List<PetriNet> getByIdentifier(String identifier);
 
-    List<PetriNet> findAllByUri(String uri);
+    List<PetriNet> findAllByUriNodeId(String uriNodeId);
+
+    List<PetriNet> findAllById(List<String> ids);
 
     PetriNet getNewestVersionByIdentifier(String identifier);
 
