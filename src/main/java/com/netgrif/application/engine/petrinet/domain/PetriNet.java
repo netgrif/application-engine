@@ -422,9 +422,9 @@ public class PetriNet extends PetriNetObject {
         clone.setCreationDate(this.creationDate);
         clone.setVersion(this.version == null ? null : this.version.clone());
         clone.setAuthor(this.author == null ? null : this.author.clone());
-        clone.setTransitions(this.transitions == null ? null : this.transitions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
-        clone.setRoles(this.roles == null ? null : this.roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
-        clone.setTransactions(this.transactions == null ? null : this.transactions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
+        clone.setTransitions(this.transitions == null ? null : this.transitions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, LinkedHashMap::new)));
+        clone.setRoles(this.roles == null ? null : this.roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, LinkedHashMap::new)));
+        clone.setTransactions(this.transactions == null ? null : this.transactions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, LinkedHashMap::new)));
         clone.setImportXmlPath(this.importXmlPath);
         clone.setImportId(this.importId);
         clone.setObjectId(this._id);
