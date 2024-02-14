@@ -49,6 +49,7 @@ class FileListFieldTest {
     public static final String FIELD_ID = "fileList"
     public static final String TASK_TITLE = "Task"
     public static final String USER_EMAIL = "super@netgrif.com"
+    public static final String MOCK_FILE_NAME = "hello.txt"
 
     @Value('${admin.password:password}')
     private String userPassword
@@ -97,12 +98,12 @@ class FileListFieldTest {
 
 
     @Test
-    void geteRemoteFile() {
+    void downloadRemoteFile() {
         Case useCase = uploadTestFile()
         def taskPair = useCase.tasks.find { it.transition == "task" }
         assert taskPair != null
 
-        mockMvc.perform(get("/api/task/" + taskPair.task + "/file/" + FIELD_ID + "/" + "hello.txt")
+        mockMvc.perform(get("/api/task/" + taskPair.task + "/file/" + FIELD_ID + "/" + MOCK_FILE_NAME)
                 .with(httpBasic(USER_EMAIL, userPassword))
         ).andDo(print())
                 .andExpect(status().isOk())
@@ -119,7 +120,7 @@ class FileListFieldTest {
         def taskPair = useCase.tasks.find { it.transition == "task" }
         assert taskPair != null
 
-        mockMvc.perform(delete("/api/task/" + taskPair.task + "/file/" + FIELD_ID + "/" + "hello.txt")
+        mockMvc.perform(delete("/api/task/" + taskPair.task + "/file/" + FIELD_ID + "/" + MOCK_FILE_NAME)
                 .with(httpBasic(USER_EMAIL, userPassword))
                 .param("parentTaskId", taskPair.task)
         ).andDo(print())
@@ -127,7 +128,7 @@ class FileListFieldTest {
                 .andReturn()
 
         Assertions.assertThatThrownBy(() ->
-                mockMvc.perform(get("/api/task/" + taskPair.task + "/file/" + FIELD_ID + "/" + "hello.txt")
+                mockMvc.perform(get("/api/task/" + taskPair.task + "/file/" + FIELD_ID + "/" + MOCK_FILE_NAME)
                         .with(httpBasic(USER_EMAIL, userPassword))
                 ).andDo(print())
         ).isInstanceOf(FileNotFoundException.class)
@@ -142,7 +143,7 @@ class FileListFieldTest {
 
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
-        mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/" + FIELD_ID + '/hello.txt')
+        mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/" + FIELD_ID + "/"+ MOCK_FILE_NAME)
                 .with(httpBasic(USER_EMAIL, userPassword)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -167,7 +168,7 @@ class FileListFieldTest {
         MockMultipartFile file
                 = new MockMultipartFile(
                 "files",
-                "hello.txt",
+                MOCK_FILE_NAME,
                 MediaType.TEXT_PLAIN_VALUE,
                 "Hello, World!".getBytes()
         )
