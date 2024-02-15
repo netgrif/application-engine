@@ -35,7 +35,6 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
-    @Transient
     private String uriNodeId;
 
     @Getter

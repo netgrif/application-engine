@@ -3,6 +3,7 @@ package com.netgrif.application.engine.petrinet.service.interfaces;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
@@ -69,7 +70,7 @@ public interface IPetriNetService {
 
     List<DataFieldReference> getDataFieldReferences(List<TransitionReference> transitions, Locale locale);
 
-    Page<PetriNetReference> search(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale);
+    Page<PetriNetReference> search(PetriNetSearch criteria, LoggedUser user, Pageable pageable, Locale locale);
 
     Optional<PetriNet> findByImportId(String id);
 
@@ -103,8 +104,6 @@ public interface IPetriNetService {
     void runActions(List<Action> actions, PetriNet petriNet);
 
     List<String> getExistingPetriNetIdentifiersFromIdentifiersList(List<String> identifiers);
-
-    PetriNet populateUriNodeId(PetriNet petriNet);
 
     PetriNetImportReference getNetFromCase(String caseId);
 }

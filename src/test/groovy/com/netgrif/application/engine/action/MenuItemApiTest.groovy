@@ -81,9 +81,8 @@ class MenuItemApiTest {
         Case filter = getFilter(caze)
 
         Thread.sleep(4000)
-        item = workflowService.populateUriNodeId(item)
         UriNode leafNode = uriService.findByUri("/netgrif/test/new_menu_item")
-        assert item.uriNodeId == uriService.findByUri("/netgrif/test").id
+        assert item.uriNodeId == uriService.findByUri("/netgrif/test").stringId
         assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_ICON.attributeId].value == "device_hub"
         assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME.attributeId].value == new I18nString("FILTER")
         assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_IDENTIFIER.attributeId].value.toString() == "new_menu_item"
@@ -100,19 +99,17 @@ class MenuItemApiTest {
         assert leafNode != null
 
         Case testFolder = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId}.textValue.keyword:\"/netgrif/test\"", PageRequest.of(0, 1))[0]
-        testFolder = workflowService.populateUriNodeId(testFolder)
         Case netgrifFolder = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId}.textValue.keyword:\"/netgrif\"", PageRequest.of(0, 1))[0]
-        netgrifFolder = workflowService.populateUriNodeId(netgrifFolder)
         UriNode testNode = uriService.findByUri("/netgrif")
         UriNode netgrifNode = uriService.getRoot()
         Case rootFolder = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId}.textValue.keyword:\"/\"", PageRequest.of(0, 1))[0]
 
         assert testFolder != null && testNode != null
-        assert testFolder.uriNodeId == testNode.id
+        assert testFolder.uriNodeId == testNode.stringId
         assert testFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value == [netgrifFolder.stringId]
         assert (testFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as ArrayList).contains(item.stringId)
         assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value == [testFolder.stringId]
-        assert netgrifFolder.uriNodeId == netgrifNode.id
+        assert netgrifFolder.uriNodeId == netgrifNode.stringId
         assert netgrifFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value == [rootFolder.stringId]
         assert (netgrifFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as ArrayList).contains(testFolder.stringId)
         assert rootFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value == []
@@ -122,6 +119,7 @@ class MenuItemApiTest {
     @Test
     void testChangeFilterAndMenuItems() {
         Case caze = createMenuItem()
+        Thread.sleep(3000)
         def newUri = uriService.getOrCreate("/netgrif/test_new", UriContentType.DEFAULT)
         caze = setData(caze, [
                 "uri": newUri.uriPath,
@@ -133,15 +131,13 @@ class MenuItemApiTest {
                 "change_filter_and_menu": "0"
         ])
         Case item = getMenuItem(caze)
-        Thread.sleep(3000)
-        item = workflowService.populateUriNodeId(item)
         Case filter = getFilter(caze)
 
         assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME.attributeId].value.toString() == "CHANGED FILTER"
         assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_ALLOWED_ROLES.attributeId].options.entrySet()[0].key.contains("role_2")
         assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS.attributeId].value == "meta-title,meta-title,meta-title"
         assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS.attributeId].value == "meta-title,meta-title,meta-title"
-        assert item.uriNodeId == newUri.id
+        assert item.uriNodeId == newUri.stringId
 
         assert filter.dataSet["filter"].allowedNets == ["filter"]
         assert filter.dataSet["filter"].filterMetadata["defaultSearchCategories"] == false
@@ -179,12 +175,11 @@ class MenuItemApiTest {
 
         Case viewCase = workflowService.findOne(viewId)
         Thread.sleep(2000)
-        viewCase = workflowService.populateUriNodeId(viewCase)
 
         UriNode node = uriService.findByUri("/netgrif2")
         Case folderCase = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId}.textValue:\"/netgrif2\"", PageRequest.of(0, 1))[0]
 
-        assert viewCase.uriNodeId == node.id
+        assert viewCase.uriNodeId == node.stringId
         ArrayList<String> childIds = folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as ArrayList<String>
         assert childIds.contains(viewId) && childIds.size() == 2
 
@@ -215,25 +210,22 @@ class MenuItemApiTest {
 
         folderCase = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId}.textValue:\"/netgrif/test3/netgrif2\"", PageRequest.of(0, 1))[0]
         assert folderCase != null
-        folderCase = workflowService.populateUriNodeId(folderCase)
         node = uriService.findByUri("/netgrif/test3")
         assert node != null
-        assert folderCase.uriNodeId == node.id
+        assert folderCase.uriNodeId == node.stringId
         assert folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId].value == "/netgrif/test3/netgrif2"
 
         childIds = folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as ArrayList<String>
         assert childIds.size() == 2
 
         folderCase = workflowService.findOne(childIds[0])
-        folderCase = workflowService.populateUriNodeId(folderCase)
         node = uriService.findByUri("/netgrif/test3/netgrif2")
         assert folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId].value == "/netgrif/test3/netgrif2/test2"
-        assert folderCase.uriNodeId == node.id
+        assert folderCase.uriNodeId == node.stringId
 
         viewCase = workflowService.findOne(viewId2)
-        viewCase = workflowService.populateUriNodeId(viewCase)
         node = uriService.findByUri("/netgrif/test3/netgrif2/test2")
-        assert viewCase.uriNodeId == node.id
+        assert viewCase.uriNodeId == node.stringId
     }
 
     @Test
@@ -272,8 +264,6 @@ class MenuItemApiTest {
         Case duplicated = workflowService.searchOne(QCase.case$.processIdentifier.eq("preference_item").and(QCase.case$.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_IDENTIFIER.attributeId).value.eq(newIdentifier)))
         assert duplicated != null
 
-        duplicated = workflowService.populateUriNodeId(duplicated)
-        testFolder = workflowService.populateUriNodeId(testFolder)
         UriNode leafNode = uriService.findByUri("/netgrif/" + newIdentifier)
 
         assert duplicated.uriNodeId == testFolder.uriNodeId

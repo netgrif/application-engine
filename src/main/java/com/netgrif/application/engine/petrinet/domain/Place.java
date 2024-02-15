@@ -44,7 +44,7 @@ public class Place extends Node implements Referencable {
         clone.setTokens(this.tokens);
         clone.setIsStatic(this.isStatic);
         clone.setTitle(this.getTitle());
-        clone.setPosition(this.getPosition().getX(), this.getPosition().getY());
+        clone.setPosition(this.getPosition());
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.getImportId());
         return clone;

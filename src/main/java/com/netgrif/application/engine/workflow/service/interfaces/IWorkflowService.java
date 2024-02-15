@@ -74,6 +74,4 @@ public interface IWorkflowService {
     Page<Case> findAllByUri(String uri, Pageable pageable);
 
     Page<Case> search(Predicate predicate, Pageable pageable);
-
-    Case populateUriNodeId(Case aCase);
 }

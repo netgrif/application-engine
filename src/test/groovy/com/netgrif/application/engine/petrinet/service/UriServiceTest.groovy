@@ -60,22 +60,22 @@ class UriServiceTest {
         splitUri[0] = "/"
         UriNode uriNode = uriService.getOrCreate(testUri3, UriContentType.CASE)
         assert uriNode != null && uriNode.getName() == splitUri[splitUri.length - 1]
-        assert uriNode.parentId == uriNodeRepository.findByUriPath(testUri1).id
+        assert uriNode.parentId == uriNodeRepository.findByUriPath(testUri1).stringId
         assert uriNode.contentTypes.size() == 2 && uriNode.contentTypes.contains(UriContentType.DEFAULT)
         assert uriNode.getChildrenId().isEmpty()
         assert uriNode.level == 4
 
         uriNode = uriService.getOrCreate(testUri1, UriContentType.CASE)
-        assert uriNode.getChildrenId().size() == 1 && uriNode.getChildrenId().contains(uriNodeRepository.findByUriPath(testUri3).id)
+        assert uriNode.getChildrenId().size() == 1 && uriNode.getChildrenId().contains(uriNodeRepository.findByUriPath(testUri3).stringId)
         assert uriNode.containsCase()
 
         uriNode = uriService.getOrCreate(testUri5wrong, UriContentType.PROCESS)
-        assert uriNode != null && uriNode.id == uriNodeRepository.findByUriPath(testUri5).id
-        assert uriNode.parentId == uriNodeRepository.findByUriPath(testUri5parent).id
+        assert uriNode != null && uriNode.stringId == uriNodeRepository.findByUriPath(testUri5).stringId
+        assert uriNode.parentId == uriNodeRepository.findByUriPath(testUri5parent).stringId
         assert uriNode.containsNet()
 
         uriNode = uriService.getOrCreate(testUri6wrong, UriContentType.DEFAULT)
-        assert uriNode.id == uriNodeRepository.findByUriPath(testUri6).id
+        assert uriNode.stringId == uriNodeRepository.findByUriPath(testUri6).stringId
         assert uriNode.parentId == null
         assert uriNode.level == 0
     }
@@ -99,8 +99,8 @@ class UriServiceTest {
         UriNode uriNode = uriService.getOrCreate(testUri1, UriContentType.DEFAULT)
         uriNode = uriService.populateDirectRelatives(uriNode)
 
-        assert uriNode.parent != null && uriNode.parent.id == uriNode.parentId
-        assert uriNode.children.size() == 1 && uriNode.children.find {it.id == uriNode.childrenId[0]} != null
+        assert uriNode.parent != null && uriNode.parent.stringId == uriNode.parentId
+        assert uriNode.children.size() == 1 && uriNode.children.find {it.stringId == uriNode.childrenId[0]} != null
     }
 
     @Test
@@ -109,14 +109,14 @@ class UriServiceTest {
         UriNode cNode = uriService.move("/a/b/c", "/a")
         UriNode aNode = uriService.findByUri("/a")
         UriNode bNode = uriService.findByUri("/a/b")
-        assert cNode.parentId == aNode.id && bNode.childrenId.size() == 0
+        assert cNode.parentId == aNode.stringId && bNode.childrenId.size() == 0
 
         prepareDatabase(List.of("/a/b/c", "/a/b/d"))
         bNode = uriService.move("/a/b", "/")
         aNode = uriService.findByUri("/a")
         cNode = uriService.findByUri("/b/c")
         UriNode rootNode = uriService.findByUri("/")
-        assert aNode.childrenId.size() == 0 && bNode.childrenId.size() == 2 && cNode.parentId == bNode.id
+        assert aNode.childrenId.size() == 0 && bNode.childrenId.size() == 2 && cNode.parentId == bNode.stringId
         assert rootNode.childrenId.size() == 2
 
         prepareDatabase(List.of("/a/b/c"))
@@ -130,7 +130,7 @@ class UriServiceTest {
         UriNode dNode = uriService.findByUri("/d")
         assert aNode.childrenId.size() == 0
         assert dNode.childrenId.size() == 1
-        assert bNode.childrenId.size() == 1 && bNode.parentId == dNode.id
+        assert bNode.childrenId.size() == 1 && bNode.parentId == dNode.stringId
     }
 
     private prepareDatabase(List<String> listOfUriPaths) {
@@ -155,7 +155,7 @@ class UriServiceTest {
         UriNode uriNode = uriService.createDefault()
         assert uriNode != null && uriNode.level == 0
 
-        uriNodeRepository.deleteById(uriNode.id)
+        uriNodeRepository.deleteById(uriNode.stringId)
 
         uriNode = uriService.createDefault()
         assert uriNode != null && uriNode.level == 0
