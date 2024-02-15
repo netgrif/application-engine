@@ -17,7 +17,6 @@ import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearc
 import com.netgrif.application.engine.export.configuration.ExportConfiguration
 import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
-import com.netgrif.application.engine.history.service.IHistoryService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.history.service.IHistoryService
 import com.netgrif.application.engine.importer.service.FieldFactory
@@ -57,7 +56,6 @@ import com.netgrif.application.engine.workflow.domain.menu.MenuItemConstants
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.*
-import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
@@ -1468,8 +1466,8 @@ class ActionDelegate {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Case> findCases(List<CaseSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
-                          int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
+    Page<Case> findCasesElastic(List<CaseSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+                                int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         return elasticCaseService.search(requests, loggedUser, PageRequest.of(page, pageSize), locale, isIntersection)
     }
 
@@ -1483,10 +1481,10 @@ class ActionDelegate {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Case> findCases(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
-                         int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
+    Page<Case> findCasesElastic(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+                                int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         List<CaseSearchRequest> requests = Collections.singletonList(new CaseSearchRequest(request))
-        return findCases(requests, loggedUser, page, pageSize, locale, isIntersection)
+        return findCasesElastic(requests, loggedUser, page, pageSize, locale, isIntersection)
     }
 
     /**
