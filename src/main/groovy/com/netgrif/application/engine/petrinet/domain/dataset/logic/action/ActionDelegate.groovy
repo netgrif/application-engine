@@ -74,9 +74,9 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 
 import java.text.Normalizer
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.stream.Collectors
-
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -750,6 +750,8 @@ class ActionDelegate {
         ChangedField changedField = new ChangedField(field.stringId)
         if (field instanceof I18nField) {
             changedField.attributes.put("value", value)
+        } else if (field instanceof DateTimeField) {
+            changedField.addAttribute("value", FieldFactory.parseDateTime(((LocalDateTime) value).toDate()))
         } else {
             changedField.addAttribute("value", value)
         }

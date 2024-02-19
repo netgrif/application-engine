@@ -16,7 +16,11 @@ import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataValidationExpressionEvaluator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -48,6 +52,9 @@ public final class FieldFactory {
 
     @Autowired
     private IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
+
+    @Autowired
+    private HttpServletRequest request;
 
     // TODO: refactor this shit
     Field getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {
@@ -688,12 +695,17 @@ public final class FieldFactory {
         if (value == null)
             return null;
 
-        if (value instanceof LocalDate)
+        if (value instanceof LocalDate) {
             return LocalDateTime.of((LocalDate) value, LocalTime.NOON);
-        else if (value instanceof String)
-            return parseDateTimeFromString((String) value);
-        else if (value instanceof Date)
-            return LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault());
+        } else if (value instanceof String) {
+            LocalDateTime localDateTime = parseDateTimeFromString((String) value);
+            if (localDateTime == null) {
+                return null;
+            }
+            return localDateTime.atZone(getTimeZoneId()).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        } else if (value instanceof Date) {
+            return LocalDateTime.ofInstant(((Date) value).toInstant(), getTimeZoneId());
+        }
         return (LocalDateTime) value;
     }
 
@@ -742,6 +754,18 @@ public final class FieldFactory {
     public static String parseEnumerationMapValue(Case useCase, String fieldId) {
         Object value = useCase.getFieldValue(fieldId);
         return value != null ? value.toString() : null;
+    }
+
+    public static ZoneId getTimeZoneId() {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes == null) {
+            return ZoneId.systemDefault();
+        }
+        TimeZone timeZone = RequestContextUtils.getTimeZone(requestAttributes.getRequest());
+        if (timeZone == null) {
+            return ZoneId.systemDefault();
+        }
+        return timeZone.toZoneId();
     }
 
     private void parseFileValue(FileField field, Case useCase, String fieldId) {
