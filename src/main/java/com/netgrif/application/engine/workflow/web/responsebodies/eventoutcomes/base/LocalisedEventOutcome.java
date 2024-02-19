@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes.base;
 
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.FrontAction;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import lombok.Data;
 
@@ -15,11 +16,14 @@ public abstract class LocalisedEventOutcome {
 
     private List<LocalisedEventOutcome> outcomes;
 
+    private List<FrontAction> frontActions;
+
     protected LocalisedEventOutcome() {
     }
 
     protected LocalisedEventOutcome(EventOutcome outcome, Locale locale){
         this.message = outcome.getMessage() == null ? null : outcome.getMessage().getTranslation(locale);
+        this.frontActions = outcome.getFrontActions();
         this.outcomes = outcome.getOutcomes() == null ? null : outcome.getOutcomes().stream()
                 .map(eventOutcome -> LocalisedEventOutcomeFactory.from(eventOutcome, locale))
                 .collect(Collectors.toList());

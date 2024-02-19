@@ -6,7 +6,6 @@ import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
 import lombok.Data;
-import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.List;

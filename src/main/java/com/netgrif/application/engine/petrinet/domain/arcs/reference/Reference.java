@@ -5,11 +5,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Transient;
 
+import java.io.Serializable;
+
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Reference {
+public class Reference implements Serializable {
+
+    private static final long serialVersionUID = 7082645066561158952L;
 
     private String reference;
 
@@ -30,4 +34,9 @@ public class Reference {
         }
         return multiplicity;
     }
+
+    public Reference clone() {
+        return new Reference(this.reference, this.type);
+    }
+
 }

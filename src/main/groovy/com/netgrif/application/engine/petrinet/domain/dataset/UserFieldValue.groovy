@@ -2,7 +2,9 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.auth.domain.IUser
 
-class UserFieldValue {
+class UserFieldValue implements Serializable {
+
+    private static final long serialVersionUID = 5228212326436828485L
 
     protected String id
 

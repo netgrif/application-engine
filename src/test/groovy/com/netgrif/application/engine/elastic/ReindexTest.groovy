@@ -88,8 +88,6 @@ class ReindexTest {
             List<Case> result = elasticCaseService.search(Collections.singletonList(request), superCreator.getLoggedSuper(), PageRequest.of(0, 10), LocaleContextHolder.getLocale(), false).getContent()
             assert result.size() == 1
         })
-
-
     }
 
 }

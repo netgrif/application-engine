@@ -8,6 +8,7 @@ import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
@@ -154,6 +155,19 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         }
     }
 
+    public String findUriNodeId(Case aCase) {
+        if (aCase == null) {
+            return null;
+        }
+        ElasticCase elasticCase = repository.findByStringId(aCase.getStringId());
+        if (elasticCase == null) {
+            log.warn("[" + aCase.getStringId() + "] Case with id [" + aCase.getStringId() + "] is not indexed.");
+            return null;
+        }
+
+        return elasticCase.getUriNodeId();
+    }
+
     private NativeSearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
         List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
 
@@ -191,6 +205,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         buildStringQuery(request, query, user);
         buildCaseIdQuery(request, query);
         buildUriNodeIdQuery(request, query);
+        buildTagsQuery(request, query);
         boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
 
         // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch
@@ -354,6 +369,19 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         query.filter(dataQuery);
     }
 
+    private void buildTagsQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+        if (request.tags == null || request.tags.isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder tagsQuery = boolQuery();
+        for (Map.Entry<String, String> field : request.tags.entrySet()) {
+            tagsQuery.must(termQuery("tags." + field.getKey(), field.getValue()));
+        }
+
+        query.filter(tagsQuery);
+    }
+
     private void buildFullTextQuery(CaseSearchRequest request, BoolQueryBuilder query) {
         if (request.fullText == null || request.fullText.isEmpty()) {
             return;
@@ -438,8 +466,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             return false;
         }
 
-        Map<String, Object> processQuery = new HashMap<>();
-        processQuery.put("group", request.group);
+        PetriNetSearch processQuery = new PetriNetSearch();
+        processQuery.setGroup(request.group);
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
         if (groupProcesses.size() == 0)
             return true;

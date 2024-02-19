@@ -4,7 +4,9 @@ import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
 
-class Validation {
+class Validation implements Serializable {
+
+    private static final long serialVersionUID = 3287600522204188694L
 
     protected String name
 
