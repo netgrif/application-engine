@@ -25,7 +25,7 @@ class ValidationService implements IValidationService {
             return
         }
         field.getValidations().forEach(validation -> {
-            List<String> rules = validation.getValidationRule().trim().split(" ")
+            List<String> rules = validation.getArguments().trim().split(" ")
             if (rules.size() >= 1) {
                 AbstractFieldValidation instance = new AbstractFieldValidation()
                 if (field instanceof NumberField) {

@@ -32,7 +32,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>between 2020-03-03,today</expression> <!-- od datumu do dnešného dňa -->
+                <expression>between 2020-03-02,today</expression> <!-- od datumu do dnešného dňa -->
                 <message>error-date03</message>
             </validation>
         </validations>

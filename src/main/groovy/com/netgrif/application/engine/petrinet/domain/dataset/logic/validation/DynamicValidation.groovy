@@ -20,6 +20,8 @@ class DynamicValidation extends Validation {
         this.expression = new Expression("\"$validationRule\"" as String)
     }
 
+
+
     DynamicValidation() {}
 
     String getCompiledRule() {
@@ -35,7 +37,7 @@ class DynamicValidation extends Validation {
     }
 
     LocalizedValidation getLocalizedValidation(Locale locale) {
-        LocalizedValidation ret = new LocalizedValidation(this.compiledRule, getTranslatedValidationMessage(locale))
+        LocalizedValidation ret = new LocalizedValidation(this.compiledRule, getArguments(), getTranslatedValidationMessage(locale))
         return ret
     }
 
