@@ -2,13 +2,11 @@ package com.netgrif.application.engine.elastic.service;
 
 import com.google.common.collect.ImmutableMap;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.configuration.ElasticsearchConfiguration;
-import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
-import com.netgrif.application.engine.elastic.domain.ElasticTask;
-import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository;
+import com.netgrif.application.engine.elastic.domain.*;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
+import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
@@ -25,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -39,8 +36,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
@@ -51,23 +47,23 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
 
     private static final Logger log = LoggerFactory.getLogger(ElasticTaskService.class);
 
-    private ElasticTaskRepository repository;
-    private ITaskService taskService;
-    private ElasticsearchRestTemplate template;
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    protected ITaskService taskService;
+    protected ElasticsearchRestTemplate template;
 
     @Value("${spring.data.elasticsearch.index.task}")
-    private String taskIndex;
+    protected String taskIndex;
 
     @Autowired
-    private ElasticsearchRestTemplate elasticsearchTemplate;
+    protected ElasticsearchRestTemplate elasticsearchTemplate;
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private ElasticTaskQueueManager elasticTaskQueueManager;
 
     @Autowired
-    public ElasticTaskService(ElasticTaskRepository repository, ElasticsearchRestTemplate template) {
-        this.repository = repository;
+    protected IPetriNetService petriNetService;
+
+    @Autowired
+    public ElasticTaskService(ElasticsearchRestTemplate template) {
         this.template = template;
     }
 
@@ -77,12 +73,12 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         this.taskService = taskService;
     }
 
-    private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
+    protected Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title", 1f,
             "caseTitle", 1f
     );
 
-    private Map<String, Float> caseTitledMap = ImmutableMap.of(
+    protected Map<String, Float> caseTitledMap = ImmutableMap.of(
             "caseTitle", 1f
     );
 
@@ -98,42 +94,25 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
 
     @Override
     public void remove(String taskId) {
-        executor.execute(() -> {
-            repository.deleteAllByStringId(taskId);
-            log.info("[?]: Task \"" + taskId + "\" deleted");
-        });
+        ElasticTask task = new ElasticTask();
+        task.setTaskId(taskId);
+        elasticTaskQueueManager.scheduleOperation(new ElasticTaskJob(ElasticJob.REMOVE, task));
     }
 
     @Override
     public void removeByPetriNetId(String petriNetId) {
-        executor.execute(() -> {
-            repository.deleteAllByProcessId(petriNetId);
-            log.info("[" + petriNetId + "]: All tasks of Petri Net with id \"" + petriNetId + "\" deleted");
-        });
+        elasticTaskQueueManager.removeTasksByProcess(petriNetId);
+    }
+
+    @Override
+    public Future<ElasticTask> scheduleTaskIndexing(ElasticTask task) {
+        return elasticTaskQueueManager.scheduleOperation(new ElasticTaskJob(ElasticJob.INDEX, task));
     }
 
     @Async
     @Override
     public void index(ElasticTask task) {
-        executor.execute(() -> {
-            try {
-                ElasticTask elasticTask = repository.findByStringId(task.getStringId());
-
-                if (elasticTask == null) {
-                    repository.save(task);
-                } else {
-                    elasticTask.update(task);
-                    repository.save(elasticTask);
-                }
-
-                log.debug("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" [" + task.getStringId() + "] indexed");
-            } catch (InvalidDataAccessApiUsageException e) {
-                log.debug("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" has duplicates, will be reindexed");
-                repository.deleteAllByStringId(task.getStringId());
-                repository.save(task);
-                log.debug("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" indexed");
-            }
-        });
+        elasticTaskQueueManager.scheduleOperation(new ElasticTaskJob(ElasticJob.INDEX, task));
     }
 
     @Override
@@ -143,12 +122,12 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
 
     @Override
     public Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
-        NativeSearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
+        NativeSearchQuery query = buildQuery(requests, user.getSelfOrImpersonated(), pageable, locale, isIntersection);
         List<Task> taskPage;
         long total;
         if (query != null) {
-            SearchHits<ElasticTask> hits = elasticsearchTemplate.search(query, ElasticTask.class,  IndexCoordinates.of(taskIndex));
-            Page<ElasticTask> indexedTasks = (Page)SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
+            SearchHits<ElasticTask> hits = elasticsearchTemplate.search(query, ElasticTask.class, IndexCoordinates.of(taskIndex));
+            Page<ElasticTask> indexedTasks = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             taskPage = taskService.findAllById(indexedTasks.get().map(ElasticTask::getStringId).collect(Collectors.toList()));
             total = indexedTasks.getTotalElements();
         } else {
@@ -161,7 +140,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
 
     @Override
     public long count(List<ElasticTaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
-        NativeSearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
+        NativeSearchQuery query = buildQuery(requests, user.getSelfOrImpersonated(), new FullPageRequest(), locale, isIntersection);
         if (query != null) {
             return template.count(query, ElasticTask.class);
         } else {
@@ -169,7 +148,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         }
     }
 
-    private NativeSearchQuery buildQuery(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+    protected NativeSearchQuery buildQuery(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
         List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
@@ -193,7 +172,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
                 .build();
     }
 
-    private BoolQueryBuilder buildSingleQuery(ElasticTaskSearchRequest request, LoggedUser user, Locale locale) {
+    protected BoolQueryBuilder buildSingleQuery(ElasticTaskSearchRequest request, LoggedUser user, Locale locale) {
         if (request == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
@@ -207,6 +186,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         buildProcessQuery(request, query);
         buildFullTextQuery(request, query);
         buildTransitionQuery(request, query);
+        buildTagsQuery(request, query);
         buildStringQuery(request, query, user);
         boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
 
@@ -262,7 +242,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
      * }]
      * }
      */
-    private void buildCaseQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+    protected void buildCaseQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.useCase == null || request.useCase.isEmpty()) {
             return;
         }
@@ -277,7 +257,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
      * @return query for ID if only ID is present. Query for title if only title is present.
      * If both are present an ID query is returned. If neither are present null is returned.
      */
-    private QueryBuilder caseRequestQuery(TaskSearchCaseRequest caseRequest) {
+    protected QueryBuilder caseRequestQuery(TaskSearchCaseRequest caseRequest) {
         if (caseRequest.id != null) {
             return termQuery("caseId", caseRequest.id);
         } else if (caseRequest.title != null) {
@@ -300,7 +280,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
      * ]
      * }
      */
-    private void buildTitleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+    protected void buildTitleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.title == null || request.title.isEmpty()) {
             return;
         }
@@ -321,7 +301,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
      * <p>
      * Tasks assigned to user with id 1 OR 2
      */
-    private void buildUserQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+    protected void buildUserQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.user == null || request.user.isEmpty()) {
             return;
         }
@@ -348,7 +328,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
      * ]
      * }
      */
-    private void buildProcessQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+    protected void buildProcessQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.process == null || request.process.isEmpty()) {
             return;
         }
@@ -366,7 +346,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     /**
      * Full text search on fields defined by {@link #fullTextFields()}.
      */
-    private void buildFullTextQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+    protected void buildFullTextQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.fullText == null || request.fullText.isEmpty()) {
             return;
         }
@@ -389,7 +369,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
      * ]
      * }
      */
-    private void buildTransitionQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+    protected void buildTransitionQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.transitionId == null || request.transitionId.isEmpty()) {
             return;
         }
@@ -400,10 +380,23 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         query.filter(transitionQuery);
     }
 
+    private void buildTagsQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+        if (request.tags == null || request.tags.isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder tagsQuery = boolQuery();
+        for (Map.Entry<String, String> field : request.tags.entrySet()) {
+            tagsQuery.must(termQuery("tags." + field.getKey(), field.getValue()));
+        }
+
+        query.filter(tagsQuery);
+    }
+
     /**
      * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a>
      */
-    private void buildStringQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
+    protected void buildStringQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
         if (request.query == null || request.query.isEmpty()) {
             return;
         }
@@ -431,8 +424,8 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         if (request.group == null || request.group.isEmpty())
             return false;
 
-        Map<String, Object> processQuery = new HashMap<>();
-        processQuery.put("group", request.group);
+        PetriNetSearch processQuery = new PetriNetSearch();
+        processQuery.setGroup(request.group);
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
         if (groupProcesses.size() == 0)
             return true;

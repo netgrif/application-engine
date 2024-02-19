@@ -1,8 +1,6 @@
 package com.netgrif.application.engine.elastic.service;
 
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.domain.BooleanField;
 import com.netgrif.application.engine.elastic.domain.ButtonField;
 import com.netgrif.application.engine.elastic.domain.DateField;
@@ -18,7 +16,6 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -27,14 +24,10 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class ElasticCaseMappingService implements IElasticCaseMappingService {
-
-    @Autowired
-    private IUserService userService;
 
     @Override
     public ElasticCase transform(Case useCase) {
@@ -109,8 +102,8 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformI18nField(com.netgrif.application.engine.workflow.domain.DataField dataField, com.netgrif.application.engine.petrinet.domain.dataset.I18nField netField) {
-        Set<String> keys = netField.getValue().getTranslations().keySet();
-        Set<String> values = new HashSet<>(netField.getValue().getTranslations().values());
+        Set<String> keys = ((I18nString)dataField.getValue()).getTranslations().keySet();
+        Set<String> values = new HashSet<>(((I18nString)dataField.getValue()).getTranslations().values());
         values.add(((I18nString) dataField.getValue()).getDefaultValue());
         return Optional.of(new I18nField(keys, values));
     }
@@ -153,7 +146,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         if (multichoice.getValue() instanceof Set) {
             return Optional.of((Set) multichoice.getValue());
         } else if (multichoice.getValue() instanceof Collection) {
-            log.warn(String.format("Multichoice field should have values of type Set! DateField (%s) with %s value found! Value will be converted for indexation.", netField.getImportId(), multichoice.getValue().getClass().getCanonicalName()));
+//            log.warn(String.format("Multichoice field should have values of type Set! DateField (%s) with %s value found! Value will be converted for indexation.", netField.getImportId(), multichoice.getValue().getClass().getCanonicalName()));
             Set values = new HashSet();
             values.addAll((Collection) multichoice.getValue());
             return Optional.of(values);
@@ -233,7 +226,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             LocalDate date = (LocalDate) dateField.getValue();
             return formatDateField(LocalDateTime.of(date, LocalTime.NOON));
         } else if (dateField.getValue() instanceof Date) {
-            log.warn(String.format("DateFields should have LocalDate values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
+//            log.warn(String.format("DateFields should have LocalDate values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
             LocalDateTime transformed = this.transformDateValueField(dateField);
             return formatDateField(LocalDateTime.of(transformed.toLocalDate(), LocalTime.NOON));
         } else {
@@ -247,7 +240,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         if (dateTimeField.getValue() instanceof LocalDateTime) {
             return formatDateField((LocalDateTime) dateTimeField.getValue());
         } else if (dateTimeField.getValue() instanceof Date) {
-            log.warn(String.format("DateTimeFields should have LocalDateTime values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
+//            log.warn(String.format("DateTimeFields should have LocalDateTime values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
             return formatDateField(this.transformDateValueField(dateTimeField));
         } else {
             // TODO throw error?

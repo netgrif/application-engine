@@ -13,6 +13,7 @@ import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepos
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Filter
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation
@@ -27,7 +28,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateFilterBody
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
-import groovy.json.JsonOutput
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -87,6 +87,9 @@ class ImportHelper {
     @Autowired
     private ProcessRoleService processRoleService
 
+    @Autowired
+    private IUriService uriService
+
     private final ClassLoader loader = ImportHelper.getClassLoader()
 
 
@@ -106,16 +109,18 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = superCreator.loggedSuper) {
-        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author)
+    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().stringId) {
+        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author, uriNodeId)
     }
 
-    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
+    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().stringId) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        return Optional.of(petriNetService.importPetriNet(netStream, release, author).getNet())
+        PetriNet petriNet = petriNetService.importPetriNet(netStream, release, author, uriNodeId).getNet()
+        log.info("Imported '${petriNet?.title?.defaultValue}' ['${petriNet?.identifier}', ${petriNet?.stringId}]")
+        return Optional.of(petriNet)
     }
 
-    Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
+    Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser()) {
         PetriNet petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
         if (!petriNet) {
             return createNet(filename, release, author)
@@ -177,7 +182,11 @@ class ImportHelper {
     }
 
     Case createCase(String title, PetriNet net) {
-        return createCase(title, net, superCreator.loggedSuper)
+        return createCase(title, net, userService.getSystem().transformToLoggedUser())
+    }
+
+    Case createCaseAsSuper(String title, PetriNet net) {
+        return createCase(title, net, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
     boolean createCaseFilter(String title, String query, MergeFilterOperation operation, LoggedUser user) {
@@ -189,7 +198,7 @@ class ImportHelper {
     }
 
     AssignTaskEventOutcome assignTaskToSuper(String taskTitle, String caseId) {
-        return assignTask(taskTitle, caseId, superCreator.loggedSuper)
+        return assignTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
     FinishTaskEventOutcome finishTask(String taskTitle, String caseId, LoggedUser author) {
@@ -197,7 +206,7 @@ class ImportHelper {
     }
 
     FinishTaskEventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
-        return finishTask(taskTitle, caseId, superCreator.loggedSuper)
+        return finishTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
     CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, LoggedUser user) {
@@ -205,7 +214,7 @@ class ImportHelper {
     }
 
     CancelTaskEventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {
-        return cancelTask(taskTitle, caseId, superCreator.loggedSuper)
+        return cancelTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
     String getTaskId(String taskTitle, String caseId) {
@@ -232,7 +241,7 @@ class ImportHelper {
 
     static ObjectNode populateDataset(Map<String, Map<String, String>> data) {
         ObjectMapper mapper = new ObjectMapper()
-        String json = JsonOutput.toJson(data)
+        String json = mapper.writeValueAsString(data)
         return mapper.readTree(json) as ObjectNode
     }
 

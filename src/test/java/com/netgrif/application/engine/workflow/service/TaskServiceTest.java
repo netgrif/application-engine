@@ -15,7 +15,7 @@ import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExe
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.startup.SystemUserRunner;
-import com.netgrif.application.engine.utils.FullPageRequest;
+import com.netgrif.application.engine.startup.UriRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
@@ -70,6 +70,9 @@ public class TaskServiceTest {
     private SystemUserRunner userRunner;
 
     @Autowired
+    private UriRunner uriRunner;
+
+    @Autowired
     private IPetriNetService petriNetService;
 
     @Autowired
@@ -80,19 +83,11 @@ public class TaskServiceTest {
         mongoTemplate.getDb().drop();
         taskRepository.deleteAll();
         userRunner.run("");
+        uriRunner.run();
 
         petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
         PetriNet net = petriNetRepository.findAll().get(0);
         workflowService.createCase(net.getStringId(), "Storage Unit", "color", mockLoggedUser());
-    }
-
-    @Test
-    public void createTasks() {
-        Case useCase = workflowService.getAll(new FullPageRequest()).getContent().get(0);
-
-        service.createTasks(useCase);
-
-        assert taskRepository.findAll().size() > 0;
     }
 
     @Test

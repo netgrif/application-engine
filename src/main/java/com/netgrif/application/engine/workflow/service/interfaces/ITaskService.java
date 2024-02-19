@@ -23,7 +23,6 @@ import java.util.Set;
 
 public interface ITaskService {
 
-    @Transactional
     void reloadTasks(Case useCase);
 
     Task findOne(String taskId);
@@ -38,8 +37,6 @@ public interface ITaskService {
 
     List<Task> findAllById(List<String> ids);
 
-    void createTasks(Case useCase);
-
     Page<Task> findByUser(Pageable pageable, IUser user);
 
     Task findById(String id);
@@ -52,30 +49,24 @@ public interface ITaskService {
 
     Task searchOne(com.querydsl.core.types.Predicate predicate);
 
-    @Transactional(rollbackFor = Exception.class)
     List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException;
 
-    @Transactional
     FinishTaskEventOutcome finishTask(Task task, IUser user) throws TransitionNotExecutableException;
 
     FinishTaskEventOutcome finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
     FinishTaskEventOutcome finishTask(String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
-    @Transactional
     List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException;
 
-    @Transactional
     AssignTaskEventOutcome assignTask(Task task, IUser user) throws TransitionNotExecutableException;
 
     AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException;
 
     AssignTaskEventOutcome assignTask(String taskId) throws TransitionNotExecutableException;
 
-    @Transactional(rollbackFor = Exception.class)
     List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, IUser user);
 
-    @Transactional
     CancelTaskEventOutcome cancelTask(Task task, IUser user);
 
     CancelTaskEventOutcome cancelTask(LoggedUser loggedUser, String taskId);
@@ -92,9 +83,9 @@ public interface ITaskService {
 
     Task resolveUserRef(Task task, Case useCase);
 
-    void delete(Iterable<? extends Task> tasks, Case useCase);
+    void delete(List<Task> tasks, Case useCase);
 
-    void delete(Iterable<? extends Task> tasks, String caseId);
+    void delete(List<Task> tasks, String caseId);
 
     void deleteTasksByCase(String caseId);
 

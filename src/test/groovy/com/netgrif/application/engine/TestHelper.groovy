@@ -47,6 +47,10 @@ class TestHelper {
     @Autowired
     private FinisherRunner finisherRunner
     @Autowired
+    private ImpersonationRunner impersonationRunner
+    @Autowired
+    private UriRunner uriRunner
+    @Autowired
     private IPetriNetService petriNetService
 
     void truncateDbs() {
@@ -65,8 +69,10 @@ class TestHelper {
         defaultRoleRunner.run()
         anonymousRoleRunner.run()
         systemUserRunner.run()
+        uriRunner.run()
         groupRunner.run()
         filterRunner.run()
+        impersonationRunner.run()
         superCreator.run()
         finisherRunner.run()
     }

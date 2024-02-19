@@ -18,7 +18,7 @@ import java.util.Set;
 @ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapUser extends User {
 
-    @Indexed(unique = true)
+    @Indexed
     private String dn;
 
     private String commonName;
@@ -65,6 +65,9 @@ public class LdapUser extends User {
         if (!this.getProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(this.getProcessRoles());
         loggedUser.setGroups(this.getNextGroups());
+        if (this.isImpersonating()) {
+            loggedUser.impersonate(this.getImpersonated().transformToLoggedUser());
+        }
 
         return loggedUser;
     }

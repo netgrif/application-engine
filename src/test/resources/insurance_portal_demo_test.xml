@@ -608,6 +608,7 @@
         <values>3</values>
         <values>4</values>
         <values>viac ako 4</values>
+        <init>1</init>
         <action id="39" trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -674,6 +675,7 @@
         <values>1</values>
         <values>2</values>
         <values>viac ako 2</values>
+        <init>1</init>
         <action id="45" trigger="set">
             <!--@formatter:off-->
             field: f.this,

@@ -18,13 +18,16 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Document
-public class Case {
+public class Case implements Serializable {
+
+    private static final long serialVersionUID = 3687481049847498422L;
 
     @Id
     @Getter
@@ -154,6 +157,10 @@ public class Case {
     @Setter
     private List<String> negativeViewUsers;
 
+    @Getter
+    @Setter
+    private Map<String, String> tags;
+
     protected Case() {
         _id = new ObjectId();
         activePlaces = new HashMap<>();
@@ -171,6 +178,7 @@ public class Case {
         viewUsers = new LinkedList<>();
         negativeViewRoles = new LinkedList<>();
         negativeViewUsers = new ArrayList<>();
+        tags = new HashMap<>();
     }
 
     public Case(PetriNet petriNet) {
@@ -185,6 +193,7 @@ public class Case {
         negativeViewRoles.addAll(petriNet.getNegativeViewRoles());
         icon = petriNet.getIcon();
         userRefs = petriNet.getUserRefs();
+        tags = new HashMap<>(petriNet.getTags());
 
         permissions = petriNet.getPermissions().entrySet().stream()
                 .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
@@ -228,6 +237,9 @@ public class Case {
             }
             if (field instanceof UserField) {
                 this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
+            }
+            if (field instanceof UserListField) {
+                this.dataSet.get(key).setChoices(((UserListField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
             }
             if (field instanceof FieldWithAllowedNets) {
                 this.dataSet.get(key).setAllowedNets(((FieldWithAllowedNets) field).getAllowedNets());

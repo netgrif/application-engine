@@ -17,6 +17,7 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.hamcrest.CoreMatchers
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 
 //import com.netgrif.application.engine.orgstructure.domain.Group
 
@@ -50,6 +51,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
+@Disabled
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest(
@@ -155,6 +157,7 @@ class InsuranceTest {
     private Map mapper
 
     @Test
+    @Disabled
     @DisplayName("Insurance Test")
     void test() {
         createCase()

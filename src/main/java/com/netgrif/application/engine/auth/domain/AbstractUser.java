@@ -3,12 +3,16 @@ package com.netgrif.application.engine.auth.domain;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class AbstractUser implements IUser {
+public abstract class AbstractUser implements IUser, Serializable {
+
+    private static final long serialVersionUID = 341922197277508726L;
 
     @NotNull
     @Getter
@@ -26,6 +30,11 @@ public abstract class AbstractUser implements IUser {
     @Getter
     @Setter
     protected Set<String> nextGroups;
+
+    @Setter
+    @Getter
+    @Transient
+    protected IUser impersonated;
 
     public AbstractUser() {
         authorities = new HashSet<>();
@@ -68,5 +77,15 @@ public abstract class AbstractUser implements IUser {
         author.setFullName(this.getFullName());
 
         return author;
+    }
+
+    @Override
+    public boolean isImpersonating() {
+        return this.impersonated != null;
+    }
+
+    @Override
+    public IUser getSelfOrImpersonated() {
+        return isImpersonating() ? this.impersonated : this;
     }
 }

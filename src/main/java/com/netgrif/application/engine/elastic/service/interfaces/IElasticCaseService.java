@@ -10,7 +10,6 @@ import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public interface IElasticCaseService {
 
@@ -23,9 +22,9 @@ public interface IElasticCaseService {
 
     long count(List<CaseSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection);
 
-    Map<String, Float> fullTextFields();
-
     void remove(String caseId);
 
     void removeByPetriNetId(String processId);
+
+    String findUriNodeId(Case aCase);
 }

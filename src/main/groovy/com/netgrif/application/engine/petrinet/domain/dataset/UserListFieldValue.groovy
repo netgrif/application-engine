@@ -1,23 +1,30 @@
-package com.netgrif.application.engine.petrinet.domain.dataset;
+package com.netgrif.application.engine.petrinet.domain.dataset
 
-class UserListFieldValue {
+class UserListFieldValue implements Serializable {
 
-    private List<UserFieldValue> userValues;
+    private static final long serialVersionUID = 5228212326431238485L
 
-    UserListFieldValue(List<UserFieldValue> userValues) {
-        this.userValues = userValues;
+    private Set<UserFieldValue> userValues
+
+    UserListFieldValue() {
+        this.userValues = new LinkedHashSet<>()
     }
 
-    List<UserFieldValue> getUserValues() {
-        return userValues;
+    UserListFieldValue(Collection<UserFieldValue> userValues) {
+        this()
+        this.userValues = new LinkedHashSet<>(userValues)
     }
 
-    void setUserValues(List<UserFieldValue> userValues) {
-        this.userValues = userValues;
+    LinkedHashSet<UserFieldValue> getUserValues() {
+        return userValues
+    }
+
+    void setUserValues(Collection<UserFieldValue> userValues) {
+        this.userValues = new LinkedHashSet<>(userValues)
     }
 
     @Override
     String toString() {
-        return userValues.toString();
+        return userValues.toString()
     }
 }

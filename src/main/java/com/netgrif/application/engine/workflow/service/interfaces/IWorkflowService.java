@@ -22,6 +22,8 @@ public interface IWorkflowService {
 
     Case findOne(String caseId);
 
+    Case findOneNoNet(String caseId);
+
     List<Case> findAllById(List<String> ids);
 
     Page<Case> getAll(Pageable pageable);
@@ -42,6 +44,8 @@ public interface IWorkflowService {
 
     DeleteCaseEventOutcome deleteSubtreeRootedAt(String caseId);
 
+    DeleteCaseEventOutcome deleteCase(Case useCase);
+
     void deleteInstancesOfPetriNet(PetriNet net);
 
     void updateMarking(Case useCase);
@@ -61,9 +65,9 @@ public interface IWorkflowService {
 
 //    List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId);
 
-    boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId);
+    boolean removeTasksFromCase(List<Task> tasks, String caseId);
 
-    boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase);
+    boolean removeTasksFromCase(List<Task> tasks, Case useCase);
 
     Case decrypt(Case useCase);
 

@@ -12,5 +12,6 @@ public class UriProperties {
 
     private String index = "nae_uri";
     private String separator = "/";
+    private String name = "root";
 
 }

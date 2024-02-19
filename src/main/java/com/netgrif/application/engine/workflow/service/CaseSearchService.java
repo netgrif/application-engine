@@ -4,6 +4,7 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -36,6 +37,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     public static final String ROLE = "role";
     public static final String DATA = "data";
+    public static final String TAGS = "tags";
     public static final String PETRINET_IDENTIFIER = "identifier";
     public static final String PETRINET_ID = "id";
     public static final String PETRINET = "petriNet";
@@ -53,9 +55,10 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     public Predicate buildQuery(Map<String, Object> requestQuery, LoggedUser user, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
+        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
 
         if (requestQuery.containsKey(PETRINET)) {
-            builder.and(petriNet(requestQuery.get(PETRINET), user, locale));
+            builder.and(petriNet(requestQuery.get(PETRINET), loggedOrImpersonated, locale));
         }
         if (requestQuery.containsKey(AUTHOR)) {
             builder.and(author(requestQuery.get(AUTHOR)));
@@ -72,21 +75,24 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (requestQuery.containsKey(DATA)) {
             builder.and(data(requestQuery.get(DATA)));
         }
+        if (requestQuery.containsKey(TAGS)) {
+            builder.and(tags(requestQuery.get(TAGS)));
+        }
         if (requestQuery.containsKey(CASE_ID)) {
             builder.and(caseId(requestQuery.get(CASE_ID)));
         }
         if (requestQuery.containsKey(GROUP)) {
-            Predicate groupPredicate = group(requestQuery.get(GROUP), user, locale);
+            Predicate groupPredicate = group(requestQuery.get(GROUP), loggedOrImpersonated, locale);
             if (groupPredicate != null) {
                 builder.and(groupPredicate);
             } else {
                 return null;
             }
         }
-        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(user));
-        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(user));
-        permissionConstraints.or(buildViewUserQueryConstraint(user));
-        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(user));
+        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedOrImpersonated));
+        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
+        permissionConstraints.or(buildViewUserQueryConstraint(loggedOrImpersonated));
+        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(loggedOrImpersonated));
         builder.and(permissionConstraints);
         return builder;
     }
@@ -229,6 +235,25 @@ public class CaseSearchService extends MongoSearchService<Case> {
         return builder;
     }
 
+    public Predicate tags(Object tags) {
+        if (!(tags instanceof Map)) {
+            throw new IllegalArgumentException("Unsupported class " + tags.getClass().getName());
+        }
+        Map tagsQueries = (Map) tags;
+
+        List<BooleanExpression> predicates = new ArrayList<>();
+        (tagsQueries).forEach((k, v) -> {
+            if (k instanceof String && v instanceof String) {
+                predicates.add(QCase.case$.tags.get((String) k).eq((String) v));
+            } else {
+                throw new IllegalArgumentException("Unsupported class in key or value tags element (" + k.getClass().getName() + "," + v.getClass().getName() + ")");
+            }
+        });
+        BooleanBuilder builder = new BooleanBuilder();
+        predicates.forEach(builder::and);
+        return builder;
+    }
+
     public Predicate fullText(Object petriNetQuery, String searchPhrase) {
         List<String> processes = new ArrayList<>();
         if (petriNetQuery instanceof ArrayList) {
@@ -319,12 +344,16 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     private static BooleanExpression caseIdString(String caseId) {
-        return QCase.case$._id.eq(new ObjectId(caseId));
+        return caseId.equals("") ? QCase.case$._id.isNull() :  QCase.case$._id.eq(new ObjectId(caseId));
     }
 
     public Predicate group(Object query, LoggedUser user, Locale locale) {
-        Map<String, Object> processQuery = new HashMap<>();
-        processQuery.put(GROUP, query);
+        PetriNetSearch processQuery = new PetriNetSearch();
+        if (query instanceof List) {
+            processQuery.setGroup((List<String>) query);
+        } else if (query instanceof String) {
+            processQuery.setGroup(new ArrayList<String>( Arrays.asList((String) query)) );
+        }
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
         if (groupProcesses.size() == 0)
             return null;

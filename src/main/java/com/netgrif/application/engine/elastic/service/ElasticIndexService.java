@@ -45,7 +45,7 @@ public class ElasticIndexService implements IElasticIndexService {
     @Autowired
     private ElasticsearchOperations operations;
 
-    private static final String PLACEHOLDERS = "caseIndex, taskIndex";
+    private static final String PLACEHOLDERS = "petriNetIndex, caseIndex, taskIndex";
 
     @Override
     public boolean indexExists(String indexName) {

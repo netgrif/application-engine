@@ -51,7 +51,6 @@ public class LdapLoggedUser extends LoggedUser {
         this.homeDirectory = homeDirectory;
     }
 
-
     public IUser transformToUser() {
         LdapUser user = new LdapUser(new ObjectId(this.id));
         user.setEmail(getUsername());
@@ -64,12 +63,17 @@ public class LdapLoggedUser extends LoggedUser {
         user.setMemberOf(this.memberOf);
         user.setHomeDirectory(homeDirectory);
         user.setState(UserState.ACTIVE);
+        user.setPassword("n/a");
         user.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
         user.setProcessRoles(this.getProcessRoles().stream().map(roleId -> {
             ProcessRole role = new ProcessRole();
             role.set_id(roleId);
             return role;
         }).collect(Collectors.toSet()));
+        if (this.isImpersonating()) {
+            user.setImpersonated(this.getImpersonated().transformToUser());
+        }
         return user;
     }
+
 }
