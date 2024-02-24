@@ -37,7 +37,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public abstract class AbstractTaskController {
 
@@ -259,7 +262,8 @@ public abstract class AbstractTaskController {
         outcomes.put(taskId, dataService.deleteFile(taskId, fieldId));
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
-                LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));    }
+                LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
+    }
 
     public EntityModel<EventOutcomeWithMessage> saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles, Map<String, String> dataBody) {
         Map<String, SetDataEventOutcome> outcomes = new HashMap<>();

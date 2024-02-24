@@ -15,7 +15,7 @@ public class Version implements Serializable {
 
     /**
      * @deprecated since 6.0.3 - please use {@link #LATEST} instead
-     * */
+     */
     @Deprecated(since = "6.0.3", forRemoval = false)
     public static final String NEWEST = "^";
 

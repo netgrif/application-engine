@@ -15,9 +15,9 @@ public class LdapGroupsResource extends CollectionModel<LdapGroupResponseBody> {
 
     private void buildLinks() {
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(LdapController.class)
-                .getAllLdapGroups(null,null)).withSelfRel())
-        .add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(LdapController.class)
-                .assignRolesToLdapGroup(null, null)).withRel("roleAssign"));
+                .getAllLdapGroups(null, null)).withSelfRel())
+                .add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(LdapController.class)
+                        .assignRolesToLdapGroup(null, null)).withRel("roleAssign"));
     }
 
 }

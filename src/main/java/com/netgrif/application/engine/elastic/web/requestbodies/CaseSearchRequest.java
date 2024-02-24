@@ -44,6 +44,8 @@ public class CaseSearchRequest {
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<String> group;
 
+    public Map<String, String> tags;
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -69,6 +71,4 @@ public class CaseSearchRequest {
 
         public String email;
     }
-
-    public Map<String, String> tags;
 }

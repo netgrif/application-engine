@@ -43,7 +43,7 @@ public class User {
 
     /**
      * This static method doesn't set attributes regarding the ProcessRoles
-     *
+     * <p>
      * Use the IUserFactory service to create instances that have these attributes set.
      */
     public static User createSmallUser(IUser user) {
@@ -52,7 +52,7 @@ public class User {
 
     /**
      * This static method doesn't set attributes regarding the ProcessRoles
-     *
+     * <p>
      * Use the IUserFactory service to create instances that have these attributes set.
      */
     public static User createUser(IUser user) {

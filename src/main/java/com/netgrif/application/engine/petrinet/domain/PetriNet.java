@@ -192,7 +192,9 @@ public class PetriNet extends PetriNetObject {
         negativeViewRoles.add(roleId);
     }
 
-    public void addFunction(Function function) { functions.add(function); }
+    public void addFunction(Function function) {
+        functions.add(function);
+    }
 
     public void addUserPermission(String usersRefId, Map<String, Boolean> permissions) {
         if (this.userRefs.containsKey(usersRefId) && this.userRefs.get(usersRefId) != null) {
@@ -270,14 +272,14 @@ public class PetriNet extends PetriNetObject {
         arcs.values()
                 .stream()
                 .flatMap(List::stream)
-                .filter(arc -> arc.getReference() !=null)
+                .filter(arc -> arc.getReference() != null)
                 .forEach(arc -> {
-                        String referenceId = arc.getReference().getReference();
-                        arc.getReference().setReferencable(getArcReference(referenceId, arc.getReference().getType(), dataSet));
+                    String referenceId = arc.getReference().getReference();
+                    arc.getReference().setReferencable(getArcReference(referenceId, arc.getReference().getType(), dataSet));
                 });
     }
 
-    private Referencable getArcReference(String referenceId, Type type, Map<String, DataField> dataSet){
+    private Referencable getArcReference(String referenceId, Type type, Map<String, DataField> dataSet) {
         if (type == Type.PLACE) {
             return places.get(referenceId);
         } else {

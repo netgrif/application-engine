@@ -21,9 +21,13 @@ import java.util.Map;
 
 public interface IMenuImportExportService {
 
-    Map<String, I18nString>  createAvailableEntriesChoices(List<Case> menuItemCases);
-    Map<String, I18nString>  addSelectedEntriesToExport(MultichoiceMapField availableEntries, EnumerationMapField menusForExport, String menuidentifier);
+    Map<String, I18nString> createAvailableEntriesChoices(List<Case> menuItemCases);
+
+    Map<String, I18nString> addSelectedEntriesToExport(MultichoiceMapField availableEntries, EnumerationMapField menusForExport, String menuidentifier);
+
     FileFieldValue exportMenu(EnumerationMapField menusForExport, String groupId, FileField fileField) throws IOException;
+
     List<String> importMenu(List<Case> menuItemCases, FileFieldValue ffv, String groupCaseId) throws IOException, IllegalMenuFileException, TransitionNotExecutableException;
-    String createMenuItemCase(StringBuilder resultMessage, MenuEntry item,  String menuIdentifier, String groupCaseId, String filterCaseId);
+
+    String createMenuItemCase(StringBuilder resultMessage, MenuEntry item, String menuIdentifier, String groupCaseId, String filterCaseId);
 }

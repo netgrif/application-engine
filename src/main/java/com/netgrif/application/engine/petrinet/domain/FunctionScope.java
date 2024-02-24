@@ -11,10 +11,6 @@ public enum FunctionScope {
         value = v;
     }
 
-    public String value() {
-        return value;
-    }
-
     public static FunctionScope fromValue(String v) {
         for (FunctionScope c : FunctionScope.values()) {
             if (c.value.equals(v)) {
@@ -22,5 +18,9 @@ public enum FunctionScope {
             }
         }
         throw new IllegalArgumentException(v);
+    }
+
+    public String value() {
+        return value;
     }
 }

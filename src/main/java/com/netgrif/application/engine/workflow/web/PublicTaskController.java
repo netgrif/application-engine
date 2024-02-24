@@ -9,7 +9,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskResource;
-import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -46,11 +45,9 @@ import java.util.Map;
 @RequestMapping({"/api/public/task"})
 public class PublicTaskController extends AbstractTaskController {
 
-    private final ITaskService taskService;
-
-    private final IDataService dataService;
-
     final IUserService userService;
+    private final ITaskService taskService;
+    private final IDataService dataService;
 
     public PublicTaskController(ITaskService taskService, IDataService dataService, IUserService userService) {
         super(taskService, dataService, null);

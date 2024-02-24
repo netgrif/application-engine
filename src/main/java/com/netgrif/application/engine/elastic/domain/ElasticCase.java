@@ -18,7 +18,10 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
@@ -101,11 +104,12 @@ public class ElasticCase {
 
     /**
      * Data that is stored in the elasticsearch database.
-     *
+     * <p>
      * Note that the dataSet attribute is NOT set when the object is created and must be set later.
-     *
+     * <p>
      * The {@link com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService IElasticCaseMappingService} can be used to create
      * instances of this class from Case objects, that have the dataset populated.
+     *
      * @param useCase the data object that should be turned into elasticsearch data object
      */
     public ElasticCase(Case useCase) {

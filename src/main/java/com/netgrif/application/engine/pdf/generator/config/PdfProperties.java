@@ -32,9 +32,17 @@ public class PdfProperties {
 
     protected int marginBottom = 4 * unit;
 
+    protected int formGridRowHeight = ((pageHeight - marginBottom - marginTop) / formGridRows);
+
     protected int marginLeft = (int) (0.5 * unit);
 
+    protected int baseX = marginLeft;
+
     protected int marginRight = (int) (0.5 * unit);
+
+    protected int pageDrawableWidth = pageWidth - marginLeft - marginRight;
+
+    protected int formGridColWidth = (pageDrawableWidth / formGridCols);
 
     protected int padding = 4;
 
@@ -46,11 +54,7 @@ public class PdfProperties {
 
     protected String colorDataGroup = "#2297F2";
 
-    protected int baseX = marginLeft;
-
     protected int baseY;
-
-    protected int pageDrawableWidth = pageWidth - marginLeft - marginRight;
 
     protected int fontTitleSize = 13;
 
@@ -63,10 +67,6 @@ public class PdfProperties {
     protected int formGridCols = 4;
 
     protected int formGridRows = 30;
-
-    protected int formGridColWidth = (pageDrawableWidth / formGridCols);
-
-    protected int formGridRowHeight = ((pageHeight - marginBottom - marginTop) / formGridRows);
 
     protected int rowGridFree = formGridCols;
 

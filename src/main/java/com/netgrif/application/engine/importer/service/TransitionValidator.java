@@ -5,7 +5,6 @@ import com.netgrif.application.engine.importer.service.throwable.BeatingAttribut
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
-import java.util.List;
 
 @Component
 public class TransitionValidator implements ITransitionValidator {
