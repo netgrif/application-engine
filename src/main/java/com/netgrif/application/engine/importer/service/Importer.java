@@ -2,6 +2,11 @@ package com.netgrif.application.engine.importer.service;
 
 import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
+import com.netgrif.application.engine.petrinet.domain.Component;
+import com.netgrif.application.engine.petrinet.domain.DataGroup;
+import com.netgrif.application.engine.petrinet.domain.Place;
+import com.netgrif.application.engine.petrinet.domain.Transaction;
+import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Reference;
@@ -12,7 +17,11 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
-import com.netgrif.application.engine.petrinet.domain.events.*;
+import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
+import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
+import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
+import com.netgrif.application.engine.petrinet.domain.events.EventType;
+import com.netgrif.application.engine.petrinet.domain.events.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.layout.DataGroupLayout;
 import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
@@ -113,16 +122,6 @@ public class Importer {
 
     @Autowired
     private ILogicValidator logicValidator;
-
-    protected static void copyInputStreamToFile(InputStream inputStream, File file) throws IOException {
-        try (FileOutputStream outputStream = new FileOutputStream(file)) {
-            int read;
-            byte[] bytes = new byte[1024];
-            while ((read = inputStream.read(bytes)) != -1) {
-                outputStream.write(bytes, 0, read);
-            }
-        }
-    }
 
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
@@ -1273,6 +1272,16 @@ public class Importer {
 
     public I18nString getI18n(String id) {
         return i18n.get(id);
+    }
+
+    protected static void copyInputStreamToFile(InputStream inputStream, File file) throws IOException {
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            int read;
+            byte[] bytes = new byte[1024];
+            while ((read = inputStream.read(bytes)) != -1) {
+                outputStream.write(bytes, 0, read);
+            }
+        }
     }
 
     protected void setMetaData() throws MissingPetriNetMetaDataException {
