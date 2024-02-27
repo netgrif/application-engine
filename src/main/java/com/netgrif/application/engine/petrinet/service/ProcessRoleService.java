@@ -20,6 +20,7 @@ import com.netgrif.application.engine.security.service.ISecurityContextService;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -33,27 +34,51 @@ public class ProcessRoleService implements IProcessRoleService {
 
     private static final Logger log = LoggerFactory.getLogger(ProcessRoleService.class);
 
-    private final IUserService userService;
-    private final ProcessRoleRepository processRoleRepository;
-    private final PetriNetRepository netRepository;
-    private final ApplicationEventPublisher publisher;
-    private final RoleActionsRunner roleActionsRunner;
-    private final IPetriNetService petriNetService;
-    private final ISecurityContextService securityContextService;
+    private IUserService userService;
+    private ProcessRoleRepository processRoleRepository;
+    private PetriNetRepository netRepository;
+    private ApplicationEventPublisher publisher;
+    private RoleActionsRunner roleActionsRunner;
+    private IPetriNetService petriNetService;
+    private ISecurityContextService securityContextService;
 
     private ProcessRole defaultRole;
     private ProcessRole anonymousRole;
 
-    public ProcessRoleService(ProcessRoleRepository processRoleRepository,
-                              PetriNetRepository netRepository,
-                              ApplicationEventPublisher publisher, RoleActionsRunner roleActionsRunner,
-                              @Lazy IPetriNetService petriNetService, @Lazy IUserService userService, ISecurityContextService securityContextService) {
-        this.processRoleRepository = processRoleRepository;
-        this.netRepository = netRepository;
-        this.publisher = publisher;
-        this.roleActionsRunner = roleActionsRunner;
-        this.petriNetService = petriNetService;
+    @Autowired
+    @Lazy
+    public void setUserService(IUserService userService) {
         this.userService = userService;
+    }
+
+    @Autowired
+    public void setProcessRoleRepository(ProcessRoleRepository processRoleRepository) {
+        this.processRoleRepository = processRoleRepository;
+    }
+
+    @Autowired
+    public void setNetRepository(PetriNetRepository netRepository) {
+        this.netRepository = netRepository;
+    }
+
+    @Autowired
+    public void setPublisher(ApplicationEventPublisher publisher) {
+        this.publisher = publisher;
+    }
+
+    @Autowired
+    public void setRoleActionsRunner(RoleActionsRunner roleActionsRunner) {
+        this.roleActionsRunner = roleActionsRunner;
+    }
+
+    @Autowired
+    @Lazy
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
+    }
+
+    @Autowired
+    public void setSecurityContextService(ISecurityContextService securityContextService) {
         this.securityContextService = securityContextService;
     }
 

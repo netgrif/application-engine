@@ -19,27 +19,51 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 @Slf4j
 public class GroupRunner extends AbstractOrderedCommandLineRunner {
 
-    @Autowired
     private ImportHelper helper
 
-    @Autowired
     private INextGroupService nextGroupService
 
-    @Autowired
     private IUserService userService
 
-    @Autowired
     private SystemUserRunner systemCreator
 
-    @Autowired
     private IPetriNetService petriNetService
 
-    @Autowired
     private GroupConfigurationProperties groupProperties
 
     private static final String GROUP_FILE_NAME = "engine-processes/org_group.xml";
     private static final String GROUP_PETRINET_IDENTIFIER = "org_group"
     public static final String DEFAULT_GROUP_TITLE = "Default system group"
+
+    @Autowired
+    void setHelper(ImportHelper helper) {
+        this.helper = helper
+    }
+
+    @Autowired
+    void setNextGroupService(INextGroupService nextGroupService) {
+        this.nextGroupService = nextGroupService
+    }
+
+    @Autowired
+    void setUserService(IUserService userService) {
+        this.userService = userService
+    }
+
+    @Autowired
+    void setSystemCreator(SystemUserRunner systemCreator) {
+        this.systemCreator = systemCreator
+    }
+
+    @Autowired
+    void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService
+    }
+
+    @Autowired
+    void setGroupProperties(GroupConfigurationProperties groupProperties) {
+        this.groupProperties = groupProperties
+    }
 
     @Override
     void run(String... args) throws Exception {

@@ -10,8 +10,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthorizationService implements IAuthorizationService {
 
-    @Autowired
     private IUserService userService;
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public boolean hasAuthority(String authority) {

@@ -21,8 +21,12 @@ import java.util.stream.Collectors;
 @Service
 public class TaskSearchService extends MongoSearchService<Task> {
 
-    @Autowired
     private IPetriNetService petriNetService;
+
+    @Autowired
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
+    }
 
     public Predicate buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
         LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();

@@ -50,8 +50,12 @@ public class CaseSearchService extends MongoSearchService<Case> {
     public static final String CASE_ID = "stringId";
     public static final String GROUP = "group";
 
-    @Autowired
     private IPetriNetService petriNetService;
+
+    @Autowired
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
+    }
 
     public Predicate buildQuery(Map<String, Object> requestQuery, LoggedUser user, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();

@@ -26,11 +26,20 @@ import java.util.List;
 
 @Service
 public class HistoryService implements IHistoryService {
-    @Autowired
+
     private EventLogRepository eventLogRepository;
 
-    @Autowired
     private MongoTemplate mongoTemplate;
+
+    @Autowired
+    public void setEventLogRepository(EventLogRepository eventLogRepository) {
+        this.eventLogRepository = eventLogRepository;
+    }
+
+    @Autowired
+    public void setMongoTemplate(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
 
     @Override
     @Async

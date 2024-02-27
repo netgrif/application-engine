@@ -13,8 +13,12 @@ import org.springframework.stereotype.Component
 @Component
 class AnonymousRoleRunner extends AbstractOrderedCommandLineRunner {
 
-    @Autowired
     private ProcessRoleRepository repository
+
+    @Autowired
+    void setRepository(ProcessRoleRepository repository) {
+        this.repository = repository
+    }
 
     @Override
     void run(String... strings) throws Exception {

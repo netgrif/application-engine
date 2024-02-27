@@ -29,26 +29,54 @@ import java.util.stream.Collectors;
 @Service
 public class ImpersonationService implements IImpersonationService {
 
-    @Autowired
     protected ImpersonationProperties properties;
 
-    @Autowired
     protected IUserService userService;
 
-    @Autowired
     protected IHistoryService historyService;
 
-    @Autowired
     protected IImpersonationSessionService sessionService;
 
-    @Autowired
     protected ISecurityContextService securityContextService;
 
-    @Autowired
     protected ImpersonatorRepository impersonatorRepository;
 
-    @Autowired
     protected IImpersonationAuthorizationService impersonationAuthorizationService;
+
+    @Autowired
+    public void setProperties(ImpersonationProperties properties) {
+        this.properties = properties;
+    }
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setHistoryService(IHistoryService historyService) {
+        this.historyService = historyService;
+    }
+
+    @Autowired
+    public void setSessionService(IImpersonationSessionService sessionService) {
+        this.sessionService = sessionService;
+    }
+
+    @Autowired
+    public void setSecurityContextService(ISecurityContextService securityContextService) {
+        this.securityContextService = securityContextService;
+    }
+
+    @Autowired
+    public void setImpersonatorRepository(ImpersonatorRepository impersonatorRepository) {
+        this.impersonatorRepository = impersonatorRepository;
+    }
+
+    @Autowired
+    public void setImpersonationAuthorizationService(IImpersonationAuthorizationService impersonationAuthorizationService) {
+        this.impersonationAuthorizationService = impersonationAuthorizationService;
+    }
 
     @Override
     public LoggedUser impersonateUser(String impersonatedId) throws ImpersonatedUserHasSessionException {

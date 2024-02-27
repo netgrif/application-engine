@@ -24,8 +24,12 @@ import java.util.stream.Collectors;
 @Repository("caseRepository")
 public abstract class CaseRepositoryImpl implements CaseRepository {
 
-    @Autowired
     private IPetriNetService petriNetService;
+
+    @Autowired
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
+    }
 
     @Override
     public void customize(QuerydslBindings bindings, QCase qCase) {

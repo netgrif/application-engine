@@ -18,11 +18,19 @@ public class CaseRuleEvaluationJob extends RuleJob {
 
     private static final Logger log = LoggerFactory.getLogger(CaseRuleEvaluationJob.class);
 
-    @Autowired
     private IRuleEngine ruleEngine;
 
-    @Autowired
     private IWorkflowService workflowService;
+
+    @Autowired
+    public void setRuleEngine(IRuleEngine ruleEngine) {
+        this.ruleEngine = ruleEngine;
+    }
+
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
 
     @Override
     public void doExecute(JobExecutionContext context) {

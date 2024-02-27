@@ -23,19 +23,35 @@ abstract class FieldActionsRunner {
     @Lookup("actionDelegate")
     abstract ActionDelegate getActionDeleget()
 
-    @Autowired
     private IOrsrService orsrService
 
-    @Autowired
     private IPostalCodeService postalCodeService
 
-    @Autowired
     private FieldFactory fieldFactory
 
-    @Autowired
     private IFieldActionsCacheService actionsCacheService
 
     private Map<String, Object> actionsCache = new HashMap<>()
+
+    @Autowired
+    void setOrsrService(IOrsrService orsrService) {
+        this.orsrService = orsrService
+    }
+
+    @Autowired
+    void setPostalCodeService(IPostalCodeService postalCodeService) {
+        this.postalCodeService = postalCodeService
+    }
+
+    @Autowired
+    void setFieldFactory(FieldFactory fieldFactory) {
+        this.fieldFactory = fieldFactory
+    }
+
+    @Autowired
+    void setActionsCacheService(IFieldActionsCacheService actionsCacheService) {
+        this.actionsCacheService = actionsCacheService
+    }
 
     List<EventOutcome> run(Action action, Case useCase, List<Function> functions = []) {
         return run(action, useCase, Optional.empty(), functions)

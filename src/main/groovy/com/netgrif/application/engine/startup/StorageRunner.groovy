@@ -17,8 +17,12 @@ class StorageRunner extends AbstractOrderedCommandLineRunner {
     @Value('${nae.storage.clean}')
     private boolean cleanStorage
 
-    @Autowired
     private FileStorageConfiguration fileStorageConfiguration
+
+    @Autowired
+    void setFileStorageConfiguration(FileStorageConfiguration fileStorageConfiguration) {
+        this.fileStorageConfiguration = fileStorageConfiguration
+    }
 
     @Override
     void run(String... strings) throws Exception {

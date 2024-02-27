@@ -11,8 +11,12 @@ import java.util.Map;
 public class ElasticCasePrioritySearch implements IElasticCasePrioritySearch {
 
 
-    @Autowired
     protected ElasticCaseSearchConfiguration elasticCaseSearchConfiguration;
+
+    @Autowired
+    public void setElasticCaseSearchConfiguration(ElasticCaseSearchConfiguration elasticCaseSearchConfiguration) {
+        this.elasticCaseSearchConfiguration = elasticCaseSearchConfiguration;
+    }
 
     @Override
     public Map<String, Float> fullTextFields() {

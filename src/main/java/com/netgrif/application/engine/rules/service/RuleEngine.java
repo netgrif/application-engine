@@ -28,8 +28,12 @@ public abstract class RuleEngine implements IRuleEngine {
     @Value("${rule-engine.rethrow-exceptions:#{false}}")
     protected boolean rethrowExceptions;
 
-    @Autowired
     private RuleRepository ruleRepository;
+
+    @Autowired
+    public void setRuleRepository(RuleRepository ruleRepository) {
+        this.ruleRepository = ruleRepository;
+    }
 
     @Lookup
     protected abstract KieSession ruleEngine();

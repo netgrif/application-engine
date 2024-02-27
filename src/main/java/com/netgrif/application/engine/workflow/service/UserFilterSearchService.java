@@ -18,11 +18,19 @@ import java.util.List;
 @Service
 public class UserFilterSearchService implements IUserFilterSearchService {
 
-    @Autowired
     private IElasticCaseService caseSearchService;
 
-    @Autowired
     private IUserService userService;
+
+    @Autowired
+    public void setCaseSearchService(IElasticCaseService caseSearchService) {
+        this.caseSearchService = caseSearchService;
+    }
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public List<Case> autocompleteFindFilters(String userInput) {

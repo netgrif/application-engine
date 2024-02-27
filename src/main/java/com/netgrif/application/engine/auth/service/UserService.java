@@ -26,32 +26,47 @@ import java.util.stream.Collectors;
 
 public class UserService extends AbstractUserService {
 
-    @Autowired
-    protected UserRepository userRepository;
-
-    @Autowired
     protected AuthorityRepository authorityRepository;
 
-    @Autowired
-    protected IProcessRoleService processRoleService;
-
-    @Autowired
     protected ApplicationEventPublisher publisher;
 
-    @Autowired
-    protected INextGroupService groupService;
-
-    @Autowired
     protected IRegistrationService registrationService;
 
-    @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Autowired
     private GroupConfigurationProperties groupProperties;
 
-    @Autowired
     private IFilterImportExportService filterImportExportService;
+
+    @Autowired
+    public void setAuthorityRepository(AuthorityRepository authorityRepository) {
+        this.authorityRepository = authorityRepository;
+    }
+
+    @Autowired
+    public void setPublisher(ApplicationEventPublisher publisher) {
+        this.publisher = publisher;
+    }
+
+    @Autowired
+    public void setRegistrationService(IRegistrationService registrationService) {
+        this.registrationService = registrationService;
+    }
+
+    @Autowired
+    public void setbCryptPasswordEncoder(BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
+
+    @Autowired
+    public void setGroupProperties(GroupConfigurationProperties groupProperties) {
+        this.groupProperties = groupProperties;
+    }
+
+    @Autowired
+    public void setFilterImportExportService(IFilterImportExportService filterImportExportService) {
+        this.filterImportExportService = filterImportExportService;
+    }
 
     @Override
     public IUser saveNewAndAuthenticate(IUser user) {

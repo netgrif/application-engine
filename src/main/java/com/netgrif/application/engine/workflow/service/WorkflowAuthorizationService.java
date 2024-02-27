@@ -17,11 +17,19 @@ import java.util.Map;
 @Service
 public class WorkflowAuthorizationService extends AbstractAuthorizationService implements IWorkflowAuthorizationService {
 
-    @Autowired
     private IWorkflowService workflowService;
 
-    @Autowired
     private IPetriNetService petriNetService;
+
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
+
+    @Autowired
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
+    }
 
     @Override
     public boolean canCallDelete(LoggedUser user, String caseId) {

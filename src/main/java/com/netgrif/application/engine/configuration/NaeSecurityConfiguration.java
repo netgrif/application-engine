@@ -50,37 +50,70 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 @Order(SecurityProperties.DEFAULT_FILTER_ORDER)
 public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
-    @Autowired
     private Environment env;
 
-    @Autowired
     private RestAuthenticationEntryPoint authenticationEntryPoint;
 
-    @Autowired
     private IAuthorityService authorityService;
 
-    @Autowired
     private IJwtService jwtService;
 
-    @Autowired
     private IUserService userService;
 
-    @Autowired
-    private NaeAuthProperties naeAuthProperties;
-
-    @Autowired
     private SecurityConfigProperties properties;
 
-    @Autowired
     private ISecurityContextService securityContextService;
 
-    @Autowired
     protected NaeLdapProperties ldapProperties;
 
-    @Autowired
     protected IImpersonationService impersonationService;
 
     private static final String ANONYMOUS_USER = "anonymousUser";
+
+    @Autowired
+    public void setEnv(Environment env) {
+        this.env = env;
+    }
+
+    @Autowired
+    public void setAuthenticationEntryPoint(RestAuthenticationEntryPoint authenticationEntryPoint) {
+        this.authenticationEntryPoint = authenticationEntryPoint;
+    }
+
+    @Autowired
+    public void setAuthorityService(IAuthorityService authorityService) {
+        this.authorityService = authorityService;
+    }
+
+    @Autowired
+    public void setJwtService(IJwtService jwtService) {
+        this.jwtService = jwtService;
+    }
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setProperties(SecurityConfigProperties properties) {
+        this.properties = properties;
+    }
+
+    @Autowired
+    public void setSecurityContextService(ISecurityContextService securityContextService) {
+        this.securityContextService = securityContextService;
+    }
+
+    @Autowired
+    public void setLdapProperties(NaeLdapProperties ldapProperties) {
+        this.ldapProperties = ldapProperties;
+    }
+
+    @Autowired
+    public void setImpersonationService(IImpersonationService impersonationService) {
+        this.impersonationService = impersonationService;
+    }
 
     @Bean
     public HttpSessionIdResolver httpSessionIdResolver() {

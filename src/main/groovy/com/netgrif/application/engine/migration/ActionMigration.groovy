@@ -16,11 +16,19 @@ import java.util.stream.Collectors
 @Slf4j
 class ActionMigration {
 
-    @Autowired
     private IPetriNetService petriNetService
 
-    @Autowired
     private IUserService userService;
+
+    @Autowired
+    void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService
+    }
+
+    @Autowired
+    void setUserService(IUserService userService) {
+        this.userService = userService
+    }
 
     void migrateActions(String petriNetPath) {
         InputStream netStream = new ClassPathResource(petriNetPath).inputStream

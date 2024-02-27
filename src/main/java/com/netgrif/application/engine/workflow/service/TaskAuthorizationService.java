@@ -17,8 +17,12 @@ import java.util.Map;
 @Service
 public class TaskAuthorizationService extends AbstractAuthorizationService implements ITaskAuthorizationService {
 
-    @Autowired
     ITaskService taskService;
+
+    @Autowired
+    public void setTaskService(ITaskService taskService) {
+        this.taskService = taskService;
+    }
 
     @Override
     public Boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, RolePermission... permissions) {

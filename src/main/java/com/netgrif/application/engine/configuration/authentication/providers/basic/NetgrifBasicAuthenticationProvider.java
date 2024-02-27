@@ -22,13 +22,16 @@ import org.springframework.util.Assert;
 @Component
 public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationProvider {
 
-    @Autowired
     protected UserRepository userRepository;
 
     protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
 
     protected PasswordEncoder passwordEncoder;
 
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {

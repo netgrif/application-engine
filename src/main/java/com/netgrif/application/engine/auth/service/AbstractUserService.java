@@ -23,21 +23,40 @@ import static com.netgrif.application.engine.startup.SystemUserRunner.*;
 
 public abstract class AbstractUserService implements IUserService {
 
-    @Autowired
     protected IAuthorityService authorityService;
 
-    @Autowired
     protected IProcessRoleService processRoleService;
 
-
-    @Autowired
     protected INextGroupService groupService;
 
-    @Autowired
-    protected UserRepository repository;
+    protected UserRepository userRepository;
+
+    private ISecurityContextService securityContextService;
 
     @Autowired
-    private ISecurityContextService securityContextService;
+    public void setAuthorityService(IAuthorityService authorityService) {
+        this.authorityService = authorityService;
+    }
+
+    @Autowired
+    public void setProcessRoleService(IProcessRoleService processRoleService) {
+        this.processRoleService = processRoleService;
+    }
+
+    @Autowired
+    public void setGroupService(INextGroupService groupService) {
+        this.groupService = groupService;
+    }
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Autowired
+    public void setSecurityContextService(ISecurityContextService securityContextService) {
+        this.securityContextService = securityContextService;
+    }
 
     @Override
     public void addDefaultRole(IUser user) {
@@ -109,11 +128,11 @@ public abstract class AbstractUserService implements IUserService {
 
     @Override
     public IUser createSystemUser() {
-        User system = repository.findByEmail(SYSTEM_USER_EMAIL);
+        User system = userRepository.findByEmail(SYSTEM_USER_EMAIL);
         if (system == null) {
             system = new User(SYSTEM_USER_EMAIL, "n/a", SYSTEM_USER_NAME, SYSTEM_USER_SURNAME);
             system.setState(UserState.ACTIVE);
-            repository.save(system);
+            userRepository.save(system);
         }
         return system;
     }

@@ -66,34 +66,24 @@ public class DataService implements IDataService {
 
     public static final int MONGO_ID_LENGTH = 24;
 
-    @Autowired
     protected ApplicationEventPublisher publisher;
 
-    @Autowired
     protected ITaskService taskService;
 
-    @Autowired
     protected IWorkflowService workflowService;
 
-    @Autowired
     protected IUserService userService;
 
-    @Autowired
     protected FieldFactory fieldFactory;
 
-    @Autowired
     protected FieldActionsRunner actionsRunner;
 
-    @Autowired
     protected IEventService eventService;
 
-    @Autowired
     protected IHistoryService historyService;
 
-    @Autowired
     protected IPetriNetService petriNetService;
 
-    @Autowired
     protected IValidationService validation;
 
     @Value("${nae.image.preview.scaling.px:400}")
@@ -101,6 +91,56 @@ public class DataService implements IDataService {
 
     @Value("${nae.validation.setData.enable:false}")
     protected boolean validationEnable;
+
+    @Autowired
+    public void setPublisher(ApplicationEventPublisher publisher) {
+        this.publisher = publisher;
+    }
+
+    @Autowired
+    public void setTaskService(ITaskService taskService) {
+        this.taskService = taskService;
+    }
+
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setFieldFactory(FieldFactory fieldFactory) {
+        this.fieldFactory = fieldFactory;
+    }
+
+    @Autowired
+    public void setActionsRunner(FieldActionsRunner actionsRunner) {
+        this.actionsRunner = actionsRunner;
+    }
+
+    @Autowired
+    public void setEventService(IEventService eventService) {
+        this.eventService = eventService;
+    }
+
+    @Autowired
+    public void setHistoryService(IHistoryService historyService) {
+        this.historyService = historyService;
+    }
+
+    @Autowired
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
+    }
+
+    @Autowired
+    public void setValidation(IValidationService validation) {
+        this.validation = validation;
+    }
 
     @Override
     public GetDataEventOutcome getData(String taskId) {

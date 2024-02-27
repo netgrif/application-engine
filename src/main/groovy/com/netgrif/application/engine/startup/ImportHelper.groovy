@@ -48,50 +48,105 @@ class ImportHelper {
 
     private static final Logger log = LoggerFactory.getLogger(ImportHelper.class.name)
 
-    @Autowired
     private PetriNetRepository petriNetRepository
 
-    @Autowired
     private IUserService userService
 
-    @Autowired
     private CaseRepository caseRepository
 
-    @Autowired
     private IAuthorityService authorityService
 
-    @Autowired
     private ITaskService taskService
 
-    @Autowired
     private IPetriNetService petriNetService
 
-    @Autowired
     private ResourceLoader resourceLoader
 
-    @Autowired
     private IFilterService filterService
 
-    @Autowired(required = false)
     private SuperCreator superCreator
 
-    @Autowired
     private IDataService dataService
 
-    @Autowired
     private IWorkflowService workflowService
 
-    @Autowired
     private INextGroupService groupService
 
-    @Autowired
     private ProcessRoleService processRoleService
 
-    @Autowired
     private IUriService uriService
 
     private final ClassLoader loader = ImportHelper.getClassLoader()
 
+    @Autowired
+    void setPetriNetRepository(PetriNetRepository petriNetRepository) {
+        this.petriNetRepository = petriNetRepository
+    }
+
+    @Autowired
+    void setUserService(IUserService userService) {
+        this.userService = userService
+    }
+
+    @Autowired
+    void setCaseRepository(CaseRepository caseRepository) {
+        this.caseRepository = caseRepository
+    }
+
+    @Autowired
+    void setAuthorityService(IAuthorityService authorityService) {
+        this.authorityService = authorityService
+    }
+
+    @Autowired
+    void setTaskService(ITaskService taskService) {
+        this.taskService = taskService
+    }
+
+    @Autowired
+    void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService
+    }
+
+    @Autowired
+    void setResourceLoader(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader
+    }
+
+    @Autowired
+    void setFilterService(IFilterService filterService) {
+        this.filterService = filterService
+    }
+
+    @Autowired(required = false)
+    void setSuperCreator(SuperCreator superCreator) {
+        this.superCreator = superCreator
+    }
+
+    @Autowired
+    void setDataService(IDataService dataService) {
+        this.dataService = dataService
+    }
+
+    @Autowired
+    void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService
+    }
+
+    @Autowired
+    void setGroupService(INextGroupService groupService) {
+        this.groupService = groupService
+    }
+
+    @Autowired
+    void setProcessRoleService(ProcessRoleService processRoleService) {
+        this.processRoleService = processRoleService
+    }
+
+    @Autowired
+    void setUriService(IUriService uriService) {
+        this.uriService = uriService
+    }
 
     @SuppressWarnings("GroovyAssignabilityCheck")
     Map<String, Authority> createAuthorities(Map<String, String> authorities) {

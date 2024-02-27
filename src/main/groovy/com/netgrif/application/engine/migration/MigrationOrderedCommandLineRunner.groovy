@@ -15,11 +15,19 @@ abstract class MigrationOrderedCommandLineRunner extends AbstractOrderedCommandL
 
     private String title = this.class.simpleName
 
-    @Autowired
     private MigrationRepository repository
 
-    @Autowired
     private IPetriNetService service
+
+    @Autowired
+    void setRepository(MigrationRepository repository) {
+        this.repository = repository
+    }
+
+    @Autowired
+    void setService(IPetriNetService service) {
+        this.service = service
+    }
 
     @Override
     void run(String... strings) throws Exception {

@@ -19,22 +19,38 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(SuperCreator.class.name)
 
-    @Autowired
     private IAuthorityService authorityService
 
-    @Autowired
     private IUserService userService
 
-    @Autowired
     private INextGroupService groupService
 
-    @Autowired
     private IProcessRoleService processRoleService
 
     @Value('${nae.admin.password}')
     private String superAdminPassword
 
     private IUser superUser
+
+    @Autowired
+    void setAuthorityService(IAuthorityService authorityService) {
+        this.authorityService = authorityService
+    }
+
+    @Autowired
+    void setUserService(IUserService userService) {
+        this.userService = userService
+    }
+
+    @Autowired
+    void setGroupService(INextGroupService groupService) {
+        this.groupService = groupService
+    }
+
+    @Autowired
+    void setProcessRoleService(IProcessRoleService processRoleService) {
+        this.processRoleService = processRoleService
+    }
 
     @Override
     void run(String... strings) {

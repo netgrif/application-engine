@@ -35,11 +35,19 @@ public class PdfGenerator implements IPdfGenerator {
 
     private PDDocument pdf;
 
-    @Autowired
     private IPdfDataHelper pdfDataHelper;
 
-    @Autowired
     private IPdfDrawer pdfDrawer;
+
+    @Autowired
+    public void setPdfDataHelper(IPdfDataHelper pdfDataHelper) {
+        this.pdfDataHelper = pdfDataHelper;
+    }
+
+    @Autowired
+    public void setPdfDrawer(IPdfDrawer pdfDrawer) {
+        this.pdfDrawer = pdfDrawer;
+    }
 
     @Override
     public void setupPdfGenerator(PdfResource pdfResource) throws IOException {

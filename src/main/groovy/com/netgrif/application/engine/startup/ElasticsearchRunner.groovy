@@ -36,11 +36,19 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
     @Value('${spring.data.elasticsearch.index.task}')
     private String taskIndex
 
-    @Autowired
     private UriProperties uriProperties
 
-    @Autowired
     private IElasticIndexService template
+
+    @Autowired
+    void setUriProperties(UriProperties uriProperties) {
+        this.uriProperties = uriProperties
+    }
+
+    @Autowired
+    void setTemplate(IElasticIndexService template) {
+        this.template = template
+    }
 
     @Override
     void run(String... args) throws Exception {

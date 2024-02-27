@@ -23,11 +23,19 @@ class PostalCodeImporter extends AbstractOrderedCommandLineRunner {
     @Value("\${nae.postal.codes.csv}")
     String postalCodesPath
 
-    @Autowired
     private IPostalCodeService service
 
-    @Autowired
     private PostalCodeRepository repository
+
+    @Autowired
+    void setService(IPostalCodeService service) {
+        this.service = service
+    }
+
+    @Autowired
+    void setRepository(PostalCodeRepository repository) {
+        this.repository = repository
+    }
 
     void run(String... strings) {
         if (!importPostalCode) {

@@ -13,8 +13,12 @@ class FinisherRunnerSuperCreator extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(FinisherRunnerSuperCreator)
 
-    @Autowired
     private SuperCreator superCreator
+
+    @Autowired
+    void setSuperCreator(SuperCreator superCreator) {
+        this.superCreator = superCreator
+    }
 
     @Override
     void run(String... strings) throws Exception {

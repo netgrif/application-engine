@@ -70,47 +70,36 @@ public class TaskService implements ITaskService {
 
     private static final Logger log = LoggerFactory.getLogger(TaskService.class);
 
-    @Autowired
     protected ApplicationEventPublisher publisher;
 
-    @Autowired
     protected TaskRepository taskRepository;
 
-    @Autowired
     protected IUserService userService;
 
-    @Autowired
     protected MongoTemplate mongoTemplate;
 
-    @Autowired
     protected TaskSearchService searchService;
 
-    @Autowired
     @Qualifier("taskScheduler")
     protected TaskScheduler scheduler;
 
-    @Autowired
     protected IWorkflowService workflowService;
 
-    @Autowired
     protected IDataService dataService;
 
-    @Autowired
     protected IProcessRoleService processRoleService;
 
-    @Autowired
     protected IElasticTaskMappingService taskMappingService;
 
-    @Autowired
     protected IEventService eventService;
 
     protected IElasticTaskService elasticTaskService;
 
-    @Autowired
     protected IHistoryService historyService;
 
-    @Autowired
     protected IValidationService validation;
+
+    private IRuleEngine ruleEngine;
 
     @Autowired
     public void setElasticTaskService(IElasticTaskService elasticTaskService) {
@@ -118,7 +107,74 @@ public class TaskService implements ITaskService {
     }
 
     @Autowired
-    private IRuleEngine ruleEngine;
+    public void setPublisher(ApplicationEventPublisher publisher) {
+        this.publisher = publisher;
+    }
+
+    @Autowired
+    public void setTaskRepository(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setMongoTemplate(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
+
+    @Autowired
+    public void setSearchService(TaskSearchService searchService) {
+        this.searchService = searchService;
+    }
+
+    @Autowired
+    public void setScheduler(TaskScheduler scheduler) {
+        this.scheduler = scheduler;
+    }
+
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
+
+    @Autowired
+    public void setDataService(IDataService dataService) {
+        this.dataService = dataService;
+    }
+
+    @Autowired
+    public void setProcessRoleService(IProcessRoleService processRoleService) {
+        this.processRoleService = processRoleService;
+    }
+
+    @Autowired
+    public void setTaskMappingService(IElasticTaskMappingService taskMappingService) {
+        this.taskMappingService = taskMappingService;
+    }
+
+    @Autowired
+    public void setEventService(IEventService eventService) {
+        this.eventService = eventService;
+    }
+
+    @Autowired
+    public void setHistoryService(IHistoryService historyService) {
+        this.historyService = historyService;
+    }
+
+    @Autowired
+    public void setValidation(IValidationService validation) {
+        this.validation = validation;
+    }
+
+    @Autowired
+    public void setRuleEngine(IRuleEngine ruleEngine) {
+        this.ruleEngine = ruleEngine;
+    }
 
     @Override
     public List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException {

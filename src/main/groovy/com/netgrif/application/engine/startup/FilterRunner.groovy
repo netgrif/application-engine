@@ -12,13 +12,10 @@ import org.springframework.stereotype.Component
 @Component
 class FilterRunner extends AbstractOrderedCommandLineRunner {
 
-    @Autowired
     private IPetriNetService petriNetService
 
-    @Autowired
     private ImportHelper helper
 
-    @Autowired
     private SystemUserRunner systemCreator
 
     private static final String FILTER_FILE_NAME = "engine-processes/filter.xml"
@@ -32,6 +29,21 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
 
     private static final String IMPORT_FILTER_FILE_NAME = "engine-processes/import_filters.xml"
     private static final String IMPORT_NET_IDENTIFIER = "import_filters"
+
+    @Autowired
+    void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService
+    }
+
+    @Autowired
+    void setHelper(ImportHelper helper) {
+        this.helper = helper
+    }
+
+    @Autowired
+    void setSystemCreator(SystemUserRunner systemCreator) {
+        this.systemCreator = systemCreator
+    }
 
     @Override
     void run(String... args) throws Exception {

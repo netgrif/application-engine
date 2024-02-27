@@ -13,8 +13,12 @@ import org.springframework.stereotype.Component;
 @Profile("!test")
 public class AuthEventListener {
 
-    @Autowired
     private ILoginAttemptService loginAttemptService;
+
+    @Autowired
+    public void setLoginAttemptService(ILoginAttemptService loginAttemptService) {
+        this.loginAttemptService = loginAttemptService;
+    }
 
     @EventListener
     public void onAuthenticationFailureBadCredentialsEvent(final AuthenticationFailureBadCredentialsEvent e) {

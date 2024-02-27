@@ -14,8 +14,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class PetriNetEventHandler extends AbstractMongoEventListener<PetriNet> {
 
-    @Autowired
     private IElasticPetriNetService service;
+
+    @Autowired
+    public void setService(IElasticPetriNetService service) {
+        this.service = service;
+    }
 
     @Override
     public void onAfterDelete(AfterDeleteEvent<PetriNet> event) {

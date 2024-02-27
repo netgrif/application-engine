@@ -8,7 +8,6 @@ import java.util.Locale;
 
 public class UserResourceAssembler implements RepresentationModelAssembler<IUser, UserResource> {
 
-    @Autowired
     private IUserFactory userFactory;
 
     private Locale locale;
@@ -18,6 +17,11 @@ public class UserResourceAssembler implements RepresentationModelAssembler<IUser
     private boolean initialized = false;
 
     public UserResourceAssembler() {
+    }
+
+    @Autowired
+    public void setUserFactory(IUserFactory userFactory) {
+        this.userFactory = userFactory;
     }
 
     public void initialize(Locale locale, boolean small, String selfRel) {

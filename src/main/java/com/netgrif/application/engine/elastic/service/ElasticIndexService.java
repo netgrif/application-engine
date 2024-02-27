@@ -36,16 +36,28 @@ import java.util.List;
 @Service
 public class ElasticIndexService implements IElasticIndexService {
 
-    @Autowired
     private ApplicationContext context;
 
-    @Autowired
     private ElasticsearchRestTemplate elasticsearchTemplate;
 
-    @Autowired
     private ElasticsearchOperations operations;
 
     private static final String PLACEHOLDERS = "petriNetIndex, caseIndex, taskIndex";
+
+    @Autowired
+    public void setContext(ApplicationContext context) {
+        this.context = context;
+    }
+
+    @Autowired
+    public void setElasticsearchTemplate(ElasticsearchRestTemplate elasticsearchTemplate) {
+        this.elasticsearchTemplate = elasticsearchTemplate;
+    }
+
+    @Autowired
+    public void setOperations(ElasticsearchOperations operations) {
+        this.operations = operations;
+    }
 
     @Override
     public boolean indexExists(String indexName) {

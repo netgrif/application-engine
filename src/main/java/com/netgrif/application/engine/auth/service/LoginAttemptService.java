@@ -16,7 +16,6 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class LoginAttemptService implements ILoginAttemptService {
 
-    @Autowired
     private SecurityLimitsProperties securityLimitsProperties;
 
     private LoadingCache<String, Integer> attemptsCache;
@@ -31,6 +30,10 @@ public class LoginAttemptService implements ILoginAttemptService {
                 });
     }
 
+    @Autowired
+    public void setSecurityLimitsProperties(SecurityLimitsProperties securityLimitsProperties) {
+        this.securityLimitsProperties = securityLimitsProperties;
+    }
 
     public void loginSucceeded(String key) {
         attemptsCache.invalidate(key);

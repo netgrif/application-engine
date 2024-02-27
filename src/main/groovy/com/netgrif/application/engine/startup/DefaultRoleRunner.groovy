@@ -17,8 +17,12 @@ class DefaultRoleRunner extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultRoleRunner.class)
 
-    @Autowired
     private ProcessRoleRepository repository
+
+    @Autowired
+    void setRepository(ProcessRoleRepository repository) {
+        this.repository = repository
+    }
 
     @Override
     void run(String... strings) throws Exception {

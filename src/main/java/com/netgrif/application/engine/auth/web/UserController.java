@@ -59,32 +59,68 @@ import java.util.stream.Collectors;
 @Tag(name = "User")
 public class UserController {
 
-    @Autowired
     private IUserService userService;
 
-    @Autowired
     private IUserResourceHelperService userResourceHelperService;
 
-    @Autowired
     private IProcessRoleService processRoleService;
 
-    @Autowired
     private IAuthorityService authorityService;
 
-    @Autowired
     private IPreferencesService preferencesService;
 
-    @Autowired
     private ServerAuthProperties serverAuthProperties;
 
-    @Autowired
     private IUserFactory userResponseFactory;
 
-    @Autowired
     private Provider<UserResourceAssembler> userResourceAssemblerProvider;
 
-    @Autowired
     private ISecurityContextService securityContextService;
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setUserResourceHelperService(IUserResourceHelperService userResourceHelperService) {
+        this.userResourceHelperService = userResourceHelperService;
+    }
+
+    @Autowired
+    public void setProcessRoleService(IProcessRoleService processRoleService) {
+        this.processRoleService = processRoleService;
+    }
+
+    @Autowired
+    public void setAuthorityService(IAuthorityService authorityService) {
+        this.authorityService = authorityService;
+    }
+
+    @Autowired
+    public void setPreferencesService(IPreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
+    }
+
+    @Autowired
+    public void setServerAuthProperties(ServerAuthProperties serverAuthProperties) {
+        this.serverAuthProperties = serverAuthProperties;
+    }
+
+    @Autowired
+    public void setUserResponseFactory(IUserFactory userResponseFactory) {
+        this.userResponseFactory = userResponseFactory;
+    }
+
+    @Autowired
+    public void setUserResourceAssemblerProvider(Provider<UserResourceAssembler> userResourceAssemblerProvider) {
+        this.userResourceAssemblerProvider = userResourceAssemblerProvider;
+    }
+
+    @Autowired
+    public void setSecurityContextService(ISecurityContextService securityContextService) {
+        this.securityContextService = securityContextService;
+    }
 
     protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
         UserResourceAssembler result = userResourceAssemblerProvider.get();

@@ -12,8 +12,12 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class DashboardService implements IDashboardService {
 
-    @Autowired
     private ElasticsearchProperties properties;
+
+    @Autowired
+    public void setProperties(ElasticsearchProperties properties) {
+        this.properties = properties;
+    }
 
     @Override
     public String searchByQuery(String searchBody, String type) {

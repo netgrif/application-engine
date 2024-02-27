@@ -24,14 +24,26 @@ import java.util.Optional;
 @Service
 public class FilterService implements IFilterService {
 
-    @Autowired
     private FilterRepository repository;
 
-    @Autowired
     private FilterSearchService searchService;
 
-    @Autowired
     private FilterAuthorizationService authenticationService;
+
+    @Autowired
+    public void setRepository(FilterRepository repository) {
+        this.repository = repository;
+    }
+
+    @Autowired
+    public void setSearchService(FilterSearchService searchService) {
+        this.searchService = searchService;
+    }
+
+    @Autowired
+    public void setAuthenticationService(FilterAuthorizationService authenticationService) {
+        this.authenticationService = authenticationService;
+    }
 
     @Override
     public boolean deleteFilter(String filterId, LoggedUser user) throws UnauthorisedRequestException {

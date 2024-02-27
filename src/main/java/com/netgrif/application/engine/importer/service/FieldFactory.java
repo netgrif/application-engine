@@ -31,23 +31,47 @@ import java.util.stream.Collectors;
 @Slf4j
 public final class FieldFactory {
 
-    @Autowired
     private FormatFactory formatFactory;
 
-    @Autowired
     private ViewFactory viewFactory;
 
-    @Autowired
     private ComponentFactory componentFactory;
 
-    @Autowired
     private IDataValidator dataValidator;
 
-    @Autowired
     private IUserService userService;
 
-    @Autowired
     private IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
+
+    @Autowired
+    public void setFormatFactory(FormatFactory formatFactory) {
+        this.formatFactory = formatFactory;
+    }
+
+    @Autowired
+    public void setViewFactory(ViewFactory viewFactory) {
+        this.viewFactory = viewFactory;
+    }
+
+    @Autowired
+    public void setComponentFactory(ComponentFactory componentFactory) {
+        this.componentFactory = componentFactory;
+    }
+
+    @Autowired
+    public void setDataValidator(IDataValidator dataValidator) {
+        this.dataValidator = dataValidator;
+    }
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setDataValidationExpressionEvaluator(IDataValidationExpressionEvaluator dataValidationExpressionEvaluator) {
+        this.dataValidationExpressionEvaluator = dataValidationExpressionEvaluator;
+    }
 
     // TODO: refactor this shit
     Field getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {

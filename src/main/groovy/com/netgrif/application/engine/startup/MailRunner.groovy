@@ -13,8 +13,12 @@ class MailRunner extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(MailRunner)
 
-    @Autowired
     private IMailService service
+
+    @Autowired
+    void setService(IMailService service) {
+        this.service = service
+    }
 
     @Override
     void run(String... strings) throws Exception {

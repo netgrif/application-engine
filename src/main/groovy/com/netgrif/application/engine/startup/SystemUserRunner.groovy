@@ -15,10 +15,14 @@ class SystemUserRunner extends AbstractOrderedCommandLineRunner {
     public static final String SYSTEM_USER_NAME = "application"
     public static final String SYSTEM_USER_SURNAME = "engine"
 
-    @Autowired
     private IUserService service
 
     private IUser systemUser
+
+    @Autowired
+    void setService(IUserService service) {
+        this.service = service
+    }
 
     IUser createSystemUser() {
         return service.createSystemUser()

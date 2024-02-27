@@ -44,36 +44,25 @@ import java.util.stream.Collectors;
 @Slf4j
 public class NextGroupService implements INextGroupService {
 
-    @Autowired
     protected IWorkflowService workflowService;
 
-    @Autowired
     protected IMailService mailService;
 
-    @Autowired
     protected IMailAttemptService mailAttemptService;
 
-    @Autowired
     protected IUserService userService;
 
-    @Autowired
     protected IDataService dataService;
 
-    @Autowired
     protected IRegistrationService registrationService;
 
-    @Autowired
     protected IPetriNetService petriNetService;
 
-    @Autowired
     protected ITaskService taskService;
 
-    @Autowired
     protected IElasticCaseService elasticCaseService;
 
-    @Autowired
     protected ISecurityContextService securityContextService;
-
 
     protected final static String GROUP_NET_IDENTIFIER = "org_group";
     protected final static String GROUP_INIT_TASK_ID = "2";
@@ -82,6 +71,56 @@ public class NextGroupService implements INextGroupService {
     protected final static String GROUP_MEMBERS_FIELD = "members";
     protected final static String GROUP_AUTHOR_FIELD = "author";
     protected final static String GROUP_TITLE_FIELD = "group_name";
+
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
+
+    @Autowired
+    public void setMailService(IMailService mailService) {
+        this.mailService = mailService;
+    }
+
+    @Autowired
+    public void setMailAttemptService(IMailAttemptService mailAttemptService) {
+        this.mailAttemptService = mailAttemptService;
+    }
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setDataService(IDataService dataService) {
+        this.dataService = dataService;
+    }
+
+    @Autowired
+    public void setRegistrationService(IRegistrationService registrationService) {
+        this.registrationService = registrationService;
+    }
+
+    @Autowired
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
+    }
+
+    @Autowired
+    public void setTaskService(ITaskService taskService) {
+        this.taskService = taskService;
+    }
+
+    @Autowired
+    public void setElasticCaseService(IElasticCaseService elasticCaseService) {
+        this.elasticCaseService = elasticCaseService;
+    }
+
+    @Autowired
+    public void setSecurityContextService(ISecurityContextService securityContextService) {
+        this.securityContextService = securityContextService;
+    }
 
     @Override
     public CreateCaseEventOutcome createDefaultSystemGroup(IUser author){

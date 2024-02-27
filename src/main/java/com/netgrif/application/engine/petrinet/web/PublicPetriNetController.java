@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,19 +40,32 @@ import static com.netgrif.application.engine.petrinet.web.PetriNetController.dec
 @RequestMapping({"/api/public/petrinet"})
 public class PublicPetriNetController {
 
-    private final IPetriNetService petriNetService;
+    private IPetriNetService petriNetService;
 
-    private final IProcessRoleService roleService;
+    private IProcessRoleService roleService;
 
-    private final IUserService userService;
+    private IUserService userService;
 
-    private final StringToVersionConverter converter;
+    private StringToVersionConverter converter;
 
-    public PublicPetriNetController(IPetriNetService petriNetService, IUserService userService, StringToVersionConverter converter, IProcessRoleService roleService) {
+    @Autowired
+    public void setPetriNetService(IPetriNetService petriNetService) {
         this.petriNetService = petriNetService;
-        this.converter = converter;
-        this.userService = userService;
+    }
+
+    @Autowired
+    public void setRoleService(IProcessRoleService roleService) {
         this.roleService = roleService;
+    }
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setConverter(StringToVersionConverter converter) {
+        this.converter = converter;
     }
 
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)

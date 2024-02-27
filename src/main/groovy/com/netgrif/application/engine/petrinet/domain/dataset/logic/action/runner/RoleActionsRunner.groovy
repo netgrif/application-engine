@@ -21,11 +21,14 @@ abstract class RoleActionsRunner {
     @Lookup("roleActionDelegate")
     abstract RoleActionDelegate getRoleActionDelegate()
 
-    @Autowired
     private IGroovyShellFactory shellFactory
-
     private Map<String, Object> actionsCache = new HashMap<>()
     private Map<String, Closure> actions = new HashMap<>()
+
+    @Autowired
+    void setShellFactory(IGroovyShellFactory shellFactory) {
+        this.shellFactory = shellFactory
+    }
 
     void run(Action action, RoleContext roleContext) {
         if (!actionsCache)

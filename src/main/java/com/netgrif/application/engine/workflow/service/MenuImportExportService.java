@@ -54,26 +54,54 @@ public class MenuImportExportService implements IMenuImportExportService {
     private static final String ENTRY_DEFAULT_NAME = "entry_default_name";
     private static final String GROUP_NAV_TASK = "navigationMenuConfig";
 
-    @Autowired
     IUserService userService;
 
-    @Autowired
     IWorkflowService workflowService;
 
-    @Autowired
     IPetriNetService petriNetService;
 
-    @Autowired
     DefaultFiltersRunner defaultFiltersRunner;
 
-    @Autowired
     private ITaskService taskService;
 
-    @Autowired
     private IDataService dataService;
 
-    @Autowired
     private IFilterImportExportService filterImportExportService;
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
+
+    @Autowired
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
+    }
+
+    @Autowired
+    public void setDefaultFiltersRunner(DefaultFiltersRunner defaultFiltersRunner) {
+        this.defaultFiltersRunner = defaultFiltersRunner;
+    }
+
+    @Autowired
+    public void setTaskService(ITaskService taskService) {
+        this.taskService = taskService;
+    }
+
+    @Autowired
+    public void setDataService(IDataService dataService) {
+        this.dataService = dataService;
+    }
+
+    @Autowired
+    public void setFilterImportExportService(IFilterImportExportService filterImportExportService) {
+        this.filterImportExportService = filterImportExportService;
+    }
 
     /**
      * Method which performs export of selected menu entries with their filters into xml file.

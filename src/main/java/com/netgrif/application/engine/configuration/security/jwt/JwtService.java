@@ -24,11 +24,19 @@ public class JwtService implements IJwtService {
 
     private String secret = "";
 
-    @Autowired
     private JwtProperties properties;
 
-    @Autowired
     private IProcessRoleService roleService;
+
+    @Autowired
+    public void setProperties(JwtProperties properties) {
+        this.properties = properties;
+    }
+
+    @Autowired
+    public void setRoleService(IProcessRoleService roleService) {
+        this.roleService = roleService;
+    }
 
     @PostConstruct
     private void resolveSecret() {

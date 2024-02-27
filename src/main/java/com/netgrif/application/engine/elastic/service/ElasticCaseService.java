@@ -55,10 +55,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     private Executor executors;
 
-    @Autowired
     private IPetriNetService petriNetService;
 
-    @Autowired
     private IElasticCasePrioritySearch iElasticCasePrioritySearch;
 
     @Autowired
@@ -66,6 +64,16 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         this.repository = repository;
         this.template = template;
         this.executors = executors;
+    }
+
+    @Autowired
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
+    }
+
+    @Autowired
+    public void setiElasticCasePrioritySearch(IElasticCasePrioritySearch iElasticCasePrioritySearch) {
+        this.iElasticCasePrioritySearch = iElasticCasePrioritySearch;
     }
 
     @Autowired

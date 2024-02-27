@@ -19,11 +19,19 @@ public class TaskEventHandler extends AbstractMongoEventListener<Task> {
 
     private static final Logger log = LoggerFactory.getLogger(TaskEventHandler.class);
 
-    @Autowired
     private IElasticTaskService service;
 
-    @Autowired
     private IElasticTaskMappingService taskMappingService;
+
+    @Autowired
+    public void setService(IElasticTaskService service) {
+        this.service = service;
+    }
+
+    @Autowired
+    public void setTaskMappingService(IElasticTaskMappingService taskMappingService) {
+        this.taskMappingService = taskMappingService;
+    }
 
     @Async
     @Override

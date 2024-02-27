@@ -98,91 +98,34 @@ class ActionDelegate {
     @Value('${nae.create.default.filters:false}')
     private Boolean createDefaultFilters
 
-    @Autowired
     FieldFactory fieldFactory
-
-    @Autowired
     TaskService taskService
-
-    @Autowired
     IDataService dataService
-
-    @Autowired
     IWorkflowService workflowService
-
-    @Autowired
     IUserService userService
-
-    @Autowired
     IPetriNetService petriNetService
-
-    @Autowired
     AsyncRunner async
-
-    @Autowired
     IPdfGenerator pdfGenerator
-
-    @Autowired
     IMailService mailService
-
-    @Autowired
     INextGroupService nextGroupService
-
-    @Autowired
     IRegistrationService registrationService
-
-    @Autowired
     IMailAttemptService mailAttemptService
-
-    @Autowired
     UserDetailsServiceImpl userDetailsService
-
-    @Autowired
     IDataValidationExpressionEvaluator dataValidationExpressionEvaluator
-
-    @Autowired
     IInitValueExpressionEvaluator initValueExpressionEvaluator
-
-    @Autowired
     RuleRepository ruleRepository
-
-    @Autowired
     Scheduler scheduler
-
-    @Autowired
     IUserFilterSearchService filterSearchService
-
-    @Autowired
     IConfigurableMenuService configurableMenuService
-
-    @Autowired
     IMenuImportExportService menuImportExportService
-
-    @Autowired
     IFilterImportExportService filterImportExportService
-
-    @Autowired
     IExportService exportService
-
-    @Autowired
     IElasticCaseService elasticCaseService
-
-    @Autowired
     IElasticTaskService elasticTaskService
-
-    @Autowired
     ExportConfiguration exportConfiguration
-
-    @Autowired
     IUriService uriService
-
-    @Autowired
     IImpersonationService impersonationService
-
-    @Autowired
     IHistoryService historyService
-
-    @Autowired
     PublicViewProperties publicViewProperties
 
     FrontendActionOutcome Frontend
@@ -196,6 +139,151 @@ class ActionDelegate {
     Action action
     FieldActionsRunner actionsRunner
     List<EventOutcome> outcomes
+
+    @Autowired
+    void setFieldFactory(FieldFactory fieldFactory) {
+        this.fieldFactory = fieldFactory
+    }
+
+    @Autowired
+    void setTaskService(TaskService taskService) {
+        this.taskService = taskService
+    }
+
+    @Autowired
+    void setDataService(IDataService dataService) {
+        this.dataService = dataService
+    }
+
+    @Autowired
+    void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService
+    }
+
+    @Autowired
+    void setUserService(IUserService userService) {
+        this.userService = userService
+    }
+
+    @Autowired
+    void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService
+    }
+
+    @Autowired
+    void setAsync(AsyncRunner async) {
+        this.async = async
+    }
+
+    @Autowired
+    void setPdfGenerator(IPdfGenerator pdfGenerator) {
+        this.pdfGenerator = pdfGenerator
+    }
+
+    @Autowired
+    void setMailService(IMailService mailService) {
+        this.mailService = mailService
+    }
+
+    @Autowired
+    void setNextGroupService(INextGroupService nextGroupService) {
+        this.nextGroupService = nextGroupService
+    }
+
+    @Autowired
+    void setRegistrationService(IRegistrationService registrationService) {
+        this.registrationService = registrationService
+    }
+
+    @Autowired
+    void setMailAttemptService(IMailAttemptService mailAttemptService) {
+        this.mailAttemptService = mailAttemptService
+    }
+
+    @Autowired
+    void setUserDetailsService(UserDetailsServiceImpl userDetailsService) {
+        this.userDetailsService = userDetailsService
+    }
+
+    @Autowired
+    void setDataValidationExpressionEvaluator(IDataValidationExpressionEvaluator dataValidationExpressionEvaluator) {
+        this.dataValidationExpressionEvaluator = dataValidationExpressionEvaluator
+    }
+
+    @Autowired
+    void setInitValueExpressionEvaluator(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
+        this.initValueExpressionEvaluator = initValueExpressionEvaluator
+    }
+
+    @Autowired
+    void setRuleRepository(RuleRepository ruleRepository) {
+        this.ruleRepository = ruleRepository
+    }
+
+    @Autowired
+    void setScheduler(Scheduler scheduler) {
+        this.scheduler = scheduler
+    }
+
+    @Autowired
+    void setFilterSearchService(IUserFilterSearchService filterSearchService) {
+        this.filterSearchService = filterSearchService
+    }
+
+    @Autowired
+    void setConfigurableMenuService(IConfigurableMenuService configurableMenuService) {
+        this.configurableMenuService = configurableMenuService
+    }
+
+    @Autowired
+    void setMenuImportExportService(IMenuImportExportService menuImportExportService) {
+        this.menuImportExportService = menuImportExportService
+    }
+
+    @Autowired
+    void setFilterImportExportService(IFilterImportExportService filterImportExportService) {
+        this.filterImportExportService = filterImportExportService
+    }
+
+    @Autowired
+    void setExportService(IExportService exportService) {
+        this.exportService = exportService
+    }
+
+    @Autowired
+    void setElasticCaseService(IElasticCaseService elasticCaseService) {
+        this.elasticCaseService = elasticCaseService
+    }
+
+    @Autowired
+    void setElasticTaskService(IElasticTaskService elasticTaskService) {
+        this.elasticTaskService = elasticTaskService
+    }
+
+    @Autowired
+    void setExportConfiguration(ExportConfiguration exportConfiguration) {
+        this.exportConfiguration = exportConfiguration
+    }
+
+    @Autowired
+    void setUriService(IUriService uriService) {
+        this.uriService = uriService
+    }
+
+    @Autowired
+    void setImpersonationService(IImpersonationService impersonationService) {
+        this.impersonationService = impersonationService
+    }
+
+    @Autowired
+    void setHistoryService(IHistoryService historyService) {
+        this.historyService = historyService
+    }
+
+    @Autowired
+    void setPublicViewProperties(PublicViewProperties publicViewProperties) {
+        this.publicViewProperties = publicViewProperties
+    }
 
     def init(Action action, Case useCase, Optional<Task> task, FieldActionsRunner actionsRunner) {
         this.action = action

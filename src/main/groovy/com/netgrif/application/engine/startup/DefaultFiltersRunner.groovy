@@ -42,20 +42,40 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
     @Value('${nae.create.default.filters:false}')
     private Boolean createDefaultFilters
 
-    @Autowired
     private IPetriNetService petriNetService
 
-    @Autowired
     private IWorkflowService workflowService
 
-    @Autowired
     private IUserService userService
 
-    @Autowired
     private ITaskService taskService
 
-    @Autowired
     private IDataService dataService
+
+    @Autowired
+    void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService
+    }
+
+    @Autowired
+    void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService
+    }
+
+    @Autowired
+    void setUserService(IUserService userService) {
+        this.userService = userService
+    }
+
+    @Autowired
+    void setTaskService(ITaskService taskService) {
+        this.taskService = taskService
+    }
+
+    @Autowired
+    void setDataService(IDataService dataService) {
+        this.dataService = dataService
+    }
 
     @Override
     void run(String... args) throws Exception {

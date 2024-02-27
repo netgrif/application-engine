@@ -19,29 +19,54 @@ class DemoRunner extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(DemoRunner)
 
-    @Autowired
     private ImportHelper helper
-
-    @Autowired
     private CaseRepository caseRepository
-
-    @Autowired
     private TaskRepository taskRepository
-
-    @Autowired
     private IElasticCaseService caseService
-
-    @Autowired
     private ElasticCaseRepository repository
-
-    @Autowired
     private ElasticTaskRepository elasticTaskRepository
-
-    @Autowired
     private IDataService dataService;
+    private IWorkflowService workflowService;
 
     @Autowired
-    private IWorkflowService workflowService;
+    void setHelper(ImportHelper helper) {
+        this.helper = helper
+    }
+
+    @Autowired
+    void setCaseRepository(CaseRepository caseRepository) {
+        this.caseRepository = caseRepository
+    }
+
+    @Autowired
+    void setTaskRepository(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository
+    }
+
+    @Autowired
+    void setCaseService(IElasticCaseService caseService) {
+        this.caseService = caseService
+    }
+
+    @Autowired
+    void setRepository(ElasticCaseRepository repository) {
+        this.repository = repository
+    }
+
+    @Autowired
+    void setElasticTaskRepository(ElasticTaskRepository elasticTaskRepository) {
+        this.elasticTaskRepository = elasticTaskRepository
+    }
+
+    @Autowired
+    void setDataService(IDataService dataService) {
+        this.dataService = dataService
+    }
+
+    @Autowired
+    void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService
+    }
 
     @Override
     void run(String... args) throws Exception {

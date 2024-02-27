@@ -8,9 +8,12 @@ import org.springframework.stereotype.Component
 @Component
 class UriRunner extends AbstractOrderedCommandLineRunner {
 
-    @Autowired
     private IUriService uriService
 
+    @Autowired
+    void setUriService(IUriService uriService) {
+        this.uriService = uriService
+    }
 
     @Override
     void run(String... args) throws Exception {

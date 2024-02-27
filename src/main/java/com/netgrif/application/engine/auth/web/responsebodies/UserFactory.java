@@ -9,11 +9,19 @@ import java.util.stream.Collectors;
 
 public class UserFactory implements IUserFactory {
 
-    @Autowired
     private IProcessRoleService processRoleService;
 
-    @Autowired
     private IProcessRoleFactory processRoleFactory;
+
+    @Autowired
+    public void setProcessRoleService(IProcessRoleService processRoleService) {
+        this.processRoleService = processRoleService;
+    }
+
+    @Autowired
+    public void setProcessRoleFactory(IProcessRoleFactory processRoleFactory) {
+        this.processRoleFactory = processRoleFactory;
+    }
 
     @Override
     public User getUser(IUser user, Locale locale) {

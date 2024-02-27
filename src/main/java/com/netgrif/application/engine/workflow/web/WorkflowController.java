@@ -66,18 +66,33 @@ public class WorkflowController {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowController.class.getName());
 
-    @Autowired
     private IWorkflowService workflowService;
 
-    @Autowired
     private ITaskService taskService;
 
-    @Autowired
     private IElasticCaseService elasticCaseService;
 
-    @Autowired
     private IDataService dataService;
 
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
+
+    @Autowired
+    public void setTaskService(ITaskService taskService) {
+        this.taskService = taskService;
+    }
+
+    @Autowired
+    public void setElasticCaseService(IElasticCaseService elasticCaseService) {
+        this.elasticCaseService = elasticCaseService;
+    }
+
+    @Autowired
+    public void setDataService(IDataService dataService) {
+        this.dataService = dataService;
+    }
 
     @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
     @Operation(summary = "Create new case", security = {@SecurityRequirement(name = "BasicAuth")})

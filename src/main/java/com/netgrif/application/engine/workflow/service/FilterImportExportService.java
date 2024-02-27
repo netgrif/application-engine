@@ -68,29 +68,61 @@ public class FilterImportExportService implements IFilterImportExportService {
     private static final String FIELD_MISSING_ALLOWED_NETS = "missing_allowed_nets";
     private static final String FIELD_MISSING_NETS_TRANSLATION = "missing_nets_translation";
 
-    @Autowired
     IUserService userService;
 
-    @Autowired
     IWorkflowService workflowService;
 
-    @Autowired
     IPetriNetService petriNetService;
 
-    @Autowired
     DefaultFiltersRunner defaultFiltersRunner;
 
-    @Autowired
     private ITaskService taskService;
 
-    @Autowired
     private IDataService dataService;
 
-    @Autowired
     private FileStorageConfiguration fileStorageConfiguration;
 
-    @Autowired
     private FilterProperties filterProperties;
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
+
+    @Autowired
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
+    }
+
+    @Autowired
+    public void setDefaultFiltersRunner(DefaultFiltersRunner defaultFiltersRunner) {
+        this.defaultFiltersRunner = defaultFiltersRunner;
+    }
+
+    @Autowired
+    public void setTaskService(ITaskService taskService) {
+        this.taskService = taskService;
+    }
+
+    @Autowired
+    public void setDataService(IDataService dataService) {
+        this.dataService = dataService;
+    }
+
+    @Autowired
+    public void setFileStorageConfiguration(FileStorageConfiguration fileStorageConfiguration) {
+        this.fileStorageConfiguration = fileStorageConfiguration;
+    }
+
+    @Autowired
+    public void setFilterProperties(FilterProperties filterProperties) {
+        this.filterProperties = filterProperties;
+    }
 
     @Override
     public void createFilterImport(IUser author) {

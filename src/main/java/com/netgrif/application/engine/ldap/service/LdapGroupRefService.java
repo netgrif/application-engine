@@ -11,6 +11,7 @@ import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefServi
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextAdapter;
@@ -31,19 +32,31 @@ import static org.springframework.ldap.query.LdapQueryBuilder.query;
 @ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapGroupRefService implements ILdapGroupRefService {
 
-    private final LdapConfiguration ldapConfiguration;
+    private LdapConfiguration ldapConfiguration;
 
-    private final LdapGroupRoleRepository ldapGroupRoleRepository;
+    private LdapGroupRoleRepository ldapGroupRoleRepository;
 
-    private final IProcessRoleService processRoleService;
+    private IProcessRoleService processRoleService;
 
-    private final NaeLdapProperties ldapProperties;
+    private NaeLdapProperties ldapProperties;
 
-    public LdapGroupRefService(LdapConfiguration ldapConfiguration, LdapGroupRoleRepository ldapGroupRoleRepository,
-                               IProcessRoleService processRoleService, NaeLdapProperties ldapProperties) {
+    @Autowired
+    public void setLdapConfiguration(LdapConfiguration ldapConfiguration) {
         this.ldapConfiguration = ldapConfiguration;
+    }
+
+    @Autowired
+    public void setLdapGroupRoleRepository(LdapGroupRoleRepository ldapGroupRoleRepository) {
         this.ldapGroupRoleRepository = ldapGroupRoleRepository;
+    }
+
+    @Autowired
+    public void setProcessRoleService(IProcessRoleService processRoleService) {
         this.processRoleService = processRoleService;
+    }
+
+    @Autowired
+    public void setLdapProperties(NaeLdapProperties ldapProperties) {
         this.ldapProperties = ldapProperties;
     }
 

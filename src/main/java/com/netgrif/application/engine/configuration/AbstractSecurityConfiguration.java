@@ -28,17 +28,33 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Autowired
     protected ServerAuthProperties serverAuthProperties;
 
-    @Autowired
     protected SessionUtilsProperties sessionUtilsProperties;
 
-    @Autowired
-    private NaeAuthProperties naeAuthProperties;
+    protected NaeAuthProperties naeAuthProperties;
+
+    private ApplicationContext context;
 
     @Autowired
-    private ApplicationContext context;
+    public void setServerAuthProperties(ServerAuthProperties serverAuthProperties) {
+        this.serverAuthProperties = serverAuthProperties;
+    }
+
+    @Autowired
+    public void setSessionUtilsProperties(SessionUtilsProperties sessionUtilsProperties) {
+        this.sessionUtilsProperties = sessionUtilsProperties;
+    }
+
+    @Autowired
+    public void setNaeAuthProperties(NaeAuthProperties naeAuthProperties) {
+        this.naeAuthProperties = naeAuthProperties;
+    }
+
+    @Autowired
+    public void setContext(ApplicationContext context) {
+        this.context = context;
+    }
 
     protected void setHeaders(HttpSecurity http) throws Exception {
         setStrictTransportSecurity(http);

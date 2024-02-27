@@ -39,29 +39,61 @@ import static org.springframework.ldap.query.LdapQueryBuilder.query;
 @ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapUserRefService implements ILdapUserRefService {
 
-    @Autowired
     private LdapUserRefRepository repository;
 
-    @Autowired
     private LdapUserService ldapUserService;
 
-    @Autowired
     private INextGroupService groupService;
 
-    @Autowired
     private ApplicationEventPublisher publisher;
 
-    @Autowired
     private GroupConfigurationProperties groupProperties;
 
-    @Autowired
     private NaeLdapProperties ldapProperties;
 
-    @Autowired
     private LdapConfiguration ldapUserConfiguration;
 
-    @Autowired
     protected ILdapGroupRefService ldapGroupRefService;
+
+    @Autowired
+    public void setRepository(LdapUserRefRepository repository) {
+        this.repository = repository;
+    }
+
+    @Autowired
+    public void setLdapUserService(LdapUserService ldapUserService) {
+        this.ldapUserService = ldapUserService;
+    }
+
+    @Autowired
+    public void setGroupService(INextGroupService groupService) {
+        this.groupService = groupService;
+    }
+
+    @Autowired
+    public void setPublisher(ApplicationEventPublisher publisher) {
+        this.publisher = publisher;
+    }
+
+    @Autowired
+    public void setGroupProperties(GroupConfigurationProperties groupProperties) {
+        this.groupProperties = groupProperties;
+    }
+
+    @Autowired
+    public void setLdapProperties(NaeLdapProperties ldapProperties) {
+        this.ldapProperties = ldapProperties;
+    }
+
+    @Autowired
+    public void setLdapUserConfiguration(LdapConfiguration ldapUserConfiguration) {
+        this.ldapUserConfiguration = ldapUserConfiguration;
+    }
+
+    @Autowired
+    public void setLdapGroupRefService(ILdapGroupRefService ldapGroupRefService) {
+        this.ldapGroupRefService = ldapGroupRefService;
+    }
 
     @Override
     public IUser createUser(LdapUserRef ldapUserRef) {

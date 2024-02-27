@@ -31,23 +31,47 @@ import java.util.Objects;
 @Service
 public class RegistrationService implements IRegistrationService {
 
-    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
     private IUserService userService;
 
-    @Autowired
     private INextGroupService groupService;
 
-    @Autowired
     private IProcessRoleService processRole;
 
-    @Autowired
     private ServerAuthProperties serverAuthProperties;
 
-    @Autowired
     protected BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setGroupService(INextGroupService groupService) {
+        this.groupService = groupService;
+    }
+
+    @Autowired
+    public void setProcessRole(IProcessRoleService processRole) {
+        this.processRole = processRole;
+    }
+
+    @Autowired
+    public void setServerAuthProperties(ServerAuthProperties serverAuthProperties) {
+        this.serverAuthProperties = serverAuthProperties;
+    }
+
+    @Autowired
+    public void setbCryptPasswordEncoder(BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
 
     @Override
     @Transactional
