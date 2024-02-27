@@ -30,33 +30,58 @@ public class RuleEngineGlobalsProvider implements IRuleEngineGlobalsProvider {
     protected List<RuleEngineGlobal> globals;
     protected List<String> imports;
 
-    private final IRuleEvaluationScheduleService ruleEvaluationScheduleService;
-    private final IWorkflowService workflowService;
-    private final ITaskService taskService;
-    private final IElasticCaseService elasticCaseService;
-    private final IElasticTaskService elasticTaskService;
-    private final IDataService dataService;
-    private final IMailService mailService;
-    private final IUserService userService;
-    private final FactRepository factRepository;
+    private IRuleEvaluationScheduleService ruleEvaluationScheduleService;
+    private IWorkflowService workflowService;
+    private ITaskService taskService;
+    private IElasticCaseService elasticCaseService;
+    private IElasticTaskService elasticTaskService;
+    private IDataService dataService;
+    private IMailService mailService;
+    private IUserService userService;
+    private FactRepository factRepository;
 
-    public RuleEngineGlobalsProvider(@Autowired IRuleEvaluationScheduleService ruleEvaluationScheduleService,
-                                     @Autowired IWorkflowService workflowService,
-                                     @Autowired ITaskService taskService,
-                                     @Autowired IElasticCaseService elasticCaseService,
-                                     @Autowired IElasticTaskService elasticTaskService,
-                                     @Autowired IDataService dataService,
-                                     @Autowired IMailService mailService,
-                                     @Autowired IUserService userService,
-                                     @Autowired FactRepository factRepository) {
+    @Autowired
+    public void setRuleEvaluationScheduleService(IRuleEvaluationScheduleService ruleEvaluationScheduleService) {
         this.ruleEvaluationScheduleService = ruleEvaluationScheduleService;
+    }
+
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
         this.workflowService = workflowService;
+    }
+
+    @Autowired
+    public void setTaskService(ITaskService taskService) {
         this.taskService = taskService;
+    }
+
+    @Autowired
+    public void setElasticCaseService(IElasticCaseService elasticCaseService) {
         this.elasticCaseService = elasticCaseService;
+    }
+
+    @Autowired
+    public void setElasticTaskService(IElasticTaskService elasticTaskService) {
         this.elasticTaskService = elasticTaskService;
+    }
+
+    @Autowired
+    public void setDataService(IDataService dataService) {
         this.dataService = dataService;
+    }
+
+    @Autowired
+    public void setMailService(IMailService mailService) {
         this.mailService = mailService;
+    }
+
+    @Autowired
+    public void setUserService(IUserService userService) {
         this.userService = userService;
+    }
+
+    @Autowired
+    public void setFactRepository(FactRepository factRepository) {
         this.factRepository = factRepository;
     }
 

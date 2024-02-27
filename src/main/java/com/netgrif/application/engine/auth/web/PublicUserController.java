@@ -43,19 +43,35 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/public/user")
 public class PublicUserController {
 
-    @Autowired
     private IUserFactory userResponseFactory;
 
-    @Autowired
     private Provider<UserResourceAssembler> userResourceAssemblerProvider;
 
-    @Autowired
     private IUserService userService;
 
-    @Autowired
     private IPreferencesService preferencesService;
 
     public PublicUserController() {
+    }
+
+    @Autowired
+    public void setUserResponseFactory(IUserFactory userResponseFactory) {
+        this.userResponseFactory = userResponseFactory;
+    }
+
+    @Autowired
+    public void setUserResourceAssemblerProvider(Provider<UserResourceAssembler> userResourceAssemblerProvider) {
+        this.userResourceAssemblerProvider = userResourceAssemblerProvider;
+    }
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setPreferencesService(IPreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
     }
 
     protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {

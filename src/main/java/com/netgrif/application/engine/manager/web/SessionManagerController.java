@@ -30,8 +30,12 @@ import java.util.Collection;
 @Tag(name = "Session Manager")
 public class SessionManagerController {
 
-    @Autowired
     private ISessionManagerService sessionManagerService;
+
+    @Autowired
+    public void setSessionManagerService(ISessionManagerService sessionManagerService) {
+        this.sessionManagerService = sessionManagerService;
+    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get All logged users",

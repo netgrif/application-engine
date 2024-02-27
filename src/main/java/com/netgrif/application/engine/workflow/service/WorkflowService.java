@@ -62,56 +62,120 @@ public class WorkflowService implements IWorkflowService {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowService.class);
 
-    @Autowired
     protected CaseRepository repository;
 
-    @Autowired
     protected MongoTemplate mongoTemplate;
 
-    @Autowired
     protected IPetriNetService petriNetService;
 
-    @Autowired
     protected IProcessRoleService processRoleService;
 
-    @Autowired
     protected ITaskService taskService;
 
-    @Autowired
     protected CaseSearchService searchService;
 
-    @Autowired
     protected ApplicationEventPublisher publisher;
 
-    @Autowired
     protected EncryptionService encryptionService;
 
-    @Autowired
     protected FieldFactory fieldFactory;
 
-    @Autowired
     protected IRuleEngine ruleEngine;
 
-    @Autowired
     protected FieldActionsRunner actionsRunner;
 
-    @Autowired
     protected IUserService userService;
 
-    @Autowired
     protected IInitValueExpressionEvaluator initValueExpressionEvaluator;
 
-    @Autowired
     protected IElasticCaseMappingService caseMappingService;
 
-    @Lazy
-    @Autowired
     private IEventService eventService;
 
-    @Autowired
     private IHistoryService historyService;
 
     protected IElasticCaseService elasticCaseService;
+
+    @Autowired
+    public void setRepository(CaseRepository repository) {
+        this.repository = repository;
+    }
+
+    @Autowired
+    public void setMongoTemplate(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
+
+    @Autowired
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
+    }
+
+    @Autowired
+    public void setProcessRoleService(IProcessRoleService processRoleService) {
+        this.processRoleService = processRoleService;
+    }
+
+    @Autowired
+    public void setTaskService(ITaskService taskService) {
+        this.taskService = taskService;
+    }
+
+    @Autowired
+    public void setSearchService(CaseSearchService searchService) {
+        this.searchService = searchService;
+    }
+
+    @Autowired
+    public void setPublisher(ApplicationEventPublisher publisher) {
+        this.publisher = publisher;
+    }
+
+    @Autowired
+    public void setEncryptionService(EncryptionService encryptionService) {
+        this.encryptionService = encryptionService;
+    }
+
+    @Autowired
+    public void setFieldFactory(FieldFactory fieldFactory) {
+        this.fieldFactory = fieldFactory;
+    }
+
+    @Autowired
+    public void setRuleEngine(IRuleEngine ruleEngine) {
+        this.ruleEngine = ruleEngine;
+    }
+
+    @Autowired
+    public void setActionsRunner(FieldActionsRunner actionsRunner) {
+        this.actionsRunner = actionsRunner;
+    }
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setInitValueExpressionEvaluator(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
+        this.initValueExpressionEvaluator = initValueExpressionEvaluator;
+    }
+
+    @Autowired
+    public void setCaseMappingService(IElasticCaseMappingService caseMappingService) {
+        this.caseMappingService = caseMappingService;
+    }
+
+    @Lazy
+    @Autowired
+    public void setEventService(IEventService eventService) {
+        this.eventService = eventService;
+    }
+
+    @Autowired
+    public void setHistoryService(IHistoryService historyService) {
+        this.historyService = historyService;
+    }
 
     @Autowired
     public void setElasticCaseService(IElasticCaseService elasticCaseService) {

@@ -20,14 +20,26 @@ public class UserResourceHelperService implements IUserResourceHelperService {
 
     public static final Logger log = LoggerFactory.getLogger(UserResourceHelperService.class);
 
-    @Autowired
     private IUserService userService;
 
-    @Autowired
     private IUserFactory userFactory;
 
-    @Autowired
     private IImpersonationService impersonationService;
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setUserFactory(IUserFactory userFactory) {
+        this.userFactory = userFactory;
+    }
+
+    @Autowired
+    public void setImpersonationService(IImpersonationService impersonationService) {
+        this.impersonationService = impersonationService;
+    }
 
     @Override
     public UserResource getResource(LoggedUser loggedUser, Locale locale, boolean small) {

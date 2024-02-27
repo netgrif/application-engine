@@ -41,20 +41,40 @@ import java.util.Locale;
 @Tag(name = "Impersonation")
 public class ImpersonationController {
 
-    @Autowired
     protected IImpersonationService impersonationService;
 
-    @Autowired
     protected IImpersonationAuthorizationService impersonationAuthorizationService;
 
-    @Autowired
     protected IUserService userService;
 
-    @Autowired
     protected IUserResourceHelperService userResourceHelperService;
 
-    @Autowired
     protected Provider<UserResourceAssembler> userResourceAssemblerProvider;
+
+    @Autowired
+    public void setImpersonationService(IImpersonationService impersonationService) {
+        this.impersonationService = impersonationService;
+    }
+
+    @Autowired
+    public void setImpersonationAuthorizationService(IImpersonationAuthorizationService impersonationAuthorizationService) {
+        this.impersonationAuthorizationService = impersonationAuthorizationService;
+    }
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setUserResourceHelperService(IUserResourceHelperService userResourceHelperService) {
+        this.userResourceHelperService = userResourceHelperService;
+    }
+
+    @Autowired
+    public void setUserResourceAssemblerProvider(Provider<UserResourceAssembler> userResourceAssemblerProvider) {
+        this.userResourceAssemblerProvider = userResourceAssemblerProvider;
+    }
 
     protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
         UserResourceAssembler result = userResourceAssemblerProvider.get();

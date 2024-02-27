@@ -27,9 +27,6 @@ public class ElasticServiceConfiguration {
     private ElasticCaseRepository caseRepository;
 
     @Autowired
-    private ElasticTaskRepository taskRepository;
-
-    @Autowired
     private ElasticsearchRestTemplate elasticsearchTemplate;
 
     @Autowired

@@ -23,17 +23,33 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
 
-    @Autowired
     protected UserRepository userRepository;
 
-    @Autowired
     protected ApplicationEventPublisher publisher;
 
-    @Autowired
     protected ILoginAttemptService loginAttemptService;
 
-    @Autowired
     protected HttpServletRequest request;
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Autowired
+    public void setPublisher(ApplicationEventPublisher publisher) {
+        this.publisher = publisher;
+    }
+
+    @Autowired
+    public void setLoginAttemptService(ILoginAttemptService loginAttemptService) {
+        this.loginAttemptService = loginAttemptService;
+    }
+
+    @Autowired
+    public void setRequest(HttpServletRequest request) {
+        this.request = request;
+    }
 
     @Override
     @Transactional(readOnly = true)

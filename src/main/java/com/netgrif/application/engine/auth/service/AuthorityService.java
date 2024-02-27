@@ -15,8 +15,12 @@ import java.util.stream.Collectors;
 @Service
 public class AuthorityService implements IAuthorityService {
 
-    @Autowired
     private AuthorityRepository repository;
+
+    @Autowired
+    public void setRepository(AuthorityRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public List<Authority> findAll() {

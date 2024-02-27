@@ -9,8 +9,12 @@ import org.springframework.stereotype.Component
 @Component
 abstract class AbstractOrderedCommandLineRunner implements CommandLineRunner, Ordered {
 
-    @Autowired
     protected RunnerController runner
+
+    @Autowired
+    void setRunner(RunnerController runner) {
+        this.runner = runner
+    }
 
     @Override
     int getOrder() {

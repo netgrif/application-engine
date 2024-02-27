@@ -18,8 +18,12 @@ import java.util.Map;
 @Component
 public class RoleFactory {
 
-    @Autowired
     private ProcessRoleRepository repository;
+
+    @Autowired
+    public void setRepository(ProcessRoleRepository repository) {
+        this.repository = repository;
+    }
 
     Map<String, Boolean> getPermissions(Logic roleLogic) {
         Map<String, Boolean> permissions = new HashMap<>();

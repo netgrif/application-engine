@@ -28,13 +28,21 @@ public class MongoSearchService<T> {
 
     private static final String ERROR_KEY = "ERROR";
 
-    @Autowired
     private IUserService userService;
 
-    @Autowired
     private MongoTemplate mongoTemplate;
 
     private Class<T> tClass;
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setMongoTemplate(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
 
     public Page<T> search(Map<String, Object> searchRequest, Pageable pageable, Class<T> clazz) {
         try {

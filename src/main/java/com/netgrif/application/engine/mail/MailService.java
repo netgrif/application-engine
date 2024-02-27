@@ -37,10 +37,8 @@ public class MailService implements IMailService {
     public static final String SERVER = "server";
     public static final String NAME = "name";
 
-    @Autowired
     private IRegistrationService registrationService;
 
-    @Autowired
     private ServerAuthProperties serverAuthProperties;
 
     @Getter
@@ -66,6 +64,16 @@ public class MailService implements IMailService {
     @Getter
     @Setter
     protected Configuration configuration;
+
+    @Autowired
+    public void setRegistrationService(IRegistrationService registrationService) {
+        this.registrationService = registrationService;
+    }
+
+    @Autowired
+    public void setServerAuthProperties(ServerAuthProperties serverAuthProperties) {
+        this.serverAuthProperties = serverAuthProperties;
+    }
 
     @Override
     public void sendRegistrationEmail(RegisteredUser user) throws MessagingException, IOException, TemplateException {

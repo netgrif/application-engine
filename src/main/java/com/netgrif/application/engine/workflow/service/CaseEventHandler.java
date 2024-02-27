@@ -16,8 +16,12 @@ public class CaseEventHandler extends AbstractMongoEventListener<Case> {
 
     private static final Logger log = LoggerFactory.getLogger(CaseEventHandler.class);
 
-    @Autowired
     private IElasticCaseService service;
+
+    @Autowired
+    public void setService(IElasticCaseService service) {
+        this.service = service;
+    }
 
     @Override
     public void onAfterDelete(AfterDeleteEvent<Case> event) {

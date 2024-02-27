@@ -12,8 +12,12 @@ import org.springframework.ldap.core.support.LdapContextSource;
 @ConditionalOnExpression("${nae.ldap.enabled:false} AND ${nae.ldap.ignore-partial:false}")
 public class AdLdapConfiguration {
 
-    @Autowired
     protected LdapContextSource ldapContextSource;
+
+    @Autowired
+    public void setLdapContextSource(LdapContextSource ldapContextSource) {
+        this.ldapContextSource = ldapContextSource;
+    }
 
     @Bean
     @Primary

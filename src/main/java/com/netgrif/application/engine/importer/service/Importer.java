@@ -78,50 +78,96 @@ public class Importer {
     protected Map<String, Action> actionRefs;
     protected List<com.netgrif.application.engine.petrinet.domain.Function> functions;
 
-    @Autowired
     protected FieldFactory fieldFactory;
-
-    @Autowired
     protected FunctionFactory functionFactory;
-
-    @Autowired
     protected IPetriNetService service;
-
-    @Autowired
     protected IProcessRoleService processRoleService;
-
-    @Autowired
     protected ArcFactory arcFactory;
-
-    @Autowired
     protected RoleFactory roleFactory;
-
-    @Autowired
     protected TriggerFactory triggerFactory;
-
-    @Autowired
     protected IActionValidator actionValidator;
-
-    @Autowired
     protected FieldActionsRunner actionsRunner;
-
-    @Autowired
     protected FileStorageConfiguration fileStorageConfiguration;
-
-    @Autowired
     protected ComponentFactory componentFactory;
-
-    @Autowired
     protected IFieldActionsCacheService actionsCacheService;
-
-    @Autowired
     private IDocumentValidator documentValidator;
-
-    @Autowired
     private ITransitionValidator transitionValidator;
+    private ILogicValidator logicValidator;
 
     @Autowired
-    private ILogicValidator logicValidator;
+    public void setFieldFactory(FieldFactory fieldFactory) {
+        this.fieldFactory = fieldFactory;
+    }
+
+    @Autowired
+    public void setFunctionFactory(FunctionFactory functionFactory) {
+        this.functionFactory = functionFactory;
+    }
+
+    @Autowired
+    public void setService(IPetriNetService service) {
+        this.service = service;
+    }
+
+    @Autowired
+    public void setProcessRoleService(IProcessRoleService processRoleService) {
+        this.processRoleService = processRoleService;
+    }
+
+    @Autowired
+    public void setArcFactory(ArcFactory arcFactory) {
+        this.arcFactory = arcFactory;
+    }
+
+    @Autowired
+    public void setRoleFactory(RoleFactory roleFactory) {
+        this.roleFactory = roleFactory;
+    }
+
+    @Autowired
+    public void setTriggerFactory(TriggerFactory triggerFactory) {
+        this.triggerFactory = triggerFactory;
+    }
+
+    @Autowired
+    public void setActionValidator(IActionValidator actionValidator) {
+        this.actionValidator = actionValidator;
+    }
+
+    @Autowired
+    public void setActionsRunner(FieldActionsRunner actionsRunner) {
+        this.actionsRunner = actionsRunner;
+    }
+
+    @Autowired
+    public void setFileStorageConfiguration(FileStorageConfiguration fileStorageConfiguration) {
+        this.fileStorageConfiguration = fileStorageConfiguration;
+    }
+
+    @Autowired
+    public void setComponentFactory(ComponentFactory componentFactory) {
+        this.componentFactory = componentFactory;
+    }
+
+    @Autowired
+    public void setActionsCacheService(IFieldActionsCacheService actionsCacheService) {
+        this.actionsCacheService = actionsCacheService;
+    }
+
+    @Autowired
+    public void setDocumentValidator(IDocumentValidator documentValidator) {
+        this.documentValidator = documentValidator;
+    }
+
+    @Autowired
+    public void setTransitionValidator(ITransitionValidator transitionValidator) {
+        this.transitionValidator = transitionValidator;
+    }
+
+    @Autowired
+    public void setLogicValidator(ILogicValidator logicValidator) {
+        this.logicValidator = logicValidator;
+    }
 
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {

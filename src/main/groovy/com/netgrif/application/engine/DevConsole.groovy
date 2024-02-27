@@ -26,11 +26,19 @@ class DevConsole {
 
     private static final Logger log = LoggerFactory.getLogger(DevConsole)
 
-    @Autowired
     private CaseRepository caseRepository
 
-    @Autowired
     private PetriNetRepository netRepository
+
+    @Autowired
+    void setCaseRepository(CaseRepository caseRepository) {
+        this.caseRepository = caseRepository
+    }
+
+    @Autowired
+    void setNetRepository(PetriNetRepository netRepository) {
+        this.netRepository = netRepository
+    }
 
     @GetMapping(value = "/dataset/{title}", produces = APPLICATION_JSON_VALUE)
     String dataset(@PathVariable String title) {

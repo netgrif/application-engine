@@ -14,7 +14,6 @@ import java.util.Properties;
 @Configuration
 public class MailConfiguration {
 
-    @Autowired
     private freemarker.template.Configuration configuration;
 
     @Value("${spring.mail.default-encoding}")
@@ -43,6 +42,11 @@ public class MailConfiguration {
     private boolean smtpStartTlsEnable;
     @Value("${spring.mail.smtp.starttls.required}")
     private boolean smtpStartTlsRequired;
+
+    @Autowired
+    public void setConfiguration(freemarker.template.Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     @Bean
     public JavaMailSenderImpl mailSender() {

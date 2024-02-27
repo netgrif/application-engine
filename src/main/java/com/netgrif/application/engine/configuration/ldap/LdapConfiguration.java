@@ -12,8 +12,12 @@ import org.springframework.ldap.core.support.LdapContextSource;
 @ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapConfiguration {
 
-    @Autowired
     private NaeLdapProperties ldapProperties;
+
+    @Autowired
+    public void setLdapProperties(NaeLdapProperties ldapProperties) {
+        this.ldapProperties = ldapProperties;
+    }
 
     @Bean
     public LdapContextSource contextSource() {

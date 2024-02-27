@@ -11,8 +11,12 @@ import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 @Configuration
 public class SessionRegistryConfiguration {
 
-    @Autowired
     private ImpersonationProperties impersonationProperties;
+
+    @Autowired
+    public void setImpersonationProperties(ImpersonationProperties impersonationProperties) {
+        this.impersonationProperties = impersonationProperties;
+    }
 
     @Bean
     public SpringSessionBackedSessionRegistry<? extends Session> springSessionBackedSessionRegistry(FindByIndexNameSessionRepository<? extends Session> sessionRepository) {

@@ -16,8 +16,12 @@ class QuartzSchedulerRunner extends AbstractOrderedCommandLineRunner {
     @Value('${quartz.scheduler.run:#{true}}')
     private boolean start
 
-    @Autowired
     private Scheduler scheduler
+
+    @Autowired
+    void setScheduler(Scheduler scheduler) {
+        this.scheduler = scheduler
+    }
 
     @Override
     void run(String... strings) throws Exception {

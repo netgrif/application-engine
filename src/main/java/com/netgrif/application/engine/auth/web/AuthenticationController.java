@@ -46,29 +46,54 @@ import java.util.Locale;
 @Tag(name = "Authentication")
 public class AuthenticationController {
 
-    @Autowired
     private IRegistrationService registrationService;
 
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
     private IMailService mailService;
 
-    @Autowired
     private IUserService userService;
 
-    @Autowired
     private IMailAttemptService mailAttemptService;
 
-    @Autowired
     private ServerAuthProperties serverAuthProperties;
 
-    @Autowired
     private IUserFactory userResponseFactory;
 
-    @Autowired
     private ISecurityContextService securityContextService;
+
+    @Autowired
+    public void setRegistrationService(IRegistrationService registrationService) {
+        this.registrationService = registrationService;
+    }
+
+    @Autowired
+    public void setMailService(IMailService mailService) {
+        this.mailService = mailService;
+    }
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setMailAttemptService(IMailAttemptService mailAttemptService) {
+        this.mailAttemptService = mailAttemptService;
+    }
+
+    @Autowired
+    public void setServerAuthProperties(ServerAuthProperties serverAuthProperties) {
+        this.serverAuthProperties = serverAuthProperties;
+    }
+
+    @Autowired
+    public void setUserResponseFactory(IUserFactory userResponseFactory) {
+        this.userResponseFactory = userResponseFactory;
+    }
+
+    @Autowired
+    public void setSecurityContextService(ISecurityContextService securityContextService) {
+        this.securityContextService = securityContextService;
+    }
 
     @Operation(summary = "New user registration")
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)

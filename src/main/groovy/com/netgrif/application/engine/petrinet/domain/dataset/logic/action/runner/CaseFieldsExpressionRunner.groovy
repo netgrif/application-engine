@@ -19,12 +19,16 @@ abstract class CaseFieldsExpressionRunner {
     @Lookup("actionDelegate")
     abstract ActionDelegate getActionDelegate()
 
-    @Autowired
     private IGroovyShellFactory shellFactory
 
     private int cacheSize
 
     private Map<String, Closure> cache = new MaxSizeHashMap<>(cacheSize)
+
+    @Autowired
+    void setShellFactory(IGroovyShellFactory shellFactory) {
+        this.shellFactory = shellFactory
+    }
 
     @Autowired
     CaseFieldsExpressionRunner(@Value('${nae.expressions.runner.cache-size}') int cacheSize) {

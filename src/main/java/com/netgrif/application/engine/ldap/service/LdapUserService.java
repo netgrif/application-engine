@@ -20,11 +20,19 @@ import javax.naming.Name;
 @ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapUserService extends UserService {
 
-    @Autowired
     private LdapUserRepository ldapUserRepository;
 
-    @Autowired
     private LdapGroupRefService ldapGroupRefService;
+
+    @Autowired
+    public void setLdapUserRepository(LdapUserRepository ldapUserRepository) {
+        this.ldapUserRepository = ldapUserRepository;
+    }
+
+    @Autowired
+    public void setLdapGroupRefService(LdapGroupRefService ldapGroupRefService) {
+        this.ldapGroupRefService = ldapGroupRefService;
+    }
 
     public LdapUser findByDn(Name dn) {
         return ldapUserRepository.findByDn(dn.toString());

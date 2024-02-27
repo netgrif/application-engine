@@ -11,13 +11,10 @@ import org.springframework.stereotype.Component
 @Component
 class ImpersonationRunner extends AbstractOrderedCommandLineRunner {
 
-    @Autowired
     protected IPetriNetService petriNetService
 
-    @Autowired
     protected ImportHelper helper
 
-    @Autowired
     protected SystemUserRunner systemCreator
 
     protected static final String IMPERSONATION_CONFIG_FILE_NAME = "engine-processes/impersonation_config.xml"
@@ -25,6 +22,21 @@ class ImpersonationRunner extends AbstractOrderedCommandLineRunner {
 
     protected static final String IMPERSONATION_CONFIG_USER_SELECT_FILE_NAME = "engine-processes/impersonation_users_select.xml"
     public static final String IMPERSONATION_CONFIG_USER_SELECT_PETRI_NET_IDENTIFIER = "impersonation_users_select"
+
+    @Autowired
+    void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService
+    }
+
+    @Autowired
+    void setHelper(ImportHelper helper) {
+        this.helper = helper
+    }
+
+    @Autowired
+    void setSystemCreator(SystemUserRunner systemCreator) {
+        this.systemCreator = systemCreator
+    }
 
     @Override
     void run(String... args) throws Exception {

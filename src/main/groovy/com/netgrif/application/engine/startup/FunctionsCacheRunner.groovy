@@ -10,11 +10,19 @@ import org.springframework.stereotype.Component
 @Slf4j
 class FunctionsCacheRunner extends AbstractOrderedCommandLineRunner {
 
-    @Autowired
     private IPetriNetService petriNetService
 
-    @Autowired
     private IFieldActionsCacheService cacheService
+
+    @Autowired
+    void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService
+    }
+
+    @Autowired
+    void setCacheService(IFieldActionsCacheService cacheService) {
+        this.cacheService = cacheService
+    }
 
     @Override
     void run(String... args) throws Exception {

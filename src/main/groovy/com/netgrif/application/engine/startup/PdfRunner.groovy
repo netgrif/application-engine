@@ -11,8 +11,12 @@ import org.springframework.stereotype.Component
 @Slf4j
 class PdfRunner extends AbstractOrderedCommandLineRunner{
 
-    @Autowired
     private PdfResource resource
+
+    @Autowired
+    void setResource(PdfResource resource) {
+        this.resource = resource
+    }
 
     @Override
     void run(String... args) throws Exception {

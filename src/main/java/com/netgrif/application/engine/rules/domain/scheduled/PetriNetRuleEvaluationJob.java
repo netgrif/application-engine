@@ -18,11 +18,19 @@ public class PetriNetRuleEvaluationJob extends RuleJob {
 
     private static final Logger log = LoggerFactory.getLogger(PetriNetRuleEvaluationJob.class);
 
-    @Autowired
     private IRuleEngine ruleEngine;
 
-    @Autowired
     private IPetriNetService petriNetService;
+
+    @Autowired
+    public void setRuleEngine(IRuleEngine ruleEngine) {
+        this.ruleEngine = ruleEngine;
+    }
+
+    @Autowired
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
+    }
 
     @Override
     public void doExecute(JobExecutionContext context) {

@@ -11,6 +11,7 @@ import com.netgrif.application.engine.workflow.web.requestbodies.CreateCaseBody;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
@@ -33,13 +34,18 @@ import java.util.Locale;
 @Tag(name = "Public Workflow Controller")
 public class PublicWorkflowController {
 
-    private final IWorkflowService workflowService;
+    private IWorkflowService workflowService;
 
-    private final IUserService userService;
+    private IUserService userService;
 
-    public PublicWorkflowController(IWorkflowService workflowService, IUserService userService) {
-        this.userService = userService;
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
         this.workflowService = workflowService;
+    }
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
     }
 
     @PreAuthorize("@workflowAuthorizationService.canCallCreate(@userService.getAnonymousLogged(), #body.netId)")

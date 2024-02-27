@@ -12,8 +12,12 @@ import org.springframework.context.annotation.Lazy;
 @Configuration
 public class NetgrifBasicAuthenticationProviderLoader {
 
-     @Autowired
     private EncryptionConfiguration passwordEncoder;
+
+    @Autowired
+    public void setPasswordEncoder(EncryptionConfiguration passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Lazy
     @Bean("netgrifBasicAuthenticationProvider")

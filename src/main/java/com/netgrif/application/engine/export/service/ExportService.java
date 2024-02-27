@@ -35,30 +35,61 @@ import java.util.stream.Collectors;
 @Service
 public class ExportService implements IExportService {
 
-    @Autowired
     private IWorkflowService workflowService;
 
-    @Autowired
     private IElasticCaseService elasticCaseService;
 
-    @Autowired
     private IElasticTaskService elasticTaskService;
 
-    @Autowired
     private CaseRepository caseRepository;
 
-    @Autowired
     private ITaskService taskService;
 
-    @Autowired
     private TaskRepository taskRepository;
 
-    @Autowired
     private ExportConfiguration exportConfiguration;
 
-    @Autowired
     private IUserService userService;
 
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
+
+    @Autowired
+    public void setElasticCaseService(IElasticCaseService elasticCaseService) {
+        this.elasticCaseService = elasticCaseService;
+    }
+
+    @Autowired
+    public void setElasticTaskService(IElasticTaskService elasticTaskService) {
+        this.elasticTaskService = elasticTaskService;
+    }
+
+    @Autowired
+    public void setCaseRepository(CaseRepository caseRepository) {
+        this.caseRepository = caseRepository;
+    }
+
+    @Autowired
+    public void setTaskService(ITaskService taskService) {
+        this.taskService = taskService;
+    }
+
+    @Autowired
+    public void setTaskRepository(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
+
+    @Autowired
+    public void setExportConfiguration(ExportConfiguration exportConfiguration) {
+        this.exportConfiguration = exportConfiguration;
+    }
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public Set<String> buildDefaultCsvCaseHeader(List<Case> exportCases) {

@@ -48,23 +48,29 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     private static final Logger log = LoggerFactory.getLogger(ElasticTaskService.class);
 
     protected ITaskService taskService;
-    protected ElasticsearchRestTemplate template;
 
     @Value("${spring.data.elasticsearch.index.task}")
     protected String taskIndex;
 
-    @Autowired
     protected ElasticsearchRestTemplate elasticsearchTemplate;
 
-    @Autowired
     private ElasticTaskQueueManager elasticTaskQueueManager;
 
-    @Autowired
     protected IPetriNetService petriNetService;
 
     @Autowired
-    public ElasticTaskService(ElasticsearchRestTemplate template) {
-        this.template = template;
+    public ElasticTaskService(ElasticsearchRestTemplate elasticsearchTemplate) {
+        this.elasticsearchTemplate = elasticsearchTemplate;
+    }
+
+    @Autowired
+    public void setElasticTaskQueueManager(ElasticTaskQueueManager elasticTaskQueueManager) {
+        this.elasticTaskQueueManager = elasticTaskQueueManager;
+    }
+
+    @Autowired
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
     }
 
     @Autowired
@@ -142,7 +148,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     public long count(List<ElasticTaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
         NativeSearchQuery query = buildQuery(requests, user.getSelfOrImpersonated(), new FullPageRequest(), locale, isIntersection);
         if (query != null) {
-            return template.count(query, ElasticTask.class);
+            return elasticsearchTemplate.count(query, ElasticTask.class);
         } else {
             return 0;
         }

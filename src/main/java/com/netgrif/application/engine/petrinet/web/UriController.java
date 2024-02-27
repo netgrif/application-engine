@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
@@ -25,10 +26,10 @@ import java.util.List;
 @Tag(name = "Process URI")
 public class UriController {
 
-    private final IUriService uriService;
+    private IUriService uriService;
 
-
-    public UriController(IUriService uriService) {
+    @Autowired
+    public void setUriService(IUriService uriService) {
         this.uriService = uriService;
     }
 

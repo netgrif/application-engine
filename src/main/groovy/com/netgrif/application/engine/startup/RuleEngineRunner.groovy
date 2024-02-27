@@ -15,10 +15,8 @@ class RuleEngineRunner extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(RuleEngineRunner)
 
-    @Autowired
     private IRefreshableKieBase refreshableKieBase
 
-    @Autowired
     private IRuleEngineGlobalsProvider sessionInitializer
 
     @Value('${drools.template.generate:#{true}}')
@@ -29,6 +27,16 @@ class RuleEngineRunner extends AbstractOrderedCommandLineRunner {
 
     @Value('${drools.template-resource.classpath:#{"rules/templates/template.drl"}}')
     private String templateResource
+
+    @Autowired
+    void setRefreshableKieBase(IRefreshableKieBase refreshableKieBase) {
+        this.refreshableKieBase = refreshableKieBase
+    }
+
+    @Autowired
+    void setSessionInitializer(IRuleEngineGlobalsProvider sessionInitializer) {
+        this.sessionInitializer = sessionInitializer
+    }
 
     @Override
     void run(String... strings) throws Exception {

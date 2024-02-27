@@ -39,11 +39,19 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
     @Value("${drools.compile.page-size:100}")
     private Integer pageSize;
 
-    @Autowired
     private RuleRepository ruleRepository;
 
-    @Autowired
     private ObjectDataCompiler compiler;
+
+    @Autowired
+    public void setRuleRepository(RuleRepository ruleRepository) {
+        this.ruleRepository = ruleRepository;
+    }
+
+    @Autowired
+    public void setCompiler(ObjectDataCompiler compiler) {
+        this.compiler = compiler;
+    }
 
     @Override
     public KieBase constructKieBase() {

@@ -37,17 +37,29 @@ public class ElasticController {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticController.class.getName());
 
-    @Autowired
     private IWorkflowService workflowService;
 
-    @Autowired
     private CaseSearchService searchService;
 
-    @Autowired
     private ReindexingTask reindexingTask;
 
     @Value("${spring.data.elasticsearch.reindexExecutor.size:20}")
     private int pageSize;
+
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
+
+    @Autowired
+    public void setSearchService(CaseSearchService searchService) {
+        this.searchService = searchService;
+    }
+
+    @Autowired
+    public void setReindexingTask(ReindexingTask reindexingTask) {
+        this.reindexingTask = reindexingTask;
+    }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Reindex specified cases",

@@ -13,19 +13,33 @@ import javax.servlet.http.HttpServletRequest;
 
 public abstract class NetgrifAuthenticationProvider implements AuthenticationProvider {
 
-
-    @Autowired
     protected UserDetailsService userDetailsService;
 
-    @Autowired
     protected HttpServletRequest request;
 
-    @Autowired
     protected ApplicationEventPublisher publisher;
 
-    @Autowired
     protected ILoginAttemptService loginAttemptService;
 
+    @Autowired
+    public void setUserDetailsService(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
+    @Autowired
+    public void setRequest(HttpServletRequest request) {
+        this.request = request;
+    }
+
+    @Autowired
+    public void setPublisher(ApplicationEventPublisher publisher) {
+        this.publisher = publisher;
+    }
+
+    @Autowired
+    public void setLoginAttemptService(ILoginAttemptService loginAttemptService) {
+        this.loginAttemptService = loginAttemptService;
+    }
 
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return null;

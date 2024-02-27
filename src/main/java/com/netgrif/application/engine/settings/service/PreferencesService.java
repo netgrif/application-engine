@@ -8,8 +8,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class PreferencesService implements IPreferencesService {
 
-    @Autowired
     private PreferencesRepository repository;
+
+    @Autowired
+    public void setRepository(PreferencesRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public Preferences get(String userId) {

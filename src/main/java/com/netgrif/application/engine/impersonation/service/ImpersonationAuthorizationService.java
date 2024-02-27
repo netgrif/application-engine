@@ -33,23 +33,47 @@ import static com.netgrif.application.engine.startup.ImpersonationRunner.IMPERSO
 @Service
 public class ImpersonationAuthorizationService implements IImpersonationAuthorizationService {
 
-    @Autowired
     protected ImpersonationProperties properties;
 
-    @Autowired
     protected IUserService userService;
 
-    @Autowired
     protected IElasticCaseService elasticCaseService;
 
-    @Autowired
     protected IAuthorityService authorityService;
 
-    @Autowired
     protected IWorkflowService workflowService;
 
-    @Autowired
     protected IProcessRoleService processRoleService;
+
+    @Autowired
+    public void setProperties(ImpersonationProperties properties) {
+        this.properties = properties;
+    }
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setElasticCaseService(IElasticCaseService elasticCaseService) {
+        this.elasticCaseService = elasticCaseService;
+    }
+
+    @Autowired
+    public void setAuthorityService(IAuthorityService authorityService) {
+        this.authorityService = authorityService;
+    }
+
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
+
+    @Autowired
+    public void setProcessRoleService(IProcessRoleService processRoleService) {
+        this.processRoleService = processRoleService;
+    }
 
     @Override
     public Page<IUser> getConfiguredImpersonationUsers(String query, LoggedUser impersonator, Pageable pageable) {

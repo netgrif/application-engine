@@ -23,10 +23,8 @@ import java.util.Properties;
 @Configuration
 public class QuartzConfiguration {
 
-    @Autowired
     private ApplicationContext applicationContext;
 
-    @Autowired
     private AutowiringSpringBeanJobFactory jobFactory;
 
     @Value("${spring.data.mongodb.host:null}")
@@ -37,6 +35,16 @@ public class QuartzConfiguration {
 
     @Value("${nae.quartz.dbName:nae}")
     private String db;
+
+    @Autowired
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
+    @Autowired
+    public void setJobFactory(AutowiringSpringBeanJobFactory jobFactory) {
+        this.jobFactory = jobFactory;
+    }
 
     @Bean
     public Properties quartzProperties() throws IOException {

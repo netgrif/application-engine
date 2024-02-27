@@ -28,7 +28,6 @@ import java.util.concurrent.ConcurrentMap;
 @Service
 public class AuthenticationService implements IAuthenticationService, ApplicationListener<SessionDestroyedEvent> {
 
-
     @Value("${server.login.attempts:10}")
     private int maxLoginAttempts;
 
@@ -37,12 +36,16 @@ public class AuthenticationService implements IAuthenticationService, Applicatio
 
     private ConcurrentMap<String, Attempt> cache;
 
-    @Autowired
     private IImpersonationService impersonationService;
 
     public AuthenticationService() {
         super();
         cache = new ConcurrentHashMap<>();
+    }
+
+    @Autowired
+    public void setImpersonationService(IImpersonationService impersonationService) {
+        this.impersonationService = impersonationService;
     }
 
     public static String getClientIP(HttpServletRequest request) {

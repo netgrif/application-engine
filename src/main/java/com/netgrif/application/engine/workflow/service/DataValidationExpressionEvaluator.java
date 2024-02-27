@@ -10,8 +10,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataValidationExpressionEvaluator implements IDataValidationExpressionEvaluator {
 
-    @Autowired
     protected CaseFieldsExpressionRunner runner;
+
+    @Autowired
+    public void setRunner(CaseFieldsExpressionRunner runner) {
+        this.runner = runner;
+    }
 
     @Override
     public String compile(Case useCase, Expression expression) {

@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,9 +32,10 @@ import java.util.stream.Collectors;
 @Tag(name = "Group")
 public class GroupController {
 
-    private final INextGroupService service;
+    private INextGroupService service;
 
-    public GroupController(INextGroupService service) {
+    @Autowired
+    public void setService(INextGroupService service) {
         this.service = service;
     }
 

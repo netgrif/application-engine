@@ -71,61 +71,43 @@ import static com.netgrif.application.engine.petrinet.service.interfaces.IPetriN
 @Service
 public class PetriNetService implements IPetriNetService {
 
-    @Autowired
     private IProcessRoleService processRoleService;
 
-    @Autowired
     private PetriNetRepository repository;
 
-    @Autowired
     private MongoTemplate mongoTemplate;
 
-    @Autowired
     private FileStorageConfiguration fileStorageConfiguration;
 
-    @Autowired
     private IRuleEngine ruleEngine;
 
-    @Autowired
     private IWorkflowService workflowService;
 
-    @Autowired
     private INextGroupService groupService;
 
-    @Autowired
     private Provider<Importer> importerProvider;
 
-    @Autowired
     private FieldActionsRunner actionsRunner;
 
-    @Autowired(required = false)
     private ILdapGroupRefService ldapGroupService;
 
-    @Autowired
     private IFieldActionsCacheService functionCacheService;
 
-    @Autowired
     private IUserService userService;
 
-    @Autowired
     private IEventService eventService;
 
-    @Autowired
     private IHistoryService historyService;
 
-    @Autowired
     private CacheManager cacheManager;
 
-    @Autowired
     private CacheProperties cacheProperties;
 
     @Resource
     private IPetriNetService self;
 
-    @Autowired
     private IElasticPetriNetMappingService petriNetMappingService;
 
-    @Autowired
     private IUriService uriService;
 
     private IElasticPetriNetService elasticPetriNetService;
@@ -133,6 +115,96 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     public void setElasticPetriNetService(IElasticPetriNetService elasticPetriNetService) {
         this.elasticPetriNetService = elasticPetriNetService;
+    }
+
+    @Autowired
+    public void setProcessRoleService(IProcessRoleService processRoleService) {
+        this.processRoleService = processRoleService;
+    }
+
+    @Autowired
+    public void setRepository(PetriNetRepository repository) {
+        this.repository = repository;
+    }
+
+    @Autowired
+    public void setMongoTemplate(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
+
+    @Autowired
+    public void setFileStorageConfiguration(FileStorageConfiguration fileStorageConfiguration) {
+        this.fileStorageConfiguration = fileStorageConfiguration;
+    }
+
+    @Autowired
+    public void setRuleEngine(IRuleEngine ruleEngine) {
+        this.ruleEngine = ruleEngine;
+    }
+
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
+
+    @Autowired
+    public void setGroupService(INextGroupService groupService) {
+        this.groupService = groupService;
+    }
+
+    @Autowired
+    public void setImporterProvider(Provider<Importer> importerProvider) {
+        this.importerProvider = importerProvider;
+    }
+
+    @Autowired
+    public void setActionsRunner(FieldActionsRunner actionsRunner) {
+        this.actionsRunner = actionsRunner;
+    }
+
+    @Autowired(required = false)
+    public void setLdapGroupService(ILdapGroupRefService ldapGroupService) {
+        this.ldapGroupService = ldapGroupService;
+    }
+
+    @Autowired
+    public void setFunctionCacheService(IFieldActionsCacheService functionCacheService) {
+        this.functionCacheService = functionCacheService;
+    }
+
+    @Autowired
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setEventService(IEventService eventService) {
+        this.eventService = eventService;
+    }
+
+    @Autowired
+    public void setHistoryService(IHistoryService historyService) {
+        this.historyService = historyService;
+    }
+
+    @Autowired
+    public void setCacheManager(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+    }
+
+    @Autowired
+    public void setCacheProperties(CacheProperties cacheProperties) {
+        this.cacheProperties = cacheProperties;
+    }
+
+    @Autowired
+    public void setPetriNetMappingService(IElasticPetriNetMappingService petriNetMappingService) {
+        this.petriNetMappingService = petriNetMappingService;
+    }
+
+    @Autowired
+    public void setUriService(IUriService uriService) {
+        this.uriService = uriService;
     }
 
     protected Importer getImporter() {

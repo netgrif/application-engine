@@ -61,20 +61,40 @@ public class PetriNetController {
 
     private static final Logger log = LoggerFactory.getLogger(PetriNetController.class);
 
-    @Autowired
     private FileStorageConfiguration fileStorageConfiguration;
 
-    @Autowired
     private IPetriNetService service;
 
-    @Autowired
     private IProcessRoleService roleService;
 
-    @Autowired
     private StringToVersionConverter converter;
 
-    @Autowired
     private AsyncRunner asyncRunner;
+
+    @Autowired
+    public void setFileStorageConfiguration(FileStorageConfiguration fileStorageConfiguration) {
+        this.fileStorageConfiguration = fileStorageConfiguration;
+    }
+
+    @Autowired
+    public void setService(IPetriNetService service) {
+        this.service = service;
+    }
+
+    @Autowired
+    public void setRoleService(IProcessRoleService roleService) {
+        this.roleService = roleService;
+    }
+
+    @Autowired
+    public void setConverter(StringToVersionConverter converter) {
+        this.converter = converter;
+    }
+
+    @Autowired
+    public void setAsyncRunner(AsyncRunner asyncRunner) {
+        this.asyncRunner = asyncRunner;
+    }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Import new process",

@@ -23,10 +23,18 @@ import java.util.stream.Collectors;
 @Service
 public class ConfigurableMenuService implements IConfigurableMenuService {
 
-    @Autowired
     private PetriNetService petriNetService;
-    @Autowired
     private StringToVersionConverter converter;
+
+    @Autowired
+    public void setPetriNetService(PetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
+    }
+
+    @Autowired
+    public void setConverter(StringToVersionConverter converter) {
+        this.converter = converter;
+    }
 
     /**
      * Constructs a map that can be used as a value for any {@link com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField}.

@@ -11,8 +11,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class GroovyShellConfiguration {
 
-    @Autowired
     private ActionsProperties actionsProperties;
+
+    @Autowired
+    public void setActionsProperties(ActionsProperties actionsProperties) {
+        this.actionsProperties = actionsProperties;
+    }
 
     @Bean
     @ConditionalOnMissingBean

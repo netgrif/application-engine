@@ -40,8 +40,12 @@ import java.util.stream.Collectors;
 @Tag(name = "Ldap")
 public class LdapController {
 
-    @Autowired
     protected ILdapGroupRefService service;
+
+    @Autowired
+    public void setService(ILdapGroupRefService service) {
+        this.service = service;
+    }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Get all ldap groups",

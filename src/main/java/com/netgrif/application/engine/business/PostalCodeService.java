@@ -10,8 +10,12 @@ import java.util.List;
 @Service
 public class PostalCodeService implements IPostalCodeService {
 
-    @Autowired
     private PostalCodeRepository repository;
+
+    @Autowired
+    public void setRepository(PostalCodeRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public void savePostalCodes(Collection<PostalCode> codes) {

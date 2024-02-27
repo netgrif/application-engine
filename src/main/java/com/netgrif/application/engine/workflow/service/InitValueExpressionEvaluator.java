@@ -17,8 +17,12 @@ import java.util.stream.Collectors;
 @Service
 public class InitValueExpressionEvaluator implements IInitValueExpressionEvaluator {
 
-    @Autowired
     private CaseFieldsExpressionRunner runner;
+
+    @Autowired
+    public void setRunner(CaseFieldsExpressionRunner runner) {
+        this.runner = runner;
+    }
 
     @Override
     public <T> T evaluate(Case useCase, Field<T> defaultField) {

@@ -16,8 +16,12 @@ public class EncryptionConfiguration {
     @Value("${nae.database.password}")
     private String password;
 
-    @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    public void setUserDetailsService(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     @Bean
     public StandardPBEStringEncryptor standardPBEStringEncryptor() {

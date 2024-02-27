@@ -23,11 +23,19 @@ public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleSer
 
     private static final Logger log = LoggerFactory.getLogger(RuleEvaluationScheduleService.class);
 
-    @Autowired
     private Scheduler scheduler;
 
-    @Autowired
     private RuleRepository ruleRepository;
+
+    @Autowired
+    public void setScheduler(Scheduler scheduler) {
+        this.scheduler = scheduler;
+    }
+
+    @Autowired
+    public void setRuleRepository(RuleRepository ruleRepository) {
+        this.ruleRepository = ruleRepository;
+    }
 
     @Override
     public ScheduleOutcome scheduleRuleEvaluationForCase(Case useCase, String ruleIdentifier, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {

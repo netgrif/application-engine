@@ -21,7 +21,6 @@ class MongoDbRunner extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(MongoDbRunner)
 
-    @Autowired
     private MongoTemplate mongoTemplate
 
     @Value('${spring.data.mongodb.database}')
@@ -41,6 +40,11 @@ class MongoDbRunner extends AbstractOrderedCommandLineRunner {
 
     @Value('${spring.data.mongodb.runner-ensure-index}')
     private boolean resolveIndexesOnStartup
+
+    @Autowired
+    void setMongoTemplate(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate
+    }
 
     @Override
     void run(String... strings) throws Exception {

@@ -14,12 +14,19 @@ class FlushSessionsRunner extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(FlushSessionsRunner.class.name)
 
-    @Autowired
     private JedisConnectionFactory connectionFactory
 
-    @Autowired
     private RedisIndexedSessionRepository repository
 
+    @Autowired
+    void setConnectionFactory(JedisConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory
+    }
+
+    @Autowired
+    void setRepository(RedisIndexedSessionRepository repository) {
+        this.repository = repository
+    }
 
     @Override
     void run(String... args) {

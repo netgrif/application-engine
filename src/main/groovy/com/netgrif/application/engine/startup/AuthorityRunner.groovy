@@ -8,8 +8,12 @@ import org.springframework.stereotype.Component
 @Component
 class AuthorityRunner extends AbstractOrderedCommandLineRunner {
 
-    @Autowired
     private IAuthorityService service
+
+    @Autowired
+    void setService(IAuthorityService service) {
+        this.service = service
+    }
 
     @Override
     void run(String... strings) throws Exception {

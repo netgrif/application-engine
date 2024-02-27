@@ -11,8 +11,12 @@ import java.util.Locale;
 @Service
 public class ProcessRoleFactory implements IProcessRoleFactory {
 
-    @Autowired
     private IPetriNetService petriNetService;
+
+    @Autowired
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
+    }
 
     @Override
     public ProcessRole getProcessRole(com.netgrif.application.engine.petrinet.domain.roles.ProcessRole role, Locale locale) {

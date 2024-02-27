@@ -15,6 +15,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -25,12 +26,17 @@ import java.util.*;
 @Service
 public class EventService implements IEventService {
 
-    private final FieldActionsRunner actionsRunner;
+    private FieldActionsRunner actionsRunner;
 
-    private final IWorkflowService workflowService;
+    private IWorkflowService workflowService;
 
-    public EventService(FieldActionsRunner actionsRunner, IWorkflowService workflowService) {
+    @Autowired
+    public void setActionsRunner(FieldActionsRunner actionsRunner) {
         this.actionsRunner = actionsRunner;
+    }
+
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
         this.workflowService = workflowService;
     }
 

@@ -15,14 +15,26 @@ import org.springframework.context.annotation.Scope;
 @Configuration
 public class DroolsConfiguration {
 
-    @Autowired
     private IKnowledgeBaseInitializer baseInitializer;
 
-    @Autowired
     private IRuleEngineGlobalsProvider sessionInitializer;
 
-    @Autowired
     private RuleRepository ruleRepository;
+
+    @Autowired
+    public void setBaseInitializer(IKnowledgeBaseInitializer baseInitializer) {
+        this.baseInitializer = baseInitializer;
+    }
+
+    @Autowired
+    public void setSessionInitializer(IRuleEngineGlobalsProvider sessionInitializer) {
+        this.sessionInitializer = sessionInitializer;
+    }
+
+    @Autowired
+    public void setRuleRepository(RuleRepository ruleRepository) {
+        this.ruleRepository = ruleRepository;
+    }
 
     @Bean(name = "kieRuntime")
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)

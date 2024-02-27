@@ -26,10 +26,8 @@ import java.util.stream.Collectors;
 @Service
 public class PdfDataHelper implements IPdfDataHelper {
 
-    @Autowired
     private ITaskService taskService;
 
-    @Autowired
     private IDataService dataService;
 
     @Getter
@@ -69,6 +67,16 @@ public class PdfDataHelper implements IPdfDataHelper {
     private int originalCols;
 
     private static final String DIVIDER = "divider";
+
+    @Autowired
+    public void setTaskService(ITaskService taskService) {
+        this.taskService = taskService;
+    }
+
+    @Autowired
+    public void setDataService(IDataService dataService) {
+        this.dataService = dataService;
+    }
 
     @Override
     public void setupDataHelper(PdfResource resource) {

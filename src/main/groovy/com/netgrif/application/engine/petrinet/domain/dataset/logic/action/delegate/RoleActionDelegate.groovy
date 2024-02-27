@@ -16,19 +16,31 @@ import org.springframework.stereotype.Component
 @SuppressWarnings(["GrMethodMayBeStatic", "GroovyUnusedDeclaration"])
 class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
 
-    @Autowired
     IUserService userService
 
-    @Autowired
     IPetriNetService petriNetService
 
-    @Autowired
     IProcessRoleService processRoleService
 
     Action action
     ProcessRole processRole
     PetriNet petriNet
     def affectedUser
+
+    @Autowired
+    void setUserService(IUserService userService) {
+        this.userService = userService
+    }
+
+    @Autowired
+    void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService
+    }
+
+    @Autowired
+    void setProcessRoleService(IProcessRoleService processRoleService) {
+        this.processRoleService = processRoleService
+    }
 
     def init(Action action, RoleContext roleContext) {
         this.action = action
