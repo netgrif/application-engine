@@ -57,7 +57,6 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
             template.deleteIndex(ElasticPetriNet.class)
             template.deleteIndex(ElasticCase.class)
             template.deleteIndex(ElasticTask.class)
-            template.deleteIndex(UriNode.class)
         }
         if (!template.indexExists(petriNetIndex)) {
             log.info "Creating Elasticsearch case index [${petriNetIndex}]"
@@ -77,19 +76,11 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
         } else {
             log.info "Elasticsearch task index exists [${taskIndex}]"
         }
-        if (!template.indexExists(uriProperties.index)) {
-            log.info "Creating Elasticsearch uri index [${uriProperties.index}]"
-            template.createIndex(UriNode.class)
-        } else {
-            log.info "Elasticsearch uri index exists [${uriProperties.index}]"
-        }
         log.info("Updating Elasticsearch case mapping [${petriNetIndex}]")
         template.putMapping(ElasticPetriNet.class)
         log.info("Updating Elasticsearch case mapping [${caseIndex}]")
         template.putMapping(ElasticCase.class)
         log.info("Updating Elasticsearch task mapping [${taskIndex}]")
         template.putMapping(ElasticTask.class)
-        log.info("Updating Elasticsearch uri mapping [${uriProperties.index}]")
-        template.putMapping(UriNode.class)
     }
 }
