@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome;
@@ -61,7 +62,7 @@ public interface ITaskService {
 
     AssignTaskEventOutcome assignTask(Task task, IUser user) throws TransitionNotExecutableException;
 
-    AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException;
+    AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException, TaskNotFoundException;
 
     AssignTaskEventOutcome assignTask(String taskId) throws TransitionNotExecutableException;
 
