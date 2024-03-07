@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic
 
-class CaseChangedFields {
+class CaseChangedFields implements Serializable {
+
+    private static final long serialVersionUID = 2299918326436821185L;
 
     protected String caseId
     protected Map<String, ChangedField> changedFields = new HashMap<>()

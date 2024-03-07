@@ -30,6 +30,7 @@ import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
 import com.netgrif.application.engine.workflow.domain.TaskPair;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
@@ -44,8 +45,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
@@ -65,10 +65,9 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 @Service
 public class TaskService implements ITaskService {
-
-    private static final Logger log = LoggerFactory.getLogger(TaskService.class);
 
     @Autowired
     protected ApplicationEventPublisher publisher;
@@ -133,7 +132,7 @@ public class TaskService implements ITaskService {
     public AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException {
         Optional<Task> taskOptional = taskRepository.findById(taskId);
         if (taskOptional.isEmpty()) {
-            throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
+            throw new TaskNotFoundException("Could not find task with id [" + taskId + "]");
         }
 
         IUser user = getUserFromLoggedUser(loggedUser);
@@ -396,7 +395,7 @@ public class TaskService implements ITaskService {
      * Reloads all unassigned tasks of given case:
      * <table border="1">
      * <tr>
-     * <td></td><td>LocalisedTask is present</td><td>LocalisedTask is not present</td>
+     * <td></td><td>Task is present</td><td>Task is not present</td>
      * </tr>
      * <tr>
      * <td>Transition executable</td><td>no action</td><td>create task</td>
@@ -448,23 +447,21 @@ public class TaskService implements ITaskService {
         useCase = workflowService.resolveUserRef(useCase);
 
         for (Task task : newTasks) {
-            try {
-                Transition transition = net.getTransition(task.getTransitionId());
-                if (transition.getTriggers().stream().anyMatch(trigger -> trigger instanceof AutoTrigger)) {
-                    executeTransition(task, useCase);
-                }
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
+            executeIfAutoTrigger(useCase, net, task);
         }
     }
 
-    private boolean isNotAssigned(Task task) {
-        return !(task.getUserId() != null && !task.getUserId().isBlank());
-    }
-
-    private boolean isExecutableAndTaskDoesNotExist(PetriNet net, Transition transition, String taskId) {
-        return isExecutable(transition, net) && taskId == null;
+    private void executeIfAutoTrigger(Case useCase, PetriNet net, Task task) {
+        try {
+            Transition transition = net.getTransition(task.getTransitionId());
+            if (transition.hasAutoTrigger()) {
+                executeTransition(task, useCase);
+            }
+        } catch (TaskNotFoundException e) {
+            log.info("Could not execute auto trigger on task [" + task.getStringId() + "],[" + task.getTransitionId() + "], reason: " + e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     boolean isExecutable(Transition transition, PetriNet net) {
@@ -745,6 +742,7 @@ public class TaskService implements ITaskService {
                 .caseId(useCase.get_id().toString())
                 .transitionId(transition.getImportId())
                 .layout(transition.getLayout())
+                .tags(transition.getTags())
                 .caseColor(useCase.getColor())
                 .caseTitle(useCase.getTitle())
                 .priority(transition.getPriority())

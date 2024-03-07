@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public interface IElasticCaseService {
 
@@ -35,4 +34,6 @@ public interface IElasticCaseService {
     List<ElasticCase> findAllByStringIdOrId(String stringId, String elasticId, IndexCoordinates indexCoordinates);
 
     long countByLastModified(Case useCase, long timestamp);
+
+    String findUriNodeId(Case aCase);
 }

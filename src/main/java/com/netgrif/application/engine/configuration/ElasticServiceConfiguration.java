@@ -57,7 +57,7 @@ public class ElasticServiceConfiguration {
     @Bean
     @Primary
     public IElasticTaskService elasticTaskService() {
-        return new ElasticTaskService(taskRepository, elasticsearchTemplate);
+        return new ElasticTaskService(elasticsearchTemplate);
     }
 
     @Bean
@@ -68,7 +68,7 @@ public class ElasticServiceConfiguration {
 
     @Bean
     public IElasticTaskService reindexingTaskElasticTaskService() {
-        return new ElasticTaskService(taskRepository, elasticsearchTemplate);
+        return new ElasticTaskService(elasticsearchTemplate);
     }
 
 }

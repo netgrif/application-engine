@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 @Service
 public class ElasticIndexService implements IElasticIndexService {
 
-    private static final String PLACEHOLDERS = "caseIndex, taskIndex";
+    private static final String PLACEHOLDERS = "petriNetIndex, caseIndex, taskIndex";
 
     private static final int FIRST_LEVEL = 0;
 

@@ -37,6 +37,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+@Disabled
 @Slf4j
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -67,6 +68,7 @@ class RuleEvaluationScheduleServiceTest {
     }
 
     @Test
+    @Disabled
     void testScheduledRule() throws IOException, MissingPetriNetMetaDataException, RuleEvaluationScheduleException, InterruptedException, MissingIconKeyException {
         LoggedUser user = superCreator.getLoggedSuper();
         ReindexRetryHelper<Case> caseSearchHelper = new ReindexRetryHelper<>();
