@@ -56,7 +56,6 @@ public class MenuItemBody {
     private boolean mergeFilters = true;
     private String taskViewSearchType = "fulltext_advanced";
     private List<String> taskHeadersMode = new ArrayList<>(List.of("sort", "edit"));
-    ;
     private String taskHeadersDefaultMode = "sort";
     private boolean taskIsHeaderModeChangeable = true;
     private boolean taskAllowHeaderTableMode = true;
