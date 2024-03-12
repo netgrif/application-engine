@@ -104,9 +104,9 @@ public class ElasticCase {
 
     /**
      * Data that is stored in the elasticsearch database.
-     * <p>
+     *
      * Note that the dataSet attribute is NOT set when the object is created and must be set later.
-     * <p>
+     *
      * The {@link com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService IElasticCaseMappingService} can be used to create
      * instances of this class from Case objects, that have the dataset populated.
      *

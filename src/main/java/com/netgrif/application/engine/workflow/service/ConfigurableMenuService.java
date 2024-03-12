@@ -30,12 +30,12 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
 
     /**
      * Constructs a map that can be used as a value for any {@link com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField}.
-     * <p>
+     *
      * The map will contain strings related to process nets authored by the provided user.
-     * <p>
+     *
      * A key of the map is a string of the form "&lt;net identifier&gt;:&lt;net version&gt;".
      * The version portion of the string uses the dash (-) character to separate the major, minor a patch version numbers instead of the traditional dot character.
-     * <p>
+     *
      * A value of the map is an {@link I18nString} with no translations of the form  "&lt;net identifier&gt; : &lt;net version&gt;".
      * The default value of the net title is used.
      *
@@ -93,7 +93,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
 
     /**
      * Constructs a map that can be used as a value for any {@link com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField}.
-     * <p>
+     *
      * The map will contain all the options from the input field except for those that are selected in the input field.
      *
      * @param mapField a map field whose value complement we want to get
@@ -109,11 +109,11 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
 
     /**
      * Constructs a map that can be used as a value for any {@link com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField}.
-     * <p>
+     *
      * The map will contain a union of the options that are already present in the {@code addedRoles} field with the options selected in the {@code rolesAvailable} field.
-     * <p>
+     *
      * The keys remain unchanged.
-     * <p>
+     *
      * The values of the map are a combination of the options from the {@code addedRoles} field (they remain unchanged)
      * and new values corresponding to the new keys from the {@code rolesAvailable} field. The new values are of the form "&lt;original value&gt; (&lt;net title&gt;)"
      *
