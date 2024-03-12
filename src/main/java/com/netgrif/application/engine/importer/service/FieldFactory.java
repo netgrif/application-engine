@@ -114,6 +114,10 @@ public final class FieldFactory {
                 }
             }
         }
+        LocalDateTime dateTime = parseDateTimeFromString(value);
+        if (dateTime != null) {
+            return dateTime.toLocalDate();
+        }
         return null;
     }
 
