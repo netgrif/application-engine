@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 
-import static org.springframework.data.elasticsearch.annotations.FieldType.Long;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
 

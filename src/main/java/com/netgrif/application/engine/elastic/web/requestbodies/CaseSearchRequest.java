@@ -45,6 +45,8 @@ public class CaseSearchRequest {
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<String> group;
 
+    public Map<String, String> tags;
+
     public CaseSearchRequest(Map<String, Object> request) {
         if (request.containsKey("process") && request.get("process") instanceof List) {
             List<String> processIdentifiers = (List<String>) request.get("process");
@@ -114,6 +116,4 @@ public class CaseSearchRequest {
 
         public String email;
     }
-
-    public Map<String, String> tags;
 }

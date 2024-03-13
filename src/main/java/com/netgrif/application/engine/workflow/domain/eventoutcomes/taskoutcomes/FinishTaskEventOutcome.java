@@ -8,7 +8,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class FinishTaskEventOutcome extends TaskEventOutcome{
+public class FinishTaskEventOutcome extends TaskEventOutcome {
 
     public FinishTaskEventOutcome() {
         super();

@@ -17,14 +17,16 @@ public class RefreshableKieBase implements IRefreshableKieBase {
 
     public static final Logger log = LoggerFactory.getLogger(RefreshableKieBase.class);
 
+    private final RuleRepository ruleRepository;
+
+    private final IKnowledgeBaseInitializer knowledgeBaseInitializer;
+
     @Value("${drools.knowBase.auto-refresh:#{true}}")
     private boolean autoRefresh;
 
     private LocalDateTime lastRefresh;
-    private KieBase kieBase;
 
-    private final RuleRepository ruleRepository;
-    private final IKnowledgeBaseInitializer knowledgeBaseInitializer;
+    private KieBase kieBase;
 
 
     public RefreshableKieBase(@Autowired RuleRepository ruleRepository, @Autowired IKnowledgeBaseInitializer knowledgeBaseInitializer) {

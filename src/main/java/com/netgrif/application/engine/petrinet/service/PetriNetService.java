@@ -13,9 +13,12 @@ import com.netgrif.application.engine.history.domain.taskevents.TaskEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
+import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
+import com.netgrif.application.engine.petrinet.domain.Transition;
+import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
@@ -36,7 +39,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -481,7 +483,7 @@ public class PetriNetService implements IPetriNetService {
             if (criteriaClass.getGroup().size() == 1) {
                 this.addValueCriteria(query, queryTotal, Criteria.where("author.email").is(this.groupService.getGroupOwnerEmail(criteriaClass.getGroup().get(0))));
             } else {
-                this.addValueCriteria(query, queryTotal,Criteria.where("author.email").in(this.groupService.getGroupsOwnerEmails(criteriaClass.getGroup())));
+                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(this.groupService.getGroupsOwnerEmails(criteriaClass.getGroup())));
             }
         }
         if (criteriaClass.getVersion() != null) {

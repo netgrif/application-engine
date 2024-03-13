@@ -210,7 +210,7 @@ public class DataField implements Referencable, Serializable {
     @Override
     public int getMultiplicity() {
         double parsedValue = Double.parseDouble(String.valueOf(value));
-        if(parsedValue == Math.floor(parsedValue) && !Double.isInfinite(parsedValue)){
+        if (parsedValue == Math.floor(parsedValue) && !Double.isInfinite(parsedValue)) {
             return (int) Double.parseDouble(String.valueOf(value));
         } else {
             throw new IllegalArgumentException("Variable arc must be an non negative integer");

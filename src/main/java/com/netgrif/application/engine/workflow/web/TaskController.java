@@ -199,12 +199,12 @@ public class TaskController extends AbstractTaskController {
     @Operation(summary = "Upload file into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
-    @PostMapping(value = "/{id}/file",  produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/{id}/file", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EntityModel<EventOutcomeWithMessage> saveFile(Authentication auth, @PathVariable("id") String taskId, @RequestPart(value = "data") FileFieldRequest dataBody, @RequestPart(value = "file") MultipartFile multipartFile, Locale locale){
+    public EntityModel<EventOutcomeWithMessage> saveFile(Authentication auth, @PathVariable("id") String taskId, @RequestPart(value = "data") FileFieldRequest dataBody, @RequestPart(value = "file") MultipartFile multipartFile, Locale locale) {
         return super.saveFile(taskId, multipartFile, dataBody, locale);
     }
 
@@ -230,7 +230,7 @@ public class TaskController extends AbstractTaskController {
     @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
     @Operation(summary = "Upload multiple files into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
-            security = {@SecurityRequirement(name =  "BasicAuth")})
+            security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/{id}/files", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),

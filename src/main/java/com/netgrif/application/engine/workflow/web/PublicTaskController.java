@@ -45,11 +45,9 @@ import java.util.Locale;
 @RequestMapping({"/api/public/task"})
 public class PublicTaskController extends AbstractTaskController {
 
-    private final ITaskService taskService;
-
-    private final IDataService dataService;
-
     final IUserService userService;
+    private final ITaskService taskService;
+    private final IDataService dataService;
 
     public PublicTaskController(ITaskService taskService, IDataService dataService, IUserService userService) {
         super(taskService, dataService, null);

@@ -10,11 +10,10 @@ import java.util.Date;
 public class DateUtils {
 
     private static final String DATETIME_PATTERN = "yyyy-MM-dd HH:mm";
-    private static final String DATE_PATTERN = "dd.MM.yyyy";
-    private static final String DATE_PATTERN_dd_MMM_yyyy = "dd-MMM-yyyy";
-
     public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
+    private static final String DATE_PATTERN = "dd.MM.yyyy";
     public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
+    private static final String DATE_PATTERN_dd_MMM_yyyy = "dd-MMM-yyyy";
     public static final DateTimeFormatter dd_MMM_yyyy = DateTimeFormatter.ofPattern(DATE_PATTERN_dd_MMM_yyyy);
 
     public static String toString(LocalDateTime localDateTime) {
