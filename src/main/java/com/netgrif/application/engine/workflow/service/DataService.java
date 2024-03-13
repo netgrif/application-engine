@@ -228,21 +228,29 @@ public class DataService implements IDataService {
                         outcome.setMessage(dataSet.get(fieldId).getEvents().get(DataEventType.SET).getMessage());
                     }
                 }
-                Object newValue = parseFieldsValues(entry.getValue(), dataField);
-                dataField.setValue(newValue);
-                dataField.setLastModified(LocalDateTime.now());
+                boolean modified = false;
                 ChangedField changedField = new ChangedField();
                 changedField.setId(fieldId);
-                changedField.addAttribute("value", newValue);
+                Object newValue = parseFieldsValues(entry.getValue(), dataField);
+                if (newValue != null) {
+                    dataField.setValue(newValue);
+                    changedField.addAttribute("value", newValue);
+                    modified = true;
+                }
                 List<String> allowedNets = parseAllowedNetsValue(entry.getValue());
                 if (allowedNets != null) {
                     dataField.setAllowedNets(allowedNets);
                     changedField.addAttribute("allowedNets", allowedNets);
+                    modified = true;
                 }
                 Map<String, Object> filterMetadata = parseFilterMetadataValue(entry.getValue());
                 if (filterMetadata != null) {
                     dataField.setFilterMetadata(filterMetadata);
                     changedField.addAttribute("filterMetadata", filterMetadata);
+                    modified = true;
+                }
+                if (modified) {
+                    dataField.setLastModified(LocalDateTime.now());
                 }
                 if (validationEnable) {
                     validation.valid(useCase.getPetriNet().getDataSet().get(entry.getKey()), dataField);
@@ -826,6 +834,10 @@ public class DataService implements IDataService {
                 break;
             case "caseRef":
                 List<String> list = parseListStringValues(node);
+                if (list == null) {
+                    value = null;
+                    break;
+                }
                 validateCaseRefValue(list, dataField.getAllowedNets());
                 value = list;
                 break;
