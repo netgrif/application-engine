@@ -2,6 +2,7 @@ package com.netgrif.application.engine.elastic.service;
 
 
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
 import org.elasticsearch.action.admin.indices.open.OpenIndexResponse;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
@@ -25,7 +26,6 @@ import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -36,6 +36,7 @@ import java.util.List;
 @Service
 public class ElasticIndexService implements IElasticIndexService {
 
+    private static final String PLACEHOLDERS = "petriNetIndex, caseIndex, taskIndex";
     @Autowired
     private ApplicationContext context;
 
@@ -44,8 +45,6 @@ public class ElasticIndexService implements IElasticIndexService {
 
     @Autowired
     private ElasticsearchOperations operations;
-
-    private static final String PLACEHOLDERS = "petriNetIndex, caseIndex, taskIndex";
 
     @Override
     public boolean indexExists(String indexName) {

@@ -1,7 +1,10 @@
 package com.netgrif.application.engine.ldap.domain;
 
 
-import com.netgrif.application.engine.auth.domain.*;
+import com.netgrif.application.engine.auth.domain.Authority;
+import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.auth.domain.UserState;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;

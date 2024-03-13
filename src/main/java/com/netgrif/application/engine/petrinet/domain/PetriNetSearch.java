@@ -4,6 +4,7 @@ import com.netgrif.application.engine.auth.domain.Author;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import lombok.Getter;
 import lombok.Setter;
+
 import java.util.List;
 import java.util.Map;
 

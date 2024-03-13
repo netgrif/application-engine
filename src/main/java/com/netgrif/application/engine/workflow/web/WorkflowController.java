@@ -226,8 +226,8 @@ public class WorkflowController {
     }
 
     @Operation(summary = "Download case file field value", security = {@SecurityRequirement(name = "BasicAuth")})
-    @GetMapping(value = "/case/{id}/file/{field}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<Resource> getFile(@PathVariable("id") String caseId, @PathVariable("field") String fieldId) throws FileNotFoundException {
+    @GetMapping(value = "/case/{id}/file", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<Resource> getFile(@PathVariable("id") String caseId, @RequestParam("fieldId") String fieldId) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByCase(caseId, null, fieldId, false);
 
         if (fileFieldInputStream.getInputStream() == null)
@@ -244,8 +244,8 @@ public class WorkflowController {
     }
 
     @Operation(summary = "Download one file from cases file list field value", security = {@SecurityRequirement(name = "BasicAuth")})
-    @GetMapping(value = "/case/{id}/file/{field}/{name}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<Resource> getFileByName(@PathVariable("id") String caseId, @PathVariable("field") String fieldId, @PathVariable("name") String name) throws FileNotFoundException {
+    @GetMapping(value = "/case/{id}/file/named", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<Resource> getFileByName(@PathVariable("id") String caseId, @RequestParam("fieldId") String fieldId, @RequestParam("fileName") String name) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByCaseAndName(caseId, fieldId, name);
 
         if (fileFieldInputStream.getInputStream() == null)

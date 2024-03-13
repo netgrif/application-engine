@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.petrinet.service;
 
 import com.netgrif.application.engine.configuration.properties.UriProperties;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.UriContentType;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository;
@@ -18,9 +17,11 @@ import java.util.stream.StreamSupport;
  */
 @Service
 public class UriService implements IUriService {
-    
+
     private static final int FIRST_LEVEL = 0;
+
     private final UriNodeRepository uriNodeRepository;
+
     private final UriProperties uriProperties;
 
     public UriService(UriNodeRepository uriNodeRepository, UriProperties uriProperties) {

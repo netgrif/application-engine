@@ -43,10 +43,11 @@ public abstract class EventOutcome implements Serializable {
         this.outcomes.add(eventOutcome);
     }
 
-    public void addOutcomes(List<EventOutcome> outcomes){
+    public void addOutcomes(List<EventOutcome> outcomes) {
         this.outcomes.addAll(outcomes);
     }
-    public void addFrontAction(FrontAction frontAction){
+
+    public void addFrontAction(FrontAction frontAction) {
         this.frontActions.add(frontAction);
     }
 }

@@ -14,11 +14,11 @@ public interface IPdfDataHelper {
 
     void setTaskId(Case useCase, Transition transition);
 
-    void setPdfFields(List<PdfField> fields);
-
     void setExcludedFields(List<String> excludedFields);
 
     List<PdfField> getPdfFields();
+
+    void setPdfFields(List<PdfField> fields);
 
     void setupDataHelper(PdfResource resource);
 

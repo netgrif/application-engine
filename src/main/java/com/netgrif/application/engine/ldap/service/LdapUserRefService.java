@@ -40,6 +40,9 @@ import static org.springframework.ldap.query.LdapQueryBuilder.query;
 public class LdapUserRefService implements ILdapUserRefService {
 
     @Autowired
+    protected ILdapGroupRefService ldapGroupRefService;
+
+    @Autowired
     private LdapUserRefRepository repository;
 
     @Autowired
@@ -59,9 +62,6 @@ public class LdapUserRefService implements ILdapUserRefService {
 
     @Autowired
     private LdapConfiguration ldapUserConfiguration;
-
-    @Autowired
-    protected ILdapGroupRefService ldapGroupRefService;
 
     @Override
     public IUser createUser(LdapUserRef ldapUserRef) {
