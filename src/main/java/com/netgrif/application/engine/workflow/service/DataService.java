@@ -228,7 +228,7 @@ public class DataService implements IDataService {
                         outcome.setMessage(dataSet.get(fieldId).getEvents().get(DataEventType.SET).getMessage());
                     }
                 }
-                Object newValue = parseFieldsValues(entry.getValue(), dataField);
+                Object newValue = parseFieldsValues(entry.getValue(), dataField, task.getStringId());
                 dataField.setValue(newValue);
                 dataField.setLastModified(LocalDateTime.now());
                 ChangedField changedField = new ChangedField();
@@ -763,7 +763,7 @@ public class DataService implements IDataService {
         return eventService.processDataEvents(field, trigger, phase, useCase, task);
     }
 
-    private Object parseFieldsValues(JsonNode jsonNode, DataField dataField) {
+    private Object parseFieldsValues(JsonNode jsonNode, DataField dataField, String taskId) {
         ObjectNode node = (ObjectNode) jsonNode;
         Object value;
         switch (getFieldTypeFromNode(node)) {
@@ -830,7 +830,9 @@ public class DataService implements IDataService {
                 value = list;
                 break;
             case "taskRef":
-                value = parseListStringValues(node);
+                List<String> listTask = parseListStringValues(node);
+                validateTaskRefValue(listTask, taskId);
+                value = listTask;
                 // TODO 29.9.2020: validate task ref value? is such feature desired?
                 break;
             case "stringCollection":
@@ -955,6 +957,14 @@ public class DataService implements IDataService {
         cases.forEach(_case -> {
             if (!nets.contains(_case.getProcessIdentifier())) {
                 throw new IllegalArgumentException(String.format("Case '%s' with id '%s' cannot be added to case ref, since it is an instance of process with identifier '%s', which is not one of the allowed nets", _case.getTitle(), _case.getStringId(), _case.getProcessIdentifier()));
+            }
+        });
+    }
+
+    public void validateTaskRefValue(List<String> value, String restrictedTaskId) throws IllegalArgumentException {
+        value.forEach(taskId -> {
+            if (taskId.equals(restrictedTaskId)) {
+                throw new IllegalArgumentException(String.format("Task with id '%s' cannot be added to task ref, since it is an task which displaying task ref", restrictedTaskId));
             }
         });
     }
