@@ -45,6 +45,7 @@ import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -243,10 +244,22 @@ public class DataService implements IDataService {
                     changedField.addAttribute("allowedNets", allowedNets);
                     modified = true;
                 }
-                Map<String, Object> filterMetadata = parseFilterMetadataValue(entry.getValue());
+                String fieldType = getFieldTypeFromNode((ObjectNode) entry.getValue());
+                Map<String, Object> filterMetadata = parseFilterMetadataValue((ObjectNode) entry.getValue(), fieldType);
                 if (filterMetadata != null) {
                     dataField.setFilterMetadata(filterMetadata);
                     changedField.addAttribute("filterMetadata", filterMetadata);
+                    modified = true;
+                }
+                Map<String, I18nString> options = parseOptionsNode(entry.getValue(), fieldType);
+                if (options != null) {
+                    setDataFieldOptions(options, dataField, changedField, fieldType);
+                    modified = true;
+                }
+                Set<I18nString> choices = parseChoicesNode((ObjectNode) entry.getValue(), fieldType);
+                if (choices != null) {
+                    dataField.setChoices(choices);
+                    changedField.addAttribute("choices", choices.stream().map(i18nString -> i18nString.getTranslation(LocaleContextHolder.getLocale())).collect(Collectors.toSet()));
                     modified = true;
                 }
                 if (modified) {
@@ -911,7 +924,7 @@ public class DataService implements IDataService {
     private List<String> parseAllowedNetsValue(JsonNode jsonNode) {
         ObjectNode node = (ObjectNode) jsonNode;
         String fieldType = getFieldTypeFromNode(node);
-        if (Objects.equals(fieldType, "caseRef") || Objects.equals(fieldType, "filter")) {
+        if (Objects.equals(fieldType, FieldType.CASE_REF.getName()) || Objects.equals(fieldType, FieldType.FILTER.getName())) {
             return parseListStringAllowedNets(node);
         }
         return null;
@@ -931,14 +944,28 @@ public class DataService implements IDataService {
         return list;
     }
 
+    private List<I18nString> parseListI18nString(ObjectNode node, String attributeKey) {
+        ArrayNode arrayNode = (ArrayNode) node.get(attributeKey);
+        if (arrayNode == null) {
+            return null;
+        }
+        ArrayList<I18nString> list = new ArrayList<>();
+        arrayNode.forEach(item -> {
+            if (item.isTextual()) {
+                list.add(new I18nString(item.asText()));
+            } else {
+                list.add(parseI18nStringValues((ObjectNode) item));
+            }
+        });
+        return list;
+    }
+
     private String getFieldTypeFromNode(ObjectNode node) {
         return node.get("type").asText();
     }
 
-    private Map<String, Object> parseFilterMetadataValue(JsonNode jsonNode) {
-        ObjectNode node = (ObjectNode) jsonNode;
-        String fieldType = getFieldTypeFromNode(node);
-        if (Objects.equals(fieldType, "filter")) {
+    private Map<String, Object> parseFilterMetadataValue(ObjectNode node, String fieldType) {
+        if (Objects.equals(fieldType, FieldType.FILTER.getName())) {
             JsonNode filterMetadata = node.get("filterMetadata");
             if (filterMetadata == null) {
                 return null;
@@ -960,6 +987,64 @@ public class DataService implements IDataService {
         }
         return new I18nString(defaultValue, translations);
     }
+
+    private Map<String, I18nString> parseOptionsNode(JsonNode node, String fieldType) {
+        if (Objects.equals(fieldType, FieldType.ENUMERATION_MAP.getName()) || Objects.equals(fieldType, FieldType.MULTICHOICE_MAP.getName()) ||
+        Objects.equals(fieldType, FieldType.ENUMERATION.getName()) || Objects.equals(fieldType, FieldType.MULTICHOICE.getName())) {
+            return parseOptions(node);
+        }
+        return null;
+    }
+
+    private Map<String, I18nString> parseOptions(JsonNode node) {
+        JsonNode optionsNode =  node.get("options");
+        if (optionsNode == null) {
+            return null;
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> optionsMapped = mapper.convertValue(optionsNode, new TypeReference<Map<String, Object>>() {});
+        if (optionsMapped.isEmpty()) {
+            return null;
+        }
+        Map<String, I18nString> options = new HashMap<>();
+        optionsMapped.forEach((key, value) -> {
+            if (value instanceof I18nString) {
+                options.put(key, (I18nString) value);
+            } else {
+                options.put(key, new I18nString((String) value));
+            }
+        });
+        return options;
+    }
+
+    private void setDataFieldOptions(Map<String, I18nString> options, DataField dataField, ChangedField changedField, String fieldType) {
+        if (Objects.equals(fieldType, FieldType.ENUMERATION_MAP.getName()) || Objects.equals(fieldType, FieldType.MULTICHOICE_MAP.getName())) {
+            dataField.setOptions(options);
+            changedField.addAttribute("options", options.entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey,
+                            e -> e.getValue().getTranslation(LocaleContextHolder.getLocale()))));
+        } else {
+            Set<I18nString> choices = new LinkedHashSet<>();
+            options.forEach((key, value) -> choices.add(value));
+            dataField.setChoices(choices);
+            changedField.addAttribute("choices", choices
+                    .stream()
+                    .map(i18nString -> i18nString
+                            .getTranslation(LocaleContextHolder.getLocale())).collect(Collectors.toSet()));
+        }
+    }
+
+    private Set<I18nString> parseChoicesNode(ObjectNode node, String fieldType) {
+        if (Objects.equals(fieldType, FieldType.ENUMERATION.getName()) || Objects.equals(fieldType, FieldType.MULTICHOICE.getName())) {
+            List<I18nString> list = parseListI18nString(node, "choices");
+            if (list != null) {
+                return new HashSet<>(list);
+            }
+        }
+        return null;
+    }
+
 
     public void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException {
         List<Case> cases = workflowService.findAllById(value);
