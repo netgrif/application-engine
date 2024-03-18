@@ -3,6 +3,7 @@ package com.netgrif.application.engine.workflow.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -884,7 +885,7 @@ public class DataService implements IDataService {
                     value = new I18nString("");
                     break;
                 }
-                value = parseI18nStringValues(node);
+                value = parseI18nStringValues((ObjectNode) node.get("value"));
                 break;
             default:
                 if (node.get("value") == null || node.get("value").isNull()) {
@@ -978,10 +979,10 @@ public class DataService implements IDataService {
     }
 
     private I18nString parseI18nStringValues(ObjectNode node) {
-        String defaultValue = node.get("value").get("defaultValue") != null ? node.get("value").get("defaultValue").asText() : "";
+        String defaultValue = node.get("defaultValue") != null ? node.get("defaultValue").asText() : "";
         Map<String, String> translations = new HashMap<>();
-        if (node.get("value").get("translations") != null) {
-            node.get("value").get("translations").fields().forEachRemaining(entry ->
+        if (node.get("translations") != null) {
+            node.get("translations").fields().forEachRemaining(entry ->
                     translations.put(entry.getKey(), entry.getValue().asText())
             );
         }
@@ -1002,19 +1003,14 @@ public class DataService implements IDataService {
             return null;
         }
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> optionsMapped = mapper.convertValue(optionsNode, new TypeReference<Map<String, Object>>() {});
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(I18nString.class, new I18nStringDeserializer());
+        mapper.registerModule(module);
+        Map<String, I18nString> optionsMapped = mapper.convertValue(optionsNode, new TypeReference<Map<String, I18nString>>() {});
         if (optionsMapped.isEmpty()) {
             return null;
         }
-        Map<String, I18nString> options = new HashMap<>();
-        optionsMapped.forEach((key, value) -> {
-            if (value instanceof I18nString) {
-                options.put(key, (I18nString) value);
-            } else {
-                options.put(key, new I18nString((String) value));
-            }
-        });
-        return options;
+        return optionsMapped;
     }
 
     private void setDataFieldOptions(Map<String, I18nString> options, DataField dataField, ChangedField changedField, String fieldType) {
