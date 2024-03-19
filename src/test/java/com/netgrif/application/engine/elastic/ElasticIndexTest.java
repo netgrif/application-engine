@@ -149,7 +149,7 @@ public class ElasticIndexTest {
         List<String> combinedList_aaa_bbb = Stream.concat(indexList_aaa.stream(), indexList_bbb.stream())
                 .collect(Collectors.toList());
 
-        sleep(1000);
+        sleep(15000);
 
         List<Case> results_aaa_bbb = findCasesElastic("dataSet.text_1.textValue:\"aaa\"", combinedList_aaa_bbb, PageRequest.of(0, 100));
         assertNotNull(results_aaa_bbb.get(0), "test0 should not be null");
@@ -189,11 +189,11 @@ public class ElasticIndexTest {
 
         elasticCaseService.moveElasticIndex(searchRequests, "nae_test_case_aaa", "nae_test_case_bbb");
 
-        sleep(8000);
+        sleep(15000);
 
         List<Case> results_aaa2 = findCasesElastic("dataSet.text_1.textValue:\"aaa\"", indexList_aaa, PageRequest.of(0, 100));
         assertTrue(results_aaa2.isEmpty(), "test2 should be null");
-        sleep(85000);
+        sleep(15000);
 
         List<Case> results_bbb2 = findCasesElastic("dataSet.text_1.textValue:\"aaa\"", indexList_bbb, PageRequest.of(0, 100));
         assertFalse(results_bbb2.isEmpty(), "test1 should not be null");
@@ -220,7 +220,7 @@ public class ElasticIndexTest {
 
         elasticCaseService.moveElasticIndex("nae_test_case_aaa", "nae_test_case_bbb");
 
-        sleep(5000);
+        sleep(15000);
 
 
         assertFalse(elasticIndexService.indexExists("nae_test_case_aaa"), "index remove!");
