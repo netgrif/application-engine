@@ -48,13 +48,11 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     private static final Logger log = LoggerFactory.getLogger(ElasticTaskService.class);
 
     protected ITaskService taskService;
+
     protected ElasticsearchRestTemplate template;
 
     @Value("${spring.data.elasticsearch.index.task}")
     protected String taskIndex;
-
-    @Autowired
-    protected ElasticsearchRestTemplate elasticsearchTemplate;
 
     @Autowired
     private ElasticTaskQueueManager elasticTaskQueueManager;
@@ -126,7 +124,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         List<Task> taskPage;
         long total;
         if (query != null) {
-            SearchHits<ElasticTask> hits = elasticsearchTemplate.search(query, ElasticTask.class, IndexCoordinates.of(taskIndex));
+            SearchHits<ElasticTask> hits = template.search(query, ElasticTask.class, IndexCoordinates.of(taskIndex));
             Page<ElasticTask> indexedTasks = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             taskPage = taskService.findAllById(indexedTasks.get().map(ElasticTask::getStringId).collect(Collectors.toList()));
             total = indexedTasks.getTotalElements();

@@ -4,9 +4,11 @@ import com.netgrif.application.engine.configuration.properties.ElasticsearchProp
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository;
 import com.netgrif.application.engine.elastic.service.ElasticCaseService;
+import com.netgrif.application.engine.elastic.service.ElasticIndexService;
 import com.netgrif.application.engine.elastic.service.ElasticTaskService;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -58,6 +60,10 @@ public class ElasticServiceConfiguration {
     @Primary
     public IElasticTaskService elasticTaskService() {
         return new ElasticTaskService(elasticsearchTemplate);
+    }
+    @Bean
+    public IElasticIndexService elasticIndexService() {
+        return new ElasticIndexService(elasticsearchTemplate);
     }
 
     @Bean

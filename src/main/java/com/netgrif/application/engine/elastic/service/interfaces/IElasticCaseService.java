@@ -35,5 +35,7 @@ public interface IElasticCaseService {
 
     long countByLastModified(Case useCase, long timestamp);
 
-    String findUriNodeId(Case aCase);
+    void moveElasticIndex(String fromIndex, String toIndex);
+
+    void moveElasticIndex(List<CaseSearchRequest> requests, String fromIndex, String toIndex);
 }

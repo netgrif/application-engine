@@ -69,8 +69,6 @@ class TestHelper {
     private ImpersonationRunner impersonationRunner
 
     @Autowired
-    private UriRunner uriRunner
-    @Autowired
     private IPetriNetService petriNetService
 
     @Autowired

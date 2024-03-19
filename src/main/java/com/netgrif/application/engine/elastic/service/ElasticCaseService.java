@@ -20,6 +20,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import org.bson.types.ObjectId;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -240,18 +241,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         }
     }
 
-    public String findUriNodeId(Case aCase) {   //TODO: JOZO REMOVE?
-        if (aCase == null) {
-            return null;
-        }
-        ElasticCase elasticCase = repository.findByStringId(aCase.getStringId());
-        if (elasticCase == null) {
-            log.warn("[" + aCase.getStringId() + "] Case with id [" + aCase.getStringId() + "] is not indexed.");
-            return null;
-        }
-
-        return elasticCase.getUriNodeId();
-    }
 
     private NativeSearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
         List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
@@ -276,6 +265,95 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                 .withPageable(pageable)
                 .build();
     }
+
+
+    @Override
+    public void moveElasticIndex(List<CaseSearchRequest> requests, String fromIndex, String toIndex) {
+        BoolQueryBuilder combinedQuery = QueryBuilders.boolQuery();
+        for (CaseSearchRequest request : requests) {
+            BoolQueryBuilder queryForSingleRequest = QueryBuilders.boolQuery();
+            buildPetriNetQuery(request, null, queryForSingleRequest);
+            combinedQuery.should(queryForSingleRequest);
+        }
+
+        final int pageSize = 100;
+        long totalHits;
+        do {
+            Pageable pageable = PageRequest.of(0, pageSize);
+
+            Query searchQuery = new NativeSearchQueryBuilder()
+                    .withQuery(combinedQuery)
+                    .withPageable(pageable)
+                    .build();
+
+            SearchHits<ElasticCase> searchHits = template.search(searchQuery, ElasticCase.class, IndexCoordinates.of(fromIndex));
+            totalHits = searchHits.getTotalHits();
+
+            List<IndexQuery> indexQueries = new ArrayList<>();
+            List<String> documentIdsToBeDeleted = new ArrayList<>();
+
+            searchHits.forEach(hit -> {
+                IndexQuery indexQuery = new IndexQueryBuilder()
+                        .withId(hit.getId())
+                        .withObject(hit.getContent())
+                        .build();
+                indexQueries.add(indexQuery);
+                documentIdsToBeDeleted.add(hit.getId());
+            });
+
+            if (!indexQueries.isEmpty()) {
+                template.bulkIndex(indexQueries, IndexCoordinates.of(toIndex));
+                documentIdsToBeDeleted.forEach(id -> template.delete(id, IndexCoordinates.of(fromIndex)));
+                log.debug("Moved " + indexQueries.size() + " documents from index '" + fromIndex + "' to '" + toIndex + "'.");
+            }
+            template.indexOps(IndexCoordinates.of(fromIndex)).refresh();
+            template.indexOps(IndexCoordinates.of(toIndex)).refresh();
+
+        } while (totalHits != 0);
+    }
+
+    @Override
+    public void moveElasticIndex(String fromIndex, String toIndex) {
+        final int pageSize = 100;
+        long totalHits;
+
+        do {
+            Pageable pageable = PageRequest.of(0, pageSize);
+
+            Query searchQuery = new NativeSearchQueryBuilder()
+                    .withQuery(QueryBuilders.matchAllQuery())
+                    .withPageable(pageable)
+                    .build();
+
+            SearchHits<ElasticCase> searchHits = template.search(searchQuery, ElasticCase.class, IndexCoordinates.of(fromIndex));
+            totalHits = searchHits.getTotalHits();
+
+            List<IndexQuery> indexQueries = searchHits.getSearchHits().stream().map(hit ->
+                    new IndexQueryBuilder()
+                            .withId(hit.getId())
+                            .withObject(hit.getContent())
+                            .build()
+            ).collect(Collectors.toList());
+
+            if (!indexQueries.isEmpty()) {
+                template.bulkIndex(indexQueries, IndexCoordinates.of(toIndex));
+                searchHits.forEach(hit -> template.delete(hit.getId(), IndexCoordinates.of(fromIndex)));
+            }
+
+            template.indexOps(IndexCoordinates.of(fromIndex)).refresh();
+            template.indexOps(IndexCoordinates.of(toIndex)).refresh();
+
+        } while (totalHits > 0);
+
+        long remainingDocs = template.count(new NativeSearchQueryBuilder().withQuery(QueryBuilders.matchAllQuery()).build(), ElasticCase.class, IndexCoordinates.of(fromIndex));
+        if (remainingDocs == 0) {
+            template.indexOps(IndexCoordinates.of(fromIndex)).delete();
+            log.info("Index '" + fromIndex + "' was empty after moving documents and has been deleted.");
+        } else {
+            log.warn("Index '" + fromIndex + "' is not empty after moving documents. Remaining documents: " + remainingDocs);
+        }
+    }
+
 
     private BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, LoggedUser user, Locale locale) {
         BoolQueryBuilder query = boolQuery();
@@ -604,6 +682,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     /**
      * validates request for nullability, collects requested indexes into IndexCoordinates
+     *
      * @param requests List<CaseSearchRequest> | IndexAwareSearchRequest
      * @return indexCoordinates
      */

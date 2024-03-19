@@ -173,10 +173,10 @@ public class UriService implements IUriService {
             childrenToSave.addAll(moveChildrenRecursive(oldNodePath, newNodePath, node.getChildren()));
         }
 
-        node.setParentId(newParent.getId());
-        node.setUriPath(destUri + uriProperties.getSeparator() + node.getName());
-        node = uriNodeRepository.save(node);
-        indexService.evictCache(node.getId());
+        uriNodeRepository.saveAll(List.of(oldParent, newParent, node));
+        uriNodeRepository.saveAll(childrenToSave);
+
+        indexService.evictCache(node.getStringId());
         return node;
     }
 
@@ -263,7 +263,7 @@ public class UriService implements IUriService {
         UriNode node = uriNodeList.getLast();
         if (node.getParentId() != null) {
             UriNode root = getRoot();
-            if (Objects.equals(node.getParentId(), root.getId())) {
+            if (Objects.equals(node.getParentId(), root.getStringId())) {
                 indexService.createIndex(node);
                 indexService.evictAllCaches();
             }
