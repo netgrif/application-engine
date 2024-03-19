@@ -1,8 +1,15 @@
 package com.netgrif.application.engine.elastic.service;
 
 
+import com.netgrif.application.engine.configuration.properties.UriProperties;
+import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
-import lombok.extern.slf4j.Slf4j;
+import com.netgrif.application.engine.petrinet.domain.UriNode;
+import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
+import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
 import org.elasticsearch.action.admin.indices.open.OpenIndexResponse;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
@@ -12,6 +19,9 @@ import org.elasticsearch.client.indices.CloseIndexResponse;
 import org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.elasticsearch.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Setting;
@@ -26,25 +36,135 @@ import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class ElasticIndexService implements IElasticIndexService {
 
     private static final String PLACEHOLDERS = "petriNetIndex, caseIndex, taskIndex";
+
+    private static final int FIRST_LEVEL = 0;
+
+    //index.mapping.total_fields.limit
+    @Value("${spring.data.elasticsearch.index.total-fields:1000}")
+    private int defaultTotalFields;
+
+    @Value("${spring.data.elasticsearch.index.case}")
+    private String caseIndex;
+
     @Autowired
     private ApplicationContext context;
 
     @Autowired
-    private ElasticsearchRestTemplate elasticsearchTemplate;
+    private ElasticsearchOperations operations;
 
     @Autowired
-    private ElasticsearchOperations operations;
+    private IUriService uriService;
+
+    @Autowired
+    private CacheManager cacheManager;
+
+    @Autowired
+    private UriProperties uriProperties;
+
+    @Autowired
+    private ITaskService taskService;
+
+    @Autowired
+    private IWorkflowService workflowService;
+
+    protected ElasticsearchRestTemplate elasticsearchTemplate;
+
+    public ElasticIndexService(ElasticsearchRestTemplate template) {
+        this.elasticsearchTemplate = template;
+    }
+
+    @Override
+    @Cacheable("caseIndexByNodeId")
+    public String getIndex(String uriNodeId) {
+        return getIndex(uriService.findById(uriNodeId));
+    }
+
+    @Override
+    @Cacheable("caseIndexDynamic")
+    public List<String> getAllDynamicIndexes() {
+        List<UriNode> root = uriService.findByLevel(FIRST_LEVEL);
+        if (root.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<UriNode> indexNodes = uriService.findAllByParent(root.get(0).getStringId());
+        return indexNodes.stream().map(this::makeName).collect(Collectors.toList());
+    }
+
+    @Override
+    @Cacheable("caseIndexAll")
+    public List<String> getAllIndexes() {
+        List<String> indexes = new ArrayList<>(getAllDynamicIndexes());
+        indexes.add(getDefaultIndex());
+        return Collections.unmodifiableList(indexes);
+    }
+
+    @Override
+    public void evictAllCaches() {
+        Objects.requireNonNull(cacheManager.getCache("caseIndexByNodeId")).clear();
+        Objects.requireNonNull(cacheManager.getCache("caseIndexByMenuTaskId")).clear();
+        Objects.requireNonNull(cacheManager.getCache("caseIndexDynamic")).clear();
+        Objects.requireNonNull(cacheManager.getCache("caseIndexAll")).clear();
+    }
+
+    @Override
+    public void evictCache(String uriNodeId) {
+        Objects.requireNonNull(cacheManager.getCache("caseIndexByNodeId")).evict(uriNodeId);
+        Objects.requireNonNull(cacheManager.getCache("caseIndexDynamic")).clear();
+        Objects.requireNonNull(cacheManager.getCache("caseIndexAll")).clear();
+    }
+
+    @Override
+    public void evictCacheForMenuItem(String menuItemId) {
+        Objects.requireNonNull(cacheManager.getCache("caseIndexByMenuTaskId")).evict(menuItemId);
+        Objects.requireNonNull(cacheManager.getCache("caseIndexDynamic")).clear();
+        Objects.requireNonNull(cacheManager.getCache("caseIndexAll")).clear();
+    }
+
+    @Override
+    public String makeName(UriNode node) {
+        int separatorIndex = node.getUriPath().lastIndexOf(uriProperties.getSeparator());
+        String lastUriPart = node.getUriPath();
+        if (separatorIndex != -1) {
+            lastUriPart = lastUriPart.substring(separatorIndex + 1);
+        }
+        return makeName(lastUriPart);
+    }
+
+    @Override
+    public String makeName(String nodeName) {
+        return caseIndex + "_" + nodeName.toLowerCase();
+    }
+
+
+    public String getIndex(UriNode node) {
+        UriNode root = uriService.getRoot();
+        if (node.getStringId().equals(root.getStringId())) {
+            return getDefaultIndex();
+        }
+        while (!node.getParentId().equals(root.getStringId())) {
+            node = uriService.findById(node.getParentId());
+        }
+        return makeName(node);
+    }
+
+    @Override
+    @Cacheable("caseIndexByMenuTaskId")
+    public String getIndexByMenuItemId(String menuItemId) {
+        Task task = taskService.findOne(menuItemId);
+        Case menuCase = workflowService.findOne(task.getCaseId());
+        return getIndex(menuCase.getUriNodeId());
+    }
 
     @Override
     public boolean indexExists(String indexName) {
@@ -66,13 +186,17 @@ public class ElasticIndexService implements IElasticIndexService {
 
     @Override
     public boolean bulkIndex(List<?> list, Class<?> clazz, String... placeholders) {
-        String indexName = getIndexName(clazz, placeholders);
         try {
             if (list != null && !list.isEmpty()) {
                 List<IndexQuery> indexQueries = new ArrayList<>();
-                list.forEach(source ->
-                        indexQueries.add(new IndexQueryBuilder().withId(getIdFromSource(source)).withObject(source).build()));
-                elasticsearchTemplate.bulkIndex(indexQueries, IndexCoordinates.of(indexName));
+                list.forEach(source -> {
+                    String indexName = getIndexName(clazz, placeholders);
+                    if (source instanceof ElasticCase) {
+                        indexName = getIndex(((ElasticCase) source).getUriNodeId());
+                    }
+                    indexQueries.add(new IndexQueryBuilder().withId(getIdFromSource(source)).withObject(source).build());
+                    elasticsearchTemplate.bulkIndex(indexQueries, IndexCoordinates.of(indexName));
+                });
             }
         } catch (Exception e) {
             log.error("bulkIndex:", e);
@@ -82,15 +206,42 @@ public class ElasticIndexService implements IElasticIndexService {
     }
 
     @Override
+    public void createIndex(UriNode node) {
+        createIndex(makeName(node));
+    }
+
+    @Override
+    public void createIndex(String indexName) {
+        if (!indexExists(indexName)) {
+            log.info("Creating Elasticsearch case index " + indexName);
+            createElasticsearchIndex(indexName, ElasticCase.class);
+        }
+    }
+
+    @Override
     public boolean createIndex(Class<?> clazz, String... placeholders) {
         try {
             String indexName = getIndexName(clazz, placeholders);
             if (!this.indexExists(indexName)) {
-                // https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html
-                HashMap<String, Object> settingMap = new HashMap<>();
-                settingMap.put("number_of_shards", getShardsFromClass(clazz));
-                settingMap.put("number_of_replicas", getReplicasFromClass(clazz));
-                settingMap.put("max_result_window", 10000000);
+                log.info("Creating new index - {} ", indexName);
+                createElasticsearchIndex(indexName, clazz);
+                return true;
+            } else {
+                log.info("This index {} already exists", indexName);
+            }
+        } catch (Exception e) {
+            log.error("createIndex:", e);
+        }
+        return false;
+    }
+
+    protected void createElasticsearchIndex(String indexName, Class<?> clazz) {
+        HashMap<String, Object> settingMap = new HashMap<>();
+        settingMap.put("number_of_shards", getShardsFromClass(clazz));
+        settingMap.put("number_of_replicas", getReplicasFromClass(clazz));
+        settingMap.put("max_result_window", 10000000);
+        settingMap.put("mapping.total_fields.limit", defaultTotalFields);
+        // https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html
 //                HashMap<String, Object> analyzer = new HashMap<>();  //TODO: Analyzer
 //                HashMap<String, Object> netgrif = new HashMap<>();
 //                HashMap<String, Object> filter = new HashMap<>();
@@ -100,16 +251,11 @@ public class ElasticIndexService implements IElasticIndexService {
 //                filter.put("netgrif", netgrif);
 //                analyzer.put("analyzer", filter);
 //                settingMap.put("analysis", analyzer);
-                Document settings = Document.from(settingMap);
-                log.info("Creating new index - {} ", indexName);
-                return elasticsearchTemplate.indexOps(IndexCoordinates.of(indexName)).create(settings);
-            } else {
-                log.info("This index {} already exists", indexName);
-            }
-        } catch (Exception e) {
-            log.error("createIndex:", e);
-        }
-        return false;
+        Document settings = Document.from(settingMap);
+        elasticsearchTemplate.indexOps(IndexCoordinates.of(indexName)).create(settings);
+
+        Document mapping = operations.indexOps(clazz).createMapping();
+        elasticsearchTemplate.indexOps(IndexCoordinates.of(indexName)).putMapping(mapping);
     }
 
     @Override
@@ -175,6 +321,22 @@ public class ElasticIndexService implements IElasticIndexService {
             log.error("scrollFirst:", e);
         }
         return null;
+    }
+
+    @Override
+    public void deleteIndex(UriNode node) {
+        deleteIndex(makeName(node));
+    }
+
+    @Override
+    public void deleteIndex(String index) {
+        elasticsearchTemplate.indexOps(IndexCoordinates.of(index)).delete();
+    }
+
+
+    @Override
+    public String getDefaultIndex() {
+        return caseIndex;
     }
 
     @Override
@@ -297,5 +459,4 @@ public class ElasticIndexService implements IElasticIndexService {
         }
         return indexName;
     }
-
 }

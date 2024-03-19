@@ -1,10 +1,13 @@
 package com.netgrif.application.engine.petrinet.service;
 
 import com.netgrif.application.engine.configuration.properties.UriProperties;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
+import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.UriContentType;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,9 @@ public class UriService implements IUriService {
     private final UriNodeRepository uriNodeRepository;
 
     private final UriProperties uriProperties;
+
+    @Autowired
+    private IElasticIndexService indexService;
 
     public UriService(UriNodeRepository uriNodeRepository, UriProperties uriProperties) {
         this.uriNodeRepository = uriNodeRepository;
@@ -171,6 +177,8 @@ public class UriService implements IUriService {
 
         uriNodeRepository.saveAll(List.of(oldParent, newParent, node));
         uriNodeRepository.saveAll(childrenToSave);
+
+        indexService.evictCache(node.getStringId());
         return node;
     }
 
@@ -253,7 +261,16 @@ public class UriService implements IUriService {
             uriNodeList.add(uriNode);
             parent = uriNode;
         }
-        return uriNodeList.getLast();
+
+        UriNode node = uriNodeList.getLast();
+        if (node.getParentId() != null) {
+            UriNode root = getRoot();
+            if (Objects.equals(node.getParentId(), root.getStringId())) {
+                indexService.createIndex(node);
+                indexService.evictAllCaches();
+            }
+        }
+        return node;
     }
 
     /**

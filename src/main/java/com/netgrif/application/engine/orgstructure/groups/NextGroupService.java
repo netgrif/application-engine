@@ -137,10 +137,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Case findByName(String name) {
-        CaseSearchRequest request = new CaseSearchRequest();
-        request.query = "title.keyword:\"" + name + "\"";
-        List<Case> result = elasticCaseService.search(Collections.singletonList(request), userService.getSystem().transformToLoggedUser(), PageRequest.of(0, 1), LocaleContextHolder.getLocale(), false).getContent();
-        return !result.isEmpty() ? result.get(0) : null;
+        return workflowService.searchOne(groupCase().and(QCase.case$.title.eq(name)));
     }
 
     @Override

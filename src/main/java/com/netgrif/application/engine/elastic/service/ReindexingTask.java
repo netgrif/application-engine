@@ -110,7 +110,7 @@ public class ReindexingTask {
         Page<Case> cases = this.workflowService.search(predicate, PageRequest.of(page, pageSize));
 
         for (Case aCase : cases) {
-            if (forced || elasticCaseRepository.countByStringIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {
+            if (forced || elasticCaseService.countByLastModified(aCase, Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {
                 elasticCaseService.indexNow(this.caseMappingService.transform(aCase));
                 List<Task> tasks = taskRepository.findAllByCaseId(aCase.getStringId());
                 for (Task task : tasks) {

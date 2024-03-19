@@ -23,14 +23,14 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import java.util.ArrayList;
 import java.util.List;
 
-@EnableCaching
-@EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-@EnableAspectJAutoProxy
-@SpringBootApplication(exclude= {DataSourceAutoConfiguration.class})
-@EnableMongoAuditing
-@Aspect
 @Slf4j
+@Aspect
+@EnableCaching
+@EnableMongoAuditing
+@EnableAspectJAutoProxy
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
 public class ApplicationEngine {
 
     @Around("execution(* com.netgrif.application.engine.startup.AbstractOrderedCommandLineRunner+.run(..))")

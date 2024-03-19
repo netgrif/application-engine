@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.startup
 
+import com.netgrif.application.engine.configuration.ElasticsearchConfiguration
 import com.netgrif.application.engine.configuration.properties.UriProperties
 import com.netgrif.application.engine.elastic.domain.ElasticCase
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
@@ -42,20 +43,41 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IElasticIndexService template
 
+    @Autowired
+    private ElasticsearchConfiguration properties
+    
     @Override
     void run(String... args) throws Exception {
         if (drop) {
-            log.info("Dropping Elasticsearch database [${url}:${port}/${clusterName}]")
-            template.deleteIndex(ElasticPetriNet.class)
-            template.deleteIndex(ElasticCase.class)
-            template.deleteIndex(ElasticTask.class)
+            log.info("Dropping Elasticsearch database [${url}:${port}/${clusterName}]");
+            if (template.indexExists(caseIndex)) {
+                template.deleteIndex(ElasticCase.class)
+            }
+            if (template.indexExists(taskIndex)) {
+                template.deleteIndex(ElasticTask.class)
+            }
+            if (!template.indexExists(petriNetIndex)) {
+                log.info "Creating Elasticsearch case index [${petriNetIndex}]"
+                template.createIndex(ElasticPetriNet.class)
+            }
+            try {
+                template.getAllDynamicIndexes().forEach(indexName -> {
+                    if (template.indexExists(indexName)) {
+                        log.info("Deleting dynamic index {}", indexName);
+                        template.deleteIndex(indexName);
+                    } else {
+                        log.warn("Index {} does not exist, skipping deletion.", indexName);
+                    }
+                })
+            } catch (Exception e){
+                log.warn("Index {} does not exist, skipping deletion.", e.message);
+            }
+            if (template.indexExists(uriProperties.index)) {
+                template.deleteIndex(UriNode.class)
+            }
+            template.evictAllCaches();
         }
-        if (!template.indexExists(petriNetIndex)) {
-            log.info "Creating Elasticsearch case index [${petriNetIndex}]"
-            template.createIndex(ElasticPetriNet.class)
-        } else {
-            log.info "Elasticsearch case index exists [${caseIndex}]"
-        }
+
         if (!template.indexExists(caseIndex)) {
             log.info "Creating Elasticsearch case index [${caseIndex}]"
             template.createIndex(ElasticCase.class)

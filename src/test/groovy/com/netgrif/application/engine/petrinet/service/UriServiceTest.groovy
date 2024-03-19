@@ -100,7 +100,7 @@ class UriServiceTest {
         uriNode = uriService.populateDirectRelatives(uriNode)
 
         assert uriNode.parent != null && uriNode.parent.stringId == uriNode.parentId
-        assert uriNode.children.size() == 1 && uriNode.children.find {it.stringId == uriNode.childrenId[0]} != null
+        assert uriNode.children.size() == 1 && uriNode.children.find { it.stringId == uriNode.childrenId[0] } != null
     }
 
     @Test
@@ -135,7 +135,7 @@ class UriServiceTest {
 
     private prepareDatabase(List<String> listOfUriPaths) {
         uriNodeRepository.deleteAll()
-        listOfUriPaths.each {path ->
+        listOfUriPaths.each { path ->
             uriService.getOrCreate(path, UriContentType.DEFAULT)
         }
     }
@@ -160,6 +160,5 @@ class UriServiceTest {
         uriNode = uriService.createDefault()
         assert uriNode != null && uriNode.level == 0
     }
-
 
 }

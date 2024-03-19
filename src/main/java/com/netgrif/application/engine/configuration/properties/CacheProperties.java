@@ -19,11 +19,31 @@ public class CacheProperties {
 
     private String petriNetCache = "petriNetCache";
 
+    private String caseIndexByNodeId = "caseIndexByNodeId";
+
+    private String caseIndexDynamic = "caseIndexDynamic";
+
+    private String caseIndexAll = "caseIndexAll";
+
+    private String caseIndexByMenuTaskId = "caseIndexByMenuTaskId";
+
     private List<String> additional = new ArrayList<>();
 
     public Set<String> getAllCaches() {
-        Set<String> caches = new LinkedHashSet<>(Arrays.asList(petriNetById, petriNetByIdentifier, petriNetNewest, petriNetCache));
+        List<String> cacheNames = Arrays.asList(
+                petriNetById,
+                petriNetByIdentifier,
+                petriNetNewest,
+                petriNetCache,
+                caseIndexByNodeId,
+                caseIndexDynamic,
+                caseIndexAll,
+                caseIndexByMenuTaskId
+        );
+
+        Set<String> caches = new LinkedHashSet<>(cacheNames);
         caches.addAll(additional);
         return caches;
     }
+
 }
