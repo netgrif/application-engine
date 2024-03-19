@@ -10,8 +10,8 @@ public enum DataEventType {
         this.value = value;
     }
 
-    public static DataEventType fromString(String type){
-        if(type == null){
+    public static DataEventType fromString(String type) {
+        if (type == null) {
             return null;
         }
         return valueOf(type.toUpperCase());

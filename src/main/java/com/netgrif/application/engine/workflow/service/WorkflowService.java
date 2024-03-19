@@ -158,7 +158,7 @@ public class WorkflowService implements IWorkflowService {
         return repository.findAllBy_idIn(ids).stream()
                 .filter(Objects::nonNull)
                 .sorted(Ordering.explicit(ids)
-                .onResultOf(Case::getStringId))
+                        .onResultOf(Case::getStringId))
                 .map(caze -> {
                     caze.setPetriNet(petriNetService.get(caze.getPetriNetObjectId()));
                     decryptDataSet(caze);

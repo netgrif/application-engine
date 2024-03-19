@@ -10,13 +10,13 @@ import java.util.List;
 
 public abstract class PdfSelectionField extends PdfField {
 
-    public PdfSelectionField(PdfResource resource) {
-        super(resource);
-    }
-
     @Getter
     @Setter
     protected List<String> choices = null;
+
+    public PdfSelectionField(PdfResource resource) {
+        super(resource);
+    }
 
     @Override
     public void countMultiLineHeight(int fontSize, PdfResource resource) {

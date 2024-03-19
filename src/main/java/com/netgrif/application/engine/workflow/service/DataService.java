@@ -320,7 +320,7 @@ public class DataService implements IDataService {
     }
 
     private boolean hasRequiredComponentProperty(Component component, String propertyName, String propertyValue) {
-        return  component != null
+        return component != null
                 && component.getProperties() != null
                 && component.getProperties().containsKey(propertyName)
                 && component.getProperties().get(propertyName).equals(propertyValue);

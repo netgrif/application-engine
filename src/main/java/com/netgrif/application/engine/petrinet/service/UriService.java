@@ -22,7 +22,9 @@ import java.util.stream.StreamSupport;
 public class UriService implements IUriService {
 
     private static final int FIRST_LEVEL = 0;
+
     private final UriNodeRepository uriNodeRepository;
+
     private final UriProperties uriProperties;
 
     @Autowired

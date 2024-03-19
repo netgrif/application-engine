@@ -84,8 +84,8 @@ public class NextGroupService implements INextGroupService {
     protected final static String GROUP_TITLE_FIELD = "group_name";
 
     @Override
-    public CreateCaseEventOutcome createDefaultSystemGroup(IUser author){
-        if(findDefaultGroup() != null) {
+    public CreateCaseEventOutcome createDefaultSystemGroup(IUser author) {
+        if (findDefaultGroup() != null) {
             log.info("Default system group has already been created.");
             return null;
         }
@@ -93,12 +93,12 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
-    public CreateCaseEventOutcome createGroup(IUser author){
+    public CreateCaseEventOutcome createGroup(IUser author) {
         return createGroup(author.getFullName(), author);
     }
 
     @Override
-    public CreateCaseEventOutcome createGroup(String title, IUser author){
+    public CreateCaseEventOutcome createGroup(String title, IUser author) {
         Case userDefaultGroup = findUserDefaultGroup(author);
         if (userDefaultGroup != null && userDefaultGroup.getTitle().equals(title)) {
             return null;
@@ -106,7 +106,7 @@ public class NextGroupService implements INextGroupService {
         PetriNet orgGroupNet = petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER);
         CreateCaseEventOutcome outcome = workflowService.createCase(orgGroupNet.getStringId(), title, "", author.transformToLoggedUser());
 
-        Map<String, Map<String,String>> taskData = getInitialGroupData(author, title, outcome.getCase());
+        Map<String, Map<String, String>> taskData = getInitialGroupData(author, title, outcome.getCase());
         Task initTask = getGroupInitTask(outcome.getCase());
         dataService.setData(initTask.getStringId(), ImportHelper.populateDataset(taskData));
 
@@ -193,9 +193,9 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
-    public void addUser(IUser user, String groupId){
+    public void addUser(IUser user, String groupId) {
         Case groupCase = this.findGroup(groupId);
-        if(groupCase != null){
+        if (groupCase != null) {
             this.addUser(user, groupCase);
         }
     }
@@ -220,7 +220,7 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
-    public void removeUser(IUser user, Case groupCase){
+    public void removeUser(IUser user, Case groupCase) {
         HashSet<String> userIds = new HashSet<>();
         Map<String, I18nString> existingUsers = groupCase.getDataField(GROUP_MEMBERS_FIELD).getOptions();
 
@@ -252,7 +252,7 @@ public class NextGroupService implements INextGroupService {
     @Override
     public Set<String> getAllCoMembers(IUser user) {
         Set<String> users = workflowService.searchAll(
-                groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(user.getStringId())))
+                        groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(user.getStringId())))
                 .map(it -> it.getDataSet().get(GROUP_MEMBERS_FIELD).getOptions().keySet()).stream()
                 .collect(HashSet::new, Set::addAll, Set::addAll);
         users.remove(user.getStringId());
@@ -316,8 +316,8 @@ public class NextGroupService implements INextGroupService {
 
     protected boolean authorHasDefaultGroup(IUser author) {
         List<Case> allGroups = findAllGroups();
-        for (Case group : allGroups){
-            if(group.getAuthor().getId().equals(author.getStringId())) {
+        for (Case group : allGroups) {
+            if (group.getAuthor().getId().equals(author.getStringId())) {
                 return true;
             }
         }
@@ -335,7 +335,7 @@ public class NextGroupService implements INextGroupService {
     protected Task getGroupInitTask(Case groupCase) {
         List<TaskReference> taskList = taskService.findAllByCase(groupCase.getStringId(), LocaleContextHolder.getLocale());
         Optional<TaskReference> initTaskReference = taskList.stream().filter(taskReference ->
-                taskReference.getTransitionId().equals(GROUP_INIT_TASK_ID))
+                        taskReference.getTransitionId().equals(GROUP_INIT_TASK_ID))
                 .findFirst();
 
         if (initTaskReference.isEmpty()) {

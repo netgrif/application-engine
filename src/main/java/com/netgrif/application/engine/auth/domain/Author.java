@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.auth.domain;
 
 import lombok.Data;
-import org.bson.types.ObjectId;
 
 import java.io.Serializable;
 

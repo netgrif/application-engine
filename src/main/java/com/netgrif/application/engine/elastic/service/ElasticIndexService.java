@@ -258,7 +258,6 @@ public class ElasticIndexService implements IElasticIndexService {
         elasticsearchTemplate.indexOps(IndexCoordinates.of(indexName)).putMapping(mapping);
     }
 
-
     @Override
     public boolean deleteIndex(Class<?> clazz, String... placeholders) {
         try {

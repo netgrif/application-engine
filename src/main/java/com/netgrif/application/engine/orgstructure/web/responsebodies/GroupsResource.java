@@ -12,7 +12,7 @@ public class GroupsResource extends CollectionModel<Group> {
         buildLinks();
     }
 
-    private void buildLinks(){
+    private void buildLinks() {
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(GroupController.class)
                 .getAllGroups()).withSelfRel());
     }

@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.domain.*;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
-import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -60,6 +59,16 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     @Autowired
     protected IPetriNetService petriNetService;
 
+    protected Map<String, Float> fullTextFieldMap = ImmutableMap.of(
+            "title", 1f,
+            "caseTitle", 1f
+    );
+
+    protected Map<String, Float> caseTitledMap = ImmutableMap.of(
+            "caseTitle", 1f
+    );
+
+
     @Autowired
     public ElasticTaskService(ElasticsearchRestTemplate template) {
         this.template = template;
@@ -70,15 +79,6 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     public void setTaskService(ITaskService taskService) {
         this.taskService = taskService;
     }
-
-    protected Map<String, Float> fullTextFieldMap = ImmutableMap.of(
-            "title", 1f,
-            "caseTitle", 1f
-    );
-
-    protected Map<String, Float> caseTitledMap = ImmutableMap.of(
-            "caseTitle", 1f
-    );
 
     /**
      * See {@link QueryStringQueryBuilder#fields(Map)}
