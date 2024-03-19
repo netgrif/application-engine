@@ -9,8 +9,8 @@ import com.netgrif.application.engine.elastic.domain.I18nField;
 import com.netgrif.application.engine.elastic.domain.NumberField;
 import com.netgrif.application.engine.elastic.domain.TextField;
 import com.netgrif.application.engine.elastic.domain.UserField;
-import com.netgrif.application.engine.elastic.domain.*;
 import com.netgrif.application.engine.elastic.domain.UserListField;
+import com.netgrif.application.engine.elastic.domain.*;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
@@ -102,8 +102,8 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformI18nField(com.netgrif.application.engine.workflow.domain.DataField dataField, com.netgrif.application.engine.petrinet.domain.dataset.I18nField netField) {
-        Set<String> keys = ((I18nString)dataField.getValue()).getTranslations().keySet();
-        Set<String> values = new HashSet<>(((I18nString)dataField.getValue()).getTranslations().values());
+        Set<String> keys = ((I18nString) dataField.getValue()).getTranslations().keySet();
+        Set<String> values = new HashSet<>(((I18nString) dataField.getValue()).getTranslations().values());
         values.add(((I18nString) dataField.getValue()).getDefaultValue());
         return Optional.of(new I18nField(keys, values));
     }

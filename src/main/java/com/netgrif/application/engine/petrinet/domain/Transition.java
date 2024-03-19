@@ -11,9 +11,11 @@ import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
+import com.netgrif.application.engine.workflow.domain.triggers.AutoTrigger;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Transient;
 import org.apache.lucene.analysis.CharArrayMap;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -89,6 +91,9 @@ public class Transition extends Node {
     @Setter
     private String defaultRoleId;
 
+    @Transient
+    private Boolean hasAutoTrigger;
+
     @Getter
     @Setter
     private Map<String, String> tags;
@@ -109,19 +114,19 @@ public class Transition extends Node {
         tags = new HashMap<>();
     }
 
-    public void addDataSet(String field, Set<FieldBehavior> behavior, Map<DataEventType, DataEvent> events, FieldLayout layout, Component component){
-        if(dataSet.containsKey(field) && dataSet.get(field) != null){
-            if(behavior != null) dataSet.get(field).getBehavior().addAll(behavior);
-            if(events != null) dataSet.get(field).setEvents(events);
-            if(layout != null) dataSet.get(field).setLayout(layout);
-            if(component != null) dataSet.get(field).setComponent(component);
+    public void addDataSet(String field, Set<FieldBehavior> behavior, Map<DataEventType, DataEvent> events, FieldLayout layout, Component component) {
+        if (dataSet.containsKey(field) && dataSet.get(field) != null) {
+            if (behavior != null) dataSet.get(field).getBehavior().addAll(behavior);
+            if (events != null) dataSet.get(field).setEvents(events);
+            if (layout != null) dataSet.get(field).setLayout(layout);
+            if (component != null) dataSet.get(field).setComponent(component);
         } else {
             dataSet.put(field, new DataFieldLogic(behavior, events, layout, component));
         }
     }
 
-    public void setDataEvents(String field, Map<DataEventType, DataEvent> events){
-        if(dataSet.containsKey(field)){
+    public void setDataEvents(String field, Map<DataEventType, DataEvent> events) {
+        if (dataSet.containsKey(field)) {
             dataSet.get(field).setEvents(events);
         }
     }
@@ -245,6 +250,13 @@ public class Transition extends Node {
 
     public void addEvent(Event event) {
         events.put(event.getType(), event);
+    }
+
+    public boolean hasAutoTrigger() {
+        if (hasAutoTrigger == null) {
+            hasAutoTrigger = this.getTriggers().stream().anyMatch(trigger -> trigger instanceof AutoTrigger);
+        }
+        return hasAutoTrigger;
     }
 
     @Override

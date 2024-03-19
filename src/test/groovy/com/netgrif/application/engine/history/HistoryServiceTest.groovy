@@ -5,9 +5,11 @@ import com.netgrif.application.engine.history.service.IHistoryService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
@@ -37,6 +39,9 @@ class HistoryServiceTest {
 
     @Autowired
     private ITaskService taskService
+
+    @Autowired
+    private IDataService dataService
 
     @Autowired
     private SuperCreator superCreator
@@ -74,6 +79,18 @@ class HistoryServiceTest {
         taskService.finishTask(superCreator.getLoggedSuper(), task)
         Thread.sleep(1000) // HistoryService::save is @Async
         assert historyService.findAllFinishTaskEventLogsByCaseId(caze.getStringId()).size() == count + 2  // 2 PRE POST
+    }
+
+    @Test
+    void findAllSetDataEventLogsByCaseId() {
+        Case caze = workflowService.createCase(net.getStringId(), "Test set data", "", superCreator.getLoggedSuper()).getCase()
+        int count = historyService.findAllSetDataEventLogsByCaseId(caze.getStringId()).size()
+        assert count == 0
+        String task = caze.tasks.find { it.transition == "1" }.task
+        Map dataToSet = ["number": ["value":"110101116103114105102","type":"number"]]
+        dataService.setData(task, ImportHelper.populateDataset(dataToSet))
+        Thread.sleep(1000) // HistoryService::save is @Async
+        assert historyService.findAllSetDataEventLogsByCaseId(caze.getStringId()).size() == count + 2  // 2 PRE POST
     }
 
 }

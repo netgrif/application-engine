@@ -1456,6 +1456,68 @@ class ActionDelegate {
         return uriService.move(uri, dest)
     }
 
+    /**
+     * Action API case search function using Elasticsearch database
+     * @param requests the CaseSearchRequest list
+     * @param loggedUser the user who is searching for the requests
+     * @param page the order of page to return. by default it returns the first page
+     * @param pageable the page configuration that will contain the requests
+     * @param locale the Locale to be used when searching for requests
+     * @param isIntersection to decide null query handling
+     * @return page of cases
+     * */
+    Page<Case> findCasesElastic(List<CaseSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+                                int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
+        return elasticCaseService.search(requests, loggedUser, PageRequest.of(page, pageSize), locale, isIntersection)
+    }
+
+    /**
+     * Action API case search function using Elasticsearch database
+     * @param request case search request
+     * @param page the order of page to return
+     * @param loggedUser the user who is searching for the requests
+     * @param pageable the page configuration that will contain the requests
+     * @param locale the Locale to be used when searching for requests
+     * @param isIntersection to decide null query handling
+     * @return page of cases
+     * */
+    Page<Case> findCasesElastic(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+                                int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
+        List<CaseSearchRequest> requests = Collections.singletonList(new CaseSearchRequest(request))
+        return findCasesElastic(requests, loggedUser, page, pageSize, locale, isIntersection)
+    }
+
+    /**
+     * Action API case search function using Elasticsearch database
+     * @param requests the CaseSearchRequest list
+     * @param loggedUser the user who is searching for the requests
+     * @param page the order of page to return. by default it returns the first page
+     * @param pageable the page configuration that will contain the requests
+     * @param locale the Locale to be used when searching for requests
+     * @param isIntersection to decide null query handling
+     * @return page of cases
+     * */
+    Page<Task> findTasks(List<ElasticTaskSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+                         int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
+        return elasticTaskService.search(requests, loggedUser, PageRequest.of(page, pageSize), locale, isIntersection)
+    }
+
+    /**
+     * Action API case search function using Elasticsearch database
+     * @param request case search request
+     * @param loggedUser the user who is searching for the requests
+     * @param page the order of page to return. by default it returns the first page
+     * @param pageable the page configuration that will contain the requests
+     * @param locale the Locale to be used when searching for requests
+     * @param isIntersection to decide null query handling
+     * @return page of cases
+     * */
+    Page<Task> findTasks(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+                         int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
+        List<ElasticTaskSearchRequest> requests = Collections.singletonList(new ElasticTaskSearchRequest(request))
+        return findTasks(requests, loggedUser, page, pageSize, locale, isIntersection)
+    }
+
     List<Case> findDefaultFilters() {
         if (!createDefaultFilters) {
             return []
@@ -1616,7 +1678,7 @@ class ActionDelegate {
          uri           : { cl ->
              filter = workflowService.findOne(filter.stringId)
              def uri = cl() as String
-             filter.setUriNodeId(uriService.findByUri(uri).id)
+             filter.setUriNodeId(uriService.findByUri(uri).stringId)
              workflowService.save(filter)
          }]
     }
@@ -2022,7 +2084,7 @@ class ActionDelegate {
         I18nString newName = body.menuName ?: (body.filter?.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString)
 
         Case menuItemCase = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, newName?.defaultValue)
-        menuItemCase.setUriNodeId(uriService.findByUri(body.uri).id)
+        menuItemCase.setUriNodeId(uriService.findByUri(body.uri).stringId)
         menuItemCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_ALLOWED_ROLES.attributeId].options = body.allowedRoles
         menuItemCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_BANNED_ROLES.attributeId].options = body.bannedRoles
         if (parentItemCase != null) {
@@ -2127,7 +2189,7 @@ class ActionDelegate {
             item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value = null
         }
 
-        item.uriNodeId = destNode.id
+        item.uriNodeId = destNode.stringId
         item = resolveAndHandleNewNodePath(item, destNode.uriPath)
         casesToSave.add(item)
 
@@ -2164,8 +2226,6 @@ class ActionDelegate {
         if (existsMenuItem(sanitizedIdentifier)) {
             throw new IllegalArgumentException("View item identifier $sanitizedIdentifier is not unique!")
         }
-
-        originItem = workflowService.populateUriNodeId(originItem)
 
         Case duplicated = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, newTitle.defaultValue)
         duplicated.uriNodeId = originItem.uriNodeId
@@ -2228,7 +2288,7 @@ class ActionDelegate {
         List<Case> casesToSave = new ArrayList<>()
         for (child in children) {
             UriNode parentNode = uriService.getOrCreate(parentFolder.getFieldValue(MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId) as String, UriContentType.CASE)
-            child.uriNodeId = parentNode.id
+            child.uriNodeId = parentNode.stringId
             child = resolveAndHandleNewNodePath(child, parentNode.uriPath)
 
             casesToSave.add(child)
@@ -2337,7 +2397,7 @@ class ActionDelegate {
      */
     Case findMenuItem(String uri, String name) {
         UriNode uriNode = uriService.findByUri(uri)
-        return findCaseElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND title.keyword:\"$name\" AND uriNodeId:\"$uriNode.id\"")
+        return findCaseElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND title.keyword:\"$name\" AND uriNodeId:\"$uriNode.stringId\"")
     }
 
     Case findMenuItemByUriAndIdentifier(String uri, String identifier) {

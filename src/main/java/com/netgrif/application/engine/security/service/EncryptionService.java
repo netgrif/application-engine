@@ -11,6 +11,8 @@ import java.util.HashMap;
 @Service
 public class EncryptionService implements IEncryptionService {
 
+    private final String PREFIX = "#encrypted";
+
     @Autowired
     private StandardPBEStringEncryptor standardEncryptor;
 
@@ -19,8 +21,6 @@ public class EncryptionService implements IEncryptionService {
 
     @Value("${nae.database.algorithm}")
     private String STANDARD_ALGORITHM;
-
-    private final String PREFIX = "#encrypted";
 
     private HashMap<String, StandardPBEStringEncryptor> encryptors = new HashMap<>();
 

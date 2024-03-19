@@ -21,6 +21,10 @@ public class FilterDeserializer extends UntypedObjectDeserializer {
 
     private static final FilterDeserializer INSTANCE = new FilterDeserializer(null, null);
 
+    public static String[] listValues = {"filter", "allowedNet", "searchCategory", "predicateMetadataItem", "predicate",
+            "stringValue", "doubleValue", "booleanValue", "mapValue", "longValue"
+    };
+
     private FilterDeserializer(JavaType listType, JavaType mapType) {
         super(listType, mapType);
     }
@@ -28,10 +32,6 @@ public class FilterDeserializer extends UntypedObjectDeserializer {
     public static FilterDeserializer getInstance() {
         return INSTANCE;
     }
-
-    public static String[] listValues = {"filter", "allowedNet", "searchCategory", "predicateMetadataItem", "predicate",
-            "stringValue", "doubleValue", "booleanValue", "mapValue", "longValue"
-    };
 
     @Override
     protected Object mapObject(JsonParser parser, DeserializationContext context) throws IOException {

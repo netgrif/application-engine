@@ -44,23 +44,28 @@ public class DataGroup extends PetriNetObject {
     private Boolean stretch;
 
     @Transient
-    @Getter @Setter
+    @Getter
+    @Setter
     private String parentTaskId;
 
     @Transient
-    @Getter @Setter
+    @Getter
+    @Setter
     private String parentTransitionId;
 
     @Transient
-    @Getter @Setter
+    @Getter
+    @Setter
     private String parentCaseId;
 
     @Transient
-    @Getter @Setter
+    @Getter
+    @Setter
     private String parentTaskRefId;
 
     @Transient
-    @Getter @Setter
+    @Getter
+    @Setter
     private int nestingLevel;
 
     public DataGroup() {

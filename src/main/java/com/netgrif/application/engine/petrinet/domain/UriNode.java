@@ -1,38 +1,35 @@
 package com.netgrif.application.engine.petrinet.domain;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 
+@Document
 @AllArgsConstructor
-@Document(indexName = "#{@elasticUriIndex}")
 public class UriNode {
 
     @Id
     @Getter
-    private String id;
+    private ObjectId _id;
 
     @Getter
     @Setter
-    @Field(type = Keyword)
     private String uriPath;
 
     @Getter
     @Setter
-    @Field(type = Keyword)
     private String name;
 
     @Getter
     @Setter
-    @Field(type = Keyword)
     private String parentId;
 
     @Getter
@@ -42,7 +39,6 @@ public class UriNode {
 
     @Getter
     @Setter
-    @Field(type = Keyword)
     private Set<String> childrenId;
 
     @Getter
@@ -52,7 +48,6 @@ public class UriNode {
 
     @Getter
     @Setter
-    @Field(type = FieldType.Integer)
     private int level;
 
     @Getter
@@ -78,5 +73,9 @@ public class UriNode {
 
     public boolean containsNet() {
         return contentTypes.contains(UriContentType.PROCESS);
+    }
+
+    public String getStringId() {
+        return this._id.toString();
     }
 }

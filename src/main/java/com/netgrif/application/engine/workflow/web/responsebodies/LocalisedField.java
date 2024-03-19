@@ -47,7 +47,8 @@ public class LocalisedField {
 
     private String parentCaseId;
 
-    public LocalisedField() {}
+    public LocalisedField() {
+    }
 
     public LocalisedField(Field field, Locale locale) {
         this();

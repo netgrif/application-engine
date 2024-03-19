@@ -13,9 +13,12 @@ import com.netgrif.application.engine.history.domain.taskevents.TaskEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
+import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
+import com.netgrif.application.engine.petrinet.domain.Transition;
+import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
@@ -185,7 +188,7 @@ public class PetriNetService implements IPetriNetService {
     @Override
     @Deprecated
     public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author, uriService.getRoot().getId());
+        return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author, uriService.getRoot().getStringId());
     }
 
     @Override
@@ -196,7 +199,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, releaseType, author, uriService.getRoot().getId());
+        return importPetriNet(xmlFile, releaseType, author, uriService.getRoot().getStringId());
     }
 
     @Override
@@ -457,35 +460,61 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public Page<PetriNetReference> search(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale) {
+    public Page<PetriNetReference> search(PetriNetSearch criteriaClass, LoggedUser user, Pageable pageable, Locale locale) {
         Query query = new Query();
-        Query query_total = new Query();
+        Query queryTotal = new Query();
 
         if (!user.getSelfOrImpersonated().isAdmin())
             query.addCriteria(getProcessRolesCriteria(user.getSelfOrImpersonated()));
 
-        criteria.forEach((key, value) -> {
-            Criteria valueCriteria;
-            if (key.equalsIgnoreCase("group")) {
-                if (value instanceof List) {
-                    Collection<String> authors = this.groupService.getGroupsOwnerEmails((List<String>) value);
-                    valueCriteria = Criteria.where("author.email").in(authors);
-                } else {
-                    valueCriteria = Criteria.where("author.email").is(this.groupService.getGroupOwnerEmail((String) value));
-                }
-            } else if (value instanceof List)
-                valueCriteria = Criteria.where(key).in(value);
-            else if (key.equalsIgnoreCase("title") || key.equalsIgnoreCase("initials") || key.equalsIgnoreCase("identifier"))
-                valueCriteria = Criteria.where(key).regex((String) value, "i");
-            else
-                valueCriteria = Criteria.where(key).is(value);
-            query.addCriteria(valueCriteria);
-            query_total.addCriteria(valueCriteria);
-        });
+        if (criteriaClass.getIdentifier() != null) {
+            this.addValueCriteria(query, queryTotal, Criteria.where("identifier").regex(criteriaClass.getIdentifier(), "i"));
+        }
+        if (criteriaClass.getTitle() != null) {
+            this.addValueCriteria(query, queryTotal, Criteria.where("title.defaultValue").regex(criteriaClass.getTitle(), "i"));
+        }
+        if (criteriaClass.getInitials() != null) {
+            this.addValueCriteria(query, queryTotal, Criteria.where("initials").regex(criteriaClass.getInitials(), "i"));
+        }
+        if (criteriaClass.getDefaultCaseName() != null) {
+            this.addValueCriteria(query, queryTotal, Criteria.where("defaultCaseName.defaultValue").regex(criteriaClass.getDefaultCaseName(), "i"));
+        }
+        if (criteriaClass.getGroup() != null) {
+            if (criteriaClass.getGroup().size() == 1) {
+                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").is(this.groupService.getGroupOwnerEmail(criteriaClass.getGroup().get(0))));
+            } else {
+                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(this.groupService.getGroupsOwnerEmails(criteriaClass.getGroup())));
+            }
+        }
+        if (criteriaClass.getVersion() != null) {
+            this.addValueCriteria(query, queryTotal, Criteria.where("version").is(criteriaClass.getVersion()));
+        }
+        if (criteriaClass.getAuthor() != null) {
+            if (criteriaClass.getAuthor().getEmail() != null) {
+                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").is(criteriaClass.getAuthor().getEmail()));
+            }
+            if (criteriaClass.getAuthor().getId() != null) {
+                this.addValueCriteria(query, queryTotal, Criteria.where("author.id").is(criteriaClass.getAuthor().getId()));
+            }
+            if (criteriaClass.getAuthor().getFullName() != null) {
+                this.addValueCriteria(query, queryTotal, Criteria.where("author.fullName").is(criteriaClass.getAuthor().getFullName()));
+            }
+        }
+        if (criteriaClass.getNegativeViewRoles() != null) {
+            this.addValueCriteria(query, queryTotal, Criteria.where("negativeViewRoles").in(criteriaClass.getNegativeViewRoles()));
+        }
+        if (criteriaClass.getTags() != null) {
+            criteriaClass.getTags().entrySet().forEach(stringStringEntry -> this.addValueCriteria(query, queryTotal, Criteria.where("tags." + stringStringEntry.getKey()).is(stringStringEntry.getValue())));
+        }
 
         query.with(pageable);
         List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
-        return new PageImpl<>(nets.stream().map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()), pageable, mongoTemplate.count(query_total, PetriNet.class));
+        return new PageImpl<>(nets.stream().map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()), pageable, mongoTemplate.count(queryTotal, PetriNet.class));
+    }
+
+    private void addValueCriteria(Query query, Query queryTotal, Criteria criteria) {
+        query.addCriteria(criteria);
+        queryTotal.addCriteria(criteria);
     }
 
     @Override
@@ -541,12 +570,5 @@ public class PetriNetService implements IPetriNetService {
             throw new NullPointerException();
         }
         return obj;
-    }
-
-    @Override
-    public PetriNet populateUriNodeId(PetriNet petriNet) {
-        String uriNodeId = elasticPetriNetService.findUriNodeId(petriNet);
-        petriNet.setUriNodeId(uriNodeId);
-        return petriNet;
     }
 }

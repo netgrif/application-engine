@@ -4,6 +4,7 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -343,12 +344,16 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     private static BooleanExpression caseIdString(String caseId) {
-        return caseId.equals("") ? QCase.case$._id.isNull() :  QCase.case$._id.eq(new ObjectId(caseId));
+        return caseId.equals("") ? QCase.case$._id.isNull() : QCase.case$._id.eq(new ObjectId(caseId));
     }
 
     public Predicate group(Object query, LoggedUser user, Locale locale) {
-        Map<String, Object> processQuery = new HashMap<>();
-        processQuery.put(GROUP, query);
+        PetriNetSearch processQuery = new PetriNetSearch();
+        if (query instanceof List) {
+            processQuery.setGroup((List<String>) query);
+        } else if (query instanceof String) {
+            processQuery.setGroup(new ArrayList<String>(Arrays.asList((String) query)));
+        }
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
         if (groupProcesses.size() == 0)
             return null;

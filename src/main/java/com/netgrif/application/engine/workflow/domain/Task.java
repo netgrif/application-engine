@@ -21,7 +21,6 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -307,13 +306,6 @@ public class Task implements Serializable {
         return eventTitles.get(assign).getTranslation(locale);
     }
 
-    public enum Type {
-        USER,
-        AUTO,
-        TIME,
-        MESSAGE,
-    }
-
     public void resolveViewRoles() {
         getViewRoles();
         this.viewRoles.clear();
@@ -350,5 +342,12 @@ public class Task implements Serializable {
                 users.get(userId).put(id, perm);
             }
         });
+    }
+
+    public enum Type {
+        USER,
+        AUTO,
+        TIME,
+        MESSAGE,
     }
 }

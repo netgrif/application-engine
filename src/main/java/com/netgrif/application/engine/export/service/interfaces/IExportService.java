@@ -21,19 +21,19 @@ public interface IExportService {
 
     Set<String> buildDefaultCsvTaskHeader(List<Task> exportTasks);
 
-    OutputStream fillCsvCaseData(Predicate predicate, File outFile)  throws FileNotFoundException;
+    OutputStream fillCsvCaseData(Predicate predicate, File outFile) throws FileNotFoundException;
 
-    OutputStream fillCsvCaseData(Predicate predicate, File outFile, ExportDataConfig config)  throws FileNotFoundException;
+    OutputStream fillCsvCaseData(Predicate predicate, File outFile, ExportDataConfig config) throws FileNotFoundException;
 
-    OutputStream fillCsvCaseData(Predicate predicate, File outFile, ExportDataConfig config, int pageSize)  throws FileNotFoundException;
+    OutputStream fillCsvCaseData(Predicate predicate, File outFile, ExportDataConfig config, int pageSize) throws FileNotFoundException;
 
-    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile)  throws FileNotFoundException ;
+    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile) throws FileNotFoundException;
 
-    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config) throws FileNotFoundException ;
+    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config) throws FileNotFoundException;
 
     OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user) throws FileNotFoundException;
 
-    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user, int pageSize)  throws FileNotFoundException;
+    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user, int pageSize) throws FileNotFoundException;
 
     OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user, int pageSize, Locale locale) throws FileNotFoundException;
 
@@ -43,7 +43,7 @@ public interface IExportService {
 
     OutputStream fillCsvTaskData(Predicate predicate, File outFile, ExportDataConfig config) throws FileNotFoundException;
 
-    OutputStream fillCsvTaskData(Predicate predicate, File outFile, ExportDataConfig config, int pageSize)  throws FileNotFoundException;
+    OutputStream fillCsvTaskData(Predicate predicate, File outFile, ExportDataConfig config, int pageSize) throws FileNotFoundException;
 
     OutputStream buildCaseCsv(List<Case> exportCases, ExportDataConfig config, File outFile) throws FileNotFoundException;
 
