@@ -126,13 +126,9 @@ class DataServiceTest {
         i18nValue.put("defaultValue", "This is default value")
         i18nValue.set("translations", i18nTranslations)
 
-        ObjectNode node = mapper.createObjectNode()
-        node.put("type", "i18n")
-        node.set("value", i18nValue)
-
         Method method = dataService.getClass().getDeclaredMethod("parseI18nStringValues", new Class[]{ObjectNode.class})
         method.setAccessible(true)
-        I18nString parsedValue = method.invoke(dataService, new Object[]{node}) as I18nString
+        I18nString parsedValue = method.invoke(dataService, new Object[]{i18nValue}) as I18nString
 
         assert parsedValue.defaultValue == "This is default value"
         assert parsedValue.translations.size() == 2
