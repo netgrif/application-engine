@@ -10,7 +10,7 @@ import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.files.StorageResolverService;
 import com.netgrif.application.engine.files.interfaces.IStorageService;
-import com.netgrif.application.engine.files.throwable.RemoteStorageException;
+import com.netgrif.application.engine.files.throwable.StorageException;
 import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
 import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
@@ -438,7 +438,7 @@ public class DataService implements IDataService {
         try {
             return new FileFieldInputStream(field.isRemote() ? download(field, fileFieldValue.get()) :
                     new FileInputStream(fileFieldValue.get().getPath()), name);
-        } catch (IOException | RemoteStorageException e) {
+        } catch (IOException | StorageException e) {
             log.error("Getting file failed: ", e);
             return null;
         }
@@ -460,7 +460,7 @@ public class DataService implements IDataService {
                 return new FileFieldInputStream(field, field.isRemote() ? download(field) :
                         new FileInputStream(field.getValue().getPath()));
             }
-        } catch (IOException | RemoteStorageException e) {
+        } catch (IOException | StorageException e) {
             log.error("Getting file failed: ", e);
             return null;
         }
@@ -474,7 +474,7 @@ public class DataService implements IDataService {
         }
     }
 
-    private FileFieldInputStream getFilePreview(FileField field, Case useCase) throws IOException, RemoteStorageException {
+    private FileFieldInputStream getFilePreview(FileField field, Case useCase) throws IOException, StorageException {
         if (field.isRemote()) {
             IStorageService storageService = storageResolverService.resolve(field.getRemote());
             InputStream stream = storageService.get(field.getFilePreviewPath(useCase.getStringId()));
@@ -487,7 +487,7 @@ public class DataService implements IDataService {
             try {
                 storageService.upload(field.getFilePreviewPath(useCase.getStringId()), inputStream);
                 return new FileFieldInputStream(field, inputStream);
-            } catch (RemoteStorageException e) {
+            } catch (StorageException e) {
                 throw new EventNotExecutableException("File preview cannot be saved", e);
             }
 
@@ -546,7 +546,7 @@ public class DataService implements IDataService {
         return image;
     }
 
-    private File getRemoteFile(FileField field) throws IOException, RemoteStorageException {
+    private File getRemoteFile(FileField field) throws IOException, StorageException {
         File file;
         InputStream is = download(field);
         file = File.createTempFile(field.getStringId(), ".pdf");
@@ -557,12 +557,12 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public InputStream download(FileField field) throws RemoteStorageException {
+    public InputStream download(FileField field) throws StorageException {
         return storageResolverService.resolve(field.getRemote()).get(field.getValue().getPath());
     }
 
     @Override
-    public InputStream download(FileListField field, FileFieldValue fieldValue) throws RemoteStorageException {
+    public InputStream download(FileListField field, FileFieldValue fieldValue) throws StorageException {
         return storageResolverService.resolve(field.getRemote()).get(fieldValue.getPath());
     }
 
@@ -673,7 +673,7 @@ public class DataService implements IDataService {
             field.getValue().setPath(useCase.getStringId() + "-" + field.getStringId() + "-" + multipartFile.getOriginalFilename());
             useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
             return storageService.upload(useCase.getStringId() + "-" + field.getStringId() + "-" + multipartFile.getOriginalFilename(), multipartFile);
-        } catch (RemoteStorageException e) {
+        } catch (StorageException e) {
             log.error(e.getMessage());
             throw new EventNotExecutableException("File " + multipartFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file field " + field.getStringId(), e);
         }
@@ -693,7 +693,7 @@ public class DataService implements IDataService {
                 String path = useCase.getStringId() + "-" + field.getStringId() + "-" + oneFile.getOriginalFilename();
                 field.addValue(oneFile.getOriginalFilename(), path);
                 storageService.upload(path, oneFile);
-            } catch (RemoteStorageException e) {
+            } catch (StorageException e) {
                 log.error(e.getMessage());
                 throw new EventNotExecutableException("File " + oneFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file list field " + field.getStringId(), e);
             }
@@ -707,7 +707,7 @@ public class DataService implements IDataService {
             storageResolverService.resolve(field.getRemote()).delete(field.getValue().getPath());
             storageResolverService.resolve(field.getRemote()).delete(field.getValue().getPreviewPath(useCase.getStringId(), field.getStringId(), field.isRemote()));
             return true;
-        } catch (RemoteStorageException e) {
+        } catch (StorageException e) {
             log.error(e.getMessage());
             throw new EventNotExecutableException("File " + field.getValue().getPath() + " in case " + useCase.getStringId() + " cannot be deleted from field " + field.getStringId(), e);
         }
@@ -718,7 +718,7 @@ public class DataService implements IDataService {
             storageResolverService.resolve(field.getRemote()).delete(fileFieldValue.getPath());
             field.getValue().getNamesPaths().remove(fileFieldValue);
             return true;
-        } catch (RemoteStorageException e) {
+        } catch (StorageException e) {
             log.error(e.getMessage());
             throw new EventNotExecutableException("File " + fileFieldValue.getPath() + " in case " + useCase.getStringId() + " cannot be deleted from field " + field.getStringId(), e);
         }

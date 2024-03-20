@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.application.engine.files.throwable.RemoteStorageException;
+import com.netgrif.application.engine.files.throwable.StorageException;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -39,9 +39,9 @@ public interface IDataService {
 
     FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name);
 
-    InputStream download(FileField field) throws RemoteStorageException;
+    InputStream download(FileField field) throws StorageException;
 
-    InputStream download(FileListField field, FileFieldValue name) throws RemoteStorageException;
+    InputStream download(FileListField field, FileFieldValue name) throws StorageException;
 
     SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile);
 

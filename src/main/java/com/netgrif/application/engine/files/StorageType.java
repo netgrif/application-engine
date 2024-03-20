@@ -4,7 +4,8 @@ import lombok.Getter;
 
 public enum StorageType {
 
-    MINIO("MINIO");
+    MINIO("MINIO"),
+    LOCAL("LOCAL");
 
     @Getter
     String type;

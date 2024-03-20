@@ -2,7 +2,7 @@ package com.netgrif.application.engine.files.minio;
 
 import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.files.throwable.BadRequestException;
-import com.netgrif.application.engine.files.throwable.RemoteStorageException;
+import com.netgrif.application.engine.files.throwable.StorageException;
 import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
@@ -70,16 +70,16 @@ public class MinioStorageService implements IStorageService {
     }
 
     @Override
-    public boolean upload(String name, MultipartFile file) throws RemoteStorageException {
+    public boolean upload(String name, MultipartFile file) throws StorageException {
         try (InputStream stream = file.getInputStream()) {
             return this.upload(name, stream);
-        } catch (RemoteStorageException | IOException e) {
-            throw new RemoteStorageException("File cannot be save", e);
+        } catch (StorageException | IOException e) {
+            throw new StorageException("File cannot be save", e);
         }
     }
 
     @Override
-    public boolean upload(String name, InputStream stream) throws RemoteStorageException {
+    public boolean upload(String name, InputStream stream) throws StorageException {
         try {
             return minioClient.putObject(PutObjectArgs
                     .builder()
@@ -89,7 +89,7 @@ public class MinioStorageService implements IStorageService {
                     .build()).etag() != null;
         } catch (ErrorResponseException e) {
             log.error(e.getMessage(), e);
-            throw new RemoteStorageException(e.getMessage(), e);
+            throw new StorageException(e.getMessage(), e);
         } catch (InsufficientDataException | XmlParserException | InvalidKeyException | InternalException |
                  InvalidResponseException | IOException | NoSuchAlgorithmException | ServerException e) {
             log.error(e.getMessage(), e);
@@ -98,7 +98,7 @@ public class MinioStorageService implements IStorageService {
     }
 
     @Override
-    public void delete(String name) throws RemoteStorageException {
+    public void delete(String name) throws StorageException {
         try {
             minioClient.removeObject(RemoveObjectArgs
                     .builder()
@@ -112,7 +112,7 @@ public class MinioStorageService implements IStorageService {
             throw new BadRequestException(e.getMessage());
         } catch (ErrorResponseException e) {
             log.error("File cannot be deleted", e);
-            throw new RemoteStorageException("File cannot be deleted", e);
+            throw new StorageException("File cannot be deleted", e);
         }
     }
 
