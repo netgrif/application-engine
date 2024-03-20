@@ -817,7 +817,7 @@ public class DataService implements IDataService {
                     value = null;
                     break;
                 }
-                value = parseI18nString((ObjectNode) node.get("value"));
+                value = parseI18nString(node.get("value"));
                 break;
             case "user":
                 if (node.get("value") == null || node.get("value").isNull()) {
