@@ -817,12 +817,7 @@ public class DataService implements IDataService {
                     value = null;
                     break;
                 }
-                if (node.get("value").isTextual()) {
-                    String val = node.get("value").asText();
-                    value = new I18nString(val);
-                } else {
-                    value = parseI18nStringValues((ObjectNode) node.get("value"));
-                }
+                value = parseI18nString((ObjectNode) node.get("value"));
                 break;
             case "user":
                 if (node.get("value") == null || node.get("value").isNull()) {
@@ -956,13 +951,16 @@ public class DataService implements IDataService {
         }
         ArrayList<I18nString> list = new ArrayList<>();
         arrayNode.forEach(item -> {
-            if (item.isTextual()) {
-                list.add(new I18nString(item.asText()));
-            } else {
-                list.add(parseI18nStringValues((ObjectNode) item));
-            }
+            list.add(parseI18nString(item));
         });
         return list;
+    }
+
+    private I18nString parseI18nString(JsonNode node) {
+        if (node.isTextual()) {
+            return new I18nString(node.asText());
+        }
+        return parseI18nStringValues((ObjectNode) node);
     }
 
     private String getFieldTypeFromNode(ObjectNode node) {
