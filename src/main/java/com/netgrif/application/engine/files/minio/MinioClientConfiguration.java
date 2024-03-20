@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnProperty(
-        value = "nae.minio.enabled",
+        value = "nae.storage.minio.enabled",
         havingValue = "true"
 )
 public class MinioClientConfiguration {

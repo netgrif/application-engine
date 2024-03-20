@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.IUser
@@ -12,6 +13,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,12 +27,14 @@ import org.springframework.http.MediaType
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
 import static org.hamcrest.core.StringContains.containsString
+import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
@@ -43,6 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = ApplicationEngine.class
 )
+@TestPropertySource(properties = "nae.storage.minio.enabled=true")
 @AutoConfigureMockMvc
 class FileFieldTest {
 
@@ -81,6 +86,8 @@ class FileFieldTest {
 
     private MockMvc mockMvc
 
+    private ObjectMapper objectMapper
+
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
@@ -88,6 +95,7 @@ class FileFieldTest {
                 .webAppContextSetup(context)
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build()
+        objectMapper = new ObjectMapper()
     }
 
     PetriNet getNet() {
@@ -112,7 +120,8 @@ class FileFieldTest {
 
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
-        mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/" + FIELD_ID)
+        mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file")
+                .param("fieldId", FIELD_ID)
                 .with(httpBasic(USER_EMAIL, userPassword)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -133,7 +142,8 @@ class FileFieldTest {
 
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
-        mockMvc.perform(get("/api/task/" + taskPair.task + "/file/" + FIELD_ID)
+        mockMvc.perform(get("/api/task/" + taskPair.task + "/file")
+                .param("fieldId", FIELD_ID)
                 .with(httpBasic(USER_EMAIL, userPassword)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -149,15 +159,20 @@ class FileFieldTest {
         def taskPair = useCase.tasks.find { it.transition == "task" }
         assert taskPair != null
 
-        mockMvc.perform(delete("/api/task/" + taskPair.task + "/file/" + FIELD_ID)
+        FileFieldRequest requestBody = new FileFieldRequest(FIELD_ID, taskPair.task, MOCK_FILE_NAME)
+
+
+        mockMvc.perform(delete("/api/task/" + taskPair.task + "/file")
+                .content(objectMapper.writeValueAsBytes(requestBody))
+                .contentType(APPLICATION_JSON)
                 .with(httpBasic(USER_EMAIL, userPassword))
-                .param("parentTaskId", taskPair.task)
         ).andDo(print())
                 .andExpect(status().isOk())
                 .andReturn()
 
         Assertions.assertThatThrownBy(() ->
-                mockMvc.perform(get("/api/task/" + taskPair.task + "/file/" + FIELD_ID)
+                mockMvc.perform(get("/api/task/" + taskPair.task + "/file")
+                        .param("fieldId", FIELD_ID)
                         .with(httpBasic(USER_EMAIL, userPassword))
                 ).andDo(print())
         ).isInstanceOf(FileNotFoundException.class)
@@ -177,17 +192,19 @@ class FileFieldTest {
                 MediaType.TEXT_PLAIN_VALUE,
                 "Hello, World!".getBytes()
         )
-        String taskId = importHelper.getTaskId(TASK_TITLE, useCase.getStringId())
-        assert taskId != null
+        def taskPair = useCase.tasks.find { it.transition == "task" }
+        assert taskPair != null
+
+        FileFieldRequest requestBody = new FileFieldRequest(FIELD_ID, taskPair.task, MOCK_FILE_NAME)
 
         MockMultipartFile data
                 = new MockMultipartFile(
                 "data",
                 "",
                 MediaType.APPLICATION_JSON_VALUE,
-                "{\"$taskId\": \"$FIELD_ID\"}".getBytes()
+                objectMapper.writeValueAsBytes(requestBody)
         )
-        mockMvc.perform(multipart("/api/task/" + taskId + "/file/" + FIELD_ID)
+        mockMvc.perform(multipart("/api/task/" + taskPair.task + "/file")
                 .file(file)
                 .file(data)
                 .with(httpBasic(USER_EMAIL, userPassword))

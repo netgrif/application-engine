@@ -25,7 +25,7 @@ import static com.netgrif.application.engine.files.StorageType.MINIO;
 @Slf4j
 @Service
 @ConditionalOnProperty(
-        value = "nae.minio.enabled",
+        value = "nae.storage.minio.enabled",
         havingValue = "true"
 )
 public class MinioStorageService implements IStorageService {

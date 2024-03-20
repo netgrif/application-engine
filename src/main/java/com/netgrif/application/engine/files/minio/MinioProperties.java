@@ -8,12 +8,13 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConditionalOnProperty(
-        value = "nae.minio.enabled",
+        value = "nae.storage.minio.enabled",
         havingValue = "true"
 )
-@ConfigurationProperties(prefix = "nae.minio")
+@ConfigurationProperties(prefix = "nae.storage.minio")
 public class MinioProperties {
 
+    private boolean enabled = false;
     private String host;
     private String user;
     private String password;
