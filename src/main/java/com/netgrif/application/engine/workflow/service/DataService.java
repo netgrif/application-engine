@@ -232,7 +232,7 @@ public class DataService implements IDataService {
                 ChangedField changedField = new ChangedField();
                 changedField.setId(fieldId);
                 Object newValue = parseFieldsValues(entry.getValue(), dataField);
-                if (newValue != null) {
+                if (entry.getValue().has("value")) {
                     dataField.setValue(newValue);
                     changedField.addAttribute("value", newValue);
                     modified = true;
