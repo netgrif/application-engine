@@ -8,7 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class NetgrifResource {
+public class ExternalResource {
 
     public Resource getResource(String filePath) {
         try {

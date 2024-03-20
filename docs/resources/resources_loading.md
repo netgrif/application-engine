@@ -1,7 +1,7 @@
 # Resource Loading
 
 If you want to load resources, which will not be in JAR(for example big files), you can use our resource loader.
-ResourceLoader return InputStreamResource, from which you can use InputStream, and loading resources from directory **resource/** in root of the project.
+ResourceLoader return InputStreamResource, from which you can use InputStream, and loading resources from directory **resource/**  inworking directory of the app.
 The prefix for NetgrifResourceLoaser is 
 
 ```
