@@ -430,35 +430,27 @@ public class DataService implements IDataService {
         field.setValue((FileListFieldValue) useCase.getFieldValue(field.getStringId()));
 
         Optional<FileFieldValue> fileFieldValue = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
-        if (!fileFieldValue.isPresent() || fileFieldValue.get().getPath() == null) {
+        if (fileFieldValue.isEmpty() || fileFieldValue.get().getPath() == null) {
             log.error("File " + name + " not found!");
             return null;
         }
-
-        try {
-            return new FileFieldInputStream(field.isRemote() ? download(field, fileFieldValue.get()) :
-                    new FileInputStream(fileFieldValue.get().getPath()), name);
-        } catch (IOException | StorageException e) {
-            log.error("Getting file failed: ", e);
-            return null;
-        }
+        return new FileFieldInputStream(storageResolverService.resolve(field.getStorageType()).get(field, fileFieldValue.get().getPath()), name);
     }
 
     @Override
     public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview) {
         runGetActionsFromFileField(field.getEvents(), useCase);
-        if (useCase.getFieldValue(field.getStringId()) == null)
+        if (useCase.getFieldValue(field.getStringId()) == null) {
             return null;
+        }
 
         workflowService.save(useCase);
         field.setValue((FileFieldValue) useCase.getFieldValue(field.getStringId()));
-
         try {
             if (forPreview) {
                 return getFilePreview(field, useCase);
             } else {
-                return new FileFieldInputStream(field, field.isRemote() ? download(field) :
-                        new FileInputStream(field.getValue().getPath()));
+                return new FileFieldInputStream(field, storageResolverService.resolve(field.getStorageType()).get(field, useCase, false));
             }
         } catch (IOException | StorageException e) {
             log.error("Getting file failed: ", e);
@@ -475,32 +467,25 @@ public class DataService implements IDataService {
     }
 
     private FileFieldInputStream getFilePreview(FileField field, Case useCase) throws IOException, StorageException {
-        if (field.isRemote()) {
-            IStorageService storageService = storageResolverService.resolve(field.getRemote());
-            InputStream stream = storageService.get(field.getFilePreviewPath(useCase.getStringId()));
-            if (stream != null) {
-                return new FileFieldInputStream(field, stream);
-            }
-            File file = getRemoteFile(field);
-            byte[] bytes = generateFilePreviewToStream(file).toByteArray();
-            InputStream inputStream = new ByteArrayInputStream(bytes);
-            try {
-                storageService.upload(field.getFilePreviewPath(useCase.getStringId()), inputStream);
-                return new FileFieldInputStream(field, inputStream);
-            } catch (StorageException e) {
-                throw new EventNotExecutableException("File preview cannot be saved", e);
-            }
-
+        IStorageService storageService = storageResolverService.resolve(field.getStorageType());
+        InputStream stream = storageService.get(field, useCase, true);
+        if (stream != null) {
+            return new FileFieldInputStream(field, stream);
         }
-
-        File localPreview = new File(field.getFilePreviewPath(useCase.getStringId()));
-        if (localPreview.exists()) {
-            return new FileFieldInputStream(field, new FileInputStream(localPreview));
+        stream = storageService.get(field, useCase, false);
+        File file = File.createTempFile(field.getStringId(), ".pdf");
+        file.deleteOnExit();
+        FileOutputStream fos = new FileOutputStream(file);
+        IOUtils.copy(stream, fos);
+        byte[] bytes = generateFilePreviewToStream(file).toByteArray();
+        InputStream inputStream = new ByteArrayInputStream(bytes);
+        try {
+            storageService.save(field, storageService.getPreviewPath(useCase.getStringId(), field.getImportId(), field.getValue().getName()), inputStream);
+            inputStream.reset();
+            return new FileFieldInputStream(field, inputStream);
+        } catch (StorageException e) {
+            throw new EventNotExecutableException("File preview cannot be saved", e);
         }
-        File file = new File(field.getValue().getPath());
-        ByteArrayOutputStream os = generateFilePreviewToStream(file);
-        saveFilePreview(localPreview, os);
-        return new FileFieldInputStream(field, new ByteArrayInputStream(os.toByteArray()));
     }
 
     private ByteArrayOutputStream generateFilePreviewToStream(File file) throws IOException {
@@ -515,14 +500,6 @@ public class DataService implements IDataService {
         return os;
     }
 
-    private void saveFilePreview(File localPreview, ByteArrayOutputStream os) throws IOException {
-        localPreview.getParentFile().mkdirs();
-        localPreview.createNewFile();
-        FileOutputStream fos = new FileOutputStream(localPreview);
-        fos.write(os.toByteArray());
-        fos.close();
-    }
-
     private BufferedImage getBufferedImageFromFile(File file, FileFieldDataType fileType) throws IOException {
         BufferedImage image;
         if (fileType.equals(FileFieldDataType.PDF)) {
@@ -531,7 +508,6 @@ public class DataService implements IDataService {
             image = renderer.renderImage(0);
         } else {
             image = ImageIO.read(file);
-
         }
         return image;
     }
@@ -546,24 +522,10 @@ public class DataService implements IDataService {
         return image;
     }
 
-    private File getRemoteFile(FileField field) throws IOException, StorageException {
-        File file;
-        InputStream is = download(field);
-        file = File.createTempFile(field.getStringId(), ".pdf");
-        file.deleteOnExit();
-        FileOutputStream fos = new FileOutputStream(file);
-        IOUtils.copy(is, fos);
-        return file;
-    }
-
-    @Override
-    public InputStream download(FileField field) throws StorageException {
-        return storageResolverService.resolve(field.getRemote()).get(field.getValue().getPath());
-    }
 
     @Override
     public InputStream download(FileListField field, FileFieldValue fieldValue) throws StorageException {
-        return storageResolverService.resolve(field.getRemote()).get(fieldValue.getPath());
+        return storageResolverService.resolve(field.getStorageType()).get(field, fieldValue.getPath());
     }
 
     @Override
@@ -572,12 +534,23 @@ public class DataService implements IDataService {
         ImmutablePair<Case, FileField> pair = getCaseAndFileField(taskId, fieldId);
         FileField field = pair.getRight();
         Case useCase = pair.getLeft();
+        IStorageService storageService = storageResolverService.resolve(field.getStorageType());
+        try {
+            if (useCase.getDataSet().get(field.getStringId()).getValue() != null) {
+                storageService.delete(field, useCase);
+                useCase.getDataSet().get(field.getStringId()).setValue(null);
+            }
 
-        if (field.isRemote()) {
-            upload(useCase, field, multipartFile);
-        } else {
-            saveLocalFile(useCase, field, multipartFile);
+            field.setValue(multipartFile.getOriginalFilename());
+            String path = storageService.getPath(useCase.getStringId(), field.getStringId(), multipartFile.getOriginalFilename());
+            field.getValue().setPath(path);
+            storageService.save(field, path, multipartFile);
+        } catch (StorageException e) {
+//            TODO
+            throw new RuntimeException(e);
         }
+
+        useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
         return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase));
     }
 
@@ -587,11 +560,25 @@ public class DataService implements IDataService {
         ImmutablePair<Case, FileListField> pair = getCaseAndFileListField(taskId, fieldId);
         FileListField field = pair.getRight();
         Case useCase = pair.getLeft();
+        IStorageService storageService = storageResolverService.resolve(field.getStorageType());
+        for (MultipartFile multipartFile : multipartFiles) {
+            try {
+                if (field.getValue() != null && field.getValue().getNamesPaths() != null) {
+                    Optional<FileFieldValue> fileFieldValue = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(multipartFile.getOriginalFilename())).findFirst();
+                    if (fileFieldValue.isPresent()) {
+//                        TODO
+//                        storageService.delete(fileFieldValue.get());
+                        field.getValue().getNamesPaths().remove(fileFieldValue.get());
+                    }
+                }
+                String path = useCase.getStringId() + "-" + field.getStringId() + "-" + multipartFile.getOriginalFilename();
+                field.addValue(multipartFile.getOriginalFilename(), path);
+                storageService.save(field, path, multipartFile);
+            } catch (StorageException e) {
+                log.error(e.getMessage());
+                throw new EventNotExecutableException("File " + multipartFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file list field " + field.getStringId(), e);
+            }
 
-        if (field.isRemote()) {
-            upload(useCase, field, multipartFiles);
-        } else {
-            saveLocalFiles(useCase, field, multipartFiles);
         }
         return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase));
     }
@@ -606,122 +593,15 @@ public class DataService implements IDataService {
         return outcomes;
     }
 
-    private boolean saveLocalFiles(Case useCase, FileListField field, MultipartFile[] multipartFiles) {
-        for (MultipartFile oneFile : multipartFiles) {
-            if (field.getValue() != null && field.getValue().getNamesPaths() != null) {
-                Optional<FileFieldValue> fileField = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(oneFile.getOriginalFilename())).findFirst();
-                if (fileField.isPresent()) {
-                    new File(field.getFilePath(useCase.getStringId(), oneFile.getOriginalFilename())).delete();
-                    field.getValue().getNamesPaths().remove(fileField.get());
-                }
-            }
-
-            field.addValue(oneFile.getOriginalFilename(), field.getFilePath(useCase.getStringId(), oneFile.getOriginalFilename()));
-            File file = new File(field.getFilePath(useCase.getStringId(), oneFile.getOriginalFilename()));
-
-            try {
-                writeFile(oneFile, file);
-            } catch (IOException e) {
-                log.error(e.getMessage());
-                throw new EventNotExecutableException("File " + oneFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file list field " + field.getStringId(), e);
-            }
-        }
-        useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
-        return true;
-    }
-
-    private boolean saveLocalFile(Case useCase, FileField field, MultipartFile multipartFile) {
-        if (useCase.getDataSet().get(field.getStringId()).getValue() != null) {
-            new File(field.getFilePath(useCase.getStringId())).delete();
-            useCase.getDataSet().get(field.getStringId()).setValue(null);
-        }
-
-        field.setValue(multipartFile.getOriginalFilename());
-        field.getValue().setPath(field.getFilePath(useCase.getStringId()));
-        File file = new File(field.getFilePath(useCase.getStringId()));
-        try {
-            writeFile(multipartFile, file);
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            throw new EventNotExecutableException("File " + multipartFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file field " + field.getStringId(), e);
-        }
-
-        useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
-        return true;
-    }
-
-    private void writeFile(MultipartFile multipartFile, File file) throws IOException {
-        file.getParentFile().mkdirs();
-        if (!file.createNewFile()) {
-            file.delete();
-            file.createNewFile();
-        }
-
-        FileOutputStream fout = new FileOutputStream(file);
-        fout.write(multipartFile.getBytes());
-        fout.close();
-    }
-
-    protected boolean upload(Case useCase, FileField field, MultipartFile multipartFile) {
-        try {
-            IStorageService storageService = storageResolverService.resolve(field.getRemote());
-            if (useCase.getDataSet().get(field.getStringId()).getValue() != null) {
-                storageService.delete(useCase.getStringId() + "-" + field.getStringId() + "-" + multipartFile.getOriginalFilename());
-                useCase.getDataSet().get(field.getStringId()).setValue(null);
-            }
-            field.setValue(multipartFile.getOriginalFilename());
-            field.getValue().setPath(useCase.getStringId() + "-" + field.getStringId() + "-" + multipartFile.getOriginalFilename());
-            useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
-            return storageService.upload(useCase.getStringId() + "-" + field.getStringId() + "-" + multipartFile.getOriginalFilename(), multipartFile);
-        } catch (StorageException e) {
-            log.error(e.getMessage());
-            throw new EventNotExecutableException("File " + multipartFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file field " + field.getStringId(), e);
-        }
-    }
-
-    protected boolean upload(Case useCase, FileListField field, MultipartFile[] multipartFiles) {
-        IStorageService storageService = storageResolverService.resolve(field.getRemote());
-        for (MultipartFile oneFile : multipartFiles) {
-            try {
-                if (field.getValue() != null && field.getValue().getNamesPaths() != null) {
-                    Optional<FileFieldValue> fileFieldValue = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(oneFile.getOriginalFilename())).findFirst();
-                    if (fileFieldValue.isPresent()) {
-                        storageService.delete(fileFieldValue.get().getPath());
-                        field.getValue().getNamesPaths().remove(fileFieldValue.get());
-                    }
-                }
-                String path = useCase.getStringId() + "-" + field.getStringId() + "-" + oneFile.getOriginalFilename();
-                field.addValue(oneFile.getOriginalFilename(), path);
-                storageService.upload(path, oneFile);
-            } catch (StorageException e) {
-                log.error(e.getMessage());
-                throw new EventNotExecutableException("File " + oneFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file list field " + field.getStringId(), e);
-            }
-        }
-        useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
-        return true;
-    }
-
-    protected boolean deleteRemote(Case useCase, FileField field) {
-        try {
-            storageResolverService.resolve(field.getRemote()).delete(field.getValue().getPath());
-            storageResolverService.resolve(field.getRemote()).delete(field.getValue().getPreviewPath(useCase.getStringId(), field.getStringId(), field.isRemote()));
-            return true;
-        } catch (StorageException e) {
-            log.error(e.getMessage());
-            throw new EventNotExecutableException("File " + field.getValue().getPath() + " in case " + useCase.getStringId() + " cannot be deleted from field " + field.getStringId(), e);
-        }
-    }
-
     protected boolean deleteRemote(Case useCase, FileListField field, FileFieldValue fileFieldValue) {
-        try {
-            storageResolverService.resolve(field.getRemote()).delete(fileFieldValue.getPath());
-            field.getValue().getNamesPaths().remove(fileFieldValue);
+//        try {
+//            storageResolverService.resolve(field.getStorageType()).delete(fileFieldValue.getPath());
+//            field.getValue().getNamesPaths().remove(fileFieldValue);
             return true;
-        } catch (StorageException e) {
-            log.error(e.getMessage());
-            throw new EventNotExecutableException("File " + fileFieldValue.getPath() + " in case " + useCase.getStringId() + " cannot be deleted from field " + field.getStringId(), e);
-        }
+//        } catch (StorageException e) {
+//            log.error(e.getMessage());
+//            throw new EventNotExecutableException("File " + fileFieldValue.getPath() + " in case " + useCase.getStringId() + " cannot be deleted from field " + field.getStringId(), e);
+//        }
     }
 
     @Override
@@ -732,11 +612,11 @@ public class DataService implements IDataService {
         Task task = taskService.findById(taskId);
 
         if (useCase.getDataSet().get(field.getStringId()).getValue() != null) {
-            if (field.isRemote()) {
-                deleteRemote(useCase, field);
-            } else {
-                new File(field.getValue().getPath()).delete();
-                new File(field.getFilePreviewPath(useCase.getStringId())).delete();
+            try {
+                storageResolverService.resolve(field.getStorageType()).delete(field, useCase);
+            } catch (StorageException e) {
+//                TODO
+                throw new RuntimeException(e);
             }
             useCase.getDataSet().get(field.getStringId()).setValue(null);
         }
@@ -790,10 +670,8 @@ public class DataService implements IDataService {
     @Override
     public List<Field> getImmediateFields(Task task) {
         Case useCase = workflowService.findOne(task.getCaseId());
-
         List<Field> fields = task.getImmediateDataFields().stream().map(id -> fieldFactory.buildFieldWithoutValidation(useCase, id, task.getTransitionId())).collect(Collectors.toList());
         LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
-
         return fields;
     }
 

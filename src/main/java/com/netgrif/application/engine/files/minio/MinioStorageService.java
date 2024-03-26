@@ -1,9 +1,14 @@
 package com.netgrif.application.engine.files.minio;
 
+import com.netgrif.application.engine.files.StorageType;
 import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.files.throwable.BadRequestException;
-import com.netgrif.application.engine.files.throwable.StorageException;
 import com.netgrif.application.engine.files.throwable.ServiceErrorException;
+import com.netgrif.application.engine.files.throwable.StorageException;
+import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
+import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
+import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
+import com.netgrif.application.engine.workflow.domain.Case;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
@@ -37,12 +42,24 @@ public class MinioStorageService implements IStorageService {
     MinioProperties properties;
 
     @Override
-    public String getType() {
-        return MINIO.getType();
+    public StorageType getType() {
+        return MINIO;
     }
 
     @Override
-    public InputStream get(String name) throws BadRequestException, ServiceErrorException {
+    public InputStream get(FileListField field, String path) throws BadRequestException, ServiceErrorException {
+//        field.getValue()
+//        TODO resolve filename
+        return get(path);
+    }
+
+    @Override
+    public InputStream get(FileField field, Case useCase, boolean getPreview) throws BadRequestException, ServiceErrorException {
+        String fieldValue = getPreview ? getPreviewPath(useCase.getStringId(), field.getImportId(), field.getValue().getName()) : getPath(useCase.getStringId(), field.getImportId(), field.getValue().getName());
+        return this.get(fieldValue);
+    }
+
+    private InputStream get(String name) {
         try {
             return minioClient.getObject(
                     GetObjectArgs.builder()
@@ -60,7 +77,6 @@ public class MinioStorageService implements IStorageService {
                 throw new ServiceErrorException("Some http error from minio", e);
             }
         } catch (InvalidKeyException e) {
-            log.error("Key " + name + " is corrupted.", e);
             throw new BadRequestException("Key " + name + " is corrupted.", e);
         } catch (ServerException | InsufficientDataException | IOException | NoSuchAlgorithmException |
                  InvalidResponseException | XmlParserException | InternalException e) {
@@ -70,21 +86,20 @@ public class MinioStorageService implements IStorageService {
     }
 
     @Override
-    public boolean upload(String name, MultipartFile file) throws StorageException {
+    public boolean save(FileField field, String path, MultipartFile file) throws StorageException {
         try (InputStream stream = file.getInputStream()) {
-            return this.upload(name, stream);
+            return this.save(field, path, stream);
         } catch (StorageException | IOException e) {
             throw new StorageException("File cannot be save", e);
         }
     }
 
     @Override
-    public boolean upload(String name, InputStream stream) throws StorageException {
+    public boolean save(FileField field, String path, InputStream stream) throws StorageException {
         try {
             return minioClient.putObject(PutObjectArgs
                     .builder()
-                    .bucket(properties.getBucketName())
-                    .object(name)
+                    .bucket(properties.getBucketName()).object(path)
                     .stream(stream, -1, properties.getPartSize())
                     .build()).etag() != null;
         } catch (ErrorResponseException e) {
@@ -98,12 +113,12 @@ public class MinioStorageService implements IStorageService {
     }
 
     @Override
-    public void delete(String name) throws StorageException {
+    public void delete(FileField field, Case useCase) throws StorageException {
         try {
             minioClient.removeObject(RemoveObjectArgs
                     .builder()
-                    .bucket(properties.getBucketName())
-                    .object(name)
+                    .bucket(properties.getBucketName()).object(getPath(useCase.getStringId(), field.getImportId(), field.getValue().getName())).build());
+            minioClient.removeObject(RemoveObjectArgs.builder().bucket(properties.getBucketName()).object(getPreviewPath(useCase.getStringId(), field.getImportId(), field.getValue().getName()))
                     .build());
         } catch (InsufficientDataException | InternalException | InvalidResponseException |
                  IOException | NoSuchAlgorithmException | ServerException | XmlParserException e) {
@@ -116,4 +131,28 @@ public class MinioStorageService implements IStorageService {
         }
     }
 
+    @Override
+    public void delete(FileListField fileField, Case useCase, FileFieldValue fileFieldValue) throws StorageException {
+
+    }
+
+    @Override
+    public boolean save(FileListField field, String path, MultipartFile file) throws StorageException {
+        return false;
+    }
+
+    @Override
+    public boolean save(FileListField field, String path, InputStream stream) throws StorageException {
+        return false;
+    }
+
+    @Override
+    public String getPreviewPath(String caseId, String fieldId, String name) {
+        return caseId + "-" + fieldId + "-" + name + ".file_preview";
+    }
+
+    @Override
+    public String getPath(String caseId, String fieldId, String name) {
+        return caseId + "-" + fieldId + "-" + name;
+    }
 }

@@ -105,13 +105,6 @@ class FileFieldTest {
     }
 
     @Test
-    void testRemoteAttribute() {
-        PetriNet net = getNet()
-        assert net.getField(FIELD_ID).isPresent()
-        assert (net.getField(FIELD_ID).get() as FileField).isRemote()
-    }
-
-    @Test
     void downloadFileByCase() {
         Case useCase = uploadTestFile()
 

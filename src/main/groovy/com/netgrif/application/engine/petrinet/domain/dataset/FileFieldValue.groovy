@@ -1,8 +1,5 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
-import com.netgrif.application.engine.configuration.ApplicationContextProvider
-import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration
-
 class FileFieldValue implements Serializable {
 
     private static final long serialVersionUID = 1299918326436821185L;
@@ -11,12 +8,20 @@ class FileFieldValue implements Serializable {
 
     private String path
 
+    private String previewPath
+
     FileFieldValue() {
     }
 
     FileFieldValue(String name, String path) {
         this.name = name
         this.path = path
+    }
+
+    FileFieldValue(String name, String path, String previewPath) {
+        this.name = name
+        this.path = path
+        this.previewPath = previewPath
     }
 
     static FileFieldValue fromString(String value) {
@@ -37,20 +42,6 @@ class FileFieldValue implements Serializable {
 
     String getPath() {
         return path
-    }
-
-    String getPath(String caseId, String fieldId) {
-        FileStorageConfiguration fileStorageConfiguration = ApplicationContextProvider.getBean("fileStorageConfiguration") as FileStorageConfiguration
-        return "${fileStorageConfiguration.getStoragePath()}/${caseId}-${fieldId}-${name}"
-    }
-
-    //    TODO stored in mongo?
-    String getPreviewPath(String caseId, String fieldId, boolean isRemote) {
-        if (isRemote) {
-            return "${caseId}-${fieldId}-${name}.file_preview"
-        }
-        FileStorageConfiguration fileStorageConfiguration = ApplicationContextProvider.getBean("fileStorageConfiguration") as FileStorageConfiguration
-        return "${fileStorageConfiguration.getStoragePath()}/file_preview/${caseId}-${fieldId}-${name}"
     }
 
     void setPath(String path) {
