@@ -15,6 +15,7 @@ import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataValidationExpressionEvaluator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,6 +30,9 @@ import java.util.stream.Collectors;
 @org.springframework.stereotype.Component
 @Slf4j
 public final class FieldFactory {
+
+    @Value("${nae.storage.default-type}")
+    private String defaultStorageType;
 
     @Autowired
     private FormatFactory formatFactory;
@@ -511,7 +515,7 @@ public final class FieldFactory {
 
     private FileField buildFileField(Data data) {
         FileField fileField = new FileField();
-        fileField.setStorageType(data.getRemote() == null ? StorageType.LOCAL : StorageType.fromString(data.getRemote()));
+        fileField.setStorageType(data.getRemote() == null ? StorageType.fromString(defaultStorageType) : StorageType.fromString(data.getRemote()));
         setDefaultValue(fileField, data, defaultValue -> {
             if (defaultValue != null) {
                 fileField.setDefaultValue(defaultValue);
@@ -522,7 +526,7 @@ public final class FieldFactory {
 
     private FileListField buildFileListField(Data data) {
         FileListField fileListField = new FileListField();
-        fileListField.setStorageType(data.getRemote() == null ? StorageType.LOCAL : StorageType.fromString(data.getRemote()));
+        fileListField.setStorageType(data.getRemote() == null ? StorageType.fromString(defaultStorageType) : StorageType.fromString(data.getRemote()));
         setDefaultValues(fileListField, data, defaultValues -> {
             if (defaultValues != null && !defaultValues.isEmpty()) {
                 fileListField.setDefaultValue(defaultValues);

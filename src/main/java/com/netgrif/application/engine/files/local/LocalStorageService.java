@@ -5,10 +5,6 @@ import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.files.throwable.BadRequestException;
 import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import com.netgrif.application.engine.files.throwable.StorageException;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
-import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import lombok.extern.slf4j.Slf4j;
@@ -31,25 +27,25 @@ public class LocalStorageService implements IStorageService {
     }
 
     @Override
-    public InputStream get(FileListField field, String path) throws BadRequestException, ServiceErrorException {
-
-        return null;
-    }
-
-    @Override
-    public InputStream get(FileField field, Case useCase, boolean getPreview) throws BadRequestException, ServiceErrorException {
+    public InputStream get(String path) throws BadRequestException, ServiceErrorException {
         try {
-            if (getPreview) {
-                    return new FileInputStream(getPreviewPath(useCase.getStringId(), field.getImportId(), field.getValue().getName()));
-            }
-            return new FileInputStream(field.getValue().getPath());
+            return new FileInputStream(path);
         } catch (FileNotFoundException e) {
             return null;
         }
     }
 
     @Override
-    public boolean save(FileField field, String path, MultipartFile file) throws StorageException {
+    public boolean save(String path, MultipartFile file) throws StorageException {
+        try (InputStream stream = file.getInputStream()) {
+            return this.save(path, stream);
+        } catch (StorageException | IOException e) {
+            throw new StorageException("File cannot be save", e);
+        }
+    }
+
+    @Override
+    public boolean save(String path, InputStream stream) throws StorageException {
         File savedFile = new File(path);
         try {
             savedFile.getParentFile().mkdirs();
@@ -57,42 +53,20 @@ public class LocalStorageService implements IStorageService {
                 savedFile.delete();
                 savedFile.createNewFile();
             }
-
             FileOutputStream fout = new FileOutputStream(savedFile);
-            fout.write(file.getBytes());
+            stream.transferTo(fout);
             fout.close();
         } catch (IOException e) {
             log.error(e.getMessage());
-            throw new EventNotExecutableException("File " + file.getName() + " could not be saved to file field " + field.getStringId(), e);
+            throw new EventNotExecutableException("File " + path + " could not be saved", e);
         }
 
         return true;
     }
 
     @Override
-    public boolean save(FileField field, String path, InputStream stream) throws StorageException {
-        return false;
-    }
-
-    @Override
-    public void delete(FileField fileField, Case useCase) throws StorageException {
-        new File(getPath(useCase.getStringId(), fileField.getStringId(), fileField.getValue().getName())).delete();
-        new File(getPreviewPath(useCase.getStringId(), fileField.getStringId(), fileField.getValue().getName())).delete();
-    }
-
-    @Override
-    public void delete(FileListField fileField, Case useCase, FileFieldValue fileFieldValue) throws StorageException {
-
-    }
-
-    @Override
-    public boolean save(FileListField field, String path, MultipartFile file) throws StorageException {
-        return false;
-    }
-
-    @Override
-    public boolean save(FileListField field, String path, InputStream stream) throws StorageException {
-        return false;
+    public void delete(String path) throws StorageException {
+        new File(path).delete();
     }
 
     @Override

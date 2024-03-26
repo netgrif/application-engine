@@ -2,7 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 class FileFieldValue implements Serializable {
 
-    private static final long serialVersionUID = 1299918326436821185L;
+    private static final long serialVersionUID = 1299918326436821185L
 
     private String name
 
@@ -48,6 +48,13 @@ class FileFieldValue implements Serializable {
         this.path = path
     }
 
+    String getPreviewPath() {
+        return previewPath
+    }
+
+    void setPreviewPath(String previewPath) {
+        this.previewPath = previewPath
+    }
 
     @Override
     String toString() {
