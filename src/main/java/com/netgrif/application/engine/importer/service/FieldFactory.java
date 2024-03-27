@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.importer.service;
 
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.files.StorageType;
 import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Component;
@@ -15,6 +15,7 @@ import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataValidationExpressionEvaluator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,6 +31,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public final class FieldFactory {
 
+    @Value("${nae.storage.default-type}")
+    private String defaultStorageType;
+
     @Autowired
     private FormatFactory formatFactory;
 
@@ -41,9 +45,6 @@ public final class FieldFactory {
 
     @Autowired
     private IDataValidator dataValidator;
-
-    @Autowired
-    private IUserService userService;
 
     @Autowired
     private IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
@@ -514,7 +515,7 @@ public final class FieldFactory {
 
     private FileField buildFileField(Data data) {
         FileField fileField = new FileField();
-        fileField.setRemote(data.getRemote() != null);
+        fileField.setStorageType(data.getRemote() == null ? StorageType.fromString(defaultStorageType) : StorageType.fromString(data.getRemote()));
         setDefaultValue(fileField, data, defaultValue -> {
             if (defaultValue != null) {
                 fileField.setDefaultValue(defaultValue);
@@ -525,7 +526,7 @@ public final class FieldFactory {
 
     private FileListField buildFileListField(Data data) {
         FileListField fileListField = new FileListField();
-        fileListField.setRemote(data.getRemote() != null);
+        fileListField.setStorageType(data.getRemote() == null ? StorageType.fromString(defaultStorageType) : StorageType.fromString(data.getRemote()));
         setDefaultValues(fileListField, data, defaultValues -> {
             if (defaultValues != null && !defaultValues.isEmpty()) {
                 fileListField.setDefaultValue(defaultValues);

@@ -1,10 +1,8 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
+import com.netgrif.application.engine.files.throwable.StorageException;
+import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
@@ -15,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
@@ -42,7 +39,7 @@ public interface IDataService {
 
     FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name);
 
-    InputStream download(String url) throws IOException;
+    InputStream download(FileListField field, FileFieldValue name) throws StorageException;
 
     SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile);
 
