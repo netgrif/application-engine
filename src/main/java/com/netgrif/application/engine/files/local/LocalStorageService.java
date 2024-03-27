@@ -17,9 +17,12 @@ import java.io.*;
 @Slf4j
 @Service
 public class LocalStorageService implements IStorageService {
+    FileStorageConfiguration fileStorageConfiguration;
 
     @Autowired
-    FileStorageConfiguration fileStorageConfiguration;
+    public void setFileStorageConfiguration(FileStorageConfiguration fileStorageConfiguration) {
+        this.fileStorageConfiguration = fileStorageConfiguration;
+    }
 
     @Override
     public StorageType getType() {
@@ -66,6 +69,7 @@ public class LocalStorageService implements IStorageService {
 
     @Override
     public void delete(String path) throws StorageException {
+//        TODO chyba v deletovani
         new File(path).delete();
     }
 

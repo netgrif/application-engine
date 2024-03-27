@@ -31,11 +31,19 @@ import static com.netgrif.application.engine.files.StorageType.MINIO;
 )
 public class MinioStorageService implements IStorageService {
 
-    @Autowired
     MinioClient minioClient;
 
-    @Autowired
     MinioProperties properties;
+
+    @Autowired
+    public void setMinioClient(MinioClient minioClient) {
+        this.minioClient = minioClient;
+    }
+
+    @Autowired
+    public void setProperties(MinioProperties properties) {
+        this.properties = properties;
+    }
 
     @Override
     public StorageType getType() {

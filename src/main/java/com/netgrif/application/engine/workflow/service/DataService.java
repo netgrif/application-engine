@@ -477,9 +477,10 @@ public class DataService implements IDataService {
         file.deleteOnExit();
         FileOutputStream fos = new FileOutputStream(file);
         IOUtils.copy(stream, fos);
+        fos.close();
+        stream.close();
         byte[] bytes = generateFilePreviewToStream(file).toByteArray();
-        InputStream inputStream = new ByteArrayInputStream(bytes);
-        try {
+        try (InputStream inputStream = new ByteArrayInputStream(bytes)) {
             String previewPath = storageService.getPreviewPath(useCase.getStringId(), field.getImportId(), field.getValue().getName());
             storageService.save(previewPath, inputStream);
             field.getValue().setPreviewPath(previewPath);
@@ -510,6 +511,7 @@ public class DataService implements IDataService {
             PDDocument document = PDDocument.load(file);
             PDFRenderer renderer = new PDFRenderer(document);
             image = renderer.renderImage(0);
+            document.close();
         } else {
             image = ImageIO.read(file);
         }
