@@ -56,6 +56,7 @@ class NewInitTest {
         assert (initTestCase.dataSet["old_init_multichoice_map"].value as List<String>).stream().any { it == "ca" }
         assert !(initTestCase.dataSet["new_init_taskref"].value as List).empty
         assert !(initTestCase.dataSet["old_init_taskref"].value as List).empty
+//        TODO not testing if file was really uploaded
         assert (initTestCase.dataSet["new_init_fileList"].value as FileListFieldValue).namesPaths.stream().any { it.getName() == "test-file.txt" }
         assert (initTestCase.dataSet["new_init_fileList"].value as FileListFieldValue).namesPaths.stream().any { it.getName() == "test-file-list.txt" }
         assert (initTestCase.dataSet["old_init_fileList"].value as FileListFieldValue).namesPaths.stream().any { it.getName() == "test-file.txt" }
