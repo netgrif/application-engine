@@ -81,7 +81,7 @@
         <title>Old init remote File List</title>
         <placeholder>Old initRemote file list</placeholder>
         <init>test-file.txt:https://netgrif.com,test-file-list.txt:https://netgrif.com</init>
-        <remote/>
+        <remote>MINIO</remote>
     </data>
     <data type="fileList">
         <id>new_init_fileList</id>
@@ -91,7 +91,7 @@
             <init>test-file-list.txt:https://netgrif.com</init>
             <init>test-file.txt:https://netgrif.com</init>
         </inits>
-        <remote/>
+        <remote>MINIO</remote>
     </data>
     <data type="i18n">
         <id>init_i18n</id>
