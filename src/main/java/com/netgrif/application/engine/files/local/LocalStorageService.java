@@ -69,7 +69,6 @@ public class LocalStorageService implements IStorageService {
 
     @Override
     public void delete(String path) throws StorageException {
-//        TODO chyba v deletovani
         new File(path).delete();
     }
 
