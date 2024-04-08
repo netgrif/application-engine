@@ -11,6 +11,7 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexSe
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.startup.SystemUserRunner;
@@ -313,9 +314,26 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     @Override
-    public void moveElasticIndex(String fromIndex, String toIndex) {
+    public void moveElasticIndex(UriNode fromIndex, UriNode toIndex) {
+        String from = indexService.getIndex(fromIndex);
+        String to = indexService.getIndex(toIndex);
+        if (from.isEmpty() || to.isEmpty()) {
+            return;
+        }
+        moveElasticIndex(from, to);
+    }
+
+    @Override
+    public void moveElasticIndex(String fromUriNodeId, String toUriNodeId) {
         final int pageSize = 100;
         long totalHits;
+
+        String fromIndexPath = indexService.getIndex(fromUriNodeId);
+        String toIndexPath = indexService.getIndex(toUriNodeId);
+
+        if (fromIndexPath.equalsIgnoreCase(toIndexPath)) {
+            return;
+        }
 
         do {
             Pageable pageable = PageRequest.of(0, pageSize);
@@ -325,7 +343,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                     .withPageable(pageable)
                     .build();
 
-            SearchHits<ElasticCase> searchHits = template.search(searchQuery, ElasticCase.class, IndexCoordinates.of(fromIndex));
+            SearchHits<ElasticCase> searchHits = template.search(searchQuery, ElasticCase.class, IndexCoordinates.of(fromIndexPath));
             totalHits = searchHits.getTotalHits();
 
             List<IndexQuery> indexQueries = searchHits.getSearchHits().stream().map(hit ->
@@ -336,21 +354,21 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             ).collect(Collectors.toList());
 
             if (!indexQueries.isEmpty()) {
-                template.bulkIndex(indexQueries, IndexCoordinates.of(toIndex));
-                searchHits.forEach(hit -> template.delete(hit.getId(), IndexCoordinates.of(fromIndex)));
+                template.bulkIndex(indexQueries, IndexCoordinates.of(toIndexPath));
+                searchHits.forEach(hit -> template.delete(hit.getId(), IndexCoordinates.of(fromIndexPath)));
             }
 
-            template.indexOps(IndexCoordinates.of(fromIndex)).refresh();
-            template.indexOps(IndexCoordinates.of(toIndex)).refresh();
+            template.indexOps(IndexCoordinates.of(fromIndexPath)).refresh();
+            template.indexOps(IndexCoordinates.of(toIndexPath)).refresh();
 
         } while (totalHits > 0);
 
-        long remainingDocs = template.count(new NativeSearchQueryBuilder().withQuery(QueryBuilders.matchAllQuery()).build(), ElasticCase.class, IndexCoordinates.of(fromIndex));
+        long remainingDocs = template.count(new NativeSearchQueryBuilder().withQuery(QueryBuilders.matchAllQuery()).build(), ElasticCase.class, IndexCoordinates.of(fromIndexPath));
         if (remainingDocs == 0) {
-            template.indexOps(IndexCoordinates.of(fromIndex)).delete();
-            log.info("Index '" + fromIndex + "' was empty after moving documents and has been deleted.");
+            template.indexOps(IndexCoordinates.of(fromIndexPath)).delete();
+            log.info("Index '" + fromIndexPath + "' was empty after moving documents and has been deleted.");
         } else {
-            log.warn("Index '" + fromIndex + "' is not empty after moving documents. Remaining documents: " + remainingDocs);
+            log.warn("Index '" + fromIndexPath + "' is not empty after moving documents. Remaining documents: " + remainingDocs);
         }
     }
 

@@ -71,17 +71,20 @@ public class ElasticIndexTest {
     private PetriNet aaaNet;
     private PetriNet bbbNet;
     private PetriNet cccNet;
+    private PetriNet xxxNet;
 
 
     @BeforeEach
     public void before() {
         testHelper.truncateDbs();
 
-        UriNode aaa = uriService.getOrCreate("aaa", UriContentType.PROCESS);
-        UriNode bbb = uriService.getOrCreate("bbb", UriContentType.PROCESS);
+        UriNode aaa = uriService.getOrCreate("/aaa", UriContentType.PROCESS);
+        UriNode bbb = uriService.getOrCreate("/bbb", UriContentType.PROCESS);
+        UriNode xxx = uriService.getOrCreate("/xxx", UriContentType.PROCESS);
 
         this.aaaNet = helper.createNet("elasticIndex/aaa.xml", VersionType.MAJOR, userService.getSystem().transformToLoggedUser(), aaa.getStringId()).get();
         this.bbbNet = helper.createNet("elasticIndex/bbb.xml", VersionType.MAJOR, userService.getSystem().transformToLoggedUser(), bbb.getStringId()).get();
+        this.xxxNet = helper.createNet("elasticIndex/xxx.xml", VersionType.MAJOR, userService.getSystem().transformToLoggedUser(), xxx.getStringId()).get();
 
         this.cccNet = helper.createNet("elasticIndex/ccc.xml", VersionType.MAJOR, userService.getSystem().transformToLoggedUser(), uriService.getRoot().getStringId()).get();
 
@@ -99,6 +102,12 @@ public class ElasticIndexTest {
         Case cccCase2 = helper.createCase("C2", cccNet);
         Case cccCase3 = helper.createCase("C3", cccNet);
         Case cccCase4 = helper.createCase("C4", cccNet);
+
+
+        Case xxxCase1 = helper.createCase("X1", xxxNet);
+        Case xxxCase2 = helper.createCase("X2", xxxNet);
+        Case xxxCase3 = helper.createCase("X3", xxxNet);
+        Case xxxCase4 = helper.createCase("X4", xxxNet);
 
         Case case_ = null;
 
@@ -139,6 +148,23 @@ public class ElasticIndexTest {
         }
     }
 
+    @Test
+    public void getIndexTest(){
+        List<String> indexList_aaa = new ArrayList<>(Arrays.asList("nae_test_case_aaa"));
+        UriNode aaa = uriService.getOrCreate("aaa", UriContentType.PROCESS);
+        String elastic_aaa = elasticIndexService.getIndex(aaa);
+        assert indexList_aaa.get(0).equals(elastic_aaa);
+
+        List<String> indexList_bbb = new ArrayList<>(Arrays.asList("nae_test_case_bbb"));
+        UriNode bbb = uriService.getOrCreate("bbb", UriContentType.PROCESS);
+        String elastic_bbb = elasticIndexService.getIndex(bbb);
+        assert indexList_bbb.get(0).equals(elastic_bbb);
+
+        List<String> indexList_root = new ArrayList<>(Arrays.asList("nae_test_case"));
+        UriNode ccc = uriService.getRoot();
+        String root_ccc = elasticIndexService.getIndex(ccc);
+        assert indexList_root.get(0).equals(root_ccc);
+    }
 
     @Test
     public void elasticIndexTest() throws InterruptedException {
@@ -162,6 +188,41 @@ public class ElasticIndexTest {
 
         List<Case> results_ccc = findCasesElastic("dataSet.text_1.textValue:\"aaa\"", indexList_ccc, PageRequest.of(0, 100));
         assertTrue(results_ccc.isEmpty(), "test3 should be null");
+    }
+
+    @Test
+    public void uriMoveTest() throws InterruptedException {
+        IntStream.range(0, 120).parallel().forEach(i -> {
+            helper.createCase("A" + i, aaaNet);
+        });
+
+        List<String> indexList_aaa = new ArrayList<>(Arrays.asList("nae_test_case_aaa"));
+        List<String> indexList_xxx = new ArrayList<>(Arrays.asList("nae_test_case_xxx"));
+        sleep(20000);
+
+        List<Case> results_aaa = findCasesElastic("dataSet.text_1.textValue:\"aaa\"", indexList_aaa, PageRequest.of(0, 100));
+        assertNotNull(results_aaa.get(0), "test1 should not be null");
+
+
+        List<Case> results_bbb = findCasesElastic("dataSet.text_1.textValue:\"xxx\"", indexList_xxx, PageRequest.of(0, 100));
+        assertNotNull(results_bbb.get(0), "test1 should not be null");
+
+        UriNode rootNode = uriService.findByUri("/");
+
+        assert rootNode.getChildrenId().size() == 3;
+
+        uriService.move("/xxx", "/aaa");
+
+        rootNode = uriService.findByUri("/");
+
+        assert rootNode.getChildrenId().size() == 2;
+
+        sleep(25000);
+
+        assertFalse(elasticIndexService.indexExists("nae_test_case_xxx"), "index remove!");
+
+        List<Case> results_bbb2 = findCasesElastic("dataSet.text_1.textValue:\"aaa\"", indexList_xxx, PageRequest.of(0, 100));
+        assertNotNull(results_bbb2.get(0), "test1 should not be null");
     }
 
     @Test
