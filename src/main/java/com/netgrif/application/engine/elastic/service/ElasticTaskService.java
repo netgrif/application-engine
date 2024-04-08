@@ -2,10 +2,7 @@ package com.netgrif.application.engine.elastic.service;
 
 import com.google.common.collect.ImmutableMap;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.elastic.domain.ElasticJob;
-import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
-import com.netgrif.application.engine.elastic.domain.ElasticTask;
-import com.netgrif.application.engine.elastic.domain.ElasticTaskJob;
+import com.netgrif.application.engine.elastic.domain.*;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
@@ -50,13 +47,14 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     private static final Logger log = LoggerFactory.getLogger(ElasticTaskService.class);
 
     protected ITaskService taskService;
+
     protected ElasticsearchRestTemplate template;
 
     @Value("${spring.data.elasticsearch.index.task}")
     protected String taskIndex;
 
     @Autowired
-    protected ElasticsearchRestTemplate elasticsearchTemplate;
+    private ElasticTaskQueueManager elasticTaskQueueManager;
 
     @Autowired
     protected IPetriNetService petriNetService;
@@ -70,8 +68,6 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
             "caseTitle", 1f
     );
 
-    @Autowired
-    private ElasticTaskQueueManager elasticTaskQueueManager;
 
     @Autowired
     public ElasticTaskService(ElasticsearchRestTemplate template) {
@@ -128,7 +124,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         List<Task> taskPage;
         long total;
         if (query != null) {
-            SearchHits<ElasticTask> hits = elasticsearchTemplate.search(query, ElasticTask.class, IndexCoordinates.of(taskIndex));
+            SearchHits<ElasticTask> hits = template.search(query, ElasticTask.class, IndexCoordinates.of(taskIndex));
             Page<ElasticTask> indexedTasks = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             taskPage = taskService.findAllById(indexedTasks.get().map(ElasticTask::getStringId).collect(Collectors.toList()));
             total = indexedTasks.getTotalElements();
