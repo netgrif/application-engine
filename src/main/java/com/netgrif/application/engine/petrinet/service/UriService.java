@@ -182,7 +182,8 @@ public class UriService implements IUriService {
 
         uriNodeRepository.saveAll(List.of(oldParent, newParent, node));
         uriNodeRepository.saveAll(childrenToSave);
-        elasticCaseService.moveElasticIndex(oldNodePath, newNodePath);
+
+//      elasticCaseService.moveElasticIndex(oldNodePath, newNodePath);  //TODO: totok este
         indexService.evictCache(node.getStringId());
         return node;
     }

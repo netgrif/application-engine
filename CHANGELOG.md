@@ -13,6 +13,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.2](h
 - [NAE-1908] NAE-1906 Improvements
 - [NAE-1937] Fix the problem with empty string in filter
 - [NAE-1884] Improve execution of auto trigger tasks
+- [NAE-1942] Authorization Bypass Process Download
 
 ### Added
 - [NAE-1901] Taskref list rendering update
