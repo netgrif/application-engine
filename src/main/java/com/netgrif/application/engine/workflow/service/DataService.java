@@ -813,7 +813,7 @@ public class DataService implements IDataService {
                 value = parseMultichoiceFieldValues(node);
                 break;
             case "enumeration":
-                if (node.get("value") == null || node.get("value").asText() == null) {
+                if (node.get("value") == null || node.get("value").asText() == null || node.get("value").asText() == "null") {
                     value = null;
                     break;
                 }
