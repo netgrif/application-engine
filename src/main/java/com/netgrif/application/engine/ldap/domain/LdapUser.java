@@ -23,6 +23,7 @@ public class LdapUser extends User {
 
     private String commonName;
 
+    @Indexed
     private String uid;
 
     private String homeDirectory;
