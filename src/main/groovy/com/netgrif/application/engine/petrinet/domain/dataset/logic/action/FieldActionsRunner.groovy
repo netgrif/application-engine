@@ -37,18 +37,18 @@ abstract class FieldActionsRunner {
 
     private Map<String, Object> actionsCache = new HashMap<>()
 
-    List<EventOutcome> run(Action action, Case useCase, List<Function> functions = []) {
-        return run(action, useCase, Optional.empty(), functions)
+    List<EventOutcome> run(Action action, Case useCase, Map<String, String> params, List<Function> functions = []) {
+        return run(action, useCase, Optional.empty(), params, functions)
     }
 
-    List<EventOutcome> run(Action action, Case useCase, Optional<Task> task, List<Function> functions = []) {
+    List<EventOutcome> run(Action action, Case useCase, Optional<Task> task, Map<String, String> params, List<Function> functions = []) {
         if (!actionsCache)
             actionsCache = new HashMap<>()
 
         log.debug("Action: $action")
         def code = getActionCode(action, functions)
         try {
-            code.init(action, useCase, task, this)
+            code.init(action, useCase, task, params, this)
             code()
         } catch (Exception e) {
             log.error("Action: $action.definition")

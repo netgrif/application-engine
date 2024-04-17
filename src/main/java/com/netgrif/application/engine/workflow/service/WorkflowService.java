@@ -247,28 +247,52 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale) {
+    public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale, Map<String, String> params) {
         if (locale == null) {
             locale = LocaleContextHolder.getLocale();
         }
         if (title == null) {
-            return this.createCase(netId, resolveDefaultCaseTitle(netId, locale), color, user);
+            return this.createCase(netId, resolveDefaultCaseTitle(netId, locale, params), color, user, params);
         }
-        return this.createCase(netId, title, color, user);
+        return this.createCase(netId, title, color, user, params);
+    }
+
+    @Override
+    public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale) {
+        return this.createCase(netId, title, color, user, locale, null);
+    }
+
+    @Override
+    public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Map<String, String> params) {
+        return createCase(netId, (u) -> title, color, user, params);
     }
 
     @Override
     public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user) {
-        return createCase(netId, (u) -> title, color, user);
+        return this.createCase(netId, (u) -> title, color, user);
     }
 
     @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale) {
+    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale, Map<String, String> params) {
         PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier);
         if (net == null) {
             throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
         }
-        return this.createCase(net.getStringId(), title != null && !title.equals("") ? title : net.getDefaultCaseName().getTranslation(locale), color, user);
+        return this.createCase(net.getStringId(), title != null && !title.equals("") ? title : net.getDefaultCaseName().getTranslation(locale), color, user, params);
+    }
+
+    @Override
+    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale) {
+        return this.createCase(identifier, title, color, user, locale, null);
+    }
+
+    @Override
+    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Map<String, String> params) {
+        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier);
+        if (net == null) {
+            throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
+        }
+        return this.createCase(net.getStringId(), title, color, user, params);
     }
 
     @Override
@@ -281,11 +305,15 @@ public class WorkflowService implements IWorkflowService {
     }
 
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
+        return this.createCase(netId, makeTitle, color, user, null);
+    }
+
+    public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user, Map<String, String> params) {
         LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
         int rulesExecuted;
         Case useCase = new Case(petriNet);
-        useCase.populateDataSet(initValueExpressionEvaluator);
+        useCase.populateDataSet(initValueExpressionEvaluator, params);
         useCase.setColor(color);
         useCase.setAuthor(loggedOrImpersonated.transformToAuthor());
         useCase.setCreationDate(LocalDateTime.now());
@@ -293,7 +321,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.setUriNodeId(petriNet.getUriNodeId());
 
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
-        outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty()));
+        outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty(), params));
         rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         if (rulesExecuted > 0) {
             useCase = save(useCase);
@@ -308,7 +336,7 @@ public class WorkflowService implements IWorkflowService {
         resolveTaskRefs(useCase);
 
         useCase = findOne(useCase.getStringId());
-        outcome.addOutcomes(eventService.runActions(petriNet.getPostCreateActions(), useCase, Optional.empty()));
+        outcome.addOutcomes(eventService.runActions(petriNet.getPostCreateActions(), useCase, Optional.empty(), params));
         useCase = findOne(useCase.getStringId());
         rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
         if (rulesExecuted > 0) {
@@ -321,11 +349,11 @@ public class WorkflowService implements IWorkflowService {
         return outcome;
     }
 
-    protected Function<Case, String> resolveDefaultCaseTitle(String netId, Locale locale) {
+    protected Function<Case, String> resolveDefaultCaseTitle(String netId, Locale locale, Map<String, String> params) {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
         Function<Case, String> makeTitle;
         if (petriNet.hasDynamicCaseName()) {
-            makeTitle = (u) -> initValueExpressionEvaluator.evaluateCaseName(u, petriNet.getDefaultCaseNameExpression()).getTranslation(locale);
+            makeTitle = (u) -> initValueExpressionEvaluator.evaluateCaseName(u, petriNet.getDefaultCaseNameExpression(), params).getTranslation(locale);
         } else {
             makeTitle = (u) -> petriNet.getDefaultCaseName().getTranslation(locale);
         }
@@ -343,25 +371,35 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public DeleteCaseEventOutcome deleteCase(String caseId) {
+    public DeleteCaseEventOutcome deleteCase(String caseId, Map<String, String> params) {
         Case useCase = findOne(caseId);
-        return deleteCase(useCase);
+        return deleteCase(useCase, params);
     }
 
     @Override
-    public DeleteCaseEventOutcome deleteCase(Case useCase) {
+    public DeleteCaseEventOutcome deleteCase(String caseId) {
+        return deleteCase(caseId, null);
+    }
 
-        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty()));
+    @Override
+    public DeleteCaseEventOutcome deleteCase(Case useCase, Map<String, String> params) {
+
+        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty(), params));
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
         log.info("[" + useCase.getStringId() + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting case " + useCase.getTitle());
 
         taskService.deleteTasksByCase(useCase.getStringId());
         repository.delete(useCase);
 
-        outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty()));
+        outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty(), params));
         addMessageToOutcome(useCase.getPetriNet(), CaseEventType.DELETE, outcome);
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.POST));
         return outcome;
+    }
+
+    @Override
+    public DeleteCaseEventOutcome deleteCase(Case useCase) {
+        return deleteCase(useCase, null);
     }
 
     @Override

@@ -106,14 +106,24 @@ public class DataService implements IDataService {
 
     @Override
     public GetDataEventOutcome getData(String taskId) {
+        return getData(taskId, null);
+    }
+
+    @Override
+    public GetDataEventOutcome getData(String taskId, Map<String, String> params) {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
 
-        return getData(task, useCase);
+        return getData(task, useCase, params);
     }
 
     @Override
     public GetDataEventOutcome getData(Task task, Case useCase) {
+        return getData(task, useCase, null);
+    }
+
+    @Override
+    public GetDataEventOutcome getData(Task task, Case useCase, Map<String, String> params) {
         log.info("[" + useCase.getStringId() + "]: Getting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
         IUser user = userService.getLoggedOrSystem();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
@@ -128,7 +138,7 @@ public class DataService implements IDataService {
             if (isForbidden(fieldId, transition, useCase.getDataField(fieldId)))
                 return;
             Field field = useCase.getPetriNet().getField(fieldId).get();
-            outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task));
+            outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, params));
             historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE, user));
 
             if (outcome.getMessage() == null) {
@@ -163,7 +173,7 @@ public class DataService implements IDataService {
                     dataSetFields.add(validationField);
                 }
             }
-            outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task));
+            outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task, params));
             historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST, user));
         });
 
@@ -198,12 +208,22 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome setData(String taskId, ObjectNode values) {
+        return setData(taskId, values, null);
+    }
+
+    @Override
+    public SetDataEventOutcome setData(String taskId, ObjectNode values, Map<String, String> params) {
         Task task = taskService.findOne(taskId);
-        return setData(task, values);
+        return setData(task, values, params);
     }
 
     @Override
     public SetDataEventOutcome setData(Task task, ObjectNode values) {
+        return setData(task, values, null);
+    }
+
+    @Override
+    public SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params) {
         Case useCase = workflowService.findOne(task.getCaseId());
         IUser user = userService.getLoggedOrSystem();
 
@@ -218,7 +238,7 @@ public class DataService implements IDataService {
             DataField dataField = useCase.getDataSet().get(fieldId);
             if (dataField != null) {
                 Field field = useCase.getPetriNet().getField(fieldId).get();
-                outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task));
+                outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task, params));
                 if (outcome.getMessage() == null) {
                     Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
                     if (field.getEvents().containsKey(DataEventType.SET) &&
@@ -272,8 +292,7 @@ public class DataService implements IDataService {
                 outcome.addChangedField(fieldId, changedField);
                 workflowService.save(useCase);
                 historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE, Collections.singletonMap(fieldId, changedField), user));
-                outcome.addOutcomes(resolveDataEvents(field,
-                        DataEventType.SET, EventPhase.POST, useCase, task));
+                outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, params));
 
                 historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, null, user));
                 applyFieldConnectedChanges(useCase, field);
@@ -419,8 +438,13 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFileByTaskAndName(String taskId, String fieldId, String name) {
+        return getFileByTaskAndName(taskId, fieldId, name, null);
+    }
+
+    @Override
+    public FileFieldInputStream getFileByTaskAndName(String taskId, String fieldId, String name, Map<String, String> params) {
         Task task = taskService.findOne(taskId);
-        return getFileByCaseAndName(task.getCaseId(), fieldId, name);
+        return getFileByCaseAndName(task.getCaseId(), fieldId, name, params);
     }
 
     @Override
@@ -432,14 +456,24 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name) {
+        return getFileByCaseAndName(caseId, fieldId, name, null);
+    }
+
+    @Override
+    public FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name, Map<String, String> params) {
         Case useCase = workflowService.findOne(caseId);
         FileListField field = (FileListField) useCase.getPetriNet().getDataSet().get(fieldId);
-        return getFileByName(useCase, field, name);
+        return getFileByName(useCase, field, name, params);
     }
 
     @Override
     public FileFieldInputStream getFileByName(Case useCase, FileListField field, String name) {
-        runGetActionsFromFileField(field.getEvents(), useCase);
+        return getFileByName(useCase, field, name, null);
+    }
+
+    @Override
+    public FileFieldInputStream getFileByName(Case useCase, FileListField field, String name, Map<String, String> params) {
+        runGetActionsFromFileField(field.getEvents(), useCase, params);
         if (useCase.getFieldValue(field.getStringId()) == null)
             return null;
 
@@ -463,7 +497,12 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview) {
-        runGetActionsFromFileField(field.getEvents(), useCase);
+        return getFile(useCase, task, field, forPreview, null);
+    }
+
+    @Override
+    public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview, Map<String, String> params) {
+        runGetActionsFromFileField(field.getEvents(), useCase, params);
         if (useCase.getFieldValue(field.getStringId()) == null)
             return null;
 
@@ -483,11 +522,11 @@ public class DataService implements IDataService {
         }
     }
 
-    private void runGetActionsFromFileField(Map<DataEventType, DataEvent> events, Case useCase) {
+    private void runGetActionsFromFileField(Map<DataEventType, DataEvent> events, Case useCase, Map<String, String> params) {
         if (events != null && !events.isEmpty() && events.containsKey(DataEventType.GET)) {
             DataEvent event = events.get(DataEventType.GET);
-            event.getPreActions().forEach(action -> actionsRunner.run(action, useCase));
-            event.getPostActions().forEach(action -> actionsRunner.run(action, useCase));
+            event.getPreActions().forEach(action -> actionsRunner.run(action, useCase, params));
+            event.getPostActions().forEach(action -> actionsRunner.run(action, useCase, params));
         }
     }
 
@@ -563,6 +602,11 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
+        return saveFile(taskId, fieldId, multipartFile, null);
+    }
+
+    @Override
+    public SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> params) {
         Task task = taskService.findOne(taskId);
         ImmutablePair<Case, FileField> pair = getCaseAndFileField(taskId, fieldId);
         FileField field = pair.getRight();
@@ -573,11 +617,16 @@ public class DataService implements IDataService {
         } else {
             saveLocalFile(useCase, field, multipartFile);
         }
-        return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase));
+        return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase, params));
     }
 
     @Override
     public SetDataEventOutcome saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles) {
+        return saveFiles(taskId, fieldId, multipartFiles, null);
+    }
+
+    @Override
+    public SetDataEventOutcome saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles, Map<String, String> params) {
         Task task = taskService.findOne(taskId);
         ImmutablePair<Case, FileListField> pair = getCaseAndFileListField(taskId, fieldId);
         FileListField field = pair.getRight();
@@ -588,14 +637,14 @@ public class DataService implements IDataService {
         } else {
             saveLocalFiles(useCase, field, multipartFiles);
         }
-        return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase));
+        return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase, params));
     }
 
-    private List<EventOutcome> getChangedFieldByFileFieldContainer(String fieldId, Task referencingTask, Case useCase) {
+    private List<EventOutcome> getChangedFieldByFileFieldContainer(String fieldId, Task referencingTask, Case useCase, Map<String, String> params) {
         List<EventOutcome> outcomes = new ArrayList<>(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
-                EventPhase.PRE, useCase, referencingTask));
+                EventPhase.PRE, useCase, referencingTask, params));
         outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
-                EventPhase.POST, useCase, referencingTask));
+                EventPhase.POST, useCase, referencingTask, params));
         updateDataset(useCase);
         workflowService.save(useCase);
         return outcomes;
@@ -675,6 +724,11 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome deleteFile(String taskId, String fieldId) {
+        return deleteFile(taskId, fieldId, null);
+    }
+
+    @Override
+    public SetDataEventOutcome deleteFile(String taskId, String fieldId, Map<String, String> params) {
         ImmutablePair<Case, FileField> pair = getCaseAndFileField(taskId, fieldId);
         FileField field = pair.getRight();
         Case useCase = pair.getLeft();
@@ -689,7 +743,7 @@ public class DataService implements IDataService {
             }
             useCase.getDataSet().get(field.getStringId()).setValue(null);
         }
-        return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase));
+        return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase, params));
     }
 
     private ImmutablePair<Case, FileField> getCaseAndFileField(String taskId, String fieldId) {
@@ -703,6 +757,11 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name) {
+        return deleteFileByName(taskId, fieldId, name, null);
+    }
+
+    @Override
+    public SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name, Map<String, String> params) {
         ImmutablePair<Case, FileListField> pair = getCaseAndFileListField(taskId, fieldId);
         FileListField field = pair.getRight();
         Case useCase = pair.getLeft();
@@ -719,7 +778,7 @@ public class DataService implements IDataService {
             }
             useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
         }
-        return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase));
+        return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase, params));
     }
 
     private ImmutablePair<Case, FileListField> getCaseAndFileListField(String taskId, String fieldId) {
@@ -781,8 +840,8 @@ public class DataService implements IDataService {
         }
     }
 
-    private List<EventOutcome> resolveDataEvents(Field field, DataEventType trigger, EventPhase phase, Case useCase, Task task) {
-        return eventService.processDataEvents(field, trigger, phase, useCase, task);
+    private List<EventOutcome> resolveDataEvents(Field field, DataEventType trigger, EventPhase phase, Case useCase, Task task, Map<String, String> params) {
+        return eventService.processDataEvents(field, trigger, phase, useCase, task, params);
     }
 
     private Object parseFieldsValues(JsonNode jsonNode, DataField dataField) {

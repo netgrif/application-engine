@@ -35,28 +35,28 @@ public class EventService implements IEventService {
     }
 
     @Override
-    public List<EventOutcome> runActions(List<Action> actions, Case useCase, Task task, Transition transition) {
+    public List<EventOutcome> runActions(List<Action> actions, Case useCase, Task task, Transition transition, Map<String, String> params) {
         log.info("[" + useCase.getStringId() + "]: Running actions of transition " + transition.getStringId());
-        return runActions(actions, useCase, Optional.of(task));
+        return runActions(actions, useCase, Optional.of(task), params);
     }
 
     @Override
-    public List<EventOutcome> runActions(List<Action> actions) {
-        return runActions(actions, null, Optional.empty());
+    public List<EventOutcome> runActions(List<Action> actions, Map<String, String> params) {
+        return runActions(actions, null, Optional.empty(), params);
     }
 
     @Override
-    public List<EventOutcome> runActions(List<Action> actions, Case useCase, Optional<Task> task) {
+    public List<EventOutcome> runActions(List<Action> actions, Case useCase, Optional<Task> task, Map<String, String> params) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
         if (actions.isEmpty()) {
             return allOutcomes;
         }
         actions.forEach(action -> {
-            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
+            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, params, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
                         if (((SetDataEventOutcome) outcome).getChangedFields().isEmpty()) return;
-                        runEventActionsOnChanged(task.orElse(null), (SetDataEventOutcome) outcome, DataEventType.SET);
+                        runEventActionsOnChanged(task.orElse(null), (SetDataEventOutcome) outcome, DataEventType.SET, params);
                     });
             allOutcomes.addAll(outcomes);
         });
@@ -67,17 +67,17 @@ public class EventService implements IEventService {
     }
 
     @Override
-    public List<EventOutcome> runEventActions(Case useCase, Task task, List<Action> actions, DataEventType trigger) {
+    public List<EventOutcome> runEventActions(Case useCase, Task task, List<Action> actions, DataEventType trigger, Map<String, String> params) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
         if (actions.isEmpty()) {
             return allOutcomes;
         }
         actions.forEach(action -> {
-            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
+            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), params, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
                         if (((SetDataEventOutcome) outcome).getChangedFields().isEmpty()) return;
-                        runEventActionsOnChanged(task, (SetDataEventOutcome) outcome, trigger);
+                        runEventActionsOnChanged(task, (SetDataEventOutcome) outcome, trigger, params);
                     });
             allOutcomes.addAll(outcomes);
         });
@@ -85,7 +85,7 @@ public class EventService implements IEventService {
     }
 
     @Override
-    public List<EventOutcome> processDataEvents(Field field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task) {
+    public List<EventOutcome> processDataEvents(Field field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task, Map<String, String> params) {
         LinkedList<Action> fieldActions = new LinkedList<>();
         if (field.getEvents() != null && field.getEvents().containsKey(actionTrigger)) {
             fieldActions.addAll(DataFieldLogic.getEventAction((DataEvent) field.getEvents().get(actionTrigger), phase));
@@ -101,17 +101,22 @@ public class EventService implements IEventService {
             return Collections.emptyList();
         }
 
-        return runEventActions(useCase, task, fieldActions, actionTrigger);
+        return runEventActions(useCase, task, fieldActions, actionTrigger, params);
     }
 
     @Override
     public void runEventActionsOnChanged(Task task, SetDataEventOutcome outcome, DataEventType trigger) {
+        runEventActionsOnChanged(task, outcome, trigger, null);
+    }
+
+    @Override
+    public void runEventActionsOnChanged(Task task, SetDataEventOutcome outcome, DataEventType trigger, Map<String, String> params) {
         outcome.getChangedFields().forEach((s, changedField) -> {
             if (changedField.getAttributes().containsKey("value") && trigger == DataEventType.SET) {
                 Field field = outcome.getCase().getField(s);
                 log.info("[" + outcome.getCase().getStringId() + "] " + outcome.getCase().getTitle() + ": Running actions on changed field " + s);
-                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, outcome.getCase(), outcome.getTask()));
-                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.POST, outcome.getCase(), outcome.getTask()));
+                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, outcome.getCase(), outcome.getTask(), params));
+                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.POST, outcome.getCase(), outcome.getTask(), params));
             }
         });
     }
