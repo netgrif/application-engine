@@ -7,13 +7,15 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.2](https://github.com/netgrif/application-engine/commits/v6.3.2)
 
-## [6.4.0](https://github.com/netgrif/application-engine/releases/tag/v6.4.0) (2024-03-20)
+## [6.4.0](https://github.com/netgrif/application-engine/releases/tag/v6.4.0) (2024-04-19)
 
 ### Fixed
 - [NAE-1908] NAE-1906 Improvements
 - [NAE-1937] Fix the problem with empty string in filter
 - [NAE-1884] Improve execution of auto trigger tasks
 - [NAE-1956] setData fails on setting allowedNets without value key
+- [NAE-1959] Indexing enumerationMap field fails when no options exist
+- [NAE-1960] Enumeration Map does not propagate changes when selecting
 
 ### Added
 - [NAE-1901] Taskref list rendering update
@@ -30,6 +32,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.2](h
 - [NAE-1654] Find actions for Elasticsearch
 - [NAE-1813] Field id as path variable in TaskController
 - [NAE-1955] Update setData to handle options / choices
+- [NAE-1958] Make component properties changeable
 
 ### Changed
 - [NAE-1947] HistoryService findAllSetDataEventLogs is not working
