@@ -706,10 +706,12 @@ class ActionDelegate {
          },
          componentProperties: { cl ->
              def properties = cl()
-             if (properties == null || (properties instanceof Closure && properties() == UNCHANGED_VALUE))
+             if (properties == null || (properties instanceof Closure && properties() == UNCHANGED_VALUE)) {
                  return
-             if (!(properties instanceof Map && properties.every { it.getKey() instanceof String }))
+             }
+             if (!(properties instanceof Map && properties.every { it.getKey() instanceof String })) {
                  return
+             }
 
              addSetDataOutcomeToOutcomes(dataService.changeComponentProperties(targetCase, targetTask.get(), field.stringId, properties))
          }
