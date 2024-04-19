@@ -813,7 +813,7 @@ public class DataService implements IDataService {
                 value = parseMultichoiceFieldValues(node);
                 break;
             case "enumeration":
-                if (node.get("value") == null || node.get("value").asText() == null || node.get("value").asText() == "null") {
+                if (node.get("value") == null || node.get("value").asText() == null || "null".equals(node.get("value").asText())) {
                     value = null;
                     break;
                 }
@@ -993,14 +993,14 @@ public class DataService implements IDataService {
 
     private Map<String, I18nString> parseOptionsNode(JsonNode node, String fieldType) {
         if (Objects.equals(fieldType, FieldType.ENUMERATION_MAP.getName()) || Objects.equals(fieldType, FieldType.MULTICHOICE_MAP.getName()) ||
-        Objects.equals(fieldType, FieldType.ENUMERATION.getName()) || Objects.equals(fieldType, FieldType.MULTICHOICE.getName())) {
+                Objects.equals(fieldType, FieldType.ENUMERATION.getName()) || Objects.equals(fieldType, FieldType.MULTICHOICE.getName())) {
             return parseOptions(node);
         }
         return null;
     }
 
     private Map<String, I18nString> parseOptions(JsonNode node) {
-        JsonNode optionsNode =  node.get("options");
+        JsonNode optionsNode = node.get("options");
         if (optionsNode == null) {
             return null;
         }
