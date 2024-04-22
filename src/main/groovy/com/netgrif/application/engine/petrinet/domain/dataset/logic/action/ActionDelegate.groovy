@@ -264,7 +264,7 @@ class ActionDelegate {
 
     def unchanged = { return UNCHANGED_VALUE }
 
-    def initValueOfField = { Field field, Map<String, String> params = null ->
+    def initValueOfField = { Field field, Map<String, String> params = [:] ->
         if (!field.hasDefault()) {
             return null
         } else if (field.isDynamicDefaultValue()) {
@@ -884,41 +884,41 @@ class ActionDelegate {
         return workflowService.searchOne(predicate(qCase))
     }
 
-    Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = null) {
+    Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
         return workflowService.createCaseByIdentifier(identifier, title, color, author.transformToLoggedUser(), locale, params).getCase()
     }
 
-    Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = null) {
+    Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
         CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser(), params)
         this.outcomes.add(outcome)
         return outcome.getCase()
     }
 
-    Task assignTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = null) {
+    Task assignTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
         AssignTaskEventOutcome outcome = taskService.assignTask(user.transformToLoggedUser(), taskId, params)
         this.outcomes.add(outcome)
         return outcome.getTask()
     }
 
-    Task assignTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = null) {
+    Task assignTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         return addTaskOutcomeAndReturnTask(taskService.assignTask(task, user, params))
     }
 
-    void assignTasks(List<Task> tasks, IUser assignee = userService.loggedOrSystem, Map<String, String> params = null) {
+    void assignTasks(List<Task> tasks, IUser assignee = userService.loggedOrSystem, Map<String, String> params = [:]) {
         this.outcomes.addAll(taskService.assignTasks(tasks, assignee, params))
     }
 
-    Task cancelTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = null) {
+    Task cancelTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
         return addTaskOutcomeAndReturnTask(taskService.cancelTask(user.transformToLoggedUser(), taskId, params))
     }
 
-    Task cancelTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = null) {
+    Task cancelTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, user, params))
     }
 
-    void cancelTasks(List<Task> tasks, IUser user = userService.loggedOrSystem, Map<String, String> params = null) {
+    void cancelTasks(List<Task> tasks, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         this.outcomes.addAll(taskService.cancelTasks(tasks, user, params))
     }
 
@@ -927,16 +927,16 @@ class ActionDelegate {
         return outcome.getTask()
     }
 
-    void finishTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = null) {
+    void finishTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
         addTaskOutcomeAndReturnTask(taskService.finishTask(user.transformToLoggedUser(), taskId, params))
     }
 
-    void finishTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = null) {
+    void finishTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         addTaskOutcomeAndReturnTask(taskService.finishTask(task, user, params))
     }
 
-    void finishTasks(List<Task> tasks, IUser finisher = userService.loggedOrSystem, Map<String, String> params = null) {
+    void finishTasks(List<Task> tasks, IUser finisher = userService.loggedOrSystem, Map<String, String> params = [:]) {
         this.outcomes.addAll(taskService.finishTasks(tasks, finisher, params))
     }
 
@@ -1008,19 +1008,19 @@ class ActionDelegate {
         return removeRole(roleId, net, user)
     }
 
-    SetDataEventOutcome setData(Task task, Map dataSet, Map<String, String> params = null) {
+    SetDataEventOutcome setData(Task task, Map dataSet, Map<String, String> params = [:]) {
         return setData(task.stringId, dataSet, params)
     }
 
-    SetDataEventOutcome setData(String taskId, Map dataSet, Map<String, String> params = null) {
+    SetDataEventOutcome setData(String taskId, Map dataSet, Map<String, String> params = [:]) {
         return addSetDataOutcomeToOutcomes(dataService.setData(taskId, ImportHelper.populateDataset(dataSet), params))
     }
 
-    SetDataEventOutcome setData(Transition transition, Map dataSet, Map<String, String> params = null) {
+    SetDataEventOutcome setData(Transition transition, Map dataSet, Map<String, String> params = [:]) {
         return addSetDataOutcomeToOutcomes(setData(transition.importId, this.useCase, dataSet, params))
     }
 
-    SetDataEventOutcome setData(String transitionId, Case useCase, Map dataSet, Map<String, String> params = null) {
+    SetDataEventOutcome setData(String transitionId, Case useCase, Map dataSet, Map<String, String> params = [:]) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
         return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet), params))
@@ -1061,22 +1061,22 @@ class ActionDelegate {
         }
     }
 
-    Map<String, Field> getData(Task task, Map<String, String> params = null) {
+    Map<String, Field> getData(Task task, Map<String, String> params = [:]) {
         def useCase = workflowService.findOne(task.caseId)
         return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, params)))
     }
 
-    Map<String, Field> getData(String taskId, Map<String, String> params = null) {
+    Map<String, Field> getData(String taskId, Map<String, String> params = [:]) {
         Task task = taskService.findById(taskId)
         def useCase = workflowService.findOne(task.caseId)
         return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, params)))
     }
 
-    Map<String, Field> getData(Transition transition, Map<String, String> params = null) {
+    Map<String, Field> getData(Transition transition, Map<String, String> params = [:]) {
         return getData(transition.stringId, this.useCase, params)
     }
 
-    Map<String, Field> getData(String transitionId, Case useCase, Map<String, String> params = null) {
+    Map<String, Field> getData(String transitionId, Case useCase, Map<String, String> params = [:]) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
         if (!task)
