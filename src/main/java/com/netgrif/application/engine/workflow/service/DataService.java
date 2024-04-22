@@ -24,10 +24,7 @@ import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.DataField;
-import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.application.engine.workflow.domain.*;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
@@ -38,6 +35,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataFieldsResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField;
+import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -281,6 +279,11 @@ public class DataService implements IDataService {
                 if (choices != null) {
                     dataField.setChoices(choices);
                     changedField.addAttribute("choices", choices.stream().map(i18nString -> i18nString.getTranslation(LocaleContextHolder.getLocale())).collect(Collectors.toSet()));
+                    modified = true;
+                }
+                Map<String, String> properties = parseProperties(entry.getValue());
+                if (properties != null) {
+                    outcome.addOutcome(this.changeComponentProperties(useCase, task, field.getStringId(), properties));
                     modified = true;
                 }
                 if (modified) {
@@ -840,6 +843,54 @@ public class DataService implements IDataService {
         }
     }
 
+    @Override
+    public SetDataEventOutcome changeComponentProperties(Case useCase, String transitionId, String fieldId,  Map<String, String> properties) {
+        Predicate predicate = QTask.task.caseId.eq(useCase.getStringId()).and(QTask.task.transitionId.eq(transitionId));
+        Task task = taskService.searchOne(predicate);
+        return this.changeComponentProperties(useCase, task, fieldId, properties);
+    }
+
+    @Override
+    public SetDataEventOutcome changeComponentProperties(Case useCase, Task task, String fieldId, Map<String, String> properties) {
+        Component comp = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(fieldId).getComponent();
+        return this.resolveComponentProperties(comp, useCase, task, fieldId, properties);
+    }
+
+    @Override
+    public SetDataEventOutcome changeComponentProperties(Case useCase, String fieldId, Map<String, String> properties) {
+        Component comp = useCase.getPetriNet().getDataSet().get(fieldId).getComponent();
+        return this.resolveComponentProperties(comp, useCase, null, fieldId, properties);
+    }
+
+    private SetDataEventOutcome resolveComponentProperties(Component comp, Case useCase, Task task, String fieldId, Map<String, String> properties) {
+        SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
+        ChangedField changedField = new ChangedField();
+        changedField.setId(fieldId);
+        if (comp != null) {
+            properties.forEach((key, value) -> comp.getProperties().put(key, value));
+            changedField.addAttribute("component", comp);
+            outcome.addChangedField(fieldId, changedField);
+            if (task == null) {
+                useCase.getPetriNet().getTransitions().forEach((key, transition) -> {
+                    if (transition.getDataSet().get(fieldId) != null && transition.getDataSet().get(fieldId).getComponent() != null &&
+                            transition.getDataSet().get(fieldId).getComponent().getName().equals(comp.getName())) {
+                        transition.getDataSet().get(fieldId).getComponent().setProperties(comp.getProperties());
+                    }
+                });
+            }
+        } else if (task == null) {
+            log.debug("Setting component on field " + fieldId + " in case [" + useCase.getTitle() + "] as default");
+            Component newComp = new Component("default", properties);
+            useCase.getPetriNet().getDataSet().get(fieldId).setComponent(newComp);
+            changedField.addAttribute("component", newComp);
+            outcome.addChangedField(fieldId, changedField);
+        } else {
+            log.warn("Setting properties on field " + fieldId + " on task [" + task.getStringId() + "] in case [" + useCase.getTitle() + "] failed, field dont have component!");
+        }
+        outcome.setCase(workflowService.save(useCase));
+        return outcome;
+    }
+
     private List<EventOutcome> resolveDataEvents(Field field, DataEventType trigger, EventPhase phase, Case useCase, Task task, Map<String, String> params) {
         return eventService.processDataEvents(field, trigger, phase, useCase, task, params);
     }
@@ -872,7 +923,7 @@ public class DataService implements IDataService {
                 value = parseMultichoiceFieldValues(node);
                 break;
             case "enumeration":
-                if (node.get("value") == null || node.get("value").asText() == null) {
+                if (node.get("value") == null || node.get("value").asText() == null || "null".equals(node.get("value").asText())) {
                     value = null;
                     break;
                 }
@@ -1052,14 +1103,14 @@ public class DataService implements IDataService {
 
     private Map<String, I18nString> parseOptionsNode(JsonNode node, String fieldType) {
         if (Objects.equals(fieldType, FieldType.ENUMERATION_MAP.getName()) || Objects.equals(fieldType, FieldType.MULTICHOICE_MAP.getName()) ||
-        Objects.equals(fieldType, FieldType.ENUMERATION.getName()) || Objects.equals(fieldType, FieldType.MULTICHOICE.getName())) {
+                Objects.equals(fieldType, FieldType.ENUMERATION.getName()) || Objects.equals(fieldType, FieldType.MULTICHOICE.getName())) {
             return parseOptions(node);
         }
         return null;
     }
 
     private Map<String, I18nString> parseOptions(JsonNode node) {
-        JsonNode optionsNode =  node.get("options");
+        JsonNode optionsNode = node.get("options");
         if (optionsNode == null) {
             return null;
         }
@@ -1102,6 +1153,18 @@ public class DataService implements IDataService {
         return null;
     }
 
+    private Map<String, String> parseProperties(JsonNode node) {
+        JsonNode propertiesNode =  node.get("properties");
+        if (propertiesNode == null) {
+            return null;
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, String> propertiesMapped = mapper.convertValue(propertiesNode, new TypeReference<Map<String, String>>() {});
+        if (propertiesMapped.isEmpty()) {
+            return null;
+        }
+        return propertiesMapped;
+    }
 
     public void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException {
         List<Case> cases = workflowService.findAllById(value);

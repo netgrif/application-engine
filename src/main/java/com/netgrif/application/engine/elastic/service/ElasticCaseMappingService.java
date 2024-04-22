@@ -172,6 +172,9 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
     protected List<String> collectTranslations(I18nString i18nString) {
         List<String> translations = new ArrayList<>();
+        if (i18nString == null) {
+            return translations;
+        }
         translations.add(i18nString.getDefaultValue());
         translations.addAll(i18nString.getTranslations().values());
         return translations;

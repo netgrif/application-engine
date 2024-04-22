@@ -1,16 +1,19 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
+import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -91,4 +94,9 @@ public interface IDataService {
 
     void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException;
 
+    SetDataEventOutcome changeComponentProperties(Case useCase, String transitionId, String fieldId, Map<String, String> properties);
+
+    SetDataEventOutcome changeComponentProperties(Case useCase, Task task, String fieldId, Map<String, String> properties);
+
+    SetDataEventOutcome changeComponentProperties(Case useCase, String fieldId, Map<String, String> properties);
 }
