@@ -31,7 +31,7 @@ abstract class CaseFieldsExpressionRunner {
         this.cacheSize = cacheSize
     }
 
-    def run(Case useCase, Expression expression, Map<String, String> params = null) {
+    def run(Case useCase, Expression expression, Map<String, String> params = [:]) {
         Map<String, String> fields = useCase.getDataSet().keySet().collectEntries { fieldId ->
             [(fieldId): (fieldId)]
         } as Map<String, String>
