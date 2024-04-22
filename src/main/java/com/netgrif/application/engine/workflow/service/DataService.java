@@ -117,7 +117,7 @@ public class DataService implements IDataService {
 
     @Override
     public GetDataEventOutcome getData(Task task, Case useCase) {
-        return getData(task, useCase, null);
+        return getData(task, useCase, new HashMap<>());
     }
 
     @Override
@@ -206,7 +206,7 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome setData(String taskId, ObjectNode values) {
-        return setData(taskId, values, null);
+        return setData(taskId, values, new HashMap<>());
     }
 
     @Override
@@ -217,7 +217,7 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome setData(Task task, ObjectNode values) {
-        return setData(task, values, null);
+        return setData(task, values, new HashMap<>());
     }
 
     @Override
@@ -441,7 +441,7 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFileByTaskAndName(String taskId, String fieldId, String name) {
-        return getFileByTaskAndName(taskId, fieldId, name, null);
+        return getFileByTaskAndName(taskId, fieldId, name, new HashMap<>());
     }
 
     @Override
@@ -459,7 +459,7 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name) {
-        return getFileByCaseAndName(caseId, fieldId, name, null);
+        return getFileByCaseAndName(caseId, fieldId, name, new HashMap<>());
     }
 
     @Override
@@ -471,7 +471,7 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFileByName(Case useCase, FileListField field, String name) {
-        return getFileByName(useCase, field, name, null);
+        return getFileByName(useCase, field, name, new HashMap<>());
     }
 
     @Override
@@ -500,7 +500,7 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview) {
-        return getFile(useCase, task, field, forPreview, null);
+        return getFile(useCase, task, field, forPreview, new HashMap<>());
     }
 
     @Override
@@ -605,7 +605,7 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
-        return saveFile(taskId, fieldId, multipartFile, null);
+        return saveFile(taskId, fieldId, multipartFile, new HashMap<>());
     }
 
     @Override
@@ -625,7 +625,7 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles) {
-        return saveFiles(taskId, fieldId, multipartFiles, null);
+        return saveFiles(taskId, fieldId, multipartFiles, new HashMap<>());
     }
 
     @Override
@@ -727,7 +727,7 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome deleteFile(String taskId, String fieldId) {
-        return deleteFile(taskId, fieldId, null);
+        return deleteFile(taskId, fieldId, new HashMap<>());
     }
 
     @Override
@@ -760,7 +760,7 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name) {
-        return deleteFileByName(taskId, fieldId, name, null);
+        return deleteFileByName(taskId, fieldId, name, new HashMap<>());
     }
 
     @Override

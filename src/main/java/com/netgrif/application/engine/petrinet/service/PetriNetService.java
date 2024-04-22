@@ -209,7 +209,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, releaseType, author, uriNodeId, null);
+        return importPetriNet(xmlFile, releaseType, author, uriNodeId, new HashMap<>());
     }
 
     @Override
@@ -568,7 +568,7 @@ public class PetriNetService implements IPetriNetService {
         log.info("Running actions of net [" + petriNet.getStringId() + "]");
 
         actions.forEach(action -> {
-            actionsRunner.run(action, null, null, petriNet.getFunctions());
+            actionsRunner.run(action, null, new HashMap<>(), petriNet.getFunctions());
         });
     }
 

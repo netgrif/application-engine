@@ -69,7 +69,7 @@ public class ProcessRoleService implements IProcessRoleService {
 
     @Override
     public void assignRolesToUser(String userId, Set<String> requestedRolesIds, LoggedUser loggedUser) {
-        assignRolesToUser(userId, requestedRolesIds, loggedUser, null);
+        assignRolesToUser(userId, requestedRolesIds, loggedUser, new HashMap<>());
     }
 
     @Override

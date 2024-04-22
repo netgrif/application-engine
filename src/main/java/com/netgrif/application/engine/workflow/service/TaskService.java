@@ -121,7 +121,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException {
-        return assignTasks(tasks, user, null);
+        return assignTasks(tasks, user, new HashMap<>());
     }
 
     @Override
@@ -135,7 +135,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException {
-        return assignTask(loggedUser, taskId, null);
+        return assignTask(loggedUser, taskId, new HashMap<>());
     }
 
     @Override
@@ -151,7 +151,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public AssignTaskEventOutcome assignTask(String taskId) throws TransitionNotExecutableException {
-        return assignTask(taskId, null);
+        return assignTask(taskId, new HashMap<>());
     }
 
     @Override
@@ -162,7 +162,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public AssignTaskEventOutcome assignTask(Task task, IUser user) throws TransitionNotExecutableException {
-        return assignTask(task, user, null);
+        return assignTask(task, user, new HashMap<>());
     }
 
     @Override
@@ -206,7 +206,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException {
-        return finishTasks(tasks, user, null);
+        return finishTasks(tasks, user, new HashMap<>());
     }
 
     @Override
@@ -220,7 +220,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public FinishTaskEventOutcome finishTask(String taskId) throws IllegalArgumentException, TransitionNotExecutableException {
-        return finishTask(taskId, null);
+        return finishTask(taskId, new HashMap<>());
     }
 
     @Override
@@ -231,7 +231,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public FinishTaskEventOutcome finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException {
-        return finishTask(loggedUser, taskId, null);
+        return finishTask(loggedUser, taskId, new HashMap<>());
     }
 
     @Override
@@ -294,7 +294,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, IUser user) {
-        return cancelTasks(tasks, user, null);
+        return cancelTasks(tasks, user, new HashMap<>());
     }
 
     @Override
@@ -308,7 +308,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public CancelTaskEventOutcome cancelTask(LoggedUser loggedUser, String taskId) {
-        return cancelTask(loggedUser, taskId, null);
+        return cancelTask(loggedUser, taskId, new HashMap<>());
     }
 
     @Override
@@ -358,7 +358,7 @@ public class TaskService implements ITaskService {
      */
     @Override
     public void cancelTasksWithoutReload(Set<String> transitions, String caseId) {
-        cancelTasksWithoutReload(transitions, caseId, null);
+        cancelTasksWithoutReload(transitions, caseId, new HashMap<>());
     }
 
     /**
@@ -401,7 +401,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId) throws TransitionNotExecutableException {
-        return delegateTask(loggedUser, delegatedId, taskId, null);
+        return delegateTask(loggedUser, delegatedId, taskId, new HashMap<>());
     }
 
     @Override

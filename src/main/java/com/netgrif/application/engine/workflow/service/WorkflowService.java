@@ -259,7 +259,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale) {
-        return this.createCase(netId, title, color, user, locale, null);
+        return this.createCase(netId, title, color, user, locale, new HashMap<>());
     }
 
     @Override
@@ -283,7 +283,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale) {
-        return this.createCase(identifier, title, color, user, locale, null);
+        return this.createCase(identifier, title, color, user, locale, new HashMap<>());
     }
 
     @Override
@@ -305,7 +305,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
-        return this.createCase(netId, makeTitle, color, user, null);
+        return this.createCase(netId, makeTitle, color, user, new HashMap<>());
     }
 
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user, Map<String, String> params) {
@@ -378,7 +378,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public DeleteCaseEventOutcome deleteCase(String caseId) {
-        return deleteCase(caseId, null);
+        return deleteCase(caseId, new HashMap<>());
     }
 
     @Override
@@ -399,7 +399,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public DeleteCaseEventOutcome deleteCase(Case useCase) {
-        return deleteCase(useCase, null);
+        return deleteCase(useCase, new HashMap<>());
     }
 
     @Override

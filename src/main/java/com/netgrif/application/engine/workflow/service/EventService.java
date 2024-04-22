@@ -106,7 +106,7 @@ public class EventService implements IEventService {
 
     @Override
     public void runEventActionsOnChanged(Task task, SetDataEventOutcome outcome, DataEventType trigger) {
-        runEventActionsOnChanged(task, outcome, trigger, null);
+        runEventActionsOnChanged(task, outcome, trigger, new HashMap<>());
     }
 
     @Override
