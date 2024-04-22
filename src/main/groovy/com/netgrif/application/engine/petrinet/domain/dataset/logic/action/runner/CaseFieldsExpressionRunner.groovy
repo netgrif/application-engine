@@ -38,7 +38,7 @@ abstract class CaseFieldsExpressionRunner {
         return run(useCase, fields, expression, params)
     }
 
-    def run(Case useCase, Map<String, String> fields, Expression expression, Map<String, String> params = null) {
+    def run(Case useCase, Map<String, String> fields, Expression expression, Map<String, String> params = [:]) {
         logger().debug("Expression: $expression")
         def code = getExpressionCode(expression)
         try {
