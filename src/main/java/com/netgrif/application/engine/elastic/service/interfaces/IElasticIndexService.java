@@ -2,15 +2,19 @@ package com.netgrif.application.engine.elastic.service.interfaces;
 
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.SearchScrollHits;
+import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.query.Query;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IElasticIndexService {
 
     boolean indexExists(String indexName);
 
     boolean createIndex(Class<?> clazz, String... placeholders);
+
+    Map<String, Object> prepareAnalysisSettings();
 
     boolean deleteIndex(Class<?> clazz, String... placeholders);
 
@@ -19,6 +23,8 @@ public interface IElasticIndexService {
     boolean openIndex(Class<?> clazz, String... placeholders);
 
     boolean putMapping(Class<?> clazz, String... placeholders);
+
+    void applyMappingSettings(Document mapping);
 
     boolean putTemplate(String name, String source);
 
