@@ -31,10 +31,10 @@ class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
     PetriNet petriNet
     def affectedUser
 
-    def init(Action action, RoleContext roleContext, Map<String, String> params) {
+    def init(Action action, RoleContext roleContext, Map<String, String> params = [:]) {
         this.action = action
         this.actionContext = actionContext
-        this.params = params ?: new HashMap<String, String>()
+        this.params = params
 
         this.processRole = roleContext.role
         this.affectedUser = roleContext.user

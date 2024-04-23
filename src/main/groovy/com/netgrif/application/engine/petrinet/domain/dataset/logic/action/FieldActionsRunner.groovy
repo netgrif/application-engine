@@ -48,7 +48,7 @@ abstract class FieldActionsRunner {
         log.debug("Action: $action")
         def code = getActionCode(action, functions)
         try {
-            code.init(action, useCase, task, params, this)
+            code.init(action, useCase, task, this, params)
             code()
         } catch (Exception e) {
             log.error("Action: $action.definition")

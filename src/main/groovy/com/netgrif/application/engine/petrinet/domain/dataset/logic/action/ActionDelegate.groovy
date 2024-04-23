@@ -198,11 +198,11 @@ class ActionDelegate {
     FieldActionsRunner actionsRunner
     List<EventOutcome> outcomes
 
-    def init(Action action, Case useCase, Optional<Task> task, Map<String, String> params, FieldActionsRunner actionsRunner) {
+    def init(Action action, Case useCase, Optional<Task> task, FieldActionsRunner actionsRunner, Map<String, String> params = [:]) {
         this.action = action
         this.useCase = useCase
         this.task = task
-        this.params = params ?: new HashMap<String, String>()
+        this.params = params
         this.actionsRunner = actionsRunner
         this.initFieldsMap(action.fieldIds)
         this.initTransitionsMap(action.transitionIds)

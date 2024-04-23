@@ -8,17 +8,17 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runne
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class InitValueExpressionEvaluator implements IInitValueExpressionEvaluator {
 
-    private final CaseFieldsExpressionRunner runner;
+    @Autowired
+    private CaseFieldsExpressionRunner runner;
 
     @Override
     public <T> T evaluate(Case useCase, Field<T> defaultField, Map<String, String> params) {
