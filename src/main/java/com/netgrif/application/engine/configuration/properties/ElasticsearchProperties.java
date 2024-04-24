@@ -2,6 +2,7 @@ package com.netgrif.application.engine.configuration.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -36,7 +37,11 @@ public class ElasticsearchProperties {
 
     private boolean analyzerEnabled = false;
 
+    private Resource analyzerPathFile;
+
     private Map<String, Object> indexSettings = new HashMap<>();
+
+    private Map<String, Map<String, Object>> classSpecificIndexSettings = new HashMap<>();
 
     private Map<String, Object> mappingSettings = new HashMap<>();
 
@@ -58,5 +63,9 @@ public class ElasticsearchProperties {
                 defaultSearchFilters.addAll(List.of("lowercase", "asciifolding", "unique"));
             }
         }
+    }
+
+    public Map<String, Object> getClassSpecificSettings(String className) {
+        return classSpecificIndexSettings.getOrDefault(className, new HashMap<>());
     }
 }

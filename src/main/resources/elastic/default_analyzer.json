@@ -1,0 +1,30 @@
+{
+  "analyzer": {
+    "default_search": {
+      "filter": [
+        "lowercase",
+        "asciifolding",
+        "keyword_repeat",
+        "unique"
+      ],
+      "char_filter": [
+        "html_strip"
+      ],
+      "type": "custom",
+      "tokenizer": "standard"
+    },
+    "default": {
+      "filter": [
+        "lowercase",
+        "asciifolding",
+        "keyword_repeat",
+        "unique"
+      ],
+      "char_filter": [
+        "html_strip"
+      ],
+      "type": "custom",
+      "tokenizer": "standard"
+    }
+  }
+}

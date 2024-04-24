@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.elastic.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,8 @@ import org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.elasticsearch.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Setting;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -28,11 +31,9 @@ import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -94,7 +95,7 @@ public class ElasticIndexService implements IElasticIndexService {
             if (!this.indexExists(indexName)) {
                 // https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html
                 HashMap<String, Object> settingMap = new HashMap<>();
-                applySettings(settingMap);
+                applySettings(settingMap, clazz);
                 settingMap.put("number_of_shards", getShardsFromClass(clazz));
                 settingMap.put("number_of_replicas", getReplicasFromClass(clazz));
 
@@ -116,10 +117,16 @@ public class ElasticIndexService implements IElasticIndexService {
     }
 
     @Override
-    public void applySettings(HashMap<String, Object> settingMap) {
+    public void applySettings(HashMap<String, Object> settingMap, Class<?> clazz) {
         Map<String, Object> settings = elasticsearchProperties.getIndexSettings();
         if ((settings != null || settingMap != null) && !settings.isEmpty()) {
             settingMap.putAll(settings);
+        }
+
+        String className = clazz.getSimpleName();
+        Map<String, Object> classSpecificSettings = elasticsearchProperties.getClassSpecificSettings(className);
+        if (classSpecificSettings != null && !classSpecificSettings.isEmpty()) {
+            settingMap.putAll(classSpecificSettings);
         }
     }
 
@@ -127,6 +134,14 @@ public class ElasticIndexService implements IElasticIndexService {
     public Map<String, Object> prepareAnalysisSettings() {
         if (!elasticsearchProperties.isAnalyzerEnabled()) {
             return null;
+        }
+        if (elasticsearchProperties.getAnalyzerPathFile() != null) {
+            Map<String, Object> fileSettings = parseAnalysisSettings();
+            if (fileSettings != null) {
+                return fileSettings;
+            } else {
+                log.error("Failed to load analysis settings from file, falling back to default settings.");
+            }
         }
 
         Map<String, Object> defaultAnalyzer = new HashMap<>();
@@ -146,6 +161,18 @@ public class ElasticIndexService implements IElasticIndexService {
         analysisSettings.put("analyzer", analyzers);
 
         return analysisSettings;
+    }
+
+    protected Map<String, Object> parseAnalysisSettings() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Resource resource = elasticsearchProperties.getAnalyzerPathFile();
+
+        try (InputStream inputStream = resource.getInputStream()) {
+            return objectMapper.readValue(inputStream, HashMap.class);
+        } catch (Exception e) {
+            log.error("Failed to parse settings file", e);
+            return null;
+        }
     }
 
     @Override
