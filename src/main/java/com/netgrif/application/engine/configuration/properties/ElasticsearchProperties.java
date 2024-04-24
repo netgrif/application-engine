@@ -37,6 +37,10 @@ public class ElasticsearchProperties {
 
     private boolean analyzerEnabled = false;
 
+    /**
+     * Example:
+     * spring.data.elasticsearch.analyzer-path-file=file:src/main/resources/elastic/default_analyzer.json
+     */
     private Resource analyzerPathFile;
 
     private Map<String, Object> indexSettings = new HashMap<>();
