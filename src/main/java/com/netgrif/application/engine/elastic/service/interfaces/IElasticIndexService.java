@@ -5,6 +5,7 @@ import org.springframework.data.elasticsearch.core.SearchScrollHits;
 import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.query.Query;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,4 +38,6 @@ public interface IElasticIndexService {
     SearchScrollHits<?> scroll(String scrollId, Class<?> clazz, String... placeholders);
 
     SearchHits<?> search(Query query, Class<?> clazz, String... placeholders);
+
+    void applySettings(HashMap<String, Object> settingMap);
 }

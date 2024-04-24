@@ -36,6 +36,8 @@ public class ElasticsearchProperties {
 
     private boolean analyzerEnabled = false;
 
+    private Map<String, Object> indexSettings = new HashMap<>();
+
     private Map<String, Object> mappingSettings = new HashMap<>();
 
     private List<String> defaultFilters = new ArrayList<>();
@@ -44,6 +46,8 @@ public class ElasticsearchProperties {
 
     @PostConstruct
     public void init() {
+        indexSettings.putIfAbsent("max_result_window", 10000000);
+
         mappingSettings.putIfAbsent("date_detection", false);
 
         if (analyzerEnabled) {

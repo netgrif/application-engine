@@ -94,9 +94,9 @@ public class ElasticIndexService implements IElasticIndexService {
             if (!this.indexExists(indexName)) {
                 // https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html
                 HashMap<String, Object> settingMap = new HashMap<>();
+                applySettings(settingMap);
                 settingMap.put("number_of_shards", getShardsFromClass(clazz));
                 settingMap.put("number_of_replicas", getReplicasFromClass(clazz));
-                settingMap.put("max_result_window", 10000000);
 
                 Map<String, Object> analysisSettings = prepareAnalysisSettings();
                 if (analysisSettings != null) {
@@ -113,6 +113,14 @@ public class ElasticIndexService implements IElasticIndexService {
             log.error("createIndex:", e);
         }
         return false;
+    }
+
+    @Override
+    public void applySettings(HashMap<String, Object> settingMap) {
+        Map<String, Object> settings = elasticsearchProperties.getIndexSettings();
+        if ((settings != null || settingMap != null) && !settings.isEmpty()) {
+            settingMap.putAll(settings);
+        }
     }
 
     @Override
