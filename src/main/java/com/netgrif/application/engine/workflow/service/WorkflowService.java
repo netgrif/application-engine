@@ -283,7 +283,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale) {
-        return this.createCase(identifier, title, color, user, locale, new HashMap<>());
+        return this.createCaseByIdentifier(identifier, title, color, user, locale, new HashMap<>());
     }
 
     @Override
