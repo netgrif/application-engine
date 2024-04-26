@@ -235,6 +235,9 @@ public class Case implements Serializable {
             } else {
                 this.dataSet.put(key, new DataField(field.getDefaultValue()));
             }
+            if (field.getComponent() != null) {
+                this.dataSet.get(key).setComponent(field.getComponent());
+            }
             if (field instanceof UserField) {
                 this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
             }
@@ -257,13 +260,16 @@ public class Case implements Serializable {
         dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field)));
         dynamicChoicesFields.forEach(field -> this.dataSet.get(field.getImportId()).setChoices(initValueExpressionEvaluator.evaluateChoices(this, field)));
         dynamicOptionsFields.forEach(field -> this.dataSet.get(field.getImportId()).setOptions(initValueExpressionEvaluator.evaluateOptions(this, field)));
-        populateDataSetBehavior();
+        populateDataSetBehaviorAndComponents();
     }
 
-    private void populateDataSetBehavior() {
+    private void populateDataSetBehaviorAndComponents() {
         petriNet.getTransitions().forEach((transitionKey, transitionValue) -> {
             transitionValue.getDataSet().forEach((dataKey, dataValue) -> {
                 getDataSet().get(dataKey).addBehavior(transitionKey, new HashSet<>(dataValue.getBehavior()));
+                if (dataValue.getComponent() != null) {
+                    getDataSet().get(dataKey).addDataRefComponent(transitionKey, dataValue.getComponent());
+                }
             });
         });
     }

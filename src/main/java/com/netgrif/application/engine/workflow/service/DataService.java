@@ -147,7 +147,6 @@ public class DataService implements IDataService {
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
                         validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
-                    resolveComponents(validationField, transition);
                     dataSetFields.add(validationField);
                 }
             } else {
@@ -157,7 +156,6 @@ public class DataService implements IDataService {
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
                         validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
-                    resolveComponents(validationField, transition);
                     dataSetFields.add(validationField);
                 }
             }
@@ -178,12 +176,6 @@ public class DataService implements IDataService {
                 .forEach(index -> dataSetFields.get((int) index).setOrder(index));
         outcome.setData(dataSetFields);
         return outcome;
-    }
-
-    private void resolveComponents(Field field, Transition transition) {
-        Component transitionComponent = transition.getDataSet().get(field.getImportId()).getComponent();
-        if (transitionComponent != null)
-            field.setComponent(transitionComponent);
     }
 
     private boolean isForbidden(String fieldId, Transition transition, DataField dataField) {
@@ -793,13 +785,13 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome changeComponentProperties(Case useCase, Task task, String fieldId, Map<String, String> properties) {
-        Component comp = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(fieldId).getComponent();
+        Component comp = useCase.getDataField(fieldId).getDataRefComponents().get(task.getTransitionId());
         return this.resolveComponentProperties(comp, useCase, task, fieldId, properties);
     }
 
     @Override
     public SetDataEventOutcome changeComponentProperties(Case useCase, String fieldId, Map<String, String> properties) {
-        Component comp = useCase.getPetriNet().getDataSet().get(fieldId).getComponent();
+        Component comp = useCase.getDataField(fieldId).getComponent();
         return this.resolveComponentProperties(comp, useCase, null, fieldId, properties);
     }
 
@@ -812,17 +804,14 @@ public class DataService implements IDataService {
             changedField.addAttribute("component", comp);
             outcome.addChangedField(fieldId, changedField);
             if (task == null) {
-                useCase.getPetriNet().getTransitions().forEach((key, transition) -> {
-                    if (transition.getDataSet().get(fieldId) != null && transition.getDataSet().get(fieldId).getComponent() != null &&
-                            transition.getDataSet().get(fieldId).getComponent().getName().equals(comp.getName())) {
-                        transition.getDataSet().get(fieldId).getComponent().setProperties(comp.getProperties());
-                    }
-                });
+                useCase.getDataField(fieldId).setComponent(comp);
+            } else {
+                useCase.getDataField(fieldId).addDataRefComponent(task.getTransitionId(), comp);
             }
         } else if (task == null) {
             log.debug("Setting component on field " + fieldId + " in case [" + useCase.getTitle() + "] as default");
             Component newComp = new Component("default", properties);
-            useCase.getPetriNet().getDataSet().get(fieldId).setComponent(newComp);
+            useCase.getDataField(fieldId).setComponent(newComp);
             changedField.addAttribute("component", newComp);
             outcome.addChangedField(fieldId, changedField);
         } else {
