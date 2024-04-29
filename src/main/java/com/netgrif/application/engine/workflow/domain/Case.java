@@ -224,7 +224,7 @@ public class Case implements Serializable {
         return this.dataSet.get(field).hasDefinedBehavior(transition);
     }
 
-    public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
+    public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator, Map<String, String> params) {
         List<Field<?>> dynamicInitFields = new LinkedList<>();
         List<MapOptionsField<I18nString, ?>> dynamicOptionsFields = new LinkedList<>();
         List<ChoiceField<?>> dynamicChoicesFields = new LinkedList<>();
@@ -257,9 +257,9 @@ public class Case implements Serializable {
                 dynamicChoicesFields.add((ChoiceField<?>) field);
             }
         });
-        dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field)));
-        dynamicChoicesFields.forEach(field -> this.dataSet.get(field.getImportId()).setChoices(initValueExpressionEvaluator.evaluateChoices(this, field)));
-        dynamicOptionsFields.forEach(field -> this.dataSet.get(field.getImportId()).setOptions(initValueExpressionEvaluator.evaluateOptions(this, field)));
+        dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field, params)));
+        dynamicChoicesFields.forEach(field -> this.dataSet.get(field.getImportId()).setChoices(initValueExpressionEvaluator.evaluateChoices(this, field, params)));
+        dynamicOptionsFields.forEach(field -> this.dataSet.get(field.getImportId()).setOptions(initValueExpressionEvaluator.evaluateOptions(this, field, params)));
         populateDataSetBehaviorAndComponents();
     }
 

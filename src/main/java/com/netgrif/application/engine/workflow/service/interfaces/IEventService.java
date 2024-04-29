@@ -11,19 +11,22 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface IEventService {
 
-    List<EventOutcome> runActions(List<Action> actions, Case useCase, Task task, Transition transition);
+    List<EventOutcome> runActions(List<Action> actions, Case useCase, Task task, Transition transition, Map<String, String> params);
 
-    List<EventOutcome> runActions(List<Action> actions, Case useCase, Optional<Task> task);
+    List<EventOutcome> runActions(List<Action> actions, Case useCase, Optional<Task> task, Map<String, String> params);
 
-    List<EventOutcome> runActions(List<Action> actions);
+    List<EventOutcome> runActions(List<Action> actions, Map<String, String> params);
 
-    List<EventOutcome> processDataEvents(Field field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task);
+    List<EventOutcome> processDataEvents(Field field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task, Map<String, String> params);
 
-    List<EventOutcome> runEventActions(Case useCase, Task task, List<Action> actions, DataEventType trigger);
+    List<EventOutcome> runEventActions(Case useCase, Task task, List<Action> actions, DataEventType trigger, Map<String, String> params);
 
     void runEventActionsOnChanged(Task task, SetDataEventOutcome outcome, DataEventType trigger);
+
+    void runEventActionsOnChanged(Task task, SetDataEventOutcome outcome, DataEventType trigger, Map<String, String> params);
 }
