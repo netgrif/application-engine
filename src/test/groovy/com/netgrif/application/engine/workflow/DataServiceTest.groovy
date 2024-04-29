@@ -221,14 +221,13 @@ class DataServiceTest {
                 ]
         ] as Map)).getCase()
 
-        assert caze.getPetriNet().getDataSet().get("button_0").getComponent().getName() == "raised";
-        assert caze.getPetriNet().getDataSet().get("button_0").getComponent().getProperties().isEmpty();
-        assert caze.getPetriNet().getTransition("t1").getDataSet().get("button_0").getComponent().getName() == "raised";
-        assert caze.getPetriNet().getTransition("t1").getDataSet().get("button_0").getComponent().getProperties().get("stretch") == "true";
+        assert caze.getDataField("button_0").getComponent().getName() == "raised";
+        assert caze.getDataField("button_0").getComponent().getProperties().isEmpty();
+        assert caze.getDataField("button_0").getDataRefComponents().get("t1") == null;
 
-        assert caze.getPetriNet().getDataSet().get("button_1").getComponent() == null;
-        assert caze.getPetriNet().getTransition("t1").getDataSet().get("button_1").getComponent().getName() == "stroked";
-        assert caze.getPetriNet().getTransition("t1").getDataSet().get("button_1").getComponent().getProperties().get("stretch") == "true";
+        assert caze.getDataField("button_1").getComponent() == null;
+        assert caze.getDataField("button_1").getDataRefComponents().get("t1").getName() == "stroked";
+        assert caze.getDataField("button_1").getDataRefComponents().get("t1").getProperties().get("stretch") == "true";
     }
 
     @Test
@@ -238,17 +237,22 @@ class DataServiceTest {
         def caze = dataService.changeComponentProperties(aCase, 'button_0', new HashMap<String, String>(){{
             put("stretch", "true");}}).getCase();
 
-        assert caze.getPetriNet().getDataSet().get("button_0").getComponent().getName() == "raised";
-        assert caze.getPetriNet().getDataSet().get("button_0").getComponent().getProperties().get("stretch") == "true";
-        assert caze.getPetriNet().getTransition("t1").getDataSet().get("button_0").getComponent().getName() == "raised";
-        assert caze.getPetriNet().getTransition("t1").getDataSet().get("button_0").getComponent().getProperties().get("stretch") == "true";
+        assert caze.getDataField("button_0").getComponent().getName() == "raised";
+        assert caze.getDataField("button_0").getComponent().getProperties().get("stretch") == "true";
+        assert caze.getDataField("button_0").getDataRefComponents().get("t1") == null
 
         caze = dataService.changeComponentProperties(aCase, 'button_1', new HashMap<String, String>(){{
             put("stretch", "true");}}).getCase();
 
-        assert caze.getPetriNet().getDataSet().get("button_1").getComponent().getName() == 'default';
-        assert caze.getPetriNet().getDataSet().get("button_1").getComponent().getProperties().get("stretch") == "true";
-        assert caze.getPetriNet().getTransition("t1").getDataSet().get("button_1").getComponent().getName() == "stroked";
-        assert caze.getPetriNet().getTransition("t1").getDataSet().get("button_1").getComponent().getProperties().isEmpty();
+        assert caze.getDataField("button_1").getComponent().getName() == 'default';
+        assert caze.getDataField("button_1").getComponent().getProperties().get("stretch") == "true";
+        assert caze.getDataField("button_1").getDataRefComponents().get("t1").getName() == "stroked";
+        assert caze.getDataField("button_1").getDataRefComponents().get("t1").getProperties().isEmpty();
+
+        caze = dataService.changeComponentProperties(aCase, "t1",'button_1', new HashMap<String, String>(){{
+            put("stretch", "true");}}).getCase();
+
+        assert caze.getDataField("button_1").getDataRefComponents().get("t1").getName() == "stroked";
+        assert caze.getDataField("button_1").getDataRefComponents().get("t1").getProperties().get("stretch") == "true";
     }
 }

@@ -18,14 +18,14 @@
 		<id>enumeration_0</id>
 		<title/>
 	</data>
-	<data type="enumeration">
+	<data type="button">
 		<id>button_0</id>
 		<title/>
 		<component>
 			<name>raised</name>
 		</component>
 	</data>
-	<data type="enumeration">
+	<data type="button">
 		<id>button_1</id>
 		<title/>
 	</data>
