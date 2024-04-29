@@ -16,6 +16,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.2](h
 - [NAE-1956] setData fails on setting allowedNets without value key
 - [NAE-1959] Indexing enumerationMap field fails when no options exist
 - [NAE-1960] Enumeration Map does not propagate changes when selecting
+- [NAE-1967] Elasticsearch disable dynamic field mapping
 
 ### Added
 - [NAE-1901] Taskref list rendering update
@@ -33,6 +34,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.2](h
 - [NAE-1813] Field id as path variable in TaskController
 - [NAE-1955] Update setData to handle options / choices
 - [NAE-1958] Make component properties changeable
+- [NAE-1962] Event properties
 
 ### Changed
 - [NAE-1947] HistoryService findAllSetDataEventLogs is not working
