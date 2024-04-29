@@ -42,7 +42,7 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
 @Service
 public class ElasticCaseService extends ElasticViewPermissionService implements IElasticCaseService {
 
-    protected static final Logger log = LoggerFactory.getLogger(ElasticCaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(ElasticCaseService.class);
 
     protected ElasticCaseRepository repository;
 
