@@ -28,29 +28,6 @@ public abstract class Renderer {
 
     Color colorString, colorLabelString, colorDataGroupLabel;
 
-    public abstract int renderLabel(PdfField field) throws IOException;
-
-    public void setupRenderer(IPdfDrawer pdfDrawer, PdfResource resource) {
-        this.pdfDrawer = pdfDrawer;
-        this.resource = resource;
-        this.marginLeft = resource.getMarginLeft();
-        this.marginBottom = resource.getMarginBottom();
-        this.marginTop = resource.getMarginTop();
-        this.lineHeight = resource.getLineHeight();
-        this.pageDrawableWidth = resource.getPageDrawableWidth();
-        this.padding = resource.getPadding();
-        this.colorString = Color.decode(resource.getColorString().toUpperCase());
-        this.colorDataGroupLabel = Color.decode(resource.getColorDataGroup().toUpperCase());
-        this.colorLabelString = Color.decode(resource.getColorLabelString().toUpperCase());
-        this.baseX = resource.getBaseX();
-        this.pageHeight = resource.getPageHeight();
-        this.fontValueSize = resource.getFontValueSize();
-        this.fontLabelSize = resource.getFontLabelSize();
-        this.fontTitleSize = resource.getFontTitleSize();
-        this.strokeWidth = resource.getStrokeWidth();
-    }
-
-
     protected static int getTextWidth(List<String> values, PDType0Font font, int fontSize, PdfResource resource) throws IOException {
         int result = 0;
         for (String value : values) {
@@ -59,10 +36,6 @@ public abstract class Renderer {
                 result = (int) (font.getStringWidth(formattedValue) / 1000 * fontSize);
         }
         return result;
-    }
-
-    protected int getMaxLabelLineSize(int fieldWidth, int fontSize) {
-        return (int) ((fieldWidth - padding) * resource.getSizeMultiplier() / fontSize);
     }
 
     public static String removeUnsupportedChars(String input, PdfResource resource) {
@@ -88,5 +61,31 @@ public abstract class Renderer {
         } catch (IllegalArgumentException | IOException iae) {
             return false;
         }
+    }
+
+    public abstract int renderLabel(PdfField field) throws IOException;
+
+    public void setupRenderer(IPdfDrawer pdfDrawer, PdfResource resource) {
+        this.pdfDrawer = pdfDrawer;
+        this.resource = resource;
+        this.marginLeft = resource.getMarginLeft();
+        this.marginBottom = resource.getMarginBottom();
+        this.marginTop = resource.getMarginTop();
+        this.lineHeight = resource.getLineHeight();
+        this.pageDrawableWidth = resource.getPageDrawableWidth();
+        this.padding = resource.getPadding();
+        this.colorString = Color.decode(resource.getColorString().toUpperCase());
+        this.colorDataGroupLabel = Color.decode(resource.getColorDataGroup().toUpperCase());
+        this.colorLabelString = Color.decode(resource.getColorLabelString().toUpperCase());
+        this.baseX = resource.getBaseX();
+        this.pageHeight = resource.getPageHeight();
+        this.fontValueSize = resource.getFontValueSize();
+        this.fontLabelSize = resource.getFontLabelSize();
+        this.fontTitleSize = resource.getFontTitleSize();
+        this.strokeWidth = resource.getStrokeWidth();
+    }
+
+    protected int getMaxLabelLineSize(int fieldWidth, int fontSize) {
+        return (int) ((fieldWidth - padding) * resource.getSizeMultiplier() / fontSize);
     }
 }

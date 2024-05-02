@@ -6,11 +6,11 @@ public interface RegisteredUser extends IUser {
 
     String getToken();
 
+    void setToken(String token);
+
     String getPassword();
 
     void setPassword(String password);
-
-    void setToken(String token);
 
     void setExpirationDate(LocalDateTime expirationDate);
 }

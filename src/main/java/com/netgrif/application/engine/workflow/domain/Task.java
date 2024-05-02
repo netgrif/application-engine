@@ -21,15 +21,17 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Document
 @AllArgsConstructor
 @Builder(builderMethodName = "with")
-public class Task {
+public class Task implements Serializable {
+
+    private static final long serialVersionUID = -7112277728921547546L;
 
     @Id
     @Builder.Default
@@ -189,6 +191,11 @@ public class Task {
 
     private Map<String, Integer> consumedTokens = new HashMap<>();
 
+    @Getter
+    @Setter
+    @Builder.Default
+    private Map<String, String> tags = new HashMap<>();
+
     public Task() {
     }
 
@@ -299,13 +306,6 @@ public class Task {
         return eventTitles.get(assign).getTranslation(locale);
     }
 
-    public enum Type {
-        USER,
-        AUTO,
-        TIME,
-        MESSAGE,
-    }
-
     public void resolveViewRoles() {
         getViewRoles();
         this.viewRoles.clear();
@@ -342,5 +342,12 @@ public class Task {
                 users.get(userId).put(id, perm);
             }
         });
+    }
+
+    public enum Type {
+        USER,
+        AUTO,
+        TIME,
+        MESSAGE,
     }
 }

@@ -12,7 +12,7 @@ public class PlaceImportReference extends Node {
     private Boolean isStatic;
 
     public PlaceImportReference(Place place) {
-        this.setPosition(place.getPosition().getX(), place.getPosition().getY());
+        this.setPosition(place.getPosition());
         this.setTitle(place.getTitle());
         this.setObjectId(place.getObjectId());
         this.setImportId(place.getImportId());

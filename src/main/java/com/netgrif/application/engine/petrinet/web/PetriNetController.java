@@ -6,6 +6,7 @@ import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
@@ -43,10 +44,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/petrinet")
@@ -75,6 +80,17 @@ public class PetriNetController {
     @Autowired
     private AsyncRunner asyncRunner;
 
+    public static String decodeUrl(String s1) {
+        try {
+            if (s1 == null)
+                return null;
+            return URLDecoder.decode(s1, StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            log.error("Decoding URL failed: ", e);
+            return "";
+        }
+    }
+
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Import new process",
             description = "Caller must have the ADMIN role. Imports an entirely new process or a new version of an existing process.",
@@ -87,11 +103,12 @@ public class PetriNetController {
     @PostMapping(value = "/import", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> importPetriNet(
             @RequestParam(value = "file", required = true) MultipartFile multipartFile,
+            @RequestParam(value = "uriNodeId", required = true) String uriNodeId,
             @RequestParam(value = "meta", required = false) String releaseType,
             Authentication auth, Locale locale) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
             VersionType release = releaseType == null ? VersionType.MAJOR : VersionType.valueOf(releaseType.trim().toUpperCase());
-            ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(multipartFile.getInputStream(), release, (LoggedUser) auth.getPrincipal());
+            ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(multipartFile.getInputStream(), release, (LoggedUser) auth.getPrincipal(), uriNodeId);
             return EventOutcomeWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully",
                     LocalisedEventOutcomeFactory.from(importPetriNetOutcome, locale));
         } catch (IOException e) {
@@ -155,6 +172,7 @@ public class PetriNetController {
         return new TransactionsResource(net.getTransactions().values(), netId, locale);
     }
 
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Download process model", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{netId}/file", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public FileSystemResource getNetFile(@PathVariable("netId") String netId, @RequestParam(value = "title", required = false) String title, Authentication auth, HttpServletResponse response) {
@@ -169,7 +187,7 @@ public class PetriNetController {
     @Operation(summary = "Search processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search", produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
-    PagedModel<PetriNetReferenceResource> searchPetriNets(@RequestBody Map<String, Object> criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
+    PagedModel<PetriNetReferenceResource> searchPetriNets(@RequestBody PetriNetSearch criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         Page<PetriNetReference> nets = service.search(criteria, user, pageable, locale);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetriNetController.class)
@@ -202,17 +220,6 @@ public class PetriNetController {
     @Operation(summary = "Get net by case id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public PetriNetImportReference getOne(@PathVariable("id") String caseId) {
-            return service.getNetFromCase(decodeUrl(caseId));
-    }
-
-    public static String decodeUrl(String s1) {
-        try {
-            if (s1 == null)
-                return null;
-            return URLDecoder.decode(s1, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            log.error("Decoding URL failed: ", e);
-            return "";
-        }
+        return service.getNetFromCase(decodeUrl(caseId));
     }
 }

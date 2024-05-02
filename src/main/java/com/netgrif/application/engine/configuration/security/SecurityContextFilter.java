@@ -14,13 +14,13 @@ import java.io.IOException;
 
 /**
  * Request filter for filtering out user tokens
- * */
+ */
 @Slf4j
 public class SecurityContextFilter extends OncePerRequestFilter {
 
     /**
      * Security context service for managing user tokens
-     * */
+     */
     private final ISecurityContextService securityContextService;
 
     public SecurityContextFilter(ISecurityContextService securityContextService) {
@@ -29,7 +29,7 @@ public class SecurityContextFilter extends OncePerRequestFilter {
 
     /**
      * Filter function that helps to filter out the user token and call corresponding service when it is needed
-     * */
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (securityContextService.isAuthenticatedPrincipalLoggedUser())

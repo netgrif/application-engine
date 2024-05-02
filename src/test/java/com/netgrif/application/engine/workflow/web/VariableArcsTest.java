@@ -9,6 +9,7 @@ import com.netgrif.application.engine.auth.domain.UserState;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
@@ -103,7 +104,7 @@ public class VariableArcsTest {
         repository.deleteAll();
         assertNotNull(processRoleService.defaultRole());
         testHelper.truncateDbs();
-        ImportPetriNetEventOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), VersionType.MAJOR, superCreator.getLoggedSuper());
 
         assert outcome.getNet() != null;
         PetriNet net = outcome.getNet();

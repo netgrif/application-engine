@@ -6,7 +6,9 @@ import com.querydsl.core.annotations.QueryType
 import org.bson.types.ObjectId
 
 
-class Action {
+class Action implements Serializable{
+
+    private static final long serialVersionUID = 3687481049847555522L;
 
     private String importId;
 
@@ -98,6 +100,10 @@ class Action {
         this.transitionIds = transitionIds
     }
 
+    void setId(ObjectId id) {
+        this.id = id
+    }
+
     @Override
     String toString() {
         return "[$trigger] $definition"
@@ -123,6 +129,7 @@ class Action {
     @Override
     Action clone() {
         Action clone = new Action()
+        clone.setId(new ObjectId(this.getId().toString()))
         clone.setTrigger(this.trigger)
         clone.setDefinition(this.definition)
         clone.setImportId(this.importId)
