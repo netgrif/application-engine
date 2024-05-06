@@ -72,25 +72,6 @@ public class PluginService implements IPluginService {
         return existingPlugin == null ? register(plugin) : activate(plugin, existingPlugin.getId());
     }
 
-    private String register(Plugin plugin) {
-        return saveAndInject(plugin, "registered");
-    }
-
-    private String activate(Plugin plugin, ObjectId existingPluginId) {
-        plugin.setActive(true);
-        plugin.setId(existingPluginId);
-        return saveAndInject(plugin, "activated"); // we must also re-inject the plugin in case of there is a change of entry points
-    }
-
-    private String saveAndInject(Plugin plugin, String state) {
-        pluginRepository.save(plugin);
-        PluginInjector.inject(plugin);
-
-        String responseMsg = "Plugin with identifier \"" + plugin.getIdentifier() + "\" was " + state + ".";
-        log.info(responseMsg);
-        return responseMsg;
-    }
-
     /**
      * Calls method with arguments of a specified entry point
      *
@@ -150,6 +131,25 @@ public class PluginService implements IPluginService {
      * */
     public List<Plugin> findAll() {
         return pluginRepository.findAll();
+    }
+
+    private String register(Plugin plugin) {
+        return saveAndInject(plugin, "registered");
+    }
+
+    private String activate(Plugin plugin, ObjectId existingPluginId) {
+        plugin.setActive(true);
+        plugin.setId(existingPluginId);
+        return saveAndInject(plugin, "activated"); // we must also re-inject the plugin in case of there is a change of entry points
+    }
+
+    private String saveAndInject(Plugin plugin, String state) {
+        pluginRepository.save(plugin);
+        PluginInjector.inject(plugin);
+
+        String responseMsg = "Plugin with identifier \"" + plugin.getIdentifier() + "\" was " + state + ".";
+        log.info(responseMsg);
+        return responseMsg;
     }
 
 }
