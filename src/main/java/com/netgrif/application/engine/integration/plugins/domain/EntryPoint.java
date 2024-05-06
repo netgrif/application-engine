@@ -9,6 +9,7 @@ import java.util.Map;
 public class EntryPoint {
     private String name;
     private Map<String, Method> methods;
+
     public EntryPoint() {
         this.methods = new LinkedHashMap<>();
     }

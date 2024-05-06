@@ -11,6 +11,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.SerializationUtils;
 
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -29,13 +31,17 @@ import java.util.stream.Collectors;
 public final class PluginRegistrationService extends RegistrationServiceGrpc.RegistrationServiceImplBase {
     private final IPluginService pluginService;
 
+
+    /**
+     * Registers or activate plugin provided by request.
+     *
+     * @param request request containing information about the plugin to be registered
+     * */
     @Override
     public void register(RegistrationRequest request, StreamObserver<RegistrationResponse> responseObserver) {
         try {
-            pluginService.register(convert(request));
-            RegistrationResponse response = RegistrationResponse.newBuilder()
-                    .setMessage("Plugin with identifier \"" + request.getIdentifier() + "\" was successfully registered.")
-                    .build();
+            String responseMsg = pluginService.registerOrActivate(convertRequestToModel(request));
+            RegistrationResponse response = RegistrationResponse.newBuilder().setMessage(responseMsg).build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (IllegalArgumentException e) {
@@ -43,13 +49,16 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
         }
     }
 
+    /**
+     * Deactivates plugin provided by request.
+     *
+     * @param request request containing information about the plugin to be deactivated
+     * */
     @Override
     public void deactivate(DeactivationRequest request, StreamObserver<DeactivationResponse> responseObserver) {
         try {
-            pluginService.deactivate(request.getIdentifier());
-            DeactivationResponse response = DeactivationResponse.newBuilder()
-                    .setMessage("Plugin with identifier \"" + request.getIdentifier() + "\" was successfully deactivated.")
-                    .build();
+            String responseMsg = pluginService.deactivate(request.getIdentifier());
+            DeactivationResponse response = DeactivationResponse.newBuilder().setMessage(responseMsg).build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (IllegalArgumentException e) {
@@ -58,24 +67,31 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
 
     }
 
-    private Plugin convert(RegistrationRequest request) {
+    private Plugin convertRequestToModel(RegistrationRequest request) {
         Plugin plugin = new Plugin();
         plugin.setIdentifier(request.getIdentifier());
         plugin.setName(request.getName());
         plugin.setUrl(request.getUrl());
         plugin.setPort(request.getPort());
         plugin.setActive(true);
-        plugin.setEntryPoints(request.getEntryPointsList().stream().map(entryPoint -> {
-            EntryPoint ep = new EntryPoint();
-            ep.setName(entryPoint.getName());
-            ep.setMethods(entryPoint.getMethodsList().stream().map(method -> {
-                Method mth = new Method();
-                mth.setName(method.getName());
-                mth.setArgs(method.getArgsList().stream().map(arg -> (Class<?>) SerializationUtils.deserialize(arg.toByteArray())).collect(Collectors.toList()));
-                return mth;
-            }).collect(Collectors.toMap(Method::getName, Function.identity())));
-            return ep;
-        }).collect(Collectors.toMap(EntryPoint::getName, Function.identity())));
+        plugin.setEntryPoints(convertEntryPointsFromRequest(request.getEntryPointsList()));
         return plugin;
+    }
+
+    private Map<String, EntryPoint> convertEntryPointsFromRequest(List<com.netgrif.pluginlibrary.core.EntryPoint> entryPoints) {
+        return entryPoints.stream().map(epReq -> {
+            EntryPoint epModel = new EntryPoint();
+            epModel.setName(epReq.getName());
+            epModel.setMethods(epReq.getMethodsList().stream().map(methodReq -> {
+                Method methodModel = new Method();
+                methodModel.setName(methodReq.getName());
+                methodModel.setArgs(methodReq.getArgsList().stream()
+                        .map(arg -> (Class<?>) SerializationUtils.deserialize(arg.toByteArray()))
+                        .collect(Collectors.toList())
+                );
+                return methodModel;
+            }).collect(Collectors.toMap(Method::getName, Function.identity())));
+            return epModel;
+        }).collect(Collectors.toMap(EntryPoint::getName, Function.identity()));
     }
 }

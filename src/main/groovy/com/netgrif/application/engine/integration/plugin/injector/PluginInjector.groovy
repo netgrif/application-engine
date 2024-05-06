@@ -9,6 +9,11 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 
 class PluginInjector {
 
+    /**
+     * Injects provided plugin into meta class of {@link ActionDelegate}
+     *
+     * @param plugin model of plugin to be injected
+     * */
     static void inject(Plugin plugin) {
         MetaClass actionDelegateMeta = ActionDelegate.metaClass
         MetaClass pluginMetaClass = PluginMeta.metaClass

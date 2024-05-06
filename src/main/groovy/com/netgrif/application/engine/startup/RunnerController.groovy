@@ -15,6 +15,7 @@ class RunnerController {
             AuthorityRunner,
             SystemUserRunner,
             UriRunner,
+            PluginRunner,
             FunctionsCacheRunner,
             FilterRunner,
             GroupRunner,

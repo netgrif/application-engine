@@ -64,7 +64,7 @@
         <drools.version>7.70.0.Final</drools.version>
         <sonar.organization>netgrif-oss</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <grpc.version>1.53.0</grpc.version>
+        <grpc.version>1.63.0</grpc.version>
         <protobuf.version>3.17.3</protobuf.version>
     </properties>
 

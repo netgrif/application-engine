@@ -13,6 +13,7 @@ import io.grpc.ServerBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
+import org.bson.types.ObjectId;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Base service that manages gRPC server on application startup, registers, activates and deactivates plugins, sends
+ * Base service, that manages gRPC server on application startup, registers, activates and deactivates plugins, sends
  * plugin execution requests to desired plugin.
  * */
 @Slf4j
@@ -41,6 +42,8 @@ public class PluginService implements IPluginService {
     private final PluginConfigProperties properties;
     private Server server;
 
+    private static final String LOG_PREFIX = "[gRPC Server] -";
+
     @PostConstruct
     public void startServer() throws IOException {
         server = ServerBuilder
@@ -48,46 +51,64 @@ public class PluginService implements IPluginService {
                 .addService(new PluginRegistrationService(this))
                 .build();
         server.start();
-        log.info("[gRPC Server] - Started on port " + properties.getPort());
+        log.info(LOG_PREFIX + " Started on port " + properties.getPort());
     }
 
     @PreDestroy
     public void stopServer() {
         server.shutdown();
-        log.info("[gRPC Server] - Sopped server on port " + properties.getPort());
+        log.info(LOG_PREFIX + " Stopped server on port " + properties.getPort());
     }
 
     /**
-     * @param plugin - plugin to be registered, or if already registered, then activate
+     * Registers provided plugin into repository. If the plugin already exists, it's activated.
+     * @param plugin - plugin to be registered, or if already registered, then activated
+     *
+     * @return activation or registration string message is returned
      * */
     @Override
-    public void register(Plugin plugin) {
+    public String registerOrActivate(Plugin plugin) {
         Plugin existingPlugin = pluginRepository.findByIdentifier(plugin.getIdentifier());
-        if (existingPlugin != null) {
-            log.warn("Plugin with identifier \"" + plugin.getIdentifier() + "\" has already been registered. Plugin will be activated.");
-            plugin.setId(existingPlugin.getId());
-        }
+        return existingPlugin == null ? register(plugin) : activate(plugin, existingPlugin.getId());
+    }
+
+    private String register(Plugin plugin) {
+        return saveAndInject(plugin, "registered");
+    }
+
+    private String activate(Plugin plugin, ObjectId existingPluginId) {
+        plugin.setActive(true);
+        plugin.setId(existingPluginId);
+        return saveAndInject(plugin, "activated"); // we must also re-inject the plugin in case of there is a change of entry points
+    }
+
+    private String saveAndInject(Plugin plugin, String state) {
         pluginRepository.save(plugin);
         PluginInjector.inject(plugin);
-        if (existingPlugin != null) {
-            log.info("Plugin with identifier \"" + plugin.getIdentifier() + "\" was activated.");
-        } else {
-            log.info("Plugin with identifier \"" + plugin.getIdentifier() + "\" was registered.");
-        }
+
+        String responseMsg = "Plugin with identifier \"" + plugin.getIdentifier() + "\" was " + state + ".";
+        log.info(responseMsg);
+        return responseMsg;
     }
 
     /**
-     * @param pluginId ID of plugin that contains the method that should be executed
-     * @param entryPoint name of entry point in plugin that contains the method that should be executed
-     * @param method name of method that should be executed
+     * Calls method with arguments of a specified entry point
+     *
+     * @param pluginId plugin identifier, that contains the method to be executed
+     * @param entryPoint name of entry point in plugin, that contains the method to be executed
+     * @param method name of method to be executed
      * @param args arguments to send to plugin method. All args should be the exact type of method input arguments type (not superclass, or subclass)
+     *
      * @return the returned object of the executed plugin method
      * */
     @Override
-    public Object call(String pluginId, String entryPoint, String method, Serializable... args) {
+    public Object call(String pluginId, String entryPoint, String method, Serializable... args) throws IllegalArgumentException {
         Plugin plugin = pluginRepository.findByIdentifier(pluginId);
         if (plugin == null) {
             throw new IllegalArgumentException("Plugin with identifier \"" + pluginId + "\" cannot be found");
+        }
+        if (!plugin.isActive()) {
+            throw new IllegalArgumentException("Plugin with name \"" + plugin.getName() + "\" is deactivated");
         }
         ManagedChannel channel = ManagedChannelBuilder.forAddress(plugin.getUrl(), (int) plugin.getPort())
                 .usePlaintext()
@@ -104,18 +125,31 @@ public class PluginService implements IPluginService {
     }
 
     /**
-     * @param identifier Identifier of plugin, that should be deactivated.
+     * Deactivates the plugin of the provided identifier
+     *
+     * @param identifier Identifier of the plugin, that should be deactivated.
      * */
     @Override
-    public void deactivate(String identifier) {
+    public String deactivate(String identifier) throws IllegalArgumentException {
         Plugin existingPlugin = pluginRepository.findByIdentifier(identifier);
         if (existingPlugin == null) {
             throw new IllegalArgumentException("Plugin with identifier \"" + identifier + "\" cannot be deactivated. Plugin with this identifier does not exist.");
         }
         existingPlugin.setActive(false);
         pluginRepository.save(existingPlugin);
-        log.info("Plugin with identifier \"" + identifier + "\" was deactivated.");
+
+        String responseMsg = "Plugin with identifier \"" + identifier + "\" was deactivated.";
+        log.info(responseMsg);
+        return responseMsg;
     }
 
+    /**
+     * Finds all plugins in the database
+     *
+     * @return list of plugins
+     * */
+    public List<Plugin> findAll() {
+        return pluginRepository.findAll();
+    }
 
 }
