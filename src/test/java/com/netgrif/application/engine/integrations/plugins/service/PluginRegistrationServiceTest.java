@@ -39,4 +39,15 @@ public class PluginRegistrationServiceTest {
         assert foundPlugin.isActive();
     }
 
+    @Test
+    public void testUnregister() {
+        MockPlugin.registerOrActivatePlugin();
+        Plugin foundPlugin = repository.findByIdentifier(MockPlugin.mockIdentifier);
+        assert foundPlugin != null;
+
+        MockPlugin.unregisterPlugin();
+        foundPlugin = repository.findByIdentifier(MockPlugin.mockIdentifier);
+        assert foundPlugin == null;
+    }
+
 }

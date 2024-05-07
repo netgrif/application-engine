@@ -3,6 +3,7 @@ package com.netgrif.application.engine.integrations.plugins.mock;
 import com.netgrif.pluginlibrary.core.DeactivationRequest;
 import com.netgrif.pluginlibrary.core.RegistrationRequest;
 import com.netgrif.pluginlibrary.core.RegistrationServiceGrpc;
+import com.netgrif.pluginlibrary.core.UnregistrationRequest;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
@@ -22,6 +23,18 @@ public class MockPlugin {
                 .setName(mockName)
                 .setUrl("mockurl")
                 .setPort(9999)
+                .build());
+        channel.shutdown();
+    }
+
+    public static void unregisterPlugin() {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8081)
+                .usePlaintext()
+                .build();
+
+        RegistrationServiceGrpc.RegistrationServiceBlockingStub stub = RegistrationServiceGrpc.newBlockingStub(channel);
+        stub.unregister(UnregistrationRequest.newBuilder()
+                .setIdentifier(mockIdentifier)
                 .build());
         channel.shutdown();
     }
