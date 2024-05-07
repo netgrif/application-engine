@@ -8,6 +8,8 @@ import java.util.List;
 public interface IPluginService {
     String registerOrActivate(Plugin plugin);
 
+    String unregister(String identifier) throws IllegalArgumentException;
+
     Object call(String pluginId, String entryPoint, String method, Serializable... args) throws IllegalArgumentException;
 
     String deactivate(String identifier) throws IllegalArgumentException;

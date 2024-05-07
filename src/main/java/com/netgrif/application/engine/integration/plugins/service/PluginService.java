@@ -73,6 +73,27 @@ public class PluginService implements IPluginService {
     }
 
     /**
+     * Unregisters provided plugin from memory and database
+     * @param identifier - identifier of the plugin to be unregistered
+     *
+     * @return unregistration string message is returned
+     * */
+    @Override
+    public String unregister(String identifier) {
+        Plugin plugin = pluginRepository.findByIdentifier(identifier);
+        if (plugin == null) {
+            throw new IllegalArgumentException("Plugin with identifier \"" + identifier + "\" cannot be found");
+        }
+
+        PluginInjector.uninject(plugin);
+        pluginRepository.delete(plugin);
+
+        String responseMsg = "Plugin with identifier \"" + identifier + "\" was unregistered.";
+        log.info(responseMsg);
+        return responseMsg;
+    }
+
+    /**
      * Calls method with arguments of a specified entry point
      *
      * @param pluginId plugin identifier, that contains the method to be executed

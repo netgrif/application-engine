@@ -50,6 +50,23 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
     }
 
     /**
+     * Unregisters plugin provided by request.
+     *
+     * @param request request containing identifier of the plugin
+     * */
+    @Override
+    public void unregister(UnregistrationRequest request, StreamObserver<UnregistrationResponse> responseObserver) {
+        try {
+            String responseMsg = pluginService.unregister(request.getIdentifier());
+            UnregistrationResponse response = UnregistrationResponse.newBuilder().setMessage(responseMsg).build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (IllegalArgumentException e) {
+            responseObserver.onError(e);
+        }
+    }
+
+    /**
      * Deactivates plugin provided by request.
      *
      * @param request request containing information about the plugin to be deactivated
