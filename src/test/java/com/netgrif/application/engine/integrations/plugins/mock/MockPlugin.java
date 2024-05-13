@@ -1,16 +1,18 @@
 package com.netgrif.application.engine.integrations.plugins.mock;
 
-import com.netgrif.pluginlibrary.core.DeactivationRequest;
-import com.netgrif.pluginlibrary.core.RegistrationRequest;
-import com.netgrif.pluginlibrary.core.RegistrationServiceGrpc;
-import com.netgrif.pluginlibrary.core.UnregistrationRequest;
+import com.google.protobuf.ByteString;
+import com.netgrif.pluginlibrary.core.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import org.apache.commons.lang3.SerializationUtils;
 
 public class MockPlugin {
 
     public static final String mockIdentifier = "mock_plugin";
     public static final String mockName = "mockPlugin";
+    public static final String mockEntryPointName = "mockEntryPoint";
+    public static final String mockMethodName = "mockMethodName";
+    public static final Class<String> mockArgumentType = String.class;
 
     public static void registerOrActivatePlugin() {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8081)
@@ -23,6 +25,13 @@ public class MockPlugin {
                 .setName(mockName)
                 .setUrl("mockurl")
                 .setPort(9999)
+                .addEntryPoints(EntryPoint.newBuilder()
+                        .setName(mockEntryPointName)
+                        .addMethods(Method.newBuilder()
+                                .setName(mockMethodName)
+                                .addArgs(ByteString.copyFrom(SerializationUtils.serialize(mockArgumentType)))
+                                .build())
+                        .build())
                 .build());
         channel.shutdown();
     }

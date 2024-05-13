@@ -1,0 +1,76 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>entry_point</id>
+	<version>1.0.0</version>
+	<initials>ENP</initials>
+	<title>Entry point</title>
+	<icon>class</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<data type="text" immediate="true">
+		<id>name</id>
+		<title>Name</title>
+	</data>
+	<data type="caseRef">
+		<id>method_ids</id>
+		<title>Table of methods</title>
+		<allowedNets>
+			<allowedNet>method</allowedNet>
+		</allowedNets>
+	</data>
+	<!--	todo translations-->
+	<transition>
+		<id>detail</id>
+		<x>432</x>
+		<y>144</y>
+		<label>Detail</label>
+		<dataGroup>
+			<id>detail_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>name</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>method_ids</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>304</x>
+		<y>144</y>
+		<label/>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>read</type>
+		<sourceId>p1</sourceId>
+		<destinationId>detail</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

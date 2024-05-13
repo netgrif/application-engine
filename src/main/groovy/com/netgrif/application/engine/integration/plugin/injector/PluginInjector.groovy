@@ -3,47 +3,68 @@ package com.netgrif.application.engine.integration.plugin.injector
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
 import com.netgrif.application.engine.integration.plugin.injector.meta.EntryPointMeta
 import com.netgrif.application.engine.integration.plugin.injector.meta.PluginMeta
-import com.netgrif.application.engine.integration.plugins.domain.Plugin
 import com.netgrif.application.engine.integration.plugins.service.PluginService
+import com.netgrif.application.engine.integration.plugins.utils.PluginUtils
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
+import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
 
+@Service
 class PluginInjector {
+
+    @Autowired
+    protected IWorkflowService workflowService
+
+    @Autowired
+    protected PluginUtils utils
 
     /**
      * Injects provided plugin into meta class of {@link ActionDelegate}
      *
-     * @param plugin model of plugin to be injected
+     * @param plugin case of plugin to be injected
      * */
-    static void inject(Plugin plugin) {
+    void inject(Case plugin) {
         updateMetaClasses(plugin, false)
     }
 
     /**
      * Removes provided plugin from the meta class of {@link ActionDelegate}.
      *
-     * @param plugin model of plugin to be uninjected
+     * @param plugin case of plugin to be uninjected
      * */
-    static void uninject(Plugin plugin) {
+    void uninject(Case plugin) {
         updateMetaClasses(plugin, true)
     }
 
-    protected static void updateMetaClasses(Plugin plugin, boolean isRemoval) {
+    protected void updateMetaClasses(Case pluginCase, boolean isRemoval) {
         MetaClass actionDelegateMeta = ActionDelegate.metaClass
         MetaClass pluginMetaClass = PluginMeta.metaClass
-        plugin.entryPoints.each {ep ->
+
+        List<Case> entryPointCases = utils.getPluginEntryPoints(pluginCase)
+        String pluginIdentifier = PluginUtils.getPluginIdentifier(pluginCase)
+        String pluginName = PluginUtils.getPluginName(pluginCase)
+
+        entryPointCases.each { epCase ->
             MetaClass entryPointMetaClass = EntryPointMeta.metaClass
-            ep.value.methods.each { m ->
+            List<Case> methodCases = utils.getEntryPointMethods(epCase)
+            String epName = PluginUtils.getEntryPointName(epCase)
+
+            methodCases.each { methodCase ->
+                String methodName = PluginUtils.getMethodName(methodCase)
+
                 if (isRemoval) {
-                    entryPointMetaClass[m.value.name] = null
+                    entryPointMetaClass[methodName] = null
                 } else {
-                    entryPointMetaClass[m.value.name] << { Serializable... args ->
+                    entryPointMetaClass[methodName] << { Serializable... args ->
                         PluginService pluginService = ApplicationContextProvider.getBean("pluginService") as PluginService
-                        return pluginService.call(plugin.identifier, ep.value.name, m.value.name, args)
+                        return pluginService.call(pluginIdentifier, epName, methodName, args)
                     }
                 }
             }
-            pluginMetaClass[ep.value.name] = isRemoval ? null : new EntryPointMeta()
+            pluginMetaClass[epName] = isRemoval ? null : new EntryPointMeta()
         }
-        actionDelegateMeta[plugin.name] = isRemoval ? null : new PluginMeta()
+        actionDelegateMeta[pluginName] = isRemoval ? null : new PluginMeta()
     }
 }

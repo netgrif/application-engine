@@ -1,12 +1,14 @@
 package com.netgrif.application.engine.integration.plugins.service;
 
-import com.netgrif.application.engine.integration.plugins.domain.Plugin;
+import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.pluginlibrary.core.RegistrationRequest;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
 public interface IPluginService {
-    String registerOrActivate(Plugin plugin);
+    String registerOrActivate(RegistrationRequest request);
 
     String unregister(String identifier) throws IllegalArgumentException;
 
@@ -14,5 +16,7 @@ public interface IPluginService {
 
     String deactivate(String identifier) throws IllegalArgumentException;
 
-    List<Plugin> findAll();
+    List<Case> findAll();
+
+    Optional<Case> findByIdentifier(String identifier);
 }

@@ -239,7 +239,14 @@ class ImportHelper {
         superCreator.setAllToSuperUser();
     }
 
+    @Deprecated
     static ObjectNode populateDataset(Map<String, Map<String, String>> data) {
+        ObjectMapper mapper = new ObjectMapper()
+        String json = mapper.writeValueAsString(data)
+        return mapper.readTree(json) as ObjectNode
+    }
+
+    static ObjectNode populateDatasetAsObjects(Map<String, Map<String, Object>> data) {
         ObjectMapper mapper = new ObjectMapper()
         String json = mapper.writeValueAsString(data)
         return mapper.readTree(json) as ObjectNode
