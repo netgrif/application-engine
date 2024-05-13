@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.integration.plugins.service;
 
 import com.netgrif.pluginlibrary.core.*;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +37,10 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (RuntimeException e) {
-            log.error("Something went wrong when registering or activating plugin with identifier [{}]", request.getIdentifier(), e);
-            responseObserver.onError(e);
+            String message = String.format("Something went wrong when registering or activating plugin with identifier [%s]",
+                    request.getIdentifier());
+            log.error(message, e);
+            responseObserver.onError(new StatusRuntimeException(Status.INTERNAL.withDescription(message)));
         }
     }
 
@@ -53,8 +57,10 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (RuntimeException e) {
-            log.error("Something went wrong when unregistering plugin with identifier [{}]", request.getIdentifier(), e);
-            responseObserver.onError(e);
+            String message = String.format("Something went wrong when unregistering plugin with identifier [%s]",
+                    request.getIdentifier());
+            log.error(message, e);
+            responseObserver.onError(new StatusRuntimeException(Status.INTERNAL.withDescription(message)));
         }
     }
 
@@ -71,8 +77,10 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (RuntimeException e) {
-            log.error("Something went wrong when deactivating plugin with identifier [{}]", request.getIdentifier(), e);
-            responseObserver.onError(e);
+            String message = String.format("Something went wrong when deactivating plugin with identifier [%s]",
+                    request.getIdentifier());
+            log.error(message, e);
+            responseObserver.onError(new StatusRuntimeException(Status.INTERNAL.withDescription(message)));
         }
     }
 }

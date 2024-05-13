@@ -113,7 +113,7 @@ public class PluginRegistrationServiceTest {
     // register deactivate unregister
     // register unregister
     // unregister missing
-    // register with corrupt request -> check rollback
+    // register with corrupt request -> check rollback and status exception
     // activate missing plugin
 
 }
