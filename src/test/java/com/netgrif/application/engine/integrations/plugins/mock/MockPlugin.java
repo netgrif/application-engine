@@ -9,11 +9,12 @@ import org.apache.commons.lang3.SerializationUtils;
 public class MockPlugin {
 
     public static final String mockIdentifier = "mock_plugin";
-    public static final String mockName = "mockPlugin";
-    public static final String mockEntryPointName = "mockEntryPoint";
-    public static final String mockMethodName = "mockMethodName";
+    public static String mockName = "mockPlugin";
+    public static String mockEntryPointName = "mockEntryPoint";
+    public static String mockMethodName = "mockMethodName";
     public static final Class<String> mockArgumentType = String.class;
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void registerOrActivatePlugin() {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8081)
                 .usePlaintext()
@@ -36,6 +37,18 @@ public class MockPlugin {
         channel.shutdown();
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static void registerWithCustomRequest(RegistrationRequest request) {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8081)
+                .usePlaintext()
+                .build();
+
+        RegistrationServiceGrpc.RegistrationServiceBlockingStub stub = RegistrationServiceGrpc.newBlockingStub(channel);
+        stub.register(request);
+        channel.shutdown();
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void unregisterPlugin() {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8081)
                 .usePlaintext()
@@ -48,6 +61,18 @@ public class MockPlugin {
         channel.shutdown();
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static void unregisterPluginWithCustomRequest(UnregistrationRequest request) {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8081)
+                .usePlaintext()
+                .build();
+
+        RegistrationServiceGrpc.RegistrationServiceBlockingStub stub = RegistrationServiceGrpc.newBlockingStub(channel);
+        stub.unregister(request);
+        channel.shutdown();
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void deactivatePlugin() {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8081)
                 .usePlaintext()
@@ -57,6 +82,17 @@ public class MockPlugin {
         stub.deactivate(DeactivationRequest.newBuilder()
                 .setIdentifier(mockIdentifier)
                 .build());
+        channel.shutdown();
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static void deactivatePluginWithCustomRequest(DeactivationRequest request) {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8081)
+                .usePlaintext()
+                .build();
+
+        RegistrationServiceGrpc.RegistrationServiceBlockingStub stub = RegistrationServiceGrpc.newBlockingStub(channel);
+        stub.deactivate(request);
         channel.shutdown();
     }
 }

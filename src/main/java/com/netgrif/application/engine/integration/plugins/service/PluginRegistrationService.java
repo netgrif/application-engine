@@ -1,9 +1,12 @@
 package com.netgrif.application.engine.integration.plugins.service;
 
+import com.netgrif.application.engine.integration.plugins.exceptions.InvalidRequestException;
+import com.netgrif.application.engine.integration.plugins.exceptions.PluginIsAlreadyActiveException;
 import com.netgrif.pluginlibrary.core.*;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
+import joptsimple.internal.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -32,10 +35,14 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
     @Override
     public void register(RegistrationRequest request, StreamObserver<RegistrationResponse> responseObserver) {
         try {
+            validateRequest(request);
             String responseMsg = pluginService.registerOrActivate(request);
             RegistrationResponse response = RegistrationResponse.newBuilder().setMessage(responseMsg).build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
+        } catch (PluginIsAlreadyActiveException | InvalidRequestException e) {
+            log.error(e.getMessage(), e);
+            responseObserver.onError(new StatusRuntimeException(Status.INVALID_ARGUMENT.withDescription(e.getMessage())));
         } catch (RuntimeException e) {
             String message = String.format("Something went wrong when registering or activating plugin with identifier [%s]",
                     request.getIdentifier());
@@ -52,10 +59,14 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
     @Override
     public void unregister(UnregistrationRequest request, StreamObserver<UnregistrationResponse> responseObserver) {
         try {
+            validateRequest(request);
             String responseMsg = pluginService.unregister(request.getIdentifier());
             UnregistrationResponse response = UnregistrationResponse.newBuilder().setMessage(responseMsg).build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
+        } catch (InvalidRequestException e) {
+            log.error(e.getMessage(), e);
+            responseObserver.onError(new StatusRuntimeException(Status.INVALID_ARGUMENT.withDescription(e.getMessage())));
         } catch (RuntimeException e) {
             String message = String.format("Something went wrong when unregistering plugin with identifier [%s]",
                     request.getIdentifier());
@@ -72,15 +83,53 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
     @Override
     public void deactivate(DeactivationRequest request, StreamObserver<DeactivationResponse> responseObserver) {
         try {
+            validateRequest(request);
             String responseMsg = pluginService.deactivate(request.getIdentifier());
             DeactivationResponse response = DeactivationResponse.newBuilder().setMessage(responseMsg).build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
+        } catch (InvalidRequestException e) {
+            log.error(e.getMessage(), e);
+            responseObserver.onError(new StatusRuntimeException(Status.INVALID_ARGUMENT.withDescription(e.getMessage())));
         } catch (RuntimeException e) {
             String message = String.format("Something went wrong when deactivating plugin with identifier [%s]",
                     request.getIdentifier());
             log.error(message, e);
             responseObserver.onError(new StatusRuntimeException(Status.INTERNAL.withDescription(message)));
+        }
+    }
+
+    private void validateRequest(RegistrationRequest request) throws InvalidRequestException {
+        if (request.getIdentifier().equals(Strings.EMPTY)) {
+            throw new InvalidRequestException("Plugin identifier is null or empty");
+        }
+        if (request.getName().equals(Strings.EMPTY)) {
+            throw new InvalidRequestException("Plugin name is null or empty");
+        }
+        if (request.getUrl().equals(Strings.EMPTY)) {
+            throw new InvalidRequestException("Plugin URL is null or empty");
+        }
+        for (EntryPoint ep : request.getEntryPointsList()) {
+            if (ep.getName().equals(Strings.EMPTY)) {
+                throw new InvalidRequestException("Entry point name is null or empty");
+            }
+            for (Method m : ep.getMethodsList()) {
+                if (m.getName().equals(Strings.EMPTY)) {
+                    throw new InvalidRequestException("Method name is null or empty");
+                }
+            }
+        }
+    }
+
+    private void validateRequest(UnregistrationRequest request) throws InvalidRequestException {
+        if (request.getIdentifier().equals(Strings.EMPTY)) {
+            throw new InvalidRequestException("Plugin identifier is null or empty");
+        }
+    }
+
+    private void validateRequest(DeactivationRequest request) {
+        if (request.getIdentifier().equals(Strings.EMPTY)) {
+            throw new InvalidRequestException("Plugin identifier is null or empty");
         }
     }
 }

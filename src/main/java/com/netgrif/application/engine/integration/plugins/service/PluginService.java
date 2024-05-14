@@ -7,6 +7,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.integration.plugin.injector.PluginInjector;
+import com.netgrif.application.engine.integration.plugins.exceptions.PluginIsAlreadyActiveException;
 import com.netgrif.application.engine.integration.plugins.outcomes.CreateOrUpdateOutcome;
 import com.netgrif.application.engine.integration.plugins.outcomes.GetOrCreateOutcome;
 import com.netgrif.application.engine.integration.plugins.properties.PluginConfigProperties;
@@ -27,11 +28,11 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.util.SerializationUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -91,7 +92,7 @@ public class PluginService implements IPluginService {
      * @return activation or registration string message is returned
      */
     @Override
-    public String registerOrActivate(RegistrationRequest request) {
+    public String registerOrActivate(RegistrationRequest request) throws PluginIsAlreadyActiveException {
         Optional<Case> existingPluginOpt = findByIdentifier(request.getIdentifier());
         try {
             if (existingPluginOpt.isPresent()) {
@@ -119,13 +120,7 @@ public class PluginService implements IPluginService {
 
         pluginInjector.uninject(existingPluginOpt.get());
 
-        for (Case entryPointCase : utils.getPluginEntryPoints(existingPluginOpt.get())) {
-            for (Case methodCase : utils.getEntryPointMethods(entryPointCase)) {
-                workflowService.deleteCase(methodCase);
-            }
-            workflowService.deleteCase(entryPointCase);
-        }
-        workflowService.deleteCase(existingPluginOpt.get());
+        removePluginCase(existingPluginOpt.get());
 
         String responseMsg = "Plugin with identifier \"" + identifier + "\" was unregistered.";
         log.info(responseMsg);
@@ -154,7 +149,8 @@ public class PluginService implements IPluginService {
         ManagedChannel channel = ManagedChannelBuilder.forAddress(getPluginUrl(pluginCase), getPluginPort(pluginCase))
                 .usePlaintext()
                 .build();
-        List<ByteString> argBytes = Arrays.stream(args).map(arg -> ByteString.copyFrom(SerializationUtils.serialize(arg))).collect(Collectors.toList());
+        List<ByteString> argBytes = Arrays.stream(args).map(arg -> ByteString.copyFrom(
+                Objects.requireNonNull(SerializationUtils.serialize(arg)))).collect(Collectors.toList());
         ExecutionServiceGrpc.ExecutionServiceBlockingStub stub = ExecutionServiceGrpc.newBlockingStub(channel);
         ExecutionResponse responseMessage = stub.execute(ExecutionRequest.newBuilder()
                 .setEntryPoint(entryPoint)
@@ -232,11 +228,14 @@ public class PluginService implements IPluginService {
         return inject(pluginCase, "registered");
     }
 
-    private String activate(Case pluginCase, RegistrationRequest request) throws TransitionNotExecutableException {
-        pluginCase = createOrUpdatePluginCase(request, Optional.of(pluginCase));
-        if (!isPluginActive(pluginCase)) {
-            pluginCase = doActivation(pluginCase);
+    private String activate(Case pluginCase, RegistrationRequest request) throws TransitionNotExecutableException,
+            PluginIsAlreadyActiveException {
+        if (isPluginActive(pluginCase)) {
+            throw new PluginIsAlreadyActiveException(String.format("Plugin with identifier [%s] is already active. Plugin must be inactive.",
+                    request.getIdentifier()));
         }
+        pluginCase = createOrUpdatePluginCase(request, Optional.of(pluginCase));
+        pluginCase = doActivation(pluginCase);
         return inject(pluginCase, "activated"); // we must also re-inject the plugin in case of there is a change of entry points
     }
 
@@ -287,7 +286,7 @@ public class PluginService implements IPluginService {
             String taskId = findTaskIdInCase(pluginCase, PLUGIN_ACTIVATE_TRANS_ID);
             dataService.setData(taskId, ImportHelper.populateDatasetAsObjects(dataToSet));
 
-            removeCases(epToBeRemovedIds);
+            removeEntryPointCases(epToBeRemovedIds);
 
             return pluginCase;
         } catch (Exception rethrow) {
@@ -312,8 +311,8 @@ public class PluginService implements IPluginService {
                 CreateOrUpdateOutcome methodOutcome = createOrUpdateMethodCases(entryPoint, loggedUser,
                         utils.getEntryPointMethods(entryPointCase));
                 outcome.addAllCreatedCaseId(methodOutcome.getCreatedCaseIds());
-                Set<String> epToBeRemovedIds = new HashSet<>(getEntryPointMethodIds(entryPointCase));
-                epToBeRemovedIds.removeAll(methodOutcome.getSubjectCaseIds());
+                Set<String> methodToBeRemovedIds = new HashSet<>(getEntryPointMethodIds(entryPointCase));
+                methodToBeRemovedIds.removeAll(methodOutcome.getSubjectCaseIds());
 
                 Map<String, Map<String, Object>> dataToSet = new HashMap<>();
                 dataToSet.put(ENTRY_POINT_NAME_FIELD_ID, Map.of("value", entryPoint.getName(), "type",
@@ -324,7 +323,7 @@ public class PluginService implements IPluginService {
                 String taskId = findTaskIdInCase(entryPointCase, ENTRY_POINT_DETAIL_TRANS_ID);
                 dataService.setData(taskId, ImportHelper.populateDatasetAsObjects(dataToSet));
 
-                removeCases(epToBeRemovedIds);
+                removeCases(methodToBeRemovedIds);
             }
 
             return outcome;
@@ -363,7 +362,7 @@ public class PluginService implements IPluginService {
                         "type", FieldType.TEXT.getName()));
                 List<String> argTypesAsString = method.getArgsList().stream()
                         .map(arg -> {
-                            Class<?> clazz = (Class<?>) org.springframework.util.SerializationUtils.deserialize(arg.toByteArray());
+                            Class<?> clazz = (Class<?>) SerializationUtils.deserialize(arg.toByteArray());
                             assert clazz != null;
                             return clazz.getName();
                         })
@@ -391,8 +390,26 @@ public class PluginService implements IPluginService {
         return new GetOrCreateOutcome(methodCase, methodCaseOpt.isEmpty());
     }
 
-    private void removeCases(Set<String> createdCaseIds) {
-        for (String caseId : createdCaseIds) {
+    private void removePluginCase(Case pluginCase) {
+        removeEntryPointCases(utils.getPluginEntryPoints(pluginCase));
+        workflowService.deleteCase(pluginCase);
+    }
+
+    private void removeEntryPointCases(Set<String> entryPointCaseIds) {
+        removeEntryPointCases(entryPointCaseIds.stream().map(workflowService::findOne).collect(Collectors.toList()));
+    }
+
+    private void removeEntryPointCases(List<Case> entryPointCases) {
+        for (Case entryPointCase : entryPointCases) {
+            for (Case methodCase : utils.getEntryPointMethods(entryPointCase)) {
+                workflowService.deleteCase(methodCase);
+            }
+            workflowService.deleteCase(entryPointCase);
+        }
+    }
+
+    private void removeCases(Set<String> caseIds) {
+        for (String caseId : caseIds) {
             Case caseToRemove = workflowService.findOne(caseId);
             if (caseToRemove != null) {
                 workflowService.deleteCase(caseId);
