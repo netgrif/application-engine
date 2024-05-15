@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.configuration.authentication.providers;
 
 import com.netgrif.application.engine.auth.service.interfaces.ILoginAttemptService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -9,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import javax.servlet.http.HttpServletRequest;
 
 public abstract class NetgrifAuthenticationProvider implements AuthenticationProvider {
 

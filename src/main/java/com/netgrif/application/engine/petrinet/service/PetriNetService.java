@@ -38,6 +38,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutc
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
@@ -56,7 +57,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import javax.inject.Provider;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

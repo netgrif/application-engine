@@ -23,14 +23,18 @@ enum FieldBehavior {
     FieldBehavior(String name, boolean populate) {
         this.name = name
         if (populate) {
-            REQUIRED.setAntonyms()
-            OPTIONAL.setAntonyms()
-            VISIBLE.setAntonyms()
-            EDITABLE.setAntonyms()
-            HIDDEN.setAntonyms()
-            FORBIDDEN.setAntonyms()
-            IMMEDIATE.setAntonyms()
+            initAntonyms()
         }
+    }
+
+    private static void initAntonyms() {
+        REQUIRED.setAntonyms()
+        OPTIONAL.setAntonyms()
+        VISIBLE.setAntonyms()
+        EDITABLE.setAntonyms()
+        HIDDEN.setAntonyms()
+        FORBIDDEN.setAntonyms()
+        IMMEDIATE.setAntonyms()
     }
 
     private FieldBehavior[] addAntonyms() {

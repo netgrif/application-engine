@@ -4,6 +4,7 @@ package com.netgrif.application.engine.configuration.security;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.configuration.security.interfaces.IAuthenticationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,6 @@ import org.springframework.security.core.session.SessionDestroyedEvent;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
