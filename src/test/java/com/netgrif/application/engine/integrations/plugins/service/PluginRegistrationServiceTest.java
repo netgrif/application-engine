@@ -1,13 +1,17 @@
 package com.netgrif.application.engine.integrations.plugins.service;
 
 import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.integration.plugins.utils.PluginUtils;
 import com.netgrif.application.engine.integrations.plugins.mock.MockPlugin;
+import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QCase;
+import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.pluginlibrary.core.*;
 import io.grpc.Status;
@@ -45,6 +49,9 @@ public class PluginRegistrationServiceTest {
     private IUserService userService;
 
     @Autowired
+    private ITaskService taskService;
+
+    @Autowired
     private PluginUtils utils;
 
     private static final int ELASTIC_WAIT_TIME_IN_MS = 2000;
@@ -55,10 +62,11 @@ public class PluginRegistrationServiceTest {
         helper.createNet("engine-processes/plugin/plugin.xml");
         helper.createNet("engine-processes/plugin/entry_point.xml");
         helper.createNet("engine-processes/plugin/method.xml");
+        helper.createNet("plugin/test_plugin_injector.xml");
     }
 
     @Test
-    public void testRegistrationDeactivationAndActivation() throws InterruptedException {
+    public void testRegistrationDeactivationAndActivation() throws InterruptedException, TransitionNotExecutableException {
         MockPlugin.registerOrActivatePlugin();
 
         Page<Case> pluginCases = workflowService.search(QCase.case$.processIdentifier.eq("plugin"), Pageable.ofSize(2));
@@ -92,6 +100,7 @@ public class PluginRegistrationServiceTest {
         assert !PluginUtils.isPluginActive(pluginCase);
         assert !pluginCase.getActivePlaces().containsKey("active");
         assert pluginCase.getActivePlaces().get("inactive").equals(1);
+        testIsInjected();
 
         MockPlugin.registerOrActivatePlugin();
         pluginCase = workflowService.findOne(pluginCase.getStringId());
@@ -102,17 +111,19 @@ public class PluginRegistrationServiceTest {
     }
 
     @Test
-    public void testRegisterAndUnregister() throws InterruptedException {
+    public void testRegisterAndUnregister() throws InterruptedException, TransitionNotExecutableException {
         MockPlugin.registerOrActivatePlugin();
         Page<Case> pluginCases = workflowService.search(QCase.case$.processIdentifier.eq("plugin"), Pageable.ofSize(2));
         assert pluginCases.getTotalElements() == 1;
         Case pluginCase = pluginCases.getContent().get(0);
         assert pluginCase != null;
+        testIsInjected();
 
         Thread.sleep(ELASTIC_WAIT_TIME_IN_MS);
 
         MockPlugin.unregisterPlugin();
         assertIfAnyCaseExists();
+        testIsNotInjected();
     }
 
     @Test
@@ -290,6 +301,24 @@ public class PluginRegistrationServiceTest {
         StatusRuntimeException e = assertThrows(StatusRuntimeException.class, () -> MockPlugin.unregisterPluginWithCustomRequest(corruptReq));
         assert e.getStatus().getCode().value() == Status.INVALID_ARGUMENT.getCode().value();
         assertIfAnyCaseNotExists();
+    }
+
+    private void testIsInjected() throws TransitionNotExecutableException {
+        Case testCase = doTestInjection("injection");
+        assert (Boolean) testCase.getFieldValue("is_injected");
+    }
+
+    private void testIsNotInjected() throws TransitionNotExecutableException {
+        Case testCase = doTestInjection("uninjection");
+        assert !((Boolean) testCase.getFieldValue("is_injected"));
+    }
+
+    private Case doTestInjection(String transitionId) throws TransitionNotExecutableException {
+        LoggedUser loggedUser = userService.getSystem().transformToLoggedUser();
+        Case testCase = workflowService.createCaseByIdentifier("test_plugin_injector", "", "", loggedUser).getCase();
+        String taskId = PluginUtils.findTaskIdInCase(testCase, transitionId);
+        Task injectionTask = taskService.assignTask(taskId).getTask();
+        return taskService.finishTask(injectionTask, loggedUser.transformToUser()).getCase();
     }
 
     private void assertIfAnyCaseExists() {

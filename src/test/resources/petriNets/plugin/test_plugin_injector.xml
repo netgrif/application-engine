@@ -1,0 +1,92 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>test_plugin_injector</id>
+	<version>1.0.0</version>
+	<initials>TPI</initials>
+	<title>test_plugin_injector</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<data type="boolean">
+		<id>is_injected</id>
+		<title/>
+	</data>
+	<transition>
+		<id>uninjection</id>
+		<x>240</x>
+		<y>176</y>
+		<label>TestUninjection</label>
+		<event type="finish">
+			<id>0</id>
+			<actions phase="post">
+				<action>
+					is_injected: f.is_injected;
+					try {
+						mockPlugin.mockEntryPoint.mockMethodName("test")
+					} catch (NullPointerException ignore) {
+						change is_injected value { false }
+					}
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>injection</id>
+		<x>240</x>
+		<y>80</y>
+		<label>TestInjection</label>
+		<event type="finish">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					is_injected: f.is_injected;
+					try {
+						mockPlugin.mockEntryPoint.mockMethodName("test")
+						change is_injected value { true }
+					} catch (NullPointerException ignore) {
+						change is_injected value { false }
+					} catch (Exception ignore) {
+						// target microservice is not running
+						change is_injected value { true }
+					}
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>112</x>
+		<y>112</y>
+		<label/>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>injection</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>injection</sourceId>
+		<destinationId>p1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>uninjection</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>uninjection</sourceId>
+		<destinationId>p1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>
