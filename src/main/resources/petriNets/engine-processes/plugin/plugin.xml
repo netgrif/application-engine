@@ -13,29 +13,46 @@
 	</data>
 	<data type="text" immediate="true">
 		<id>name</id>
-		<title>Name</title>
+		<title name="name">Name</title>
 	</data>
 	<data type="text">
 		<id>url</id>
-		<title>Url</title>
+		<title name="url">Url</title>
 	</data>
 	<data type="number">
 		<id>port</id>
-		<title>Port</title>
+		<title name="port">Port</title>
 	</data>
 	<data type="boolean" immediate="true">
 		<id>active</id>
-		<title>Is active</title>
+		<title name="active">Is active</title>
 		<init>false</init>
 	</data>
 	<data type="caseRef">
 		<id>entry_point_ids</id>
-		<title>Table of EntryPoints</title>
+		<title/>
 		<allowedNets>
 			<allowedNet>entry_point</allowedNet>
 		</allowedNets>
 	</data>
-	<!--	todo translations-->
+	<i18n locale="sk">
+		<i18nString name="name">Názov</i18nString>
+		<i18nString name="url">Url</i18nString>
+		<i18nString name="port">Port</i18nString>
+		<i18nString name="active">Je aktívny</i18nString>
+		<i18nString name="detail">Detail</i18nString>
+		<i18nString name="activate">Aktivovať</i18nString>
+		<i18nString name="deactivate">Deaktivovať</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="name">Name</i18nString>
+		<i18nString name="url">Url</i18nString>
+		<i18nString name="port">Port</i18nString>
+		<i18nString name="active">Ist aktiv</i18nString>
+		<i18nString name="detail">Detail</i18nString>
+		<i18nString name="activate">Aktivieren</i18nString>
+		<i18nString name="deactivate">Deaktivieren</i18nString>
+	</i18n>
 	<transition>
 		<id>init</id>
 		<x>400</x>
@@ -47,7 +64,7 @@
 		<id>detail</id>
 		<x>400</x>
 		<y>176</y>
-		<label>Detail</label>
+		<label name="detail">Detail</label>
 		<dataGroup>
 			<id>detail_0</id>
 			<cols>4</cols>
@@ -142,7 +159,7 @@
 		<id>activate</id>
 		<x>624</x>
 		<y>304</y>
-		<label>Activate</label>
+		<label name="activate">Activate</label>
 		<event type="finish">
 			<id>onFinish_activate</id>
 			<actions phase="post">
@@ -157,7 +174,7 @@
 		<id>deactivate</id>
 		<x>624</x>
 		<y>432</y>
-		<label>Deactivate</label>
+		<label name="deactivate">Deactivate</label>
 		<event type="finish">
 			<id>onFinish_deactivate</id>
 			<actions phase="post">

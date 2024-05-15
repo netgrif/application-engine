@@ -9,21 +9,28 @@
 	<transitionRole>false</transitionRole>
 	<data type="text" immediate="true">
 		<id>name</id>
-		<title>Name</title>
+		<title name="name">Name</title>
 	</data>
 	<data type="caseRef">
 		<id>method_ids</id>
-		<title>Table of methods</title>
+		<title/>
 		<allowedNets>
 			<allowedNet>method</allowedNet>
 		</allowedNets>
 	</data>
-	<!--	todo translations-->
+	<i18n locale="sk">
+		<i18nString name="name">Názov</i18nString>
+		<i18nString name="detail">Detail</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="name">Name</i18nString>
+		<i18nString name="detail">Detail</i18nString>
+	</i18n>
 	<transition>
 		<id>detail</id>
 		<x>432</x>
 		<y>144</y>
-		<label>Detail</label>
+		<label name="detail">Detail</label>
 		<dataGroup>
 			<id>detail_0</id>
 			<cols>4</cols>

@@ -76,13 +76,13 @@ public class PluginService implements IPluginService {
                 .addService(new PluginRegistrationService(this))
                 .build();
         server.start();
-        log.info(LOG_PREFIX + " Started on port " + properties.getPort());
+        log.info("{} Started on port {}", LOG_PREFIX, properties.getPort());
     }
 
     @PreDestroy
     public void stopServer() {
         server.shutdown();
-        log.info(LOG_PREFIX + " Stopped server on port " + properties.getPort());
+        log.info("{} Stopped server on port {}", LOG_PREFIX, properties.getPort());
     }
 
     /**
