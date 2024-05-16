@@ -1,15 +1,17 @@
 package com.netgrif.application.engine.elastic.service.interfaces;
 
-import org.elasticsearch.index.query.QueryStringQueryBuilder;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
+
+import java.util.List;
 import java.util.Map;
 
 public interface IElasticCasePrioritySearch {
 
     /**
-     * See {@link QueryStringQueryBuilder#fields(Map)}
+     * See {@link QueryStringQuery.Builder#fields(List)}
      *
-     * @return map where keys are ElasticCase field names and values are boosts of these fields
+     * @return list where members are ElasticCase field with boost separated by "^" of these fields, e.g. ["stringId^2"]
      */
-    Map<String, Float> fullTextFields();
+    List<String> fullTextFields();
 }
