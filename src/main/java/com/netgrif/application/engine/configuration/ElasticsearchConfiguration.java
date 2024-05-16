@@ -65,19 +65,19 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
         return uriProperties.getIndex();
     }
 
-    @Bean
-    public ElasticsearchClient elasticsearchClient(RestClient elasticSearchRestClient) {
-        ElasticsearchTransport transport = new RestClientTransport(
-                elasticSearchRestClient,
-                new JacksonJsonpMapper()
-        );
-        return new ElasticsearchClient(transport);
-    }
-
-    @Bean
-    public ElasticsearchTemplate elasticsearchTemplate(ElasticsearchClient elasticsearchClient) {
-        return new ElasticsearchTemplate(elasticsearchClient);
-    }
+//    @Bean
+//    public ElasticsearchClient elasticsearchClient(RestClient elasticSearchRestClient) {
+//        ElasticsearchTransport transport = new RestClientTransport(
+//                elasticSearchRestClient,
+//                new JacksonJsonpMapper()
+//        );
+//        return new ElasticsearchClient(transport);
+//    }
+//
+//    @Bean
+//    public ElasticsearchTemplate elasticsearchTemplate(ElasticsearchClient elasticsearchClient) {
+//        return new ElasticsearchTemplate(elasticsearchClient);
+//    }
 
     @Bean
     public CaseEventHandler caseEventHandler() {
