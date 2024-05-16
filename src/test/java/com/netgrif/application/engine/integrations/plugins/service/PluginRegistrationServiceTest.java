@@ -135,7 +135,7 @@ public class PluginRegistrationServiceTest {
     }
 
     @Test
-    public void testRegisterDeactivateEditAndActivate() throws InterruptedException {
+    public void testRegisterDeactivateEditAndActivate() throws InterruptedException, TransitionNotExecutableException {
         MockPlugin.registerOrActivatePlugin();
 
         Thread.sleep(ELASTIC_WAIT_TIME_IN_MS);
@@ -159,6 +159,8 @@ public class PluginRegistrationServiceTest {
         MockPlugin.mockMethodName = "methodNewName";
 
         MockPlugin.registerOrActivatePlugin();
+
+        testIsNotInjected(); // will not assert if the old meta classes are uninjected
 
         pluginCase = workflowService.findOne(pluginCase.getStringId());
         assert getPluginName(pluginCase).equals("pluginNewName");
@@ -305,12 +307,12 @@ public class PluginRegistrationServiceTest {
 
     private void testIsInjected() throws TransitionNotExecutableException {
         Case testCase = doTestInjection("injection");
-        assert (Boolean) testCase.getFieldValue("is_injected");
+        assert (Boolean) testCase.getFieldValue("is_injected"): "Plugin is not injected";
     }
 
     private void testIsNotInjected() throws TransitionNotExecutableException {
         Case testCase = doTestInjection("uninjection");
-        assert !((Boolean) testCase.getFieldValue("is_injected"));
+        assert !((Boolean) testCase.getFieldValue("is_injected")): "Plugin is still injected";
     }
 
     private Case doTestInjection(String transitionId) throws TransitionNotExecutableException {

@@ -234,6 +234,7 @@ public class PluginService implements IPluginService {
             throw new PluginIsAlreadyActiveException(String.format("Plugin with identifier [%s] is already active. Plugin must be inactive.",
                     request.getIdentifier()));
         }
+        pluginInjector.uninject(pluginCase); // remove potentially outdated meta classes
         pluginCase = createOrUpdatePluginCase(request, Optional.of(pluginCase));
         pluginCase = doActivation(pluginCase);
         return inject(pluginCase, "activated"); // we must also re-inject the plugin in case of there is a change of entry points

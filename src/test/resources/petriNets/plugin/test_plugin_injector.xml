@@ -23,8 +23,11 @@
 					is_injected: f.is_injected;
 					try {
 						mockPlugin.mockEntryPoint.mockMethodName("test")
+						change is_injected value { true }
 					} catch (NullPointerException ignore) {
 						change is_injected value { false }
+					} catch (io.grpc.StatusRuntimeException ignore) {
+						change is_injected value { true }
 					}
 				</action>
 			</actions>
@@ -46,7 +49,7 @@
 					} catch (NullPointerException ignore) {
 						change is_injected value { false }
 					} catch (Exception ignore) {
-						// target microservice is not running
+						// target microservice is not running or is deactivated
 						change is_injected value { true }
 					}
 				</action>
