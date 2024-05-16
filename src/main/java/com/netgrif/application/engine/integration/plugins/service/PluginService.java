@@ -38,6 +38,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.io.Serializable;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -100,7 +101,7 @@ public class PluginService implements IPluginService {
             } else {
                 return register(request);
             }
-        } catch (TransitionNotExecutableException e) {
+        } catch (TransitionNotExecutableException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
     }
@@ -222,19 +223,19 @@ public class PluginService implements IPluginService {
         return result.hasContent() ? Optional.of(result.getContent().get(0)) : Optional.empty();
     }
 
-    private String register(RegistrationRequest request) throws TransitionNotExecutableException {
+    private String register(RegistrationRequest request) throws TransitionNotExecutableException, NoSuchAlgorithmException {
         Case pluginCase = createOrUpdatePluginCase(request, Optional.empty());
         pluginCase = doActivation(pluginCase);
         return inject(pluginCase, "registered");
     }
 
     private String activate(Case pluginCase, RegistrationRequest request) throws TransitionNotExecutableException,
-            PluginIsAlreadyActiveException {
+            PluginIsAlreadyActiveException, NoSuchAlgorithmException {
         if (isPluginActive(pluginCase)) {
             throw new PluginIsAlreadyActiveException(String.format("Plugin with identifier [%s] is already active. Plugin must be inactive.",
                     request.getIdentifier()));
         }
-        pluginInjector.uninject(pluginCase); // remove potentially outdated meta classes
+        pluginInjector.uninject(pluginCase); // remove potentially outdated meta data
         pluginCase = createOrUpdatePluginCase(request, Optional.of(pluginCase));
         pluginCase = doActivation(pluginCase);
         return inject(pluginCase, "activated"); // we must also re-inject the plugin in case of there is a change of entry points
@@ -255,7 +256,7 @@ public class PluginService implements IPluginService {
         return responseMsg;
     }
 
-    private Case createOrUpdatePluginCase(RegistrationRequest request, Optional<Case> pluginCaseOpt) {
+    private Case createOrUpdatePluginCase(RegistrationRequest request, Optional<Case> pluginCaseOpt) throws NoSuchAlgorithmException {
         Set<String> createdCaseIds = new HashSet<>();
         LoggedUser loggedUser = userService.getLoggedOrSystem().transformToLoggedUser();
 
@@ -296,7 +297,8 @@ public class PluginService implements IPluginService {
         }
     }
 
-    private CreateOrUpdateOutcome createOrUpdateEntryPointCases(List<EntryPoint> entryPoints, LoggedUser loggedUser, List<Case> existingEpCases) {
+    private CreateOrUpdateOutcome createOrUpdateEntryPointCases(List<EntryPoint> entryPoints, LoggedUser loggedUser,
+                                                                List<Case> existingEpCases) throws NoSuchAlgorithmException {
         CreateOrUpdateOutcome outcome = new CreateOrUpdateOutcome();
 
         try {
@@ -344,12 +346,19 @@ public class PluginService implements IPluginService {
     }
 
     private CreateOrUpdateOutcome createOrUpdateMethodCases(EntryPoint entryPoint, LoggedUser loggedUser,
-                                                            List<Case> existingMethodCases) {
+                                                            List<Case> existingMethodCases) throws NoSuchAlgorithmException {
         CreateOrUpdateOutcome outcome = new CreateOrUpdateOutcome();
 
         try {
             for (com.netgrif.pluginlibrary.core.Method method : entryPoint.getMethodsList()) {
-                GetOrCreateOutcome methodOutcome = getOrCreateMethodCase(method, loggedUser, existingMethodCases);
+                List<String> argTypesAsString = method.getArgsList().stream()
+                        .map(arg -> {
+                            Class<?> clazz = (Class<?>) SerializationUtils.deserialize(arg.toByteArray());
+                            assert clazz != null;
+                            return clazz.getName();
+                        })
+                        .collect(Collectors.toList());
+                GetOrCreateOutcome methodOutcome = getOrCreateMethodCase(method, loggedUser, argTypesAsString, existingMethodCases);
 
                 Case methodCase = methodOutcome.getSubjectCase();
                 if (methodOutcome.isNew()) {
@@ -361,15 +370,10 @@ public class PluginService implements IPluginService {
                 Map<String, Map<String, Object>> dataToSet = new HashMap<>();
                 dataToSet.put(METHOD_NAME_FIELD_ID, Map.of("value", method.getName(),
                         "type", FieldType.TEXT.getName()));
-                List<String> argTypesAsString = method.getArgsList().stream()
-                        .map(arg -> {
-                            Class<?> clazz = (Class<?>) SerializationUtils.deserialize(arg.toByteArray());
-                            assert clazz != null;
-                            return clazz.getName();
-                        })
-                        .collect(Collectors.toList());
                 dataToSet.put(METHOD_ARGUMENTS_FIELD_ID, Map.of("value", argTypesAsString, "type",
                         FieldType.STRING_COLLECTION.getName()));
+                dataToSet.put(METHOD_HASHED_SIGNATURE_FIELD_ID, Map.of("value", methodOutcome.getAdditionalData(),
+                        "type", FieldType.TEXT.getName()));
 
                 String taskId = findTaskIdInCase(methodCase, METHOD_DETAIL_TRANS_ID);
                 dataService.setData(taskId, ImportHelper.populateDatasetAsObjects(dataToSet));
@@ -382,13 +386,16 @@ public class PluginService implements IPluginService {
         }
     }
 
-    private GetOrCreateOutcome getOrCreateMethodCase(Method method, LoggedUser loggedUser, List<Case> existingMethodCases) {
+    private GetOrCreateOutcome getOrCreateMethodCase(Method method, LoggedUser loggedUser, List<String> argTypes,
+                                                     List<Case> existingMethodCases)
+            throws NoSuchAlgorithmException {
+        String hashedSignature = PluginUtils.hashMethodSignature(method.getName(), argTypes);
         Optional<Case> methodCaseOpt = existingMethodCases.stream()
-                .filter((aCase) -> getMethodName(aCase).equals(method.getName()))
+                .filter((aCase) -> getMethodSignatureHash(aCase).equals(hashedSignature))
                 .findFirst();
         Case methodCase = methodCaseOpt.orElseGet(() -> workflowService.createCaseByIdentifier(METHOD_PROCESS_IDENTIFIER,
                 method.getName(), "", loggedUser).getCase());
-        return new GetOrCreateOutcome(methodCase, methodCaseOpt.isEmpty());
+        return new GetOrCreateOutcome(methodCase, methodCaseOpt.isEmpty(), hashedSignature);
     }
 
     private void removePluginCase(Case pluginCase) {

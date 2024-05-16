@@ -38,7 +38,7 @@ public class MockPlugin {
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void registerWithCustomRequest(RegistrationRequest request) {
+    public static void registerOrActivateWithCustomRequest(RegistrationRequest request) {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8081)
                 .usePlaintext()
                 .build();

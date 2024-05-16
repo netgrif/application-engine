@@ -15,6 +15,10 @@
 		<id>arguments</id>
 		<title name="arguments">Method arguments</title>
 	</data>
+	<data type="text">
+		<id>hashed_signature</id>
+		<title/>
+	</data>
 	<i18n locale="sk">
 		<i18nString name="name">Názov</i18nString>
 		<i18nString name="arguments">Argumenty funkcie</i18nString>

@@ -9,4 +9,10 @@ import lombok.Getter;
 public class GetOrCreateOutcome {
     private final Case subjectCase;
     private final boolean isNew;
+    private Object additionalData;
+
+    public GetOrCreateOutcome(Case subjectCase, boolean isNew) {
+        this.subjectCase = subjectCase;
+        this.isNew = isNew;
+    }
 }

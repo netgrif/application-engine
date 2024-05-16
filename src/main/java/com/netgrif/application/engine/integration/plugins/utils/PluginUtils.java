@@ -12,6 +12,9 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -146,6 +149,13 @@ public class PluginUtils {
     }
 
     /**
+     * Finds method signature hash from the dataSet of the provided method case
+     * */
+    public static String getMethodSignatureHash(Case methodCase) {
+        return (String) methodCase.getFieldValue(PluginConstants.METHOD_HASHED_SIGNATURE_FIELD_ID);
+    }
+
+    /**
      * Assigns task by provided task id. If the task is already assigned, it cancels the task and tries again.
      *
      * @param taskId task id of the task to be assigned
@@ -164,5 +174,32 @@ public class PluginUtils {
             aTask = taskService.cancelTask(aTask, user).getTask();
             return taskService.assignTask(aTask, user);
         }
+    }
+
+    /**
+     * Creates SHA-256 hash of method name and list of argument types.
+     *
+     * @param methodName name of the method
+     * @param argTypes list of argument types as string
+     *
+     * @return SHA-256 string hash of the provided input
+     * */
+    public static String hashMethodSignature(String methodName, List<String> argTypes) throws NoSuchAlgorithmException {
+        String original = methodName + argTypes;
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] encodedHash = digest.digest(original.getBytes(StandardCharsets.UTF_8));
+        return bytesToHex(encodedHash);
+    }
+
+    private static String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (byte b : hash) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 }

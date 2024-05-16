@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.integrations.plugins.service;
 
+import com.google.protobuf.ByteString;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
@@ -16,6 +17,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import com.netgrif.pluginlibrary.core.*;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
+import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.netgrif.application.engine.integration.plugins.utils.PluginUtils.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -160,7 +163,7 @@ public class PluginRegistrationServiceTest {
 
         MockPlugin.registerOrActivatePlugin();
 
-        testIsNotInjected(); // will not assert if the old meta classes are uninjected
+        testIsNotInjected(); // will not assert if the old metadata are uninjected
 
         pluginCase = workflowService.findOne(pluginCase.getStringId());
         assert getPluginName(pluginCase).equals("pluginNewName");
@@ -192,6 +195,47 @@ public class PluginRegistrationServiceTest {
     @Test
     public void testUnregisterMissing() {
         assertThrows(StatusRuntimeException.class, MockPlugin::unregisterPlugin);
+    }
+
+
+    @Test
+    public void testRegistrationWithOverloadingMethods() throws InterruptedException {
+        String pluginIdentifier = "identifier";
+
+        RegistrationRequest req = RegistrationRequest.newBuilder()
+                .setIdentifier(pluginIdentifier)
+                .setName("name")
+                .setUrl("url")
+                .setPort(1)
+                .addEntryPoints(EntryPoint.newBuilder()
+                        .setName("name")
+                        .addMethods(Method.newBuilder()
+                                .setName("method1")
+                                .addArgs(ByteString.copyFrom(SerializationUtils.serialize(Integer.class)))
+                                .build())
+                        .addMethods(Method.newBuilder()
+                                .setName("method1")
+                                .addArgs(ByteString.copyFrom(SerializationUtils.serialize(Double.class)))
+                                .build())
+                        .build())
+                .build();
+
+        MockPlugin.registerOrActivateWithCustomRequest(req);
+
+        Case entryPointCase = workflowService.searchOne(QCase.case$.processIdentifier.eq("entry_point"));
+        List<Case> methodCases = utils.getEntryPointMethods(entryPointCase);
+        List<String> methodCaseIds = getEntryPointMethodIds(entryPointCase);
+        assert methodCases.size() == 2;
+        assert !Objects.equals(getMethodSignatureHash(methodCases.get(0)), getMethodSignatureHash(methodCases.get(1)));
+
+        Thread.sleep(ELASTIC_WAIT_TIME_IN_MS);
+
+        MockPlugin.deactivatePluginWithCustomRequest(DeactivationRequest.newBuilder().setIdentifier(pluginIdentifier).build());
+        MockPlugin.registerOrActivateWithCustomRequest(req);
+        entryPointCase = workflowService.findOne(entryPointCase.getStringId());
+        assert methodCaseIds.equals(getEntryPointMethodIds(entryPointCase));
+        assert utils.getEntryPointMethods(entryPointCase).size() == 2;
+        assert workflowService.searchAll(QCase.case$.processIdentifier.eq("method")).getTotalElements() == 2;
     }
 
     @Test
@@ -259,7 +303,7 @@ public class PluginRegistrationServiceTest {
     }
 
     private void assertCorruptRegistrationRequest(RegistrationRequest corruptReq) {
-        StatusRuntimeException e = assertThrows(StatusRuntimeException.class, () -> MockPlugin.registerWithCustomRequest(corruptReq));
+        StatusRuntimeException e = assertThrows(StatusRuntimeException.class, () -> MockPlugin.registerOrActivateWithCustomRequest(corruptReq));
         assert e.getStatus().getCode().value() == Status.INVALID_ARGUMENT.getCode().value();
         assertIfAnyCaseExists();
     }
