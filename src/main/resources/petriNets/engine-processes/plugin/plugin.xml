@@ -7,6 +7,38 @@
 	<defaultRole>true</defaultRole>
 	<anonymousRole>false</anonymousRole>
 	<transitionRole>false</transitionRole>
+	<roleRef>
+		<id>system</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>admin</id>
+		<caseLogic>
+			<create>false</create>
+			<delete>false</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>default</id>
+		<caseLogic>
+			<create>false</create>
+			<delete>false</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
 	<data type="text" immediate="true">
 		<id>identifier</id>
 		<title>Identifier</title>
@@ -160,6 +192,15 @@
 		<x>624</x>
 		<y>304</y>
 		<label name="activate">Activate</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
 		<event type="finish">
 			<id>onFinish_activate</id>
 			<actions phase="post">
@@ -175,6 +216,15 @@
 		<x>624</x>
 		<y>432</y>
 		<label name="deactivate">Deactivate</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
 		<event type="finish">
 			<id>onFinish_deactivate</id>
 			<actions phase="post">

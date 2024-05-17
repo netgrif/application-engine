@@ -204,11 +204,11 @@ public class PluginRegistrationServiceTest {
 
         RegistrationRequest req = RegistrationRequest.newBuilder()
                 .setIdentifier(pluginIdentifier)
-                .setName("name")
+                .setName("pluginName")
                 .setUrl("url")
                 .setPort(1)
                 .addEntryPoints(EntryPoint.newBuilder()
-                        .setName("name")
+                        .setName("epName")
                         .addMethods(Method.newBuilder()
                                 .setName("method1")
                                 .addArgs(ByteString.copyFrom(SerializationUtils.serialize(Integer.class)))

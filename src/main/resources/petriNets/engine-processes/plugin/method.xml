@@ -7,6 +7,38 @@
 	<defaultRole>true</defaultRole>
 	<anonymousRole>false</anonymousRole>
 	<transitionRole>false</transitionRole>
+	<roleRef>
+		<id>system</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>admin</id>
+		<caseLogic>
+			<create>false</create>
+			<delete>false</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>default</id>
+		<caseLogic>
+			<create>false</create>
+			<delete>false</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
 	<data type="text" immediate="true">
 		<id>name</id>
 		<title name="name">Name</title>
