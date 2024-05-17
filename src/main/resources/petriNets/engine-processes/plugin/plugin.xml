@@ -206,6 +206,8 @@
 			<actions phase="post">
 				<action>
 					active: f.active;
+
+					pluginInjector.inject(useCase)
 					change active value { true }
 				</action>
 			</actions>
@@ -230,6 +232,8 @@
 			<actions phase="post">
 				<action>
 					active: f.active;
+
+					pluginInjector.uninject(useCase)
 					change active value { false }
 				</action>
 			</actions>
@@ -334,7 +338,7 @@
 	</arc>
 	<arc>
 		<id>a8</id>
-		<type>regular</type>
+		<type>read</type>
 		<sourceId>initialized</sourceId>
 		<destinationId>detail</destinationId>
 		<multiplicity>1</multiplicity>

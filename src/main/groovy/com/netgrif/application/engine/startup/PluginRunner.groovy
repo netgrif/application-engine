@@ -7,6 +7,9 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
+import static com.netgrif.application.engine.integration.plugins.utils.PluginUtils.getPluginIdentifier
+import static com.netgrif.application.engine.integration.plugins.utils.PluginUtils.isPluginActive
+
 @Slf4j
 @Component
 class PluginRunner extends AbstractOrderedCommandLineRunner {
@@ -34,11 +37,14 @@ class PluginRunner extends AbstractOrderedCommandLineRunner {
         importPluginNets()
 
         List<Case> plugins = pluginService.findAll()
-        plugins.size()
 
         log.info("Re-injecting ${plugins.size()} plugins from database into memory.")
         plugins.each { plugin ->
-            pluginInjector.inject(plugin)
+            if (isPluginActive(plugin)) {
+                pluginInjector.inject(plugin)
+            } else {
+                log.warn("Plugin with identifier [{}] is disabled and will not be injected.", getPluginIdentifier(plugin))
+            }
         }
     }
 

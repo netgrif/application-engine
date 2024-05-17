@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.integration.plugins.utils;
 
+import com.google.protobuf.ByteString;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -11,12 +12,15 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.SerializationUtils;
 
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -174,6 +178,28 @@ public class PluginUtils {
             aTask = taskService.cancelTask(aTask, user).getTask();
             return taskService.assignTask(aTask, user);
         }
+    }
+
+    /**
+     * Serializes provided object into {@link ByteString}
+     *
+     * @param object object to be serialized
+     *
+     * @return serialized object into {@link ByteString}
+     * */
+    public static ByteString serializeObject(Serializable object) {
+        return ByteString.copyFrom(Objects.requireNonNull(SerializationUtils.serialize(object)));
+    }
+
+    /**
+     * Deserializes provided object as {@link ByteString} into {@link Object}
+     *
+     * @param object object to be deserialized
+     *
+     * @return deserialized object into {@link Object}
+     * */
+    public static Object deserializeObject(ByteString object) {
+        return SerializationUtils.deserialize(object.toByteArray());
     }
 
     /**

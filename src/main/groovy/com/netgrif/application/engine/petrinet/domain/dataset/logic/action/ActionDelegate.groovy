@@ -20,6 +20,7 @@ import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.history.service.IHistoryService
 import com.netgrif.application.engine.importer.service.FieldFactory
+import com.netgrif.application.engine.integration.plugin.injector.PluginInjector
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
 import com.netgrif.application.engine.mail.interfaces.IMailService
@@ -184,6 +185,9 @@ class ActionDelegate {
 
     @Autowired
     PublicViewProperties publicViewProperties
+
+    @Autowired
+    PluginInjector pluginInjector
 
     FrontendActionOutcome Frontend
 

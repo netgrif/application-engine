@@ -131,27 +131,19 @@ public class PluginService implements IPluginService {
     /**
      * Calls method with arguments of a specified entry point. Plugin must exist and be activated.
      *
-     * @param pluginId   plugin identifier, that contains the method to be executed
+     * @param url   URL of the plugin microservice
+     * @param port   port of the plugin microservice
      * @param entryPoint name of entry point in plugin, that contains the method to be executed
      * @param method     name of method to be executed
      * @param args       arguments to send to plugin method. All args should be the exact type of method input arguments type (not superclass, or subclass)
      * @return the returned object of the executed plugin method
      */
     @Override
-    public Object call(String pluginId, String entryPoint, String method, Serializable... args) throws IllegalArgumentException {
-        Optional<Case> pluginCaseOpt = findByIdentifier(pluginId);
-        if (pluginCaseOpt.isEmpty()) {
-            throw new IllegalArgumentException("Plugin with identifier \"" + pluginId + "\" cannot be found");
-        }
-        Case pluginCase = pluginCaseOpt.get();
-        if (!isPluginActive(pluginCase)) {
-            throw new IllegalArgumentException("Plugin with name \"" + getPluginName(pluginCase) + "\" is deactivated");
-        }
-        ManagedChannel channel = ManagedChannelBuilder.forAddress(getPluginUrl(pluginCase), getPluginPort(pluginCase))
+    public Object call(String url, int port, String entryPoint, String method, Serializable... args) throws IllegalArgumentException {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(url, port)
                 .usePlaintext()
                 .build();
-        List<ByteString> argBytes = Arrays.stream(args).map(arg -> ByteString.copyFrom(
-                Objects.requireNonNull(SerializationUtils.serialize(arg)))).collect(Collectors.toList());
+        List<ByteString> argBytes = Arrays.stream(args).map(PluginUtils::serializeObject).collect(Collectors.toList());
         ExecutionServiceGrpc.ExecutionServiceBlockingStub stub = ExecutionServiceGrpc.newBlockingStub(channel);
         ExecutionResponse responseMessage = stub.execute(ExecutionRequest.newBuilder()
                 .setEntryPoint(entryPoint)
@@ -159,7 +151,7 @@ public class PluginService implements IPluginService {
                 .addAllArgs(argBytes)
                 .build());
         channel.shutdownNow();
-        return SerializationUtils.deserialize(responseMessage.getResponse().toByteArray());
+        return deserializeObject(responseMessage.getResponse());
     }
 
     /**
@@ -179,6 +171,7 @@ public class PluginService implements IPluginService {
             try {
                 Task deactivateTask = utils.safelyAssignTask(taskId).getTask();
                 taskService.finishTask(deactivateTask, user);
+//                pluginInjector.uninject(pluginOpt.get());
             } catch (TransitionNotExecutableException e) {
                 throw new RuntimeException(e);
             }
@@ -226,7 +219,12 @@ public class PluginService implements IPluginService {
     private String register(RegistrationRequest request) throws TransitionNotExecutableException, NoSuchAlgorithmException {
         Case pluginCase = createOrUpdatePluginCase(request, Optional.empty());
         pluginCase = doActivation(pluginCase);
-        return inject(pluginCase, "registered");
+
+        pluginInjector.inject(pluginCase);
+
+        String responseMsg = String.format("Plugin with identifier \"%s\" was registered", getPluginIdentifier(pluginCase));
+        log.info(responseMsg);
+        return responseMsg;
     }
 
     private String activate(Case pluginCase, RegistrationRequest request) throws TransitionNotExecutableException,
@@ -238,7 +236,10 @@ public class PluginService implements IPluginService {
         pluginInjector.uninject(pluginCase); // remove potentially outdated meta data
         pluginCase = createOrUpdatePluginCase(request, Optional.of(pluginCase));
         pluginCase = doActivation(pluginCase);
-        return inject(pluginCase, "activated"); // we must also re-inject the plugin in case of there is a change of entry points
+
+        String responseMsg = String.format("Plugin with identifier \"%s\" was activated.", getPluginIdentifier(pluginCase));
+        log.info(responseMsg);
+        return responseMsg;
     }
 
     private Case doActivation(Case pluginCase) throws TransitionNotExecutableException {
@@ -353,7 +354,7 @@ public class PluginService implements IPluginService {
             for (com.netgrif.pluginlibrary.core.Method method : entryPoint.getMethodsList()) {
                 List<String> argTypesAsString = method.getArgsList().stream()
                         .map(arg -> {
-                            Class<?> clazz = (Class<?>) SerializationUtils.deserialize(arg.toByteArray());
+                            Class<?> clazz = (Class<?>) deserializeObject(arg);
                             assert clazz != null;
                             return clazz.getName();
                         })

@@ -95,6 +95,7 @@ public class PluginRegistrationServiceTest {
         List<String> methodArgs = getMethodArguments(methodCase);
         assert methodArgs.size() == 1;
         assert methodArgs.get(0).equals(MockPlugin.mockArgumentType.getName());
+        testIsInjected();
 
         Thread.sleep(ELASTIC_WAIT_TIME_IN_MS);
         MockPlugin.deactivatePlugin();
@@ -103,7 +104,7 @@ public class PluginRegistrationServiceTest {
         assert !PluginUtils.isPluginActive(pluginCase);
         assert !pluginCase.getActivePlaces().containsKey("active");
         assert pluginCase.getActivePlaces().get("inactive").equals(1);
-        testIsInjected();
+        testIsNotInjected();
 
         MockPlugin.registerOrActivatePlugin();
         pluginCase = workflowService.findOne(pluginCase.getStringId());
@@ -111,6 +112,7 @@ public class PluginRegistrationServiceTest {
         assert PluginUtils.isPluginActive(pluginCase);
         assert pluginCase.getActivePlaces().get("active").equals(1);
         assert !pluginCase.getActivePlaces().containsKey("inactive");
+        testIsInjected();
     }
 
     @Test

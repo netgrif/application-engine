@@ -17,7 +17,7 @@ import java.io.IOException;
 @Service
 public class MockExecutionService extends ExecutionServiceGrpc.ExecutionServiceImplBase {
 
-    private static final int port = 8090;
+    public static final int port = 8090;
     private Server server;
 
     public ExecutionRequest lastExecutionRequest;

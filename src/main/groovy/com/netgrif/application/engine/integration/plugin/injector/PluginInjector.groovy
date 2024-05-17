@@ -7,15 +7,11 @@ import com.netgrif.application.engine.integration.plugins.service.PluginService
 import com.netgrif.application.engine.integration.plugins.utils.PluginUtils
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
 class PluginInjector {
-
-    @Autowired
-    protected IWorkflowService workflowService
 
     @Autowired
     protected PluginUtils utils
@@ -43,8 +39,10 @@ class PluginInjector {
         MetaClass pluginMetaClass = PluginMeta.metaClass
 
         List<Case> entryPointCases = utils.getPluginEntryPoints(pluginCase)
-        String pluginIdentifier = PluginUtils.getPluginIdentifier(pluginCase)
+
         String pluginName = PluginUtils.getPluginName(pluginCase)
+        String pluginUrl = PluginUtils.getPluginUrl(pluginCase)
+        int pluginPort = PluginUtils.getPluginPort(pluginCase)
 
         entryPointCases.each { epCase ->
             MetaClass entryPointMetaClass = EntryPointMeta.metaClass
@@ -53,13 +51,12 @@ class PluginInjector {
 
             methodCases.each { methodCase ->
                 String methodName = PluginUtils.getMethodName(methodCase)
-
                 if (isRemoval) {
                     entryPointMetaClass[methodName] = null
                 } else {
-                    entryPointMetaClass[methodName] << { Serializable... args ->
+                    entryPointMetaClass[methodName] = { Serializable... args ->
                         PluginService pluginService = ApplicationContextProvider.getBean("pluginService") as PluginService
-                        return pluginService.call(pluginIdentifier, epName, methodName, args)
+                        return pluginService.call(pluginUrl, pluginPort, epName, methodName, args)
                     }
                 }
             }
