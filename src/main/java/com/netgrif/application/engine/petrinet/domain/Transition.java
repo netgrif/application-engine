@@ -274,7 +274,6 @@ public class Transition extends Node {
         clone.setLayout(this.layout == null ? null : layout.clone());
         clone.setPriority(priority);
         clone.setAssignPolicy(assignPolicy);
-        clone.setAssignedUserPolicy(assignedUserPolicy);
         clone.setIcon(icon);
         clone.setDataFocusPolicy(dataFocusPolicy);
         clone.setFinishPolicy(finishPolicy);

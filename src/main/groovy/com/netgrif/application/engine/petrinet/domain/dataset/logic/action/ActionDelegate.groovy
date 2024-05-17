@@ -192,15 +192,17 @@ class ActionDelegate {
      */
     Case useCase
     Optional<Task> task
+    Map<String, String> params
     def map = [:]
     Action action
     FieldActionsRunner actionsRunner
     List<EventOutcome> outcomes
 
-    def init(Action action, Case useCase, Optional<Task> task, FieldActionsRunner actionsRunner) {
+    def init(Action action, Case useCase, Optional<Task> task, FieldActionsRunner actionsRunner, Map<String, String> params = [:]) {
         this.action = action
         this.useCase = useCase
         this.task = task
+        this.params = params
         this.actionsRunner = actionsRunner
         this.initFieldsMap(action.fieldIds)
         this.initTransitionsMap(action.transitionIds)
@@ -262,11 +264,11 @@ class ActionDelegate {
 
     def unchanged = { return UNCHANGED_VALUE }
 
-    def initValueOfField = { Field field ->
+    def initValueOfField = { Field field, Map<String, String> params = [:] ->
         if (!field.hasDefault()) {
             return null
         } else if (field.isDynamicDefaultValue()) {
-            return initValueExpressionEvaluator.evaluate(useCase, field)
+            return initValueExpressionEvaluator.evaluate(useCase, field, params)
         }
         return field.defaultValue
     }
@@ -681,7 +683,7 @@ class ActionDelegate {
                  if (options.every { it.getValue() instanceof I18nString }) {
                      field.setOptions(options)
                  } else {
-                     Map<String, I18nString> newOptions = new LinkedHashMap<>();
+                     Map<String, I18nString> newOptions = new LinkedHashMap<>()
                      options.each { it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String)) }
                      field.setOptions(newOptions)
                  }
@@ -693,7 +695,7 @@ class ActionDelegate {
                      options.forEach({ k, v -> choices.add(v) })
                      field.setChoices(choices)
                  } else {
-                     Set<I18nString> newChoices = new LinkedHashSet<>();
+                     Set<I18nString> newChoices = new LinkedHashSet<>()
                      options.each { it -> newChoices.add(new I18nString(it.getValue() as String)) }
                      field.setChoices(newChoices)
                  }
@@ -703,6 +705,17 @@ class ActionDelegate {
          },
          validations: { cl ->
              changeFieldValidations(field, cl, targetCase, targetTask)
+         },
+         componentProperties: { cl ->
+             def properties = cl()
+             if (properties == null || (properties instanceof Closure && properties() == UNCHANGED_VALUE)) {
+                 return
+             }
+             if (!(properties instanceof Map && properties.every { it.getKey() instanceof String })) {
+                 return
+             }
+
+             addSetDataOutcomeToOutcomes(dataService.changeComponentProperties(targetCase, targetTask.get(), field.stringId, properties))
          }
         ]
     }
@@ -882,42 +895,42 @@ class ActionDelegate {
         return workflowService.searchOne(predicate(qCase))
     }
 
-    Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
-        return workflowService.createCaseByIdentifier(identifier, title, color, author.transformToLoggedUser(), locale).getCase()
+    Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
+        return workflowService.createCaseByIdentifier(identifier, title, color, author.transformToLoggedUser(), locale, params).getCase()
     }
 
-    Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
-        CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser())
+    Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
+        CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser(), params)
         this.outcomes.add(outcome)
         return outcome.getCase()
     }
 
-    Task assignTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem) {
+    Task assignTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        AssignTaskEventOutcome outcome = taskService.assignTask(user.transformToLoggedUser(), taskId)
+        AssignTaskEventOutcome outcome = taskService.assignTask(user.transformToLoggedUser(), taskId, params)
         this.outcomes.add(outcome)
         return outcome.getTask()
     }
 
-    Task assignTask(Task task, IUser user = userService.loggedOrSystem) {
-        return addTaskOutcomeAndReturnTask(taskService.assignTask(task, user))
+    Task assignTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        return addTaskOutcomeAndReturnTask(taskService.assignTask(task, user, params))
     }
 
-    void assignTasks(List<Task> tasks, IUser assignee = userService.loggedOrSystem) {
-        this.outcomes.addAll(taskService.assignTasks(tasks, assignee))
+    void assignTasks(List<Task> tasks, IUser assignee = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        this.outcomes.addAll(taskService.assignTasks(tasks, assignee, params))
     }
 
-    Task cancelTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem) {
+    Task cancelTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        return addTaskOutcomeAndReturnTask(taskService.cancelTask(user.transformToLoggedUser(), taskId))
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(user.transformToLoggedUser(), taskId, params))
     }
 
-    Task cancelTask(Task task, IUser user = userService.loggedOrSystem) {
-        return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, user))
+    Task cancelTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, user, params))
     }
 
-    void cancelTasks(List<Task> tasks, IUser user = userService.loggedOrSystem) {
-        this.outcomes.addAll(taskService.cancelTasks(tasks, user))
+    void cancelTasks(List<Task> tasks, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        this.outcomes.addAll(taskService.cancelTasks(tasks, user, params))
     }
 
     private Task addTaskOutcomeAndReturnTask(TaskEventOutcome outcome) {
@@ -925,17 +938,17 @@ class ActionDelegate {
         return outcome.getTask()
     }
 
-    void finishTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem) {
+    void finishTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        addTaskOutcomeAndReturnTask(taskService.finishTask(user.transformToLoggedUser(), taskId))
+        addTaskOutcomeAndReturnTask(taskService.finishTask(user.transformToLoggedUser(), taskId, params))
     }
 
-    void finishTask(Task task, IUser user = userService.loggedOrSystem) {
-        addTaskOutcomeAndReturnTask(taskService.finishTask(task, user))
+    void finishTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        addTaskOutcomeAndReturnTask(taskService.finishTask(task, user, params))
     }
 
-    void finishTasks(List<Task> tasks, IUser finisher = userService.loggedOrSystem) {
-        this.outcomes.addAll(taskService.finishTasks(tasks, finisher))
+    void finishTasks(List<Task> tasks, IUser finisher = userService.loggedOrSystem, Map<String, String> params = [:]) {
+        this.outcomes.addAll(taskService.finishTasks(tasks, finisher, params))
     }
 
     List<Task> findTasks(Closure<Predicate> predicate) {
@@ -1006,22 +1019,22 @@ class ActionDelegate {
         return removeRole(roleId, net, user)
     }
 
-    SetDataEventOutcome setData(Task task, Map dataSet) {
-        return setData(task.stringId, dataSet)
+    SetDataEventOutcome setData(Task task, Map dataSet, Map<String, String> params = [:]) {
+        return setData(task.stringId, dataSet, params)
     }
 
-    SetDataEventOutcome setData(String taskId, Map dataSet) {
-        return addSetDataOutcomeToOutcomes(dataService.setData(taskId, ImportHelper.populateDataset(dataSet)))
+    SetDataEventOutcome setData(String taskId, Map dataSet, Map<String, String> params = [:]) {
+        return addSetDataOutcomeToOutcomes(dataService.setData(taskId, ImportHelper.populateDataset(dataSet), params))
     }
 
-    SetDataEventOutcome setData(Transition transition, Map dataSet) {
-        return addSetDataOutcomeToOutcomes(setData(transition.importId, this.useCase, dataSet))
+    SetDataEventOutcome setData(Transition transition, Map dataSet, Map<String, String> params = [:]) {
+        return addSetDataOutcomeToOutcomes(setData(transition.importId, this.useCase, dataSet, params))
     }
 
-    SetDataEventOutcome setData(String transitionId, Case useCase, Map dataSet) {
+    SetDataEventOutcome setData(String transitionId, Case useCase, Map dataSet, Map<String, String> params = [:]) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
-        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet)))
+        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet), params))
     }
 
     @Deprecated
@@ -1059,27 +1072,27 @@ class ActionDelegate {
         }
     }
 
-    Map<String, Field> getData(Task task) {
+    Map<String, Field> getData(Task task, Map<String, String> params = [:]) {
         def useCase = workflowService.findOne(task.caseId)
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, params)))
     }
 
-    Map<String, Field> getData(String taskId) {
+    Map<String, Field> getData(String taskId, Map<String, String> params = [:]) {
         Task task = taskService.findById(taskId)
         def useCase = workflowService.findOne(task.caseId)
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, params)))
     }
 
-    Map<String, Field> getData(Transition transition) {
-        return getData(transition.stringId, this.useCase)
+    Map<String, Field> getData(Transition transition, Map<String, String> params = [:]) {
+        return getData(transition.stringId, this.useCase, params)
     }
 
-    Map<String, Field> getData(String transitionId, Case useCase) {
+    Map<String, Field> getData(String transitionId, Case useCase, Map<String, String> params = [:]) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
         if (!task)
             return new HashMap<String, Field>()
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, params)))
     }
 
     private List<Field> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome) {
@@ -1205,12 +1218,12 @@ class ActionDelegate {
     }
 
     void sendEmail(List<String> to, String subject, String body) {
-        MailDraft mailDraft = MailDraft.builder(mailFrom, to).subject(subject).body(body).build();
+        MailDraft mailDraft = MailDraft.builder(mailFrom, to).subject(subject).body(body).build()
         sendMail(mailDraft)
     }
 
     void sendEmail(List<String> to, String subject, String body, Map<String, File> attachments) {
-        MailDraft mailDraft = MailDraft.builder(mailFrom, to).subject(subject).body(body).attachments(attachments).build();
+        MailDraft mailDraft = MailDraft.builder(mailFrom, to).subject(subject).body(body).attachments(attachments).build()
         sendMail(mailDraft)
     }
 
@@ -1300,13 +1313,13 @@ class ActionDelegate {
     }
 
     MessageResource inviteUser(NewUserRequest newUserRequest) {
-        IUser user = registrationService.createNewUser(newUserRequest);
+        IUser user = registrationService.createNewUser(newUserRequest)
         if (user == null)
-            return MessageResource.successMessage("Done");
-        mailService.sendRegistrationEmail(user);
+            return MessageResource.successMessage("Done")
+        mailService.sendRegistrationEmail(user)
 
-        mailAttemptService.mailAttempt(newUserRequest.email);
-        return MessageResource.successMessage("Done");
+        mailAttemptService.mailAttempt(newUserRequest.email)
+        return MessageResource.successMessage("Done")
     }
 
     void deleteUser(String email) {
@@ -1417,7 +1430,7 @@ class ActionDelegate {
     }
 
     OutputStream exportTasks(Closure<Predicate> predicate, File outFile, ExportDataConfig config = null, int pageSize = exportConfiguration.getMongoPageSize()) {
-        QTask qTask = new QTask("task");
+        QTask qTask = new QTask("task")
         return exportService.fillCsvTaskData(predicate(qTask), outFile, config, pageSize)
     }
 
