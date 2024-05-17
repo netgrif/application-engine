@@ -13,11 +13,11 @@ public class GroupConfigurationProperties {
 
     /**
      * Determines whether user's default groups are enabled and can be created
-     * */
+     */
     private boolean defaultEnabled = true;
 
     /**
      * Determines whether default system group is enabled and can be created
-     * */
+     */
     private boolean systemEnabled = true;
 }

@@ -834,11 +834,10 @@ public class Importer {
     @Transactional
     protected void addDataComponent(Transition transition, DataRef dataRef) throws MissingIconKeyException {
         String fieldId = getField(dataRef.getId()).getStringId();
-        Component component;
-        if ((dataRef.getComponent()) == null)
-            component = getField(dataRef.getId()).getComponent();
-        else
+        Component component = null;
+        if ((dataRef.getComponent()) != null) {
             component = componentFactory.buildComponent(dataRef.getComponent(), this, getField(dataRef.getId()));
+        }
         transition.addDataSet(fieldId, null, null, null, component);
     }
 

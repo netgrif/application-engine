@@ -239,8 +239,8 @@ public class UserService extends AbstractUserService {
     @Override
     public List<IUser> findAllByProcessRoles(Set<String> roleIds, boolean small) {
         List<User> users = userRepository.findAllByProcessRoles__idIn(new ArrayList<>(roleIds));
-            return changeType(users);
-        }
+        return changeType(users);
+    }
 
     @Override
     public List<IUser> findAllByIds(Set<String> ids, boolean small) {
@@ -267,7 +267,7 @@ public class UserService extends AbstractUserService {
     @Override
     public IUser getLoggedOrSystem() {
         try {
-            if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof String){
+            if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof String) {
                 return getSystem();
             }
             return getLoggedUser();

@@ -44,10 +44,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/petrinet")
@@ -75,6 +79,17 @@ public class PetriNetController {
 
     @Autowired
     private AsyncRunner asyncRunner;
+
+    public static String decodeUrl(String s1) {
+        try {
+            if (s1 == null)
+                return null;
+            return URLDecoder.decode(s1, StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            log.error("Decoding URL failed: ", e);
+            return "";
+        }
+    }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Import new process",
@@ -205,17 +220,6 @@ public class PetriNetController {
     @Operation(summary = "Get net by case id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public PetriNetImportReference getOne(@PathVariable("id") String caseId) {
-            return service.getNetFromCase(decodeUrl(caseId));
-    }
-
-    public static String decodeUrl(String s1) {
-        try {
-            if (s1 == null)
-                return null;
-            return URLDecoder.decode(s1, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            log.error("Decoding URL failed: ", e);
-            return "";
-        }
+        return service.getNetFromCase(decodeUrl(caseId));
     }
 }
