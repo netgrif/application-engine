@@ -50,12 +50,12 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     private static final Logger log = LoggerFactory.getLogger(ElasticCaseService.class);
 
     protected final ElasticCaseRepository repository;
-    protected IWorkflowService workflowService;
     protected final ElasticsearchTemplate template;
-    protected Executor executors;
+    protected final Executor executors;
     protected final ElasticsearchProperties elasticsearchProperties;
-    protected final IPetriNetService petriNetService;
-    protected final IElasticCasePrioritySearch iElasticCasePrioritySearch;
+    protected IPetriNetService petriNetService;
+    protected IWorkflowService workflowService;
+    protected IElasticCasePrioritySearch iElasticCasePrioritySearch;
     @Value("${spring.data.elasticsearch.index.case}")
     protected String caseIndex;
 
@@ -63,6 +63,17 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     @Lazy
     public void setWorkflowService(IWorkflowService workflowService) {
         this.workflowService = workflowService;
+    }
+
+    @Autowired
+    @Lazy
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
+    }
+
+    @Autowired
+    public void setElasticCasePrioritySearch(IElasticCasePrioritySearch iElasticCasePrioritySearch) {
+        this.iElasticCasePrioritySearch = iElasticCasePrioritySearch;
     }
 
     @Override

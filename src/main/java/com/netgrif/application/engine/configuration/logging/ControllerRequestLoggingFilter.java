@@ -2,7 +2,7 @@ package com.netgrif.application.engine.configuration.logging;
 
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class ControllerRequestLoggingFilter extends CommonsRequestLoggingFilter {
 

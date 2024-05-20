@@ -33,12 +33,12 @@ public class SessionManagerService implements ISessionManagerService {
 
     @Override
     public List<LoggedUser> getAllLoggedUsers() {
-        RedisOperations<Object, Object> redisOps = repository.getSessionRedisOperations();
+        RedisOperations<String, Object> redisOps = repository.getSessionRedisOperations();
         if (redisOps == null) {
             throw new IllegalStateException("Redis session management is not configured!");
         }
         List<LoggedUser> activeUsers = new ArrayList<>();
-        Set<Object> keys = redisOps.keys(redisUsernameKey + "*");
+        Set<String> keys = redisOps.keys(redisUsernameKey + "*");
         if (keys == null || keys.isEmpty()) {
             return activeUsers;
         }

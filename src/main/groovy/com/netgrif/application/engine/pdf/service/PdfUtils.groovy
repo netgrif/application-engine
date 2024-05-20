@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.pdf.service
 
+import groovy.xml.XmlSlurper
 import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.io.MemoryUsageSetting
 import org.apache.pdfbox.multipdf.PDFMergerUtility

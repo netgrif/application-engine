@@ -16,8 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -52,7 +52,7 @@ public class MailSenderServiceTest {
     }
 
     @Test
-    public void testMailDraft() throws MessagingException, IOException, TemplateException {
+    public void testMailDraft() throws IOException, TemplateException, MessagingException {
         File file = new File("file.txt");
         file.createNewFile();
 

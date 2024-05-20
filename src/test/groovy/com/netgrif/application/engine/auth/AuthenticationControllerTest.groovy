@@ -29,10 +29,10 @@ import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-import javax.mail.BodyPart
-import javax.mail.MessagingException
-import javax.mail.internet.MimeMessage
-import javax.mail.internet.MimeMultipart
+import jakarta.mail.BodyPart
+import jakarta.mail.MessagingException
+import jakarta.mail.internet.MimeMessage
+import jakarta.mail.internet.MimeMultipart
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])

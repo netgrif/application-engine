@@ -19,7 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-import javax.mail.internet.MimeMessage
+import jakarta.mail.internet.MimeMessage
 
 import static java.util.Base64.*
 
