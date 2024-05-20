@@ -12,7 +12,7 @@ import java.io.IOException;
 @Component
 public class RestAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
 
-    @Value("${nae.server.security.realm-name:NAE-Realm}")
+    @Value("x${nae.server.security.realm-name:NAE-Realm}")
     private String realmName;
 
     @Override
