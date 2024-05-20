@@ -202,13 +202,8 @@ public class PetriNetController {
     }
 
     public static String decodeUrl(String s1) {
-        try {
-            if (s1 == null)
-                return null;
-            return URLDecoder.decode(s1, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            log.error("Decoding URL failed: ", e);
-            return "";
-        }
+        if (s1 == null)
+            return null;
+        return URLDecoder.decode(s1, StandardCharsets.UTF_8);
     }
 }
