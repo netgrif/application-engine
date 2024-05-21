@@ -755,6 +755,9 @@ class ActionDelegate {
                 value.each { id -> users.add(new UserFieldValue(userService.findById(id as String, false))) }
                 value = new UserListFieldValue(users)
             }
+            if (field instanceof TaskField && targetTask.isPresent()) {
+                dataService.validateTaskRefValue(value, targetTask.get().getStringId());
+            }
             field.value = value
             saveChangedValue(field, targetCase)
         }
