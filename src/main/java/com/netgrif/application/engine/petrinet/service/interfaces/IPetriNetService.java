@@ -26,6 +26,21 @@ import java.util.*;
 
 public interface IPetriNetService {
 
+    static PetriNetReference transformToReference(PetriNet net, Locale locale) {
+        //return new PetriNetReference(net.getStringId(), net.getIdentifier(), net.getVersion(), net.getTitle().getTranslation(locale), net.getInitials(), net.getTranslatedDefaultCaseName(locale));
+        return new PetriNetReference(net, locale);
+    }
+
+    static TransitionReference transformToReference(PetriNet net, Transition transition, Locale locale) {
+        List<com.netgrif.application.engine.workflow.web.responsebodies.DataFieldReference> list = new ArrayList<>();
+        transition.getImmediateData().forEach(fieldId -> list.add(new com.netgrif.application.engine.workflow.web.responsebodies.DataFieldReference(net.getDataSet().get(fieldId), locale)));
+        return new TransitionReference(transition.getStringId(), transition.getTitle().getTranslation(locale), net.getStringId(), list);
+    }
+
+    static DataFieldReference transformToReference(PetriNet net, Transition transition, Field field, Locale locale) {
+        return new DataFieldReference(field.getStringId(), field.getName().getTranslation(locale), net.getStringId(), transition.getStringId());
+    }
+
     PetriNet clone(ObjectId petriNetId);
 
     @Deprecated
@@ -36,7 +51,11 @@ public interface IPetriNetService {
 
     ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+
     ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user, String uriNodeId, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
     Optional<PetriNet> save(PetriNet petriNet);
 
@@ -73,21 +92,6 @@ public interface IPetriNetService {
     Page<PetriNetReference> search(PetriNetSearch criteria, LoggedUser user, Pageable pageable, Locale locale);
 
     Optional<PetriNet> findByImportId(String id);
-
-    static PetriNetReference transformToReference(PetriNet net, Locale locale) {
-        //return new PetriNetReference(net.getStringId(), net.getIdentifier(), net.getVersion(), net.getTitle().getTranslation(locale), net.getInitials(), net.getTranslatedDefaultCaseName(locale));
-        return new PetriNetReference(net, locale);
-    }
-
-    static TransitionReference transformToReference(PetriNet net, Transition transition, Locale locale) {
-        List<com.netgrif.application.engine.workflow.web.responsebodies.DataFieldReference> list = new ArrayList<>();
-        transition.getImmediateData().forEach(fieldId -> list.add(new com.netgrif.application.engine.workflow.web.responsebodies.DataFieldReference(net.getDataSet().get(fieldId), locale)));
-        return new TransitionReference(transition.getStringId(), transition.getTitle().getTranslation(locale), net.getStringId(), list);
-    }
-
-    static DataFieldReference transformToReference(PetriNet net, Transition transition, Field field, Locale locale) {
-        return new DataFieldReference(field.getStringId(), field.getName().getTranslation(locale), net.getStringId(), transition.getStringId());
-    }
 
     void evictAllCaches();
 

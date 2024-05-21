@@ -2,8 +2,8 @@ package com.netgrif.application.engine.workflow.domain.menu;
 
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
-import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate;
+import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Class, that holds configurable attributes of menu item. In case of attribute addition, please update also
  * {@link MenuItemBody#toDataSet(String, String, boolean)} method.
- * */
+ */
 @Data
 @NoArgsConstructor
 public class MenuItemBody {
@@ -55,7 +55,7 @@ public class MenuItemBody {
     private Case additionalFilter;
     private boolean mergeFilters = true;
     private String taskViewSearchType = "fulltext_advanced";
-    private List<String> taskHeadersMode = new ArrayList<>(List.of("sort", "edit"));;
+    private List<String> taskHeadersMode = new ArrayList<>(List.of("sort", "edit"));
     private String taskHeadersDefaultMode = "sort";
     private boolean taskIsHeaderModeChangeable = true;
     private boolean taskAllowHeaderTableMode = true;
@@ -113,6 +113,25 @@ public class MenuItemBody {
         this.tabIcon = tabIcon;
     }
 
+    private static void putDataSetEntry(Map<String, Map<String, Object>> dataSet, MenuItemConstants fieldId, FieldType fieldType,
+                                        @Nullable Object fieldValue) {
+        Map<String, Object> fieldMap = new LinkedHashMap<>();
+        fieldMap.put("type", fieldType.getName());
+        fieldMap.put("value", fieldValue);
+        dataSet.put(fieldId.getAttributeId(), fieldMap);
+    }
+
+    private static String sanitize(String input) {
+        if (input == null) {
+            return null;
+        }
+        return Normalizer.normalize(input.trim(), Normalizer.Form.NFD)
+                .replaceAll("[^\\p{ASCII}]", "")
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .replaceAll("[\\W-]+", "-")
+                .toLowerCase();
+    }
+
     public String getIdentifier() {
         return sanitize(this.identifier);
     }
@@ -137,7 +156,7 @@ public class MenuItemBody {
      * Transforms attributes into dataSet for {@link ActionDelegate#setData}
      *
      * @return created dataSet from attributes
-     * */
+     */
     public Map<String, Map<String, Object>> toDataSet() {
         return toDataSet(null, null, true);
     }
@@ -147,9 +166,8 @@ public class MenuItemBody {
      *
      * @param parentId id of parent menu item instance
      * @param nodePath uri, that represents the menu item (f.e.: "/myItem1/myItem2")
-     *
      * @return created dataSet from attributes
-     * */
+     */
     public Map<String, Map<String, Object>> toDataSet(String parentId, String nodePath) {
         return toDataSet(parentId, nodePath, false);
     }
@@ -243,24 +261,5 @@ public class MenuItemBody {
                 this.taskShowMoreMenu);
 
         return dataSet;
-    }
-
-    private static void putDataSetEntry(Map<String, Map<String, Object>> dataSet, MenuItemConstants fieldId, FieldType fieldType,
-                                        @Nullable Object fieldValue) {
-        Map<String, Object> fieldMap = new LinkedHashMap<>();
-        fieldMap.put("type", fieldType.getName());
-        fieldMap.put("value", fieldValue);
-        dataSet.put(fieldId.getAttributeId(), fieldMap);
-    }
-
-    private static String sanitize(String input) {
-        if (input == null) {
-            return null;
-        }
-        return Normalizer.normalize(input.trim(), Normalizer.Form.NFD)
-                .replaceAll("[^\\p{ASCII}]", "")
-                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
-                .replaceAll("[\\W-]+", "-")
-                .toLowerCase();
     }
 }

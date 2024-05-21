@@ -3,7 +3,6 @@ package com.netgrif.application.engine.pdf.generator.service.renderer;
 import com.netgrif.application.engine.pdf.generator.domain.PdfEnumerationField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfSelectionField;
-import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField;
 
 import java.io.IOException;
 

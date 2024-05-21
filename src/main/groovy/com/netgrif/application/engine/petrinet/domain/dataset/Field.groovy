@@ -191,10 +191,10 @@ abstract class Field<T> extends Imported {
 
     void addAction(Action action, DataEventType type) {
         if (action == null) return
-        if (this.events == null){
+        if (this.events == null) {
             this.events = new HashMap<>()
         }
-        if (!this.events.containsKey(type)){
+        if (!this.events.containsKey(type)) {
             this.events.get(type).addToActionsByDefaultPhase(action)
         } else {
             DataEvent event = new DataEvent()

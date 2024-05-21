@@ -31,15 +31,18 @@ abstract class CaseFieldsExpressionRunner {
         this.cacheSize = cacheSize
     }
 
-    def run(Case useCase, Expression expression) {
-        return run(useCase, useCase.getDataSet().keySet().collectEntries { [(it): (it)] } as Map<String, String>, expression)
+    def run(Case useCase, Expression expression, Map<String, String> params = [:]) {
+        Map<String, String> fields = useCase.getDataSet().keySet().collectEntries { fieldId ->
+            [(fieldId): (fieldId)]
+        } as Map<String, String>
+        return run(useCase, fields, expression, params)
     }
 
-    def run(Case useCase, Map<String, String> fields, Expression expression) {
+    def run(Case useCase, Map<String, String> fields, Expression expression, Map<String, String> params = [:]) {
         logger().debug("Expression: $expression")
         def code = getExpressionCode(expression)
         try {
-            initCode(code.delegate, useCase, fields)
+            initCode(code.delegate, useCase, fields, params)
             code()
         } catch (Exception e) {
             log.error("Action: $expression.definition")
@@ -58,9 +61,10 @@ abstract class CaseFieldsExpressionRunner {
         return code.rehydrate(getActionDelegate(), code.owner, code.thisObject)
     }
 
-    protected void initCode(Object delegate, Case useCase, Map<String, String> fields) {
+    protected void initCode(Object delegate, Case useCase, Map<String, String> fields, Map<String, String> params) {
         ActionDelegate ad = ((ActionDelegate) delegate)
         ad.useCase = useCase
+        ad.params = params
         ad.initFieldsMap(fields)
     }
 

@@ -21,7 +21,7 @@ public abstract class LocalisedEventOutcome {
     protected LocalisedEventOutcome() {
     }
 
-    protected LocalisedEventOutcome(EventOutcome outcome, Locale locale){
+    protected LocalisedEventOutcome(EventOutcome outcome, Locale locale) {
         this.message = outcome.getMessage() == null ? null : outcome.getMessage().getTranslation(locale);
         this.frontActions = outcome.getFrontActions();
         this.outcomes = outcome.getOutcomes() == null ? null : outcome.getOutcomes().stream()
@@ -38,7 +38,7 @@ public abstract class LocalisedEventOutcome {
         this.outcomes.add(outcome);
     }
 
-    public void addOutcomes(List<LocalisedEventOutcome> outcomes){
+    public void addOutcomes(List<LocalisedEventOutcome> outcomes) {
         this.outcomes.addAll(outcomes);
     }
 }
