@@ -86,6 +86,9 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     @Autowired
     protected IImpersonationService impersonationService;
 
+    @Autowired
+    private List<AuthenticationProvider> authenticationProviders;
+
     private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Bean
@@ -146,7 +149,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Bean
     protected ProviderManager authenticationManager() throws Exception {
-        return new ProviderManager();
+        return new ProviderManager(authenticationProviders);
     }
 
     @Override

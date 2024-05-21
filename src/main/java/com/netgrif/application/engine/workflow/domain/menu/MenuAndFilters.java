@@ -7,9 +7,9 @@ import com.netgrif.application.engine.workflow.domain.filter.FilterImportExportL
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlType;
 import java.util.Objects;
 
 @Data

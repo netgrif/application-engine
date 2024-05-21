@@ -7,7 +7,7 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
