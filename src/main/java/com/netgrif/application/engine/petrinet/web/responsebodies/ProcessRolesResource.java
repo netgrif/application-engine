@@ -6,7 +6,10 @@ import com.netgrif.application.engine.petrinet.web.PetriNetController;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ProcessRolesResource extends EntityModel<ProcessRolesAndPermissions> {

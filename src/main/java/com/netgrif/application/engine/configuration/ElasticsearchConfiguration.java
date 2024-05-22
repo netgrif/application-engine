@@ -20,6 +20,9 @@ public class ElasticsearchConfiguration {
     @Value("${spring.data.elasticsearch.searchport}")
     private int port;
 
+    @Value("${spring.data.elasticsearch.index.petriNet}")
+    private String petriNetIndex;
+
     @Value("${spring.data.elasticsearch.index.case}")
     private String caseIndex;
 
@@ -38,6 +41,11 @@ public class ElasticsearchConfiguration {
     @Bean
     public String springElasticsearchReindex() {
         return cron;
+    }
+
+    @Bean
+    public String elasticPetriNetIndex() {
+        return petriNetIndex;
     }
 
     @Bean

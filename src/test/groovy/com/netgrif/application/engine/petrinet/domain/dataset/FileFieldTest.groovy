@@ -107,7 +107,8 @@ class FileFieldTest {
         Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black", user.transformToLoggedUser()).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
-        mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/" + FIELD_ID)
+        mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file")
+                .param("fieldId", FIELD_ID)
                 .with(httpBasic(configuration.email, configuration.password)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -126,8 +127,9 @@ class FileFieldTest {
         Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black", user.transformToLoggedUser()).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
-        mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file/" + FIELD_ID).
-                with(httpBasic(configuration.email, configuration.password)))
+        mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file")
+                .param("fieldId", FIELD_ID)
+                .with(httpBasic(configuration.email, configuration.password)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))

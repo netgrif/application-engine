@@ -3,7 +3,10 @@ package com.netgrif.application.engine.workflow.domain.filter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,7 +70,7 @@ public class Predicate extends DoubleValueHolder {
                         for (Object val : list) {
                             doubleValues.add(convertObjectToDouble(val));
                         }
-                    }  else if (list.get(0) instanceof Long) {
+                    } else if (list.get(0) instanceof Long) {
                         longValues = new ArrayList<>();
                         for (Object val : list) {
                             longValues.add((Long) val);
@@ -86,13 +89,13 @@ public class Predicate extends DoubleValueHolder {
                     break;
                 case "doubleValues":
                     doubleValues = new ArrayList<>();
-                    for (Object val :  (List<?>) v) {
+                    for (Object val : (List<?>) v) {
                         doubleValues.add(convertObjectToDouble(val));
                     }
                     break;
                 case "longValues":
                     longValues = new ArrayList<>();
-                    for (Object val :  (List<?>) v) {
+                    for (Object val : (List<?>) v) {
                         if (val instanceof Long) {
                             longValues.add((Long) val);
                             continue;
@@ -105,7 +108,7 @@ public class Predicate extends DoubleValueHolder {
                     break;
                 case "booleanValues":
                     booleanValues = new ArrayList<>();
-                    for (Object val :  (List<?>) v) {
+                    for (Object val : (List<?>) v) {
                         if (val instanceof Boolean) {
                             booleanValues.add((Boolean) val);
                             continue;

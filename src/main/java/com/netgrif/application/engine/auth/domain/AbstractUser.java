@@ -6,10 +6,13 @@ import lombok.Setter;
 import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class AbstractUser implements IUser {
+public abstract class AbstractUser implements IUser, Serializable {
+
+    private static final long serialVersionUID = 341922197277508726L;
 
     @NotNull
     @Getter

@@ -25,6 +25,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -35,7 +36,9 @@ import static com.netgrif.application.engine.workflow.domain.State.DISABLED;
 @Getter
 @Setter
 @Builder(builderMethodName = "with")
-public class Task {
+public class Task implements Serializable {
+
+    private static final long serialVersionUID = -7112277728921547546L;
 
     @Id
     @Builder.Default
@@ -139,6 +142,9 @@ public class Task {
 
     private Map<String, Integer> consumedTokens = new HashMap<>();
 
+    @Builder.Default
+    private Map<String, String> tags = new HashMap<>();
+
     public Task() {
     }
 
@@ -208,6 +214,13 @@ public class Task {
     public String getUserId() {
         return userId;
     }
+
+    // TODO: release/8.0.0
+    /*public String getTranslatedEventTitle(EventType assign, Locale locale) {
+        if (eventTitles == null || !eventTitles.containsKey(assign))
+            return null;
+        return eventTitles.get(assign).getTranslation(locale);
+    }*/
 
     public boolean isAutoTriggered() {
         if (triggers == null || triggers.isEmpty()) {

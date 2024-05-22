@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -27,7 +28,9 @@ import java.util.stream.Collectors;
 @Document
 @Getter
 @Setter
-public class Case {
+public class Case implements Serializable {
+
+    private static final long serialVersionUID = 3687481049847498422L;
 
     @Id
     @Setter(AccessLevel.NONE)
@@ -91,6 +94,7 @@ public class Case {
     private List<String> negativeViewRoles = new ArrayList<>();
     //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
     private List<String> negativeViewUsers = new ArrayList<>();
+    private Map<String, String> tags = new HashMap<>();
 
     public Case() {
         id = new ObjectId();
@@ -138,6 +142,12 @@ public class Case {
         this.color = color == null || color.isEmpty() ? "color-fg-fm-500" : color;
     }
 
+    // TODO: release/8.0.0
+    // populateDataSet
+/*if (field.getComponent() != null) {
+                this.dataSet.get(key).setComponent(field.getComponent());
+            }
+ */
     private String generateVisualId() {
         SecureRandom random = new SecureRandom();
         int n = id.getTimestamp() + random.nextInt(99999999);

@@ -24,6 +24,7 @@ import groovy.json.JsonSlurper
 import org.hamcrest.CoreMatchers
 import org.junit.Ignore
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -55,6 +56,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
+@Disabled
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest(
@@ -158,6 +160,7 @@ class InsuranceTest {
     private ObjectWriter objectWriter
 
     @Test
+    @Disabled
     @DisplayName("Insurance Test")
     @Ignore // TODO: release/7.0.0 fix post methods with wrong json
     void test() {

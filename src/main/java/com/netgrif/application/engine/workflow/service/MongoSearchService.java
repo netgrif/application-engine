@@ -34,6 +34,123 @@ public class MongoSearchService<T> {
 
     private Class<T> tClass;
 
+    public static String oid(String id) {
+        return "{$oid:\"" + id + "\"}";
+    }
+
+    public static String in(List<Object> values, Function<Object, String> valueQueryBuilder, Predicate<Object> typeTest) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("{$in:[");
+        values.forEach(o -> {
+            if (typeTest != null && !typeTest.test(o)) return;
+
+            builder.append(valueQueryBuilder.apply(o));
+
+            builder.append(",");
+        });
+        if (!values.isEmpty())
+            builder.deleteCharAt(builder.length() - 1);
+        builder.append("]}");
+        return builder.toString();
+    }
+
+    public static String all(List<Object> values, Function<Object, String> valueQueryBuilder) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("{$all:[");
+        values.forEach(v -> {
+            builder.append(valueQueryBuilder.apply(v));
+            builder.append(",");
+        });
+        if (!values.isEmpty())
+            builder.deleteCharAt(builder.length() - 1);
+        builder.append("]}");
+        return builder.toString();
+    }
+
+    public static String ref(String attr, Object id) {
+        return "{$ref:\"" + attr + "\",$id:" + oid((String) id) + "}";
+    }
+
+
+    // **************************
+    // * Query building methods *
+    // **************************
+
+    public static String or(Collection<Object> expressions) {
+        if (expressions.isEmpty())
+            return "";
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("$or:[");
+        expressions.forEach(obj -> {
+            builder.append("{");
+            if (obj instanceof String && ((String) obj).equalsIgnoreCase(":"))
+                builder.append("");
+            else
+                builder.append(obj);
+            builder.append("},");
+        });
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append("]");
+        return builder.toString();
+    }
+
+    public static String exists(boolean val) {
+        return "{$exists:" + val + "}";
+    }
+
+    // ***********************************************
+    // * Helper methods for building mongodb queries *
+    // ***********************************************
+
+    public static String regex(String val, String opt) {
+        return "{$regex:'" + val + "',$options:'" + opt + "'}";
+    }
+
+    public static String lessThenOrEqual(Object val) {
+        return "{$lte:" + val + "}";
+    }
+
+    public static String elemMatch(Object obj, Function<Object, String> valueQueryBuilder) {
+        return "{$elemMatch:" + valueQueryBuilder.apply(obj) + "}";
+    }
+
+    public static Object resolveDataValue(Object val, String type) {
+        switch (type) {
+            case "string":
+                return "\"" + val + "\"";
+            case "date":
+                return resolveDateValue((String) val);
+            case "array":
+                return val;
+            case "user":
+                return val;
+            default:
+                return val;
+        }
+    }
+
+    public static String resolveDateValue(String val) {
+        String queryValue = "{";
+//        String[] items = val.split(" ");
+//        if (items.length != 2) return "";
+//        switch (items[0]) {
+//            case ">":
+//            case ">=":
+//                queryValue += "$qte:\"ISO-8601 ";
+//                break;
+//            case "<":
+//            case "<=":
+//                queryValue += "$lte:\"ISO-8601 ";
+//                break;
+//            default:
+//                return "";
+//        }
+//
+//        queryValue += val + "T00:00:00.000Z\"}";
+        return queryValue;
+    }
+
     public Page<T> search(Map<String, Object> searchRequest, Pageable pageable, Class<T> clazz) {
         try {
             this.tClass = clazz;
@@ -92,13 +209,8 @@ public class MongoSearchService<T> {
         log.info("Executing search query: " + queryString);
         return new PageImpl<>(mongoTemplate.find(query, tClass),
                 pageable,
-                mongoTemplate.count(new BasicQuery(queryString, "{id:1}"), tClass));
+                mongoTemplate.count(new BasicQuery(queryString, "{_id:1}"), tClass));
     }
-
-
-    // **************************
-    // * Query building methods *
-    // **************************
 
     public String idQuery(Object obj) {
         Map<Class, Function<Object, String>> builder = new HashMap<>();
@@ -116,10 +228,6 @@ public class MongoSearchService<T> {
         return or(orMap.values());
     }
 
-    // ***********************************************
-    // * Helper methods for building mongodb queries *
-    // ***********************************************
-
     protected String buildQueryPart(String attribute, Object obj, Map<Class, Function<Object, String>> builder) {
         try {
             if (obj == null || (obj instanceof List && ((List) obj).isEmpty()))
@@ -136,114 +244,6 @@ public class MongoSearchService<T> {
     protected String resolveAuthorByEmail(String email) {
         IUser user = userService.findByEmail(email, true);
         return user != null ? user.getStringId() : null;
-    }
-
-    public static String oid(String id) {
-        return "{$oid:\"" + id + "\"}";
-    }
-
-    public static String in(List<Object> values, Function<Object, String> valueQueryBuilder, Predicate<Object> typeTest) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("{$in:[");
-        values.forEach(o -> {
-            if (typeTest != null && !typeTest.test(o)) return;
-
-            builder.append(valueQueryBuilder.apply(o));
-
-            builder.append(",");
-        });
-        if (!values.isEmpty())
-            builder.deleteCharAt(builder.length() - 1);
-        builder.append("]}");
-        return builder.toString();
-    }
-
-    public static String all(List<Object> values, Function<Object, String> valueQueryBuilder) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("{$all:[");
-        values.forEach(v -> {
-            builder.append(valueQueryBuilder.apply(v));
-            builder.append(",");
-        });
-        if (!values.isEmpty())
-            builder.deleteCharAt(builder.length() - 1);
-        builder.append("]}");
-        return builder.toString();
-    }
-
-    public static String ref(String attr, Object id) {
-        return "{$ref:\"" + attr + "\",$id:" + oid((String) id) + "}";
-    }
-
-    public static String or(Collection<Object> expressions) {
-        if (expressions.isEmpty())
-            return "";
-
-        StringBuilder builder = new StringBuilder();
-        builder.append("$or:[");
-        expressions.forEach(obj -> {
-            builder.append("{");
-            if (obj instanceof String && ((String) obj).equalsIgnoreCase(":"))
-                builder.append("");
-            else
-                builder.append(obj);
-            builder.append("},");
-        });
-        builder.deleteCharAt(builder.length() - 1);
-        builder.append("]");
-        return builder.toString();
-    }
-
-    public static String exists(boolean val) {
-        return "{$exists:" + val + "}";
-    }
-
-    public static String regex(String val, String opt) {
-        return "{$regex:'" + val + "',$options:'" + opt + "'}";
-    }
-
-    public static String lessThenOrEqual(Object val) {
-        return "{$lte:" + val + "}";
-    }
-
-    public static String elemMatch(Object obj, Function<Object, String> valueQueryBuilder) {
-        return "{$elemMatch:" + valueQueryBuilder.apply(obj) + "}";
-    }
-
-    public static Object resolveDataValue(Object val, String type) {
-        switch (type) {
-            case "string":
-                return "\"" + val + "\"";
-            case "date":
-                return resolveDateValue((String) val);
-            case "array":
-                return val;
-            case "user":
-                return val;
-            default:
-                return val;
-        }
-    }
-
-    public static String resolveDateValue(String val) {
-        String queryValue = "{";
-//        String[] items = val.split(" ");
-//        if (items.length != 2) return "";
-//        switch (items[0]) {
-//            case ">":
-//            case ">=":
-//                queryValue += "$qte:\"ISO-8601 ";
-//                break;
-//            case "<":
-//            case "<=":
-//                queryValue += "$lte:\"ISO-8601 ";
-//                break;
-//            default:
-//                return "";
-//        }
-//
-//        queryValue += val + "T00:00:00.000Z\"}";
-        return queryValue;
     }
 
     protected BooleanBuilder constructPredicateTree(List<com.querydsl.core.types.Predicate> elementaryPredicates, BiFunction<BooleanBuilder, com.querydsl.core.types.Predicate, BooleanBuilder> nodeOperation) {

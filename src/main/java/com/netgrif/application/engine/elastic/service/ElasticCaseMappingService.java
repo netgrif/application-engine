@@ -42,6 +42,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         }
     }
 
+    // TODO: release/8.0.0 merge 6.4.0 changes
     protected Optional<DataField> transformDataField(String fieldId, Case useCase) {
         Field<?> netField = useCase.getDataSet().get(fieldId);
         Field<?> caseField = useCase.getDataSet().get(fieldId);

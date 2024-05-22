@@ -4,11 +4,11 @@ public class ArcOrderComparator {
 
     private static ArcOrderComparator ourInstance = new ArcOrderComparator();
 
-    public static ArcOrderComparator getInstance() {
-        return ourInstance;
+    private ArcOrderComparator() {
     }
 
-    private ArcOrderComparator() {
+    public static ArcOrderComparator getInstance() {
+        return ourInstance;
     }
 
     public int compare(Arc first, Arc second) {

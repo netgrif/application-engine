@@ -84,6 +84,24 @@ public final class FieldFactory {
         return field;
     }
 
+    //TODO: release/8.0.0 merge check
+    /*private void resolveComponent(Field field, Case useCase, String transitionId) {
+        if (useCase.getDataField(field.getStringId()).hasComponent(transitionId)) {
+            field.setComponent(useCase.getDataField(field.getStringId()).getDataRefComponents().get(transitionId));
+        } else if (useCase.getDataField(field.getStringId()).hasComponent()) {
+            field.setComponent(useCase.getDataField(field.getStringId()).getComponent());
+        }
+    }*/
+    /* private StringCollectionField buildStringCollectionField(Data data, Importer importer) {
+        StringCollectionField field = new StringCollectionField();
+        setDefaultValues(field, data, defaultValues -> {
+            if (defaultValues != null) {
+                field.setDefaultValue(defaultValues);
+            }
+        });
+        return field;
+    }*/
+
     private com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation makeValidation(String rule, I18nString message, boolean dynamic) {
         return dynamic ? new DynamicValidation(rule, message) : new com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation(rule, message);
     }

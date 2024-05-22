@@ -15,11 +15,13 @@ import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.application.engine.petrinet.domain.roles.AssignedUserPermission;
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
+import com.netgrif.application.engine.workflow.domain.triggers.AutoTrigger;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Transient;
 import org.apache.lucene.analysis.CharArrayMap;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -53,6 +55,9 @@ public class Transition extends Node {
     private Map<EventType, Event> events;
     private Map<AssignedUserPermission, Boolean> assignedUserPolicy;
     private String defaultRoleId;
+    @Transient
+    private Boolean hasAutoTrigger;
+    private Map<String, String> tags;
 
     public Transition() {
         super();
@@ -67,6 +72,7 @@ public class Transition extends Node {
         finishPolicy = FinishPolicy.MANUAL;
         events = new HashMap<>();
         assignedUserPolicy = new HashMap<>();
+        tags = new HashMap<>();
     }
 
     public void setDataRefBehavior(Field<?> field, DataFieldBehavior behavior) {
@@ -211,6 +217,13 @@ public class Transition extends Node {
         events.put(event.getType(), event);
     }
 
+    public boolean hasAutoTrigger() {
+        if (hasAutoTrigger == null) {
+            hasAutoTrigger = this.getTriggers().stream().anyMatch(trigger -> trigger instanceof AutoTrigger);
+        }
+        return hasAutoTrigger;
+    }
+
     public LinkedHashSet<String> getImmediateData() {
         return dataSet.entrySet().stream()
                 .filter(entry -> {
@@ -238,12 +251,12 @@ public class Transition extends Node {
         clone.setLayout(this.layout == null ? null : layout.clone());
         clone.setPriority(priority);
         clone.setAssignPolicy(assignPolicy);
-        clone.setAssignedUserPolicy(assignedUserPolicy);
         clone.setIcon(icon);
         clone.setDataFocusPolicy(dataFocusPolicy);
         clone.setFinishPolicy(finishPolicy);
         clone.setEvents(this.events == null ? null : events.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
         clone.setAssignedUserPolicy(new HashMap<>(assignedUserPolicy));
+        clone.setTags(new HashMap<>(this.tags));
         clone.setDefaultRoleId(defaultRoleId);
         return clone;
     }

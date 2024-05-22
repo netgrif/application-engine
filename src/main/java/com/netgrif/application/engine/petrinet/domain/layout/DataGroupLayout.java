@@ -5,6 +5,7 @@ import com.netgrif.application.engine.importer.model.HideEmptyRows;
 import com.netgrif.application.engine.importer.model.LayoutType;
 import lombok.Data;
 import com.netgrif.application.engine.importer.model.DataGroup;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data

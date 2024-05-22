@@ -31,11 +31,12 @@ abstract class CaseFieldsExpressionRunner {
         this.cacheSize = cacheSize
     }
 
-    def run(Case useCase, Expression expression) {
+    // TODO: release/8.0.0 fields? Map<String, String> fields
+    def run(Case useCase, Expression expression, Map<String, String> params = [:]) {
         log.debug("Expression: $expression")
         def code = getExpressionCode(expression)
         try {
-            initCode(code.delegate, useCase)
+            initCode(code.delegate, useCase, params)
             code()
         } catch (Exception e) {
             log.error("Action: $expression.definition")
@@ -54,9 +55,11 @@ abstract class CaseFieldsExpressionRunner {
         return code.rehydrate(getActionDelegate(), code.owner, code.thisObject)
     }
 
-    protected void initCode(Object delegate, Case useCase) {
+    // TODO: release/8.0.0 fields?
+    protected void initCode(Object delegate, Case useCase, Map<String, String> params) {
         ActionDelegate ad = ((ActionDelegate) delegate)
         ad.useCase = useCase
+        ad.params = params
         ad.initFieldsMap(useCase.dataSet.fields.collectEntries {[(it.key): (it.key)]}, useCase)
     }
 }

@@ -3,13 +3,16 @@ package com.netgrif.application.engine.petrinet.domain;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class Component {
+public class Component implements Serializable {
+
+    private static final long serialVersionUID = 5852012111111766631L;
 
     public static final String DIVIDER = "divider";
 

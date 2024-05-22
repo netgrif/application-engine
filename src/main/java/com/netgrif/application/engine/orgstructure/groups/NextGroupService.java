@@ -259,7 +259,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Set<String> getAllCoMembers(IUser user) {
-//        TODO: release/7.0.0
+        // TODO: release/8.0.0
 //        Set<String> users = workflowService.searchAll(
 //                        groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(user.getStringId())))
 //                .map(it -> it.getDataSet().get(GROUP_MEMBERS_FIELD).getOptions().keySet()).stream()
@@ -363,7 +363,7 @@ public class NextGroupService implements INextGroupService {
     protected DataSet getInitialGroupData(IUser author, String title, Case groupCase) {
         DataSet dataSet = new DataSet();
 
-//        TODO: release/7.0.0
+//        TODO: release/8.0.0
 //        groupCase.getDataSet().get(GROUP_MEMBERS_FIELD).setOptions(addUser(author, new HashMap<>()));
 //        workflowService.save(groupCase);
 //

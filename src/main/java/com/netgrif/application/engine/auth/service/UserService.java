@@ -277,7 +277,7 @@ public class UserService extends AbstractUserService {
     @Override
     public IUser getLoggedOrSystem() {
         try {
-            if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof String){
+            if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof String) {
                 return getSystem();
             }
             return getLoggedUser();

@@ -24,14 +24,14 @@ abstract class RoleActionsRunner {
     private Map<String, Object> actionsCache = new HashMap<>()
     private Map<String, Closure> actions = new HashMap<>()
 
-    void run(Action action, RoleContext roleContext) {
+    void run(Action action, RoleContext roleContext, Map<String, String> params) {
         if (!actionsCache)
             actionsCache = new HashMap<>()
 
         log.debug("Action: $action")
         def code = getActionCode(action)
         try {
-            code.init(action, roleContext)
+            code.init(action, roleContext, params)
             code()
         } catch (Exception e) {
             log.error("Action: $action.definition")

@@ -5,10 +5,16 @@ import com.netgrif.application.engine.petrinet.converter.I18nStringSerializer;
 import lombok.Data;
 
 import java.util.*;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 @Data
 @JsonSerialize(using = I18nStringSerializer.class)
-public class I18nString {
+public class I18nString implements Serializable {
+
+    private static final long serialVersionUID = 3815235231390109824L;
 
     private String defaultValue;
 

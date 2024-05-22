@@ -4,11 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
+import java.io.Serializable;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class TaskPair {
+public class TaskPair implements Serializable {
+    private static final long serialVersionUID = -3865322078419904394L;
+
     private ObjectId taskId;
     private String transitionId;
     private State state;

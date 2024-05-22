@@ -25,12 +25,11 @@ import java.util.*;
 @Slf4j
 public class PublicAuthenticationFilter extends OncePerRequestFilter {
 
+    private final static String JWT_HEADER_NAME = "X-Jwt-Token";
+    private final static String BEARER = "Bearer ";
     private final ProviderManager authenticationManager;
     private final AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
     private final Authority anonymousAuthority;
-
-    private final static String JWT_HEADER_NAME = "X-Jwt-Token";
-    private final static String BEARER = "Bearer ";
     private final String[] anonymousAccessUrls;
     private final String[] exceptions;
 

@@ -228,6 +228,9 @@ public class Importer {
         } else {
             net.setDefaultCaseName(toI18NString(document.getCaseName()));
         }
+        if (document.getTags() != null) {
+            net.setTags(this.buildTagsMap(document.getTags().getTag()));
+        }
 
         return Optional.of(net);
     }
@@ -523,6 +526,10 @@ public class Importer {
         transition.setImportId(importTransition.getId());
         transition.setTitle(importTransition.getLabel() != null ? toI18NString(importTransition.getLabel()) : new I18nString(""));
         transition.setPosition(importTransition.getX(), importTransition.getY());
+        if (importTransition.getTags() != null) {
+            transition.setTags(this.buildTagsMap(importTransition.getTags().getTag()));
+        }
+
         if (importTransition.getLayout() != null) {
             transition.setLayout(new TaskLayout(importTransition));
         }
@@ -849,13 +856,23 @@ public class Importer {
         }
     }
 
+    // TODO: release/8.0.0 check merge
+    /*protected void addDataComponent(Transition transition, DataRef dataRef) throws MissingIconKeyException {
+        String fieldId = getField(dataRef.getId()).getStringId();
+        Component component = null;
+        if ((dataRef.getComponent()) != null) {
+            component = componentFactory.buildComponent(dataRef.getComponent(), this, getField(dataRef.getId()));
+        }
+        transition.addDataSet(fieldId, null, null, null, component);
+    }*/
     protected void addDataComponent(Transition transition, DataRef dataRef) throws MissingIconKeyException {
         Field<?> field = getField(dataRef.getId());
         Component component;
-        if ((dataRef.getComponent()) == null)
+        if ((dataRef.getComponent()) == null) {
             component = field.getComponent();
-        else
+        } else {
             component = componentFactory.buildComponent(dataRef.getComponent(), this, field);
+        }
         transition.setDataRefComponent(field, component);
     }
 
@@ -931,7 +948,7 @@ public class Importer {
         }
     }
 
-    // TODO: release/7.0.0 add atribute "type" to set actions
+    // TODO: release/8.0.0 add atribute "type" to set actions
     protected Action createAction(com.netgrif.application.engine.importer.model.Action importedAction) {
         Action action = new Action(importedAction.getTrigger());
         action.setImportId(buildActionId(importedAction.getId()));
@@ -1305,5 +1322,15 @@ public class Importer {
         if (!missingMetaData.isEmpty()) {
             throw new MissingPetriNetMetaDataException(missingMetaData);
         }
+    }
+
+    protected Map<String, String> buildTagsMap(List<Tag> tagsList) {
+        Map<String, String> tags = new HashMap<>();
+        if (tagsList != null) {
+            tagsList.forEach(tag -> {
+                tags.put(tag.getKey(), tag.getValue());
+            });
+        }
+        return tags;
     }
 }

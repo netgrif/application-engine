@@ -4,7 +4,9 @@ import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
 import org.bson.types.ObjectId
 
-class Expression {
+class Expression implements Serializable {
+
+    private static final long serialVersionUID = 3687481111847498422L
 
     protected ObjectId id
 

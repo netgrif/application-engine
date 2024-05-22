@@ -3,9 +3,13 @@ package com.netgrif.application.engine.petrinet.domain.layout;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @NoArgsConstructor
-public abstract class Layout {
+public abstract class Layout implements Serializable {
+
+    private static final long serialVersionUID = -1177510908437276099L;
 
     protected Integer rows;
     protected Integer cols;

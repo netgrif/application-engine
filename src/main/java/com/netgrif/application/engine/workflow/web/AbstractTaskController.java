@@ -14,6 +14,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.Eve
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
+import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.web.responsebodies.*;
 import lombok.extern.slf4j.Slf4j;
@@ -211,10 +212,10 @@ public abstract class AbstractTaskController {
         }
     }
 
-    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> dataBody) {// TODO: release/7.0.0: dataBody?
+    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, MultipartFile multipartFile, FileFieldRequest dataBody, Locale locale) {
         try {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
-            dataBody.forEach((task, value) -> outcomes.put(task, dataService.saveFile(task, fieldId, multipartFile)));
+            outcomes.put(dataBody.getParentTaskId(), dataService.saveFile(dataBody.getParentTaskId(), dataBody.getFieldId(), multipartFile));
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set", mainOutcome);
         } catch (IllegalArgumentWithChangedFieldsException e) {
@@ -250,10 +251,9 @@ public abstract class AbstractTaskController {
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set", mainOutcome);
     }
 
-    // TODO: release/7.0.0 remove fieldId and use dataBody (taskStringId: fieldImportId)
-    public EntityModel<EventOutcomeWithMessage> saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles, Map<String, String> dataBody) {
+    public EntityModel<EventOutcomeWithMessage> saveFiles(String taskId, MultipartFile[] multipartFiles, FileFieldRequest requestBody) {
         Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
-        dataBody.forEach((task, ignored) -> outcomes.put(task, dataService.saveFiles(task, fieldId, multipartFiles)));
+        outcomes.put(requestBody.getParentTaskId(), dataService.saveFiles(requestBody.getParentTaskId(), requestBody.getFieldId(), multipartFiles));
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set", mainOutcome);
     }

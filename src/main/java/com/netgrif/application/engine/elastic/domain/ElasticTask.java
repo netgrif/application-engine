@@ -15,7 +15,9 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
@@ -100,6 +102,8 @@ public class ElasticTask {
     @Field(type = Keyword)
     private String finishPolicy;
 
+    private Map<String, String> tags;
+
     public ElasticTask(Task task) {
         this.stringId = task.getStringId();
         this.processId = task.getProcessId();
@@ -120,6 +124,7 @@ public class ElasticTask {
         this.negativeViewRoles = new HashSet<>(task.getNegativeViewRoles());
         this.viewUsers = new HashSet<>(task.getViewUsers());
         this.negativeViewUsers = new HashSet<>(task.getNegativeViewUsers());
+        this.tags = new HashMap<>(task.getTags());
     }
 
     public void update(ElasticTask task) {
@@ -136,5 +141,6 @@ public class ElasticTask {
         this.negativeViewRoles = task.getNegativeViewRoles();
         this.viewUsers = task.getViewUsers();
         this.negativeViewUsers = task.getNegativeViewUsers();
+        this.tags = task.getTags();
     }
 }

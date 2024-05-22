@@ -21,13 +21,13 @@ public class InitValueExpressionEvaluator implements IInitValueExpressionEvaluat
     private CaseFieldsExpressionRunner runner;
 
     @Override
-    public <T> T evaluate(Case useCase, Field<T> defaultField) {
-        return (T) evaluate(useCase, defaultField.getInitExpression());
+    public <T> T evaluate(Case useCase, Field<T> defaultField, Map<String, String> params) {
+        return (T) evaluate(useCase, defaultField.getInitExpression(), params);
     }
 
     @Override
-    public Map<String, I18nString> evaluateOptions(Case useCase, MapOptionsField<I18nString, ?> field) {
-        Object result = evaluate(useCase, field.getExpression());
+    public Map<String, I18nString> evaluateOptions(Case useCase, MapOptionsField<I18nString, ?> field, Map<String, String> params) {
+        Object result = evaluate(useCase, field.getExpression(), params);
         if (!(result instanceof Map)) {
             throw new IllegalArgumentException("[" + useCase.getStringId() + "] Dynamic options not an instance of Map: " + field.getImportId());
         }
@@ -40,8 +40,8 @@ public class InitValueExpressionEvaluator implements IInitValueExpressionEvaluat
     }
 
     @Override
-    public Set<I18nString> evaluateChoices(Case useCase, ChoiceField field) {
-        Object result = evaluate(useCase, field.getExpression());
+    public Set<I18nString> evaluateChoices(Case useCase, ChoiceField field, Map<String, String> params) {
+        Object result = evaluate(useCase, field.getExpression(), params);
         if (!(result instanceof Collection)) {
             throw new IllegalArgumentException("[" + useCase.getStringId() + "] Dynamic choices not an instance of Collection: " + field.getImportId());
         }
@@ -50,8 +50,8 @@ public class InitValueExpressionEvaluator implements IInitValueExpressionEvaluat
     }
 
     @Override
-    public I18nString evaluateCaseName(Case useCase, Expression expression) {
-        Object result = evaluate(useCase, expression);
+    public I18nString evaluateCaseName(Case useCase, Expression expression, Map<String, String> params) {
+        Object result = evaluate(useCase, expression, params);
         if (result instanceof I18nString) {
             return (I18nString) result;
         } else {
@@ -60,7 +60,7 @@ public class InitValueExpressionEvaluator implements IInitValueExpressionEvaluat
     }
 
     @Override
-    public Object evaluate(Case useCase, Expression expression) {
-        return runner.run(useCase, expression);
+    public Object evaluate(Case useCase, Expression expression, Map<String, String> params) {
+        return runner.run(useCase, expression, params);
     }
 }

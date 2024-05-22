@@ -18,6 +18,8 @@ public interface IPdfDataHelper {
 
     PdfDocumentContent getPdfDocumentContent();
 
+    void setPdfFields(List<PdfField> fields);
+
     void setupDataHelper(PdfResource resource);
 
     void generateTitleField();

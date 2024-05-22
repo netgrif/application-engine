@@ -67,6 +67,11 @@ public class ProcessRoleService implements IProcessRoleService {
 
     @Override
     public void assignRolesToUser(String userId, Set<String> requestedRolesIds, LoggedUser loggedUser) {
+        assignRolesToUser(userId, requestedRolesIds, loggedUser, new HashMap<>());
+    }
+
+    @Override
+    public void assignRolesToUser(String userId, Set<String> requestedRolesIds, LoggedUser loggedUser, Map<String, String> params) {
         IUser user = userService.resolveById(userId, true);
         Set<ProcessRole> requestedRoles = this.findByIds(requestedRolesIds);
         if (requestedRoles.isEmpty() && !requestedRolesIds.isEmpty())
@@ -92,11 +97,11 @@ public class ProcessRoleService implements IProcessRoleService {
         Set<ProcessRole> newRoles = this.findByIds(rolesNewToUserIds);
         Set<ProcessRole> removedRoles = this.findByIds(rolesRemovedFromUserIds);
 
-        runAllPreActions(newRoles, removedRoles, user, petriNet);
+        runAllPreActions(newRoles, removedRoles, user, petriNet, params);
         requestedRoles = updateRequestedRoles(user, rolesNewToUser, rolesRemovedFromUser);
 
         replaceUserRolesAndPublishEvent(requestedRolesIds, user, requestedRoles);
-        runAllPostActions(newRoles, removedRoles, user, petriNet);
+        runAllPostActions(newRoles, removedRoles, user, petriNet, params);
 
         securityContextService.saveToken(userId);
         if (Objects.equals(userId, loggedUser.getId())) {
@@ -156,24 +161,24 @@ public class ProcessRoleService implements IProcessRoleService {
                 .collect(Collectors.toSet());
     }
 
-    private void runAllPreActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles, IUser user, PetriNet petriNet) {
-        runAllSuitableActionsOnRoles(newRoles, EventType.ASSIGN, EventPhaseType.PRE, user, petriNet);
-        runAllSuitableActionsOnRoles(removedRoles, EventType.CANCEL, EventPhaseType.PRE, user, petriNet);
+    private void runAllPreActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles, IUser user, PetriNet petriNet, Map<String, String> params) {
+        runAllSuitableActionsOnRoles(newRoles, EventType.ASSIGN, EventPhaseType.PRE, user, petriNet, params);
+        runAllSuitableActionsOnRoles(removedRoles, EventType.CANCEL, EventPhaseType.PRE, user, petriNet, params);
     }
 
-    private void runAllPostActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles, IUser user, PetriNet petriNet) {
-        runAllSuitableActionsOnRoles(newRoles, EventType.ASSIGN, EventPhaseType.POST, user, petriNet);
-        runAllSuitableActionsOnRoles(removedRoles, EventType.CANCEL, EventPhaseType.POST, user, petriNet);
+    private void runAllPostActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles, IUser user, PetriNet petriNet, Map<String, String> params) {
+        runAllSuitableActionsOnRoles(newRoles, EventType.ASSIGN, EventPhaseType.POST, user, petriNet, params);
+        runAllSuitableActionsOnRoles(removedRoles, EventType.CANCEL, EventPhaseType.POST, user, petriNet, params);
     }
 
-    private void runAllSuitableActionsOnRoles(Set<ProcessRole> roles, EventType requiredEventType, EventPhaseType requiredPhase, IUser user, PetriNet petriNet) {
+    private void runAllSuitableActionsOnRoles(Set<ProcessRole> roles, EventType requiredEventType, EventPhaseType requiredPhase, IUser user, PetriNet petriNet, Map<String, String> params) {
         roles.forEach(role -> {
             RoleContext roleContext = new RoleContext<>(user, role, petriNet);
-            runAllSuitableActionsOnOneRole(role.getEvents(), requiredEventType, requiredPhase, roleContext);
+            runAllSuitableActionsOnOneRole(role.getEvents(), requiredEventType, requiredPhase, roleContext, params);
         });
     }
 
-    private void runAllSuitableActionsOnOneRole(Map<EventType, Event> eventMap, EventType requiredEventType, EventPhaseType requiredPhase, RoleContext roleContext) {
+    private void runAllSuitableActionsOnOneRole(Map<EventType, Event> eventMap, EventType requiredEventType, EventPhaseType requiredPhase, RoleContext roleContext, Map<String, String> params) {
         if (eventMap == null) {
             return;
         }
@@ -183,23 +188,23 @@ public class ProcessRoleService implements IProcessRoleService {
                 return;
             }
 
-            runActionsBasedOnPhase(event, requiredPhase, roleContext);
+            runActionsBasedOnPhase(event, requiredPhase, roleContext, params);
         });
     }
 
-    private void runActionsBasedOnPhase(Event event, EventPhaseType requiredPhase, RoleContext roleContext) {
+    private void runActionsBasedOnPhase(Event event, EventPhaseType requiredPhase, RoleContext roleContext, Map<String, String> params) {
         switch (requiredPhase) {
             case PRE:
-                runActions(event.getPreActions(), roleContext);
+                runActions(event.getPreActions(), roleContext, params);
                 break;
             case POST:
-                runActions(event.getPostActions(), roleContext);
+                runActions(event.getPostActions(), roleContext, params);
                 break;
         }
     }
 
-    private void runActions(List<Action> actions, RoleContext roleContext) {
-        actions.forEach(action -> roleActionsRunner.run(action, roleContext));
+    private void runActions(List<Action> actions, RoleContext roleContext, Map<String, String> params) {
+        actions.forEach(action -> roleActionsRunner.run(action, roleContext, params));
     }
 
     private void removeOldAndAssignNewRolesToUser(IUser user, Set<ProcessRole> requestedRoles) {

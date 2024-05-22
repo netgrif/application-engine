@@ -8,7 +8,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class CancelTaskEventOutcome extends TaskEventOutcome{
+public class CancelTaskEventOutcome extends TaskEventOutcome {
 
     public CancelTaskEventOutcome() {
         super();
