@@ -23,20 +23,16 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
-import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
-import org.springframework.session.web.http.HttpSessionIdResolver;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -89,12 +85,10 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     @Autowired
     private List<AuthenticationProvider> authenticationProviders;
 
-    private static final String ANONYMOUS_USER = "anonymousUser";
+    @Autowired
+    private AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    @Bean
-    public HttpSessionIdResolver httpSessionIdResolver() {
-        return HeaderHttpSessionIdResolver.xAuthToken();
-    }
+    private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -139,17 +133,14 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                                 .logoutUrl("/api/auth/logout")
                                 .invalidateHttpSession(true)
                                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)));
+        http.authenticationProvider(authenticationProviders.getFirst());
+        http.sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS));
         configureFilters(http);
         configureSession(http);
         setHeaders(http);
         setCsrf(http);
         corsEnable(http);
         return http.build();
-    }
-
-    @Bean
-    protected ProviderManager authenticationManager() throws Exception {
-        return new ProviderManager(authenticationProviders);
     }
 
     @Override
@@ -191,7 +182,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
         Authority authority = authorityService.getOrCreate(Authority.anonymous);
         authority.setUsers(new HashSet<>());
         return new PublicAuthenticationFilter(
-                authenticationManager(),
+                (ProviderManager) authenticationManager(authenticationManagerBuilder),
                 new AnonymousAuthenticationProvider(ANONYMOUS_USER),
                 authority,
                 this.naeAuthProperties.getServerPatterns(),

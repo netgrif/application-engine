@@ -22,7 +22,7 @@ public class NaeAuthProperties {
 
     private String[] serverPatterns;
 
-    private String[] staticPatterns = {"/**/favicon.ico", "/favicon.ico", "/**/manifest.json", "/manifest.json", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**"};
+    private String[] staticPatterns = {"/favicon.ico", "/favicon.ico", "/manifest.json", "/manifest.json", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**"};
 
     private String[] anonymousExceptions;
 

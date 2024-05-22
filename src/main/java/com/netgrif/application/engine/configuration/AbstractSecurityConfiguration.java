@@ -12,7 +12,9 @@ import com.netgrif.application.engine.configuration.security.SessionUtilsPropert
 import com.netgrif.application.engine.ldap.filters.LoginAttemptsFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -198,13 +200,15 @@ public abstract class AbstractSecurityConfiguration {
         }
     }
 
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationManagerBuilder auth) throws Exception {
         List<String> properties = Arrays.stream(naeAuthProperties.getProviders()).map(String::toLowerCase).collect(Collectors.toList());
         context.getBeansOfType(NetgrifAuthenticationProvider.class)
                 .entrySet().stream()
                 .filter(it -> properties.contains(it.getKey().toLowerCase()))
                 .sorted(Ordering.explicit(properties).onResultOf(entry -> entry.getKey().toLowerCase()))
                 .forEach(it -> auth.authenticationProvider(it.getValue()));
+        return auth.getObject();
     }
 
     protected String[] getPatterns() {
