@@ -55,7 +55,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <junit-jupiter.version>5.8.2</junit-jupiter.version>
+        <junit-jupiter.version>5.10.0</junit-jupiter.version>
         <java.version>21</java.version>
         <groovy.version>4.0.21</groovy.version>
         <jasypt.version>1.9.2</jasypt.version>
@@ -253,19 +253,19 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.8.2</version>
+            <version>5.10.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.8.2</version>
+            <version>5.10.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.8.2</version>
+            <version>5.10.0</version>
             <scope>test</scope>
         </dependency>
         <!-- Groovy -->
@@ -287,7 +287,7 @@
 <!--        <dependency>-->
 <!--            <groupId>org.mongodb</groupId>-->
 <!--            <artifactId>bson</artifactId>-->
-<!--            <version>4.6.0</version>-->
+<!--            <version>5.1.0</version>-->
 <!--        </dependency>-->
 
         <!-- Lombok -->
@@ -656,7 +656,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <source>11</source>
+                    <source>21</source>
                     <doclint>none</doclint>
                     <detectJavaApiLink>false</detectJavaApiLink>
                     <failOnWarnings>false</failOnWarnings>
@@ -745,7 +745,7 @@
                     <dependency>
                         <groupId>org.junit.jupiter</groupId>
                         <artifactId>junit-jupiter-engine</artifactId>
-                        <version>5.8.2</version>
+                        <version>5.10.0</version>
                     </dependency>
                 </dependencies>
             </plugin>
