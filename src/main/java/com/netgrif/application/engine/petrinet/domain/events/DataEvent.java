@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.events;
 
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 

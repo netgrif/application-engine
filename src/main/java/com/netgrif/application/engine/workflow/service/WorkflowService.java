@@ -353,14 +353,14 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public DeleteCaseEventOutcome deleteCase(String caseId, Map<String, String> params) {
-        Case useCase = findOne(caseId);
-        return deleteCase(useCase, params);
+    public DeleteCaseEventOutcome deleteCase(String caseId) {
+        return deleteCase(caseId, new HashMap<>());
     }
 
     @Override
-    public DeleteCaseEventOutcome deleteCase(String caseId) {
-        return deleteCase(caseId, new HashMap<>());
+    public DeleteCaseEventOutcome deleteCase(String caseId, Map<String, String> params) {
+        Case useCase = findOne(caseId);
+        return deleteCase(useCase, params);
     }
 
     @Override

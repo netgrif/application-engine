@@ -40,6 +40,9 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
     @Autowired
     private ApplicationContext context;
 
+    @Autowired
+    private LoginAttemptsFilter loginAttemptsFilter;
+
     protected void setHeaders(HttpSecurity http) throws Exception {
         setStrictTransportSecurity(http);
         setContentSecurityPolicy(http);
@@ -219,7 +222,7 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
 
     protected void configureFilters(HttpSecurity http) {
         if (sessionUtilsProperties.isEnabledFilter()) {
-            http.addFilterBefore(new LoginAttemptsFilter(), ChannelProcessingFilter.class);
+            http.addFilterBefore(loginAttemptsFilter, ChannelProcessingFilter.class);
         }
     }
 

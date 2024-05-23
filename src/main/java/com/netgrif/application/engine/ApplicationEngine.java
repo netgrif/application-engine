@@ -1,7 +1,5 @@
 package com.netgrif.application.engine;
 
-import com.netgrif.application.engine.configuration.ApplicationContextProvider;
-import com.netgrif.application.engine.configuration.JsonRootRelProvider;
 import com.netgrif.application.engine.petrinet.domain.DataGroupAlignmentConverter;
 import com.netgrif.application.engine.petrinet.domain.layout.LayoutTypeConverter;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
@@ -49,16 +47,6 @@ public class ApplicationEngine {
         converters.add(new LayoutTypeConverter());
         converters.add(new DataGroupAlignmentConverter());
         return new MongoCustomConversions(converters);
-    }
-
-    @Bean
-    LinkRelationProvider relProvider() {
-        return new JsonRootRelProvider();
-    }
-
-    @Bean
-    ApplicationContextProvider applicationContextProvider() {
-        return new ApplicationContextProvider();
     }
 
     public static void main(String[] args) {

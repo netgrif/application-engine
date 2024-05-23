@@ -8,7 +8,6 @@ import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
-import com.netgrif.application.engine.configuration.ApplicationContextProvider
 import com.netgrif.application.engine.configuration.PublicViewProperties
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
@@ -17,8 +16,8 @@ import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearc
 import com.netgrif.application.engine.export.configuration.ExportConfiguration
 import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
-import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.history.service.IHistoryService
+import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
@@ -27,8 +26,6 @@ import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupS
 import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -60,13 +57,10 @@ import org.quartz.Scheduler
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.core.io.ClassPathResource
-import org.springframework.core.io.FileSystemResource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 
-import java.time.ZoneId
 import java.util.stream.Collectors
 
 /**
@@ -463,18 +457,18 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     // TODO: release/8.0.0 target case, merge check
-    def saveChangedValidation(Field field) {
-        // TODO: release/8.0.0 setData?
-        Field<?> caseField = useCase.dataSet.get(field.stringId)
-        caseField.validations = field.validations
-        List<Validation> compiled = field.validations.collect { it.clone() }
-        compiled.findAll { it instanceof DynamicValidation }.collect { (DynamicValidation) it }.each {
-            it.compiledRule = dataValidationExpressionEvaluator.compile(targetCase, it.expression)
-        }
-        SetDataEventOutcome outcome = createSetDataEventOutcome()
-        outcome.addChangedField(field.stringId, caseField)
-        this.outcomes.add(outcome)
-    }
+//    def saveChangedValidation(Field field) {
+//        // TODO: release/8.0.0 setData?
+//        Field<?> caseField = useCase.dataSet.get(field.stringId)
+//        caseField.validations = field.validations
+//        List<Validation> compiled = field.validations.collect { it.clone() }
+//        compiled.findAll { it instanceof DynamicValidation }.collect { (DynamicValidation) it }.each {
+//            it.compiledRule = dataValidationExpressionEvaluator.compile(targetCase, it.expression)
+//        }
+//        SetDataEventOutcome outcome = createSetDataEventOutcome()
+//        outcome.addChangedField(field.stringId, caseField)
+//        this.outcomes.add(outcome)
+//    }
 
     def execute(String taskId) {
         [with : { DataSet dataSet ->
@@ -543,13 +537,13 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     // TODO: release/8.0.0 merge targetCase
     def change(Field field) {
-        [about      : { cl -> // TODO: deprecated
+        [about              : { cl -> // TODO: deprecated
             changeFieldValue(field, cl)
         },
-         value      : { cl ->
+         value              : { cl ->
              changeFieldValue(field, cl)
          },
-         choices    : { cl ->
+         choices            : { cl ->
              if (!(field instanceof MultichoiceField || field instanceof EnumerationField)) {
                  return
              }
@@ -571,7 +565,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
              }
              setData(field, [choices: field.choices])
          },
-         allowedNets: { cl ->
+         allowedNets        : { cl ->
              if (!(field instanceof CaseField)) {// TODO make this work with FilterField as well
                  return
              }
@@ -589,7 +583,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
              }
              setData(field, [allowedNets: field.allowedNets])
          },
-         options    : { cl ->
+         options            : { cl ->
              if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField
                      || field instanceof MultichoiceField || field instanceof EnumerationField))
                  return
@@ -625,7 +619,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
              }
 
          },
-         validations: { cl ->
+         validations        : { cl ->
              changeFieldValidations(field, cl, targetCase, targetTask)
          },
          componentProperties: { cl ->
@@ -902,7 +896,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     SetDataEventOutcome setData(String taskId, DataSet dataSet, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        return addSetDataOutcomeToOutcomes(dataService.setData(taskId, dataSet,  user, params))
+        return addSetDataOutcomeToOutcomes(dataService.setData(taskId, dataSet, user, params))
     }
 
     SetDataEventOutcome setData(Transition transition, DataSet dataSet, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
@@ -1145,9 +1139,9 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return new Validation(rule, message)
     }
 
-    DynamicValidation dynamicValidation(String rule, I18nString message) {
-        return new DynamicValidation(rule, message)
-    }
+//    DynamicValidation dynamicValidation(String rule, I18nString message) {
+//        return new DynamicValidation(rule, message)
+//    }
 
     List<Case> findFilters(String userInput) {
         return filterSearchService.autocompleteFindFilters(userInput)
@@ -1554,32 +1548,32 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      * @return
      */
     def changeMenuItem(Case item) {
-        [allowedRoles  : { cl ->
+        [allowedRoles          : { cl ->
             updateMenuItemRoles(item, cl as Closure, MenuItemConstants.PREFERENCE_ITEM_FIELD_ALLOWED_ROLES.attributeId)
         },
-         bannedRoles   : { cl ->
+         bannedRoles           : { cl ->
              updateMenuItemRoles(item, cl as Closure, MenuItemConstants.PREFERENCE_ITEM_FIELD_BANNED_ROLES.attributeId)
          },
-         caseDefaultHeaders: { cl ->
+         caseDefaultHeaders    : { cl ->
              String defaultHeaders = cl() as String
              setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS.attributeId): ["type": "text", "value": defaultHeaders]
              ])
          },
-         taskDefaultHeaders: { cl ->
+         taskDefaultHeaders    : { cl ->
              String defaultHeaders = cl() as String
              setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS.attributeId): ["type": "text", "value": defaultHeaders]
              ])
          },
-         filter        : { cl ->
+         filter                : { cl ->
              def filter = cl() as Case
              // TODO: release/8.0.0 fix
              setData("change_filter", item, [
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_NEW_FILTER_ID.attributeId): ["type": "text", "value": filter.stringId]
              ])
          },
-         uri           : { cl ->
+         uri                   : { cl ->
              def uri = cl() as String
              def aCase = useCase
              if (useCase == null || item.stringId != useCase.stringId) {
@@ -1587,20 +1581,20 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
              }
              moveMenuItem(aCase, uri)
          },
-         title         : { cl ->
+         title                 : { cl ->
              def value = cl()
              I18nString newName = (value instanceof I18nString) ? value : new I18nString(value as String)
              setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME.attributeId): ["type": "i18n", "value": newName]
              ])
          },
-         menuIcon         : { cl ->
+         menuIcon              : { cl ->
              def value = cl()
              setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_ICON.attributeId): ["type": "text", "value": value]
              ])
          },
-         tabIcon         : { cl ->
+         tabIcon               : { cl ->
              def value = cl()
              setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_TAB_ICON.attributeId): ["type": "text", "value": value]
@@ -1612,13 +1606,13 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_REQUIRE_TITLE_IN_CREATION.attributeId): ["type": "boolean", "value": value]
              ])
          },
-         useCustomView: { cl ->
+         useCustomView         : { cl ->
              def value = cl()
              setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_USE_CUSTOM_VIEW.attributeId): ["type": "boolean", "value": value]
              ])
          },
-         customViewSelector: { cl ->
+         customViewSelector    : { cl ->
              def value = cl()
              setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_CUSTOM_VIEW_SELECTOR.attributeId): ["type": "text", "value": value]
@@ -2218,7 +2212,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     Map<String, I18nString> findOptionsBasedOnSelectedNode(UriNode node, List<String> splitPathList) {
         Map<String, I18nString> options = new HashMap<>()
 
-        options.putAll(splitPathList.collectEntries { [(it): new I18nString(it)]})
+        options.putAll(splitPathList.collectEntries { [(it): new I18nString(it)] })
 
         Set<String> childrenIds = node.getChildrenId()
         if (!childrenIds.isEmpty()) {
