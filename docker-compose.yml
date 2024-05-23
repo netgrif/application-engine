@@ -2,7 +2,7 @@ version: "3.3"
 
 services:
   docker-mongo:
-    image: mongo:4.4
+    image: mongo:7.0.9
     ports:
       - "27017:27017"
     deploy:
@@ -15,7 +15,7 @@ services:
           memory: "512M"
 
   docker-elastic:
-    image: elasticsearch:7.17.4
+    image: elasticsearch:8.10.4
     environment:
       - cluster.name=elasticsearch
       - discovery.type=single-node
@@ -35,7 +35,7 @@ services:
           memory: "512M"
 
   docker-redis:
-    image: redis:6
+    image: redis:7.2.5
     ports:
       - "6379:6379"
 
