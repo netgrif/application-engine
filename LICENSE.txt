@@ -1,6 +1,6 @@
                         NETGRIF Community License
                         Version 1.0, January 2022
-                    https://netgrif.com/license
+                       https://netgrif.com/license
 
     This NETGRIF Community License (“Agreement”) sets forth the terms
     and conditions on which NETGRIF, s.r.o., with the registered office
@@ -35,7 +35,7 @@
         "Licensor" shall mean the owner of the Software specified above.
 
         "PaaS" shall mean providing Software and/or Subsequent Work as
-        a service enabling any Partner to create Subsequent Work directly 
+        a service enabling any Partner to create Subsequent Work directly
         and/or via its APIs.
 
         "Partner" means any third-party person.
@@ -46,7 +46,7 @@
         organizations within their role or mission.
 
         "SaaS" shall mean providing Software and/or Subsequent Work
-        as a service enabling any Partner to use the Software and/or 
+        as a service enabling any Partner to use the Software and/or
         Subsequent Work directly and/or via its APIs.
 
         "Software" shall mean the computer program designated to enable
@@ -55,9 +55,9 @@
         which this Agreement is attached.
 
         "Subsequent Works" shall mean any work that is based on (or derived
-        from) the Software. For the purposes of this License, Subsequent 
-        Work shall not include work that remain separable from, or merely 
-        link (or bind by name) to the interfaces of, the Software and/or 
+        from) the Software. For the purposes of this License, Subsequent
+        Work shall not include work that remain separable from, or merely
+        link (or bind by name) to the interfaces of, the Software and/or
         Subsequent Work thereof.
 
         "You" (or "Your") shall mean an individual or legal entity
@@ -130,3 +130,8 @@
         (IPR) and the UN Convention on Contracts for the International Sale
         of Goods (CISG). All disputes arising from or in connection with
         this Agreement shall be finally resolved by the courts of Slovak Republic.
+
+    END OF THE LICENSE AGREEMENT
+
+    Annex 1: File THIRD-PARTY.txt in this repository.
+             (https://github.com/netgrif/application-engine/blob/master/THIRD-PARTY.txt)
