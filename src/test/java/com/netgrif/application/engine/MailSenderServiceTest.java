@@ -1,5 +1,6 @@
 package com.netgrif.application.engine;
 
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 import com.netgrif.application.engine.auth.domain.User;
@@ -38,7 +39,7 @@ public class MailSenderServiceTest {
 
     @BeforeEach
     public void before() {
-        smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"));
+        smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp")).withConfiguration(GreenMailConfiguration.aConfig().withDisabledAuthentication());
         smtpServer.start();
     }
 

@@ -23,7 +23,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
-import com.netgrif.application.engine.workflow.service.interfaces.IFilterService
+//import com.netgrif.application.engine.workflow.service.interfaces.IFilterService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateFilterBody
@@ -69,8 +69,8 @@ class ImportHelper {
     @Autowired
     private ResourceLoader resourceLoader
 
-    @Autowired
-    private IFilterService filterService
+//    @Autowired
+//    private IFilterService filterService
 
     @Autowired(required = false)
     private SuperCreator superCreator

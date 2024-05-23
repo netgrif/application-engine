@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.auth
 
+import com.icegreen.greenmail.configuration.GreenMailConfiguration
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.application.engine.TestHelper
@@ -79,7 +80,7 @@ class AuthenticationControllerTest {
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
-        smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
+        smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp")).withConfiguration(GreenMailConfiguration.aConfig().withDisabledAuthentication())
         smtpServer.start()
 
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
