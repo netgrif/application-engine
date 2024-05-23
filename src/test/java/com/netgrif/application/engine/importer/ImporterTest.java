@@ -140,7 +140,7 @@ public class ImporterTest {
         assert repository.count() > 0;
         Page<PetriNet> nets = repository.findByIdentifier(NET_ID, new FullPageRequest());
         PetriNet net = nets.getContent().get(0);
-//        TODO: release/7.0.0 assertion error
+//        TODO: release/8.0.0 assertion error
         assert net.getTitle().getDefaultValue().equals(NET_TITLE);
         assert net.getInitials().equals(NET_INITIALS);
         assert net.getPlaces().size() == NET_PLACES;

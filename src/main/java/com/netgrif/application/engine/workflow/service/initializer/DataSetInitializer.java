@@ -9,6 +9,8 @@ import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpr
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class DataSetInitializer {
@@ -19,7 +21,7 @@ public class DataSetInitializer {
         this.initValueExpressionEvaluator = initValueExpressionEvaluator;
     }
 
-    public void populateDataSet(Case useCase) {
+    public void populateDataSet(Case useCase, Map<String, String> params) {
         ArrayList<Field<?>> dynamicValueFields = new ArrayList<>();
         ArrayList<ChoiceField<?>> dynamicChoiceFields = new ArrayList<>();
         ArrayList<MapOptionsField<I18nString, ?>> dynamicOptionFields = new ArrayList<>();
@@ -49,20 +51,20 @@ public class DataSetInitializer {
             }
         });
 
-        dynamicChoiceFields.forEach(f -> this.initializeChoices(useCase, f));
-        dynamicOptionFields.forEach(f -> this.initializeOptions(useCase, f));
-        dynamicValueFields.forEach(f -> this.initializeValue(useCase, f));
+        dynamicChoiceFields.forEach(f -> this.initializeChoices(useCase, f, params));
+        dynamicOptionFields.forEach(f -> this.initializeOptions(useCase, f, params));
+        dynamicValueFields.forEach(f -> this.initializeValue(useCase, f, params));
     }
 
-    public <t> void initializeValue(Case useCase, Field<t> field) {
-        field.setRawValue(initValueExpressionEvaluator.evaluate(useCase, field));
+    public <t> void initializeValue(Case useCase, Field<t> field, Map<String, String> params) {
+        field.setRawValue(initValueExpressionEvaluator.evaluate(useCase, field, params));
     }
 
-    public void initializeChoices(Case useCase, ChoiceField<?> field) {
-        field.setChoices(initValueExpressionEvaluator.evaluateChoices(useCase, field));
+    public void initializeChoices(Case useCase, ChoiceField<?> field, Map<String, String> params) {
+        field.setChoices(initValueExpressionEvaluator.evaluateChoices(useCase, field, params));
     }
 
-    public void initializeOptions(Case useCase, MapOptionsField<I18nString, ?> field) {
-        field.setOptions(initValueExpressionEvaluator.evaluateOptions(useCase, field));
+    public void initializeOptions(Case useCase, MapOptionsField<I18nString, ?> field, Map<String, String> params) {
+        field.setOptions(initValueExpressionEvaluator.evaluateOptions(useCase, field, params));
     }
 }

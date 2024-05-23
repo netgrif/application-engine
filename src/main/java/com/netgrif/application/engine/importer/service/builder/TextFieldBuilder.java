@@ -21,7 +21,7 @@ public class TextFieldBuilder extends FieldBuilder<TextField> {
         if (values != null && !values.isEmpty()) {
             value = values.get(0).getValue();
         }
-        field.setRawValue(value); // TODO: release/7.0.0 is it necessary?
+        field.setRawValue(value); // TODO: release/8.0.0 is it necessary?
         setDefaultValue(field, data, field::setDefaultValue);
         return field;
     }

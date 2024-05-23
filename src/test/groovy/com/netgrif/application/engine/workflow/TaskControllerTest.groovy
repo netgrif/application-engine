@@ -197,7 +197,7 @@ class TaskControllerTest {
     void setUserListValue() {
         assert task != null
         String userId = userService.findByEmail(DUMMY_USER_MAIL, false).getStringId()
-        // TODO: release/7.0.0 field 'performable_users' does not exist
+        // TODO: release/8.0.0 field 'performable_users' does not exist
 //        dataService.setData(task.stringId, new DataSet([
 //                "performable_users": new UserListField(rawValue: new UserListFieldValue(dataService.makeUserFieldValue(userId)))
 //        ] as Map<String, Field<?>>))

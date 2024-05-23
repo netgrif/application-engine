@@ -1,12 +1,5 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
@@ -16,6 +9,7 @@ import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.model.LayoutType;
 import com.netgrif.application.engine.importer.service.FieldFactory;
+import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
@@ -29,7 +23,6 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.*;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
@@ -40,9 +33,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
-import com.netgrif.application.engine.workflow.web.responsebodies.DataFieldsResource;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField;
-import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -52,7 +42,6 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -108,7 +97,7 @@ public class DataService implements IDataService {
 
     @Override
     public GetDataEventOutcome getData(String taskId, IUser user) {
-        return getData(taskId, user, null);
+        return getData(taskId, user, new HashMap<>());
     }
 
     @Override
@@ -121,12 +110,12 @@ public class DataService implements IDataService {
 
     @Override
     public GetDataEventOutcome getData(Task task, Case useCase, IUser user) {
-        return getData(task, useCase, new HashMap<>());
+        return getData(task, useCase, user, new HashMap<>());
     }
 
     @Override
     public GetDataEventOutcome getData(Task task, Case useCase, IUser user, Map<String, String> params) {
-        log.info("[" + useCase.getStringId() + "]: Getting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
+        log.info("[{}]: Getting data of task {} [{}]", useCase.getStringId(), task.getTransitionId(), task.getStringId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         Map<String, DataRef> dataRefs = transition.getDataSet();
         List<DataRef> dataSetFields = new ArrayList<>();
@@ -135,11 +124,11 @@ public class DataService implements IDataService {
         dataRefs.forEach((fieldId, dataRef) -> {
             Field<?> field = useCase.getDataSet().get(fieldId);
             DataFieldBehavior behavior = field.getBehaviors().get(task.getTransitionId());
-            // TODO: release/7.0.0 behavior is null
+            // TODO: release/8.0.0 behavior is null
             if (behavior.isForbidden()) {
                 return;
             }
-            outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, null));
+            outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, null, params));
             historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE, user));
 
             if (outcome.getMessage() == null) {
@@ -149,7 +138,8 @@ public class DataService implements IDataService {
             dataRef.setFieldId(fieldId);
             dataRef.setBehavior(behavior);
             dataSetFields.add(dataRef);
-            outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task, params));
+            // TODO: release/8.0.0 params into outcome?
+            outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task, null, params));
             historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST, user));
         });
 
@@ -160,13 +150,18 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome setData(String taskId, DataSet dataSet, IUser user) {
-        return setData(task, dataSet, user, new HashMap<>());
+        return setData(taskId, dataSet, user, new HashMap<>());
     }
 
     @Override
     public SetDataEventOutcome setData(String taskId, DataSet dataSet, IUser user, Map<String, String> params) {
         Task task = taskService.findOne(taskId);
         return setData(task, dataSet, user, params);
+    }
+
+    @Override
+    public SetDataEventOutcome setData(String taskId, DataSet values, LoggedUser loggedUser) {
+        return setData(taskId, values, loggedUser, new HashMap<>());
     }
 
     @Override
@@ -177,13 +172,23 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome setData(Case target, DataSet dataSet, IUser user) {
+        return setData(target, dataSet, user, new HashMap<>());
+    }
+
+    @Override
+    public SetDataEventOutcome setData(Case target, DataSet dataSet, IUser user, Map<String, String> params) {
         Task fake = Task.with().id(new ObjectId()).caseId(target.getStringId()).title(new I18nString("Fake")).transitionId("fake").build();
-        return setData(fake, dataSet, user);
+        return setData(fake, dataSet, user, params);
     }
 
     @Override
     public SetDataEventOutcome setData(Task task, DataSet dataSet, IUser user) {
-        log.info("[" + task.getStringId() + "]: Setting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
+        return setData(task, dataSet, user, new HashMap<>());
+    }
+
+    @Override
+    public SetDataEventOutcome setData(Task task, DataSet dataSet, IUser user, Map<String, String> params) {
+        log.info("[{}]: Setting data of task {} [{}]", task.getStringId(), task.getTransitionId(), task.getStringId());
         if (task.getUserId() != null) {
             task.setUser(userService.findById(task.getUserId(), false));
         }
@@ -197,9 +202,14 @@ public class DataService implements IDataService {
         return new SetDataEventOutcome(useCase, task, outcomes);
     }
 
-    // TODO: release/8.0.0 check
     @Override
     public SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField, IUser user) {
+        return setDataField(task, fieldId, newDataField, user, new HashMap<>());
+    }
+
+    // TODO: release/8.0.0 check
+    @Override
+    public SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField, IUser user, Map<String, String> params) {
         // TODO: NAE-1859 permissions?
         Case useCase = workflowService.findOne(task.getCaseId());
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
@@ -209,7 +219,7 @@ public class DataService implements IDataService {
         }
         Field<?> field = fieldOptional.get();
         // PRE
-        outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task, newDataField));
+        outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task, newDataField, params));
         useCase = workflowService.findOne(task.getCaseId());
         historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE, DataSet.of(fieldId, newDataField), user));
         // EXECUTION
@@ -224,7 +234,7 @@ public class DataService implements IDataService {
         outcome.addChangedField(fieldId, newDataField);
         historyService.save(new SetDataEventLog(task, useCase, EventPhase.EXECUTION, DataSet.of(fieldId, newDataField), user));
         // POST
-        outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, newDataField));
+        outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, newDataField, params));
         useCase = workflowService.findOne(task.getCaseId());
         historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, DataSet.of(fieldId, newDataField), user));
         useCase = applyFieldConnectedChanges(useCase, field);
@@ -300,15 +310,17 @@ public class DataService implements IDataService {
         return outcome;
     }
 
-    private boolean shouldResolveTaskRefData(Field<?> field, DataFieldLogic dataRef) {
-        if (dataRef.getComponent() != null) {
-            return hasRequiredComponentProperty(dataRef.getComponent(), "resolve_data", "true");
-        } else if (field.getComponent() != null) {
-            return hasRequiredComponentProperty(field.getComponent(), "resolve_data", "true");
-        }
-        return true;
-    }
+    // TODO: release/8.0.0 needed?
+//    private boolean shouldResolveTaskRefData(Field<?> field, DataFieldLogic dataRef) {
+//        if (dataRef.getComponent() != null) {
+//            return hasRequiredComponentProperty(dataRef.getComponent(), "resolve_data", "true");
+//        } else if (field.getComponent() != null) {
+//            return hasRequiredComponentProperty(field.getComponent(), "resolve_data", "true");
+//        }
+//        return true;
+//    }
 
+    // TODO: release/8.0.0 refactor?
     private boolean hasRequiredComponentProperty(Component component, String propertyName, String propertyValue) {
         return component != null
                 && component.getProperties() != null
@@ -411,7 +423,7 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFileByName(Case useCase, FileListField field, String name, Map<String, String> params) {
-        runGetActionsFromFileField(field.getEvents(), useCase);
+        runGetActionsFromFileField(field.getEvents(), useCase, params);
         FileListField caseField = (FileListField) useCase.getDataSet().get(field.getStringId());
         if (caseField.getRawValue() == null) {
             return null;
@@ -422,7 +434,7 @@ public class DataService implements IDataService {
 
         Optional<FileFieldValue> fileField = field.getRawValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
         if (fileField.isEmpty() || fileField.get().getPath() == null) {
-            log.error("File " + name + " not found!");
+            log.error("File {} not found!", name);
             return null;
         }
 
@@ -441,7 +453,8 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview, Map<String, String> params) {
-        runGetActionsFromFileField(field.getEvents(), useCase);
+        // TODO: release/8.0.0 check params pass to other functions
+        runGetActionsFromFileField(field.getEvents(), useCase, params);
         FileField caseField = (FileField) useCase.getDataSet().get(field.getStringId());
         if (caseField.getRawValue() == null) {
             return null;
@@ -583,7 +596,7 @@ public class DataService implements IDataService {
 
     private List<EventOutcome> getChangedFieldByFileFieldContainer(String fieldId, Task referencingTask, Case useCase, Map<String, String> params) {
         List<EventOutcome> outcomes = new ArrayList<>();
-        // TODO: release/7.0.0 changed value, use set data
+        // TODO: release/8.0.0 changed value, use set data
         outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET, EventPhase.PRE, useCase, referencingTask, null, params));
         outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET, EventPhase.POST, useCase, referencingTask, null, params));
         updateDataset(useCase);
@@ -666,7 +679,7 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome deleteFile(String taskId, String fieldId) {
-        return deleteFile(String taskId, String fieldId, new HashMap<>());
+        return deleteFile(taskId, fieldId, new HashMap<>());
     }
 
     @Override
@@ -684,7 +697,7 @@ public class DataService implements IDataService {
             }
             useCase.getDataSet().get(field.getStringId()).setValue(null);
         }
-        // TODO: release/7.0.0 6.2.5
+        // TODO: release/8.0.0 6.2.5
         return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase, params));
     }
 
@@ -711,7 +724,7 @@ public class DataService implements IDataService {
             }
             ((FileListField) useCase.getDataSet().get(field.getStringId())).setRawValue(field.getValue().getValue());
         }
-        // TODO: release/7.0.0 6.2.5
+        // TODO: release/8.0.0 6.2.5
         return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase, params));
     }
 
@@ -733,7 +746,7 @@ public class DataService implements IDataService {
     public List<Field<?>> getImmediateFields(Task task) {
         Case useCase = workflowService.findOne(task.getCaseId());
         List<Field<?>> fields = task.getImmediateDataFields().stream().map(f -> useCase.getDataSet().get(f)).collect(Collectors.toList());
-//        TODO: release/7.0.0 order?
+//        TODO: release/8.0.0 order?
 //        LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
         return fields;
     }
@@ -747,8 +760,8 @@ public class DataService implements IDataService {
         });
     }
 
-    private List<EventOutcome> resolveDataEvents(Field<?> field, DataEventType trigger, EventPhase phase, Case useCase, Task task, Field<?> newDataField) {
-        return eventService.processDataEvents(field, trigger, phase, useCase, task, newDataField);
+    private List<EventOutcome> resolveDataEvents(Field<?> field, DataEventType trigger, EventPhase phase, Case useCase, Task task, Field<?> newDataField, Map<String, String> params) {
+        return eventService.processDataEvents(field, trigger, phase, useCase, task, newDataField, params);
     }
 
     @Override

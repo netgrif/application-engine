@@ -95,8 +95,7 @@ public class PetriNetController {
         try {
             VersionType release = releaseType == null ? VersionType.MAJOR : VersionType.valueOf(releaseType.trim().toUpperCase());
             ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(multipartFile.getInputStream(), release, (LoggedUser) auth.getPrincipal(), uriNodeId);
-            return EventOutcomeWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully",
-                    LocalisedEventOutcomeFactory.from(importPetriNetOutcome, locale));
+            return EventOutcomeWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully", importPetriNetOutcome);
         } catch (IOException e) {
             log.error("Importing Petri net failed: ", e);
             return EventOutcomeWithMessageResource.errorMessage("IO error while importing Petri net");
@@ -166,7 +165,7 @@ public class PetriNetController {
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileResource.getFilename() + Importer.FILE_EXTENSION + "\"");
         response.setHeader("Content-Length", String.valueOf(fileResource.getFile().length()));
-        log.info("Downloading Petri net file: " + fileResource.getFilename() + " [" + netId + "]");
+        log.info("Downloading Petri net file: {} [{}]", fileResource.getFilename(), netId);
         return fileResource;
     }
 
@@ -195,7 +194,7 @@ public class PetriNetController {
     public MessageResource deletePetriNet(@PathVariable("id") String processId, Authentication auth) {
         String decodedProcessId = decodeUrl(processId);
         if (Objects.equals(decodedProcessId, "")) {
-            log.error("Deleting Petri net [" + processId + "] failed: could not decode process ID from URL");
+            log.error("Deleting Petri net [{}] failed: could not decode process ID from URL", processId);
             return MessageResource.errorMessage("Deleting Petri net " + processId + " failed!");
         }
         LoggedUser user = (LoggedUser) auth.getPrincipal();

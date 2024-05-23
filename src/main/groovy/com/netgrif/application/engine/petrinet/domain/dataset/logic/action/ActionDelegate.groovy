@@ -24,8 +24,6 @@ import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
 import com.netgrif.application.engine.mail.interfaces.IMailService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
-import com.netgrif.application.engine.pdf.generator.config.PdfResource
-import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
@@ -68,7 +66,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 
-import java.text.Normalizer
 import java.time.ZoneId
 import java.util.stream.Collectors
 
@@ -77,7 +74,7 @@ import java.util.stream.Collectors
  */
 @Slf4j
 @SuppressWarnings(["GrMethodMayBeStatic", "GroovyUnusedDeclaration"])
-class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
+class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     private static final String FILTER_FIELD_I18N_FILTER_NAME = "i18n_filter_name"
 
@@ -120,9 +117,6 @@ class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
 
     @Autowired
     AsyncRunner async
-
-    @Autowired
-    IPdfGenerator pdfGenerator
 
     @Autowired
     IMailService mailService
@@ -201,10 +195,10 @@ class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
     FieldActionsRunner actionsRunner
     List<EventOutcome> outcomes
 
-    // TODO: release/7.0.0 - <action trigger="set" type="value">
-    // TODO: release/7.0.0 - pretazit findCase, findTask - querydsl alebo caserequest, int page,int size
-    // TODO: release/7.0.0 - setdata with user
-    // TODO: release/7.0.0 - deprecate enum/multichoice with chooices, keep only maps with options
+    // TODO: release/8.0.0 - <action trigger="set" type="value">
+    // TODO: release/8.0.0 - pretazit findCase, findTask - querydsl alebo caserequest, int page,int size
+    // TODO: release/8.0.0 - setdata with user
+    // TODO: release/8.0.0 - deprecate enum/multichoice with chooices, keep only maps with options
 
     void init(Action action, Case useCase, Optional<Task> task, Field<?> fieldChanges, FieldActionsRunner actionsRunner, Map<String, String> params = [:]) {
         this.action = action
@@ -470,7 +464,7 @@ class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
 
     // TODO: release/8.0.0 target case, merge check
     def saveChangedValidation(Field field) {
-        // TODO: release/7.0.0 setData?
+        // TODO: release/8.0.0 setData?
         Field<?> caseField = useCase.dataSet.get(field.stringId)
         caseField.validations = field.validations
         List<Validation> compiled = field.validations.collect { it.clone() }
@@ -660,7 +654,7 @@ class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
             }
         }
         if (value == null && useCase.dataSet.get(field.stringId).value != null) {
-            // TODO: release/7.0.0 should be in data service
+            // TODO: release/8.0.0 should be in data service
             if (field instanceof FileListField && task.isPresent()) {
                 field.value.value.namesPaths.forEach(namePath -> {
                     dataService.deleteFileByName(task.get().stringId, field.stringId, namePath.name)
@@ -672,7 +666,7 @@ class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
             setData(field, [rawValue: null])
         }
         if (value != null) {
-            // TODO: release/7.0.0 should be in data service
+            // TODO: release/8.0.0 should be in data service
             if (field instanceof CaseField) {
                 value = ((List) value).stream().map({ entry -> entry instanceof Case ? entry.getStringId() : entry }).collect(Collectors.toList())
                 dataService.validateCaseRefValue((List<String>) value, ((CaseField) field).getAllowedNets())
@@ -973,7 +967,7 @@ class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
         return outcome.getData()
     }
 
-    // TODO: release/7.0.0 should return dataRef?
+    // TODO: release/8.0.0 should return dataRef?
     protected Map<String, Field> mapData(List<DataRef> data) {
         return data.collectEntries {
             [(it.fieldId): it.field]
@@ -1000,73 +994,6 @@ class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
             ] as Map<String, Field<?>>)
             setData(taskId, dataSet)
         }
-    }
-
-    @NamedVariant
-    void generatePdf(String sourceTransitionId, String targetFileFieldId,
-                     Case sourceCase = useCase, Case targetCase = useCase, String targetTransitionId = null,
-                     String template = null, List<String> excludedFields = [], Locale locale = null,
-                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 0) {
-        if (!sourceTransitionId || !targetFileFieldId) {
-            throw new IllegalArgumentException("Source transition or target file field is null")
-        }
-        targetTransitionId = targetTransitionId ?: sourceTransitionId
-        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
-        String filename = pdfResource.getOutputDefaultName()
-        String storagePath
-        if (pdfResource.getOutputFolder()) {
-            storagePath = pdfResource.getOutputFolder() + File.separator + targetCase.stringId + "-" + targetFileFieldId + "-" + filename
-        } else {
-            // TODO: release/7.0.0 check syntax
-            storagePath = new FileFieldValue(filename, "").getPath(targetCase.stringId, targetFileFieldId)
-        }
-
-        pdfResource.setOutputResource(new ClassPathResource(storagePath))
-        if (template) {
-            pdfResource.setTemplateResource(new FileSystemResource(template))
-        }
-        if (locale) {
-            pdfResource.setTextLocale(locale)
-        }
-        pdfResource.setDateZoneId(dateZoneId)
-        pdfResource.setMarginTitle(titleMargin)
-        pdfResource.setMarginLeft(sideMargin)
-        pdfResource.setMarginRight(sideMargin)
-        pdfResource.updateProperties()
-        pdfGenerator.setupPdfGenerator(pdfResource)
-        pdfGenerator.generatePdf(sourceCase, sourceTransitionId, pdfResource, excludedFields)
-        saveFileToField(targetCase, targetTransitionId, targetFileFieldId, filename, storagePath)
-    }
-
-    void generatePdf(Transition sourceTransition, FileField targetFileField,
-                     Case sourceCase = useCase, Case targetCase = useCase, Transition targetTransition = null,
-                     String template = null, List<String> excludedFields = [], Locale locale = null,
-                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 0) {
-        if (!sourceTransition || !targetFileField)
-            throw new IllegalArgumentException("Source transition or target file field is null")
-        targetTransition = targetTransition ?: sourceTransition
-        generatePdf(sourceTransition.stringId, targetFileField.importId, sourceCase, targetCase, targetTransition.stringId,
-                template, excludedFields, locale, dateZoneId, sideMargin, titleMargin)
-    }
-
-    void generatePdf(String transitionId, FileField fileField, List<String> excludedFields = []) {
-        generatePdf(sourceTransitionId: transitionId, targetFileFieldId: fileField, excludedFields: excludedFields)
-    }
-
-    void generatePdf(String transitionId, String fileFieldId, List<String> excludedFields, Case fromCase = useCase, Case saveToCase = useCase) {
-        generatePdf(sourceTransitionId: transitionId, targetFileFieldId: fileFieldId, excludedFields: excludedFields, sourceCase: fromCase, targetCase: useCase)
-    }
-
-    void generatePdfWithTemplate(String transitionId, String fileFieldId, String template, Case fromCase = useCase, Case saveToCase = useCase) {
-        generatePdf(sourceTransitionId: transitionId, targetFileFieldId: fileFieldId, template: template, sourceCase: fromCase, targetCase: saveToCase)
-    }
-
-    void generatePdfWithLocale(String transitionId, String fileFieldId, Locale locale, Case fromCase = useCase, Case saveToCase = useCase) {
-        generatePdf(sourceTransitionId: transitionId, targetFileFieldId: fileFieldId, locale: locale, sourceCase: fromCase, targetCase: saveToCase)
-    }
-
-    void generatePdfWithZoneId(String transitionId, String fileFieldId, ZoneId dateZoneId = ZoneId.systemDefault(), Case fromCase = useCase, Case saveToCase = useCase) {
-        generatePdf(sourceTransitionId: transitionId, targetFileFieldId: fileFieldId, dateZoneId: dateZoneId, sourceCase: fromCase, targetCase: saveToCase)
     }
 
     void sendEmail(List<String> to, String subject, String body) {
@@ -1490,7 +1417,7 @@ class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
      * </ul>
      * @param filter {@link Case} instance of filter
      */
-    // TODO: release/7.0.0: missing test on changeFilter action?
+    // TODO: release/8.0.0: missing test on changeFilter action?
     def changeFilter(Case filter) {
         [query         : { cl ->
             updateFilter(filter, [
@@ -1647,7 +1574,7 @@ class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
          },
          filter        : { cl ->
              def filter = cl() as Case
-             // TODO: release/7.0.0 fix
+             // TODO: release/8.0.0 fix
              setData("change_filter", item, [
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_NEW_FILTER_ID.attributeId): ["type": "text", "value": filter.stringId]
              ])
@@ -1699,7 +1626,7 @@ class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
          }]
     }
 
-    // TODO: release/7.0.0: missing test
+    // TODO: release/8.0.0: missing test
     private void updateMenuItemRoles(Case item, Closure cl, String roleFieldId) {
         item = workflowService.findOne(item.stringId)
         def roles = cl()
@@ -1787,11 +1714,11 @@ class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
         orgGroup = orgGroup ?: nextGroupService.findDefaultGroup()
         Case itemCase = createCase(FilterRunner.PREFERRED_FILTER_ITEM_NET_IDENTIFIER, filter.title)
         itemCase.setUriNodeId(uriService.findByUri(uri).id)
-        // TODO: release/7.0.0 check .options syntax
+        // TODO: release/8.0.0 check .options syntax
         itemCase.dataSet[PREFERENCE_ITEM_FIELD_ALLOWED_ROLES].options = allowedRoles
         itemCase.dataSet[PREFERENCE_ITEM_FIELD_BANNED_ROLES].options = bannedRoles
         itemCase = workflowService.save(itemCase)
-        // TODO: release/7.0.0 decouple
+        // TODO: release/8.0.0 decouple
         Task newItemTask = findTask(itemCase.getTaskStringId("init"))
         assignTask(newItemTask)
         DataSet dataSet = new DataSet([
@@ -1821,11 +1748,13 @@ class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
         ]
         setData(newItemTask, setDataMap)
         finishTask(newItemTask)
-// TODO: release/7.0.0 decouple
+// TODO: release/8.0.0 decouple
         def task = orgGroup.getTaskStringId("append_menu_item")
         dataService.setData(task, new DataSet([
                 (PREFERENCE_ITEM_FIELD_APPEND_MENU_ITEM): new TextField(rawValue: itemCase.stringId)
         ] as Map<String, Field<?>>), userService.loggedOrSystem)
+        // TODO release/8.0.0  check merge? chybala zatvorka a kod predtym bola asi osobitna funkcia?
+    }
 
     private Case appendChildCaseId(Case folderCase, String childItemCaseId) {
         List<String> childIds = folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as ArrayList<String>

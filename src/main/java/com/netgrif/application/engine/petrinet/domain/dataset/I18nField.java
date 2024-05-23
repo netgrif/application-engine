@@ -10,7 +10,7 @@ import lombok.Data;
 public class I18nField extends Field<I18nString> {
 
     public I18nField() {
-        // TODO: release/7.0.0 clearValue?
+        // TODO: release/8.0.0 clearValue?
         super();
     }
 
@@ -28,7 +28,7 @@ public class I18nField extends Field<I18nString> {
     @Override
     public I18nField clone() {
         I18nField clone = new I18nField();
-        // TODO: release/7.0.0 deep copy?
+        // TODO: release/8.0.0 deep copy?
         super.clone(clone);
         return clone;
     }

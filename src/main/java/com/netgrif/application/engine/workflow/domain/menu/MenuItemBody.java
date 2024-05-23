@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.domain.menu;
 
+import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate;
 import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.Data;
@@ -113,12 +113,13 @@ public class MenuItemBody {
         this.tabIcon = tabIcon;
     }
 
-    private static void putDataSetEntry(Map<String, Map<String, Object>> dataSet, MenuItemConstants fieldId, FieldType fieldType,
+    private static void putDataSetEntry(Map<String, Map<String, Object>> dataSet, MenuItemConstants fieldId, DataType DataType,
                                         @Nullable Object fieldValue) {
-        Map<String, Object> fieldMap = new LinkedHashMap<>();
-        fieldMap.put("type", fieldType.getName());
-        fieldMap.put("value", fieldValue);
-        dataSet.put(fieldId.getAttributeId(), fieldMap);
+        // TODO: release/8.0.0 change to DataSet class
+//        Map<String, Object> fieldMap = new LinkedHashMap<>();
+//        fieldMap.put("type", DataType.getName());
+//        fieldMap.put("value", fieldValue);
+//        dataSet.put(fieldId.getAttributeId(), fieldMap);
     }
 
     private static String sanitize(String input) {
@@ -186,51 +187,51 @@ public class MenuItemBody {
         }
 
         if (nodePath != null) {
-            putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH, FieldType.TEXT, nodePath);
+            putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH, DataType.TEXT, nodePath);
         }
         if (!ignoreParentId) {
-            putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID, FieldType.CASE_REF, parentIdCaseRef);
+            putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID, DataType.CASE_REF, parentIdCaseRef);
         }
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME, FieldType.I18N, this.menuName);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_ICON, FieldType.TEXT, this.menuIcon);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TAB_NAME, FieldType.I18N, this.tabName);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TAB_ICON, FieldType.TEXT, this.tabIcon);
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME, DataType.I_18_N, this.menuName);
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_ICON, DataType.TEXT, this.menuIcon);
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TAB_NAME, DataType.I_18_N, this.tabName);
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TAB_ICON, DataType.TEXT, this.tabIcon);
         if (this.identifier != null) {
-            putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_IDENTIFIER, FieldType.TEXT, this.getIdentifier());
+            putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_IDENTIFIER, DataType.TEXT, this.getIdentifier());
         }
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_FILTER_CASE, FieldType.CASE_REF, filterIdCaseRefValue);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_USE_TAB_ICON, FieldType.BOOLEAN, this.useTabIcon);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_USE_CUSTOM_VIEW, FieldType.BOOLEAN,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_FILTER_CASE, DataType.CASE_REF, filterIdCaseRefValue);
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_USE_TAB_ICON, DataType.BOOLEAN, this.useTabIcon);
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_USE_CUSTOM_VIEW, DataType.BOOLEAN,
                 this.useCustomView);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CUSTOM_VIEW_SELECTOR, FieldType.TEXT,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CUSTOM_VIEW_SELECTOR, DataType.TEXT,
                 this.customViewSelector);
 
         // CASE
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_VIEW_SEARCH_TYPE, FieldType.ENUMERATION_MAP,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_VIEW_SEARCH_TYPE, DataType.ENUMERATION_MAP,
                 this.caseViewSearchType);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CREATE_CASE_BUTTON_TITLE, FieldType.TEXT,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CREATE_CASE_BUTTON_TITLE, DataType.TEXT,
                 this.createCaseButtonTitle);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CREATE_CASE_BUTTON_ICON, FieldType.TEXT,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CREATE_CASE_BUTTON_ICON, DataType.TEXT,
                 this.createCaseButtonIcon);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_REQUIRE_TITLE_IN_CREATION, FieldType.BOOLEAN,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_REQUIRE_TITLE_IN_CREATION, DataType.BOOLEAN,
                 this.caseRequireTitleInCreation);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_SHOW_CREATE_CASE_BUTTON, FieldType.BOOLEAN,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_SHOW_CREATE_CASE_BUTTON, DataType.BOOLEAN,
                 this.showCreateCaseButton);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_BANNED_NETS_IN_CREATION, FieldType.TEXT,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_BANNED_NETS_IN_CREATION, DataType.TEXT,
                 this.bannedNetsInCreation);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_SHOW_MORE_MENU, FieldType.BOOLEAN,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_SHOW_MORE_MENU, DataType.BOOLEAN,
                 this.caseShowMoreMenu);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_ALLOW_HEADER_TABLE_MODE, FieldType.BOOLEAN,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_ALLOW_HEADER_TABLE_MODE, DataType.BOOLEAN,
                 this.caseAllowHeaderTableMode);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_HEADERS_MODE, FieldType.MULTICHOICE_MAP,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_HEADERS_MODE, DataType.MULTICHOICE_MAP,
                 this.caseHeadersMode == null ? new ArrayList<>() : this.caseHeadersMode);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_HEADERS_DEFAULT_MODE, FieldType.ENUMERATION_MAP,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_HEADERS_DEFAULT_MODE, DataType.ENUMERATION_MAP,
                 this.caseHeadersDefaultMode);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS, FieldType.TEXT,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS, DataType.TEXT,
                 this.caseDefaultHeaders != null ? String.join(",", this.caseDefaultHeaders) : null);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_IS_HEADER_MODE_CHANGEABLE, FieldType.BOOLEAN,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_IS_HEADER_MODE_CHANGEABLE, DataType.BOOLEAN,
                 this.caseIsHeaderModeChangeable);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_USE_CASE_DEFAULT_HEADERS, FieldType.BOOLEAN,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_USE_CASE_DEFAULT_HEADERS, DataType.BOOLEAN,
                 this.caseUseDefaultHeaders);
 
         // TASK
@@ -239,25 +240,25 @@ public class MenuItemBody {
             additionalFilterIdCaseRefValue.add(this.additionalFilter.getStringId());
         }
 
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_ADDITIONAL_FILTER_CASE, FieldType.CASE_REF,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_ADDITIONAL_FILTER_CASE, DataType.CASE_REF,
                 additionalFilterIdCaseRefValue);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_MERGE_FILTERS, FieldType.BOOLEAN,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_MERGE_FILTERS, DataType.BOOLEAN,
                 this.mergeFilters);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_VIEW_SEARCH_TYPE, FieldType.ENUMERATION_MAP,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_VIEW_SEARCH_TYPE, DataType.ENUMERATION_MAP,
                 this.taskViewSearchType);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_HEADERS_MODE, FieldType.MULTICHOICE_MAP,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_HEADERS_MODE, DataType.MULTICHOICE_MAP,
                 this.taskHeadersMode == null ? new ArrayList<>() : this.taskHeadersMode);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_HEADERS_DEFAULT_MODE, FieldType.ENUMERATION_MAP,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_HEADERS_DEFAULT_MODE, DataType.ENUMERATION_MAP,
                 this.taskHeadersDefaultMode);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_IS_HEADER_MODE_CHANGEABLE, FieldType.BOOLEAN,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_IS_HEADER_MODE_CHANGEABLE, DataType.BOOLEAN,
                 this.taskIsHeaderModeChangeable);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_ALLOW_HEADER_TABLE_MODE, FieldType.BOOLEAN,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_ALLOW_HEADER_TABLE_MODE, DataType.BOOLEAN,
                 this.taskAllowHeaderTableMode);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_USE_TASK_DEFAULT_HEADERS, FieldType.BOOLEAN,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_USE_TASK_DEFAULT_HEADERS, DataType.BOOLEAN,
                 this.taskUseDefaultHeaders);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS, FieldType.TEXT,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS, DataType.TEXT,
                 this.taskDefaultHeaders != null ? String.join(",", this.taskDefaultHeaders) : null);
-        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_SHOW_MORE_MENU, FieldType.BOOLEAN,
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_SHOW_MORE_MENU, DataType.BOOLEAN,
                 this.taskShowMoreMenu);
 
         return dataSet;

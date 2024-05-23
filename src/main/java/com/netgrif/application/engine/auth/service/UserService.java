@@ -53,7 +53,7 @@ public class UserService extends AbstractUserService {
     @Autowired
     private IFilterImportExportService filterImportExportService;
 
-    // TODO: release/7.0.0 cleanup, remove boolean params
+    // TODO: release/8.0.0 cleanup, remove boolean params
 
     @Override
     public IUser saveNewAndAuthenticate(IUser user) {

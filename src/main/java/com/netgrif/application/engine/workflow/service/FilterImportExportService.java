@@ -231,7 +231,7 @@ public class FilterImportExportService implements IFilterImportExportService {
             importedFilterTaskIds.put(filter.getCaseId(), importedFilterTask.getStringId());
 
             // TODO: delete after fixed issue: https://netgrif.atlassian.net/jira/servicedesk/projects/NGSD/issues/
-//            TODO: release/7.0.0
+//            TODO: release/8.0.0
 //            filterCase.get().getDataSet().get(FIELD_MISSING_ALLOWED_NETS).setBehaviors(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.HIDDEN));
 //            filterCase.get().getDataSet().get(FIELD_FILTER).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.VISIBLE));
             workflowService.save(filterCase.get());
@@ -253,7 +253,7 @@ public class FilterImportExportService implements IFilterImportExportService {
             Task importedFilterTask = taskService.findOne(f);
             Case filterCase = workflowService.findOne(importedFilterTask.getCaseId());
             PetriNet filterNet = petriNetService.getNewestVersionByIdentifier(FILTER_NET_IDENTIFIER);
-//            TODO: release/7.0.0
+//            TODO: release/8.0.0
 //            List<String> requiredNets = filterCase.getDataSet().get(FIELD_FILTER).getAllowedNets();
 //            List<String> currentNets = petriNetService.getExistingPetriNetIdentifiersFromIdentifiersList(requiredNets);
 //            if (currentNets.size() < requiredNets.size()) {
@@ -281,7 +281,7 @@ public class FilterImportExportService implements IFilterImportExportService {
     }
 
     private void changeVisibilityByAllowedNets(boolean allowedNetsMissing, Case filterCase) {
-//        TODO: release/7.0.0
+//        TODO: release/8.0.0
 //        filterCase.getDataSet().get(allowedNetsMissing ? FIELD_MISSING_ALLOWED_NETS : FIELD_FILTER).makeVisible(IMPORT_FILTER_TRANSITION);
 //        filterCase.getDataSet().get(allowedNetsMissing ? FIELD_FILTER : FIELD_MISSING_ALLOWED_NETS).makeHidden(IMPORT_FILTER_TRANSITION);
     }

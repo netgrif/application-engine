@@ -26,7 +26,7 @@ public class ExecutorTest {
 
     }
 
-    // TODO: release/7.0.0 what does it test? is sleep necessary?
+    // TODO: release/8.0.0 what does it test? is sleep necessary?
     @Test
     public void runMoreThanCapacityExecutors() throws InterruptedException {
         for (int i = 0; i < 500; i++) {

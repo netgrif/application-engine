@@ -54,8 +54,8 @@ public interface IDataService {
     SetDataEventOutcome setData(Task task, DataSet values, IUser user, Map<String, String> params);
 
     SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField, IUser user);
-
-    SetDataEventOutcome setData(Task task, ObjectNode values, Map<String, String> params);
+    
+    SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField, IUser user, Map<String, String> params);
 
     FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview);
 
@@ -79,6 +79,7 @@ public interface IDataService {
 
     InputStream download(String url) throws IOException;
 
+    // TODO: release/8.0.0 IUSer?
     SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile);
 
     SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> params);
@@ -95,10 +96,12 @@ public interface IDataService {
 
     SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name, Map<String, String> params);
 
+    // TODO: release/8.0.0 deprecated by forms
     GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, IUser user);
 
     GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, LoggedUser loggedUser);
 
+    // TODO: release/8.0.0 revision
     Page<Task> setImmediateFields(Page<Task> tasks);
 
     List<Field<?>> getImmediateFields(Task task);

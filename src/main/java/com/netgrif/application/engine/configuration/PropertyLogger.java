@@ -16,7 +16,7 @@ import java.util.stream.StreamSupport;
 @Component
 public class PropertyLogger {
 
-    // TODO: release/7.0.0 properties???
+    // TODO: release/8.0.0 properties???
     private static final String[] SECRET_PROPS = new String[]{"secret", "password", "credentials", "heslo", "pass"};
 
     @EventListener

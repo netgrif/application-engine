@@ -26,7 +26,6 @@ import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataFieldValue;
 import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.TaskPair;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
@@ -57,7 +56,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
-import java.util.stream.StreamSupport;
 
 @Slf4j
 @Service
@@ -130,7 +128,7 @@ public class WorkflowService implements IWorkflowService {
             useCase.resolveImmediateDataFields();
             elasticCaseService.indexNow(this.caseMappingService.transform(useCase));
         } catch (Exception e) {
-            log.error("Indexing failed [" + useCase.getStringId() + "]", e);
+            log.error("Indexing failed [{}]", useCase.getStringId(), e);
         }
         return useCase;
     }
@@ -148,7 +146,7 @@ public class WorkflowService implements IWorkflowService {
         if (caseOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
         }
-        // TODO: release/7.0.0 get or throw?
+        // TODO: release/8.0.0 get or throw?
         return caseOptional.get();
     }
 
@@ -187,7 +185,7 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public Page<Case> search(Predicate predicate, Pageable pageable) {
         Page<Case> page = repository.findAll(predicate, pageable);
-        // TODO: release/7.0.0: decrypt data set was not called before
+        // TODO: release/8.0.0: decrypt data set was not called before
         page.getContent().forEach(this::initialize);
         return page;
     }
@@ -196,9 +194,7 @@ public class WorkflowService implements IWorkflowService {
     public Case resolveUserRef(Case useCase) {
         useCase.getUsers().clear();
         useCase.getNegativeViewUsers().clear();
-        useCase.getUserRefs().forEach((id, permission) -> {
-            resolveUserRefPermissions(useCase, id, permission);
-        });
+        useCase.getUserRefs().forEach((id, permission) -> resolveUserRefPermissions(useCase, id, permission));
         useCase.resolveViewUsers();
         taskService.resolveUserRef(useCase);
         return save(useCase);
@@ -206,7 +202,7 @@ public class WorkflowService implements IWorkflowService {
 
     private void resolveUserRefPermissions(Case useCase, String userListId, Map<ProcessRolePermission, Boolean> permission) {
         List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(userListId).getRawValue());
-        if (userIds != null && userIds.size() != 0) {
+        if (userIds != null && !userIds.isEmpty()) {
             if (permission.containsKey(ProcessRolePermission.VIEW) && !permission.get(ProcessRolePermission.VIEW)) {
                 useCase.getNegativeViewUsers().addAll(userIds);
             } else {
@@ -219,8 +215,8 @@ public class WorkflowService implements IWorkflowService {
         if (userListValue == null) {
             return null;
         }
-        // TODO: release/7.0.0 fix null set as user value
-    // TODO: release/7.0.0  .filter(id -> userService.resolveById(id, false) != null)
+        // TODO: release/8.0.0 fix null set as user value
+        // TODO: release/8.0.0  .filter(id -> userService.resolveById(id, false) != null)
         return userListValue.getUserValues().stream()
                 .filter(Objects::nonNull)
                 .map(UserFieldValue::getId)
@@ -302,8 +298,8 @@ public class WorkflowService implements IWorkflowService {
         useCase.setTitle(makeTitle.apply(useCase));
         // TODO: release/7.0.0 6.2.5
         // TODO: release/8.0.0 useCase.setUriNodeId(petriNet.getUriNodeId());
-        UriNode uriNode = uriService.getOrCreate(petriNet, UriContentType.CASE);
-        useCase.setUriNodeId(uriNode.getId());
+//        UriNode uriNode = uriService.getOrCreate(petriNet, UriContentType.CASE);
+//        useCase.setUriNodeId(uriNode.getId());
 
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
         outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty(), params));
@@ -313,7 +309,7 @@ public class WorkflowService implements IWorkflowService {
         }
 
         historyService.save(new CreateCaseEventLog(useCase, EventPhase.PRE));
-        log.info("[" + useCase.getStringId() + "]: Case " + useCase.getTitle() + " created");
+        log.info("[{}]: Case {} created", useCase.getStringId(), useCase.getTitle());
 
         useCase.getPetriNet().initializeArcs(useCase.getDataSet());
         taskService.reloadTasks(useCase);
@@ -350,7 +346,7 @@ public class WorkflowService implements IWorkflowService {
         String queryString = "{author.id:" + authorId + ", petriNet:{$ref:\"petriNet\",$id:{$oid:\"" + petriNet + "\"}}}";
         BasicQuery query = new BasicQuery(queryString);
         query = (BasicQuery) query.with(pageable);
-//        TODO: release/7.0.0 remove mongoTemplates from project
+//        TODO: release/8.0.0 remove mongoTemplates from project
         List<Case> cases = mongoTemplate.find(query, Case.class);
         cases.forEach(this::initialize);
         return new PageImpl<>(cases, pageable, mongoTemplate.count(new BasicQuery(queryString, "{id:1}"), Case.class));
@@ -369,9 +365,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public DeleteCaseEventOutcome deleteCase(Case useCase, Map<String, String> params) {
-        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty()));
+        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty(), params));
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
-        log.info("[" + useCase.getStringId() + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting case " + useCase.getTitle());
+        log.info("[{}]: User [{}] is deleting case {}", useCase.getStringId(), userService.getLoggedOrSystem().getStringId(), useCase.getTitle());
 
         taskService.deleteTasksByCase(useCase.getStringId());
         repository.delete(useCase);
@@ -389,7 +385,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public void deleteInstancesOfPetriNet(PetriNet net) {
-        log.info("[" + net.getStringId() + "]: User " + userService.getLoggedOrSystem().getStringId() + " is deleting all cases and tasks of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
+        log.info("[{}]: User {} is deleting all cases and tasks of Petri net {} version {}", net.getStringId(), userService.getLoggedOrSystem().getStringId(), net.getIdentifier(), net.getVersion().toString());
 
         taskService.deleteTasksByPetriNetId(net.getStringId());
         CaseSearchRequest request = new CaseSearchRequest();
@@ -397,7 +393,7 @@ public class WorkflowService implements IWorkflowService {
         netRequest.processId = net.getStringId();
         request.process = Collections.singletonList(netRequest);
         long countCases = elasticCaseService.count(Collections.singletonList(request), userService.getLoggedOrSystem().transformToLoggedUser(), Locale.getDefault(), false);
-        log.info("[" + net.getStringId() + "]: User " + userService.getLoggedOrSystem().getStringId() + " is deleting " + countCases + " cases of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
+        log.info("[{}]: User {} is deleting {} cases of Petri net {} version {}", net.getStringId(), userService.getLoggedOrSystem().getStringId(), countCases, net.getIdentifier(), net.getVersion().toString());
         long pageCount = (countCases / 100) + 1;
         LongStream.range(0, pageCount)
                 .forEach(i -> elasticCaseService.search(

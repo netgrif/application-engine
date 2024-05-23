@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public abstract class FormLayout extends Layout {
-    // TODO: release/7.0.0 clean up querydsl annotations
+    // TODO: release/8.0.0 clean up querydsl annotations
     @QueryType(PropertyType.NONE)
     private LayoutType type;
     @QueryType(PropertyType.NONE)

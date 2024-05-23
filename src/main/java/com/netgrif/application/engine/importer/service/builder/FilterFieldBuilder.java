@@ -20,7 +20,7 @@ public class FilterFieldBuilder extends FieldBuilder<FilterField> {
         if (nets != null) {
             field.setAllowedNets(new ArrayList<>(nets.getAllowedNet()));
         }
-        // TODO: release/7.0.0 setDefaultValue?
+        // TODO: release/8.0.0 setDefaultValue?
         setDefaultValue(field, data, ignored -> {});
         return field;
     }

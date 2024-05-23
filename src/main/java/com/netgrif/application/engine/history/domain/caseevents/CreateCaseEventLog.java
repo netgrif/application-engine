@@ -15,10 +15,6 @@ import java.util.Map;
 public class CreateCaseEventLog extends CaseEventLog {
 
     @Getter
-    @Field("activePlaces") // TODO: release/7.0.0, final?
-    private Map<String, Integer> activePlaces;
-
-    @Getter
     @Field("dataSetValues")
     private DataSet dataSetValues;
 
@@ -28,7 +24,7 @@ public class CreateCaseEventLog extends CaseEventLog {
 
     public CreateCaseEventLog(Case useCase, EventPhase eventPhase) {
         super(useCase, eventPhase);
-        this.activePlaces = useCase.getActivePlaces();
+        this.setActivePlaces(useCase.getActivePlaces());
         this.dataSetValues = useCase.getDataSet();
     }
 }

@@ -60,9 +60,9 @@ public class Task implements Serializable {
     private TaskLayout layout;
 
     private I18nString title;
-    // TODO: release/7.0.0: TaskResource concern?
+    // TODO: release/8.0.0: TaskResource concern?
     private String caseColor;
-    // TODO: release/7.0.0: TaskResource concern?
+    // TODO: release/8.0.0: TaskResource concern?
     private String caseTitle;
 
     private Integer priority;
@@ -111,7 +111,7 @@ public class Task implements Serializable {
 
     private String transactionId;
 
-    // TODO: release/7.0.0 remove, dynamically load from dataSet
+    // TODO: release/8.0.0 remove, dynamically load from dataSet
     @Getter
     @Setter
     @JsonIgnore
@@ -257,7 +257,7 @@ public class Task implements Serializable {
     }
 
     private void compareExistingUserPermissions(String userId, Map<RolePermission, Boolean> permissions) {
-        // TODO: release/7.0.0 check if possible to reduce duplicated code, possible solution is to have abstraction on permissions map
+        // TODO: release/8.0.0 check if possible to reduce duplicated code, possible solution is to have abstraction on permissions map
         permissions.forEach((id, perm) -> {
             if ((users.containsKey(userId) && !users.get(userId).containsKey(id)) || (users.containsKey(userId) && users.get(userId).containsKey(id) && users.get(userId).get(id))) {
                 users.get(userId).put(id, perm);

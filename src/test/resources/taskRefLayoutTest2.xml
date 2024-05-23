@@ -20,7 +20,7 @@
             taskRef : f.this;
 
             def list = []
-            // TODO: release/7.0.0 fix mongo search by data
+            // TODO: release/8.0.0 fix mongo search by data
             findCases { it.processIdentifier.eq("priloha") }.findAll { it.dataSet["requestID"].value == useCase.stringId
             }.each { list.addAll(it.tasks.values().collect { it.task }) }.sort{ it.creationDate }
             change taskRef value { list }
@@ -39,7 +39,7 @@
             aPriloha.dataSet.get("requestID").rawValue = useCase.stringId
             workflowService.save(aPriloha)
             def list = []
-            // TODO: release/7.0.0 fix mongo search by data
+            // TODO: release/8.0.0 fix mongo search by data
             findCases { it.processIdentifier.eq("priloha") }.findAll { it.dataSet["requestID"].value == useCase.stringId
             }.each { list.addAll(it.tasks.values().collect { it.task }) }.sort{ it.creationDate }
             change taskRef value { list }

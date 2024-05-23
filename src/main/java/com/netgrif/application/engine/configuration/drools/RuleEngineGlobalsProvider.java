@@ -38,10 +38,6 @@ public class RuleEngineGlobalsProvider implements IRuleEngineGlobalsProvider {
     private final IUserService userService;
     private final FactRepository factRepository;
 
-    protected List<RuleEngineGlobal> globals;
-
-    protected List<String> imports;
-
     public RuleEngineGlobalsProvider(@Autowired IRuleEvaluationScheduleService ruleEvaluationScheduleService,
                                      @Autowired IWorkflowService workflowService,
                                      @Autowired ITaskService taskService,

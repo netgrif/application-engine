@@ -7,7 +7,7 @@ import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
 
 @Data
-//TODO release/7.0.0 @Document?
+//TODO release/8.0.0 @Document?
 public class NumberField extends Field<Double> implements Referencable {
 
     public NumberField() {

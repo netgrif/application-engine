@@ -2,10 +2,7 @@ package com.netgrif.application.engine.elastic.service;
 
 import com.google.common.collect.ImmutableMap;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.elastic.domain.ElasticJob;
-import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
-import com.netgrif.application.engine.elastic.domain.ElasticTask;
-import com.netgrif.application.engine.elastic.domain.ElasticTaskJob;
+import com.netgrif.application.engine.elastic.domain.*;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
@@ -54,7 +51,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     protected ElasticsearchRestTemplate template;
     protected ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    // TODO: release/7.0.0 properties
+    // TODO: release/8.0.0 properties
     @Value("${spring.data.elasticsearch.index.task}")
     protected String taskIndex;
 

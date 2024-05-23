@@ -143,7 +143,7 @@ public class ExportService implements IExportService {
         Set<String> csvHeader = config == null ? buildDefaultCsvCaseHeader(exportCases) : config.getDataToExport();
         OutputStream outStream = new FileOutputStream(outFile, false);
         PrintWriter writer;
-        // TODO: release/7.0.0 fix if-else
+        // TODO: release/8.0.0 fix if-else
         if (config == null || config.getStandardCharsets() == null) {
             writer = new PrintWriter(outStream, true, StandardCharsets.UTF_8);
         } else {
@@ -235,7 +235,7 @@ public class ExportService implements IExportService {
     public List<String> buildRecord(Set<String> csvHeader, Case exportCase) {
         List<String> recordStringList = new LinkedList<>();
         for (String dataFieldId : csvHeader) {
-//            TODO: release/7.0.0 refactor hasField
+//            TODO: release/8.0.0 refactor hasField
             if (exportCase.getDataSet().getFields().containsKey(dataFieldId)) {
                 recordStringList.add(StringEscapeUtils.escapeCsv(resolveFieldValue(exportCase, dataFieldId)));
             } else
@@ -253,7 +253,7 @@ public class ExportService implements IExportService {
             return "";
         }
         switch (field.getType()) {
-            // TODO: release/7.0.0 6.2.5
+            // TODO: release/8.0.0 6.2.5
 //            case MULTICHOICE_MAP:
 //                fieldValue = ((MultichoiceMapField) fieldData).getValue().stream()
 //                        .filter(value -> ((MultichoiceMapField) fieldData).getOptions().containsKey(value.trim()))
@@ -291,7 +291,7 @@ public class ExportService implements IExportService {
 //                fieldValue = fieldData.toString();
 //                break;
             default:
-                fieldValue= ""; // TODO: release/7.0.0
+                fieldValue= ""; // TODO: release/8.0.0
 //                fieldValue = field.getValue() == null ? (String) exportCase.getDataSet().get(exportFieldId).getValue() : (String) field.getValue();
 //                break;
         }

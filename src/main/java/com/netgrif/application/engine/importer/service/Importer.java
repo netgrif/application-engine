@@ -180,7 +180,7 @@ public class Importer {
 
     public Path saveNetFile(PetriNet net, InputStream xmlFile) throws IOException {
         File savedFile = new File(fileStorageConfiguration.getStorageArchived() + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
-        savedFile.getParentFile().mkdirs(); // TODO: release/7.0.0 return false? storage should be created so maybe delete this line?
+        savedFile.getParentFile().mkdirs(); // TODO: release/8.0.0 return false? storage should be created so maybe delete this line?
         net.setImportXmlPath(savedFile.getPath());
         copyInputStreamToFile(xmlFile, savedFile);
         return savedFile.toPath();
@@ -820,7 +820,7 @@ public class Importer {
         }
     }
 
-    // TODO: release/7.0.0 Behavior REQ,IMM,OPT deprecated
+    // TODO: release/8.0.0 Behavior REQ,IMM,OPT deprecated
     private boolean isNotDeprecated(Behavior behavior) {
         return !Behavior.REQUIRED.equals(behavior) && !Behavior.IMMEDIATE.equals(behavior) && !Behavior.OPTIONAL.equals(behavior);
     }

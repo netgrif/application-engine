@@ -12,7 +12,6 @@ import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldR
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.web.responsebodies.CountResponse;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskDataSets;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskResource;
 import io.swagger.v3.oas.annotations.Operation;
@@ -177,7 +176,7 @@ public class TaskController extends AbstractTaskController {
     @Operation(summary = "Get all task data", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> getData(@PathVariable("id") String taskId, Locale locale, Authentication auth) {
-        // TODO: release/7.0.0 6.2.5 set order?
+        // TODO: release/8.0.0 6.2.5 set order?
         return super.getData(taskId, locale, auth);
     }
 

@@ -12,45 +12,37 @@ import java.util.HashSet;
 import java.util.Set;
 
 
+@Getter
 @Document
 @AllArgsConstructor
 public class UriNode {
 
     @Id
-    @Getter
-    private ObjectId _id;
+    private ObjectId id;
 
-    @Getter
     @Setter
     private String uriPath;
 
-    @Getter
     @Setter
     private String name;
 
-    @Getter
     @Setter
     private String parentId;
 
-    @Getter
     @Setter
     @Transient
     private UriNode parent;
 
-    @Getter
     @Setter
     private Set<String> childrenId;
 
-    @Getter
     @Setter
     @Transient
     private Set<UriNode> children;
 
-    @Getter
     @Setter
     private int level;
 
-    @Getter
     @Setter
     private Set<UriContentType> contentTypes;
 
@@ -76,6 +68,6 @@ public class UriNode {
     }
 
     public String getStringId() {
-        return this._id.toString();
+        return this.id.toString();
     }
 }

@@ -13,7 +13,7 @@ public class MultichoiceMapFieldTransformer extends ElasticDataFieldTransformer<
 
     @Override
     public MapField transform(MultichoiceMapField caseField, MultichoiceMapField petriNetField) {
-        // TODO: release/7.0.0 ArrayList cannot be cast to Set
+        // TODO: release/8.0.0 ArrayList cannot be cast to Set
         Set<String> values = caseField.getRawValue();
         if (values == null || values.isEmpty()) {
             return null;
@@ -21,7 +21,7 @@ public class MultichoiceMapFieldTransformer extends ElasticDataFieldTransformer<
         Map<String, I18nString> options = caseField.getOptions() != null ? caseField.getOptions() : petriNetField.getOptions();
         Map<String, List<String>> fieldValues = new HashMap<>();
         for (String value : values) {
-            // TODO: release/7.0.0 refactor, duplicate with EnumMap transformer, probably unwanted values could be saved?
+            // TODO: release/8.0.0 refactor, duplicate with EnumMap transformer, probably unwanted values could be saved?
             I18nString selectedValue = options.get(value) != null ? options.get(value) : new I18nString();
             fieldValues.put(value, selectedValue.collectTranslations());
         }

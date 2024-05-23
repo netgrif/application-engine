@@ -52,6 +52,7 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
             template.deleteIndex(ElasticCase.class)
             template.deleteIndex(ElasticTask.class)
         }
+        // TODO: release/8.0.0 6.2.5
         if (!template.indexExists(petriNetIndex)) {
             log.info "Creating Elasticsearch case index [${petriNetIndex}]"
             template.createIndex(ElasticPetriNet.class)

@@ -98,7 +98,7 @@ public class EventService implements IEventService {
 
     @Override
     public void runEventActionsOnChanged(Task task, SetDataEventOutcome outcome, DataEventType trigger, Map<String, String> params) {
-        // TODO: release/7.0.0 6.2.5
+        // TODO: release/8.0.0 6.2.5
         if (trigger != DataEventType.SET) {
             return;
         }
@@ -108,7 +108,7 @@ public class EventService implements IEventService {
                     String fieldId = entry.getKey();
                     Field<?> field = outcome.getCase().getDataSet().get(fieldId);
                     log.info("[" + outcome.getCase().getStringId() + "] " + outcome.getCase().getTitle() + ": Running actions on changed field " + fieldId);
-                    // TODO: release/7.0.0 changed fields
+                    // TODO: release/8.0.0 changed fields
                     outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, outcome.getCase(), outcome.getTask(), null, params));
                     outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.POST, outcome.getCase(), outcome.getTask(), null, params));
                 });

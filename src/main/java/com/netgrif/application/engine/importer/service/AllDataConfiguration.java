@@ -9,6 +9,6 @@ import org.springframework.stereotype.Component;
 public class AllDataConfiguration {
 
     private Transition allData;
-// TODO: release/7.0.0 implement logic of creating all data transition here, move from importer
+// TODO: release/8.0.0 implement logic of creating all data transition here, move from importer
 
 }

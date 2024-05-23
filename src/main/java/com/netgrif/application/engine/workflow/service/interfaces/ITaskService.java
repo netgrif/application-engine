@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+// TODO: release/8.0.0 remove LoggedUser, create TaskEventContext class to merge all params
 public interface ITaskService {
 
     void reloadTasks(Case useCase);
@@ -94,14 +95,7 @@ public interface ITaskService {
 
     CancelTaskEventOutcome cancelTask(LoggedUser loggedUser, String taskId, Map<String, String> params);
 
-    /**
-     * cancel task action
-     */
-    @SuppressWarnings("unused")
-    void cancelTasksWithoutReload(Set<String> transitions, String caseId);
-
-    void cancelTasksWithoutReload(Set<String> transitions, String caseId, Map<String, String> params);
-
+    // TODO: release/8.0.0 delegate is deprecated
     DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId) throws TransitionNotExecutableException;
 
     DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId, Map<String, String> params) throws TransitionNotExecutableException;

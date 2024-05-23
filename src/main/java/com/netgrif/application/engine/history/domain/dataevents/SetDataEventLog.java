@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode(callSuper = true)
 public class SetDataEventLog extends TaskEventLog {
 
-    // TODO: release/7.0.0 final?
+    // TODO: release/8.0.0 final?
     @Getter
     private DataSet changedFields;
 

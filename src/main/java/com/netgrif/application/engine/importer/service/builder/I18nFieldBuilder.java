@@ -19,7 +19,7 @@ public class I18nFieldBuilder extends FieldBuilder<I18nField> {
         if (initExpression != null) {
             field.setInitExpression(new Expression(initExpression));
         } else {
-            // TODO: release/7.0.0 simplify
+            // TODO: release/8.0.0 simplify
             if (data.getInits() != null && data.getInits().getInit() != null && !data.getInits().getInit().isEmpty()) {
                 field.setDefaultValue(new I18nString(data.getInits().getInit().get(0).getValue()));
             } else if (data.getInit() != null && (data.getInit().getName() == null || data.getInit().getName().equals(""))) {

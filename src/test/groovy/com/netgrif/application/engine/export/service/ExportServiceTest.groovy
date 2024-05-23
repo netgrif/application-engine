@@ -152,7 +152,7 @@ class ExportServiceTest {
         List<Task> task = taskRepository.findAll(QTask.task.processId.eq(processId).and(QTask.task.transitionId.eq("t4"))) as List<Task>
         Set<String> header = exportService.buildDefaultCsvTaskHeader(task)
         assert header != null
-        // TODO: release/7.0.0 empty header
+        // TODO: release/8.0.0 empty header
         assert header.size() == 2
     }
 }

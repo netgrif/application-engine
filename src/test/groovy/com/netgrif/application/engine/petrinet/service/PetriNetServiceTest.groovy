@@ -122,7 +122,7 @@ class PetriNetServiceTest {
         assert petriNetRepository.findById(testNet.stringId).get().uriNodeId == null
         importHelper.createCase("Case 1", testNet)
 
-        // TODO: release/7.0.0 assert workflowService.getAll(new FullPageRequest()).size() == caseCount + 1
+        // TODO: release/8.0.0 assert workflowService.getAll(new FullPageRequest()).size() == caseCount + 1
         assert caseRepository.findAllByProcessIdentifier(testNet.getImportId()).size() == 1
         assert taskRepository.count() == taskCount + 3
         assert processRoleRepository.count() == processRoleCount + 2

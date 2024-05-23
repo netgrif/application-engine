@@ -7,7 +7,7 @@ import groovy.util.logging.Slf4j
 import java.lang.reflect.Method
 
 @Slf4j
-class TextGenerateReflection { // TODO: release/7.0.0 remove
+class TextGenerateReflection { // TODO: release/8.0.0 remove
 
     private static final String GENERATION_METHODS_PACKAGE = "com.netgrif.application.engine.petrinet.domain.dataset.logic.action."
 

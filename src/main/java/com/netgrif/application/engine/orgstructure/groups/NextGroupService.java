@@ -208,7 +208,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public void addUser(IUser user, Case groupCase) {
-        // TODO: release/7.0.0: WorkflowServiceTest#createCaseWithLocale - Cannot invoke "com.netgrif.application.engine.workflow.domain.Case.getDataField(String)" because "groupCase" is null
+        // TODO: release/8.0.0: WorkflowServiceTest#createCaseWithLocale - Cannot invoke "com.netgrif.application.engine.workflow.domain.Case.getDataField(String)" because "groupCase" is null
         MapOptionsField<I18nString, String> field = (MapOptionsField<I18nString, String>) groupCase.getDataSet().get(GROUP_MEMBERS_FIELD);
         Map<String, I18nString> existingUsers = field.getOptions();
         if (existingUsers == null) {
@@ -259,7 +259,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Set<String> getAllCoMembers(IUser user) {
-        // TODO: release/8.0.0
+//        TODO: release/8.0.0
 //        Set<String> users = workflowService.searchAll(
 //                        groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(user.getStringId())))
 //                .map(it -> it.getDataSet().get(GROUP_MEMBERS_FIELD).getOptions().keySet()).stream()
@@ -276,7 +276,7 @@ public class NextGroupService implements INextGroupService {
         if (!isGroupCase(groupCase)) {
             return null;
         }
-//        TODO: release/7.0.0 check field type is enummap
+//        TODO: release/8.0.0 check field type is enummap
         Set<String> userIds = ((EnumerationMapField)groupCase.getDataSet().get(GROUP_MEMBERS_FIELD)).getOptions().keySet();
         List<IUser> resultList = new ArrayList<>();
         userIds.forEach(id -> resultList.add(userService.resolveById(id, true)));
@@ -285,7 +285,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Set<String> getAllGroupsOfUser(IUser groupUser) {
-//        TODO: release/7.0.0
+//        TODO: release/8.0.0
 //        List<String> groupList = workflowService.searchAll(groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.getStringId())))
 //                .map(aCase -> aCase.getId().toString()).getContent();
 //        return new HashSet<>(groupList);

@@ -91,7 +91,7 @@ public abstract class AbstractTaskController {
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName(), taskService.assignTask(loggedUser, taskId));
         } catch (TransitionNotExecutableException e) {
-            log.error("Assigning task [" + taskId + "] failed: ", e);
+            log.error("Assigning task [{}] failed: ", taskId, e);
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
@@ -100,7 +100,7 @@ public abstract class AbstractTaskController {
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]", taskService.delegateTask(loggedUser, delegatedId, taskId));
         } catch (Exception e) {
-            log.error("Delegating task [" + taskId + "] failed: ", e);
+            log.error("Delegating task [{}] failed: ", taskId, e);
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
@@ -109,7 +109,7 @@ public abstract class AbstractTaskController {
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " finished", taskService.finishTask(loggedUser, taskId));
         } catch (Exception e) {
-            log.error("Finishing task [" + taskId + "] failed: ", e);
+            log.error("Finishing task [{}] failed: ", taskId, e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
                 return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), ((IllegalArgumentWithChangedFieldsException) e).getOutcome());
             } else {
@@ -122,7 +122,7 @@ public abstract class AbstractTaskController {
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " canceled", taskService.cancelTask(loggedUser, taskId));
         } catch (Exception e) {
-            log.error("Canceling task [" + taskId + "] failed: ", e);
+            log.error("Canceling task [{}] failed: ", taskId, e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
                 return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), ((IllegalArgumentWithChangedFieldsException) e).getOutcome());
             } else {
@@ -189,10 +189,10 @@ public abstract class AbstractTaskController {
             GetDataGroupsEventOutcome outcome = dataService.getDataGroups(taskId, locale, (LoggedUser) auth.getPrincipal());
             return EventOutcomeWithMessageResource.successMessage("Get data groups successful", outcome);
         } catch (IllegalArgumentWithChangedFieldsException e) {
-            log.error("Get data on task [" + taskId + "] failed: ", e);
+            log.error("Get data on task [{}] failed: ", taskId, e);
             return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), e.getOutcome());
         } catch (Exception e) {
-            log.error("Get data on task [" + taskId + "] failed: ", e);
+            log.error("Get data on task [{}] failed: ", taskId, e);
             return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
         }
     }
@@ -204,25 +204,25 @@ public abstract class AbstractTaskController {
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set", mainOutcome);
         } catch (IllegalArgumentWithChangedFieldsException e) {
-            log.error("Set data on task [" + taskId + "] failed: ", e);
+            log.error("Set data on task [{}] failed: ", taskId, e);
             return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), e.getOutcome());
         } catch (Exception e) {
-            log.error("Set data on task [" + taskId + "] failed: ", e);
+            log.error("Set data on task [{}] failed: ", taskId, e);
             return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
         }
     }
 
-    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, MultipartFile multipartFile, FileFieldRequest dataBody, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, MultipartFile multipartFile, FileFieldRequest dataBody, Locale ignoredLocale) {
         try {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
             outcomes.put(dataBody.getParentTaskId(), dataService.saveFile(dataBody.getParentTaskId(), dataBody.getFieldId(), multipartFile));
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set", mainOutcome);
         } catch (IllegalArgumentWithChangedFieldsException e) {
-            log.error("Set data on task [" + taskId + "] failed: ", e);
+            log.error("Set data on task [{}] failed: ", taskId, e);
             return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), e.getOutcome());
         } catch (Exception e) {
-            log.error("Set data on task [" + taskId + "] failed: ", e);
+            log.error("Set data on task [{}] failed: ", taskId, e);
             return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
         }
     }
@@ -248,14 +248,14 @@ public abstract class AbstractTaskController {
         Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
         outcomes.put(taskId, dataService.deleteFile(taskId, fieldId));
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
-        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set", mainOutcome);
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set", mainOutcome);
     }
 
     public EntityModel<EventOutcomeWithMessage> saveFiles(String taskId, MultipartFile[] multipartFiles, FileFieldRequest requestBody) {
         Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
         outcomes.put(requestBody.getParentTaskId(), dataService.saveFiles(requestBody.getParentTaskId(), requestBody.getFieldId(), multipartFiles));
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
-        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set", mainOutcome);
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set", mainOutcome);
     }
 
     public ResponseEntity<Resource> getNamedFile(String taskId, String fieldId, String name) throws FileNotFoundException {
@@ -279,7 +279,7 @@ public abstract class AbstractTaskController {
         Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
         outcomes.put(taskId, dataService.deleteFileByName(taskId, fieldId, name));
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
-        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set", mainOutcome);
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set", mainOutcome);
     }
 
     public ResponseEntity<Resource> getFilePreview(String taskId, String fieldId) throws FileNotFoundException {

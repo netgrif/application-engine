@@ -96,7 +96,7 @@ public class WorkflowController {
     }
 
     @Operation(summary = "Generic case search with QueryDSL predicate", security = {@SecurityRequirement(name = "BasicAuth")})
-    // TODO:  release/7.0.0 search by ObjectId[] for tree-case.service {stringId: (childCaseRef.value as Array<string>)}
+    // TODO:  release/8.0.0 search by ObjectId[] for tree-case.service {stringId: (childCaseRef.value as Array<string>)}
     @PostMapping(value = "/case/search2", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> search2(@QuerydslPredicate(root = Case.class) Predicate predicate, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
         Page<Case> cases = workflowService.search(predicate, pageable);

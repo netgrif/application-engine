@@ -162,7 +162,7 @@ class InsuranceTest {
     @Test
     @Disabled
     @DisplayName("Insurance Test")
-    @Ignore // TODO: release/7.0.0 fix post methods with wrong json
+    @Ignore // TODO: release/8.0.0 fix post methods with wrong json
     void test() {
         createCase()
         coverType()

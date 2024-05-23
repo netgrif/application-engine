@@ -53,7 +53,7 @@ public class MailSenderServiceTest {
 
     @Test
     public void testMailDraft() throws MessagingException, IOException, TemplateException {
-        // TODO: release/7.0.0 is created in the root folder, create in storage or somewhere else
+        // TODO: release/8.0.0 is created in the root folder, create in storage or somewhere else
         File file = new File("file.txt");
         file.createNewFile();
 

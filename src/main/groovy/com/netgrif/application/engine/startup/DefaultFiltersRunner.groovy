@@ -287,7 +287,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
             dataSet.put(viewOrigin ? FILTER_ORIGIN_VIEW_ID_FIELD_ID : FILTER_PARENT_CASE_ID_FIELD_ID, new TextField(rawValue: originId))
         }
 
-        // TODO: release/7.0.0 join setData to one call
+        // TODO: release/8.0.0 join setData to one call
         this.dataService.setData(newFilterTask, dataSet, superCreator.getSuperUser())
         if (isImported) {
             this.dataService.setData(newFilterTask, new DataSet([

@@ -31,6 +31,7 @@ class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
     PetriNet petriNet
     def affectedUser
 
+//    TODO: release/8.0.0 remove RoleActionDelegate, merge with ActionDelegate
     def init(Action action, RoleContext roleContext, Map<String, String> params = [:]) {
         this.action = action
         this.actionContext = actionContext

@@ -26,7 +26,7 @@ public abstract class CaseEventLog extends PetriNetEventLog {
     }
 
     protected CaseEventLog(Case useCase, EventPhase eventPhase) {
-        this(useCase.getid(), useCase, eventPhase);
+        this(useCase.getId(), useCase, eventPhase);
     }
 
     protected CaseEventLog(ObjectId triggerId, Case useCase, EventPhase eventPhase) {

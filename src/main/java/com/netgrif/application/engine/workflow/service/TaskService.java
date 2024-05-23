@@ -11,7 +11,10 @@ import com.netgrif.application.engine.history.domain.taskevents.CancelTaskEventL
 import com.netgrif.application.engine.history.domain.taskevents.DelegateTaskEventLog;
 import com.netgrif.application.engine.history.domain.taskevents.FinishTaskEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
-import com.netgrif.application.engine.petrinet.domain.*;
+import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Place;
+import com.netgrif.application.engine.petrinet.domain.Transaction;
+import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.ArcOrderComparator;
 import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc;
@@ -33,7 +36,6 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.State;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
-import com.netgrif.application.engine.workflow.domain.TaskPair;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.*;
@@ -123,8 +125,9 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException {
-        assignTasks(tasks, user, new HashMap<>());
+        return assignTasks(tasks, user, new HashMap<>());
     }
+
     @Override
     public List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, IUser user, Map<String, String> params) throws TransitionNotExecutableException {
         List<AssignTaskEventOutcome> outcomes = new ArrayList<>();
@@ -136,20 +139,33 @@ public class TaskService implements ITaskService {
 
     @Override
     public AssignTaskEventOutcome assignTask(String taskId) throws TransitionNotExecutableException {
-        LoggedUser user = userService.getLoggedOrSystem().transformToLoggedUser();
-        return assignTask(user, taskId);
+        return assignTask(taskId, new HashMap<>());
     }
 
-    // TODO: release/8.0.0 functions with properties
+    @Override
+    public AssignTaskEventOutcome assignTask(String taskId, Map<String, String> params) throws TransitionNotExecutableException {
+        LoggedUser user = userService.getLoggedOrSystem().transformToLoggedUser();
+        return assignTask(user, taskId, params);
+    }
 
     @Override
     public AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException {
+        return assignTask(loggedUser, taskId, new HashMap<>());
+    }
+
+    @Override
+    public AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId, Map<String, String> params) throws TransitionNotExecutableException, TaskNotFoundException {
         Optional<Task> taskOptional = taskRepository.findById(taskId);
         if (taskOptional.isEmpty()) {
             throw new TaskNotFoundException("Could not find task with id [" + taskId + "]");
         }
         IUser user = userService.getUserFromLoggedUser(loggedUser);
         return assignTask(taskOptional.get(), user, params);
+    }
+
+    @Override
+    public AssignTaskEventOutcome assignTask(Task task, IUser user) throws TransitionNotExecutableException {
+        return assignTask(task, user, new HashMap<>());
     }
 
     @Override
@@ -246,6 +262,11 @@ public class TaskService implements ITaskService {
     }
 
     @Override
+    public FinishTaskEventOutcome finishTask(Task task, IUser user) throws TransitionNotExecutableException {
+        return finishTask(task, user, new HashMap<>());
+    }
+
+    @Override
     public FinishTaskEventOutcome finishTask(Task task, IUser user, Map<String, String> params) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
@@ -295,12 +316,22 @@ public class TaskService implements ITaskService {
 
     @Override
     public CancelTaskEventOutcome cancelTask(LoggedUser loggedUser, String taskId) {
+        return cancelTask(loggedUser, taskId, new HashMap<>());
+    }
+
+    @Override
+    public CancelTaskEventOutcome cancelTask(LoggedUser loggedUser, String taskId, Map<String, String> params) {
         Optional<Task> taskOptional = taskRepository.findById(taskId);
         if (taskOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         }
         IUser user = userService.getUserFromLoggedUser(loggedUser);
-        return cancelTask(taskOptional.get(), user);
+        return cancelTask(taskOptional.get(), user, params);
+    }
+
+    @Override
+    public CancelTaskEventOutcome cancelTask(Task task, IUser user) {
+        return cancelTask(task, user, new HashMap<>());
     }
 
     @Override
@@ -330,27 +361,6 @@ public class TaskService implements ITaskService {
         historyService.save(new CancelTaskEventLog(task, useCase, EventPhase.POST, user));
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getSelfOrImpersonated().getEmail() + "] was cancelled");
         return outcome;
-    }
-
-    /**
-     * Used in cancel task action
-     */
-    @Override
-    public void cancelTasksWithoutReload(Set<String> transitions, String caseId, Map<String, String> params) {
-        List<Task> tasks = taskRepository.findAllByTransitionIdInAndCaseId(transitions, caseId);
-        Case useCase = null;
-        for (Task task : tasks) {
-            if (task.getUserId() == null) {
-                continue;
-            }
-            if (useCase == null) {
-                useCase = workflowService.findOne(task.getCaseId());
-            }
-            Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
-            eventService.runActions(transition.getPreCancelActions(), useCase, task, transition, params);
-            returnTokens(task, useCase.getStringId());
-            eventService.runActions(transition.getPostCancelActions(), useCase, task, transition, params);
-        }
     }
 
     private Task returnTokens(Task task, String useCaseId) {
@@ -458,7 +468,7 @@ public class TaskService implements ITaskService {
                     .map(transition -> createFromTransition(transition, useCase))
                     .collect(Collectors.toList());
         } else {
-            tasks= taskRepository.findAllByCaseId(useCase.getStringId());
+            tasks = taskRepository.findAllByCaseId(useCase.getStringId());
         }
         // update tasks state
         Task autoTriggered = null;
@@ -542,7 +552,7 @@ public class TaskService implements ITaskService {
     }
 
     void validateData(Transition transition, Case useCase) {
-//        TODO: release/7.0.0 fix validation
+//        TODO: release/8.0.0 fix validation
 //        for (Map.Entry<String, DataFieldLogic> entry : transition.getDataSet().entrySet()) {
 //            if (useCase.getPetriNet().getDataSet().get(entry.getKey()) != null
 //                    && useCase.getPetriNet().getDataSet().get(entry.getKey()).getValidations() != null) {
@@ -585,7 +595,7 @@ public class TaskService implements ITaskService {
         return optionalTask.get();
     }
 
-    // TODO: release/7.0.0 check usage and delete/replace with current implementation
+    // TODO: release/8.0.0 check usage and delete/replace with current implementation
     @Override
     public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable, Locale locale) {
         List<Task> tasks;
@@ -751,7 +761,7 @@ public class TaskService implements ITaskService {
         if (userListValue == null) {
             return null;
         }
-        // TODO: release/7.0.0 fix null set as user value, remove duplicate code, move this to userservice, optimize to one request to mongo
+        // TODO: release/8.0.0 fix null set as user value, remove duplicate code, move this to userservice, optimize to one request to mongo
         return userListValue.getUserValues().stream()
                 .filter(Objects::nonNull)
                 .map(UserFieldValue::getId)
@@ -814,7 +824,7 @@ public class TaskService implements ITaskService {
         Task savedTask = save(task);
 
         useCase.addTask(savedTask);
-        // TODO: release/7.0.0 remove?
+        // TODO: release/8.0.0 remove?
         workflowService.resolveUserRef(useCase);
 
         return savedTask;
@@ -875,7 +885,7 @@ public class TaskService implements ITaskService {
         return outcome;
     }
 
-    // TODO: release/7.0.0 refactor, not needed here, should be possible to create main outcome when setting data
+    // TODO: release/8.0.0 refactor, not needed here, should be possible to create main outcome when setting data
     @Override
     public SetDataEventOutcome getMainOutcome(Map<String, SetDataEventOutcome> outcomes, String taskId) {
         SetDataEventOutcome mainOutcome;

@@ -227,7 +227,7 @@
 
 			def cases = findCases({ it.processIdentifier.eq("preference_filter_item") }).findAll { it.dataSet.get("parentId").rawValue == useCase.stringId }
 			change newEntries value { return menuImportExportService.importMenu(cases, import_file.value.value, useCase.stringId) }
-			// TODO: release/7.0.0 remove?
+			// TODO: release/8.0.0 remove?
 			def actualUseCase = findCase(useCase.stringId)
 			actualUseCase.dataSet.entrySet().forEach{ e ->
 				useCase.dataSet[e.key].value.value = e.value.value

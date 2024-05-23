@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-// TODO: release/7.0.0 remove, store only ObjectId
+// TODO: release/8.0.0 remove, store only ObjectId
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

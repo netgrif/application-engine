@@ -9,7 +9,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskDataSets;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskResource;
 import io.swagger.v3.oas.annotations.Operation;

@@ -91,7 +91,7 @@ public class PetriNet extends PetriNetObject {
     @org.springframework.data.mongodb.core.mapping.Field("arcs")
     @Getter
     @Setter
-    // TODO: release/7.0.0 save sorted by execution priority
+    // TODO: release/8.0.0 save sorted by execution priority
     private LinkedHashMap<String, List<Arc>> arcs;//todo: import id
 
     @org.springframework.data.mongodb.core.mapping.Field("dataset")
@@ -194,7 +194,7 @@ public class PetriNet extends PetriNetObject {
         functions.add(function);
     }
 
-    public void addUserPermission(String usersRefId, Map<String, Boolean> permissions) {
+    public void addUserPermission(String usersRefId, Map<ProcessRolePermission, Boolean> permissions) {
         if (this.userRefs.containsKey(usersRefId) && this.userRefs.get(usersRefId) != null) {
             this.userRefs.get(usersRefId).putAll(permissions);
         } else {
@@ -279,7 +279,7 @@ public class PetriNet extends PetriNetObject {
         if (type == Type.PLACE) {
             return places.get(referenceId);
         } else {
-            // TODO: release/7.0.0 check if number field?
+            // TODO: release/8.0.0 check if number field?
             return (Referencable) dataSet.get(referenceId);
         }
     }

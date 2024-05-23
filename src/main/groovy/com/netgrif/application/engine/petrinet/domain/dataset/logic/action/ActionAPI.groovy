@@ -8,7 +8,7 @@ import com.querydsl.core.types.Predicate
 import org.bson.types.ObjectId
 
 interface ActionAPI {
-    /* TODO: release/7.0.0
+    /* TODO: release/8.0.0
     change/make actions - deprecate or remove?
     find user?
     */

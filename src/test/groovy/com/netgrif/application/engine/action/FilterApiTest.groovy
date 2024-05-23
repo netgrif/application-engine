@@ -112,7 +112,7 @@ class FilterApiTest {
         assert item.dataSet.get("icon_name").rawValue == ""
         assert item.dataSet.get("entry_name").value.toString() == "CHANGED FILTER"
         assert ((MultichoiceMapField) item.dataSet.get("allowed_roles")).options.entrySet()[0].key.contains("role_2")
-        assert item.uriNodeId == newUri.id
+        assert item.uriNodeId == newUri.id.toString()
 
         assert ((FilterField) filter.dataSet.get("filter")).allowedNets == ["filter"]
         assert ((FilterField) filter.dataSet.get("filter")).filterMetadata["defaultSearchCategories"] == false

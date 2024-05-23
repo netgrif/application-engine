@@ -59,12 +59,13 @@ class MongoDbRunner extends AbstractOrderedCommandLineRunner {
     void resolveIndexes() {
         MappingContext<? extends MongoPersistentEntity<?>, MongoPersistentProperty> mappingContext = mongoTemplate.getConverter().getMappingContext()
         IndexResolver resolver = new MongoPersistentEntityIndexResolver(mappingContext)
-        mappingContext.getPersistentEntities()
-                .stream()
-                .filter(it -> it.isAnnotationPresent(Document.class))
-                .forEach(it -> {
-                    IndexOperations indexOps = mongoTemplate.indexOps(it.getType());
-                    resolver.resolveIndexFor(it.getType()).forEach(indexOps::ensureIndex);
-                })
+        // TODO: release/8.0.0 fix  Invalid constant pool index 75 in class file com/netgrif/application/engine/startup/MongoDbRunner$_resolveIndexes_lambda2 (not a method)
+//        mappingContext.getPersistentEntities()
+//                .stream()
+//                .filter(it -> it.isAnnotationPresent(Document.class))
+//                .forEach(it -> {
+//                    IndexOperations indexOps = mongoTemplate.indexOps(it.getType());
+//                    resolver.resolveIndexFor(it.getType()).forEach(indexOps::ensureIndex);
+//                })
     }
 }

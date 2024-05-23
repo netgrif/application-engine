@@ -2,8 +2,12 @@ package com.netgrif.application.engine.petrinet.domain.dataset;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class FileFieldValue {
+public class FileFieldValue implements Serializable {
+
+    private static final long serialVersionUID = 1299918326436821185L;
 
     private String name;
     private String path;

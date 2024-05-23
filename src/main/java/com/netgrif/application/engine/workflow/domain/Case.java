@@ -76,7 +76,7 @@ public class Case implements Serializable {
     private Map<String, Integer> consumedTokens = new HashMap<>();
     @Indexed
     private Map<String, TaskPair> tasks = new HashMap<>();
-    // TODO: release/7.0.0 review json ignore and refactor to common Permission class
+    // TODO: release/8.0.0 review json ignore and refactor to common Permission class
     private Set<String> enabledRoles = new HashSet<>();
     //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
     private Map<String, Map<ProcessRolePermission, Boolean>> permissions = new HashMap<>();
@@ -138,7 +138,7 @@ public class Case implements Serializable {
     }
 
     public void setColor(String color) {
-        // TODO: release/7.0.0
+        // TODO: release/8.0.0
         this.color = color == null || color.isEmpty() ? "color-fg-fm-500" : color;
     }
 
