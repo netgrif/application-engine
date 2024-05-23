@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.CaseFieldsExpressionRunner;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataValidationExpressionEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;

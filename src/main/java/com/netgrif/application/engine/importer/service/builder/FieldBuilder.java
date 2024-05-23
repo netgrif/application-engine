@@ -9,7 +9,7 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehaviors;
 import org.bson.types.ObjectId;
 
@@ -58,7 +58,7 @@ public abstract class FieldBuilder<T extends Field<?>> {
 
     public void setFieldChoices(ChoiceField<?> field, Data data, Importer importer) {
         if (data.getValues() != null && !data.getValues().isEmpty() && data.getValues().get(0).isDynamic()) {
-            field.setExpression(new Expression(data.getValues().get(0).getValue()));
+            field.setExpression(new Expression(data.getValues().get(0).getValue(), data.getValues().get(0).isDynamic()));
         } else if (data.getValues() != null) {
             List<I18nString> choices = data.getValues().stream()
                     .map(importer::toI18NString)
@@ -69,7 +69,7 @@ public abstract class FieldBuilder<T extends Field<?>> {
 
     public void setFieldOptions(ChoiceField<?> field, Data data, Importer importer) {
         if (data.getOptions() != null && data.getOptions().getInit() != null) {
-            field.setExpression(new Expression(data.getOptions().getInit().getValue()));
+            field.setExpression(new Expression(data.getOptions().getInit().getValue(), data.getOptions().getInit().isDynamic()));
             return;
         }
 
@@ -81,7 +81,7 @@ public abstract class FieldBuilder<T extends Field<?>> {
 
     public void setFieldOptions(MapOptionsField<I18nString, ?> field, Data data, Importer importer) {
         if (data.getOptions() != null && data.getOptions().getInit() != null) {
-            field.setExpression(new Expression(data.getOptions().getInit().getValue()));
+            field.setExpression(new Expression(data.getOptions().getInit().getValue(), data.getOptions().getInit().isDynamic()));
             return;
         }
 
@@ -93,7 +93,7 @@ public abstract class FieldBuilder<T extends Field<?>> {
     public void setDefaultValue(Field<?> field, Data data, Consumer<String> setDefault) {
         String initExpression = getInitExpression(data);
         if (initExpression != null) {
-            field.setInitExpression(new Expression(initExpression));
+            field.setInitExpression(new Expression(initExpression, true));
         } else {
             setDefault.accept(resolveInit(data));
         }
@@ -102,7 +102,7 @@ public abstract class FieldBuilder<T extends Field<?>> {
     public void setDefaultValues(Field<?> field, Data data, Consumer<List<String>> setDefault) {
         String initExpression = getInitExpression(data);
         if (initExpression != null) {
-            field.setInitExpression(new Expression(initExpression));
+            field.setInitExpression(new Expression(initExpression, true));
         } else {
             setDefault.accept(resolveInits(data));
         }

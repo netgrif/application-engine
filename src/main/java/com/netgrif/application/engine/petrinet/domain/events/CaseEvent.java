@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.events;
 
+import com.netgrif.application.engine.importer.model.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import lombok.Data;
 

@@ -1,9 +1,12 @@
 package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.importer.model.CaseEventType
+import com.netgrif.application.engine.importer.model.DataEventType
+import com.netgrif.application.engine.importer.model.EventType
+import com.netgrif.application.engine.importer.model.ProcessEventType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner
-import com.netgrif.application.engine.petrinet.domain.events.*
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task

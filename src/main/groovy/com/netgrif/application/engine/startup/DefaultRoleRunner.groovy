@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.startup
 
+import com.netgrif.application.engine.importer.model.EventType
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.events.Event
-import com.netgrif.application.engine.petrinet.domain.events.EventType
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import groovy.transform.CompileStatic
@@ -38,7 +38,8 @@ class DefaultRoleRunner extends AbstractOrderedCommandLineRunner {
         )
         defaultRole = repository.save(defaultRole)
 
-        if (defaultRole == null)
+        if (defaultRole == null) {
             log.error("Error saving default process role")
+        }
     }
 }

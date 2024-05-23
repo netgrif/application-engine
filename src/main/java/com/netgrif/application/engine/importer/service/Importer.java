@@ -7,31 +7,23 @@ import com.netgrif.application.engine.importer.service.validation.IActionValidat
 import com.netgrif.application.engine.importer.service.validation.IDocumentValidator;
 import com.netgrif.application.engine.importer.service.validation.ILogicValidator;
 import com.netgrif.application.engine.importer.service.validation.ITransitionValidator;
-import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
 import com.netgrif.application.engine.petrinet.domain.Function;
 import com.netgrif.application.engine.petrinet.domain.Place;
 import com.netgrif.application.engine.petrinet.domain.Transaction;
 import com.netgrif.application.engine.petrinet.domain.Transition;
+import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Reference;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Type;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
-import com.netgrif.application.engine.petrinet.domain.events.*;
-import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
-import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
-import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
-import com.netgrif.application.engine.petrinet.domain.events.Event;
-import com.netgrif.application.engine.petrinet.domain.events.EventType;
-import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
-import com.netgrif.application.engine.petrinet.domain.events.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.layout.DataGroupLayout;
 import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
@@ -224,7 +216,7 @@ public class Importer {
         actions.forEach(this::evaluateActions);
 
         if (document.getCaseName() != null && document.getCaseName().isDynamic()) {
-            net.setDefaultCaseNameExpression(new Expression(document.getCaseName().getValue()));
+            net.setDefaultCaseNameExpression(new Expression(document.getCaseName().getValue(), document.getCaseName().isDynamic()));
         } else {
             net.setDefaultCaseName(toI18NString(document.getCaseName()));
         }
@@ -387,7 +379,7 @@ public class Importer {
 
     private List<com.netgrif.application.engine.importer.model.Action> filterActionsByTrigger(List<com.netgrif.application.engine.importer.model.Action> actions, DataEventType trigger) {
         return actions.stream()
-                .filter(action -> action.getTrigger().equalsIgnoreCase(trigger.value))
+                .filter(action -> action.getTrigger().equalsIgnoreCase(trigger.toString()))
                 .collect(Collectors.toList());
     }
 
@@ -898,7 +890,7 @@ public class Importer {
     protected com.netgrif.application.engine.petrinet.domain.events.DataEvent parseDataEvent(String fieldId, List<com.netgrif.application.engine.importer.model.DataEvent> events, String transitionId) {
         com.netgrif.application.engine.petrinet.domain.events.DataEvent dataEvent = new com.netgrif.application.engine.petrinet.domain.events.DataEvent();
         events.forEach(event -> {
-            dataEvent.setType(event.getType().value().equalsIgnoreCase(DataEventType.GET.value) ? DataEventType.GET : DataEventType.SET);
+            dataEvent.setType(event.getType() == DataEventType.GET ? DataEventType.GET : DataEventType.SET);
             if (dataEvent.getId() == null) {
                 dataEvent.setId(event.getId());
             }
@@ -950,7 +942,10 @@ public class Importer {
 
     // TODO: release/8.0.0 add atribute "type" to set actions
     protected Action createAction(com.netgrif.application.engine.importer.model.Action importedAction) {
-        Action action = new Action(importedAction.getTrigger());
+        Action action = new Action();
+        if (importedAction.getTrigger() != null) {
+            action.setTrigger(DataEventType.fromValue(importedAction.getTrigger().toLowerCase()));
+        }
         action.setImportId(buildActionId(importedAction.getId()));
         return action;
     }

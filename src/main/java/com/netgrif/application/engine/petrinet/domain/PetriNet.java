@@ -1,16 +1,16 @@
 package com.netgrif.application.engine.petrinet.domain;
 
 import com.netgrif.application.engine.auth.domain.Author;
+import com.netgrif.application.engine.importer.model.CaseEventType;
+import com.netgrif.application.engine.importer.model.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Referencable;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Type;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
-import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
-import com.netgrif.application.engine.petrinet.domain.events.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
@@ -18,7 +18,6 @@ import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -417,17 +416,17 @@ public class PetriNet extends PetriNetObject {
         clone.setObjectId(this.id);
         clone.setDataSet(this.dataSet.entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x,y)->y, LinkedHashMap::new))
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x, y) -> y, LinkedHashMap::new))
         );
         clone.setPlaces(this.places.entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x,y)->y, LinkedHashMap::new))
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x, y) -> y, LinkedHashMap::new))
         );
         clone.setArcs(this.arcs.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
                         .map(Arc::clone)
-                        .collect(Collectors.toList()), (x,y)->y, LinkedHashMap::new))
+                        .collect(Collectors.toList()), (x, y) -> y, LinkedHashMap::new))
         );
         clone.initializeArcs();
         clone.setCaseEvents(this.caseEvents == null ? null : this.caseEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));

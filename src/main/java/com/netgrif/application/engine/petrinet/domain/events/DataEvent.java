@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.events;
 
+import com.netgrif.application.engine.importer.model.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ public class DataEvent extends BaseEvent {
 
     public DataEvent(String id, String type) {
         this(id);
-        this.type = DataEventType.fromString(type);
+        this.type = DataEventType.fromValue(type);
     }
 
     public EventPhase getDefaultPhase() {
@@ -35,7 +36,8 @@ public class DataEvent extends BaseEvent {
             else if (type.equals(DataEventType.SET))
                 return EventPhase.POST;
         } catch (NullPointerException e) {
-            log.error("Trigger for event [" + this.getId() + "] is not set", e);
+            // TODO: release/8.0.0 trigger?
+            log.error("Trigger for event [{}] is not set", this.getId(), e);
         }
         return null;
     }

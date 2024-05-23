@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset;
 
 import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 import lombok.Data;
 
 import java.util.Collection;

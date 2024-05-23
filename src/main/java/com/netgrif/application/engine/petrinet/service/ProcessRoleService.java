@@ -5,12 +5,10 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.event.events.user.UserRoleChangeEvent;
 import com.netgrif.application.engine.importer.model.EventPhaseType;
+import com.netgrif.application.engine.importer.model.EventType;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.context.RoleContext;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.RoleActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.Event;
-import com.netgrif.application.engine.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
@@ -35,21 +33,23 @@ public class ProcessRoleService implements IProcessRoleService {
     private final ProcessRoleRepository processRoleRepository;
     private final PetriNetRepository netRepository;
     private final ApplicationEventPublisher publisher;
-    private final RoleActionsRunner roleActionsRunner;
     private final IPetriNetService petriNetService;
     private final ISecurityContextService securityContextService;
 
     private ProcessRole defaultRole;
     private ProcessRole anonymousRole;
 
-    public ProcessRoleService(ProcessRoleRepository processRoleRepository,
-                              PetriNetRepository netRepository,
-                              ApplicationEventPublisher publisher, RoleActionsRunner roleActionsRunner,
-                              @Lazy IPetriNetService petriNetService, @Lazy IUserService userService, ISecurityContextService securityContextService) {
+    public ProcessRoleService(
+            ProcessRoleRepository processRoleRepository,
+            PetriNetRepository netRepository,
+            ApplicationEventPublisher publisher,
+            @Lazy IPetriNetService petriNetService,
+            @Lazy IUserService userService,
+            ISecurityContextService securityContextService
+    ) {
         this.processRoleRepository = processRoleRepository;
         this.netRepository = netRepository;
         this.publisher = publisher;
-        this.roleActionsRunner = roleActionsRunner;
         this.petriNetService = petriNetService;
         this.userService = userService;
         this.securityContextService = securityContextService;
@@ -173,39 +173,41 @@ public class ProcessRoleService implements IProcessRoleService {
 
     private void runAllSuitableActionsOnRoles(Set<ProcessRole> roles, EventType requiredEventType, EventPhaseType requiredPhase, IUser user, PetriNet petriNet, Map<String, String> params) {
         roles.forEach(role -> {
-            RoleContext roleContext = new RoleContext<>(user, role, petriNet);
-            runAllSuitableActionsOnOneRole(role.getEvents(), requiredEventType, requiredPhase, roleContext, params);
+            // TODO: release/8.0.0 fix
+//            RoleContext roleContext = new RoleContext<>(user, role, petriNet);
+//            runAllSuitableActionsOnOneRole(role.getEvents(), requiredEventType, requiredPhase, roleContext, params);
         });
     }
 
-    private void runAllSuitableActionsOnOneRole(Map<EventType, Event> eventMap, EventType requiredEventType, EventPhaseType requiredPhase, RoleContext roleContext, Map<String, String> params) {
-        if (eventMap == null) {
-            return;
-        }
-        eventMap.forEach((eventType, event) -> {
+    // TODO: release/8.0.0 fix
+//    private void runAllSuitableActionsOnOneRole(Map<EventType, Event> eventMap, EventType requiredEventType, EventPhaseType requiredPhase, RoleContext roleContext, Map<String, String> params) {
+//        if (eventMap == null) {
+//            return;
+//        }
+//        eventMap.forEach((eventType, event) -> {
+//
+//            if (eventType != requiredEventType) {
+//                return;
+//            }
+//
+//            runActionsBasedOnPhase(event, requiredPhase, roleContext, params);
+//        });
+//    }
 
-            if (eventType != requiredEventType) {
-                return;
-            }
-
-            runActionsBasedOnPhase(event, requiredPhase, roleContext, params);
-        });
-    }
-
-    private void runActionsBasedOnPhase(Event event, EventPhaseType requiredPhase, RoleContext roleContext, Map<String, String> params) {
-        switch (requiredPhase) {
-            case PRE:
-                runActions(event.getPreActions(), roleContext, params);
-                break;
-            case POST:
-                runActions(event.getPostActions(), roleContext, params);
-                break;
-        }
-    }
-
-    private void runActions(List<Action> actions, RoleContext roleContext, Map<String, String> params) {
-        actions.forEach(action -> roleActionsRunner.run(action, roleContext, params));
-    }
+//    private void runActionsBasedOnPhase(Event event, EventPhaseType requiredPhase, RoleContext roleContext, Map<String, String> params) {
+//        switch (requiredPhase) {
+//            case PRE:
+//                runActions(event.getPreActions(), roleContext, params);
+//                break;
+//            case POST:
+//                runActions(event.getPostActions(), roleContext, params);
+//                break;
+//        }
+//    }
+//
+//    private void runActions(List<Action> actions, RoleContext roleContext, Map<String, String> params) {
+//        actions.forEach(action -> roleActionsRunner.run(action, roleContext, params));
+//    }
 
     private void removeOldAndAssignNewRolesToUser(IUser user, Set<ProcessRole> requestedRoles) {
         user.getProcessRoles().clear();

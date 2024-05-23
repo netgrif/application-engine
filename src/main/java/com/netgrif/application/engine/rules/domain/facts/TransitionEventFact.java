@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.rules.domain.facts;
 
+import com.netgrif.application.engine.importer.model.EventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
-import com.netgrif.application.engine.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.workflow.domain.Task;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

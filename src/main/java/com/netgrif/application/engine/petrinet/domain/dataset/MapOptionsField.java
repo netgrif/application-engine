@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset;
 
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

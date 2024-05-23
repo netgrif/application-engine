@@ -5,7 +5,7 @@ import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.I18nField;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,7 +17,7 @@ public class I18nFieldBuilder extends FieldBuilder<I18nField> {
         initialize(field);
         String initExpression = getInitExpression(data);
         if (initExpression != null) {
-            field.setInitExpression(new Expression(initExpression));
+            field.setInitExpression(new Expression(initExpression, true));
         } else {
             // TODO: release/8.0.0 simplify
             if (data.getInits() != null && data.getInits().getInit() != null && !data.getInits().getInit().isEmpty()) {

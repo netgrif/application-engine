@@ -1,12 +1,12 @@
 package com.netgrif.application.engine.petrinet.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.netgrif.application.engine.importer.model.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
-import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import lombok.Data;
@@ -72,14 +72,17 @@ public class DataRef {
     public boolean isForbidden() {
         return isBehaviorSet(FORBIDDEN);
     }
+
     @JsonIgnore
     public boolean isEditable() {
         return isBehaviorSet(EDITABLE);
     }
+
     @JsonIgnore
     public boolean isHidden() {
         return isBehaviorSet(HIDDEN);
     }
+
     @JsonIgnore
     public boolean isVisible() {
         return isBehaviorSet(VISIBLE);
