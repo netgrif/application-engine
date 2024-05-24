@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.files.minio;
 
-import com.netgrif.application.engine.files.StorageType;
 import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.files.throwable.BadRequestException;
 import com.netgrif.application.engine.files.throwable.ServiceErrorException;
@@ -16,12 +15,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-
-import static com.netgrif.application.engine.files.StorageType.MINIO;
 
 @Slf4j
 @Service
@@ -46,12 +44,12 @@ public class MinioStorageService implements IStorageService {
     }
 
     @Override
-    public StorageType getType() {
-        return MINIO;
+    public String getType() {
+        return "MINIO";
     }
 
     @Override
-    public InputStream get(String path) throws BadRequestException, ServiceErrorException {
+    public InputStream get(String path) throws BadRequestException, ServiceErrorException, FileNotFoundException {
         try {
             return minioClient.getObject(
                     GetObjectArgs.builder()
@@ -62,18 +60,19 @@ public class MinioStorageService implements IStorageService {
         } catch (ErrorResponseException e) {
             log.error(e.getMessage(), e);
             if (e.response().code() == 404) {
-                return null;
+                throw new FileNotFoundException("File " + path + " not found.");
             } else if (e.response().code() == 400) {
                 throw new BadRequestException("Getting file from minio failed.", e);
             } else {
                 throw new ServiceErrorException("Some http error from minio", e);
             }
         } catch (InvalidKeyException e) {
+            log.error("Key " + path + " is corrupted.", e);
             throw new BadRequestException("Key " + path + " is corrupted.", e);
         } catch (ServerException | InsufficientDataException | IOException | NoSuchAlgorithmException |
                  InvalidResponseException | XmlParserException | InternalException e) {
             log.error("Some internal error from minio", e);
-            throw new ServiceErrorException("File cannot be get", e);
+            throw new ServiceErrorException("The file cannot be retrieved", e);
         }
     }
 
@@ -82,7 +81,7 @@ public class MinioStorageService implements IStorageService {
         try (InputStream stream = file.getInputStream()) {
             return this.save(path, stream);
         } catch (StorageException | IOException e) {
-            throw new StorageException("File cannot be save", e);
+            throw new StorageException("File cannot be saved", e);
         }
     }
 

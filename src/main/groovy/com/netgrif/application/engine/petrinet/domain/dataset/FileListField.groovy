@@ -1,9 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
-import com.netgrif.application.engine.files.StorageType
-
 class FileListField extends Field<FileListFieldValue> {
-    private StorageType storageType
+    private String storageType
 
     FileListField() {
         super()
@@ -50,11 +48,11 @@ class FileListField extends Field<FileListFieldValue> {
         this.getValue().getNamesPaths().add(new FileFieldValue(fileName, path))
     }
 
-    StorageType getStorageType() {
+    String getStorageType() {
         return storageType
     }
 
-    void setStorageType(StorageType storageType) {
+    void setStorageType(String storageType) {
         this.storageType = storageType
     }
 

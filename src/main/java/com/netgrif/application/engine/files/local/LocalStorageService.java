@@ -1,11 +1,9 @@
 package com.netgrif.application.engine.files.local;
 
-import com.netgrif.application.engine.files.StorageType;
 import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.files.throwable.BadRequestException;
 import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import com.netgrif.application.engine.files.throwable.StorageException;
-import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,17 +23,13 @@ public class LocalStorageService implements IStorageService {
     }
 
     @Override
-    public StorageType getType() {
-        return StorageType.LOCAL;
+    public String getType() {
+        return "LOCAL";
     }
 
     @Override
-    public InputStream get(String path) throws BadRequestException, ServiceErrorException {
-        try {
-            return new FileInputStream(path);
-        } catch (FileNotFoundException e) {
-            return null;
-        }
+    public InputStream get(String path) throws BadRequestException, ServiceErrorException, FileNotFoundException {
+        return new FileInputStream(path);
     }
 
     @Override
@@ -43,28 +37,34 @@ public class LocalStorageService implements IStorageService {
         try (InputStream stream = file.getInputStream()) {
             return this.save(path, stream);
         } catch (StorageException | IOException e) {
-            throw new StorageException("File cannot be save", e);
+            throw new StorageException("File cannot be saved", e);
         }
     }
 
     @Override
     public boolean save(String path, InputStream stream) throws StorageException {
+        File savedFile = createNewFile(path);
+        try (FileOutputStream fout = new FileOutputStream(savedFile)) {
+            stream.transferTo(fout);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            throw new StorageException("File " + path + " could not be saved", e);
+        }
+        return true;
+    }
+
+    private File createNewFile(String path) throws StorageException {
         File savedFile = new File(path);
+        savedFile.getParentFile().mkdirs();
         try {
-            savedFile.getParentFile().mkdirs();
             if (!savedFile.createNewFile()) {
                 savedFile.delete();
                 savedFile.createNewFile();
             }
-            FileOutputStream fout = new FileOutputStream(savedFile);
-            stream.transferTo(fout);
-            fout.close();
         } catch (IOException e) {
-            log.error(e.getMessage());
-            throw new EventNotExecutableException("File " + path + " could not be saved", e);
+            throw new StorageException("Empty File " + path + " could not be created", e);
         }
-
-        return true;
+        return savedFile;
     }
 
     @Override

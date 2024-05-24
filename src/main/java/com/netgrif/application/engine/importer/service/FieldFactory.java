@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.importer.service;
 
-import com.netgrif.application.engine.files.StorageType;
 import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Component;
@@ -515,7 +514,7 @@ public final class FieldFactory {
 
     private FileField buildFileField(Data data) {
         FileField fileField = new FileField();
-        fileField.setStorageType(data.getRemote() == null ? StorageType.fromString(defaultStorageType) : StorageType.fromString(data.getRemote()));
+        fileField.setStorageType(data.getRemote() == null ? defaultStorageType : data.getRemote());
         setDefaultValue(fileField, data, defaultValue -> {
             if (defaultValue != null) {
                 fileField.setDefaultValue(defaultValue);
@@ -526,7 +525,7 @@ public final class FieldFactory {
 
     private FileListField buildFileListField(Data data) {
         FileListField fileListField = new FileListField();
-        fileListField.setStorageType(data.getRemote() == null ? StorageType.fromString(defaultStorageType) : StorageType.fromString(data.getRemote()));
+        fileListField.setStorageType(data.getRemote() == null ? defaultStorageType : data.getRemote());
         setDefaultValues(fileListField, data, defaultValues -> {
             if (defaultValues != null && !defaultValues.isEmpty()) {
                 fileListField.setDefaultValue(defaultValues);

@@ -1,12 +1,12 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
-import com.netgrif.application.engine.files.StorageType
+
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
 class FileField extends Field<FileFieldValue> {
 
-    private StorageType storageType
+    private String storageType
 
     FileField() {
         super()
@@ -42,11 +42,11 @@ class FileField extends Field<FileFieldValue> {
         this.setDefaultValue(FileFieldValue.fromString(defaultValue))
     }
 
-    StorageType getStorageType() {
+    String getStorageType() {
         return this.storageType
     }
 
-    void setStorageType(StorageType storageType) {
+    void setStorageType(String storageType) {
         this.storageType = storageType
     }
 

@@ -1,17 +1,17 @@
 package com.netgrif.application.engine.files.interfaces;
 
-import com.netgrif.application.engine.files.StorageType;
 import com.netgrif.application.engine.files.throwable.BadRequestException;
 import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import com.netgrif.application.engine.files.throwable.StorageException;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 public interface IStorageService {
-    StorageType getType();
+    String getType();
 
-    InputStream get(String path) throws BadRequestException, ServiceErrorException;
+    InputStream get(String path) throws BadRequestException, ServiceErrorException, FileNotFoundException;
 
     boolean save(String path, MultipartFile file) throws StorageException;
 

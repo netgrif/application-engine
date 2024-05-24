@@ -7,28 +7,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class StorageResolverService {
 
-    private List<IStorageService> storageServices;
+    private Map<String, IStorageService> storageServices;
 
     @Autowired
     private void setStorageServices(List<IStorageService> storageServices) {
-        this.storageServices = storageServices;
+        this.storageServices = storageServices.stream().collect(Collectors.toMap(IStorageService::getType, Function.identity()));
     }
 
-    public IStorageService resolve(StorageType type) {
+    public IStorageService resolve(String type) {
         if (storageServices == null) {
             log.error("Storage services with interface IStorageService not found.");
             throw new StorageNotFoundException("Remote Storage not available.");
         }
-        Optional<IStorageService> storageService = storageServices.stream().filter(service -> service.getType().equals(type)).collect(Collectors.toList()).stream().findFirst();
-        if (storageService.isPresent()) {
-            return storageService.get();
+        if (storageServices.containsKey(type)) {
+            return storageServices.get(type);
         }
         throw new StorageNotFoundException("Storage Service with type: " + type + " not available.");
 

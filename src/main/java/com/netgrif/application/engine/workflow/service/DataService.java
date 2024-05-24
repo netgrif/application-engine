@@ -437,42 +437,42 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public FileFieldInputStream getFileByTaskAndName(String taskId, String fieldId, String name) {
+    public FileFieldInputStream getFileByTaskAndName(String taskId, String fieldId, String name) throws FileNotFoundException {
         return getFileByTaskAndName(taskId, fieldId, name, new HashMap<>());
     }
 
     @Override
-    public FileFieldInputStream getFileByTaskAndName(String taskId, String fieldId, String name, Map<String, String> params) {
+    public FileFieldInputStream getFileByTaskAndName(String taskId, String fieldId, String name, Map<String, String> params) throws FileNotFoundException {
         Task task = taskService.findOne(taskId);
         return getFileByCaseAndName(task.getCaseId(), fieldId, name, params);
     }
 
     @Override
-    public FileFieldInputStream getFileByCase(String caseId, Task task, String fieldId, boolean forPreview) {
+    public FileFieldInputStream getFileByCase(String caseId, Task task, String fieldId, boolean forPreview) throws FileNotFoundException {
         Case useCase = workflowService.findOne(caseId);
         FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
         return getFile(useCase, task, field, forPreview);
     }
 
     @Override
-    public FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name) {
+    public FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name) throws FileNotFoundException {
         return getFileByCaseAndName(caseId, fieldId, name, new HashMap<>());
     }
 
     @Override
-    public FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name, Map<String, String> params) {
+    public FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name, Map<String, String> params) throws FileNotFoundException {
         Case useCase = workflowService.findOne(caseId);
         FileListField field = (FileListField) useCase.getPetriNet().getDataSet().get(fieldId);
         return getFileByName(useCase, field, name, params);
     }
 
     @Override
-    public FileFieldInputStream getFileByName(Case useCase, FileListField field, String name) {
+    public FileFieldInputStream getFileByName(Case useCase, FileListField field, String name) throws FileNotFoundException {
         return getFileByName(useCase, field, name, new HashMap<>());
     }
 
     @Override
-    public FileFieldInputStream getFileByName(Case useCase, FileListField field, String name, Map<String, String> params) {
+    public FileFieldInputStream getFileByName(Case useCase, FileListField field, String name, Map<String, String> params) throws FileNotFoundException {
         runGetActionsFromFileField(field.getEvents(), useCase, params);
         if (useCase.getFieldValue(field.getStringId()) == null)
             return null;
@@ -483,21 +483,21 @@ public class DataService implements IDataService {
         Optional<FileFieldValue> fileFieldValue = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
         if (fileFieldValue.isEmpty() || fileFieldValue.get().getPath() == null) {
             log.error("File " + name + " not found!");
-            return null;
+            throw new FileNotFoundException("File " + name + " not found!");
         }
         return new FileFieldInputStream(storageResolverService.resolve(field.getStorageType()).get(fileFieldValue.get().getPath()), name);
     }
 
     @Override
-    public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview) {
+    public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview) throws FileNotFoundException {
         return getFile(useCase, task, field, forPreview, new HashMap<>());
     }
 
     @Override
-    public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview, Map<String, String> params) {
+    public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview, Map<String, String> params) throws FileNotFoundException {
         runGetActionsFromFileField(field.getEvents(), useCase, params);
         if (useCase.getFieldValue(field.getStringId()) == null) {
-            return null;
+            throw new FileNotFoundException("Field " + field.getStringId() + " not found on case " + useCase.getStringId());
         }
 
         workflowService.save(useCase);
@@ -507,7 +507,6 @@ public class DataService implements IDataService {
                 return getFilePreview(field, useCase);
             } else {
                 return new FileFieldInputStream(field, storageResolverService.resolve(field.getStorageType()).get(field.getValue().getPath()));
-//                return new FileFieldInputStream(field, storageResolverService.resolve(field.getStorageType()).get(field, useCase, false));
             }
         } catch (IOException | StorageException e) {
             log.error("Getting file failed: ", e);
@@ -545,6 +544,7 @@ public class DataService implements IDataService {
             inputStream.reset();
             return new FileFieldInputStream(field, inputStream);
         } catch (StorageException e) {
+            stream.close();
             throw new EventNotExecutableException("File preview cannot be saved", e);
         }
     }
@@ -586,7 +586,7 @@ public class DataService implements IDataService {
 
 
     @Override
-    public InputStream download(FileListField field, FileFieldValue fieldValue) throws StorageException {
+    public InputStream download(FileListField field, FileFieldValue fieldValue) throws StorageException, FileNotFoundException {
         return storageResolverService.resolve(field.getStorageType()).get(fieldValue.getPath());
     }
 
@@ -616,10 +616,8 @@ public class DataService implements IDataService {
             field.getValue().setPath(path);
             storageService.save(path, multipartFile);
         } catch (StorageException e) {
-            log.error(e.getMessage());
-//            TODO
+            log.error("File " + multipartFile.getOriginalFilename() + " in case " + useCase.getStringId() + " could not be saved to file field " + field.getStringId(), e);
             throw new EventNotExecutableException("File " + multipartFile.getOriginalFilename() + " in case " + useCase.getStringId() + " could not be saved to file field " + field.getStringId(), e);
-
         }
 
         useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
@@ -647,7 +645,6 @@ public class DataService implements IDataService {
                         field.getValue().getNamesPaths().remove(fileFieldValue.get());
                     }
                 }
-                storageService.getPath(useCase.getStringId(), field.getStringId(), multipartFile.getOriginalFilename());
                 String path = storageService.getPath(useCase.getStringId(), field.getStringId(), multipartFile.getOriginalFilename());
                 field.addValue(multipartFile.getOriginalFilename(), path);
                 storageService.save(path, multipartFile);
@@ -791,7 +788,7 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public SetDataEventOutcome changeComponentProperties(Case useCase, String transitionId, String fieldId,  Map<String, String> properties) {
+    public SetDataEventOutcome changeComponentProperties(Case useCase, String transitionId, String fieldId, Map<String, String> properties) {
         Predicate predicate = QTask.task.caseId.eq(useCase.getStringId()).and(QTask.task.transitionId.eq(transitionId));
         Task task = taskService.searchOne(predicate);
         return this.changeComponentProperties(useCase, task, fieldId, properties);
@@ -1062,7 +1059,8 @@ public class DataService implements IDataService {
         SimpleModule module = new SimpleModule();
         module.addDeserializer(I18nString.class, new I18nStringDeserializer());
         mapper.registerModule(module);
-        Map<String, I18nString> optionsMapped = mapper.convertValue(optionsNode, new TypeReference<Map<String, I18nString>>() {});
+        Map<String, I18nString> optionsMapped = mapper.convertValue(optionsNode, new TypeReference<Map<String, I18nString>>() {
+        });
         if (optionsMapped.isEmpty()) {
             return null;
         }
@@ -1098,12 +1096,13 @@ public class DataService implements IDataService {
     }
 
     private Map<String, String> parseProperties(JsonNode node) {
-        JsonNode propertiesNode =  node.get("properties");
+        JsonNode propertiesNode = node.get("properties");
         if (propertiesNode == null) {
             return null;
         }
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, String> propertiesMapped = mapper.convertValue(propertiesNode, new TypeReference<Map<String, String>>() {});
+        Map<String, String> propertiesMapped = mapper.convertValue(propertiesNode, new TypeReference<Map<String, String>>() {
+        });
         if (propertiesMapped.isEmpty()) {
             return null;
         }
