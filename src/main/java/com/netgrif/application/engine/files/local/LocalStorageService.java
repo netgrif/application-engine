@@ -62,7 +62,7 @@ public class LocalStorageService implements IStorageService {
                 savedFile.createNewFile();
             }
         } catch (IOException e) {
-            throw new StorageException("Empty File " + path + " could not be created", e);
+            throw new StorageException("Empty file " + path + " could not be created", e);
         }
         return savedFile;
     }
