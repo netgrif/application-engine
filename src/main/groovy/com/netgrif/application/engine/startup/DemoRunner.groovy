@@ -46,7 +46,5 @@ class DemoRunner extends AbstractOrderedCommandLineRunner {
     @Override
     void run(String... args) throws Exception {
         // Code what is written here DO NOT COMMIT!
-        def aCase = helper.createCase("test", helper.createNet("function_overloading.xml").get())
-        dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number": ["value": "20", "type": "number"]]))
     }
 }
