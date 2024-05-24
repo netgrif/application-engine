@@ -1,8 +1,5 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
-import com.netgrif.application.engine.configuration.ApplicationContextProvider
-import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration
-
 class FileListFieldValue implements Serializable {
 
     private static final long serialVersionUID = 5299918326436821185L;
@@ -37,11 +34,6 @@ class FileListFieldValue implements Serializable {
             }
         }
         return newVal
-    }
-
-    static String getPath(String caseId, String fieldId, String name) {
-        FileStorageConfiguration fileStorageConfiguration = ApplicationContextProvider.getBean("fileStorageConfiguration")
-        return "${fileStorageConfiguration.getStoragePath()}/${caseId}/${fieldId}/${name}"
     }
 
     @Override

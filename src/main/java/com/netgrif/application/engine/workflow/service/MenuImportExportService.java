@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.files.StorageResolverService;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
@@ -74,6 +75,9 @@ public class MenuImportExportService implements IMenuImportExportService {
 
     @Autowired
     private IFilterImportExportService filterImportExportService;
+
+    @Autowired
+    private StorageResolverService storageResolverService;
 
     /**
      * Method which performs export of selected menu entries with their filters into xml file.
@@ -292,7 +296,7 @@ public class MenuImportExportService implements IMenuImportExportService {
         FileFieldValue ffv = new FileFieldValue();
         try {
             ffv.setName("menu_" + userService.getLoggedUser().getFullName().replaceAll("\\s+", "") + ".xml");
-            ffv.setPath(ffv.getPath(parentId, fileField.getImportId()));
+            ffv.setPath(storageResolverService.resolve(fileField.getStorageType()).getPath(parentId, fileField.getImportId(), ffv.getName()));
             File f = new File(ffv.getPath());
             XmlMapper xmlMapper = new XmlMapper();
             xmlMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
