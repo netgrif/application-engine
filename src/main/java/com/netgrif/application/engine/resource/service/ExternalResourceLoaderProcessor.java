@@ -18,16 +18,13 @@ public class ExternalResourceLoaderProcessor implements ResourceLoaderAware, Pro
         if(DefaultResourceLoader.class.isAssignableFrom(resourceLoader.getClass())) {
             ((DefaultResourceLoader)resourceLoader).addProtocolResolver(this);
         } else {
-            log.error("Could not assign protocol loader.");
+            log.error("Could not assign protocol for resource loader.");
         }
     }
 
     @Override
     public Resource resolve(String location, ResourceLoader resourceLoader) {
-        if(location.startsWith(ExternalResourceLoader.RESOURCE_PREFIX) ||
-                location.startsWith(ExternalResourceLoader.NAE_PREFIX) ||
-                location.startsWith(ExternalResourceLoader.NAE_RESOURCE_PREFIX) ||
-                location.startsWith(ExternalResourceLoader.NR_PREFIX)) {
+        if(ExternalResourceLoader.getExternalResourcePrefix(location).isPresent()){
             ExternalResourceLoader loader = new ExternalResourceLoader(resourceLoader);
             return loader.getResource(location);
         }

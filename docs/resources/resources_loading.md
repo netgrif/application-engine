@@ -1,11 +1,11 @@
 # Resource Loading
 
-If you want to load resources, which will not be in JAR(for example big files), you can use our resource loader.
-ResourceLoader return InputStreamResource, from which you can use InputStream, and loading resources from directory **resource/**  inworking directory of the app.
-The prefix for NetgrifResourceLoaser is 
+If you want to load resources, which are not included in JAR (for example large files), you can use the resource loader.
+ResourceLoader returns an InputStreamResource. You can turn it into an InputStream and load resources from the directory **resource/**  in the working directory of the app.
+The prefix for ExternalResourceLoader is 
 
 ```
-resource://
+resource:
 ```
 
 For use you can use code like this in your runner:
@@ -13,12 +13,12 @@ For use you can use code like this in your runner:
     @Autowired
     private ResourceLoader resourceLoader;
 
-    @Value("resource://nameOfFile.txt")
+    @Value("resource:nameOfFile.txt")
     private Resource customResource;
 
     @Override
     void run(String... strings) throws Exception {
-        loadResources("resource://nameOfFile.txt");
+        loadResources("resource:nameOfFile.txt");
     }
 
     void loadResources(String resourceUrl) {
