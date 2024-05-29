@@ -14,7 +14,7 @@ public class ExternalResourceLoader implements ResourceLoader {
             "resource:",
             "nae:",
             "nae-resource:",
-            "nr"
+            "nr:"
     };
 
     public static final String DEFAULT_RESOURCE_PREFIX = RESOURCE_PREFIXES[0];
