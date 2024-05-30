@@ -27,8 +27,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-// TODO: release/8.0.0 validations
-@Ignore
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
@@ -44,10 +42,10 @@ class ValidationTest {
     private TestHelper testHelper
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreator superCreator
 
     @BeforeEach
     void setup() {
@@ -1058,5 +1056,4 @@ class ValidationTest {
         })
         Assertions.assertEquals("error-number07-2", thrown.getMessage());
     }
-
 }
