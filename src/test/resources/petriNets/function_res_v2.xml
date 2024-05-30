@@ -12,7 +12,7 @@
     </function>
     <function name="updateUseCaseFieldValue" scope="namespace">
         { def fieldId, def newValue ->
-            change useCase.getField(fieldId) value { newValue }
+            change useCase.dataSet.get(fieldId) value { newValue }
         }
     </function>
     <!-- ROLE -->

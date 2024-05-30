@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.drools.RefreshableKieBase;
+import com.netgrif.application.engine.importer.model.EventType;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
@@ -169,7 +170,7 @@ class RuleEngineTest {
                 .build();
         StoredRule rule2 = StoredRule.builder()
                 .id(new ObjectId())
-                .when("$case: Case() $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + TRANS_1 + "\", type == com.netgrif.application.engine.petrinet.domain.events.EventType.FINISH, phase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)")
+                .when("$case: Case() $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + TRANS_1 + "\", type == com.netgrif.application.engine.importer.model.EventType.FINISH, phase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)")
                 .then("insert(com.netgrif.application.engine.rules.service.RuleEngineTest.TestFact.instance($case.stringId, 0));    \n $case.dataSet.get(\"text_data\").setRawValue(\"" + TEXT_VALUE + "\");    \n log.info(\"rule 2 matched\");")
                 .identifier("rule2")
                 .lastUpdate(LocalDateTime.now())
@@ -185,7 +186,7 @@ class RuleEngineTest {
                 .build();
         StoredRule rule4 = StoredRule.builder()
                 .id(new ObjectId())
-                .when("$case: Case([\"" + TEXT_VALUE + "\"] contains dataSet.get(\"text_data\").value.value) $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + TRANS_2 + "\", type == com.netgrif.application.engine.petrinet.domain.events.EventType.FINISH, phase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)")
+                .when("$case: Case([\"" + TEXT_VALUE + "\"] contains dataSet.get(\"text_data\").value.value) $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + TRANS_2 + "\", type == com.netgrif.application.engine.importer.model.EventType.FINISH, phase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)")
                 .then("$case.title = \"" + NEW_CASE_TITLE_2 + "\";    \n log.info(\"rule 4 matched\");")
                 .identifier("rule4")
                 .lastUpdate(LocalDateTime.now())
@@ -197,6 +198,7 @@ class RuleEngineTest {
         ruleRepository.save(rule4);
 
         CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color", superUser);
+        // TODO: release/8.0.0 AssertionError
         assert caseOutcome.getCase().getTitle().equals(NEW_CASE_TITLE);
 
         Task task = findTask(caseOutcome.getCase(), TRANS_1);
@@ -220,8 +222,8 @@ class RuleEngineTest {
 
     @Test
     void assignRuleTest() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
-        StoredRule rule = transitionRulePre("com.netgrif.application.engine.petrinet.domain.events.EventType.ASSIGN");
-        StoredRule rule2 = transitionRulePost("com.netgrif.application.engine.petrinet.domain.events.EventType.ASSIGN");
+        StoredRule rule = transitionRulePre("com.netgrif.application.engine.importer.model.EventType.ASSIGN");
+        StoredRule rule2 = transitionRulePost("com.netgrif.application.engine.importer.model.EventType.ASSIGN");
 
         ruleRepository.save(rule);
         ruleRepository.save(rule2);
@@ -241,8 +243,8 @@ class RuleEngineTest {
 
     @Test
     void testDelegate() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
-        StoredRule rule = transitionRulePre("EventType.DELEGATE");
-        StoredRule rule2 = transitionRulePost("EventType.DELEGATE");
+        StoredRule rule = transitionRulePre("com.netgrif.application.engine.importer.model.EventType.DELEGATE");
+        StoredRule rule2 = transitionRulePost("com.netgrif.application.engine.importer.model.EventType.DELEGATE");
 
         ruleRepository.save(rule);
         ruleRepository.save(rule2);
@@ -262,8 +264,8 @@ class RuleEngineTest {
 
     @Test
     void testFinish() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
-        StoredRule rule = transitionRulePre("EventType.FINISH");
-        StoredRule rule2 = transitionRulePost("EventType.FINISH");
+        StoredRule rule = transitionRulePre("com.netgrif.application.engine.importer.model.EventType.FINISH");
+        StoredRule rule2 = transitionRulePost("com.netgrif.application.engine.importer.model.EventType.FINISH");
 
         ruleRepository.save(rule);
         ruleRepository.save(rule2);
@@ -283,8 +285,8 @@ class RuleEngineTest {
 
     @Test
     void testCancel() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
-        StoredRule rule = transitionRulePre("EventType.CANCEL");
-        StoredRule rule2 = transitionRulePost("EventType.CANCEL");
+        StoredRule rule = transitionRulePre("com.netgrif.application.engine.importer.model.EventType.CANCEL");
+        StoredRule rule2 = transitionRulePost("com.netgrif.application.engine.importer.model.EventType.CANCEL");
 
         ruleRepository.save(rule);
         ruleRepository.save(rule2);

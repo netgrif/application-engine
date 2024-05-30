@@ -26,7 +26,7 @@ public class Action implements Serializable {
     }
 
     public Action(String definition, String trigger) {
-        this(new HashMap<String, String>(), new HashMap<String, String>(), definition, trigger);
+        this(new HashMap<>(), new HashMap<>(), definition, trigger);
     }
 
     public Action(Map<String, String> fieldIds, Map<String, String> transitionIds, String definition, DataEventType trigger) {
@@ -57,7 +57,7 @@ public class Action implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("[{}] {}", trigger, definition);
+        return String.format("[%s] %s", trigger, definition);
     }
 
     @Override

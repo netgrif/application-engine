@@ -9,7 +9,6 @@ import com.netgrif.application.engine.importer.service.validation.ILogicValidato
 import com.netgrif.application.engine.importer.service.validation.ITransitionValidator;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.petrinet.domain.Function;
 import com.netgrif.application.engine.petrinet.domain.Place;
 import com.netgrif.application.engine.petrinet.domain.Transaction;
 import com.netgrif.application.engine.petrinet.domain.Transition;
@@ -22,7 +21,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.layout.DataGroupLayout;
 import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
@@ -108,7 +107,7 @@ public class Importer {
     protected IActionValidator actionValidator;
 
     @Autowired
-    protected FieldActionsRunner actionsRunner;
+    protected ActionRunner actionsRunner;
 
     @Autowired
     protected FileStorageConfiguration fileStorageConfiguration;

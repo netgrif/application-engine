@@ -19,6 +19,11 @@ public class Validation implements Serializable {
 
     @Override
     public Validation clone() {
-        return new Validation(this.rule, this.message.clone());
+        Validation cloned =  new Validation();
+        cloned.setRule(rule);
+        if (this.message != null) {
+            cloned.setMessage(this.message.clone());
+        }
+        return cloned;
     }
 }

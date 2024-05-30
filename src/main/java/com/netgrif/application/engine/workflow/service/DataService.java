@@ -14,7 +14,7 @@ import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -75,7 +75,7 @@ public class DataService implements IDataService {
     protected FieldFactory fieldFactory;
 
     @Autowired
-    protected FieldActionsRunner actionsRunner;
+    protected ActionRunner actionsRunner;
 
     @Autowired
     protected IEventService eventService;

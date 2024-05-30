@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component
 @Slf4j
 @Component
 @SuppressWarnings("GrMethodMayBeStatic")
-abstract class FieldActionsRunner {
+abstract class ActionRunner {
 
     @Lookup("actionDelegate")
     abstract ActionDelegate getActionDelegate()

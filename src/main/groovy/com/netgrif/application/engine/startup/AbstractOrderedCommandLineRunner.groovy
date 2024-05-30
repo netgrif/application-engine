@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.workflow.domain.Case
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.core.Ordered

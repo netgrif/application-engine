@@ -345,7 +345,7 @@ public class FilterImportExportService implements IFilterImportExportService {
         exportFilter.setVisibility(visibility.getRawValue());
         EnumerationMapField type = (EnumerationMapField) filter.getDataSet().get(FIELD_FILTER_TYPE);
         exportFilter.setType(type.getRawValue());
-        EnumerationField name = (EnumerationField) filter.getDataSet().get(FIELD_NAME);
+        I18nField name = (I18nField) filter.getDataSet().get(FIELD_NAME);
         exportFilter.setFilterName(name.getRawValue());
         return exportFilter;
     }

@@ -3,6 +3,7 @@ package com.netgrif.application.engine.petrinet.domain
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField
+import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
@@ -333,21 +334,20 @@ class ImporterTest {
 
         assert net != null
 
-        ChoiceField multichoice = (ChoiceField) net.getDataSet().get(MULTICHOICE_FIELD)
-        ChoiceField multichoice_like_map = (ChoiceField) net.getDataSet().get(MULTICHOICE_LIKE_MAP_FIELD)
+        MultichoiceField multichoice = (MultichoiceField) net.getDataSet().get(MULTICHOICE_FIELD)
+        MultichoiceField multichoice_like_map = (MultichoiceField) net.getDataSet().get(MULTICHOICE_LIKE_MAP_FIELD)
         ChoiceField enumeration = (ChoiceField) net.getDataSet().get(ENUMERATION_FIELD)
         ChoiceField enumeration_like_map = (ChoiceField) net.getDataSet().get(ENUMERATION_LIKE_MAP_FIELD)
 
-        assert multichoice.getChoices() == multichoice_like_map.getChoices()
-        assert enumeration.getChoices() == enumeration_like_map.getChoices()
+        assert equalSet(multichoice.getChoices(), multichoice_like_map.getChoices())
+        assert equalSet(enumeration.getChoices(), enumeration_like_map.getChoices())
 
-        assert multichoice.getValue() == multichoice_like_map.getValue()
-        assert enumeration.getValue() == enumeration_like_map.getValue()
+        assert multichoice.getRawValue() == multichoice_like_map.getRawValue()
+        assert enumeration.getRawValue() == enumeration_like_map.getRawValue()
 
-        assert multichoice.getDefaultValue() == multichoice_like_map.getDefaultValue()
+        assert equalSet(multichoice.getDefaultValue(), multichoice_like_map.getDefaultValue())
         assert enumeration.getDefaultValue() == enumeration_like_map.getDefaultValue()
     }
-
 
     @Test
     void testDataGroupImportWithoutId() {
@@ -373,5 +373,11 @@ class ImporterTest {
         assert importNet.getTransition("1").getTitle()
         assert importNet.getTransition("layout").getTitle()
         assert importNet.getTransition("layout").getTitle().defaultValue == ""
+    }
+
+    private boolean equalSet(Set<I18nString> first, Set<I18nString> second) {
+        return first.every {
+            second.any { that -> it.defaultValue == that.defaultValue }
+        }
     }
 }

@@ -60,6 +60,7 @@ class DynamicValidationPerformanceTest {
 
     @Test
     void testValidations() {
+        // TODO: release/8.0.0 Object f.text_valid_switch  does not exists
         ImportPetriNetEventOutcome optNet1 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_validations_performance_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         ImportPetriNetEventOutcome optNet2 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_validations_performance_test_comparison.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
 

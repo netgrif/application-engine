@@ -6,7 +6,7 @@ import com.netgrif.application.engine.importer.model.DataEventType
 import com.netgrif.application.engine.importer.model.EventType
 import com.netgrif.application.engine.importer.model.ProcessEventType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
@@ -26,7 +26,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class ActionTest {
 
     @Autowired
-    private FieldActionsRunner runner
+    private ActionRunner runner
 
     @Autowired
     private TestHelper testHelper

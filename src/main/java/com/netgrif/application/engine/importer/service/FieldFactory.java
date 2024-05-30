@@ -100,8 +100,8 @@ public final class FieldFactory {
     }*/
 
     // TODO: release/8.0.0 validation register
-//    private com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation makeValidation(String rule, I18nString message, boolean dynamic) {
-//        return dynamic ? new DynamicValidation(rule, message) : new com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation(rule, message);
+//    private com.netgrif.application.engine.petrinet.domain.dataset.Validation makeValidation(String rule, I18nString message, boolean dynamic) {
+//        return dynamic ? new DynamicValidation(rule, message) : new com.netgrif.application.engine.petrinet.domain.dataset.Validation(rule, message);
 //    }
 
     private void setEncryption(Field<?> field, Data data) {

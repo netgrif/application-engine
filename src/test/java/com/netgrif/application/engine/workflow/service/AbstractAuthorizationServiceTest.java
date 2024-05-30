@@ -72,6 +72,7 @@ class AbstractAuthorizationServiceTest {
         netPermissions.get(roles.get(1).getStringId()).put(DELETE, false);
         aggregatePermission = mockInstance.getAggregateProcessRolePermissions(user, netPermissions);
 
+        // TODO: release/8.0.0 AssertionError
         assert !aggregatePermission.get(CREATE);
         assert aggregatePermission.get(VIEW);
         assert !aggregatePermission.get(DELETE);

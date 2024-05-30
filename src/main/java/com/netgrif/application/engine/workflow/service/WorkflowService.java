@@ -14,7 +14,7 @@ import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -89,7 +89,7 @@ public class WorkflowService implements IWorkflowService {
     protected IRuleEngine ruleEngine;
 
     @Autowired
-    protected FieldActionsRunner actionsRunner;
+    protected ActionRunner actionsRunner;
 
     @Autowired
     protected IUserService userService;

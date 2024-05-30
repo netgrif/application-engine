@@ -111,7 +111,7 @@
         <action trigger="set">
             toBeUpdatedInternally: f.toBeUpdatedInternally;
             function_res.updateUseCaseFieldValue("toBeUpdated", 1)
-            change toBeUpdatedInternally value { (useCase.getFieldValue("toBeUpdated") as Double) + 1.0 }
+            change toBeUpdatedInternally value { (useCase.dataSet.get("toBeUpdated").rawValue as Double) + 1.0 }
         </action>
     </data>
     <data type="number">

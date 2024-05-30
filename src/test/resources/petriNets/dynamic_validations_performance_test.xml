@@ -2038,7 +2038,7 @@
             change number validations { "odd" }
             } else {
             change number validations { new
-            com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation('''inrange
+            com.netgrif.application.engine.petrinet.domain.dataset.Validation('''inrange
             ${min.value as Integer},${max.value as Integer}''', true) }
             }
         </action>
@@ -2049,16 +2049,18 @@
         <title>Switch</title>
 
         <action trigger="set">
-            text_valid_switch: f.text_valid_switch,
-            text: f.text;
+        text_valid_switch: f.text_valid_switch ,
+        text: f.text;
 
-            if (text_valid_switch.value) {
+        if (text_valid_switch.value) {
             change text validations { "email" }
-            } else {
-            change text validations { new
-            com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation('''log.info("running");maxLength
-            ${max.value as Integer}''', true) }
+        } else {
+            change text validations {
+                new com.netgrif.application.engine.petrinet.domain.dataset.Validation(
+                        '''log.info("running");maxLength ${max.value as Integer}''',
+                        new com.netgrif.application.engine.petrinet.domain.I18nString(""))
             }
+        }
         </action>
     </data>
 

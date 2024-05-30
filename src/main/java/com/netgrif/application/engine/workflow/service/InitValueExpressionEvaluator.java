@@ -4,7 +4,7 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.CaseFieldsExpressionRunner;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ExpressionRunner;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class InitValueExpressionEvaluator implements IInitValueExpressionEvaluator {
 
     @Autowired
-    private CaseFieldsExpressionRunner runner;
+    private ExpressionRunner runner;
 
     @Override
     public <T> T evaluate(Case useCase, Field<T> defaultField, Map<String, String> params) {

@@ -79,7 +79,7 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
         Long count = ruleRepository.count();
         long numOfPages = ((count / pageSize) + 1);
 
-        log.debug("Compiling rules, count=" + count + ", pages=" + numOfPages);
+        log.debug("Compiling rules, count={}, pages={}", count, numOfPages);
         for (int page = 0; page < numOfPages; page++) {
             List<StoredRule> rules = ruleRepository.findAll(PageRequest.of(page, pageSize)).getContent();
             buildRules(rules, kieHelper);
@@ -91,7 +91,7 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
     protected KieHelper buildRules(List<StoredRule> rules, KieHelper kieHelper) throws IOException {
         String generatedDRL = compileRules(rules);
         kieHelper = addRulesResource(generatedDRL, kieHelper);
-        log.debug("drl:\n" + generatedDRL);
+        log.debug("drl:\n{}", generatedDRL);
 
         return kieHelper;
     }

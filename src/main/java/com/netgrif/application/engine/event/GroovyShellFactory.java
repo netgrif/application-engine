@@ -8,8 +8,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class GroovyShellFactory implements IGroovyShellFactory {
 
-    @Autowired
-    private CompilerConfiguration configuration;
+    private final CompilerConfiguration configuration;
+
+    public GroovyShellFactory(CompilerConfiguration configuration) {
+        this.configuration = configuration;
+    }
 
     @Override
     public GroovyShell getGroovyShell() {

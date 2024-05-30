@@ -92,6 +92,8 @@ class FieldTest {
         assert field.description.defaultValue == "Number field description"
         assert field.name.defaultValue == "Number"
         assert field.placeholder.defaultValue == "Number field placeholder"
+        //TODO: release/8.0.0 validations are ignored
+//        java.lang.NullPointerException: Cannot invoke method get() on null object
         assert field.validations.get(0).validationRule == "inrange 0,inf"
         assert field.validations.get(1).validationMessage.defaultValue == "Number field validation message"
         assert field.validations.get(1).validationRule == "inrange 0,inf"

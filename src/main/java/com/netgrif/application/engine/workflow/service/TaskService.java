@@ -434,7 +434,7 @@ public class TaskService implements ITaskService {
 
     protected Case evaluateRules(String caseId, Task task, EventType eventType, EventPhase eventPhase) {
         Case useCase = workflowService.findOne(caseId);
-        log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] evaluating rules of event " + eventType.name() + " of phase " + eventPhase.name());
+        log.info("[{}]: Task [{}] in case [{}] evaluating rules of event {} of phase {}", useCase.getStringId(), task.getTitle(), useCase.getTitle(), eventType.name(), eventPhase.name());
         int rulesExecuted = ruleEngine.evaluateRules(useCase, task, TransitionEventFact.of(task, eventType, eventPhase));
         if (rulesExecuted == 0) {
             return useCase;

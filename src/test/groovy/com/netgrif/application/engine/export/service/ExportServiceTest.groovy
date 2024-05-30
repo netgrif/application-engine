@@ -153,6 +153,11 @@ class ExportServiceTest {
         Set<String> header = exportService.buildDefaultCsvTaskHeader(task)
         assert header != null
         // TODO: release/8.0.0 empty header
+/*
+assert header.size() == 2
+       |      |      |
+       []     0      false
+ */
         assert header.size() == 2
     }
 }

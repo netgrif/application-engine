@@ -75,8 +75,8 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     public static final String PREFERENCE_ITEM_FIELD_NEW_FILTER_ID = "new_filter_id"
     public static final String PREFERENCE_ITEM_FIELD_REMOVE_OPTION = "remove_option"
     public static final String PREFERENCE_ITEM_FIELD_FILTER_CASE = "filter_case"
-    public static final String PREFERENCE_ITEM_FIELD_PARENTID = "parentId"
-    private static final String PREFERENCE_ITEM_FIELD_DEFAULT_HEADERS = "default_headers"
+    public static final String PREFERENCE_ITEM_FIELD_PARENT_ID = "parentId"
+    public static final String PREFERENCE_ITEM_FIELD_DEFAULT_HEADERS = "default_headers"
     public static final String PREFERENCE_ITEM_FIELD_IDENTIFIER = "menu_item_identifier"
     public static final String PREFERENCE_ITEM_FIELD_APPEND_MENU_ITEM = "append_menu_item_stringId"
     public static final String PREFERENCE_ITEM_FIELD_ALLOWED_ROLES = "allowed_roles"
@@ -186,7 +186,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     def map = [:]
     Action action
     Field<?> fieldChanges
-    FieldActionsRunner actionsRunner
+    ActionRunner actionsRunner
     List<EventOutcome> outcomes
 
     // TODO: release/8.0.0 - <action trigger="set" type="value">
@@ -194,7 +194,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     // TODO: release/8.0.0 - setdata with user
     // TODO: release/8.0.0 - deprecate enum/multichoice with chooices, keep only maps with options
 
-    void init(Action action, Case useCase, Optional<Task> task, Field<?> fieldChanges, FieldActionsRunner actionsRunner, Map<String, String> params = [:]) {
+    void init(Action action, Case useCase, Optional<Task> task, Field<?> fieldChanges, ActionRunner actionsRunner, Map<String, String> params = [:]) {
         this.action = action
         this.useCase = useCase
         this.task = task
@@ -1139,6 +1139,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return new Validation(rule, message)
     }
 
+    // TODO: release/8.0.0 remove?
 //    DynamicValidation dynamicValidation(String rule, I18nString message) {
 //        return new DynamicValidation(rule, message)
 //    }
@@ -1717,8 +1718,8 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         assignTask(newItemTask)
         DataSet dataSet = new DataSet([
                 (PREFERENCE_ITEM_FIELD_FILTER_CASE): new CaseField(rawValue: [filter.stringId] as List<String>),
-                (PREFERENCE_ITEM_FIELD_PARENTID)   : new TextField(rawValue: orgGroup.stringId),
-                (PREFERENCE_ITEM_FIELD_PARENTID)   : new TextField(rawValue: defaultHeaders.join(',')),
+                (PREFERENCE_ITEM_FIELD_PARENT_ID)  : new TextField(rawValue: orgGroup.stringId),
+                (PREFERENCE_ITEM_FIELD_PARENT_ID)  : new TextField(rawValue: defaultHeaders.join(',')),
                 (PREFERENCE_ITEM_FIELD_IDENTIFIER) : new TextField(rawValue: identifier)
         ] as Map<String, Field<?>>)
         setData(newItemTask, dataSet)
@@ -1727,7 +1728,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
                         "type" : "caseRef",
                         "value": [filter.stringId]
                 ],
-                (PREFERENCE_ITEM_FIELD_PARENTID)       : [
+                (PREFERENCE_ITEM_FIELD_PARENT_ID): [
                         "type" : "text",
                         "value": orgGroup.stringId
                 ],

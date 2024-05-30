@@ -1,9 +1,9 @@
-package com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner
+package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap
 import com.netgrif.application.engine.event.IGroovyShellFactory
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.workflow.domain.Case
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,21 +13,23 @@ import org.springframework.stereotype.Component
 
 @Slf4j
 @Component
-abstract class CaseFieldsExpressionRunner {
+abstract class ExpressionRunner {
 
+    // TODO: release/8.0.0 move methods to expression delegate, extended by action delegate
+//    @Lookup("expressionDelegate")
+//    abstract ExpressionDelegate getExpressionDelegate()
     @Lookup("actionDelegate")
-    abstract ActionDelegate getActionDelegate()
+    abstract ActionDelegate getExpressionDelegate()
+
 
     @Autowired
     private IGroovyShellFactory shellFactory
 
-    private int cacheSize
-
-    private Map<String, Closure> cache = new MaxSizeHashMap<>(cacheSize)
+    private Map<String, Closure> cache
 
     @Autowired
-    CaseFieldsExpressionRunner(@Value('${nae.expressions.runner.cache-size}') int cacheSize) {
-        this.cacheSize = cacheSize
+    ExpressionRunner(@Value('${nae.expressions.runner.cache-size}') int cacheSize) {
+        cache = new MaxSizeHashMap<>(cacheSize)
     }
 
     // TODO: release/8.0.0 fields? Map<String, String> fields
@@ -51,14 +53,14 @@ abstract class CaseFieldsExpressionRunner {
             code = (Closure) this.shellFactory.getGroovyShell().evaluate("{-> ${expression.definition}}")
             cache.put(expression.id, code)
         }
-        return code.rehydrate(getActionDelegate(), code.owner, code.thisObject)
+        return code.rehydrate(getExpressionDelegate(), code.owner, code.thisObject)
     }
 
-    // TODO: release/8.0.0 fields?
-    protected void initCode(Object delegate, Case useCase, Map<String, String> params) {
-        ActionDelegate ad = ((ActionDelegate) delegate)
-        ad.useCase = useCase
-        ad.params = params
-        ad.initFieldsMap(useCase.dataSet.fields.collectEntries { [(it.key): (it.key)] }, useCase)
+    protected void initCode(def delegate, Case useCase, Map<String, String> params) {
+        delegate.metaClass.useCase = useCase
+        delegate.metaClass.params = params
+        useCase.dataSet.fields.values().forEach { Field<?> field ->
+            delegate.metaClass."$field.importId" = field
+        }
     }
 }

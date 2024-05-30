@@ -5,7 +5,7 @@ import com.netgrif.application.engine.petrinet.domain.DataRef;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -23,9 +23,9 @@ import java.util.*;
 @Service
 public class EventService implements IEventService {
 
-    private final FieldActionsRunner actionsRunner;
+    private final ActionRunner actionsRunner;
 
-    public EventService(FieldActionsRunner actionsRunner) {
+    public EventService(ActionRunner actionsRunner) {
         this.actionsRunner = actionsRunner;
     }
 

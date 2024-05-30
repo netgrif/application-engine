@@ -39,12 +39,6 @@ public class I18nString implements Serializable {
         this.key = key;
     }
 
-    public I18nString(I18nString other) {
-        this(other.defaultValue);
-        this.key = other.key;
-        this.translations.putAll(other.translations);
-    }
-
     public I18nString(String defaultValue, Map<String, String> translations) {
         this(defaultValue);
         this.translations = translations;
@@ -95,13 +89,9 @@ public class I18nString implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o instanceof String)
-            return o.equals(this.defaultValue);
         if (o == null || getClass() != o.getClass()) return false;
         I18nString that = (I18nString) o;
-        return (this.key == null ? that.key == null : this.key.equals(that.key)) &&
-                (this.defaultValue == null ? that.defaultValue == null : this.defaultValue.equals(that.defaultValue)) &&
-                this.translations.equals(that.translations);
+        return Objects.equals(defaultValue, that.defaultValue) && Objects.equals(key, that.key) && Objects.equals(translations, that.translations);
     }
 
     @Override

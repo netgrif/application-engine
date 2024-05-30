@@ -85,7 +85,6 @@ class AssignActionTest {
 
     @BeforeEach
     void before() {
-
         testHelper.truncateDbs()
 
         mvc = MockMvcBuilders
@@ -112,12 +111,6 @@ class AssignActionTest {
 
         this.mainNet = mainNet.getNet()
         this.secondaryNet = secondaryNet.getNet()
-    }
-
-    private void cleanDatabases() {
-        template.db.drop()
-        userRepository.deleteAll()
-        processRoleRepository.deleteAll()
     }
 
     @Test

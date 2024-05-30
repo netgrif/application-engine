@@ -21,7 +21,7 @@ import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
@@ -98,7 +98,7 @@ public class PetriNetService implements IPetriNetService {
     private Provider<Importer> importerProvider;
 
     @Autowired
-    private FieldActionsRunner actionsRunner;
+    private ActionRunner actionsRunner;
 
     @Autowired(required = false)
     private ILdapGroupRefService ldapGroupService;
