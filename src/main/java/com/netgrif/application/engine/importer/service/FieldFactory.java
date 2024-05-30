@@ -74,10 +74,10 @@ public final class FieldFactory {
             field.setComponent(component);
         }
         if (data.getView() != null) {
-            log.warn("Data attribute [view] in field [" + field.getImportId() + "] is deprecated.");
+            log.warn("Data attribute [view] in field [{}] is deprecated.", field.getImportId());
         }
         if (data.getFormat() != null) {
-            log.warn("Data attribute [format] in field [" + field.getImportId() + "] is deprecated.");
+            log.warn("Data attribute [format] in field [{}] is deprecated.", field.getImportId());
         }
 
         setEncryption(field, data);

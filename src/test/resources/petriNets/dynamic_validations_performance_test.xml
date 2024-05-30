@@ -2049,7 +2049,7 @@
         <title>Switch</title>
 
         <action trigger="set">
-        text_valid_switch: f.text_valid_switch ,
+        text_valid_switch: f.text_valid_switch,
         text: f.text;
 
         if (text_valid_switch.value) {
