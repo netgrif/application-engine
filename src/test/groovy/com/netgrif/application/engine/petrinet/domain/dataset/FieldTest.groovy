@@ -94,9 +94,9 @@ class FieldTest {
         assert field.placeholder.defaultValue == "Number field placeholder"
         //TODO: release/8.0.0 validations are ignored
 //        java.lang.NullPointerException: Cannot invoke method get() on null object
-        assert field.validations.get(0).validationRule == "inrange 0,inf"
-        assert field.validations.get(1).validationMessage.defaultValue == "Number field validation message"
-        assert field.validations.get(1).validationRule == "inrange 0,inf"
+        assert field.validations.get(0).rule == "inrange 0,inf"
+        assert field.validations.get(1).rule == "inrange 0,inf"
+        assert field.validations.get(1).message.defaultValue == "Number field validation message"
     }
 
     private void assertTextField() {
@@ -105,9 +105,9 @@ class FieldTest {
         assert field.description.defaultValue == "Text field description"
         assert field.name.defaultValue == "Text"
         assert field.placeholder.defaultValue == "Text field placeholder"
-        assert field.validations.get(0).validationRule == "email"
-        assert field.validations.get(1).validationMessage.defaultValue == "Mail validation message"
-        assert field.validations.get(1).validationRule == "email"
+        assert field.validations.get(0).rule == "email"
+        assert field.validations.get(1).rule == "email"
+        assert field.validations.get(1).message.defaultValue == "Mail validation message"
     }
 
     private void assertEnumerationField() {
@@ -153,11 +153,11 @@ class FieldTest {
         assert field.description.defaultValue == "Date field description"
         assert field.name.defaultValue == "Date"
         assert field.placeholder.defaultValue == "Date field placeholder"
-        assert field.validations.get(0).validationRule == "between today,future"
-        assert field.validations.get(1).validationMessage.defaultValue == "Date field validation message"
-        assert field.validations.get(1).validationRule == "between today,future"
-        assert field.validations.get(2).validationMessage.defaultValue == "Date field validation message 2"
-        assert field.validations.get(2).validationRule == "between today,tommorow"
+        assert field.validations.get(0).rule == "between today,future"
+        assert field.validations.get(1).message.defaultValue == "Date field validation message"
+        assert field.validations.get(1).rule == "between today,future"
+        assert field.validations.get(2).message.defaultValue == "Date field validation message 2"
+        assert field.validations.get(2).rule == "between today,tommorow"
     }
 
     private void assertFileField() {
@@ -217,9 +217,9 @@ class FieldTest {
         assert field.description.defaultValue == "This is I18n text field"
         assert field.placeholder.defaultValue == "Text I18n field"
         assert field.defaultValue.defaultValue == "Default i18n text value"
-        assert field.validations.get(0).validationRule == "translationRequired sk,en"
-        assert field.validations.get(0).validationMessage.defaultValue == "Slovak and English language required"
-        assert field.validations.get(1).validationRule == "translationOnly sk,en,cz,de"
-        assert field.validations.get(1).validationMessage.defaultValue == "Only Slovak, English, Czech and German languages allowed"
+        assert field.validations.get(0).rule == "translationRequired sk,en"
+        assert field.validations.get(0).message.defaultValue == "Slovak and English language required"
+        assert field.validations.get(1).rule == "translationOnly sk,en,cz,de"
+        assert field.validations.get(1).message.defaultValue == "Only Slovak, English, Czech and German languages allowed"
     }
 }

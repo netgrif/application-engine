@@ -27,6 +27,7 @@ public abstract class FieldBuilder<T extends Field<?>> {
         field.setId(new ObjectId());
         field.setEvents(new HashMap<>());
         field.setBehaviors(new DataFieldBehaviors());
+        field.setValidations(new ArrayList<>());
     }
 
     public String getInitExpression(Data data) {

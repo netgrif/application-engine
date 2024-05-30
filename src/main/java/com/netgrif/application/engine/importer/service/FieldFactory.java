@@ -3,11 +3,14 @@ package com.netgrif.application.engine.importer.service;
 import com.netgrif.application.engine.configuration.properties.DatabaseProperties;
 import com.netgrif.application.engine.importer.model.Data;
 import com.netgrif.application.engine.importer.model.DataType;
+import com.netgrif.application.engine.importer.model.Valid;
 import com.netgrif.application.engine.importer.service.builder.FieldBuilder;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.importer.service.validation.IDataValidator;
 import com.netgrif.application.engine.petrinet.domain.Component;
+import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.petrinet.domain.dataset.Validation;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -52,18 +55,20 @@ public final class FieldFactory {
             field.setPlaceholder(importer.toI18NString(data.getPlaceholder()));
 
         // TODO: release/8.0.0 validation register
-//        if (data.getValid() != null) {
-//            List<Valid> list = data.getValid();
-//            for (Valid item : list) {
-//                field.addValidation(makeValidation(item.getValue(), null, item.isDynamic()));
-//            }
-//        }
-//        if (data.getValidations() != null) {
-//            List<com.netgrif.application.engine.importer.model.Validation> list = data.getValidations().getValidation();
-//            for (com.netgrif.application.engine.importer.model.Validation item : list) {
-//                field.addValidation(makeValidation(item.getExpression().getValue(), importer.toI18NString(item.getMessage()), item.getExpression().isDynamic()));
-//            }
-//        }
+        // TODO: release/8.0.0 valid deprecated
+        if (data.getValid() != null) {
+            List<Valid> list = data.getValid();
+            for (Valid item : list) {
+                // TODO: release/8.0.0 new I18nString?
+                field.addValidation(new Validation(item.getValue(), new I18nString()));
+            }
+        }
+        if (data.getValidations() != null) {
+            List<com.netgrif.application.engine.importer.model.Validation> list = data.getValidations().getValidation();
+            for (com.netgrif.application.engine.importer.model.Validation item : list) {
+                field.addValidation(new Validation(item.getExpression().getValue(), importer.toI18NString(item.getMessage())));
+            }
+        }
         if (data.getComponent() != null) {
             Component component = componentFactory.buildComponent(data.getComponent(), importer, data);
             field.setComponent(component);
@@ -81,7 +86,7 @@ public final class FieldFactory {
         return field;
     }
 
-    //TODO: release/8.0.0 merge check
+//TODO: release/8.0.0 merge check
     /*private void resolveComponent(Field field, Case useCase, String transitionId) {
         if (useCase.getDataField(field.getStringId()).hasComponent(transitionId)) {
             field.setComponent(useCase.getDataField(field.getStringId()).getDataRefComponents().get(transitionId));
@@ -98,11 +103,6 @@ public final class FieldFactory {
         });
         return field;
     }*/
-
-    // TODO: release/8.0.0 validation register
-//    private com.netgrif.application.engine.petrinet.domain.dataset.Validation makeValidation(String rule, I18nString message, boolean dynamic) {
-//        return dynamic ? new DynamicValidation(rule, message) : new com.netgrif.application.engine.petrinet.domain.dataset.Validation(rule, message);
-//    }
 
     private void setEncryption(Field<?> field, Data data) {
         if (data.getEncryption() != null && data.getEncryption().isValue()) {
