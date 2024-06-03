@@ -17,12 +17,14 @@ public abstract class ChoiceField<T> extends Field<T> {
 
     public ChoiceField() {
         super();
-        choices = new LinkedHashSet<>();
     }
 
     public ChoiceField(List<I18nString> choices) {
         this();
         if (choices != null) {
+            if (this.choices == null) {
+                this.choices = new LinkedHashSet<>();
+            }
             this.choices.addAll(choices);
         }
     }

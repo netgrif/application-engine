@@ -43,7 +43,7 @@ import static com.netgrif.application.engine.petrinet.domain.dataset.logic.Field
         @JsonSubTypes.Type(value = DateField.class, name = "DATE"),
         @JsonSubTypes.Type(value = DateTimeField.class, name = "DATE_TIME"),
         @JsonSubTypes.Type(value = EnumerationField.class, name = "ENUMERATION"),
-        @JsonSubTypes.Type(value = EnumerationMapField.class, name = "ENUMERATION_MAP_FIELD"),
+        @JsonSubTypes.Type(value = EnumerationMapField.class, name = "ENUMERATION_MAP"),
         @JsonSubTypes.Type(value = FileField.class, name = "FILE"),
         @JsonSubTypes.Type(value = FileListField.class, name = "FILE_LIST"),
         @JsonSubTypes.Type(value = FilterField.class, name = "FILTER"),

@@ -630,9 +630,9 @@ public class DataService implements IDataService {
     }
 
     private boolean saveLocalFile(Case useCase, FileField field, MultipartFile multipartFile) {
-        if (useCase.getDataSet().get(field.getStringId()).getValue() != null) {
+        if (useCase.getDataSet().get(field.getStringId()).getValue().getValue() != null) {
             new File(field.getFilePath(useCase.getStringId())).delete();
-            useCase.getDataSet().get(field.getStringId()).setValue(null);
+            useCase.getDataSet().get(field.getStringId()).getValue().setValue(null);
         }
 
         field.setValue(multipartFile.getOriginalFilename());
@@ -695,7 +695,7 @@ public class DataService implements IDataService {
                 new File(field.getRawValue().getPath()).delete();
                 new File(field.getFilePreviewPath(useCase.getStringId())).delete();
             }
-            useCase.getDataSet().get(field.getStringId()).setValue(null);
+            useCase.getDataSet().get(field.getStringId()).getValue().setValue(null);
         }
         // TODO: release/8.0.0 6.2.5
         return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase, params));

@@ -63,6 +63,9 @@ public abstract class FieldBuilder<T extends Field<?>> {
             List<I18nString> choices = data.getValues().stream()
                     .map(importer::toI18NString)
                     .collect(Collectors.toList());
+            if (field.getChoices() == null) {
+                field.setChoices(new LinkedHashSet<>());
+            }
             field.getChoices().addAll(choices);
         }
     }
