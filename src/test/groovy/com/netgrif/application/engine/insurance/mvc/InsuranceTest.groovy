@@ -70,7 +70,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class InsuranceTest {
 
     private static final String CASE_CREATE_URL = "/api/workflow/case"
-    private static final String TASK_SEARCH_URL = "/api/task/search?sort=priority"
+    private static final String TASK_SEARCH_URL = "/api/task/search?sort=priority&page=0&size=50"
     private static final String TASK_ASSIGN_URL = "/api/task/assign/{id}"
     private static final String TASK_FINISH_URL = "/api/task/finish/{id}"
     private static final String TASK_DATA_URL = "/api/task/{id}/data"
@@ -85,7 +85,7 @@ class InsuranceTest {
     private static final String TASK_SUMMARY = "Sumár"
     private static final String TASK_INFO = "Údaje o poistníkovi a mieste poistenia"
     private static final String TASK_OFFER = "Údaje o zmluve"
-    private static final String TASK_END = "Základné  informácie"
+    private static final String TASK_END = "Základné  informácie (view)"
 
     private static final String LOCALE_SK = "sk"
 
@@ -378,8 +378,8 @@ class InsuranceTest {
                 "105033": new BooleanField(rawValue: true),
         ]))
         setData(new DataSet([
-                "105032": new NumberField(rawValue: 500),
-                "105034": new NumberField(rawValue: 500),
+                "105032": new NumberField(rawValue: 500d),
+                "105034": new NumberField(rawValue: 500d),
         ]))
     }
 
@@ -399,20 +399,20 @@ class InsuranceTest {
                 "105029": new BooleanField(rawValue: true),
         ]))
         setData(new DataSet([
-                "105004": new NumberField(rawValue: 100),
+                "105004": new NumberField(rawValue: 100d),
                 "105008": new BooleanField(rawValue: false),
-                "105007": new NumberField(rawValue: 90_000),
-                "105010": new NumberField(rawValue: 500),
-                "105012": new NumberField(rawValue: 500),
-                "105014": new NumberField(rawValue: 500),
-                "105016": new NumberField(rawValue: 500),
-                "105018": new NumberField(rawValue: 500),
-                "105020": new NumberField(rawValue: 500),
-                "105022": new NumberField(rawValue: 500),
-                "105024": new NumberField(rawValue: 500),
-                "105026": new NumberField(rawValue: 500),
-                "105028": new NumberField(rawValue: 500),
-                "105030": new NumberField(rawValue: 500),
+                "105007": new NumberField(rawValue: 90_000d),
+                "105010": new NumberField(rawValue: 500d),
+                "105012": new NumberField(rawValue: 500d),
+                "105014": new NumberField(rawValue: 500d),
+                "105016": new NumberField(rawValue: 500d),
+                "105018": new NumberField(rawValue: 500d),
+                "105020": new NumberField(rawValue: 500d),
+                "105022": new NumberField(rawValue: 500d),
+                "105024": new NumberField(rawValue: 500d),
+                "105026": new NumberField(rawValue: 500d),
+                "105028": new NumberField(rawValue: 500d),
+                "105030": new NumberField(rawValue: 500d),
         ]))
     }
 
@@ -420,7 +420,7 @@ class InsuranceTest {
         setData(new DataSet([
                 "103001": new EnumerationField(rawValue: new I18nString("byt")),
                 "106001": new EnumerationField(rawValue: new I18nString("150.00 €")),
-                "106003": new NumberField(rawValue: 100),
+                "106003": new NumberField(rawValue: 100d),
                 "103002": new EnumerationField(rawValue: new I18nString("trvalá")),
                 "103004": new BooleanField(rawValue: true),
                 "103005": new BooleanField(rawValue: true),
@@ -444,15 +444,15 @@ class InsuranceTest {
                 "106020": new BooleanField(rawValue: true),
         ]))
         setData(new DataSet([
-                "106005": new NumberField(rawValue: 500),
-                "106007": new NumberField(rawValue: 500),
-                "106009": new NumberField(rawValue: 500),
-                "106011": new NumberField(rawValue: 500),
-                "106013": new NumberField(rawValue: 500),
-                "106015": new NumberField(rawValue: 500),
-                "106017": new NumberField(rawValue: 500),
-                "106019": new NumberField(rawValue: 500),
-                "106021": new NumberField(rawValue: 500),
+                "106005": new NumberField(rawValue: 500d),
+                "106007": new NumberField(rawValue: 500d),
+                "106009": new NumberField(rawValue: 500d),
+                "106011": new NumberField(rawValue: 500d),
+                "106013": new NumberField(rawValue: 500d),
+                "106015": new NumberField(rawValue: 500d),
+                "106017": new NumberField(rawValue: 500d),
+                "106019": new NumberField(rawValue: 500d),
+                "106021": new NumberField(rawValue: 500d),
         ]))
     }
 
