@@ -189,7 +189,7 @@ public class TaskService implements ITaskService {
         AssignTaskEventOutcome outcome = new AssignTaskEventOutcome(workflowService.findOne(task.getCaseId()), task, outcomes);
         addMessageToOutcome(transition, EventType.ASSIGN, outcome);
 
-        log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getSelfOrImpersonated().getEmail() + "]");
+        log.info("[{}]: Task [{}] in case [{}] assigned to [{}]", useCase.getStringId(), task.getTitle(), useCase.getTitle(), user.getSelfOrImpersonated().getEmail());
         return outcome;
     }
 
@@ -198,7 +198,7 @@ public class TaskService implements ITaskService {
         useCase.getPetriNet().initializeArcs();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
-        log.info("[" + useCaseId + "]: Assigning task [" + task.getTitle() + "] to user [" + user.getSelfOrImpersonated().getEmail() + "]");
+        log.info("[{}]: Assigning task [{}] to user [{}]", useCaseId, task.getTitle(), user.getSelfOrImpersonated().getEmail());
 
         startExecution(transition, useCase);
         task.setUserId(user.getSelfOrImpersonated().getStringId());
@@ -271,7 +271,7 @@ public class TaskService implements ITaskService {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
-        log.info("[" + useCase.getStringId() + "]: Finishing task [" + task.getTitle() + "] to user [" + user.getSelfOrImpersonated().getEmail() + "]");
+        log.info("[{}]: Finishing task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), user.getSelfOrImpersonated().getEmail());
 
         validateData(transition, useCase);
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreFinishActions(), workflowService.findOne(task.getCaseId()), task, transition, params));
@@ -295,7 +295,7 @@ public class TaskService implements ITaskService {
         FinishTaskEventOutcome outcome = new FinishTaskEventOutcome(workflowService.findOne(task.getCaseId()), task, outcomes);
         addMessageToOutcome(transition, EventType.FINISH, outcome);
         historyService.save(new FinishTaskEventLog(task, useCase, EventPhase.POST, user));
-        log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getSelfOrImpersonated().getEmail() + "] was finished");
+        log.info("[{}]: Task [{}] in case [{}] assigned to [{}] was finished", useCase.getStringId(), task.getTitle(), useCase.getTitle(), user.getSelfOrImpersonated().getEmail());
 
         return outcome;
     }
@@ -339,7 +339,7 @@ public class TaskService implements ITaskService {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
-        log.info("[" + useCase.getStringId() + "]: Canceling task [" + task.getTitle() + "] to user [" + user.getSelfOrImpersonated().getEmail() + "]");
+        log.info("[{}]: Canceling task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), user.getSelfOrImpersonated().getEmail());
 
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreCancelActions(), workflowService.findOne(task.getCaseId()), task, transition, params));
         useCase = workflowService.findOne(task.getCaseId());
@@ -359,7 +359,7 @@ public class TaskService implements ITaskService {
         addMessageToOutcome(transition, EventType.CANCEL, outcome);
 
         historyService.save(new CancelTaskEventLog(task, useCase, EventPhase.POST, user));
-        log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getSelfOrImpersonated().getEmail() + "] was cancelled");
+        log.info("[{}]: Task [{}] in case [{}] assigned to [{}] was cancelled", useCase.getStringId(), task.getTitle(), useCase.getTitle(), user.getSelfOrImpersonated().getEmail());
         return outcome;
     }
 
@@ -402,7 +402,7 @@ public class TaskService implements ITaskService {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
-        log.info("[" + useCase.getStringId() + "]: Delegating task [" + task.getTitle() + "] to user [" + delegatedUser.getEmail() + "]");
+        log.info("[{}]: Delegating task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), delegatedUser.getEmail());
 
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreDelegateActions(), workflowService.findOne(task.getCaseId()), task, transition, params));
         task = findOne(task.getStringId());
@@ -417,7 +417,7 @@ public class TaskService implements ITaskService {
         DelegateTaskEventOutcome outcome = new DelegateTaskEventOutcome(workflowService.findOne(task.getCaseId()), task, outcomes);
         addMessageToOutcome(transition, EventType.DELEGATE, outcome);
         historyService.save(new DelegateTaskEventLog(task, useCase, EventPhase.POST, delegateUser, delegatedUser.getStringId()));
-        log.info("Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + delegateUser.getSelfOrImpersonated().getEmail() + "] was delegated to [" + delegatedUser.getEmail() + "]");
+        log.info("Task [{}] in case [{}] assigned to [{}] was delegated to [{}]", task.getTitle(), useCase.getTitle(), delegateUser.getSelfOrImpersonated().getEmail(), delegatedUser.getEmail());
 
         return outcome;
     }
@@ -459,7 +459,7 @@ public class TaskService implements ITaskService {
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public void reloadTasks(Case useCase) {
-        log.info("[" + useCase.getStringId() + "]: Reloading tasks in [" + useCase.getTitle() + "]");
+        log.info("[{}]: Reloading tasks in [{}]", useCase.getStringId(), useCase.getTitle());
         PetriNet net = useCase.getPetriNet();
         List<Task> tasks;
         // create tasks on first reload (create case)
@@ -503,7 +503,7 @@ public class TaskService implements ITaskService {
 
     void finishExecution(Transition transition, String useCaseId) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(useCaseId);
-        log.info("[" + useCaseId + "]: Finish execution of task [" + transition.getTitle() + "] in case [" + useCase.getTitle() + "]");
+        log.info("[{}]: Finish execution of task [{}] in case [{}]", useCaseId, transition.getTitle(), useCase.getTitle());
         execute(transition, useCase, arc -> arc.getSource().equals(transition));
         Supplier<Stream<Arc>> arcStreamSupplier = () -> useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream();
         arcStreamSupplier.get().filter(arc -> useCase.getConsumedTokens().containsKey(arc.getStringId())).forEach(arc -> useCase.getConsumedTokens().remove(arc.getStringId()));
@@ -511,7 +511,7 @@ public class TaskService implements ITaskService {
     }
 
     public void startExecution(Transition transition, Case useCase) throws TransitionNotExecutableException {
-        log.info("[" + useCase.getStringId() + "]: Start execution of " + transition.getTitle() + " in case " + useCase.getTitle());
+        log.info("[{}]: Start execution of {} in case {}", useCase.getStringId(), transition.getTitle(), useCase.getTitle());
         execute(transition, useCase, arc -> arc.getDestination().equals(transition));
     }
 
@@ -536,17 +536,17 @@ public class TaskService implements ITaskService {
     }
 
     protected List<EventOutcome> executeTransition(Task task, Case useCase) {
-        log.info("[" + useCase.getStringId() + "]: executeTransition [" + task.getTransitionId() + "] in case [" + useCase.getTitle() + "]");
+        log.info("[{}]: executeTransition [{}] in case [{}]", useCase.getStringId(), task.getTransitionId(), useCase.getTitle());
         List<EventOutcome> outcomes = new ArrayList<>();
         try {
-            log.info("assignTask [" + task.getTitle() + "] in case [" + useCase.getTitle() + "]");
+            log.info("assignTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
             outcomes.add(assignTask(task.getStringId()));
-            log.info("getData [" + task.getTitle() + "] in case [" + useCase.getTitle() + "]");
+            log.info("getData [{}] in case [{}]", task.getTitle(), useCase.getTitle());
             outcomes.add(dataService.getData(task.getStringId(), userService.getSystem()));
-            log.info("finishTask [" + task.getTitle() + "] in case [" + useCase.getTitle() + "]");
+            log.info("finishTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
             outcomes.add(finishTask(task.getStringId()));
         } catch (TransitionNotExecutableException e) {
-            log.error("execution of task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] failed: ", e);
+            log.error("execution of task [{}] in case [{}] failed: ", task.getTitle(), useCase.getTitle(), e);
         }
         return outcomes;
     }
@@ -576,12 +576,12 @@ public class TaskService implements ITaskService {
     }
 
     protected void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase) {
-        log.info("[" + useCase.getStringId() + "]: Task " + task.getTitle() + " scheduled to run at " + time.toString());
+        log.info("[{}]: Task {} scheduled to run at {}", useCase.getStringId(), task.getTitle(), time.toString());
         scheduler.schedule(() -> {
             try {
                 executeTransition(task, useCase);
             } catch (Exception e) {
-                log.info("[" + useCase.getStringId() + "]: Scheduled task [" + task.getTitle() + "] of case [" + useCase.getTitle() + "] could not be executed: " + e);
+                log.info("[{}]: Scheduled task [{}] of case [{}] could not be executed: {}", useCase.getStringId(), task.getTitle(), useCase.getTitle(), e.toString());
             }
         }, DateUtils.localDateTimeToDate(time));
     }
@@ -849,7 +849,7 @@ public class TaskService implements ITaskService {
     @Override
     public void delete(List<Task> tasks, Case useCase) {
         workflowService.removeTasksFromCase(tasks, useCase);
-        log.info("[" + useCase.getStringId() + "]: Tasks of case " + useCase.getTitle() + " are being deleted");
+        log.info("[{}]: Tasks of case {} are being deleted", useCase.getStringId(), useCase.getTitle());
         taskRepository.deleteAll(tasks);
         tasks.forEach(t -> elasticTaskService.remove(t.getStringId()));
     }
@@ -857,7 +857,7 @@ public class TaskService implements ITaskService {
     @Override
     public void delete(List<Task> tasks, String caseId) {
         workflowService.removeTasksFromCase(tasks, caseId);
-        log.info("[" + caseId + "]: Tasks of case are being deleted");
+        log.info("[{}]: Tasks of case are being deleted", caseId);
         taskRepository.deleteAll(tasks);
         tasks.forEach(t -> elasticTaskService.remove(t.getStringId()));
     }

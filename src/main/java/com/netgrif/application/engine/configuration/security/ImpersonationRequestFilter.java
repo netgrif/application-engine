@@ -52,16 +52,16 @@ public class ImpersonationRequestFilter extends OncePerRequestFilter {
                 logout(servletRequest, servletResponse);
             }
         } catch (Exception e) {
-            log.error("ImpersonationRequestFilter error " + e.getMessage(), e);
+            log.error("ImpersonationRequestFilter error {}", e.getMessage(), e);
         }
     }
 
     protected void handleImpersonated(LoggedUser loggedUser, HttpServletRequest servletRequest) {
         try {
-            log.debug("Filtering request " + servletRequest.getRequestURI() + ", " + loggedUser.getUsername());
+            log.debug("Filtering request {}, {}", servletRequest.getRequestURI(), loggedUser.getUsername());
             impersonationService.removeImpersonatorByImpersonated(loggedUser.getId());
         } catch (Exception e) {
-            log.error("Failed to resolve impersonators for " + loggedUser.getUsername() + ", " + e.getMessage(), e);
+            log.error("Failed to resolve impersonators for {}, {}", loggedUser.getUsername(), e.getMessage(), e);
         }
     }
 
@@ -80,7 +80,7 @@ public class ImpersonationRequestFilter extends OncePerRequestFilter {
 
         Object principal = auth.getPrincipal();
         if (!(principal instanceof LoggedUser)) {
-            log.warn(principal + " is not an instance of LoggedUser");
+            log.warn("{} is not an instance of LoggedUser", principal);
             return null;
         }
 

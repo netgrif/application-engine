@@ -60,14 +60,16 @@ public class EventService implements IEventService {
     @Override
     public List<EventOutcome> runEventActions(Case useCase, Task task, Field<?> newDataField, List<Action> actions, DataEventType trigger, Map<String, String> params) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
-        actions.forEach(action -> {
-            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), newDataField, params, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
-            outcomes.stream()
-                    .filter(SetDataEventOutcome.class::isInstance)
-                    .filter(outcome -> !((SetDataEventOutcome) outcome).getChangedFields().getFields().isEmpty())
-                    .forEach(outcome -> runEventActionsOnChanged(task, (SetDataEventOutcome) outcome, trigger, params));
-            allOutcomes.addAll(outcomes);
-        });
+        actions.stream()
+                .filter(a -> a.getSetDataType().isTriggered(newDataField))
+                .forEach(action -> {
+                    List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), newDataField, params, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
+                    outcomes.stream()
+                            .filter(SetDataEventOutcome.class::isInstance)
+                            .filter(outcome -> !((SetDataEventOutcome) outcome).getChangedFields().getFields().isEmpty())
+                            .forEach(outcome -> runEventActionsOnChanged(task, (SetDataEventOutcome) outcome, trigger, params));
+                    allOutcomes.addAll(outcomes);
+                });
         return allOutcomes;
     }
 

@@ -20,6 +20,8 @@ public class Action implements Serializable {
     private Map<String, String> transitionIds = new HashMap<>();
     private String definition;
     private DataEventType trigger;
+    // TODO: release/8.0.0 replace with set action type
+    private SetDataType setDataType = SetDataType.VALUE;
 
     public Action(Map<String, String> fieldIds, Map<String, String> transitionIds, String definition, String trigger) {
         this(fieldIds, transitionIds, definition, DataEventType.fromValue(trigger));

@@ -52,7 +52,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
         ElasticDataFieldTransformer<Field<?>, ?> transformer = (ElasticDataFieldTransformer<Field<?>, ?>) transformers.get(netField.getType());
         if (transformer == null) {
-            log.error("Field " + netField.getImportId() + " has unsupported type " + netField.getType());
+            log.error("Field {} has unsupported type {}", netField.getImportId(), netField.getType());
             return Optional.empty();
         }
         return Optional.ofNullable(transformer.transform(caseField, netField));

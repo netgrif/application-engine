@@ -46,7 +46,7 @@
             field: f.this,
             other: f.109048;
             change other value {
-                return field.rawValue;
+                return field.rawValue as String;
             }
             <!--@formatter:on-->
         </action>
@@ -287,7 +287,7 @@
             change coeff value {
                 if (field.rawValue)
                     return 1.1 as Double;
-            return 1.0 as Double;
+                return 1.0 as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -352,16 +352,16 @@
             field: f.this,
             coeff: f.202001;
             change coeff value {
-            if (field.rawValue=="byt")
-            return 1.0 as Double;
-            if (field.rawValue=="rodinný dom")
-            return 1.0 as Double;
-            if (field.rawValue=="chata")
-            return 1.1 as Double;
-            if (field.rawValue=="bungalow")
-            return 1.0 as Double;
-            if (field.rawValue=="rozostavaná stavba")
-            return 1.0 as Double;
+                if (field.rawValue=="byt")
+                    return 1.0 as Double;
+                if (field.rawValue=="rodinný dom")
+                    return 1.0 as Double;
+                if (field.rawValue=="chata")
+                    return 1.1 as Double;
+                if (field.rawValue=="bungalow")
+                    return 1.0 as Double;
+                if (field.rawValue=="rozostavaná stavba")
+                    return 1.0 as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -4413,7 +4413,7 @@
             c7: f.202007,
             sum: f.202009;
             change sum value {
-                return c1.rawValue*c2.rawValue*c3.rawValue*c4.rawValue*c6.rawValue*c7.rawValue;
+                return c1.rawValue*c2.rawValue*c3.rawValue*c4.rawValue*c6.rawValue*c7.rawValue as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -4432,7 +4432,7 @@
             c7: f.202007,
             sum: f.202009;
             change sum value {
-                return c1.rawValue*c2.rawValue*c3.rawValue*c4.rawValue*c6.rawValue*c7.rawValue;
+                return c1.rawValue*c2.rawValue*c3.rawValue*c4.rawValue*c6.rawValue*c7.rawValue as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -4451,7 +4451,7 @@
             c7: f.202007,
             sum: f.202009;
             change sum value {
-                return c1.rawValue*c2.rawValue*c3.rawValue*c4.rawValue*c6.rawValue*c7.rawValue;
+                return c1.rawValue*c2.rawValue*c3.rawValue*c4.rawValue*c6.rawValue*c7.rawValue as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -4470,7 +4470,7 @@
             c7: f.202007,
             sum: f.202009;
             change sum value {
-                return c1.rawValue*c2.rawValue*c3.rawValue*c4.rawValue*c6.rawValue*c7.rawValue;
+                return c1.rawValue*c2.rawValue*c3.rawValue*c4.rawValue*c6.rawValue*c7.rawValue as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -4489,7 +4489,7 @@
             c7: f.202007,
             sum: f.202009;
             change sum value {
-                return c1.rawValue*c2.rawValue*c3.rawValue*c4.rawValue*c6.rawValue*c7.rawValue;
+                return c1.rawValue*c2.rawValue*c3.rawValue*c4.rawValue*c6.rawValue*c7.rawValue as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -4508,7 +4508,7 @@
             c7: f.202007,
             sum: f.202009;
             change sum value {
-                return c1.rawValue*c2.rawValue*c3.rawValue*c4.rawValue*c6.rawValue*c7.rawValue;
+                return c1.rawValue*c2.rawValue*c3.rawValue*c4.rawValue*c6.rawValue*c7.rawValue as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -7188,8 +7188,9 @@
                         other: f.410001,
                         field: f.this;
                         change field choices {
-                            if (other.rawValue == "Nehnutelnost")
-                                return field.choices + ["rozostavaná stavba"];
+                            if (other.rawValue == "Nehnutelnost") {
+                                return field.choices + [new I18nString("rozostavaná stavba")];
+                            }
                             return field.choices;
                         }
                         <!--@formatter:on-->
