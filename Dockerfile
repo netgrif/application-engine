@@ -6,7 +6,7 @@ COPY pom.xml /app
 RUN mvn -P docker-build -DskipTests=true -f /app/pom.xml clean package install
 
 
-FROM openjdk:11-jdk
+FROM openjdk:21-jdk
 MAINTAINER Netgrif <devops@netgrif.com>
 COPY --from=build app/target/app-exec.jar /app.jar
 COPY --from=build app/src/main/resources  /src/main/resources
