@@ -1,4 +1,4 @@
-FROM maven:3-jdk-11 AS build
+FROM maven:3.9.7 AS build
 MAINTAINER Netgrif <devops@netgrif.com>
 WORKDIR /app
 COPY src /app/src
