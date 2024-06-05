@@ -9,12 +9,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
-import com.netgrif.application.engine.petrinet.domain.I18nString
-import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.PetriNetSearch
-import com.netgrif.application.engine.petrinet.domain.UriContentType
-import com.netgrif.application.engine.petrinet.domain.UriNode
-import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
@@ -29,7 +24,6 @@ import com.netgrif.application.engine.workflow.domain.repositories.TaskRepositor
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -38,8 +32,6 @@ import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
-
-import java.time.LocalDateTime
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -178,52 +170,52 @@ class PetriNetServiceTest {
 
         assert petriNetRepository.count() == processCount + 2
 
-        PetriNetSearch search = new PetriNetSearch();
-        assert petriNetService.search(search, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == processCount + 2;
+        PetriNetSearch search = new PetriNetSearch()
+        assert petriNetService.search(search, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == processCount + 2
 
-        PetriNetSearch search1 = new PetriNetSearch();
-        search1.setIdentifier("processSearchTest");
-        assert petriNetService.search(search1, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
+        PetriNetSearch search1 = new PetriNetSearch()
+        search1.setIdentifier("processSearchTest")
+        assert petriNetService.search(search1, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
 
-        PetriNetSearch search2 = new PetriNetSearch();
-        search2.setTitle("Process Search Test");
-        assert petriNetService.search(search2, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
+        PetriNetSearch search2 = new PetriNetSearch()
+        search2.setTitle("Process Search Test")
+        assert petriNetService.search(search2, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
 
-        PetriNetSearch search3 = new PetriNetSearch();
-        search3.setDefaultCaseName("Process Search Case Name");
-        assert petriNetService.search(search3, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
+        PetriNetSearch search3 = new PetriNetSearch()
+        search3.setDefaultCaseName("Process Search Case Name")
+        assert petriNetService.search(search3, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
 
-        PetriNetSearch search4 = new PetriNetSearch();
-        search4.setInitials("PST");
-        assert petriNetService.search(search4, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
-
-
-        PetriNetSearch search5 = new PetriNetSearch();
-        Author author = new Author();
-        author.setEmail(user.getEmail());
-        search5.setAuthor(author);
-        assert petriNetService.search(search5, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
+        PetriNetSearch search4 = new PetriNetSearch()
+        search4.setInitials("PST")
+        assert petriNetService.search(search4, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
 
 
-        PetriNetSearch search6 = new PetriNetSearch();
-        search6.setVersion(new Version(1,0,0));
-        assert petriNetService.search(search6, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == processCount + 2;
+        PetriNetSearch search5 = new PetriNetSearch()
+        Author author = new Author()
+        author.setEmail(user.getEmail())
+        search5.setAuthor(author)
+        assert petriNetService.search(search5, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
 
-        PetriNetSearch search7 = new PetriNetSearch();
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put("test", "test");
-        search7.setTags(map);
-        assert petriNetService.search(search7, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
 
-        PetriNetSearch search8 = new PetriNetSearch();
-        HashMap<String, String> mapTags = new HashMap<String, String>();
-        mapTags.put("test", "test");
-        search8.setTags(mapTags);
-        search8.setIdentifier("processSearchTest");
-        search8.setTitle("Process Search Test");
-        search8.setDefaultCaseName("Process Search Case Name");
-        search8.setInitials("PST");
-        search8.setAuthor(author);
-        assert petriNetService.search(search8, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1;
+        PetriNetSearch search6 = new PetriNetSearch()
+        search6.setVersion(new Version(1, 0, 0))
+        assert petriNetService.search(search6, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == processCount + 2
+
+        PetriNetSearch search7 = new PetriNetSearch()
+        HashMap<String, String> map = new HashMap<String, String>()
+        map.put("test", "test")
+        search7.setTags(map)
+        assert petriNetService.search(search7, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
+
+        PetriNetSearch search8 = new PetriNetSearch()
+        HashMap<String, String> mapTags = new HashMap<String, String>()
+        mapTags.put("test", "test")
+        search8.setTags(mapTags)
+        search8.setIdentifier("processSearchTest")
+        search8.setTitle("Process Search Test")
+        search8.setDefaultCaseName("Process Search Case Name")
+        search8.setInitials("PST")
+        search8.setAuthor(author)
+        assert petriNetService.search(search8, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
     }
 }
