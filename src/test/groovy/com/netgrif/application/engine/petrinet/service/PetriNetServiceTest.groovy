@@ -41,7 +41,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 
 import java.time.LocalDateTime
 
-@Disabled
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
@@ -91,7 +90,7 @@ class PetriNetServiceTest {
     private ElasticPetriNetRepository elasticPetriNetRepository
 
 
-    private def stream = { String name ->
+    private static InputStream stream(String name) {
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
     }
 
@@ -110,19 +109,17 @@ class PetriNetServiceTest {
         long processCount = petriNetRepository.count()
         long taskCount = taskRepository.count()
 
-
         ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert testNetOptional.getNet() != null
         assert petriNetRepository.count() == processCount + 1
         PetriNet testNet = testNetOptional.getNet()
         Thread.sleep(5000)
         ElasticPetriNet elasticTestNet = elasticPetriNetRepository.findByStringId(testNet.stringId)
-        assert elasticTestNet != null && elasticTestNet.getUriNodeId() == uriService.getRoot().id
-        assert testNet.getUriNodeId() == uriService.getRoot().id
-        assert petriNetRepository.findById(testNet.stringId).get().uriNodeId == null
+        assert elasticTestNet != null && elasticTestNet.getUriNodeId() == uriService.getRoot().id.toString()
+        assert testNet.getUriNodeId() == uriService.getRoot().id.toString()
+        assert petriNetRepository.findById(testNet.stringId).get().uriNodeId != null
         importHelper.createCase("Case 1", testNet)
 
-        // TODO: release/8.0.0 assert workflowService.getAll(new FullPageRequest()).size() == caseCount + 1
         assert caseRepository.findAllByProcessIdentifier(testNet.getImportId()).size() == 1
         assert taskRepository.count() == taskCount + 3
         assert processRoleRepository.count() == processRoleCount + 2
@@ -161,19 +158,18 @@ class PetriNetServiceTest {
     @Test
     void findAllByUriNodeIdTest() {
         UriNode myNode = uriService.getOrCreate("/test", UriContentType.DEFAULT)
-        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), myNode.id)
-        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), myNode.id)
+        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), myNode.id.toString())
+        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), myNode.id.toString())
 
         Thread.sleep(2000)
 
-        List<PetriNet> petriNets = petriNetService.findAllByUriNodeId(myNode.id)
+        List<PetriNet> petriNets = petriNetService.findAllByUriNodeId(myNode.id.toString())
         assert petriNets.size() == 2
     }
 
     @Test
     void processSearch() {
         long processCount = petriNetRepository.count()
-
 
         def user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
         assert user != null

@@ -223,6 +223,7 @@ public class PetriNetService implements IPetriNetService {
         PetriNet net = imported.get();
         net.setUriNodeId(uriNodeId);
 
+        // TODO: release/8.0.0 fix cacheable
         PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
         if (existingNet != null) {
             net.setVersion(existingNet.getVersion());
@@ -233,7 +234,7 @@ public class PetriNetService implements IPetriNetService {
         functionCacheService.cachePetriNetFunctions(net);
         Path savedPath = getImporter().saveNetFile(net, new ByteArrayInputStream(xmlCopy.toByteArray()));
         xmlCopy.close();
-        log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully and saved in a folder: " + savedPath.toString());
+        log.info("Petri net {} ({} v{}) imported successfully and saved in a folder: {}", net.getTitle(), net.getInitials(), net.getVersion(), savedPath.toString());
 
         outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params));
         evaluateRules(net, EventPhase.PRE);
@@ -270,7 +271,7 @@ public class PetriNetService implements IPetriNetService {
         try {
             elasticPetriNetService.indexNow(this.petriNetMappingService.transform(petriNet));
         } catch (Exception e) {
-            log.error("Indexing failed [" + petriNet.getStringId() + "]", e);
+            log.error("Indexing failed [{}]", petriNet.getStringId(), e);
         }
 
         return Optional.of(petriNet);
@@ -376,7 +377,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public FileSystemResource getFile(String netId, String title) {
-        if (title == null || title.length() == 0) {
+        if (title == null || title.isEmpty()) {
             Query query = Query.query(Criteria.where("id").is(new ObjectId(netId)));
             query.fields().include("id").include("title");
             List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
@@ -535,7 +536,7 @@ public class PetriNetService implements IPetriNetService {
         }
 
         PetriNet petriNet = petriNetOptional.get();
-        log.info("[" + processId + "]: Initiating deletion of Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
+        log.info("[{}]: Initiating deletion of Petri net {} version {}", processId, petriNet.getIdentifier(), petriNet.getVersion().toString());
 
         this.userService.removeRoleOfDeletedPetriNet(petriNet);
         this.workflowService.deleteInstancesOfPetriNet(petriNet);
@@ -549,7 +550,7 @@ public class PetriNetService implements IPetriNetService {
         }
 
 
-        log.info("[" + processId + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
+        log.info("[{}]: User [{}] is deleting Petri net {} version {}", processId, userService.getLoggedOrSystem().getStringId(), petriNet.getIdentifier(), petriNet.getVersion().toString());
         this.repository.deleteById(petriNet.getObjectId());
         this.evictCache(petriNet);
         // net functions must be removed from cache after it was deleted from repository
@@ -564,7 +565,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public void runActions(List<Action> actions, PetriNet petriNet) {
-        log.info("Running actions of net [" + petriNet.getStringId() + "]");
+        log.info("Running actions of net [{}]", petriNet.getStringId());
 
         actions.forEach(action -> {
             actionsRunner.run(action, null, new HashMap<>(), petriNet.getFunctions());

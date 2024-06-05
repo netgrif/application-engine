@@ -543,8 +543,8 @@
 				return
 			}
 
-			def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
-			change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+			def filterCase = findCase(filterCaseRef.rawValue[0])
+			change filterTaskRef value {return [filterCase.tasks["view_filter"].getTaskStringId()]}
 
 			if (filterCase.dataSet["filter_type"].value == "Case") {
 				make caseViewHeader,editable on settingsTrans when { true }
@@ -789,7 +789,7 @@
 			filterCase: f.additional_filter_case,
 			filterAutocomplete: f.additional_filter_autocomplete_selection;
 
-			change filterCase value { [filterAutocomplete.value] }
+			change filterCase value { [filterAutocomplete.rawValue] }
 			change filterAutocomplete value { "" }
 			make updateFilter,visible on trans when { true }
 		</action>
@@ -818,7 +818,7 @@
 			removeButton: f.remove_additional_filter,
 			filterCaseRef: f.additional_filter_case;
 
-			if (filterCaseRef.value[0] == null) {
+			if (filterCaseRef.rawValue[0] == null) {
 				make mergeFilters,hidden on taskViewTrans when { true }
 				make filterHeader,hidden on taskViewTrans when { true }
 				make removeButton,hidden on taskViewTrans when { true }
@@ -826,8 +826,8 @@
 				return
 			}
 
-			def filterCase = findCase({ it._id.eq(filterCaseRef.value[0]) })
-			change filterTaskRef value { return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId] }
+			def filterCase = findCase(filterCaseRef.rawValue[0])
+			change filterTaskRef value { return [filterCase.tasks["view_filter"].getTaskStringId()] }
 			make mergeFilters,editable on taskViewTrans when { true }
 			make filterHeader,visible on taskViewTrans when { true }
 			make removeButton,editable on taskViewTrans when { true }

@@ -76,6 +76,7 @@
 		<event type="set">
 			<actions phase="post">
 				<action>
+					group: f.group,
 					menu_stringId: f.menu_stringId,
 					filter_stringId: f.filter_stringId,
 					uri: f.uri,
@@ -85,34 +86,24 @@
 					identifier: f.identifier,
 					icon: f.icon;
 
-                    // TODO: release/8.0.0
-                    /*def filter = createCaseFilter(title.value, query.value, allowed_nets.value.split(",") as List, icon.value)
-                    def item = createMenuItem(uri.value, identifier.value, title.value, icon.value, filter,
-                    ["role_1": "filter_api_test"], ["role_2": "filter_api_test"],
-                    ["meta-title,meta-title"], ["meta-title,meta-title"])
-
-                    change menu_stringId value { item.stringId }
-                    change filter_stringId value { filter.stringId }
-                    */
-
-					def filter = createCaseFilter(title.value.value, query.value.value, allowed_nets.value.value.split(",") as List, icon.value.value)
+					def filter = createCaseFilter(title.rawValue, query.rawValue, allowed_nets.rawValue.split(",") as List, icon.rawValue)
 					def item
 
 					if (group.value) {
 						item = createMenuItem(
-								uri.value.value,
-								identifier.value.value,
+								uri.rawValue,
+								identifier.rawValue,
 								filter,
-								group.value.value,
-								["role_1": "netgrif/test/filter_api_test"],
+								group.rawValue,
+								["role_1": "filter_api_test"],
 								[:]
 						)
 					} else {
 						item = createMenuItem(
-								uri.value.value,
-								identifier.value.value,
+								uri.rawValue,
+								identifier.rawValue,
 								filter,
-								["role_1": "netgrif/test/filter_api_test"],
+								["role_1": "filter_api_test"],
 								[:]
 						)
 					}

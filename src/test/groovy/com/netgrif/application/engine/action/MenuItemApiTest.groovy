@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.action
 
-
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
@@ -9,17 +8,20 @@ import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupS
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.UriContentType
 import com.netgrif.application.engine.petrinet.domain.UriNode
+import com.netgrif.application.engine.petrinet.domain.dataset.ButtonField
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
+import com.netgrif.application.engine.workflow.domain.menu.MenuItemConstants
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
-import com.netgrif.application.engine.workflow.domain.menu.MenuItemConstants
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,7 +34,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 
 import static org.junit.jupiter.api.Assertions.assertThrows
 
-@Disabled
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
@@ -67,6 +68,9 @@ class MenuItemApiTest {
 
     @Autowired
     private ITaskService taskService
+
+    @Autowired
+    private SuperCreator superCreator
 
     @BeforeEach
     void before() {
@@ -121,15 +125,15 @@ class MenuItemApiTest {
         Case caze = createMenuItem()
         Thread.sleep(3000)
         def newUri = uriService.getOrCreate("/netgrif/test_new", UriContentType.DEFAULT)
-        caze = setData(caze, [
-                "uri": newUri.uriPath,
-                "title": "CHANGED FILTER",
-                "allowed_nets": "filter",
-                "query": "processIdentifier:filter",
-                "type": "Case",
-                "icon": "",
+        caze = setData(caze, new DataSet([
+                "uri"                   : newUri.uriPath,
+                "title"                 : "CHANGED FILTER",
+                "allowed_nets"          : "filter",
+                "query"                 : "processIdentifier:filter",
+                "type"                  : "Case",
+                "icon"                  : "",
                 "change_filter_and_menu": "0"
-        ])
+        ]))
         Case item = getMenuItem(caze)
         Case filter = getFilter(caze)
 
@@ -149,11 +153,11 @@ class MenuItemApiTest {
         Case caze = createMenuItem()
         Case filter = getFilter(caze)
 
-        caze = setData(caze, [
-                "find_filter": "0"
-        ])
+        caze = setData(caze, new DataSet([
+                "find_filter": new ButtonField(rawValue: 0)
+        ]))
 
-        assert caze.dataSet["found_filter"].value == filter.stringId
+        assert caze.dataSet.get("found_filter").rawValue == filter.stringId
     }
 
     @Test
@@ -167,10 +171,10 @@ class MenuItemApiTest {
         // move view
         Thread.sleep(2000)
         apiCase = setData(apiCase, [
-            "move_dest_uri": "/netgrif2",
-            "move_item_id": viewId,
-            "move_folder_path": null,
-            "move_item": "0"
+                "move_dest_uri"   : "/netgrif2",
+                "move_item_id"    : viewId,
+                "move_folder_path": null,
+                "move_item"       : "0"
         ])
 
         Case viewCase = workflowService.findOne(viewId)
@@ -187,20 +191,20 @@ class MenuItemApiTest {
         // cyclic move
         assertThrows(IllegalArgumentException.class, () -> {
             setData(apiCase, [
-                    "move_dest_uri": "/netgrif2/cyclic",
-                    "move_item_id": null,
+                    "move_dest_uri"   : "/netgrif2/cyclic",
+                    "move_item_id"    : null,
                     "move_folder_path": "/netgrif2",
-                    "move_item": "0"
+                    "move_item"       : "0"
             ])
         })
 
 
         // move folder
         setData(apiCase, [
-            "move_dest_uri": "/netgrif/test3",
-            "move_item_id": null,
-            "move_folder_path": "/netgrif2",
-            "move_item": "0"
+                "move_dest_uri"   : "/netgrif/test3",
+                "move_item_id"    : null,
+                "move_folder_path": "/netgrif2",
+                "move_item"       : "0"
         ])
         Thread.sleep(2000)
 
@@ -286,18 +290,19 @@ class MenuItemApiTest {
         return result
     }
 
-    Case createMenuItem(String uri = "/netgrif/test", String identifier = "new_menu_item") {
+    Case createMenuItem(String uri = "/", String identifier = "new_menu_item") {
         Case caze = getCase()
-        caze = setData(caze, [
-                "uri": uri,
-                "title": "FILTER",
-                "allowed_nets": "filter,preference_item",
-                "query": "processIdentifier:filter OR processIdentifier:preference_item",
-                "type": "Case",
-                "identifier": identifier,
-                "icon": "device_hub",
-                "create_filter_and_menu": "0"
-        ])
+        caze = setData(caze, new DataSet([
+                "uri"                   : new TextField(rawValue: uri),
+                "title"                 : new TextField(rawValue: "FILTER"),
+                "allowed_nets"          : new TextField(rawValue: "filter,preference_item"),
+                "query"                 : new TextField(rawValue: "processIdentifier:filter OR processIdentifier:preference_item"),
+//                TODO: release/8.0.0 no type field?
+//                "type"                  : new TextField(rawValue: "Case"),
+                "identifier"            : new TextField(rawValue: identifier),
+                "icon"                  : new TextField(rawValue: "device_hub"),
+                "create_filter_and_menu": new ButtonField(rawValue: 0)
+        ]))
         return caze
     }
 
@@ -332,18 +337,15 @@ class MenuItemApiTest {
     }
 
     Case getMenuItem(Case caze) {
-        return workflowService.findOne(caze.dataSet["menu_stringId"].value as String)
+        return workflowService.findOne(caze.dataSet.get("menu_stringId").rawValue as String)
     }
 
     Case getFilter(Case caze) {
-        return workflowService.findOne(caze.dataSet["filter_stringId"].value as String)
+        return workflowService.findOne(caze.dataSet.get("filter_stringId").rawValue as String)
     }
 
-    def setData(Case caze, Map<String, String> dataSet) {
-        dataService.setData(caze.tasks[0].task, ImportHelper.populateDataset(dataSet.collectEntries {
-            [(it.key): (["value": it.value, "type": "text"])]
-        }))
+    def setData(Case caze, DataSet dataSet) {
+        dataService.setData(caze.tasks["t1"].taskStringId, dataSet, superCreator.superUser)
         return workflowService.findOne(caze.stringId)
     }
-
 }
