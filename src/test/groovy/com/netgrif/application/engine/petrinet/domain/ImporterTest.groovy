@@ -16,7 +16,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -275,15 +274,17 @@ class ImporterTest {
     }
 
     @Test
-    @Disabled
     void upsertTest() {
-        def net = importHelper.upsertNet(FILE_NAME, IDENTIFIER)
-        assert net.present
+        Optional<PetriNet> netOptional = importHelper.upsertNet(FILE_NAME, IDENTIFIER)
+        assert netOptional.present
+        PetriNet net = petriNetService.getNewestVersionByIdentifier(IDENTIFIER)
 
         def upserted = importHelper.upsertNet(FILE_NAME, IDENTIFIER)
         assert upserted.present
 
-        assert upserted.get().creationDate == net.get().creationDate
+        // MongoDB does not store creationDate with the same precision as was created, net needs to be reloaded for
+        // comparison to be true
+        assert upserted.get().creationDate == net.creationDate
     }
 
     @Test
