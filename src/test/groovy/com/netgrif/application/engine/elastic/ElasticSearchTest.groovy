@@ -7,6 +7,7 @@ import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -25,8 +26,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
 import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
+import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -52,13 +55,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(
         locations = "classpath:application-test.properties"
 )
-@Disabled("Fix Test")
 class ElasticSearchTest {
 
     private static final String LOCALE_SK = "sk"
     private static final String USER_EMAIL = "test@test.com"
     private static final String USER_PASSW = "password"
     private static final String SEARCH_URL = "/api/workflow/case/search"
+
+    private static final int CASE_NUMBER = 10
+    private static final int SYSTEM_CASE_NUMBER = 3
 
     @Autowired
     private WebApplicationContext wac
@@ -91,12 +96,11 @@ class ElasticSearchTest {
 
     @BeforeEach
     void before() {
+        testHelper.truncateDbs()
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
                 .build()
-        auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSW)
-        testHelper.truncateDbs()
 
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
         def net2 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
@@ -106,17 +110,17 @@ class ElasticSearchTest {
         netId = net.getStringId()
         netId2 = net2.getStringId()
 
-//        def org = importHelper.createGroup("Test")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-//        def processRoles = importHelper.getProcessRoles(net.get())
-        def testUser = importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
+        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [net.roles.values().find { it.importId == "process_role" }] as ProcessRole[])
+        auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSW)
+        auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
 
-        10.times {
-            def _case = importHelper.createCase("$it" as String, it % 2 == 0 ? net : net2)
-            _case.dataSet["number"].value = it * 100.0 as Double
-            _case.dataSet["enumeration"].value = _case.petriNet.dataSet["enumeration"].choices[it % 3]
+        CASE_NUMBER.times {
+            def _case = importHelper.createCaseAsSuper("$it" as String, it % 2 == 0 ? net : net2)
+            _case.dataSet.get("number").rawValue = it * 100.0 as Double
+            _case.dataSet.get("enumeration").rawValue = (_case.petriNet.dataSet.get("enumeration") as EnumerationField).choices[it % 3]
             workflowService.save(_case)
         }
 
@@ -127,7 +131,18 @@ class ElasticSearchTest {
                                         "identifier": "all_data"
                                 ]
                         ]),
-                        "size": 10
+                        "size": CASE_NUMBER
+                ],
+                "searchByAuthorIdAndIdentifier"          : [
+                        "json": JsonOutput.toJson([
+                                "author": [
+                                        "id": superCreator.superUser.stringId
+                                ],
+                                "process": [
+                                        "identifier": "all_data"
+                                ]
+                        ]),
+                        "size": CASE_NUMBER
                 ],
                 "searchByAuthorId"          : [
                         "json": JsonOutput.toJson([
@@ -135,7 +150,7 @@ class ElasticSearchTest {
                                         "id": superCreator.superUser.stringId
                                 ]
                         ]),
-                        "size": 11
+                        "size": CASE_NUMBER + SYSTEM_CASE_NUMBER
                 ],
                 "searchByAuthorName"        : [
                         "json": JsonOutput.toJson([
@@ -143,7 +158,7 @@ class ElasticSearchTest {
                                         "name": superCreator.superUser.fullName
                                 ]
                         ]),
-                        "size": 11
+                        "size": CASE_NUMBER + SYSTEM_CASE_NUMBER
                 ],
                 "searchByAuthorEmail"       : [
                         "json": JsonOutput.toJson([
@@ -151,7 +166,7 @@ class ElasticSearchTest {
                                         "email": superCreator.superUser.email
                                 ]
                         ]),
-                        "size": 11
+                        "size": CASE_NUMBER + SYSTEM_CASE_NUMBER
                 ],
                 "searchByEnumeration"       : [
                         "json": JsonOutput.toJson([
@@ -159,7 +174,7 @@ class ElasticSearchTest {
                                         "enumeration": "Carol"
                                 ]
                         ]),
-                        "size": 3
+                        "size":  (CASE_NUMBER / 3) as int
                 ],
                 "searchByNumber"            : [
                         "json": JsonOutput.toJson([
@@ -180,7 +195,7 @@ class ElasticSearchTest {
             def result = search(content)
             def response = parseResult(result)
 
-            assert response?."_embedded"?."cases"?.size == value.value["size"]
+            assert response?._embedded?.cases?.size() == value.value["size"]
         }
     }
 

@@ -80,7 +80,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     public void remove(String caseId) {
         executors.execute(caseId, () -> {
             repository.deleteAllByStringId(caseId);
-            log.info("[" + caseId + "]: Case \"" + caseId + "\" deleted");
+            log.info("[{}]: Case \"{}\" deleted", caseId, caseId);
         });
     }
 
@@ -88,7 +88,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     public void removeByPetriNetId(String processId) {
         executors.execute(processId, () -> {
             repository.deleteAllByProcessId(processId);
-            log.info("[" + processId + "]: All cases of Petri Net with id \"" + processId + "\" deleted");
+            log.info("[{}]: All cases of Petri Net with id \"{}\" deleted", processId, processId);
         });
     }
 
@@ -103,13 +103,12 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                     elasticCase.update(useCase);
                     repository.save(elasticCase);
                 }
-                log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
             } catch (InvalidDataAccessApiUsageException ignored) {
-                log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" has duplicates, will be reindexed");
+                log.debug("[{}]: Case \"{}\" has duplicates, will be reindexed", useCase.getStringId(), useCase.getTitle());
                 repository.deleteAllByStringId(useCase.getStringId());
                 repository.save(useCase);
-                log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
             }
+            log.debug("[{}]: Case \"{}\" indexed", useCase.getStringId(), useCase.getTitle());
         });
     }
 
@@ -163,7 +162,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         }
         ElasticCase elasticCase = repository.findByStringId(aCase.getStringId());
         if (elasticCase == null) {
-            log.warn("[" + aCase.getStringId() + "] Case with id [" + aCase.getStringId() + "] is not indexed.");
+            log.warn("[{}] Case with id [{}] is not indexed.", aCase.getStringId(), aCase.getStringId());
             return null;
         }
 
