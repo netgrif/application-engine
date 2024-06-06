@@ -32,7 +32,7 @@ public class User {
 
     private User impersonated;
 
-    protected User(IUser user) {
+    public User(IUser user) {
         id = user.getStringId();
         email = user.getEmail();
         avatar = user.getAvatar();

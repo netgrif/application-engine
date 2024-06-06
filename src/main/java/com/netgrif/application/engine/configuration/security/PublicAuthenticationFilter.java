@@ -98,9 +98,10 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
         LoggedUser loggedUser = createAnonymousUser(request);
 
         if (claims.containsKey("user")) {
-            IUser user = userService.findAnonymousByEmail((String) ((LinkedHashMap) claims.get("user")).get("email"), false);
-            if (user != null)
+            IUser user = userService.findAnonymousByEmail((String) ((LinkedHashMap) claims.get("user")).get("email"));
+            if (user != null) {
                 loggedUser = user.transformToLoggedUser();
+            }
         }
         loggedUser.eraseCredentials();
         claims.put("user", loggedUser);
@@ -109,7 +110,8 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private LoggedUser createAnonymousUser(HttpServletRequest request) {
         String hash = new ObjectId().toString();
 
-        AnonymousUser anonymousUser = (AnonymousUser) this.userService.findAnonymousByEmail(hash + "@nae.com", false);
+        // TODO: release/8.0.0 string constants, properties?
+        AnonymousUser anonymousUser = (AnonymousUser) this.userService.findAnonymousByEmail(hash + "@nae.com");
 
         if (anonymousUser == null) {
             anonymousUser = new AnonymousUser(hash + "@anonymous.nae",

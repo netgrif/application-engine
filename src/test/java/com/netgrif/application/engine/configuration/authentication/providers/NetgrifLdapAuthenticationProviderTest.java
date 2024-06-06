@@ -107,15 +107,14 @@ class NetgrifLdapAuthenticationProviderTest {
 
     @Test
     void getMyLDAPGroups() throws Exception {
-
-        MvcResult result = mvc.perform(get("/api/auth/login")
+        mvc.perform(get("/api/auth/login")
                         .with(httpBasic(USER_EMAIL_Test2, USER_PASSWORD_Test2))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        IUser ldapUser = userService.findByEmail(USER_EMAIL_Test2, false);
+        IUser ldapUser = userService.findByEmail(USER_EMAIL_Test2);
         assert ldapUser != null;
         assert ldapUser instanceof LdapUser;
         assert ((LdapUser) ldapUser).getMemberOf().size() == 2;
@@ -124,15 +123,14 @@ class NetgrifLdapAuthenticationProviderTest {
 
     @Test
     void noLDAPGroups() throws Exception {
-
-        MvcResult result = mvc.perform(get("/api/auth/login")
+        mvc.perform(get("/api/auth/login")
                         .with(httpBasic(USER_EMAIL_Test3, USER_PASSWORD_Test3))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        IUser ldapUser = userService.findByEmail(USER_EMAIL_Test3, false);
+        IUser ldapUser = userService.findByEmail(USER_EMAIL_Test3);
         assert ldapUser != null;
         assert ldapUser instanceof LdapUser;
         assert ((LdapUser) ldapUser).getMemberOf().size() == 0;
@@ -141,7 +139,6 @@ class NetgrifLdapAuthenticationProviderTest {
 
     @Test
     void getMyProcessRole() throws Exception {
-
         MvcResult result = mvc.perform(get("/api/user/me")
                         .with(httpBasic(USER_EMAIL_Test1, USER_PASSWORD_Test1))
                         .contentType(MediaType.APPLICATION_JSON)

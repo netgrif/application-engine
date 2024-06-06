@@ -9,7 +9,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.auth.web.requestbodies.ChangePasswordRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
-import com.netgrif.application.engine.auth.web.responsebodies.IUserFactory;
+import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
@@ -63,9 +63,6 @@ public class AuthenticationController {
 
     @Autowired
     private ServerAuthProperties serverAuthProperties;
-
-    @Autowired
-    private IUserFactory userResponseFactory;
 
     @Autowired
     private ISecurityContextService securityContextService;
@@ -140,7 +137,7 @@ public class AuthenticationController {
     @Operation(summary = "Login to the system", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/login", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource login(Authentication auth, Locale locale) {
-        return new UserResource(userResponseFactory.getUser(userService.findByAuth(auth), locale), "profile");
+        return new UserResource(new User(userService.findByAuth(auth)), "profile");
     }
 
     @Operation(summary = "Reset password")
@@ -184,7 +181,7 @@ public class AuthenticationController {
     @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource changePassword(Authentication auth, @RequestBody ChangePasswordRequest request) {
         try {
-            RegisteredUser user = (RegisteredUser) userService.findByEmail(request.login, false);
+            RegisteredUser user = (RegisteredUser) userService.findByEmail(request.login);
             if (user == null || request.password == null || request.newPassword == null) {
                 return MessageResource.errorMessage("Incorrect login!");
             }

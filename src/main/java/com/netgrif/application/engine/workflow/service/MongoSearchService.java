@@ -241,14 +241,10 @@ public class MongoSearchService<T> {
         }
     }
 
-    protected String resolveAuthorByEmail(String email) {
-        IUser user = userService.findByEmail(email, true);
-        return user != null ? user.getStringId() : null;
-    }
-
     protected BooleanBuilder constructPredicateTree(List<com.querydsl.core.types.Predicate> elementaryPredicates, BiFunction<BooleanBuilder, com.querydsl.core.types.Predicate, BooleanBuilder> nodeOperation) {
-        if (elementaryPredicates.size() == 0)
+        if (elementaryPredicates.isEmpty()) {
             return new BooleanBuilder();
+        }
 
         ArrayDeque<BooleanBuilder> subtrees = new ArrayDeque<>(elementaryPredicates.size() / 2 + elementaryPredicates.size() % 2);
 

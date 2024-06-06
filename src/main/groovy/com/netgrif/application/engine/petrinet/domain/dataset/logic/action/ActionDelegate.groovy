@@ -573,6 +573,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
                  return
              }
              def allowedNets = cl()
+             // TODO: release/8.0.0 unchaged
              if (allowedNets instanceof Closure && allowedNets() == UNCHANGED_VALUE) {
                  return
              }
@@ -592,6 +593,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
                  return
 
              def options = cl()
+             // TODO: release/8.0.0 unchaged
              if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
                  return
              if (!(options instanceof Map && options.every { it.getKey() instanceof String }))
@@ -631,7 +633,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         if (value instanceof Closure) {
             if (value == initValueOfField) {
                 value = initValueOfField(field)
-
+// TODO: release/8.0.0 unchaged
             } else if (value() == UNCHANGED_VALUE) {
                 return
             }
@@ -659,7 +661,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
             }
             if (field instanceof UserListField && (value instanceof String[] || value instanceof List)) {
                 LinkedHashSet<UserFieldValue> users = new LinkedHashSet<>()
-                value.each { id -> users.add(new UserFieldValue(userService.findById(id as String, false))) }
+                value.each { id -> users.add(new UserFieldValue(userService.findById(id as String))) }
                 value = new UserListFieldValue(users)
             }
             if (value instanceof GString) {
@@ -1000,12 +1002,12 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     def changeUserByEmail(String email, String attribute, def cl) {
-        IUser user = userService.findByEmail(email, false)
+        IUser user = userService.findByEmail(email)
         changeUser(user, attribute, cl)
     }
 
     def changeUser(String id, String attribute, def cl) {
-        IUser user = userService.findById(id, false)
+        IUser user = userService.findById(id)
         changeUser(user, attribute, cl)
     }
 
@@ -1043,7 +1045,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     void deleteUser(String email) {
-        IUser user = userService.findByEmail(email, false)
+        IUser user = userService.findByEmail(email)
         if (user == null)
             log.error("Cannot find user with email [" + email + "]")
         deleteUser(user)
@@ -1063,7 +1065,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     IUser findUserByEmail(String email) {
-        IUser user = userService.findByEmail(email, false)
+        IUser user = userService.findByEmail(email)
         if (user == null) {
             log.error("Cannot find user with email [" + email + "]")
             return null
@@ -1073,7 +1075,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     IUser findUserById(String id) {
-        IUser user = userService.findById(id, false)
+        IUser user = userService.findById(id)
         if (user == null) {
             log.error("Cannot find user with id [" + id + "]")
             return null

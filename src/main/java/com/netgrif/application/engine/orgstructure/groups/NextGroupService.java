@@ -169,9 +169,9 @@ public class NextGroupService implements INextGroupService {
         if (!isGroupCase(groupCase)) {
             return null;
         }
-        IUser user = userService.findByEmail(email, true);
+        IUser user = userService.findByEmail(email);
         if (user != null && user.isActive()) {
-            log.info("User [" + user.getFullName() + "] has already been registered.");
+            log.info("User [{}] has already been registered.", user.getFullName());
             user.addGroup(groupCase.getStringId());
             userService.save(user);
             return addUser(user, existingUsers);
@@ -242,13 +242,13 @@ public class NextGroupService implements INextGroupService {
         String authorId = this.getGroupOwnerId(groupCase);
         usersToRemove.forEach(user -> {
             if (user.equals(authorId)) {
-                log.error("Author with id [" + authorId + "] cannot be removed from group with ID [" + groupCase.getId().toString() + "]");
+                log.error("Author with id [{}] cannot be removed from group with ID [{}]", authorId, groupCase.getId().toString());
             } else {
                 existingUsers.remove(user);
                 securityContextService.saveToken(user);
             }
         });
-        userService.findAllByIds(usersToRemove, false).forEach(user -> {
+        userService.findAllByIds(usersToRemove).forEach(user -> {
             if (!user.getStringId().equals(authorId)) {
                 user.getNextGroups().remove(groupCase.getStringId());
                 userService.save(user);
@@ -279,7 +279,7 @@ public class NextGroupService implements INextGroupService {
 //        TODO: release/8.0.0 check field type is enummap
         Set<String> userIds = ((EnumerationMapField)groupCase.getDataSet().get(GROUP_MEMBERS_FIELD)).getOptions().keySet();
         List<IUser> resultList = new ArrayList<>();
-        userIds.forEach(id -> resultList.add(userService.resolveById(id, true)));
+        userIds.forEach(id -> resultList.add(userService.resolveById(id)));
         return resultList;
     }
 
@@ -321,7 +321,7 @@ public class NextGroupService implements INextGroupService {
             log.error("The input case is a null object.");
             return false;
         } else if (!aCase.getProcessIdentifier().equals(GROUP_CASE_IDENTIFIER)) {
-            log.error("Case [" + aCase.getTitle() + "] is not an organization group case.");
+            log.error("Case [{}] is not an organization group case.", aCase.getTitle());
             return false;
         }
         return true;

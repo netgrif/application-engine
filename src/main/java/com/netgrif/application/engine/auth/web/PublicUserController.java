@@ -3,7 +3,7 @@ package com.netgrif.application.engine.auth.web;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
-import com.netgrif.application.engine.auth.web.responsebodies.IUserFactory;
+import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.settings.domain.Preferences;
@@ -43,9 +43,6 @@ import java.util.stream.Collectors;
 public class PublicUserController {
 
     @Autowired
-    private IUserFactory userResponseFactory;
-
-    @Autowired
     private Provider<UserResourceAssembler> userResourceAssemblerProvider;
 
     @Autowired
@@ -57,30 +54,29 @@ public class PublicUserController {
     public PublicUserController() {
     }
 
-    protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
+    protected UserResourceAssembler getUserResourceAssembler(String selfRel) {
         UserResourceAssembler result = userResourceAssemblerProvider.get();
-        result.initialize(locale, small, selfRel);
+        result.initialize(selfRel);
         return result;
     }
 
     @Operation(summary = "Get logged user")
     @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)
-    public UserResource getLoggedUser(Locale locale) {
-        return new UserResource(userResponseFactory.getUser(userService.getAnonymousLogged().transformToAnonymousUser(), locale), "profile");
+    public UserResource getLoggedUser() {
+        return new UserResource(new User(userService.getAnonymousLogged().transformToUser()), "profile");
     }
 
     @Operation(summary = "Generic user search")
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<UserResource> search(@RequestParam(value = "small", required = false) Boolean small, @RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Locale locale) {
-        small = small == null ? false : small;
+    public PagedModel<UserResource> search(@RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Locale locale) {
         Page<IUser> page = userService.searchAllCoMembers(query.getFulltext(),
                 query.getRoles().stream().map(ObjectId::new).collect(Collectors.toList()),
                 query.getNegativeRoles().stream().map(ObjectId::new).collect(Collectors.toList()),
-                userService.getAnonymousLogged(), small, pageable);
+                userService.getAnonymousLogged(), pageable);
 
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicUserController.class)
-                .search(small, query, pageable, assembler, locale)).withRel("search");
-        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "search"), selfLink);
+                .search(query, pageable, assembler, locale)).withRel("search");
+        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler("search"), selfLink);
         ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
         return resources;
     }

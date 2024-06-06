@@ -87,7 +87,7 @@ class FunctionsTest {
 
     @Test
     void testNamespaceFunction() {
-        assert userService.findByEmail("test@test.com", true) == null
+        assert userService.findByEmail("test@test.com") == null
 
         def functionResNet = petriNetService.importPetriNet(functionResNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
         def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
@@ -98,7 +98,7 @@ class FunctionsTest {
         Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
         dataService.setData(aCase.getTaskStringId("1"), new DataSet(["createUser": new BooleanField(rawValue: true)] as Map<String, Field<?>>), superCreator.getLoggedSuper())
 
-        IUser user = userService.findByEmail("test@test.com", true)
+        IUser user = userService.findByEmail("test@test.com")
         assert user
 
         userService.deleteUser(user)

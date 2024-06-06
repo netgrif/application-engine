@@ -7,6 +7,7 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 import java.util.ArrayList;
 
+// TODO: release/8.0.0 remove User, replace with IUser
 public class UserResource extends EntityModel<User> {
 
     public UserResource(User content, String selfRel) {
@@ -16,7 +17,7 @@ public class UserResource extends EntityModel<User> {
 
     private void buildLinks(String selfRel) {
         WebMvcLinkBuilder getLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
-                .getUser(getContent().getId(), false, null));
+                .getUser(getContent().getId(), null));
         add(selfRel.equalsIgnoreCase("profile") ? getLink.withSelfRel() : getLink.withRel("profile"));
 
         WebMvcLinkBuilder roleLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)

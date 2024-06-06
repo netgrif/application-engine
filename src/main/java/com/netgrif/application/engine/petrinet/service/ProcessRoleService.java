@@ -77,7 +77,7 @@ public class ProcessRoleService implements IProcessRoleService {
 
     @Override
     public void assignRolesToUser(String userId, Set<String> requestedRolesIds, LoggedUser loggedUser, Map<String, String> params) {
-        IUser user = userService.resolveById(userId, true);
+        IUser user = userService.resolveById(userId);
         Set<ProcessRole> requestedRoles = this.findByIds(requestedRolesIds);
         if (requestedRoles.isEmpty() && !requestedRolesIds.isEmpty()) {
             throw new IllegalArgumentException("No process roles found.");
@@ -106,7 +106,7 @@ public class ProcessRoleService implements IProcessRoleService {
         Set<ProcessRole> removedRoles = this.findByIds(rolesRemovedFromUserIds);
 
         runAllPreActions(newRoles, removedRoles, user, petriNet, params);
-        user = userService.findById(userId, false);
+        user = userService.findById(userId);
         requestedRoles = updateRequestedRoles(user, rolesNewToUser, rolesRemovedFromUser);
 
         replaceUserRolesAndPublishEvent(requestedRolesIds, user, requestedRoles);
@@ -303,10 +303,10 @@ public class ProcessRoleService implements IProcessRoleService {
         List<ObjectId> deletedRoleIds = this.findAll(net).stream().map(ProcessRole::getId).collect(Collectors.toList());
         Set<String> deletedRoleStringIds = deletedRoleIds.stream().map(ObjectId::toString).collect(Collectors.toSet());
 
-        List<IUser> usersWithRemovedRoles = this.userService.findAllByProcessRoles(deletedRoleStringIds, false);
+        List<IUser> usersWithRemovedRoles = this.userService.findAllByProcessRoles(deletedRoleStringIds);
         for (IUser user : usersWithRemovedRoles) {
             log.info("[{}]: Removing deleted roles of Petri net {} version {} from user {} with id {}", net.getStringId(), net.getIdentifier(), net.getVersion().toString(), user.getFullName(), user.getStringId());
-            if (user.getProcessRoles().size() == 0) {
+            if (user.getProcessRoles().isEmpty()) {
                 continue;
             }
 

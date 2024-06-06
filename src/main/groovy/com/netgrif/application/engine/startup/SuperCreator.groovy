@@ -46,7 +46,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
         Authority adminAuthority = authorityService.getOrCreate(Authority.admin)
         Authority systemAuthority = authorityService.getOrCreate(Authority.systemAdmin)
 
-        IUser superUser = userService.findByEmail(configuration.email, false)
+        IUser superUser = userService.findByEmail(configuration.email)
         if (superUser != null) {
             log.info("Super user detected")
             this.superUser = superUser

@@ -56,7 +56,7 @@ public class ImpersonationService implements IImpersonationService {
             throw new IllegalArgumentException("Impersonation is not enabled in app properties");
         }
         LoggedUser loggedUser = userService.getLoggedUser().transformToLoggedUser();
-        IUser impersonated = userService.findById(impersonatedId, false);
+        IUser impersonated = userService.findById(impersonatedId);
 
         List<Case> configs = impersonationAuthorizationService.searchConfigs(loggedUser.getId(), impersonated.getStringId());
         LoggedUser impersonatedLogged = applyRolesAndAuthorities(impersonated, loggedUser.getId(), configs).transformToLoggedUser();
@@ -71,7 +71,7 @@ public class ImpersonationService implements IImpersonationService {
         }
         Case config = impersonationAuthorizationService.getConfig(configId);
         LoggedUser loggedUser = userService.getLoggedUser().transformToLoggedUser();
-        IUser impersonated = userService.findById(impersonationAuthorizationService.getImpersonatedUserId(config), false);
+        IUser impersonated = userService.findById(impersonationAuthorizationService.getImpersonatedUserId(config));
 
         LoggedUser impersonatedLogged = applyRolesAndAuthorities(impersonated, loggedUser.getId(), Collections.singletonList(config)).transformToLoggedUser();
         return doImpersonate(loggedUser, impersonatedLogged, Collections.singletonList(config));
@@ -150,7 +150,7 @@ public class ImpersonationService implements IImpersonationService {
 
     @Override
     public IUser applyRolesAndAuthorities(IUser impersonated, String impersonatorId, List<Case> configs) {
-        if (userService.findById(impersonatorId, true).transformToLoggedUser().isAdmin()) {
+        if (userService.findById(impersonatorId).transformToLoggedUser().isAdmin()) {
             return impersonated;
         }
         List<Authority> authorities = impersonationAuthorizationService.getAuthorities(configs, impersonated);
