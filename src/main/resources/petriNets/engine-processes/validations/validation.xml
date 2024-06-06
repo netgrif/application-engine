@@ -103,6 +103,7 @@
 				<id>name</id>
 				<logic>
 					<behavior>editable</behavior>
+					<behavior>required</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -117,6 +118,7 @@
 				<id>validation_definition_groovy</id>
 				<logic>
 					<behavior>editable</behavior>
+					<behavior>required</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -293,6 +295,7 @@
 				<id>validation_definition_groovy</id>
 				<logic>
 					<behavior>editable</behavior>
+					<behavior>required</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
