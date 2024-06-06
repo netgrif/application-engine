@@ -89,6 +89,9 @@ public class DataService implements IDataService {
     @Autowired
     protected IValidationService validation;
 
+    @Autowired
+    protected com.netgrif.application.engine.validations.interfaces.IValidationService validationService;
+
     @Value("${nae.image.preview.scaling.px:400}")
     protected int imageScale;
 
@@ -227,9 +230,10 @@ public class DataService implements IDataService {
             setOutcomeMessage(task, useCase, outcome, fieldId, field, DataEventType.SET);
         }
         useCase.getDataSet().get(fieldId).applyChanges(newDataField);
-        if (validationEnable) {
-            validation.valid(useCase.getDataSet().get(fieldId));
-        }
+        validationService.validateField(useCase, useCase.getDataSet().get(fieldId));
+//        if (validationEnable) {
+//            validation.valid(useCase.getDataSet().get(fieldId));
+//        }
         useCase = workflowService.save(useCase);
         outcome.addChangedField(fieldId, newDataField);
         historyService.save(new SetDataEventLog(task, useCase, EventPhase.EXECUTION, DataSet.of(fieldId, newDataField), user));

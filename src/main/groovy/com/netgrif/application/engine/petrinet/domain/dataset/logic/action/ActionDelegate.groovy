@@ -35,6 +35,7 @@ import com.netgrif.application.engine.rules.domain.RuleRepository
 import com.netgrif.application.engine.startup.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.utils.FullPageRequest
+import com.netgrif.application.engine.validations.interfaces.IValidationService
 import com.netgrif.application.engine.workflow.domain.*
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
@@ -176,6 +177,9 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     @Autowired
     PublicViewProperties publicViewProperties
+
+    @Autowired
+    IValidationService validationService
 
     FrontendActionOutcome Frontend
 

@@ -116,6 +116,9 @@ public class TaskService implements ITaskService {
     protected IValidationService validation;
 
     @Autowired
+    protected com.netgrif.application.engine.validations.interfaces.IValidationService validationService;
+
+    @Autowired
     public void setElasticTaskService(IElasticTaskService elasticTaskService) {
         this.elasticTaskService = elasticTaskService;
     }
@@ -273,7 +276,8 @@ public class TaskService implements ITaskService {
 
         log.info("[{}]: Finishing task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), user.getSelfOrImpersonated().getEmail());
 
-        validateData(transition, useCase);
+        validationService.validateTransition(useCase, transition);
+//        validateData(transition, useCase);
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreFinishActions(), workflowService.findOne(task.getCaseId()), task, transition, params));
         useCase = workflowService.findOne(task.getCaseId());
         task = findOne(task.getStringId());
