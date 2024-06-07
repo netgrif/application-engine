@@ -45,9 +45,6 @@ public class UserService extends AbstractUserService {
     protected IRegistrationService registrationService;
 
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
     private GroupConfigurationProperties groupProperties;
 
     @Autowired

@@ -17,7 +17,6 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
-import org.springframework.hateoas.server.LinkRelationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
 import java.util.ArrayList;
@@ -35,9 +34,9 @@ public class ApplicationEngine {
 
     @Around("execution(* com.netgrif.application.engine.startup.AbstractOrderedCommandLineRunner+.run(..))")
     void logRun(ProceedingJoinPoint joinPoint) throws Throwable {
-        log.info(joinPoint.getTarget().getClass().getSimpleName() + " started");
+        log.info("{} started", joinPoint.getTarget().getClass().getSimpleName());
         joinPoint.proceed();
-        log.info(joinPoint.getTarget().getClass().getSimpleName() + " finished");
+        log.info("{} finished", joinPoint.getTarget().getClass().getSimpleName());
     }
 
     @Bean
