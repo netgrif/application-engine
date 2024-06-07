@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.auth
 
+import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.IUser
@@ -12,6 +13,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -24,27 +26,40 @@ import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.mock.web.MockHttpServletRequest
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
 import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
-@SpringBootTest
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        classes = ApplicationEngine.class
+)
+@AutoConfigureMockMvc
+@TestPropertySource(
+        locations = "classpath:application-test.properties"
+)
 class WorkflowAuthorizationServiceTest {
 
     private static final String CREATE_CASE_URL = "/api/workflow/case"
@@ -85,13 +100,19 @@ class WorkflowAuthorizationServiceTest {
     private PetriNet net
     private PetriNet netWithUserRefs
 
-    private Authentication userAuth
-    private Authentication adminAuth
     private IUser testUser
+    private Authentication testUserAuth
+    private Authentication adminAuth
+
 
     @BeforeEach
     void init() {
         testHelper.truncateDbs()
+        mvc = MockMvcBuilders
+                .webAppContextSetup(wac)
+                .apply(springSecurity())
+                .build()
+
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/workflow_authorization_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
         this.net = net.getNet()
@@ -100,14 +121,21 @@ class WorkflowAuthorizationServiceTest {
         assert netWithUserRefs.getNet() != null
         this.netWithUserRefs = netWithUserRefs.getNet()
 
-        def auths = importHelper.createAuthorities(["user": Authority.user])
+        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")]as Authority[],
                 [] as ProcessRole[])
+        testUserAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
+        testUserAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
+
+        importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
+                [auths.get("admin")] as Authority[],
+                [] as ProcessRole[])
+        adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
+        adminAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
     }
 
     @Test
-    @Disabled
     void testDeleteCase() {
         def body = JsonOutput.toJson([
                 title: "test case",
@@ -115,44 +143,57 @@ class WorkflowAuthorizationServiceTest {
                 color: "color"
         ])
 
+        // fail without CREATE role permission
+        mvc.perform(post(CREATE_CASE_URL)
+                .content(body)
+                .contentType(APPLICATION_JSON)
+                .with(authentication(this.testUserAuth)))
+                .andExpect(status().is(403))
+        ProcessRole positiveCreateRole = this.net.getRoles().values().find(v -> v.getImportId() == "create_pos_role")
+        userService.addRole(testUser, positiveCreateRole.getStringId())
+
+        // pass with CREATE role permission
         def result = mvc.perform(post(CREATE_CASE_URL)
                 .content(body)
                 .contentType(APPLICATION_JSON)
-                .with(authentication(this.userAuth)))
+                .with(authentication(this.testUserAuth)))
                 .andExpect(status().isOk())
                 .andReturn()
         def response = parseResult(result)
-        String userCaseId1 = response.outcome.aCase.stringId
-
-        result = mvc.perform(post(CREATE_CASE_URL)
-                .content(body)
-                .contentType(APPLICATION_JSON)
-                .with(authentication(this.userAuth)))
-                .andExpect(status().isOk())
-                .andReturn()
-        response = parseResult(result)
-        String userCaseId2 = response.outcome.aCase.stringId
-
-        result = mvc.perform(post(CREATE_CASE_URL)
-                .content(body)
-                .contentType(APPLICATION_JSON)
-                .with(authentication(this.adminAuth)))
-                .andExpect(status().isOk())
-                .andReturn()
-        response = parseResult(result)
-        String otherUserCaseId = response.outcome.acase.stringId
-
-        /* TODO: momentalne vracia 200 OK, ma User vediet zmazat case ktory vytvoril Admin?
-        mvc.perform(delete(DELETE_CASE_URL + otherUserCaseId)
-                .with(authentication(this.userAuth)))
-                .andExpect(status().isForbidden())
-        */
+        String userCaseId1 = response.outcome.case.stringId
+        // fail without DELETE role permission
         mvc.perform(delete(DELETE_CASE_URL + userCaseId1)
-                .with(authentication(this.userAuth)))
+                .with(authentication(this.testUserAuth)))
+                .andExpect(status().is(403))
+        // pass with DELETE role permission
+        ProcessRole positiveDeleteRole = this.net.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
+        userService.addRole(testUser, positiveDeleteRole.getStringId())
+        mvc.perform(delete(DELETE_CASE_URL + userCaseId1)
+                .with(authentication(this.testUserAuth)))
                 .andExpect(status().isOk())
 
+        result = mvc.perform(post(CREATE_CASE_URL)
+                .content(body)
+                .contentType(APPLICATION_JSON)
+                .with(authentication(this.testUserAuth)))
+                .andExpect(status().isOk())
+                .andReturn()
+        response = parseResult(result)
+        String userCaseId2 = response.outcome.case.stringId
         mvc.perform(delete(DELETE_CASE_URL + userCaseId2)
                 .with(authentication(this.adminAuth)))
+                .andExpect(status().isOk())
+
+        result = mvc.perform(post(CREATE_CASE_URL)
+                .content(body)
+                .contentType(APPLICATION_JSON)
+                .with(authentication(this.adminAuth)))
+                .andExpect(status().isOk())
+                .andReturn()
+        response = parseResult(result)
+        String otherUserCaseId = response.outcome.case.stringId
+        mvc.perform(delete(DELETE_CASE_URL + otherUserCaseId)
+                .with(authentication(this.testUserAuth)))
                 .andExpect(status().isOk())
     }
 
