@@ -193,7 +193,7 @@
                     validation_definition_groovy: f.validation_definition_groovy,
                     active: f.active;
 
-                    validationService.registerValidation(name.value, validation_definition_groovy.value)
+                    validationService.registerValidation(name.rawValue, validation_definition_groovy.rawValue)
                     change active value { true }
                 </action>
             </actions>
@@ -220,7 +220,7 @@
                     name: f.name,
                     active: f.active;
 
-                    validationService.unregisterValidation(name.value)
+                    validationService.unregisterValidation(name.rawValue)
                     change active value { false }
                 </action>
             </actions>

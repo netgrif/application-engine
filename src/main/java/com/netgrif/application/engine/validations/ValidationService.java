@@ -3,7 +3,7 @@ package com.netgrif.application.engine.validations;
 import com.netgrif.application.engine.event.IGroovyShellFactory;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ValidationRunner;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ValidationExecutioner;
 import com.netgrif.application.engine.validations.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import groovy.lang.Closure;
@@ -18,25 +18,29 @@ public class ValidationService implements IValidationService {
 
     private final ValidationRegistry validationRegistry;
 
-    private final ValidationRunner validationRunner;
+    private final ValidationExecutioner validationExecutioner;
 
     private final IGroovyShellFactory shellFactory;
 
     @Autowired
-    public ValidationService(ValidationRegistry validationRegistry, ValidationRunner validationRunner, IGroovyShellFactory shellFactory) {
+    public ValidationService(ValidationRegistry validationRegistry, ValidationExecutioner validationExecutioner, IGroovyShellFactory shellFactory) {
         this.validationRegistry = validationRegistry;
-        this.validationRunner = validationRunner;
+        this.validationExecutioner = validationExecutioner;
         this.shellFactory = shellFactory;
     }
 
     @Override
     public void validateTransition(Case useCase, Transition transition) {
-        transition.getDataSet().values().forEach(dataRef -> validationRunner.run(useCase, dataRef.getField().getValidations()));
+        transition.getDataSet().values().forEach(dataRef -> {
+            if (dataRef.getField() != null) {
+                validationExecutioner.run(useCase, dataRef.getField(), dataRef.getField().getValidations());
+            }
+        });
     }
 
     @Override
     public void validateField(Case useCase, Field<?> field) {
-        validationRunner.run(useCase, field.getValidations());
+        validationExecutioner.run(useCase, field, field.getValidations());
     }
 
     @Override

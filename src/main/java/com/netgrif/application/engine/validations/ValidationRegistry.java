@@ -3,6 +3,8 @@ package com.netgrif.application.engine.validations;
 import groovy.lang.Closure;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,6 +19,10 @@ public final class ValidationRegistry {
 
     public Closure<Boolean> getValidation(String name) {
         return validationsMap.get(name);
+    }
+
+    public List<String> getValidationNames() {
+        return new ArrayList<>(validationsMap.keySet());
     }
 
     public Closure<Boolean> removeValidation(String name) {

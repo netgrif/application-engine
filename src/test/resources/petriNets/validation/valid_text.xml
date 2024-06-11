@@ -61,6 +61,21 @@
             </validation>
         </validations>
     </data>
+    <data type="text">
+        <id>text06</id>
+        <title/>
+        <validations>
+            <validation>
+                <expression>aaaa number01.rawValue</expression>
+                <message>error-text06</message>
+            </validation>
+        </validations>
+    </data>
+    <data type="number">
+        <id>number01</id>
+        <title/>
+        <init>5</init>
+    </data>
     <transition>
         <id>t1</id>
         <x>260</x>
@@ -134,6 +149,20 @@
                 <layout>
                     <x>0</x>
                     <y>4</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>text06</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>5</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <template>material</template>
