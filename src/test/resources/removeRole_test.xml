@@ -13,17 +13,17 @@
         <title>admin</title>
         <event type="assign">
             <id>1</id>
-            <actions phase="post">
+            <actions phase="pre">
                 <action>
-                    assignRole("manager", "test")
+                    assignRole("manager", "test", findUserByEmail("test@mail.sk"))
                 </action>
             </actions>
         </event>
         <event type="cancel">
             <id>1</id>
-            <actions phase="post">
+            <actions phase="pre">
                 <action>
-                    removeRole("manager", "test")
+                    removeRole("manager", "test", findUserByEmail("test@mail.sk") )
                 </action>
             </actions>
         </event>

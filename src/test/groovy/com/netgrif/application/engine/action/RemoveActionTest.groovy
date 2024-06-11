@@ -16,7 +16,6 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import groovy.json.JsonOutput
-import groovy.transform.CompileStatic
 import org.junit.Assert
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -57,7 +56,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         locations = "classpath:application-test.properties"
 )
 class RemoveActionTest {
-
 
     public static final String USER_EMAIL = "test@mail.sk"
     public static final String USER_PASSWORD = "password"

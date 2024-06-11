@@ -38,8 +38,6 @@ import javax.mail.internet.MimeMultipart
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-@Disabled("ClassCast")
-@CompileStatic
 class AuthenticationControllerTest {
 
     private static final String EMAIL = "tets@test.com"
@@ -76,8 +74,6 @@ class AuthenticationControllerTest {
 
     private GreenMail smtpServer
 
-    private Map<String, ProcessRole> processRoles
-
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
@@ -86,10 +82,9 @@ class AuthenticationControllerTest {
 
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
-        if (authorityRepository.count() == 0)
+        if (authorityRepository.count() == 0) {
             importHelper.createAuthority(Authority.user)
-//        group = importHelper.createGroup(GROUP_NAME)
-//        processRoles = importHelper.getProcessRoles(net.getNet())
+        }
     }
 
     @Test
