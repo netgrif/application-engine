@@ -14,6 +14,9 @@ public final class ValidationRegistry {
     private final Map<String, Closure<Boolean>> validationsMap = new ConcurrentHashMap<>();
 
     public Closure<Boolean> addValidation(String name, Closure<Boolean> closure) {
+        if (validationsMap.containsKey(name)) {
+            throw new IllegalArgumentException("Validation with name " + name + " already exists.");
+        }
         return validationsMap.put(name, closure);
     }
 

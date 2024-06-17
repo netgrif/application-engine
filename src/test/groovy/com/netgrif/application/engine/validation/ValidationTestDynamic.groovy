@@ -16,6 +16,7 @@ import com.netgrif.application.engine.workflow.domain.repositories.CaseRepositor
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -53,14 +54,9 @@ class ValidationTestDynamic {
     @Autowired
     private ITaskService taskService
 
-//    @Autowired
-//    private ValidationRunner validationRunner
-
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
-//
-//        validationRunner.run()
     }
 
     private PetriNet importTextNet() {
@@ -114,5 +110,25 @@ class ValidationTestDynamic {
         importHelper.setTaskData(task.getStringId(), new DataSet(["text06": new TextField(rawValue: "12345")]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
+    }
+
+    @Test
+    void textDynamic_validation_fail() {
+
+        createValidation("aaaa", "a -> thisField.rawValue.size() == a as Integer", true)
+
+        PetriNet testNet = importTextNet()
+        Case aCase = importHelper.createCase("TestCase", testNet)
+        assert aCase != null
+        Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
+        assert task != null
+
+        IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            importHelper.setTaskData(task.getStringId(), new DataSet(["text06": new TextField(rawValue: "1234567")]))
+            Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
+            assert taskFinish != null
+        })
+
+        assert "error-text01" == thrown.getMessage()
     }
 }

@@ -5,6 +5,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.Validation
 import com.netgrif.application.engine.validations.ValidationRegistry
 import com.netgrif.application.engine.workflow.domain.Case
+import groovy.json.StringEscapeUtils
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Lookup
@@ -27,32 +28,46 @@ abstract class ValidationExecutioner {
         if (validations) {
             log.info("Validations: ${validations.collect {it.rule }}")
 
-            def delegate = getValidationDelegate()
-
-            initCode(delegate, useCase, field, this.registry.getValidationNames())
+            ValidationDelegate delegate = initDelegate(useCase, field, this.registry.getValidationNames())
             for (Validation validation : validations) {
-                Closure<Boolean> code = (Closure<Boolean>) this.shellFactory.getGroovyShell().evaluate("{ -> " + validation.rule + "}")
-                code = code.rehydrate(delegate, code.owner, code.thisObject)
-                if (!code()) {
+                Closure<Boolean> code = initCode(validation.rule, delegate)
+                def result = code()
+                if (result !instanceof Boolean) {
+                    result = result()
+                }
+                if (!result) {
                     throw new IllegalArgumentException(validation.message.toString())
                 }
             }
         }
     }
 
-    protected Closure<Boolean> getValidationCode(String validationName, Field<?> thisField) {
-        Closure<Boolean> code = this.registry.getValidation(validationName)
-        code.delegate.metaClass.thisField = thisField
-        return code.rehydrate(code.delegate, code.owner, code.thisObject)
+    protected Closure<Boolean> getValidationCode(String validationName) {
+        return this.registry.getValidation(validationName)
     }
 
-    protected void initCode(def delegate, Case useCase, Field<?> thisField, List<String> validationNames) {
+    protected Closure<Boolean> initCode(String rule, ValidationDelegate delegate) {
+        Closure<Boolean> code = this.shellFactory.getGroovyShell().evaluate("{ -> "+ rule + " }") as Closure<Boolean>
+        return code.rehydrate(delegate, code.owner, code.thisObject)
+    }
+
+    protected ValidationDelegate initDelegate(Case useCase, Field<?> thisField, List<String> validationNames) {
+        ValidationDelegate delegate = getValidationDelegate()
         delegate.metaClass.useCase = useCase
         useCase.dataSet.fields.values().forEach { Field<?> field ->
             delegate.metaClass."$field.importId" = field
         }
-        validationNames.forEach { validationName ->
-            delegate.metaClass."$validationName" = getValidationCode(validationName, thisField)
+
+        Set commonFieldValidationNames = useCase.dataSet.fields.keySet()
+        commonFieldValidationNames.retainAll(validationNames)
+        if (!commonFieldValidationNames.isEmpty()) {
+            log.warn("Ignoring validations {} for case [{}]: field names are identical with validation names", commonFieldValidationNames, useCase.stringId)
+            validationNames -= commonFieldValidationNames
         }
+        validationNames.forEach { validationName ->
+            delegate.metaClass."$validationName" = getValidationCode(validationName)
+        }
+        delegate.thisField = thisField
+        return delegate
     }
 }
