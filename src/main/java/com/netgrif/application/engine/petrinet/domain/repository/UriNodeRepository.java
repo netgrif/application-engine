@@ -11,7 +11,7 @@ public interface UriNodeRepository extends MongoRepository<UriNode, String> {
 
     List<UriNode> findByName(String name);
 
-    UriNode findByUriPath(String uriPath);
+    UriNode findByPath(String path);
 
     List<UriNode> findAllByParentId(String parentId);
 

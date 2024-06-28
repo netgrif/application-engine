@@ -5,7 +5,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine</artifactId>
-    <version>6.4.0-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>NETGRIF Application Engine</name>
@@ -127,6 +127,12 @@
     </dependencyManagement>
 
     <dependencies>
+        <!-- Actuator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
         <!-- Batch -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -559,15 +565,23 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <layout>ZIP</layout>
+                    <mainClass>com.netgrif.application.engine.ApplicationEngine</mainClass>
+                    <classifier>exe</classifier>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
                             <goal>repackage</goal>
                         </goals>
                         <id>repackage</id>
-                        <configuration>
-                            <classifier>exec</classifier>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -785,10 +799,10 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                        <delimiters>
-                            <delimiter>@</delimiter>
-                        </delimiters>
-                        <useDefaultDelimiters>false</useDefaultDelimiters>
+                    <delimiters>
+                        <delimiter>@</delimiter>
+                    </delimiters>
+                    <useDefaultDelimiters>false</useDefaultDelimiters>
                     <nonFilteredFileExtensions>
                         <nonFilteredFileExtension>crt</nonFilteredFileExtension>
                         <nonFilteredFileExtension>der</nonFilteredFileExtension>
@@ -810,6 +824,12 @@
             <properties>
                 <activatedProperties>dev</activatedProperties>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-loader</artifactId>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>docker-build</id>
@@ -821,6 +841,9 @@
                         <executions>
                             <execution>
                                 <id>repackage</id>
+                                <goals>
+                                    <goal>repackage</goal>
+                                </goals>
                                 <configuration>
                                     <classifier>exec</classifier>
                                 </configuration>
@@ -828,6 +851,15 @@
                         </executions>
                         <configuration>
                             <finalName>app</finalName>
+                            <layout>ZIP</layout>
+                            <mainClass>com.netgrif.application.engine.ApplicationEngine</mainClass>
+                            <classifier>exe</classifier>
+                            <excludes>
+                                <exclude>
+                                    <groupId>org.projectlombok</groupId>
+                                    <artifactId>lombok</artifactId>
+                                </exclude>
+                            </excludes>
                         </configuration>
                     </plugin>
                 </plugins>

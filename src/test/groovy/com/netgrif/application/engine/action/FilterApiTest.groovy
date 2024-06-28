@@ -90,7 +90,7 @@ class FilterApiTest {
         Case caze = createMenuItem()
         def newUri = uriService.getOrCreate("netgrif/test_new", UriContentType.DEFAULT)
         caze = setData(caze, [
-                "uri": newUri.uriPath,
+                "uri": newUri.path,
                 "title": "CHANGED FILTER",
                 "allowed_nets": "filter",
                 "query": "processIdentifier:filter",

@@ -62,7 +62,7 @@ public class UriService implements IUriService {
         if (nodes.size() != 1) {
             throw new IllegalStateException("Exactly one root uri node must exist!");
         }
-        return nodes.get(0);
+        return nodes.getFirst();
     }
 
     /**
@@ -99,7 +99,7 @@ public class UriService implements IUriService {
      */
     @Override
     public UriNode findByUri(String uri) {
-        return uriNodeRepository.findByUriPath(uri);
+        return uriNodeRepository.findByPath(uri);
     }
 
     /**
@@ -117,7 +117,7 @@ public class UriService implements IUriService {
             UriNode parent = findById(uriNode.getParentId());
             uriNode.setParent(parent);
         }
-        Set<UriNode> children = StreamSupport.stream(uriNodeRepository.findAllById(uriNode.getChildrenId()).spliterator(), false).collect(Collectors.toSet());
+        Set<UriNode> children = new HashSet<>(uriNodeRepository.findAllById(uriNode.getChildrenId()));
         uriNode.setChildren(children);
         return uriNode;
     }
@@ -144,8 +144,8 @@ public class UriService implements IUriService {
      */
     @Override
     public UriNode move(UriNode node, String destUri) {
-        if (isPathCycle(node.getUriPath(), destUri)) {
-            throw new IllegalArgumentException("Uri node with path " + node.getUriPath() + " cannot be moved to path " + destUri + " due to cyclic paths");
+        if (isPathCycle(node.getPath(), destUri)) {
+            throw new IllegalArgumentException("Uri node with path " + node.getPath() + " cannot be moved to path " + destUri + " due to cyclic paths");
         }
 
         UriNode newParent = getOrCreate(destUri, null);
@@ -154,9 +154,9 @@ public class UriService implements IUriService {
         if (destUri.indexOf(uriProperties.getSeparator()) != 0) {
             destUri = uriProperties.getSeparator() + destUri;
         }
-        String oldNodePath = node.getUriPath();
+        String oldNodePath = node.getPath();
         String newNodePath = destUri + (destUri.equals(uriProperties.getSeparator()) ? "" : uriProperties.getSeparator()) + node.getName();
-        node.setUriPath(newNodePath);
+        node.setPath(newNodePath);
         node.setParentId(newParent.getStringId());
         node.setLevel(newParent.getLevel() + 1);
 
@@ -186,10 +186,10 @@ public class UriService implements IUriService {
         }
 
         for (UriNode node : nodes) {
-            String oldPath = node.getUriPath();
+            String oldPath = node.getPath();
             String diff = calcPathDifference(oldPath, oldParentPath);
             String newPath = newParentPath + diff;
-            node.setUriPath(newPath);
+            node.setPath(newPath);
 
             updated.add(node);
 
@@ -236,7 +236,7 @@ public class UriService implements IUriService {
                 uriNode = new UriNode();
                 uriNode.setName(uriComponents[i]);
                 uriNode.setLevel(i);
-                uriNode.setUriPath(uriBuilder.toString());
+                uriNode.setPath(uriBuilder.toString());
                 uriNode.setParentId(parent != null ? parent.getStringId() : null);
             }
             if (i == pathLength - 1 && contentType != null) {
@@ -263,12 +263,12 @@ public class UriService implements IUriService {
      */
     @Override
     public UriNode createDefault() {
-        UriNode uriNode = uriNodeRepository.findByUriPath(uriProperties.getSeparator());
+        UriNode uriNode = uriNodeRepository.findByPath(uriProperties.getSeparator());
         if (uriNode == null) {
             uriNode = new UriNode();
             uriNode.setName(uriProperties.getName());
             uriNode.setLevel(FIRST_LEVEL);
-            uriNode.setUriPath(uriProperties.getSeparator());
+            uriNode.setPath(uriProperties.getSeparator());
             uriNode.setParentId(null);
             uriNode.addContentType(UriContentType.DEFAULT);
             uriNode = uriNodeRepository.save(uriNode);

@@ -2158,7 +2158,7 @@ class ActionDelegate {
         }
         Task newItemTask = findTask { it._id.eq(new ObjectId(folder.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)) }
         assignTask(newItemTask)
-        setData(newItemTask, body.toDataSet(null, node.uriPath))
+        setData(newItemTask, body.toDataSet(null, node.path))
         finishTask(newItemTask)
 
         folder = workflowService.findOne(folder.stringId)
@@ -2194,7 +2194,7 @@ class ActionDelegate {
         }
 
         UriNode destNode = uriService.getOrCreate(destUri, UriContentType.CASE)
-        Case newParent = getOrCreateFolderItem(destNode.uriPath)
+        Case newParent = getOrCreateFolderItem(destNode.path)
         if (newParent != null) {
             item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value = [newParent.stringId] as ArrayList
             newParent = appendChildCaseId(newParent, item.stringId)
@@ -2204,7 +2204,7 @@ class ActionDelegate {
         }
 
         item.uriNodeId = destNode.stringId
-        item = resolveAndHandleNewNodePath(item, destNode.uriPath)
+        item = resolveAndHandleNewNodePath(item, destNode.path)
         casesToSave.add(item)
 
         if (hasChildren(item)) {
@@ -2248,7 +2248,7 @@ class ActionDelegate {
         duplicated = workflowService.save(duplicated)
 
         UriNode node = uriService.findById(originItem.uriNodeId)
-        String newNodePath = createNodePath(node.uriPath, sanitizedIdentifier)
+        String newNodePath = createNodePath(node.path, sanitizedIdentifier)
         uriService.getOrCreate(newNodePath, UriContentType.CASE)
 
         Task newItemTask = findTask { it._id.eq(new ObjectId(duplicated.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)) }
@@ -2303,7 +2303,7 @@ class ActionDelegate {
         for (child in children) {
             UriNode parentNode = uriService.getOrCreate(parentFolder.getFieldValue(MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId) as String, UriContentType.CASE)
             child.uriNodeId = parentNode.stringId
-            child = resolveAndHandleNewNodePath(child, parentNode.uriPath)
+            child = resolveAndHandleNewNodePath(child, parentNode.path)
 
             casesToSave.add(child)
             casesToSave.addAll(updateNodeInChildrenFoldersRecursive(child))
@@ -2315,7 +2315,7 @@ class ActionDelegate {
     private Case resolveAndHandleNewNodePath(Case folderItem, String destUri) {
         String newNodePath = resolveNewNodePath(folderItem, destUri)
         UriNode newNode = uriService.getOrCreate(newNodePath, UriContentType.CASE)
-        folderItem.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId].value = newNode.uriPath
+        folderItem.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId].value = newNode.path
 
         return folderItem
     }
@@ -2367,7 +2367,7 @@ class ActionDelegate {
     }
 
     protected Case findFolderCase(UriNode node) {
-        return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.nodePath.textValue.keyword:\"$node.uriPath\"")
+        return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.nodePath.textValue.keyword:\"$node.path\"")
     }
 
     /**
@@ -2774,7 +2774,7 @@ class ActionDelegate {
     }
 
     void updateMultichoiceWithCurrentNode(MultichoiceMapField field, UriNode node) {
-        List<String> splitPathList = splitUriPath(node.uriPath)
+        List<String> splitPathList = splitUriPath(node.path)
 
         change field options { findOptionsBasedOnSelectedNode(node, splitPathList) }
         change field value { splitPathList }
@@ -2794,7 +2794,7 @@ class ActionDelegate {
     }
 
     Map<String, I18nString> findOptionsBasedOnSelectedNode(UriNode node) {
-        return findOptionsBasedOnSelectedNode(node, splitUriPath(node.uriPath))
+        return findOptionsBasedOnSelectedNode(node, splitUriPath(node.path))
     }
 
     Map<String, I18nString> findOptionsBasedOnSelectedNode(UriNode node, List<String> splitPathList) {
@@ -2833,7 +2833,7 @@ class ActionDelegate {
             node = uriService.findByUri(uncheckedUri)
         }
 
-        return node.uriPath
+        return node.path
     }
 
     Field<?> getFieldOfTask(String taskId, String fieldId) {

@@ -3,7 +3,6 @@ package com.netgrif.application.engine.petrinet.domain;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -18,11 +17,8 @@ public class UriNode {
 
     @Id
     @Getter
-    private ObjectId _id;
-
-    @Getter
     @Setter
-    private String uriPath;
+    private String path;
 
     @Getter
     @Setter
@@ -76,6 +72,6 @@ public class UriNode {
     }
 
     public String getStringId() {
-        return this._id.toString();
+        return this.path;
     }
 }

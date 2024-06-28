@@ -20,7 +20,6 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.hateoas.server.LinkRelationProvider;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 import java.util.ArrayList;
@@ -29,10 +28,12 @@ import java.util.List;
 @EnableCaching
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
 @EnableMethodSecurity
-@ConfigurationPropertiesScan
 @EnableAspectJAutoProxy
-@SpringBootApplication(exclude= {DataSourceAutoConfiguration.class})
+@SpringBootApplication(
+        exclude = {DataSourceAutoConfiguration.class},
+        scanBasePackages = {"com.netgrif.application.engine"})
 @EnableMongoAuditing
+@ConfigurationPropertiesScan
 @Aspect
 @Slf4j
 public class ApplicationEngine {

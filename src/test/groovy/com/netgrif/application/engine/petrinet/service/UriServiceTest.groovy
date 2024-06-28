@@ -7,7 +7,6 @@ import com.netgrif.application.engine.petrinet.domain.UriNode
 import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -60,22 +59,22 @@ class UriServiceTest {
         splitUri[0] = "/"
         UriNode uriNode = uriService.getOrCreate(testUri3, UriContentType.CASE)
         assert uriNode != null && uriNode.getName() == splitUri[splitUri.length - 1]
-        assert uriNode.parentId == uriNodeRepository.findByUriPath(testUri1).stringId
+        assert uriNode.parentId == uriNodeRepository.findByPath(testUri1).stringId
         assert uriNode.contentTypes.size() == 2 && uriNode.contentTypes.contains(UriContentType.DEFAULT)
         assert uriNode.getChildrenId().isEmpty()
         assert uriNode.level == 4
 
         uriNode = uriService.getOrCreate(testUri1, UriContentType.CASE)
-        assert uriNode.getChildrenId().size() == 1 && uriNode.getChildrenId().contains(uriNodeRepository.findByUriPath(testUri3).stringId)
+        assert uriNode.getChildrenId().size() == 1 && uriNode.getChildrenId().contains(uriNodeRepository.findByPath(testUri3).stringId)
         assert uriNode.containsCase()
 
         uriNode = uriService.getOrCreate(testUri5wrong, UriContentType.PROCESS)
-        assert uriNode != null && uriNode.stringId == uriNodeRepository.findByUriPath(testUri5).stringId
-        assert uriNode.parentId == uriNodeRepository.findByUriPath(testUri5parent).stringId
+        assert uriNode != null && uriNode.stringId == uriNodeRepository.findByPath(testUri5).stringId
+        assert uriNode.parentId == uriNodeRepository.findByPath(testUri5parent).stringId
         assert uriNode.containsNet()
 
         uriNode = uriService.getOrCreate(testUri6wrong, UriContentType.DEFAULT)
-        assert uriNode.stringId == uriNodeRepository.findByUriPath(testUri6).stringId
+        assert uriNode.stringId == uriNodeRepository.findByPath(testUri6).stringId
         assert uriNode.parentId == null
         assert uriNode.level == 0
     }
