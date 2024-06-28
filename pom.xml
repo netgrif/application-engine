@@ -5,7 +5,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine</artifactId>
-    <version>6.3.3</version>
+    <version>6.4.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>NETGRIF Application Engine</name>
@@ -65,6 +65,32 @@
         <sonar.organization>netgrif-oss</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>oss.snapshots</id>
+            <name>OSSRH SNAPSHOT</name>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>mvnrepository1</id>
+            <url>https://maven.imagej.net/content/repositories/public/</url>
+        </repository>
+        <repository>
+            <id>mvnrepository2</id>
+            <url>https://repo.spring.io/plugins-release/</url>
+        </repository>
+        <repository>
+            <id>mulesoft</id>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
+        </repository>
+    </repositories>
 
     <dependencyManagement>
         <dependencies>
@@ -408,9 +434,9 @@
             <version>2.3.2</version>
         </dependency>
         <dependency>
-            <groupId>com.novemberain</groupId>
-            <artifactId>quartz-mongodb</artifactId>
-            <version>2.2.0-rc2</version>
+            <groupId>com.netgrif</groupId>
+            <artifactId>quartz-mongodb-connector</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <!-- OpenAPI 3 / Swagger Docs -->
@@ -501,21 +527,6 @@
             <version>2.13.2</version>
         </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>mvnrepository1</id>
-            <url>https://maven.imagej.net/content/repositories/public/</url>
-        </repository>
-        <repository>
-            <id>mvnrepository2</id>
-            <url>https://repo.spring.io/plugins-release/</url>
-        </repository>
-        <repository>
-            <id>mulesoft</id>
-            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
-        </repository>
-    </repositories>
 
     <build>
         <resources>

@@ -3,7 +3,6 @@ package com.netgrif.application.engine.pdf.generator.service.renderer;
 import com.netgrif.application.engine.pdf.generator.config.types.PdfBooleanFormat;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfTextField;
-import com.netgrif.application.engine.petrinet.domain.dataset.BooleanField;
 
 import java.io.IOException;
 import java.util.List;

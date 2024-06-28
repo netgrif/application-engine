@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.elastic.service;
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
@@ -8,6 +9,7 @@ import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
@@ -42,23 +44,26 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     private static final Logger log = LoggerFactory.getLogger(ElasticCaseService.class);
 
-    private ElasticCaseRepository repository;
+    protected ElasticCaseRepository repository;
 
-    private IWorkflowService workflowService;
+    protected IWorkflowService workflowService;
 
     @Value("${spring.data.elasticsearch.index.case}")
-    private String caseIndex;
+    protected String caseIndex;
 
     @Autowired
-    private ElasticsearchRestTemplate template;
+    protected ElasticsearchRestTemplate template;
 
-    private Executor executors;
-
-    @Autowired
-    private IPetriNetService petriNetService;
+    protected Executor executors;
 
     @Autowired
-    private IElasticCasePrioritySearch iElasticCasePrioritySearch;
+    protected ElasticsearchProperties elasticsearchProperties;
+
+    @Autowired
+    protected IPetriNetService petriNetService;
+
+    @Autowired
+    protected IElasticCasePrioritySearch iElasticCasePrioritySearch;
 
     @Autowired
     public ElasticCaseService(ElasticCaseRepository repository, ElasticsearchRestTemplate template, Executor executors) {
@@ -154,7 +159,20 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         }
     }
 
-    private NativeSearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+    public String findUriNodeId(Case aCase) {
+        if (aCase == null) {
+            return null;
+        }
+        ElasticCase elasticCase = repository.findByStringId(aCase.getStringId());
+        if (elasticCase == null) {
+            log.warn("[" + aCase.getStringId() + "] Case with id [" + aCase.getStringId() + "] is not indexed.");
+            return null;
+        }
+
+        return elasticCase.getUriNodeId();
+    }
+
+    protected NativeSearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
         List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
@@ -178,7 +196,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                 .build();
     }
 
-    private BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, LoggedUser user, Locale locale) {
+    protected BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, LoggedUser user, Locale locale) {
         BoolQueryBuilder query = boolQuery();
 
         buildViewPermissionQuery(query, user);
@@ -191,6 +209,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         buildStringQuery(request, query, user);
         buildCaseIdQuery(request, query);
         buildUriNodeIdQuery(request, query);
+        buildTagsQuery(request, query);
         boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
 
         // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch
@@ -201,7 +220,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             return query;
     }
 
-    private void buildPetriNetQuery(CaseSearchRequest request, LoggedUser user, BoolQueryBuilder query) {
+    protected void buildPetriNetQuery(CaseSearchRequest request, LoggedUser user, BoolQueryBuilder query) {
         if (request.process == null || request.process.isEmpty()) {
             return;
         }
@@ -242,7 +261,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
      * }
      * </pre><br>
      */
-    private void buildAuthorQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+    protected void buildAuthorQuery(CaseSearchRequest request, BoolQueryBuilder query) {
         if (request.author == null || request.author.isEmpty()) {
             return;
         }
@@ -283,7 +302,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
      * }
      * </pre>
      */
-    private void buildTaskQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+    protected void buildTaskQuery(CaseSearchRequest request, BoolQueryBuilder query) {
         if (request.transition == null || request.transition.isEmpty()) {
             return;
         }
@@ -314,7 +333,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
      * }
      * </pre>
      */
-    private void buildRoleQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+    protected void buildRoleQuery(CaseSearchRequest request, BoolQueryBuilder query) {
         if (request.role == null || request.role.isEmpty()) {
             return;
         }
@@ -338,7 +357,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
      * }
      * </pre>
      */
-    private void buildDataQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+    protected void buildDataQuery(CaseSearchRequest request, BoolQueryBuilder query) {
         if (request.data == null || request.data.isEmpty()) {
             return;
         }
@@ -354,20 +373,35 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         query.filter(dataQuery);
     }
 
-    private void buildFullTextQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+    protected void buildTagsQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+        if (request.tags == null || request.tags.isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder tagsQuery = boolQuery();
+        for (Map.Entry<String, String> field : request.tags.entrySet()) {
+            tagsQuery.must(termQuery("tags." + field.getKey(), field.getValue()));
+        }
+
+        query.filter(tagsQuery);
+    }
+
+    protected void buildFullTextQuery(CaseSearchRequest request, BoolQueryBuilder query) {
         if (request.fullText == null || request.fullText.isEmpty()) {
             return;
         }
 
         // TODO: improvement? wildcard does not scale good
-        QueryBuilder fullTextQuery = queryStringQuery("*" + request.fullText + "*").fields(iElasticCasePrioritySearch.fullTextFields());
+        //String searchText = elasticsearchProperties.isAnalyzerEnabled() ? request.fullText : "*" + request.fullText + "*";
+        String searchText = "*" + request.fullText + "*";
+        QueryBuilder fullTextQuery = queryStringQuery(searchText).fields(iElasticCasePrioritySearch.fullTextFields());
         query.must(fullTextQuery);
     }
 
     /**
      * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a>
      */
-    private void buildStringQuery(CaseSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
+    protected void buildStringQuery(CaseSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
         if (request.query == null || request.query.isEmpty()) {
             return;
         }
@@ -395,7 +429,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
      * }
      * </pre>
      */
-    private void buildCaseIdQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+    protected void buildCaseIdQuery(CaseSearchRequest request, BoolQueryBuilder query) {
         if (request.stringId == null || request.stringId.isEmpty()) {
             return;
         }
@@ -405,7 +439,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         query.filter(caseIdQuery);
     }
 
-    private void buildUriNodeIdQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+    protected void buildUriNodeIdQuery(CaseSearchRequest request, BoolQueryBuilder query) {
         if (request.uriNodeId == null || request.uriNodeId.isEmpty()) {
             return;
         }
@@ -433,13 +467,13 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
      * }
      * </pre>
      */
-    private boolean buildGroupQuery(CaseSearchRequest request, LoggedUser user, Locale locale, BoolQueryBuilder query) {
+    protected boolean buildGroupQuery(CaseSearchRequest request, LoggedUser user, Locale locale, BoolQueryBuilder query) {
         if (request.group == null || request.group.isEmpty()) {
             return false;
         }
 
-        Map<String, Object> processQuery = new HashMap<>();
-        processQuery.put("group", request.group);
+        PetriNetSearch processQuery = new PetriNetSearch();
+        processQuery.setGroup(request.group);
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
         if (groupProcesses.size() == 0)
             return true;
@@ -452,7 +486,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         return false;
     }
 
-    private Pageable resolveUnmappedSortAttributes(Pageable pageable) {
+    protected Pageable resolveUnmappedSortAttributes(Pageable pageable) {
         List<Sort.Order> modifiedOrders = new ArrayList<>();
         pageable.getSort().iterator().forEachRemaining(order -> modifiedOrders.add(new Order(order.getDirection(), order.getProperty()).withUnmappedType("keyword")));
         return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()).withSort(Sort.by(modifiedOrders));

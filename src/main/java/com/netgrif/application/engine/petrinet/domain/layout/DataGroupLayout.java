@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.layout;
 
-import lombok.Data;
 import com.netgrif.application.engine.importer.model.DataGroup;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data

@@ -81,10 +81,10 @@ public abstract class AbstractUserService implements IUserService {
     }
 
     /**
-     * @deprecated use {@link AbstractUserService#removeRole(IUser, ProcessRole)} instead
      * @param user
      * @param roleStringId
      * @return
+     * @deprecated use {@link AbstractUserService#removeRole(IUser, ProcessRole)} instead
      */
     @Override
     @Deprecated(since = "6.2.0")

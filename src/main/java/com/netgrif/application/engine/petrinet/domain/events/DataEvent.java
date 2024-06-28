@@ -34,22 +34,22 @@ public class DataEvent extends BaseEvent {
                 return EventPhase.PRE;
             else if (type.equals(DataEventType.SET))
                 return EventPhase.POST;
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             log.error("Trigger for event [" + this.getId() + "] is not set", e);
         }
         return null;
     }
 
-    private void initActions(){
+    private void initActions() {
         this.setPreActions(new ArrayList<>());
         this.setPostActions(new ArrayList<>());
     }
 
-    public void addToActionsByDefaultPhase(List<Action> actionList){
+    public void addToActionsByDefaultPhase(List<Action> actionList) {
         actionList.forEach(this::addToActionsByDefaultPhase);
     }
 
-    public void addToActionsByDefaultPhase(Action action){
+    public void addToActionsByDefaultPhase(Action action) {
         if (getDefaultPhase() == EventPhase.PRE) {
             this.getPreActions().add(action);
         } else {

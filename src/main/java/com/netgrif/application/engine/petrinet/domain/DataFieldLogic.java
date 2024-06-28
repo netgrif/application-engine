@@ -11,11 +11,14 @@ import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
 
-public class DataFieldLogic {
+public class DataFieldLogic implements Serializable {
+
+    private static final long serialVersionUID = 6561411252131004710L;
 
     @Getter
     @Setter
@@ -48,6 +51,15 @@ public class DataFieldLogic {
             this.component = component;
     }
 
+    public static List<Action> getEventAction(DataEvent event, EventPhase phase) {
+        if (phase == null) phase = event.getDefaultPhase();
+        if (phase.equals(EventPhase.PRE)) {
+            return event.getPreActions();
+        } else {
+            return event.getPostActions();
+        }
+    }
+
     public ObjectNode applyBehavior(ObjectNode jsonNode) {
         behavior.forEach(fieldBehavior -> jsonNode.put(fieldBehavior.toString(), true));
         return jsonNode;
@@ -63,15 +75,6 @@ public class DataFieldLogic {
 
     public boolean isDisplayableForCase() {
         return behavior.contains(FieldBehavior.EDITABLE) || behavior.contains(FieldBehavior.VISIBLE) || behavior.contains(FieldBehavior.HIDDEN);
-    }
-
-    public static List<Action> getEventAction(DataEvent event, EventPhase phase){
-        if(phase == null) phase = event.getDefaultPhase();
-        if(phase.equals(EventPhase.PRE)){
-            return event.getPreActions();
-        } else {
-            return event.getPostActions();
-        }
     }
 
     public boolean isRequired() {

@@ -2,12 +2,15 @@ package com.netgrif.application.engine.petrinet.domain;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 @Data
-public class I18nString {
+public class I18nString implements Serializable {
+
+    private static final long serialVersionUID = 3815235231390109824L;
 
     private String defaultValue;
 

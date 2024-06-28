@@ -1,10 +1,13 @@
 package com.netgrif.application.engine.auth.domain;
 
 import lombok.Data;
-import org.bson.types.ObjectId;
+
+import java.io.Serializable;
 
 @Data
-public class Author {
+public class Author implements Serializable {
+
+    private static final long serialVersionUID = 5167778985918909834L;
 
     private String id;
     private String email;
