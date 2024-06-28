@@ -15,6 +15,7 @@ import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAs
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
@@ -28,7 +29,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import javax.inject.Provider;
 import java.util.Locale;
 
 @RestController
@@ -54,10 +54,10 @@ public class ImpersonationController {
     protected IUserResourceHelperService userResourceHelperService;
 
     @Autowired
-    protected Provider<UserResourceAssembler> userResourceAssemblerProvider;
+    protected ObjectFactory<UserResourceAssembler> userResourceAssemblerProvider;
 
     protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
-        UserResourceAssembler result = userResourceAssemblerProvider.get();
+        UserResourceAssembler result = userResourceAssemblerProvider.getObject();
         result.initialize(locale, small, selfRel);
         return result;
     }

@@ -13,7 +13,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 
 @Configuration
 @ConditionalOnProperty(
@@ -30,7 +30,7 @@ public class ElasticServiceConfiguration {
     private ElasticTaskRepository taskRepository;
 
     @Autowired
-    private ElasticsearchRestTemplate elasticsearchTemplate;
+    private ElasticsearchTemplate elasticsearchTemplate;
 
     @Autowired
     private ElasticsearchProperties elasticsearchProperties;
@@ -54,7 +54,7 @@ public class ElasticServiceConfiguration {
     @Bean
     @Primary
     public IElasticCaseService elasticCaseService() {
-        return new ElasticCaseService(caseRepository, elasticsearchTemplate, executor());
+        return new ElasticCaseService(caseRepository, elasticsearchTemplate, executor(), elasticsearchProperties);
     }
 
     @Bean
@@ -65,7 +65,7 @@ public class ElasticServiceConfiguration {
 
     @Bean
     public IElasticCaseService reindexingTaskElasticCaseService() {
-        return new ElasticCaseService(caseRepository, elasticsearchTemplate, reindexingTaskCaseExecutor());
+        return new ElasticCaseService(caseRepository, elasticsearchTemplate, reindexingTaskCaseExecutor(), elasticsearchProperties);
     }
 
 

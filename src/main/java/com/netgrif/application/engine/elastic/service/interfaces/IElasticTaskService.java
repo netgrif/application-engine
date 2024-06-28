@@ -15,7 +15,7 @@ import java.util.concurrent.Future;
 
 public interface IElasticTaskService {
 
-    Map<String, Float> fullTextFields();
+    List<String> fullTextFields();
 
     Future<ElasticTask> scheduleTaskIndexing(ElasticTask task);
 

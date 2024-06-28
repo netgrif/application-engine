@@ -1,5 +1,6 @@
 package com.netgrif.application.engine;
 
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 import com.netgrif.application.engine.auth.domain.User;
@@ -16,8 +17,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -38,7 +39,7 @@ public class MailSenderServiceTest {
 
     @BeforeEach
     public void before() {
-        smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"));
+        smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp")).withConfiguration(GreenMailConfiguration.aConfig().withDisabledAuthentication());
         smtpServer.start();
     }
 
@@ -52,7 +53,7 @@ public class MailSenderServiceTest {
     }
 
     @Test
-    public void testMailDraft() throws MessagingException, IOException, TemplateException {
+    public void testMailDraft() throws IOException, TemplateException, MessagingException {
         File file = new File("file.txt");
         file.createNewFile();
 

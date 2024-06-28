@@ -10,7 +10,7 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;

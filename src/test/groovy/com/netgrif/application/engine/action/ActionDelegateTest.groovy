@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.action
 
+import com.icegreen.greenmail.configuration.GreenMailConfiguration
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.application.engine.TestHelper
@@ -19,7 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-import javax.mail.internet.MimeMessage
+import jakarta.mail.internet.MimeMessage
 
 import static java.util.Base64.*
 
@@ -58,7 +59,7 @@ class ActionDelegateTest {
 
     @Test
     void inviteUser(){
-        GreenMail smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
+        GreenMail smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp")).withConfiguration(GreenMailConfiguration.aConfig().withDisabledAuthentication())
         smtpServer.start()
 
         MessageResource messageResource = actionDelegate.inviteUser("test@netgrif.com")
@@ -71,7 +72,7 @@ class ActionDelegateTest {
 
     @Test
     void deleteUser(){
-        GreenMail smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
+        GreenMail smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp")).withConfiguration(GreenMailConfiguration.aConfig().withDisabledAuthentication())
         smtpServer.start()
         String mail = "test@netgrif.com";
         MessageResource messageResource = actionDelegate.inviteUser(mail)
@@ -89,7 +90,7 @@ class ActionDelegateTest {
 
     @Test
     void inviteUserNewUserRequest(){
-        GreenMail smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
+        GreenMail smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp")).withConfiguration(GreenMailConfiguration.aConfig().withDisabledAuthentication())
         smtpServer.start()
 
         NewUserRequest newUserRequest = new NewUserRequest()

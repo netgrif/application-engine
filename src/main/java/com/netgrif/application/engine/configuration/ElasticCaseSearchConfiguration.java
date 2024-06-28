@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -11,11 +12,11 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "nae.elastic.search.priority")
 public class ElasticCaseSearchConfiguration {
 
-    private Map<String, Float> fullTextFieldMap = Map.of(
-            "title.keyword", 2f,
-            "authorName", 1f,
-            "authorEmail", 1f,
-            "visualId.keyword", 2f
+    private List<String> fullTextFields = List.of(
+            "title.keyword^2",
+            "authorName^1",
+            "authorEmail^1",
+            "visualId.keyword^2"
     );
 
 }

@@ -25,6 +25,6 @@ class FlushSessionsRunner extends AbstractOrderedCommandLineRunner {
     void run(String... args) {
         log.info("Flushing all users session")
         connectionFactory.connection.flushAll()
-        repository.cleanupExpiredSessions()
+        repository.cleanUpExpiredSessions()
     }
 }

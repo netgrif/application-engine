@@ -2,17 +2,13 @@ package com.netgrif.application.engine.configuration;
 
 import com.netgrif.application.engine.configuration.properties.UriProperties;
 import com.netgrif.application.engine.workflow.service.CaseEventHandler;
-import org.apache.http.HttpHost;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.client.ClientConfiguration;
 
 @Configuration
-public class ElasticsearchConfiguration {
+public class ElasticsearchConfiguration extends org.springframework.data.elasticsearch.client.elc.ElasticsearchConfiguration {
 
     @Value("${spring.data.elasticsearch.url}")
     private String url;
@@ -63,20 +59,29 @@ public class ElasticsearchConfiguration {
         return uriProperties.getIndex();
     }
 
-    @Bean
-    public RestHighLevelClient client() {
-
-        return new RestHighLevelClient(
-                RestClient.builder(new HttpHost(url, port, "http")));
-    }
-
-    @Bean
-    public ElasticsearchOperations elasticsearchTemplate() {
-        return new ElasticsearchRestTemplate(client());
-    }
+//    @Bean
+//    public ElasticsearchClient elasticsearchClient(RestClient elasticSearchRestClient) {
+//        ElasticsearchTransport transport = new RestClientTransport(
+//                elasticSearchRestClient,
+//                new JacksonJsonpMapper()
+//        );
+//        return new ElasticsearchClient(transport);
+//    }
+//
+//    @Bean
+//    public ElasticsearchTemplate elasticsearchTemplate(ElasticsearchClient elasticsearchClient) {
+//        return new ElasticsearchTemplate(elasticsearchClient);
+//    }
 
     @Bean
     public CaseEventHandler caseEventHandler() {
         return new CaseEventHandler();
+    }
+
+    @Override
+    public ClientConfiguration clientConfiguration() {
+        return ClientConfiguration.builder()
+                .connectedTo(url + ":" + port)
+                .build();
     }
 }

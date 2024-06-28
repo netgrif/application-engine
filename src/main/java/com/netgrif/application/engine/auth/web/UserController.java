@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
@@ -41,7 +42,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import javax.inject.Provider;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -81,13 +81,13 @@ public class UserController {
     private IUserFactory userResponseFactory;
 
     @Autowired
-    private Provider<UserResourceAssembler> userResourceAssemblerProvider;
+    private ObjectFactory<UserResourceAssembler> userResourceAssemblerFactory;
 
     @Autowired
     private ISecurityContextService securityContextService;
 
     protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
-        UserResourceAssembler result = userResourceAssemblerProvider.get();
+        UserResourceAssembler result = userResourceAssemblerFactory.getObject();
         result.initialize(locale, small, selfRel);
         return result;
     }

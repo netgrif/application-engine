@@ -16,7 +16,6 @@ import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Transient;
-import org.apache.lucene.analysis.CharArrayMap;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 

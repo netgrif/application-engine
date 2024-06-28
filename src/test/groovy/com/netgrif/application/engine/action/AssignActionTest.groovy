@@ -25,6 +25,7 @@ import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
 import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.test.context.ActiveProfiles
@@ -80,6 +81,7 @@ class AssignActionTest {
     private PetriNet mainNet
     private PetriNet secondaryNet
     private Authentication authentication
+    Map<String, Authority> auths
 
     @BeforeEach
     void before() {
@@ -93,7 +95,7 @@ class AssignActionTest {
 
         createMainAndSecondaryNet()
 
-        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+        auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
@@ -122,7 +124,7 @@ class AssignActionTest {
     void testAssignRoleOnSecondaryNetWhenRoleIsAddedOnPrimaryNet() {
         User user = userRepository.findByEmail(USER_EMAIL)
 
-        authentication = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSWORD)
+        authentication = new UsernamePasswordAuthenticationToken(user.transformToLoggedUser(), USER_PASSWORD, [auths.get("user"), auths.get("admin")] as List<Authority>)
         authentication.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
 
         String roleIdInMainNet = mainNet.getRoles().find { it.value.name.defaultValue == "admin_main" }.key
@@ -135,7 +137,7 @@ class AssignActionTest {
                 .content(content)
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
-                .with(SecurityMockMvcRequestPostProcessors.authentication(authentication)))
+                .with(authentication(authentication)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn()
 

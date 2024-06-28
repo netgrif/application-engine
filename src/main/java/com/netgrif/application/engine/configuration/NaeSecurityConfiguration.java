@@ -23,14 +23,16 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
-import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
-import org.springframework.session.web.http.HttpSessionIdResolver;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -80,12 +82,13 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     @Autowired
     protected IImpersonationService impersonationService;
 
-    private static final String ANONYMOUS_USER = "anonymousUser";
+    @Autowired
+    private List<AuthenticationProvider> authenticationProviders;
 
-    @Bean
-    public HttpSessionIdResolver httpSessionIdResolver() {
-        return HeaderHttpSessionIdResolver.xAuthToken();
-    }
+    @Autowired
+    private AuthenticationManagerBuilder authenticationManagerBuilder;
+
+    private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -109,37 +112,35 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
         return source;
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         log.info("Configuration with frontend separated");
         http
-                .httpBasic()
-                .authenticationEntryPoint(authenticationEntryPoint)
-                .and()
+                .httpBasic(httpSecurityHttpBasicConfigurer ->
+                        httpSecurityHttpBasicConfigurer.authenticationEntryPoint(authenticationEntryPoint))
                 .addFilterBefore(new ForwardedHeaderFilter(), WebAsyncManagerIntegrationFilter.class)
                 .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(impersonationRequestFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(hostValidationRequestFilter(), BasicAuthenticationFilter.class)
-                .authorizeRequests()
-                .antMatchers(getPatterns()).permitAll()
-                .antMatchers(OPTIONS).permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .logout()
-                .logoutUrl("/api/auth/logout")
-                .invalidateHttpSession(true)
-                .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)));
+                .authorizeHttpRequests(requestMatcherRegistry ->
+                        requestMatcherRegistry
+                                .requestMatchers(getPatterns()).permitAll()
+                                .requestMatchers(OPTIONS).permitAll()
+                                .anyRequest().authenticated())
+                .logout(httpSecurityLogoutConfigurer ->
+                        httpSecurityLogoutConfigurer
+                                .logoutUrl("/api/auth/logout")
+                                .invalidateHttpSession(true)
+                                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)));
+        http.authenticationProvider(authenticationProviders.getFirst());
+        http.sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS));
         configureFilters(http);
         configureSession(http);
         setHeaders(http);
         setCsrf(http);
         corsEnable(http);
-    }
-
-    @Override
-    protected ProviderManager authenticationManager() throws Exception {
-        return (ProviderManager) super.authenticationManager();
+        return http.build();
     }
 
     @Override
@@ -181,7 +182,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
         Authority authority = authorityService.getOrCreate(Authority.anonymous);
         authority.setUsers(new HashSet<>());
         return new PublicAuthenticationFilter(
-                authenticationManager(),
+                (ProviderManager) authenticationManager(authenticationManagerBuilder),
                 new AnonymousAuthenticationProvider(ANONYMOUS_USER),
                 authority,
                 this.naeAuthProperties.getServerPatterns(),

@@ -5,7 +5,7 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePri
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
+import java.util.List;
 
 @Service
 public class ElasticCasePrioritySearch implements IElasticCasePrioritySearch {
@@ -15,7 +15,7 @@ public class ElasticCasePrioritySearch implements IElasticCasePrioritySearch {
     protected ElasticCaseSearchConfiguration elasticCaseSearchConfiguration;
 
     @Override
-    public Map<String, Float> fullTextFields() {
-        return elasticCaseSearchConfiguration.getFullTextFieldMap();
+    public List<String> fullTextFields() {
+        return elasticCaseSearchConfiguration.getFullTextFields();
     }
 }

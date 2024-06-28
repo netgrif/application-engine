@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.auth
 
+import com.icegreen.greenmail.configuration.GreenMailConfiguration
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.application.engine.TestHelper
@@ -29,10 +30,10 @@ import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-import javax.mail.BodyPart
-import javax.mail.MessagingException
-import javax.mail.internet.MimeMessage
-import javax.mail.internet.MimeMultipart
+import jakarta.mail.BodyPart
+import jakarta.mail.MessagingException
+import jakarta.mail.internet.MimeMessage
+import jakarta.mail.internet.MimeMultipart
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -79,7 +80,7 @@ class AuthenticationControllerTest {
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
-        smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
+        smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp")).withConfiguration(GreenMailConfiguration.aConfig().withDisabledAuthentication())
         smtpServer.start()
 
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
