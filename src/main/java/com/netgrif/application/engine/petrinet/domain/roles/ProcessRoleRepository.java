@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.roles;
 
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -19,5 +20,5 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
 
     Set<ProcessRole> findAllByImportId(String importId);
 
-    void deleteAllBy_idIn(Collection<ObjectId> ids);
+    void deleteAllBy_idIn(Collection<ProcessResourceId> ids);
 }

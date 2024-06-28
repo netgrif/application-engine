@@ -6,6 +6,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import lombok.Data;
 import org.bson.types.ObjectId;
 
@@ -21,7 +22,7 @@ import java.util.Map;
 public class Task {
 
     @JsonIgnore
-    private ObjectId _id;
+    private ProcessResourceId _id;
 
     private String caseId;
 
@@ -106,7 +107,7 @@ public class Task {
     }
 
     public Task(ElasticTask entity) {
-        _id = new ObjectId(entity.getStringId());
+        _id = new ProcessResourceId(entity.getStringId());
         caseId = entity.getCaseId();
         transitionId = entity.getTransitionId();
         title = entity.getTitle();

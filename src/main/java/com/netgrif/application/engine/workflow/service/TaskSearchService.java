@@ -5,6 +5,7 @@ import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
@@ -149,7 +150,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     public Predicate stringIdQuery(String id) {
-        return QTask.task._id.eq(new ObjectId(id));
+        return QTask.task._id.eq(new ProcessResourceId(id));
     }
 
     public Predicate userRefQuery(String userId) {

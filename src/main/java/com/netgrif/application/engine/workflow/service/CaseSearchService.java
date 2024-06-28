@@ -11,6 +11,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.workflow.domain.QCase;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
@@ -344,7 +345,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     private static BooleanExpression caseIdString(String caseId) {
-        return caseId.equals("") ? QCase.case$._id.isNull() : QCase.case$._id.eq(new ObjectId(caseId));
+        return caseId.equals("") ? QCase.case$._id.isNull() : QCase.case$._id.eq(new ProcessResourceId(caseId));
     }
 
     public Predicate group(Object query, LoggedUser user, Locale locale) {

@@ -12,7 +12,10 @@ import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.dataset.*;
+import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.petrinet.domain.dataset.TaskField;
+import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
@@ -145,20 +148,43 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case findOneNoNet(String caseId) {
-        Optional<Case> caseOptional = repository.findById(caseId);
+        String[] parts = caseId.split("-");
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Invalid NetgrifId format: " + caseId);
+        }
+        String objectIdPart = parts[1];
+
+        ObjectId objectId = new ObjectId(objectIdPart);
+        Optional<Case> caseOptional = repository.findByIdObjectId(objectId);
         if (caseOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
         }
-        Case useCase = caseOptional.get();
-        return useCase;
+        return caseOptional.get();
     }
 
     @Override
     public List<Case> findAllById(List<String> ids) {
-        return repository.findAllBy_idIn(ids).stream()
+        List<ObjectId> objectIds = ids.stream()
+                .map(id -> {
+                    String[] parts = id.split("-");
+                    if (parts.length < 2) {
+                        throw new IllegalArgumentException("Invalid NetgrifId format: " + id);
+                    }
+                    return new ObjectId(parts[1]);
+                })
+                .collect(Collectors.toList());
+
+        List<Case> cases = repository.findAllByObjectIdsIn(objectIds).stream()
                 .filter(Objects::nonNull)
-                .sorted(Ordering.explicit(ids)
-                        .onResultOf(Case::getStringId))
+                .collect(Collectors.toList());
+
+        Map<String, Case> caseMap = cases.stream()
+                .collect(Collectors.toMap(Case::getStringId, caze -> caze));
+
+        return ids.stream()
+                .map(caseMap::get)
+                .filter(Objects::nonNull)
+                .sorted(Ordering.explicit(ids).onResultOf(Case::getStringId))
                 .map(caze -> {
                     caze.setPetriNet(petriNetService.get(caze.getPetriNetObjectId()));
                     decryptDataSet(caze);

@@ -19,10 +19,14 @@ NAE provides additional components to make integration to your project/environme
 
 * Petriflow low-code language: [http://petriflow.com](https://petriflow.com)
 * Documentation: [https://engine.netgrif.com](https://engine.netgrif.com)
+
 <!-- * Getting Started: [https://engine.netgrif.com/get_started](https://engine.netgrif.com/get_started) -->
+
 * Issue Tracker: [GitHub issues](https://github.com/netgrif/application-engine/issues)
 * Java docs: [https://engine.netgrif.com/javadoc](https://engine.netgrif.com/javadoc)
+
 <!-- * Roadmap: [https://engine.netgrif.com/roadmap](https://engine.netgrif.com/#/roadmap) -->
+
 * License: [NETGRIF Community License](https://netgrif.com/license)
 
 ## Components
@@ -33,7 +37,8 @@ Netgrif Application Engine (or NAE for short) consists of several key components
     * **Process executions** - Process instance and task management
     * [**Actions and Events processing**](https://engine.netgrif.com/#/events/events) - Compiling and running action's
       code, handling events in processes
-    * [**Roles management and permissions resolution**](https://engine.netgrif.com/#/roles/permissions) - Permissions and
+    * [**Roles management and permissions resolution**](https://engine.netgrif.com/#/roles/permissions) - Permissions
+      and
       restrictions resolving for processes
     * [**Search and filters**](https://engine.netgrif.com/#/search/filter) - Indexing, querying and filter management.
 * **Authentication and authorization** - User management and application-wide permissions
@@ -53,11 +58,11 @@ The Application engine has some requirements for runtime environment. The follow
 run and use the engine:
 
 | Name                                                   | Version | Description                                                     | Recommendation                                                         |
-|--------------------------------------------------------|---------|-----------------------------------------------------------------|------------------------------------------------------------------------|
-| [Java](https://openjdk.java.net/)                      | 11+     | Java Development Kit                                            | [OpenJDK 11](https://openjdk.java.net/install/)                        |
-| [Redis](https://redis.io/)                             | 5+      | Key-value in-memory database used for user sessions and caching | [Redis 6.2.6](https://redis.io/download)                               |
-| [MongoDB](https://www.mongodb.com/)                    | 4.4+    | Main document store database                                    | [MongoDB 4.4.11](https://docs.mongodb.com/v4.4/installation/)          |
-| [Elasticsearch](https://www.elastic.co/elasticsearch/) | 7.17+   | Index database used for better application search               | [Elasticsearch 7.17.3](https://www.elastic.co/downloads/past-releases/elasticsearch-7-17-3) |
+|--------------------------------------------------------|---------|-----------------------------------------------------------------|:-----------------------------------------------------------------------|
+| [Java](https://openjdk.java.net/)                      | 21+     | Java Development Kit                                            | [OpenJDK 21](https://openjdk.java.net/install/)                        |
+| [Redis](https://redis.io/)                             | 7+      | Key-value in-memory database used for user sessions and caching | [Redis 7.2.5](https://redis.io/download)                               |
+| [MongoDB](https://www.mongodb.com/)                    | 7+      | Main document store database                                    | [MongoDB 7](hhttps://www.mongodb.com/docs/manual/installation/)        |
+| [Elasticsearch](https://www.elastic.co/elasticsearch/) | 8+      | Index database used for better application search               | [Elasticsearch 8.10.4](https://www.elastic.co/downloads/elasticsearch) |
 
 If you are planning on developing docker container based solution you can use our [docker-compose](docker-compose.yml)
 configuration to run all necessary databases to develop with NAE.
@@ -149,11 +154,6 @@ for building frontend applications in Application Engine platform powered by Pet
 For creating processes in Petriflow language try our free Application Builder
 on [https://builder.netgrif.com](https://builder.netgrif.com). You can start from scratch or import existing process in
 BPMN 2.0 and builder automatically converts it into Petriflow.
-
-### NCLI (Coming soon)
-
-If you need help with setting up project or looking for tool to automate your developer work with NAE based
-applications, take a look on [NCLI (Netgrif Command Line Interface)](https://github.com/netgrif/ncli).
 
 ## Reporting issues
 

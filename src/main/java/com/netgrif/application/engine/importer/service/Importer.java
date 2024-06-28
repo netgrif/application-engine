@@ -33,6 +33,7 @@ import com.netgrif.application.engine.petrinet.service.ArcFactory;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import lombok.Getter;
@@ -1065,7 +1066,7 @@ public class Importer {
         } else {
             role.setName(toI18NString(importRole.getName()));
         }
-        role.set_id(new ObjectId());
+        role.set_id(new ProcessResourceId(new ObjectId(net.getStringId())));
 
         role.setNetId(net.getStringId());
         net.addRole(role);
