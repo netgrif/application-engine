@@ -34,8 +34,7 @@ public class Task implements Serializable {
     private static final long serialVersionUID = -7112277728921547546L;
 
     @Id
-    @Builder.Default
-    private ObjectId _id = new ObjectId();
+    private ProcessResourceId _id = new ProcessResourceId();
 
     @Indexed
     @Getter
@@ -75,7 +74,7 @@ public class Task implements Serializable {
     @Setter
     private String userId;
 
-    @org.springframework.data.annotation.Transient
+    @Transient
     @Getter
     @Setter
     private IUser user;
@@ -200,7 +199,7 @@ public class Task implements Serializable {
     }
 
     @JsonIgnore
-    public ObjectId getObjectId() {
+    public ProcessResourceId getObjectId() {
         return _id;
     }
 
@@ -350,4 +349,58 @@ public class Task implements Serializable {
         TIME,
         MESSAGE,
     }
+
+    public static class TaskBuilder {
+
+        private ProcessResourceId _id;
+        private String processId;
+
+        private String caseId;
+        private String transitionId;
+        private TaskLayout layout;
+        private I18nString title;
+        private String caseColor;
+        private String caseTitle;
+        private Integer priority;
+        private String userId;
+        private IUser user;
+        private List triggers = new LinkedList<>();
+        private Map<String, Map<String, Boolean>> roles = new HashMap<>();
+        private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
+        private Map<String, Map<String, Boolean>> users = new HashMap<>();
+        private List viewRoles = new LinkedList<>();
+        private List viewUserRefs = new LinkedList<>();
+        private List viewUsers = new LinkedList<>();
+        private List negativeViewRoles = new LinkedList<>();
+        private List negativeViewUsers = new LinkedList<>();
+        private LocalDateTime startDate;
+        private LocalDateTime finishDate;
+        private String finishedBy;
+        private String transactionId;
+        private Boolean requiredFilled;
+        private LinkedHashSet immediateDataFields = new LinkedHashSet<>();
+        private List immediateData = new LinkedList<>();
+        private String icon;
+        private AssignPolicy assignPolicy = AssignPolicy.MANUAL;
+        private DataFocusPolicy dataFocusPolicy = DataFocusPolicy.MANUAL;
+        private FinishPolicy finishPolicy = FinishPolicy.MANUAL;
+        private Map<EventType, I18nString> eventTitles = new HashMap<>();
+        private Map<String, Boolean> assignedUserPolicy = new HashMap<>();
+        private Map<String, String> tags = new HashMap<>();
+
+        public TaskBuilder processId(String processId) {
+            this.processId = processId;
+            this._id = new ProcessResourceId(new ObjectId(processId));
+            return this;
+        }
+
+        public Task create() {
+            if (this._id == null && this.processId != null) {
+                this._id = new ProcessResourceId(new ObjectId(this.processId));
+            }
+            return new Task(_id, processId, caseId, transitionId, layout, title, caseColor, caseTitle, priority, userId, user, triggers, roles, userRefs, users, viewRoles, viewUserRefs, viewUsers, negativeViewRoles, negativeViewUsers, startDate, finishDate, finishedBy, transactionId, requiredFilled, immediateDataFields, immediateData, icon, assignPolicy, dataFocusPolicy, finishPolicy, eventTitles, assignedUserPolicy, new HashMap<>(), tags);
+        }
+
+    }
+
 }

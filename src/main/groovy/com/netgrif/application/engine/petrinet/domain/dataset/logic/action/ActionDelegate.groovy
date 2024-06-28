@@ -42,6 +42,7 @@ import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
@@ -1594,7 +1595,7 @@ class ActionDelegate {
         filterCase.setIcon(icon)
         filterCase.dataSet[DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID].value = (title instanceof I18nString) ? title : new I18nString(title as String)
         filterCase = workflowService.save(filterCase)
-        Task newFilterTask = findTask { it._id.eq(new ObjectId(filterCase.tasks.find { it.transition == DefaultFiltersRunner.AUTO_CREATE_TRANSITION }.task)) }
+        Task newFilterTask = findTask { it._id.eq(new ProcessResourceId(filterCase.tasks.find { it.transition == DefaultFiltersRunner.AUTO_CREATE_TRANSITION }.task)) }
         assignTask(newFilterTask)
 
         def setDataMap = [

@@ -17,6 +17,7 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepositor
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -288,8 +289,8 @@ public class ProcessRoleService implements IProcessRoleService {
     @Override
     public void deleteRolesOfNet(PetriNet net, LoggedUser loggedUser) {
         log.info("[" + net.getStringId() + "]: Initiating deletion of all roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
-        List<ObjectId> deletedRoleIds = this.findAll(net).stream().map(ProcessRole::get_id).collect(Collectors.toList());
-        Set<String> deletedRoleStringIds = deletedRoleIds.stream().map(ObjectId::toString).collect(Collectors.toSet());
+        List<ProcessResourceId> deletedRoleIds = this.findAll(net).stream().map(ProcessRole::get_id).collect(Collectors.toList());
+        Set<String> deletedRoleStringIds = deletedRoleIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet());
 
         List<IUser> usersWithRemovedRoles = this.userService.findAllByProcessRoles(deletedRoleStringIds, false);
         for (IUser user : usersWithRemovedRoles) {

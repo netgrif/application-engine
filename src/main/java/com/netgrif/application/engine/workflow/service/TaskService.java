@@ -46,6 +46,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
@@ -140,13 +141,13 @@ public class TaskService implements ITaskService {
 
     @Override
     public AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId, Map<String, String> params) throws TransitionNotExecutableException {
-        Optional<Task> taskOptional = taskRepository.findById(taskId);
-        if (taskOptional.isEmpty()) {
+        Task task = this.findById(taskId);
+        if (task == null) {
             throw new TaskNotFoundException("Could not find task with id [" + taskId + "]");
         }
 
         IUser user = getUserFromLoggedUser(loggedUser);
-        return assignTask(taskOptional.get(), user, params);
+        return assignTask(task, user, params);
     }
 
     @Override
@@ -236,11 +237,10 @@ public class TaskService implements ITaskService {
 
     @Override
     public FinishTaskEventOutcome finishTask(LoggedUser loggedUser, String taskId, Map<String, String> params) throws IllegalArgumentException, TransitionNotExecutableException {
-        Optional<Task> taskOptional = taskRepository.findById(taskId);
-        if (taskOptional.isEmpty()) {
+        Task task = this.findById(taskId);
+        if (task == null) {
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         }
-        Task task = taskOptional.get();
         IUser user = getUserFromLoggedUser(loggedUser);
 
         if (task.getUserId() == null) {
@@ -313,12 +313,12 @@ public class TaskService implements ITaskService {
 
     @Override
     public CancelTaskEventOutcome cancelTask(LoggedUser loggedUser, String taskId, Map<String, String> params) {
-        Optional<Task> taskOptional = taskRepository.findById(taskId);
-        if (taskOptional.isEmpty()) {
+        Task task = this.findById(taskId);
+        if (task == null) {
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         }
         IUser user = getUserFromLoggedUser(loggedUser);
-        return cancelTask(taskOptional.get(), user, params);
+        return cancelTask(task, user, params);
     }
 
     @Override
@@ -630,11 +630,17 @@ public class TaskService implements ITaskService {
 
     @Override
     public Task findOne(String taskId) {
-        Optional<Task> optionalTask = taskRepository.findById(taskId);
-        if (optionalTask.isEmpty()) {
+        String[] parts = taskId.split("-");
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Invalid NetgrifId format: " + taskId);
+        }
+        String objectIdPart = parts[1];
+        ObjectId objectId = new ObjectId(objectIdPart);
+        Optional<Task> taskOptional = taskRepository.findByIdObjectId(objectId);
+        if (taskOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         }
-        return optionalTask.get();
+        return taskOptional.get();
     }
 
     @Override
@@ -696,7 +702,13 @@ public class TaskService implements ITaskService {
 
     @Override
     public Task findById(String id) {
-        Optional<Task> taskOptional = taskRepository.findById(id);
+        String[] parts = id.split("-");
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Invalid NetgrifId format: " + id);
+        }
+        String objectIdPart = parts[1];
+        ObjectId objectId = new ObjectId(objectIdPart);
+        Optional<Task> taskOptional = taskRepository.findByIdObjectId(objectId);
         if (taskOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find task with id [" + id + "]");
         }
@@ -819,7 +831,7 @@ public class TaskService implements ITaskService {
                 .assignPolicy(transition.getAssignPolicy())
                 .dataFocusPolicy(transition.getDataFocusPolicy())
                 .finishPolicy(transition.getFinishPolicy())
-                .build();
+                .create();
         transition.getEvents().forEach((type, event) -> task.addEventTitle(type, event.getTitle()));
         task.addAssignedUserPolicy(transition.getAssignedUserPolicy());
         for (Trigger trigger : transition.getTriggers()) {

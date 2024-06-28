@@ -9,6 +9,7 @@ import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssemb
 import com.netgrif.application.engine.settings.domain.Preferences;
 import com.netgrif.application.engine.settings.service.IPreferencesService;
 import com.netgrif.application.engine.settings.web.PreferencesResource;
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAssembler;
 import io.swagger.v3.oas.annotations.Operation;
@@ -74,8 +75,8 @@ public class PublicUserController {
     public PagedModel<UserResource> search(@RequestParam(value = "small", required = false) Boolean small, @RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Locale locale) {
         small = small == null ? false : small;
         Page<IUser> page = userService.searchAllCoMembers(query.getFulltext(),
-                query.getRoles().stream().map(ObjectId::new).collect(Collectors.toList()),
-                query.getNegativeRoles().stream().map(ObjectId::new).collect(Collectors.toList()),
+                query.getRoles().stream().map(ProcessResourceId::new).collect(Collectors.toList()),
+                query.getNegativeRoles().stream().map(ProcessResourceId::new).collect(Collectors.toList()),
                 userService.getAnonymousLogged(), small, pageable);
 
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicUserController.class)

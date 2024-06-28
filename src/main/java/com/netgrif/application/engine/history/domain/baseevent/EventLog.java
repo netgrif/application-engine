@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.history.domain.baseevent;
 
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -17,7 +18,7 @@ public abstract class EventLog {
     protected ObjectId id;
 
     @Getter
-    protected ObjectId triggerId;
+    protected ProcessResourceId triggerId;
 
     @Getter
     protected EventPhase eventPhase;
@@ -30,13 +31,13 @@ public abstract class EventLog {
         this.id = new ObjectId();
     }
 
-    protected EventLog(ObjectId triggerId, EventPhase eventPhase) {
+    protected EventLog(ProcessResourceId triggerId, EventPhase eventPhase) {
         this();
         this.triggerId = triggerId;
         this.eventPhase = eventPhase;
     }
 
-    protected EventLog(ObjectId triggerId, EventPhase eventPhase, List<ObjectId> triggeredEvents) {
+    protected EventLog(ProcessResourceId triggerId, EventPhase eventPhase, List<ObjectId> triggeredEvents) {
         this(triggerId, eventPhase);
         this.triggeredEvents = triggeredEvents;
     }

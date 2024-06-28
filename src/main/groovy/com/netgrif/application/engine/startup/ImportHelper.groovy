@@ -189,6 +189,8 @@ class ImportHelper {
         return createCase(title, net, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
+    // TODO remove deprecated classes and methods
+    @Deprecated
     boolean createCaseFilter(String title, String query, MergeFilterOperation operation, LoggedUser user) {
         return filterService.saveFilter(new CreateFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query), operation, user)
     }

@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -71,7 +72,7 @@ public interface IUserService {
 
     void deleteUser(IUser user);
 
-    Page<IUser> searchAllCoMembers(String query, List<ObjectId> roles, List<ObjectId> negateRoleIds, LoggedUser principal, Boolean small, Pageable pageable);
+    Page<IUser> searchAllCoMembers(String query, List<ProcessResourceId> roles, List<ProcessResourceId> negateRoleIds, LoggedUser principal, Boolean small, Pageable pageable);
 
     IUser createSystemUser();
 

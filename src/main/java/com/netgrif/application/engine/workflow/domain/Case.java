@@ -7,7 +7,6 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -31,7 +30,7 @@ public class Case implements Serializable {
 
     @Id
     @Getter
-    private ObjectId _id;
+    private ProcessResourceId _id;
 
     @Getter
     @Setter
@@ -127,12 +126,10 @@ public class Case implements Serializable {
 
     @Getter
     @Setter
-    @Builder.Default
     private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
 
     @Getter
     @Setter
-    @Builder.Default
     private Map<String, Map<String, Boolean>> users = new HashMap<>();
 
     @Getter
@@ -162,13 +159,11 @@ public class Case implements Serializable {
     private Map<String, String> tags;
 
     protected Case() {
-        _id = new ObjectId();
         activePlaces = new HashMap<>();
         dataSet = new LinkedHashMap<>();
         immediateDataFields = new LinkedHashSet<>();
         consumedTokens = new HashMap<>();
         tasks = new HashSet<>();
-        visualId = generateVisualId();
         enabledRoles = new HashSet<>();
         permissions = new HashMap<>();
         userRefs = new HashMap<>();
@@ -183,6 +178,7 @@ public class Case implements Serializable {
 
     public Case(PetriNet petriNet) {
         this();
+        this._id = new ProcessResourceId(petriNet.getObjectId());
         petriNetObjectId = petriNet.getObjectId();
         processIdentifier = petriNet.getIdentifier();
         this.petriNet = petriNet;

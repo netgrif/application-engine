@@ -16,6 +16,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
@@ -123,7 +124,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Case findGroup(String groupID) {
-        Case result = workflowService.searchOne(groupCase().and(QCase.case$._id.eq(new ObjectId(groupID))));
+        Case result = workflowService.searchOne(groupCase().and(QCase.case$._id.eq(new ProcessResourceId(groupID))));
         if (!isGroupCase(result)) {
             return null;
         }
@@ -150,7 +151,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public List<Case> findByIds(Collection<String> groupIds) {
-        List<BooleanExpression> groupQueries = groupIds.stream().map(ObjectId::new).map(QCase.case$._id::eq).collect(Collectors.toList());
+        List<BooleanExpression> groupQueries = groupIds.stream().map(ProcessResourceId::new).map(QCase.case$._id::eq).collect(Collectors.toList());
         BooleanBuilder builder = new BooleanBuilder();
         groupQueries.forEach(builder::or);
         return this.workflowService.searchAll(groupCase().and(builder)).getContent();

@@ -18,6 +18,7 @@ import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.settings.domain.Preferences;
 import com.netgrif.application.engine.settings.service.IPreferencesService;
 import com.netgrif.application.engine.settings.web.PreferencesResource;
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAssembler;
 import io.swagger.v3.oas.annotations.Operation;
@@ -109,8 +110,8 @@ public class UserController {
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> search(@RequestParam(value = "small", required = false) Boolean small, @RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
         small = small == null ? false : small;
-        List<ObjectId> roles = query.getRoles() == null ? null : query.getRoles().stream().map(ObjectId::new).collect(Collectors.toList());
-        List<ObjectId> negativeRoles = query.getNegativeRoles() == null ? null : query.getNegativeRoles().stream().map(ObjectId::new).collect(Collectors.toList());
+        List<ProcessResourceId> roles = query.getRoles() == null ? null : query.getRoles().stream().map(ProcessResourceId::new).collect(Collectors.toList());
+        List<ProcessResourceId> negativeRoles = query.getNegativeRoles() == null ? null : query.getNegativeRoles().stream().map(ProcessResourceId::new).collect(Collectors.toList());
         Page<IUser> page = userService.searchAllCoMembers(query.getFulltext(),
                 roles,
                 negativeRoles,

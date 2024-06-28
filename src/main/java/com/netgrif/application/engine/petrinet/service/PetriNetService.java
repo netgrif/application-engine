@@ -74,63 +74,63 @@ import static com.netgrif.application.engine.petrinet.service.interfaces.IPetriN
 public class PetriNetService implements IPetriNetService {
 
     @Autowired
-    private IProcessRoleService processRoleService;
+    protected IProcessRoleService processRoleService;
 
     @Autowired
-    private PetriNetRepository repository;
+    protected PetriNetRepository repository;
 
     @Autowired
-    private MongoTemplate mongoTemplate;
+    protected MongoTemplate mongoTemplate;
 
     @Autowired
-    private FileStorageConfiguration fileStorageConfiguration;
+    protected FileStorageConfiguration fileStorageConfiguration;
 
     @Autowired
-    private IRuleEngine ruleEngine;
+    protected IRuleEngine ruleEngine;
 
     @Autowired
-    private IWorkflowService workflowService;
+    protected IWorkflowService workflowService;
 
     @Autowired
-    private INextGroupService groupService;
+    protected INextGroupService groupService;
 
     @Autowired
-    private ObjectFactory<Importer> importerObjectFactory;
+    protected ObjectFactory<Importer> importerObjectFactory;
 
     @Autowired
-    private FieldActionsRunner actionsRunner;
+    protected FieldActionsRunner actionsRunner;
 
     @Autowired(required = false)
-    private ILdapGroupRefService ldapGroupService;
+    protected ILdapGroupRefService ldapGroupService;
 
     @Autowired
-    private IFieldActionsCacheService functionCacheService;
+    protected IFieldActionsCacheService functionCacheService;
 
     @Autowired
-    private IUserService userService;
+    protected IUserService userService;
 
     @Autowired
-    private IEventService eventService;
+    protected IEventService eventService;
 
     @Autowired
-    private IHistoryService historyService;
+    protected IHistoryService historyService;
 
     @Autowired
-    private CacheManager cacheManager;
+    protected CacheManager cacheManager;
 
     @Autowired
-    private CacheProperties cacheProperties;
+    protected CacheProperties cacheProperties;
 
     @Resource
-    private IPetriNetService self;
+    protected IPetriNetService self;
 
     @Autowired
-    private IElasticPetriNetMappingService petriNetMappingService;
+    protected IElasticPetriNetMappingService petriNetMappingService;
 
     @Autowired
-    private IUriService uriService;
+    protected IUriService uriService;
 
-    private IElasticPetriNetService elasticPetriNetService;
+    protected IElasticPetriNetService elasticPetriNetService;
 
     @Autowired
     public void setElasticPetriNetService(IElasticPetriNetService elasticPetriNetService) {
