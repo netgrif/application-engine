@@ -196,8 +196,8 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EntityModel<EventOutcomeWithMessage> deleteNamedFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name, @RequestParam("parentTaskId") String parentTaskId) {
-        return super.deleteNamedFile(parentTaskId, fieldId, name);
+    public EntityModel<EventOutcomeWithMessage> deleteNamedFile(@PathVariable("id") String taskId, @RequestBody FileFieldRequest requestBody) {
+        return super.deleteNamedFile(requestBody.getParentTaskId(), requestBody.getFieldId(), requestBody.getFileName());
     }
 
     @Operation(summary = "Generic task search on Mongo database")
