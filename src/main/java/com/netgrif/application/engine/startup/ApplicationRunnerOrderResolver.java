@@ -4,6 +4,7 @@ import com.netgrif.application.engine.startup.annotation.AfterRunner;
 import com.netgrif.application.engine.startup.annotation.BeforeRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -40,15 +41,16 @@ public class ApplicationRunnerOrderResolver {
         Map<String, AbstractOrderedApplicationRunner> applicationRunners = event.getApplicationContext().getBeansOfType(AbstractOrderedApplicationRunner.class);
         TreeMap<Integer, List<Class<? extends AbstractOrderedApplicationRunner>>> orderedRunners = new TreeMap<>();
         applicationRunners.forEach((k, v) -> {
-            RunnerOrder order = v.getClass().getAnnotation(RunnerOrder.class);
+            Class<? extends AbstractOrderedApplicationRunner> runnerClass = AopUtils.isAopProxy(v) ? (Class<? extends AbstractOrderedApplicationRunner>) AopUtils.getTargetClass(v) : v.getClass();
+            RunnerOrder order = runnerClass.getAnnotation(RunnerOrder.class);
             if (order == null) {
-                unresolved.add(v.getClass());
+                unresolved.add(runnerClass);
                 return;
             }
             if (!orderedRunners.containsKey(order.value())) {
                 orderedRunners.put(order.value(), new ArrayList<>());
             }
-            orderedRunners.get(order.value()).add(v.getClass());
+            orderedRunners.get(order.value()).add(runnerClass);
         });
         order.clear();
         order.addAll(orderedRunners.values().stream().flatMap(List::stream).toList());

@@ -38,7 +38,7 @@ import java.util.List;
 @Slf4j
 public class ApplicationEngine {
 
-    @Around("execution(* com.netgrif.application.engine.startup.AbstractOrderedCommandLineRunner+.run(..))")
+    @Around("execution(* com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner+.run(..))")
     void logRun(ProceedingJoinPoint joinPoint) throws Throwable {
         log.info(joinPoint.getTarget().getClass().getSimpleName() + " started");
         joinPoint.proceed();

@@ -1,29 +1,30 @@
-package com.netgrif.application.engine.startup
+package com.netgrif.application.engine.startup.runner;
 
+import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.annotation.RunnerOrder;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.quartz.Scheduler;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.stereotype.Component;
 
-import org.quartz.Scheduler
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.stereotype.Component
-
+@Slf4j
 @Component
-class QuartzSchedulerRunner extends AbstractOrderedCommandLineRunner {
+@RunnerOrder(19)
+@RequiredArgsConstructor
+public class QuartzSchedulerRunner extends AbstractOrderedApplicationRunner {
 
-    private static final Logger log = LoggerFactory.getLogger(QuartzSchedulerRunner)
+    @Value("${quartz.scheduler.run:true}")
+    private boolean start;
 
-    @Value('${quartz.scheduler.run:#{true}}')
-    private boolean start
-
-    @Autowired
-    private Scheduler scheduler
+    private final Scheduler scheduler;
 
     @Override
-    void run(String... strings) throws Exception {
+    public void run(ApplicationArguments strings) throws Exception {
         if (start) {
-            log.info("Starting Quartz scheduler")
-            scheduler.start()
+            log.info("Starting Quartz scheduler");
+            scheduler.start();
         }
     }
 

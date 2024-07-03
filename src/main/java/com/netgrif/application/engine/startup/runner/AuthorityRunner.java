@@ -1,21 +1,28 @@
-package com.netgrif.application.engine.startup
+package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
+import com.netgrif.application.engine.auth.domain.Authority;
+import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
+import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.annotation.RunnerOrder;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
-class AuthorityRunner extends AbstractOrderedCommandLineRunner {
+@RunnerOrder(6)
+@RequiredArgsConstructor
+public class AuthorityRunner extends AbstractOrderedApplicationRunner {
 
-    @Autowired
-    private IAuthorityService service
+    private final IAuthorityService service;
 
     @Override
-    void run(String... strings) throws Exception {
-        service.getOrCreate(Authority.user)
-        service.getOrCreate(Authority.admin)
-        service.getOrCreate(Authority.systemAdmin)
-        service.getOrCreate(Authority.anonymous)
+    public void run(ApplicationArguments args) throws Exception {
+        service.getOrCreate(Authority.user);
+        service.getOrCreate(Authority.admin);
+        service.getOrCreate(Authority.systemAdmin);
+        service.getOrCreate(Authority.anonymous);
     }
+
 }

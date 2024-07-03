@@ -1,66 +1,60 @@
-package com.netgrif.application.engine.startup
+package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.orgstructure.groups.config.GroupConfigurationProperties
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
-import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import groovy.util.logging.Slf4j
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.orgstructure.groups.config.GroupConfigurationProperties;
+import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.ImportHelper;
+import com.netgrif.application.engine.startup.annotation.RunnerOrder;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
-@ConditionalOnProperty(value = "nae.group.default.enabled",
-        havingValue = "true",
-        matchIfMissing = true)
-@Component
+import java.util.Optional;
+
 @Slf4j
-public class GroupRunner extends AbstractOrderedCommandLineRunner {
+@Component
+@RunnerOrder(11)
+@RequiredArgsConstructor
+@ConditionalOnProperty(value = "nae.group.default.enabled", havingValue = "true", matchIfMissing = true)
+public class GroupRunner extends AbstractOrderedApplicationRunner {
 
-    @Autowired
-    private ImportHelper helper
-
-    @Autowired
-    private INextGroupService nextGroupService
-
-    @Autowired
-    private IUserService userService
-
-    @Autowired
-    private SystemUserRunner systemCreator
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private GroupConfigurationProperties groupProperties
+    public static final String DEFAULT_GROUP_TITLE = "Default system group";
 
     private static final String GROUP_FILE_NAME = "engine-processes/org_group.xml";
-    private static final String GROUP_PETRINET_IDENTIFIER = "org_group"
-    public static final String DEFAULT_GROUP_TITLE = "Default system group"
+    private static final String GROUP_PETRINET_IDENTIFIER = "org_group";
+
+    private final ImportHelper helper;
+    private final INextGroupService nextGroupService;
+    private final IUserService userService;
+    private final SystemUserRunner systemCreator;
+    private final IPetriNetService petriNetService;
+    private final GroupConfigurationProperties groupProperties;
 
     @Override
-    void run(String... args) throws Exception {
-        createDefaultGroup()
+    public void run(ApplicationArguments args) throws Exception {
+        createDefaultGroup();
     }
 
-    Optional<PetriNet> createDefaultGroup() {
-        PetriNet group
+    protected Optional<PetriNet> createDefaultGroup() {
+        PetriNet group;
         if ((group = petriNetService.getNewestVersionByIdentifier(GROUP_PETRINET_IDENTIFIER)) != null) {
-            log.info("Petri net for groups has already been imported.")
-            return Optional.of(group)
+            log.info("Petri net for groups has already been imported.");
+            return Optional.of(group);
         }
-
-        Optional<PetriNet> groupNet =  helper.createNet(GROUP_FILE_NAME, VersionType.MAJOR, systemCreator.loggedSystem)
-
-        if (!groupNet.present) {
-            log.error("Import of petri net for groups failed!")
-            return groupNet
+        Optional<PetriNet> groupNet = helper.createNet(GROUP_FILE_NAME, VersionType.MAJOR, systemCreator.getLoggedSystem());
+        if (groupNet.isEmpty()) {
+            log.error("Import of petri net for groups failed!");
+            return groupNet;
         }
         if (groupProperties.isSystemEnabled())
-            nextGroupService.createDefaultSystemGroup(userService.getLoggedOrSystem())
+            nextGroupService.createDefaultSystemGroup(userService.getLoggedOrSystem());
         return groupNet;
     }
+
 }

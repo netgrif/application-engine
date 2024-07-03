@@ -1,19 +1,24 @@
-package com.netgrif.application.engine.startup
+package com.netgrif.application.engine.startup.runner;
 
+import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
+import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.annotation.RunnerOrder;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.stereotype.Component;
 
-import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
-
+@Slf4j
 @Component
-class UriRunner extends AbstractOrderedCommandLineRunner {
+@RunnerOrder(8)
+@RequiredArgsConstructor
+public class UriRunner extends AbstractOrderedApplicationRunner {
 
-    @Autowired
-    private IUriService uriService
-
+    private final IUriService uriService;
 
     @Override
-    void run(String... args) throws Exception {
-        uriService.createDefault()
+    public void run(ApplicationArguments args) throws Exception {
+        uriService.createDefault();
     }
+
 }

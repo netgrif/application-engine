@@ -3,7 +3,7 @@ package com.netgrif.application.engine.startup;
 import com.netgrif.application.engine.configuration.ApplicationContextProvider;
 import com.netgrif.application.engine.startup.annotation.BeforeRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
-import com.netgrif.application.engine.startup.runner.MongoDbRunner;
+import com.netgrif.application.engine.startup.runner.FinisherSuperCreatorRunner;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,7 @@ import java.util.TreeMap;
 
 @Slf4j
 @Component
-@BeforeRunner(MongoDbRunner.class)
+@BeforeRunner(FinisherSuperCreatorRunner.class)
 public class ProcessApplicationStartupRunnerExecutor extends AbstractOrderedApplicationRunner {
 
     @Override
@@ -33,7 +33,7 @@ public class ProcessApplicationStartupRunnerExecutor extends AbstractOrderedAppl
         });
     }
 
-    protected List<ProcessApplicationStartupRunner> resolveRunners() {
+    protected List<ProcessApplicationStartupRunner> resolveRunners() { // TODO recognise AOP, implement other annotation ordering
         Map<String, ProcessApplicationStartupRunner> customRunners = ApplicationContextProvider.getAppContext().getBeansOfType(ProcessApplicationStartupRunner.class);
         TreeMap<Integer, List<ProcessApplicationStartupRunner>> orderedRunners = new TreeMap<>();
         customRunners.forEach((k, v) -> {

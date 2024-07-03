@@ -1,99 +1,96 @@
-package com.netgrif.application.engine.startup
+package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.auth.domain.*
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.stereotype.Component
+import com.netgrif.application.engine.auth.domain.*;
+import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.annotation.RunnerOrder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
-@ConditionalOnProperty(value = "admin.create-super", matchIfMissing = true)
+import java.util.Set;
+
+
+@Slf4j
 @Component
-class SuperCreator extends AbstractOrderedCommandLineRunner {
+@RunnerOrder(15)
+@RequiredArgsConstructor
+@ConditionalOnProperty(value = "admin.create-super", matchIfMissing = true)
+public class SuperCreatorRunner extends AbstractOrderedApplicationRunner {
 
-    private static final Logger log = LoggerFactory.getLogger(SuperCreator.class.name)
+    public static final String SUPER_ADMIN_EMAIL = "super@netgrif.com";
 
-    @Autowired
-    private IAuthorityService authorityService
+    @Value("${nae.admin.password}")
+    private String superAdminPassword;
 
-    @Autowired
-    private IUserService userService
+    private final IAuthorityService authorityService;
+    private final IUserService userService;
+    private final INextGroupService groupService;
+    private final IProcessRoleService processRoleService;
 
-    @Autowired
-    private INextGroupService groupService
-
-    @Autowired
-    private IProcessRoleService processRoleService
-
-    @Value('${nae.admin.password}')
-    private String superAdminPassword
-
-    private IUser superUser
+    @Getter
+    private IUser superUser;
 
     @Override
-    void run(String... strings) {
-        log.info("Creating Super user")
-        createSuperUser()
+    public void run(ApplicationArguments strings) {
+        log.info("Creating Super user");
+        createSuperUser();
     }
 
     private IUser createSuperUser() {
-        Authority adminAuthority = authorityService.getOrCreate(Authority.admin)
-        Authority systemAuthority = authorityService.getOrCreate(Authority.systemAdmin)
+        Authority adminAuthority = authorityService.getOrCreate(Authority.admin);
+        Authority systemAuthority = authorityService.getOrCreate(Authority.systemAdmin);
 
-        IUser superUser = userService.findByEmail("super@netgrif.com", false)
+        IUser superUser = userService.findByEmail(SUPER_ADMIN_EMAIL, false);
         if (superUser == null) {
-            this.superUser = userService.saveNew(new User(
-                    name: "Admin",
-                    surname: "Netgrif",
-                    email: "super@netgrif.com",
-                    password: superAdminPassword,
-                    state: UserState.ACTIVE,
-                    authorities: [adminAuthority, systemAuthority] as Set<Authority>,
-                    processRoles: processRoleService.findAll() as Set<ProcessRole>))
-            log.info("Super user created")
+            User user = new User();
+            user.setName("Admin");
+            user.setSurname("Netgrif");
+            user.setEmail(SUPER_ADMIN_EMAIL);
+            user.setPassword(superAdminPassword);
+            user.setState(UserState.ACTIVE);
+            user.setAuthorities(Set.of(adminAuthority, systemAuthority));
+            user.setProcessRoles(Set.copyOf(processRoleService.findAll()));
+            this.superUser = userService.saveNew(user);
+            log.info("Super user created");
         } else {
-            log.info("Super user detected")
-            this.superUser = superUser
+            log.info("Super user detected");
+            this.superUser = superUser;
         }
 
-        return this.superUser
+        return this.superUser;
     }
 
-    void setAllToSuperUser() {
-        setAllGroups()
-        setAllProcessRoles()
-        setAllAuthorities()
-        log.info("Super user updated")
+    public void setAllToSuperUser() {
+        setAllGroups();
+        setAllProcessRoles();
+        setAllAuthorities();
+        log.info("Super user updated");
     }
 
-
-    void setAllGroups() {
-        groupService.findAllGroups().each {
-            groupService.addUser(superUser, it)
-        }
+    public void setAllGroups() {
+        groupService.findAllGroups().forEach(caze -> groupService.addUser(getSuperUser(), caze));
     }
 
-    void setAllProcessRoles() {
-        superUser.setProcessRoles(processRoleService.findAll() as Set<ProcessRole>)
-        superUser = userService.save(superUser) as IUser
+    public void setAllProcessRoles() {
+        superUser.setProcessRoles(Set.copyOf(processRoleService.findAll()));
+        superUser = userService.save(superUser);
     }
 
-    void setAllAuthorities() {
-        superUser.setAuthorities(authorityService.findAll() as Set<Authority>)
-        superUser = userService.save(superUser) as IUser
+    public void setAllAuthorities() {
+        superUser.setAuthorities(Set.copyOf(authorityService.findAll()));
+        superUser = userService.save(superUser);
     }
 
-    IUser getSuperUser() {
-        return superUser
+    public LoggedUser getLoggedSuper() {
+        return superUser.transformToLoggedUser();
     }
 
-    LoggedUser getLoggedSuper() {
-        return superUser.transformToLoggedUser()
-    }
 }

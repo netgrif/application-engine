@@ -14,6 +14,7 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Filter
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation
@@ -23,8 +24,10 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
-//import com.netgrif.application.engine.workflow.service.interfaces.IFilterService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
+
+//import com.netgrif.application.engine.workflow.service.interfaces.IFilterService
+
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateFilterBody
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
@@ -73,7 +76,7 @@ class ImportHelper {
 //    private IFilterService filterService
 
     @Autowired(required = false)
-    private SuperCreator superCreator
+    private SuperCreatorRunner superCreator
 
     @Autowired
     private IDataService dataService

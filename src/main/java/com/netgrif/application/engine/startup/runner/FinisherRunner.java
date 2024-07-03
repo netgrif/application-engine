@@ -1,18 +1,21 @@
-package com.netgrif.application.engine.startup
+package com.netgrif.application.engine.startup.runner;
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Component
+import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.annotation.RunnerOrder;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
-class FinisherRunner extends AbstractOrderedCommandLineRunner {
-
-    private static final Logger log = LoggerFactory.getLogger(FinisherRunner)
+@RunnerOrder(22)
+public class FinisherRunner extends AbstractOrderedApplicationRunner {
 
     @Override
-    void run(String... strings) throws Exception {
-        log.info("+----------------------------+")
-        log.info("| Netgrif Application Engine |")
-        log.info("+----------------------------+")
+    public void run(ApplicationArguments strings) throws Exception {
+        log.info("+----------------------------+");
+        log.info("| Netgrif Application Engine |");
+        log.info("+----------------------------+");
     }
+
 }

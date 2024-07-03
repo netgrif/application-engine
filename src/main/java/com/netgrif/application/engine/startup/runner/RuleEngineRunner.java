@@ -1,71 +1,76 @@
-package com.netgrif.application.engine.startup
+package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.configuration.drools.interfaces.IRefreshableKieBase
-import com.netgrif.application.engine.configuration.drools.interfaces.IRuleEngineGlobalsProvider
-import groovy.text.SimpleTemplateEngine
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.io.ClassPathResource
-import org.springframework.stereotype.Component
+import com.beust.jcommander.Strings;
+import com.netgrif.application.engine.configuration.drools.interfaces.IRefreshableKieBase;
+import com.netgrif.application.engine.configuration.drools.interfaces.IRuleEngineGlobalsProvider;
+import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.annotation.RunnerOrder;
+import groovy.text.SimpleTemplateEngine;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+
+@Slf4j
 @Component
-class RuleEngineRunner extends AbstractOrderedCommandLineRunner {
+@RunnerOrder(3)
+@RequiredArgsConstructor
+public class RuleEngineRunner extends AbstractOrderedApplicationRunner {
 
-    private static final Logger log = LoggerFactory.getLogger(RuleEngineRunner)
+    @Value("${drools.template.generate:true}")
+    private boolean generate;
 
-    @Autowired
-    private IRefreshableKieBase refreshableKieBase
+    @Value("${drools.template.path:'rules/templates/template.drl'}")
+    private String generatedTemplatePath;
 
-    @Autowired
-    private IRuleEngineGlobalsProvider sessionInitializer
+    @Value("${drools.template-resource.classpath:'rules/templates/template.drl'}")
+    private String templateResource;
 
-    @Value('${drools.template.generate:#{true}}')
-    private boolean generate
-
-    @Value('${drools.template.path:#{"rules/templates/template.drl"}}')
-    private String generatedTemplatePath
-
-    @Value('${drools.template-resource.classpath:#{"rules/templates/template.drl"}}')
-    private String templateResource
+    private final IRefreshableKieBase refreshableKieBase;
+    private final IRuleEngineGlobalsProvider sessionInitializer;
 
     @Override
-    void run(String... strings) throws Exception {
-        log.info("Rule engine runner starting")
+    public void run(ApplicationArguments args) throws Exception {
+        log.info("Rule engine runner starting");
         if (generate) {
-            log.info("Generating template to " + generatedTemplatePath)
-            generateTemplate()
+            log.info("Generating template to {}", generatedTemplatePath);
+            generateTemplate();
         }
-
-        log.info("Loading rules from database")
-        refreshableKieBase.refresh()
-        log.info("Rule engine runner finished")
+        log.info("Loading rules from database");
+        refreshableKieBase.refresh();
+        log.info("Rule engine runner finished");
     }
 
-    void generateTemplate() {
-        def engine = new SimpleTemplateEngine()
-        def binding = [
-                imports: sessionInitializer.imports().collect { "$it" }.join(""),
-                globals: sessionInitializer.globals().collect { "${it.toString()}" }.join(""),
-        ]
+    public void generateTemplate() throws IOException, ClassNotFoundException {
+        SimpleTemplateEngine engine = new SimpleTemplateEngine();
+        LinkedHashMap<String, String> binding = new LinkedHashMap<>(2);
+        binding.put("imports", Strings.join("", sessionInitializer.imports()));
+        binding.put("globals", sessionInitializer.globals().stream().map(Object::toString).collect(Collectors.joining("")));
 
-        String template = engine.createTemplate(new ClassPathResource(templateResource).inputStream.getText()).make(binding)
+        String template = String.valueOf(engine.createTemplate(new String(new ClassPathResource(templateResource).getInputStream().readAllBytes())).make(binding));
 
-        File templateFile = new File(generatedTemplatePath)
-        templateFile.getParentFile().mkdirs()
-        boolean deleted = templateFile.delete()
+        File templateFile = new File(generatedTemplatePath);
+        templateFile.getParentFile().mkdirs();
+        boolean deleted = templateFile.delete();
         if (!deleted) {
-            log.warn("Previous generated template file was not deleted")
+            log.warn("Previous generated template file was not deleted");
         }
 
-        templateFile.createNewFile()
+        templateFile.createNewFile();
         if (!templateFile.exists()) {
-            throw new IllegalStateException("Template file $templateFile.absolutePath was not created")
+            throw new IllegalStateException("Template file " + templateFile.getAbsolutePath() + " was not created");
         }
 
-        templateFile.write(template)
-
-        log.info("Generated template into file ")
+        Files.writeString(templateFile.toPath(), template);
+        log.info("Generated template into file ");
     }
+
 }

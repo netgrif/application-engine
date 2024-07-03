@@ -1,30 +1,33 @@
-package com.netgrif.application.engine.startup
+package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.pdf.generator.config.PdfResource
-import com.netgrif.application.engine.pdf.generator.service.PdfDrawer
-import com.netgrif.application.engine.pdf.generator.service.PdfGenerator
-import groovy.util.logging.Slf4j
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
+import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.annotation.RunnerOrder;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.stereotype.Component;
 
-@Component
 @Slf4j
-class PdfRunner extends AbstractOrderedCommandLineRunner{
+@Component
+@RunnerOrder(20)
+@RequiredArgsConstructor
+public class PdfRunner extends AbstractOrderedApplicationRunner {
 
-    @Autowired
-    private PdfResource resource
+    private final PdfResource resource;
 
     @Override
-    void run(String... args) throws Exception {
-        assert resource.fontTitleResource.exists()
-        assert resource.fontLabelResource.exists()
-        assert resource.fontValueResource.exists()
+    public void run(ApplicationArguments args) throws Exception {
+        assert resource.getFontTitleResource().exists();
+        assert resource.getFontLabelResource().exists();
+        assert resource.getFontValueResource().exists();
 
-        assert resource.checkBoxCheckedResource.exists()
-        assert resource.checkBoxUnCheckedResource.exists()
-        assert resource.radioCheckedResource.exists()
-        assert resource.radioUnCheckedResource.exists()
-        assert resource.booleanCheckedResource.exists()
-        assert resource.booleanUncheckedResource.exists()
+        assert resource.getCheckBoxCheckedResource().exists();
+        assert resource.getCheckBoxUnCheckedResource().exists();
+        assert resource.getRadioCheckedResource().exists();
+        assert resource.getRadioUnCheckedResource().exists();
+        assert resource.getBooleanCheckedResource().exists();
+        assert resource.getBooleanUncheckedResource().exists();
     }
+
 }

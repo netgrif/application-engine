@@ -1,60 +1,83 @@
-package com.netgrif.application.engine.startup
+package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.business.IPostalCodeService
-import com.netgrif.application.engine.business.PostalCode
-import com.netgrif.application.engine.business.PostalCodeRepository
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Profile
-import org.springframework.core.io.ClassPathResource
-import org.springframework.stereotype.Component
+import com.netgrif.application.engine.business.IPostalCodeService;
+import com.netgrif.application.engine.business.PostalCode;
+import com.netgrif.application.engine.business.PostalCodeRepository;
+import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.annotation.RunnerOrder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
+
+
+@Slf4j
 @Component
+@RunnerOrder(18)
 @Profile("!update")
-class PostalCodeImporter extends AbstractOrderedCommandLineRunner {
+@RequiredArgsConstructor
+public class PostalCodeImporter extends AbstractOrderedApplicationRunner {
 
-    private static final Logger log = LoggerFactory.getLogger(PostalCodeImporter.class.name)
+    @Getter
+    @Setter
+    @Value("${nae.postal.codes.import}")
+    private Boolean importPostalCode;
 
-    @Value("\${nae.postal.codes.import}")
-    Boolean importPostalCode
+    @Getter
+    @Setter
+    @Value("${nae.postal.codes.csv}")
+    private String postalCodesPath;
 
-    @Value("\${nae.postal.codes.csv}")
-    String postalCodesPath
+    private final IPostalCodeService service;
+    private final PostalCodeRepository repository;
 
-    @Autowired
-    private IPostalCodeService service
-
-    @Autowired
-    private PostalCodeRepository repository
-
-    void run(String... strings) {
+    public void run(ApplicationArguments strings) throws IOException {
         if (!importPostalCode) {
-            log.info("Skip import postal codes")
-            return
-        }
-        log.info("Importing postal codes from file " + postalCodesPath)
-        def importFile = new ClassPathResource(postalCodesPath).inputStream
-
-        def lineCount = 0
-        importFile.readLines().each {
-            lineCount++
+            log.info("Skip import postal codes");
+            return;
         }
 
-        if (repository.count() == lineCount) {
-            log.info("All $lineCount postal codes have been already imported")
-            return
+        log.info("Importing postal codes from file {}", postalCodesPath);
+        AtomicInteger lineCounter = new AtomicInteger(0);
+        try (Stream<String> lines = Files.lines(new ClassPathResource(postalCodesPath).getFile().toPath())) {
+            lines.parallel().forEach(line -> lineCounter.incrementAndGet());
+        } catch (Exception ex) {
+            log.error("Failed to import postal codes", ex);
         }
 
-        repository.deleteAll()
-
-        importFile = new ClassPathResource(postalCodesPath).inputStream
-        def codes = []
-        importFile.splitEachLine(',') { items ->
-            codes << new PostalCode(items[0].replaceAll("\\s", "").trim(), items[1].trim())
+        if (repository.count() == lineCounter.get()) {
+            log.info("All {} postal codes have been already imported", lineCounter.get());
+            return;
         }
-        service.savePostalCodes(codes)
-        log.info("Postal codes imported")
+
+        repository.deleteAll();
+        List<PostalCode> codes = new ArrayList<>();
+        try (Stream<String> lines = Files.lines(new ClassPathResource(postalCodesPath).getFile().toPath())) {
+            codes = lines.map(line -> {
+                        String[] parts = line.split(",");
+                        if (parts.length < 2) return null;
+                        return new PostalCode(parts[0].replaceAll("\\s", "").trim(), parts[1].trim());
+                    })
+                    .filter(Objects::nonNull)
+                    .toList();
+        } catch (Exception ex) {
+            log.error("Failed to import postal codes", ex);
+        }
+        service.savePostalCodes(codes);
+        log.info("Postal codes imported");
     }
+
 }

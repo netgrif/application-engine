@@ -1,25 +1,26 @@
-package com.netgrif.application.engine.startup
+package com.netgrif.application.engine.startup.runner;
 
+import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.annotation.RunnerOrder;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.stereotype.Component
-
+@Slf4j
 @Component
+@RunnerOrder(21)
+@RequiredArgsConstructor
 @ConditionalOnProperty(value = "admin.create-super", matchIfMissing = true)
-class FinisherRunnerSuperCreator extends AbstractOrderedCommandLineRunner {
+public class FinisherSuperCreatorRunner extends AbstractOrderedApplicationRunner {
 
-    private static final Logger log = LoggerFactory.getLogger(FinisherRunnerSuperCreator)
-
-    @Autowired
-    private SuperCreator superCreator
+    private final SuperCreatorRunner superCreator;
 
     @Override
-    void run(String... strings) throws Exception {
-       superCreator.setAllToSuperUser()
-        log.info("Super Creator update")
+    public void run(ApplicationArguments strings) throws Exception {
+        superCreator.setAllToSuperUser();
+        log.info("Super Creator update");
     }
 
 }
