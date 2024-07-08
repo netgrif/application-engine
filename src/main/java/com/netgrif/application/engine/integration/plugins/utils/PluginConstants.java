@@ -16,6 +16,7 @@ public class PluginConstants {
     public static final String ENTRY_POINT_NAME_FIELD_ID = "name";
     public static final String METHOD_NAME_FIELD_ID = "name";
     public static final String METHOD_ARGUMENTS_FIELD_ID = "arguments";
+    public static final String METHOD_RETURN_TYPE_FIELD_ID = "return_type";
     public static final String METHOD_HASHED_SIGNATURE_FIELD_ID = "hashed_signature";
 
     public static final String PLUGIN_ACTIVATE_TRANS_ID = "activate";

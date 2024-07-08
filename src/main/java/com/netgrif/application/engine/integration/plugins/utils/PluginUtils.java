@@ -153,6 +153,13 @@ public class PluginUtils {
     }
 
     /**
+     * Finds method arguments from the dataSet of the provided method case
+     * */
+    public static String getMethodReturnType(Case methodCase) {
+        return (String) methodCase.getFieldValue(PluginConstants.METHOD_RETURN_TYPE_FIELD_ID);
+    }
+
+    /**
      * Finds method signature hash from the dataSet of the provided method case
      * */
     public static String getMethodSignatureHash(Case methodCase) {

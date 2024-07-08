@@ -48,17 +48,23 @@
 		<title name="arguments">Method arguments</title>
 	</data>
 	<data type="text">
+		<id>return_type</id>
+		<title name="return_type">Output type</title>
+	</data>
+	<data type="text">
 		<id>hashed_signature</id>
 		<title/>
 	</data>
 	<i18n locale="sk">
 		<i18nString name="name">Názov</i18nString>
 		<i18nString name="arguments">Argumenty funkcie</i18nString>
+		<i18nString name="return_type">Typ výstupu funkcie</i18nString>
 		<i18nString name="detail">Detail</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="name">Name</i18nString>
 		<i18nString name="arguments">Methodenargumente</i18nString>
+		<i18nString name="return_type">Methode Ausgabetyp</i18nString>
 		<i18nString name="detail">Detail</i18nString>
 	</i18n>
 	<transition>
@@ -92,6 +98,20 @@
 				<layout>
 					<x>0</x>
 					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>return_type</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
 					<rows>1</rows>
 					<cols>4</cols>
 					<template>material</template>

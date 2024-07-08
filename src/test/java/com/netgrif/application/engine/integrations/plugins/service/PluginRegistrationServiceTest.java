@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.integrations.plugins.service;
 
-import com.google.protobuf.ByteString;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
@@ -17,7 +16,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import com.netgrif.pluginlibrary.core.*;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
-import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,6 +93,7 @@ public class PluginRegistrationServiceTest {
         List<String> methodArgs = getMethodArguments(methodCase);
         assert methodArgs.size() == 1;
         assert methodArgs.get(0).equals(MockPlugin.mockArgumentType.getName());
+        assert getMethodReturnType(methodCase).equals(MockPlugin.mockOutputType.getName());
         testIsInjected();
 
         Thread.sleep(ELASTIC_WAIT_TIME_IN_MS);
@@ -213,11 +212,11 @@ public class PluginRegistrationServiceTest {
                         .setName("epName")
                         .addMethods(Method.newBuilder()
                                 .setName("method1")
-                                .addArgs(ByteString.copyFrom(SerializationUtils.serialize(Integer.class)))
+                                .addArgs(Integer.class.getName())
                                 .build())
                         .addMethods(Method.newBuilder()
                                 .setName("method1")
-                                .addArgs(ByteString.copyFrom(SerializationUtils.serialize(Double.class)))
+                                .addArgs(Double.class.getName())
                                 .build())
                         .build())
                 .build();

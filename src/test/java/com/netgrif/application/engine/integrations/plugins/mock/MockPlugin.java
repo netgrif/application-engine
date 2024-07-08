@@ -13,6 +13,7 @@ public class MockPlugin {
     public static String mockEntryPointName = "mockEntryPoint";
     public static String mockMethodName = "mockMethodName";
     public static final Class<String> mockArgumentType = String.class;
+    public static final Class<Double> mockOutputType = Double.class;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void registerOrActivatePlugin() {
@@ -30,7 +31,8 @@ public class MockPlugin {
                         .setName(mockEntryPointName)
                         .addMethods(Method.newBuilder()
                                 .setName(mockMethodName)
-                                .addArgs(ByteString.copyFrom(SerializationUtils.serialize(mockArgumentType)))
+                                .addArgs(mockArgumentType.getName())
+                                .setReturnType(mockOutputType.getName())
                                 .build())
                         .build())
                 .build());

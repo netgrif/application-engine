@@ -32,7 +32,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.util.SerializationUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -171,7 +170,7 @@ public class PluginService implements IPluginService {
             try {
                 Task deactivateTask = utils.safelyAssignTask(taskId).getTask();
                 taskService.finishTask(deactivateTask, user);
-//                pluginInjector.uninject(pluginOpt.get());
+                pluginInjector.uninject(pluginOpt.get());
             } catch (TransitionNotExecutableException e) {
                 throw new RuntimeException(e);
             }
@@ -352,14 +351,7 @@ public class PluginService implements IPluginService {
 
         try {
             for (com.netgrif.pluginlibrary.core.Method method : entryPoint.getMethodsList()) {
-                List<String> argTypesAsString = method.getArgsList().stream()
-                        .map(arg -> {
-                            Class<?> clazz = (Class<?>) deserializeObject(arg);
-                            assert clazz != null;
-                            return clazz.getName();
-                        })
-                        .collect(Collectors.toList());
-                GetOrCreateOutcome methodOutcome = getOrCreateMethodCase(method, loggedUser, argTypesAsString, existingMethodCases);
+                GetOrCreateOutcome methodOutcome = getOrCreateMethodCase(method, loggedUser, method.getArgsList(), existingMethodCases);
 
                 Case methodCase = methodOutcome.getSubjectCase();
                 if (methodOutcome.isNew()) {
@@ -371,8 +363,10 @@ public class PluginService implements IPluginService {
                 Map<String, Map<String, Object>> dataToSet = new HashMap<>();
                 dataToSet.put(METHOD_NAME_FIELD_ID, Map.of("value", method.getName(),
                         "type", FieldType.TEXT.getName()));
-                dataToSet.put(METHOD_ARGUMENTS_FIELD_ID, Map.of("value", argTypesAsString, "type",
+                dataToSet.put(METHOD_ARGUMENTS_FIELD_ID, Map.of("value", method.getArgsList(), "type",
                         FieldType.STRING_COLLECTION.getName()));
+                dataToSet.put(METHOD_RETURN_TYPE_FIELD_ID, Map.of("value", method.getReturnType(), "type",
+                        FieldType.TEXT.getName()));
                 dataToSet.put(METHOD_HASHED_SIGNATURE_FIELD_ID, Map.of("value", methodOutcome.getAdditionalData(),
                         "type", FieldType.TEXT.getName()));
 
