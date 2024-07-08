@@ -248,14 +248,6 @@ public class PluginService implements IPluginService {
         return taskService.finishTask(activateTask, user).getCase();
     }
 
-    private String inject(Case plugin, String state) {
-        pluginInjector.inject(plugin);
-
-        String responseMsg = String.format("Plugin with identifier \"%s\" was %s.", getPluginIdentifier(plugin), state);
-        log.info(responseMsg);
-        return responseMsg;
-    }
-
     private Case createOrUpdatePluginCase(RegistrationRequest request, Optional<Case> pluginCaseOpt) throws NoSuchAlgorithmException {
         Set<String> createdCaseIds = new HashSet<>();
         LoggedUser loggedUser = userService.getLoggedOrSystem().transformToLoggedUser();

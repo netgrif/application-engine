@@ -60,6 +60,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.*
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
+import groovy.time.TimeCategory
 import groovy.transform.NamedVariant
 import org.bson.types.ObjectId
 import org.quartz.Scheduler
@@ -73,6 +74,7 @@ import org.springframework.core.io.FileSystemResource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import com.netgrif.application.engine.integration.plugin.injector.PluginHolder
 
 import java.text.Normalizer
 import java.time.ZoneId
@@ -191,6 +193,8 @@ class ActionDelegate {
 
     FrontendActionOutcome Frontend
 
+    PluginHolder Plugin
+
     /**
      * Reference of case and task in which current action is taking place.
      */
@@ -212,6 +216,7 @@ class ActionDelegate {
         this.initTransitionsMap(action.transitionIds)
         this.outcomes = new ArrayList<>()
         this.Frontend = new FrontendActionOutcome(this.useCase, this.task, this.outcomes)
+        this.Plugin = new PluginHolder()
     }
 
     def initFieldsMap(Map<String, String> fieldIds) {

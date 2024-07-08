@@ -35,7 +35,7 @@ class PluginInjector {
     }
 
     protected void updateMetaClasses(Case pluginCase, boolean isRemoval) {
-        MetaClass actionDelegateMeta = ActionDelegate.metaClass
+        MetaClass keyClassMeta = PluginHolder.metaClass
         MetaClass pluginMetaClass = PluginMeta.metaClass
 
         List<Case> entryPointCases = utils.getPluginEntryPoints(pluginCase)
@@ -62,6 +62,6 @@ class PluginInjector {
             }
             pluginMetaClass[epName] = isRemoval ? null : new EntryPointMeta()
         }
-        actionDelegateMeta[pluginName] = isRemoval ? null : new PluginMeta()
+        keyClassMeta[pluginName] = isRemoval ? null : new PluginMeta()
     }
 }
