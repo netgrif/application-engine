@@ -92,7 +92,7 @@ public final class ProcessResourceId implements Comparable<ProcessResourceId>, S
         }
     }
 
-    private static String decodeShortProcessId(String shortProcessId) {
+    public static String decodeShortProcessId(String shortProcessId) {
         if (shortProcessId == null || shortProcessId.isEmpty()) {
             return null;
         }

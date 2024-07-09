@@ -268,7 +268,7 @@ public class UriService implements IUriService {
             uriNode = new UriNode();
             uriNode.setName(uriProperties.getName());
             uriNode.setLevel(FIRST_LEVEL);
-            uriNode.setPath(uriProperties.getSeparator());
+            uriNode.setPath(uriProperties.getSeparator() + uriProperties.getName());
             uriNode.setParentId(null);
             uriNode.addContentType(UriContentType.DEFAULT);
             uriNode = uriNodeRepository.save(uriNode);

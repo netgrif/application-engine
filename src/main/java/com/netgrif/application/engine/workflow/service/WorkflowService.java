@@ -148,13 +148,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case findOneNoNet(String caseId) {
-        String[] parts = caseId.split("-");
-        if (parts.length < 2) {
-            throw new IllegalArgumentException("Invalid NetgrifId format: " + caseId);
-        }
-        String objectIdPart = parts[1];
-
-        ObjectId objectId = new ObjectId(objectIdPart);
+        ObjectId objectId = extractObjectId(caseId);
         Optional<Case> caseOptional = repository.findByIdObjectId(objectId);
         if (caseOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
@@ -414,7 +408,7 @@ public class WorkflowService implements IWorkflowService {
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
         log.info("[" + useCase.getStringId() + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting case " + useCase.getTitle());
 
-        taskService.deleteTasksByCase(useCase.getStringId());
+        //taskService.deleteTasksByCase(useCase.getStringId());
         repository.delete(useCase);
 
         outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty(), params));
@@ -471,7 +465,8 @@ public class WorkflowService implements IWorkflowService {
         if (tasks.isEmpty()) {
             return true;
         }
-        Optional<Case> caseOptional = repository.findById(caseId);
+        ObjectId objectId = extractObjectId(caseId);
+        Optional<Case> caseOptional = repository.findByIdObjectId(objectId);
         if (caseOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
         }
@@ -530,7 +525,8 @@ public class WorkflowService implements IWorkflowService {
 
     @Deprecated
     public List<Field> getData(String caseId) {
-        Optional<Case> optionalUseCase = repository.findById(caseId);
+        ObjectId objectId = extractObjectId(caseId);
+        Optional<Case> optionalUseCase = repository.findByIdObjectId(objectId);
         if (!optionalUseCase.isPresent())
             throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
         Case useCase = optionalUseCase.get();
@@ -638,5 +634,15 @@ public class WorkflowService implements IWorkflowService {
             outcome.setMessage(net.getCaseEvents().get(type).getMessage());
         }
         return outcome;
+    }
+
+    private ObjectId extractObjectId(String caseId) {
+        String[] parts = caseId.split("-");
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Invalid NetgrifId format: " + caseId);
+        }
+        String objectIdPart = parts[1];
+
+        return new ObjectId(objectIdPart);
     }
 }
