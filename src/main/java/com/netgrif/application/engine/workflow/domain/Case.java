@@ -3,6 +3,7 @@ package com.netgrif.application.engine.workflow.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.auth.domain.Author;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.PetriNetIdentifier;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
@@ -50,6 +51,10 @@ public class Case implements Serializable {
     @NotNull
     @Indexed
     private String processIdentifier;
+    /**
+     * Contains identifiers of super petri nets. The last element is the closest parent, the first is the furthest parent.
+     * */
+    private List<PetriNetIdentifier> parentPetriNetIdentifiers;
     @org.springframework.data.mongodb.core.mapping.Field("activePlaces")
     @JsonIgnore
     private Map<String, Integer> activePlaces = new HashMap<>();
@@ -105,6 +110,7 @@ public class Case implements Serializable {
         this.petriNet = petriNet;
         petriNetObjectId = petriNet.getObjectId();
         processIdentifier = petriNet.getIdentifier();
+        parentPetriNetIdentifiers = new ArrayList<>(petriNet.getParentIdentifiers());
         activePlaces = petriNet.getActivePlaces();
         visualId = generateVisualId();
         enabledRoles = petriNet.getRoles().keySet();
