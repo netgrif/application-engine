@@ -408,7 +408,7 @@ public class WorkflowService implements IWorkflowService {
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
         log.info("[" + useCase.getStringId() + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting case " + useCase.getTitle());
 
-        //taskService.deleteTasksByCase(useCase.getStringId());
+        taskService.deleteTasksByCase(useCase.getStringId());
         repository.delete(useCase);
 
         outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty(), params));
