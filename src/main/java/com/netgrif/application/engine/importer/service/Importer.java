@@ -31,6 +31,7 @@ import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.application.engine.petrinet.domain.roles.AssignedUserPermission;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.ArcFactory;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
@@ -48,6 +49,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -70,9 +72,6 @@ public class Importer {
     protected ProcessRole anonymousRole;
     @Getter
     protected Map<String, ProcessRole> roles;
-    protected Map<String, Field<?>> fields;
-    protected Map<String, Transition> transitions;
-    protected Map<String, Place> places;
     protected Map<String, Transaction> transactions;
     protected Map<String, I18nString> i18n;
     protected Map<String, Action> actions;
@@ -93,6 +92,9 @@ public class Importer {
 
     @Autowired
     protected IProcessRoleService processRoleService;
+
+    @Autowired
+    protected IPetriNetService petriNetService;
 
     @Autowired
     protected ArcFactory arcFactory;
@@ -149,9 +151,6 @@ public class Importer {
 
     protected void initialize() {
         this.roles = new HashMap<>();
-        this.transitions = new HashMap<>();
-        this.places = new HashMap<>();
-        this.fields = new HashMap<>();
         this.transactions = new HashMap<>();
         this.defaultRole = processRoleService.defaultRole();
         this.anonymousRole = processRoleService.anonymousRole();
@@ -178,10 +177,11 @@ public class Importer {
     }
 
     protected Optional<PetriNet> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
-        net = new PetriNet();
+        initializePetriNet();
 
         documentValidator.checkConflictingAttributes(document, document.getUsersRef(), document.getUserRef(), "usersRef", "userRef");
         documentValidator.checkDeprecatedAttributes(document);
+
         document.getI18N().forEach(this::addI18N);
 
         setMetaData();
@@ -220,10 +220,44 @@ public class Importer {
             net.setDefaultCaseName(toI18NString(document.getCaseName()));
         }
         if (document.getTags() != null) {
-            net.setTags(this.buildTagsMap(document.getTags().getTag()));
+            document.getTags().getTag().forEach(this::addTag);
         }
 
         return Optional.of(net);
+    }
+
+    protected void initializePetriNet() throws IllegalArgumentException {
+        Extension extension = document.getExtends();
+        if (extension != null) {
+            initializeWithChildPetriNet(extension);
+        } else {
+            net = new PetriNet();
+        }
+    }
+
+    protected void initializeWithChildPetriNet(Extension extension) {
+        if (areExtensionAttributesEmpty(extension)) {
+            throw new IllegalArgumentException("Parent identifier or version is empty.");
+        }
+        PetriNet parentNet = petriNetService.getPetriNet(extension.getId(), Version.of(extension.getVersion()));
+        if (parentNet == null) {
+            throw new IllegalArgumentException("Parent petri net not found.");
+        }
+        net = parentNet.clone();
+        // transition must be removed since it's going to be added later with proper data
+        net.setCreationDate(LocalDateTime.now());
+        net.getTransitions().remove(allDataConfiguration.getAllData().getId());
+        net.setObjectId(new ObjectId());
+        net.addParentIdentifier(new PetriNetIdentifier(
+                parentNet.getIdentifier(),
+                parentNet.getVersion(),
+                parentNet.getObjectId()
+        ));
+    }
+
+    protected static boolean areExtensionAttributesEmpty(Extension extension) {
+        return extension.getId() == null || extension.getId().isBlank()
+                || extension.getVersion() == null || extension.getVersion().isBlank();
     }
 
     protected void addAllDataTransition() {
@@ -264,6 +298,10 @@ public class Importer {
         }
         allDataTransition.getDataGroup().add(allDataGroup);
         document.getTransition().add(allDataTransition);
+    }
+
+    protected void addTag(Tag tag) {
+        net.addTag(tag.getKey(), tag.getValue());
     }
 
     protected void resolveRoleRef(CaseRoleRef roleRef) {
@@ -484,7 +522,7 @@ public class Importer {
             arc.setMultiplicity(importArc.getMultiplicity());
         }
         if (importArc.getReference() != null) {
-            if (!places.containsKey(importArc.getReference()) && !fields.containsKey(importArc.getReference())) {
+            if (!net.getPlaces().containsKey(importArc.getReference()) && !net.getDataSet().containsKey(importArc.getReference())) {
                 throw new IllegalArgumentException("Place or Data variable with id [" + importArc.getReference() + "] referenced by Arc [" + importArc.getId() + "] could not be found.");
             }
             Reference reference = new Reference();
@@ -493,7 +531,7 @@ public class Importer {
         }
 //      It has to be here for backwards compatibility of variable arcs
         if (arc.getReference() != null) {
-            arc.getReference().setType((places.containsKey(arc.getReference().getReference())) ? Type.PLACE : Type.DATA);
+            arc.getReference().setType((net.getPlaces().containsKey(arc.getReference().getReference())) ? Type.PLACE : Type.DATA);
         }
         if (importArc.getBreakpoint() != null) {
             importArc.getBreakpoint().forEach(position -> arc.getBreakpoints().add(new Position(position.getX(), position.getY())));
@@ -504,9 +542,7 @@ public class Importer {
 
     protected void createDataSet(Data importData) throws MissingIconKeyException {
         Field<?> field = fieldFactory.getField(importData, this);
-
         net.addDataSetField(field);
-        fields.put(importData.getId(), field);
     }
 
     protected void createTransition(com.netgrif.application.engine.importer.model.Transition importTransition) throws MissingIconKeyException {
@@ -578,7 +614,6 @@ public class Importer {
         }
 
         net.addTransition(transition);
-        transitions.put(importTransition.getId(), transition);
     }
 
     protected void addAssignedUserPolicy(com.netgrif.application.engine.importer.model.Transition importTransition, Transition transition) {
@@ -1056,7 +1091,6 @@ public class Importer {
         place.setTitle(importPlace.getLabel() != null ? toI18NString(importPlace.getLabel()) : new I18nString(""));
 
         net.addPlace(place);
-        places.put(importPlace.getId(), place);
     }
 
     protected void createRole(Role importRole) {
@@ -1123,9 +1157,9 @@ public class Importer {
     }
 
     protected Node getNode(String id) {
-        if (places.containsKey(id)) {
+        if (net.getPlaces().containsKey(id)) {
             return getPlace(id);
-        } else if (transitions.containsKey(id)) {
+        } else if (net.getTransitions().containsKey(id)) {
             return getTransition(id);
         }
         throw new IllegalArgumentException("Node with id [" + id + "] not found.");
@@ -1249,7 +1283,7 @@ public class Importer {
     }
 
     public Field<?> getField(String id) {
-        Field<?> field = fields.get(id);
+        Field<?> field = net.getDataSet().get(id);
         if (field == null) {
             throw new IllegalArgumentException("Field " + id + " not found");
         }
@@ -1257,7 +1291,7 @@ public class Importer {
     }
 
     public Transition getTransition(String id) {
-        Transition transition = transitions.get(id);
+        Transition transition = net.getTransitions().get(id);
         if (transition == null) {
             throw new IllegalArgumentException("Transition " + id + " not found");
         }
@@ -1265,7 +1299,7 @@ public class Importer {
     }
 
     public Place getPlace(String id) {
-        Place place = places.get(id);
+        Place place = net.getPlaces().get(id);
         if (place == null) {
             throw new IllegalArgumentException("Place " + id + " not found");
         }

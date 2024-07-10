@@ -116,12 +116,12 @@ class PetriNetServiceTest {
         assert taskRepository.count() == taskCount + 3
         assert processRoleRepository.count() == processRoleCount + 2
 
-        def user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
+        def user = userService.findByEmail(CUSTOMER_USER_MAIL)
         assert user != null
         assert user.processRoles.size() == 1
 
         userService.addRole(user, testNet.roles.values().collect().get(0).stringId)
-        user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
+        user = userService.findByEmail(CUSTOMER_USER_MAIL)
         assert user != null
         assert user.processRoles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
@@ -133,7 +133,7 @@ class PetriNetServiceTest {
         assert caseRepository.findAllByProcessIdentifier(testNetOptional.getNet().getImportId()).size() == 0
         assert taskRepository.count() == taskCount
         assert processRoleRepository.count() == processRoleCount
-        user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
+        user = userService.findByEmail(CUSTOMER_USER_MAIL)
         assert user != null
         assert user.processRoles.size() == 1
 
@@ -161,9 +161,9 @@ class PetriNetServiceTest {
 
     @Test
     void processSearch() {
-        long processCount = petriNetRepository.count()
+        int processCount = (int) petriNetRepository.count()
 
-        def user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
+        def user = userService.findByEmail(CUSTOMER_USER_MAIL)
         assert user != null
         petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         petriNetService.importPetriNet(stream(NET_SEARCH_FILE), VersionType.MAJOR, user.transformToLoggedUser())

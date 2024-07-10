@@ -14,10 +14,13 @@ import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
+import com.netgrif.application.engine.utils.UniqueKeyMap;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -26,12 +29,20 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Document
+@CompoundIndex(name = "cmp-idx-one", def = "{'identifier': 1, 'version.major': -1, 'version.minor': -1, 'version.patch': -1}")
 public class PetriNet extends PetriNetObject {
-
 
     @Getter
     @Setter
-    private String identifier; //combination of identifier and version must be unique ... maybe use @CompoundIndex?
+    @Indexed
+    private String identifier;
+
+    /**
+     * Contains identifiers of super nets. The last element is the closest parent, the first is the furthest parent.
+     * */
+    @Getter
+    @Setter
+    private List<PetriNetIdentifier> parentIdentifiers;
 
     @Getter
     @Setter
@@ -80,23 +91,23 @@ public class PetriNet extends PetriNetObject {
     @org.springframework.data.mongodb.core.mapping.Field("places")
     @Getter
     @Setter
-    private LinkedHashMap<String, Place> places;
+    private UniqueKeyMap<String, Place> places;
 
     @org.springframework.data.mongodb.core.mapping.Field("transitions")
     @Getter
     @Setter
-    private LinkedHashMap<String, Transition> transitions;
+    private UniqueKeyMap<String, Transition> transitions;
 
     @org.springframework.data.mongodb.core.mapping.Field("arcs")
     @Getter
     @Setter
     // TODO: release/8.0.0 save sorted by execution priority
-    private LinkedHashMap<String, List<Arc>> arcs;//todo: import id
+    private UniqueKeyMap<String, List<Arc>> arcs;//todo: import id
 
     @org.springframework.data.mongodb.core.mapping.Field("dataset")
     @Getter
     @Setter
-    private LinkedHashMap<String, Field<?>> dataSet;
+    private UniqueKeyMap<String, Field<?>> dataSet;
 
     @org.springframework.data.mongodb.core.mapping.Field("roles")
     @DBRef
@@ -107,7 +118,7 @@ public class PetriNet extends PetriNetObject {
     @org.springframework.data.mongodb.core.mapping.Field("transactions")
     @Getter
     @Setter
-    private LinkedHashMap<String, Transaction> transactions;//todo: import id
+    private UniqueKeyMap<String, Transaction> transactions;//todo: import id
 
     @Getter
     @Setter
@@ -148,21 +159,30 @@ public class PetriNet extends PetriNetObject {
         this.title = new I18nString("");
         this.importId = "";
         this.version = new Version();
+        parentIdentifiers = new ArrayList<>();
         defaultCaseName = new I18nString("");
         creationDate = LocalDateTime.now();
-        places = new LinkedHashMap<>();
-        transitions = new LinkedHashMap<>();
-        arcs = new LinkedHashMap<>();
-        dataSet = new LinkedHashMap<>();
-        roles = new LinkedHashMap<>();
+        places = new UniqueKeyMap<>();
+        transitions = new UniqueKeyMap<>();
+        arcs = new UniqueKeyMap<>();
+        dataSet = new UniqueKeyMap<>();
+        roles = new UniqueKeyMap<>();
         negativeViewRoles = new LinkedList<>();
-        transactions = new LinkedHashMap<>();
+        transactions = new UniqueKeyMap<>();
         processEvents = new LinkedHashMap<>();
         caseEvents = new LinkedHashMap<>();
         permissions = new HashMap<>();
         userRefs = new HashMap<>();
         functions = new LinkedList<>();
-        tags = new HashMap<>();
+        tags = new UniqueKeyMap<>();
+    }
+
+    public void addParentIdentifier(PetriNetIdentifier identifier) {
+        parentIdentifiers.add(identifier);
+    }
+
+    public void addTag(String tagKey, String tagValue) {
+        tags.put(tagKey, tagValue);
     }
 
     public void addPlace(Place place) {
@@ -398,6 +418,7 @@ public class PetriNet extends PetriNetObject {
     public PetriNet clone() {
         PetriNet clone = new PetriNet();
         clone.setIdentifier(this.identifier);
+        clone.setParentIdentifiers(this.parentIdentifiers.stream().map(PetriNetIdentifier::clone).collect(Collectors.toList()));
         clone.setUriNodeId(this.uriNodeId);
         clone.setInitials(this.initials);
         clone.setTitle(this.title.clone());
@@ -408,25 +429,25 @@ public class PetriNet extends PetriNetObject {
         clone.setCreationDate(this.creationDate);
         clone.setVersion(this.version == null ? null : this.version.clone());
         clone.setAuthor(this.author == null ? null : this.author.clone());
-        clone.setTransitions(this.transitions == null ? null : this.transitions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, LinkedHashMap::new)));
-        clone.setRoles(this.roles == null ? null : this.roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, LinkedHashMap::new)));
-        clone.setTransactions(this.transactions == null ? null : this.transactions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, LinkedHashMap::new)));
+        clone.setTransitions(this.transitions == null ? null : this.transitions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, UniqueKeyMap::new)));
+        clone.setRoles(this.roles == null ? null : this.roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, UniqueKeyMap::new)));
+        clone.setTransactions(this.transactions == null ? null : this.transactions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, UniqueKeyMap::new)));
         clone.setImportXmlPath(this.importXmlPath);
         clone.setImportId(this.importId);
         clone.setObjectId(this.id);
         clone.setDataSet(this.dataSet.entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x, y) -> y, LinkedHashMap::new))
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x,y)->y, UniqueKeyMap::new))
         );
         clone.setPlaces(this.places.entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x, y) -> y, LinkedHashMap::new))
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x,y)->y, UniqueKeyMap::new))
         );
         clone.setArcs(this.arcs.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
                         .map(Arc::clone)
-                        .collect(Collectors.toList()), (x, y) -> y, LinkedHashMap::new))
+                        .collect(Collectors.toList()), (x,y)->y, UniqueKeyMap::new))
         );
         clone.initializeArcs();
         clone.setCaseEvents(this.caseEvents == null ? null : this.caseEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
@@ -435,7 +456,7 @@ public class PetriNet extends PetriNetObject {
         clone.setUserRefs(this.userRefs == null ? null : this.userRefs.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
         this.getNegativeViewRoles().forEach(clone::addNegativeViewRole);
         this.getFunctions().forEach(clone::addFunction);
-        clone.setTags(new HashMap<>(this.tags));
+        clone.setTags(new UniqueKeyMap<>(this.tags));
         return clone;
     }
 }

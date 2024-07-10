@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document>
+    <id>super_parent_to_be_extended</id>
+    <version>1.0.0</version>
+    <initials>SPE</initials>
+    <title>Super parent test net to be extended</title>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+
+    <tags>
+        <tag key="tag0">tag0</tag>
+    </tags>
+
+    <role>
+        <id>role0</id>
+        <title>Role 0</title>
+    </role>
+
+    <data type="text">
+        <id>variable0</id>
+        <title>Attribute0</title>
+    </data>
+
+    <transition>
+        <id>t0</id>
+        <label>Test</label>
+        <x>0</x>
+        <y>0</y>
+        <dataGroup>
+            <id>dg</id>
+            <layout>legacy</layout>
+            <dataRef>
+                <id>variable0</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+
+    <place>
+        <id>p0</id>
+        <x>0</x>
+        <y>0</y>
+        <tokens>1</tokens>
+    </place>
+
+    <arc>
+        <id>a0</id>
+        <type>regular</type>
+        <sourceId>p0</sourceId>
+        <destinationId>t0</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+
+</document>

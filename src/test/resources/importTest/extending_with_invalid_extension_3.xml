@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document>
+    <id>extending_with_invalid_extension_3</id>
+    <version>1.0.0</version>
+    <initials>EIE</initials>
+    <title>Extending with invalid extension - wrong version</title>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+
+    <extends>
+        <id>parent_to_be_extended</id>
+        <version>100</version>
+    </extends>
+
+</document>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document>
+    <id>child_extending_parent</id>
+    <version>1.0.0</version>
+    <initials>CEP</initials>
+    <title>Child extending parent</title>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+
+    <extends>
+        <id>parent_to_be_extended</id>
+        <version>1.1.0</version>
+    </extends>
+
+    <tags>
+        <tag key="tag2">tag2</tag>
+    </tags>
+
+    <role>
+        <id>role2</id>
+        <title>Role 2</title>
+    </role>
+
+    <data type="text">
+        <id>variable2</id>
+        <title>Attribute2</title>
+    </data>
+
+    <data type="taskRef">
+        <id>taskref2</id>
+        <title>TaskRef2</title>
+        <init>t0</init>
+    </data>
+
+    <transition>
+        <id>t2</id>
+        <label>Test</label>
+        <x>0</x>
+        <y>0</y>
+        <dataGroup>
+            <id>dg</id>
+            <layout>legacy</layout>
+            <dataRef>
+                <id>variable1</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+
+    <place>
+        <id>p2</id>
+        <x>0</x>
+        <y>0</y>
+        <tokens>1</tokens>
+    </place>
+
+    <arc>
+        <id>a2</id>
+        <type>regular</type>
+        <sourceId>p2</sourceId>
+        <destinationId>t2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+
+    <arc>
+        <id>a3</id>
+        <type>regular</type>
+        <sourceId>t1</sourceId>
+        <destinationId>p2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+
+    <arc>
+        <id>a4</id>
+        <type>regular</type>
+        <sourceId>t0</sourceId>
+        <destinationId>p2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+
+</document>
