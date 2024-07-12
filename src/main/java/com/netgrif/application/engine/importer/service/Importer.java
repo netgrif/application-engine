@@ -253,6 +253,13 @@ public class Importer {
                 parentNet.getVersion(),
                 parentNet.getObjectId()
         ));
+        LinkedHashMap<String, ProcessRole> processRolesWithNewIds = new LinkedHashMap<>();
+        for (Map.Entry<String, ProcessRole> entry : net.getRoles().entrySet()) {
+            ObjectId newId = new ObjectId();
+            entry.getValue().setId(newId);
+            processRolesWithNewIds.put(newId.toString(), entry.getValue());
+        }
+        net.setRoles(processRolesWithNewIds);
     }
 
     protected static boolean areExtensionAttributesEmpty(Extension extension) {
