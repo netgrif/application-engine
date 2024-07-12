@@ -91,34 +91,34 @@ public class PetriNet extends PetriNetObject {
     @org.springframework.data.mongodb.core.mapping.Field("places")
     @Getter
     @Setter
-    private UniqueKeyMap<String, Place> places;
+    private Map<String, Place> places;
 
     @org.springframework.data.mongodb.core.mapping.Field("transitions")
     @Getter
     @Setter
-    private UniqueKeyMap<String, Transition> transitions;
+    private Map<String, Transition> transitions;
 
     @org.springframework.data.mongodb.core.mapping.Field("arcs")
     @Getter
     @Setter
     // TODO: release/8.0.0 save sorted by execution priority
-    private UniqueKeyMap<String, List<Arc>> arcs;//todo: import id
+    private Map<String, List<Arc>> arcs;//todo: import id
 
     @org.springframework.data.mongodb.core.mapping.Field("dataset")
     @Getter
     @Setter
-    private UniqueKeyMap<String, Field<?>> dataSet;
+    private Map<String, Field<?>> dataSet;
 
     @org.springframework.data.mongodb.core.mapping.Field("roles")
     @DBRef
     @Getter
     @Setter
-    private LinkedHashMap<String, ProcessRole> roles;
+    private Map<String, ProcessRole> roles;
 
     @org.springframework.data.mongodb.core.mapping.Field("transactions")
     @Getter
     @Setter
-    private UniqueKeyMap<String, Transaction> transactions;//todo: import id
+    private Map<String, Transaction> transactions;//todo: import id
 
     @Getter
     @Setter
@@ -166,7 +166,7 @@ public class PetriNet extends PetriNetObject {
         transitions = new UniqueKeyMap<>();
         arcs = new UniqueKeyMap<>();
         dataSet = new UniqueKeyMap<>();
-        roles = new UniqueKeyMap<>();
+        roles = new LinkedHashMap<>();
         negativeViewRoles = new LinkedList<>();
         transactions = new UniqueKeyMap<>();
         processEvents = new LinkedHashMap<>();
@@ -430,7 +430,7 @@ public class PetriNet extends PetriNetObject {
         clone.setVersion(this.version == null ? null : this.version.clone());
         clone.setAuthor(this.author == null ? null : this.author.clone());
         clone.setTransitions(this.transitions == null ? null : this.transitions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, UniqueKeyMap::new)));
-        clone.setRoles(this.roles == null ? null : this.roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, UniqueKeyMap::new)));
+        clone.setRoles(this.roles == null ? null : this.roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, LinkedHashMap::new)));
         clone.setTransactions(this.transactions == null ? null : this.transactions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, UniqueKeyMap::new)));
         clone.setImportXmlPath(this.importXmlPath);
         clone.setImportId(this.importId);
