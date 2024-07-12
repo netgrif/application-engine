@@ -1,9 +1,13 @@
 package com.netgrif.application.engine.configuration.security;
 
 import com.netgrif.application.engine.auth.domain.*;
+import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
-import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
@@ -15,37 +19,35 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
 
 @Slf4j
 public class PublicAuthenticationFilter extends OncePerRequestFilter {
 
     private final static String JWT_HEADER_NAME = "X-Jwt-Token";
     private final static String BEARER = "Bearer ";
+    private final static String USER = "user";
     private final ProviderManager authenticationManager;
     private final AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
-    private final Authority anonymousAuthority;
     private final String[] anonymousAccessUrls;
     private final String[] exceptions;
 
     private final IJwtService jwtService;
     private final IUserService userService;
+    private final IAuthorityService authorityService;
 
     public PublicAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider,
-                                      Authority anonymousAuthority, String[] urls, String[] exceptions, IJwtService jwtService,
-                                      IUserService userService) {
+                                      String[] urls, String[] exceptions, IJwtService jwtService,
+                                      IUserService userService, IAuthorityService authorityService) {
         this.authenticationManager = authenticationManager;
         this.authenticationManager.getProviders().add(provider);
-        this.anonymousAuthority = anonymousAuthority;
         this.anonymousAccessUrls = urls;
         this.exceptions = exceptions;
         this.jwtService = jwtService;
         this.userService = userService;
+        this.authorityService = authorityService;
     }
 
     @Override
@@ -62,8 +64,8 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private void authenticate(HttpServletRequest request, String jwtToken) {
         AnonymousAuthenticationToken authRequest = new AnonymousAuthenticationToken(
                 UserProperties.ANONYMOUS_AUTH_KEY,
-                jwtService.getLoggedUser(jwtToken, this.anonymousAuthority),
-                Collections.singleton(this.anonymousAuthority)
+                jwtService.getLoggedUser(jwtToken, Authority.anonymous),
+                Collections.singleton(authorityService.getOrCreate(Authority.anonymous))
         );
         authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
         Authentication authResult = this.authenticationManager.authenticate(authRequest);
@@ -71,55 +73,44 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String resolveValidToken(HttpServletRequest request, HttpServletResponse response) {
-        Map<String, Object> claims = new HashMap<>();
         String jwtHeader = request.getHeader(JWT_HEADER_NAME);
-        String jwtToken;
+        String jwtToken = null;
 
         if (jwtHeader == null || !jwtHeader.startsWith(BEARER)) {
             log.warn("There is no JWT token or token is invalid.");
-            resolveClaims(claims, request);
-            jwtToken = jwtService.tokenFrom(claims);
+            LoggedUser loggedUser = resolveLoggedUser(jwtToken);
+            jwtToken = jwtService.tokenFrom(Collections.emptyMap(), loggedUser.getUsername(), Map.of(USER, loggedUser));
         } else {
             jwtToken = jwtHeader.replace(BEARER, "");
         }
 
-        try {
-            jwtService.isExpired(jwtToken);
-        } catch (ExpiredJwtException e) {
-            claims = e.getClaims();
-            resolveClaims(claims, request);
-            jwtToken = jwtService.tokenFrom(claims);
+        if (jwtService.isTokenExpired(jwtToken)) {
+            LoggedUser loggedUser = resolveLoggedUser(jwtToken);
+            jwtToken = jwtService.tokenFrom(Collections.emptyMap(), loggedUser.getUsername(), Map.of(USER, loggedUser));
         }
-
         return jwtToken;
     }
 
-    private void resolveClaims(Map<String, Object> claims, HttpServletRequest request) {
-        LoggedUser loggedUser = createAnonymousUser(request);
-
-        if (claims.containsKey("user")) {
-            IUser user = userService.findAnonymousByEmail((String) ((LinkedHashMap) claims.get("user")).get("email"), false);
-            if (user != null)
-                loggedUser = user.transformToLoggedUser();
+    private LoggedUser resolveLoggedUser(String existingToken) {
+        LoggedUser loggedUser;
+        if (existingToken != null) {
+            loggedUser = jwtService.getLoggedUser(existingToken, Authority.anonymous);
+        } else {
+            loggedUser = createAnonymousUser();
         }
         loggedUser.eraseCredentials();
-        claims.put("user", loggedUser);
+        return loggedUser;
     }
 
-    private LoggedUser createAnonymousUser(HttpServletRequest request) {
+    private LoggedUser createAnonymousUser() {
         String hash = new ObjectId().toString();
-
-        AnonymousUser anonymousUser = (AnonymousUser) this.userService.findAnonymousByEmail(hash + "@nae.com", false);
-
-        if (anonymousUser == null) {
-            anonymousUser = new AnonymousUser(hash + "@anonymous.nae",
-                    "n/a",
-                    "User",
-                    "Anonymous"
-            );
-            anonymousUser.setState(UserState.ACTIVE);
-            userService.saveNewAnonymous(anonymousUser);
-        }
+        AnonymousUser anonymousUser = new AnonymousUser(hash + "@anonymous.nae",
+                "n/a",
+                "User",
+                "Anonymous"
+        );
+        anonymousUser.setState(UserState.ACTIVE);
+        userService.saveNewAnonymous(anonymousUser);
         return anonymousUser.transformToLoggedUser();
     }
 

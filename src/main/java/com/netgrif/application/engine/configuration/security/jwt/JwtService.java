@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.configuration.security.jwt;
 
-import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -11,7 +11,6 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -31,6 +30,7 @@ public class JwtService implements IJwtService {
     private byte[] secret;
     private final JwtProperties properties;
     private final IProcessRoleService roleService;
+    private final IAuthorityService authorityService;
 
     @PostConstruct
     private void resolveSecret() {
@@ -43,10 +43,12 @@ public class JwtService implements IJwtService {
     }
 
     @Override
-    public String tokenFrom(Map<String, Object> claims) {
+    public String tokenFrom(Map<String, Object> header, String subject, Map<String, Object> claims) {
         log.info("Generating new JWT token.");
         return Jwts
                 .builder()
+                .setHeader(header)
+                .setSubject(subject)
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + properties.getExpiration()))
@@ -55,18 +57,18 @@ public class JwtService implements IJwtService {
     }
 
     @Override
-    public void isExpired(String token) throws ExpiredJwtException {
-        getExpirationDateFromToken(token);
+    public Boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
     }
 
     @Override
-    public LoggedUser getLoggedUser(String token, Authority anonymousAuthority) {
-        LinkedHashMap<String, Object> userMap = (LinkedHashMap<String, Object>) getAllClaimsFromToken(token).get("user");
+    public LoggedUser getLoggedUser(String token, String authority) {
+        LinkedHashMap<String, Object> userMap = (LinkedHashMap<String, Object>) extractAllClaims(token).get("user");
         LoggedUser user = new LoggedUser(
                 userMap.get("id").toString(),
                 userMap.get("username").toString(),
                 "n/a",
-                Collections.singleton(anonymousAuthority)
+                Collections.singleton(authorityService.getOrCreate(authority))
         );
         user.setFullName(userMap.get("fullName").toString());
         user.setAnonymous((boolean) userMap.get("anonymous"));
@@ -74,16 +76,16 @@ public class JwtService implements IJwtService {
         return user;
     }
 
-    private void getExpirationDateFromToken(String token) throws ExpiredJwtException {
-        getClaimFromToken(token, Claims::getExpiration);
+    private Date extractExpiration(String token) throws ExpiredJwtException {
+        return extractClaim(token, Claims::getExpiration);
     }
 
-    private <T> void getClaimFromToken(String token, Function<Claims, T> claimsResolver) throws ExpiredJwtException {
-        final Claims claims = getAllClaimsFromToken(token);
-        claimsResolver.apply(claims);
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) throws ExpiredJwtException {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
     }
 
-    private Claims getAllClaimsFromToken(String token) throws ExpiredJwtException {
+    private Claims extractAllClaims(String token) throws ExpiredJwtException {
         return Jwts
                 .parserBuilder()
                 .setSigningKey(getSignInKey())

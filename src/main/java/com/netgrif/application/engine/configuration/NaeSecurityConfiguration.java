@@ -184,11 +184,11 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
         return new PublicAuthenticationFilter(
                 (ProviderManager) authenticationManager(authenticationManagerBuilder),
                 new AnonymousAuthenticationProvider(ANONYMOUS_USER),
-                authority,
-                this.naeAuthProperties.getServerPatterns(),
-                this.naeAuthProperties.getAnonymousExceptions(),
-                this.jwtService,
-                this.userService
+                naeAuthProperties.getServerPatterns(),
+                naeAuthProperties.getAnonymousExceptions(),
+                jwtService,
+                userService,
+                authorityService
         );
     }
 
