@@ -5,7 +5,6 @@ import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.Validation
 import com.netgrif.application.engine.validations.ValidationRegistry
 import com.netgrif.application.engine.workflow.domain.Case
-import groovy.json.StringEscapeUtils
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Lookup
@@ -24,13 +23,13 @@ abstract class ValidationExecutioner {
     @Autowired
     private IGroovyShellFactory shellFactory
 
-    void run(Case useCase, Field<?> field, List<Validation> validations) {
+    void execute(Case useCase, Field<?> field, List<Validation> validations) {
         if (validations) {
-            log.info("Validations: ${validations.collect {it.rule }}")
+            log.info("Validations: ${validations.collect { it.name }}")
 
-            ValidationDelegate delegate = initDelegate(useCase, field, this.registry.getValidationNames())
+            ValidationDelegate delegate = initDelegate(useCase, field, validations.collect { it.name })
             for (Validation validation : validations) {
-                Closure<Boolean> code = initCode(validation.rule, delegate)
+                Closure<Boolean> code = initCode(validation, delegate)
                 def result = code()
                 if (result !instanceof Boolean) {
                     result = result()
@@ -46,8 +45,9 @@ abstract class ValidationExecutioner {
         return this.registry.getValidation(validationName)
     }
 
-    protected Closure<Boolean> initCode(String rule, ValidationDelegate delegate) {
-        Closure<Boolean> code = this.shellFactory.getGroovyShell().evaluate("{ -> "+ rule + " }") as Closure<Boolean>
+    protected Closure<Boolean> initCode(Validation validation, ValidationDelegate delegate) {
+        String validationCall = "${validation.name} (${validation.arguments.find { it.type.value == "server" }.argument.join(", ")})"
+        Closure<Boolean> code = this.shellFactory.getGroovyShell().evaluate("{ -> " + validationCall + " }") as Closure<Boolean>
         return code.rehydrate(delegate, code.owner, code.thisObject)
     }
 

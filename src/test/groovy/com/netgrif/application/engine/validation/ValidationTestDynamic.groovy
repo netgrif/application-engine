@@ -8,7 +8,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
-import com.netgrif.application.engine.startup.ValidationRunner
+import com.netgrif.application.engine.validations.interfaces.IValidationService
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
@@ -54,9 +54,13 @@ class ValidationTestDynamic {
     @Autowired
     private ITaskService taskService
 
+    @Autowired
+    private IValidationService validationService
+
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
+        validationService.clearValidations()
     }
 
     private PetriNet importTextNet() {
@@ -129,6 +133,6 @@ class ValidationTestDynamic {
             assert taskFinish != null
         })
 
-        assert "error-text01" == thrown.getMessage()
+        assert "error-text06" == thrown.getMessage()
     }
 }

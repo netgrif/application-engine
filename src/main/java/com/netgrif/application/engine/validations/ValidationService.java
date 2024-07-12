@@ -33,14 +33,14 @@ public class ValidationService implements IValidationService {
     public void validateTransition(Case useCase, Transition transition) {
         transition.getDataSet().values().forEach(dataRef -> {
             if (dataRef.getField() != null) {
-                validationExecutioner.run(useCase, dataRef.getField(), dataRef.getField().getValidations());
+                validationExecutioner.execute(useCase, dataRef.getField(), dataRef.getField().getValidations());
             }
         });
     }
 
     @Override
     public void validateField(Case useCase, Field<?> field) {
-        validationExecutioner.run(useCase, field, field.getValidations());
+        validationExecutioner.execute(useCase, field, field.getValidations());
     }
 
     @Override
@@ -57,5 +57,10 @@ public class ValidationService implements IValidationService {
     @Override
     public void unregisterValidation(String name) {
         validationRegistry.removeValidation(name);
+    }
+
+    @Override
+    public void clearValidations() {
+        validationRegistry.removeAllValidations();
     }
 }

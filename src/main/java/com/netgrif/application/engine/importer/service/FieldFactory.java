@@ -54,19 +54,10 @@ public final class FieldFactory {
         if (data.getPlaceholder() != null)
             field.setPlaceholder(importer.toI18NString(data.getPlaceholder()));
 
-        // TODO: release/8.0.0 validation register
-        // TODO: release/8.0.0 valid deprecated
-        if (data.getValid() != null) {
-            List<Valid> list = data.getValid();
-            for (Valid item : list) {
-                // TODO: release/8.0.0 new I18nString?
-                field.addValidation(new Validation(item.getValue(), new I18nString()));
-            }
-        }
         if (data.getValidations() != null) {
             List<com.netgrif.application.engine.importer.model.Validation> list = data.getValidations().getValidation();
             for (com.netgrif.application.engine.importer.model.Validation item : list) {
-                field.addValidation(new Validation(item.getExpression().getValue(), importer.toI18NString(item.getMessage())));
+                field.addValidation(new Validation(item.getName(), item.getArguments(), importer.toI18NString(item.getMessage())));
             }
         }
         if (data.getComponent() != null) {

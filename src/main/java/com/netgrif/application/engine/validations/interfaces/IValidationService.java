@@ -17,4 +17,6 @@ public interface IValidationService {
     Closure<Boolean> getValidation(String name);
 
     void unregisterValidation(String name);
+
+    void clearValidations();
 }

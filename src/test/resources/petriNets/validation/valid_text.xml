@@ -11,8 +11,12 @@
         <id>text01</id>
         <title/>
         <validations>
+<!--            <validation>-->
+<!--                <expression>email</expression>-->
+<!--                <message>error-text01</message>-->
+<!--            </validation>-->
             <validation>
-                <expression>email</expression>
+                <name>email</name>
                 <message>error-text01</message>
             </validation>
         </validations>
@@ -21,8 +25,12 @@
         <id>text02</id>
         <title/>
         <validations>
+<!--            <validation>-->
+<!--                <expression>telnumber</expression>-->
+<!--                <message>error-text02</message>-->
+<!--            </validation>-->
             <validation>
-                <expression>telnumber</expression>
+                <name>telnumber</name>
                 <message>error-text02</message>
             </validation>
         </validations>
@@ -31,8 +39,15 @@
         <id>text03</id>
         <title/>
         <validations>
+<!--            <validation>-->
+<!--                <expression>maxlength 6</expression>-->
+<!--                <message>error-text03</message>-->
+<!--            </validation>-->
             <validation>
-                <expression>maxlength 6</expression>
+                <name>maxlength</name>
+                <arguments type="server">
+                    <argument>6</argument>
+                </arguments>
                 <message>error-text03</message>
             </validation>
         </validations>
@@ -41,8 +56,15 @@
         <id>text04</id>
         <title/>
         <validations>
+<!--            <validation>-->
+<!--                <expression>minlength 3</expression>-->
+<!--                <message>error-text04</message>-->
+<!--            </validation>-->
             <validation>
-                <expression>minlength 3</expression>
+                <name>minlength</name>
+                <arguments type="server">
+                    <argument>3</argument>
+                </arguments>
                 <message>error-text04</message>
             </validation>
         </validations>
@@ -51,12 +73,26 @@
         <id>text05</id>
         <title/>
         <validations>
+<!--            <validation>-->
+<!--                <expression>minlength 3</expression>-->
+<!--                <message>error-text05</message>-->
+<!--            </validation>-->
+<!--            <validation>-->
+<!--                <expression>maxlength 6</expression>-->
+<!--                <message>error-text05</message>-->
+<!--            </validation>-->
             <validation>
-                <expression>minlength 3</expression>
+                <name>minlength</name>
+                <arguments type="server">
+                    <argument>3</argument>
+                </arguments>
                 <message>error-text05</message>
             </validation>
             <validation>
-                <expression>maxlength 6</expression>
+                <name>maxlength</name>
+                <arguments type="server">
+                    <argument>6</argument>
+                </arguments>
                 <message>error-text05</message>
             </validation>
         </validations>
@@ -65,8 +101,15 @@
         <id>text06</id>
         <title/>
         <validations>
+<!--            <validation>-->
+<!--                <expression>aaaa number01.rawValue</expression>-->
+<!--                <message>error-text06</message>-->
+<!--            </validation>-->
             <validation>
-                <expression>aaaa number01.rawValue</expression>
+                <name>aaaa</name>
+                <arguments type="server">
+                    <argument>number01.rawValue</argument>
+                </arguments>
                 <message>error-text06</message>
             </validation>
         </validations>

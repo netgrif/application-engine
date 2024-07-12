@@ -52,6 +52,10 @@
 			<name>textarea</name>
 		</component>
     </data>
+    <data type="number">
+        <id>num_arguments_groovy</id>
+        <title name="num_arguments_groovy">Number of arguments - Groovy</title>
+    </data>
     <data type="text">
         <id>validation_definition_javascript</id>
         <title name="validation_definition_javascript">Validation definition - JavaScript</title>
@@ -59,6 +63,10 @@
 			<name>textarea</name>
 		</component>
     </data>
+	<data type="number">
+		<id>num_arguments_javascript</id>
+		<title name="num_arguments_javascript">Number of arguments - JavaScript</title>
+	</data>
     <data type="text">
         <id>version</id>
         <title name="version">Version</title>
@@ -72,7 +80,9 @@
     <i18n locale="sk">
         <i18nString name="name">Meno</i18nString>
         <i18nString name="validation_definition_groovy">Definícia validácie - Groovy</i18nString>
+        <i18nString name="num_arguments_groovy">Počet argumentov - Groovy</i18nString>
         <i18nString name="validation_definition_javascript">Definícia validácie - JavaScript</i18nString>
+        <i18nString name="num_arguments_javascript">Počet argumentov - JavaScript</i18nString>
         <i18nString name="version">Verzia</i18nString>
         <i18nString name="active">Je aktívny</i18nString>
         <i18nString name="detail">Detail</i18nString>
@@ -82,7 +92,9 @@
     <i18n locale="de">
         <i18nString name="name">Name</i18nString>
         <i18nString name="validation_definition_groovy">Validierungsdefinition - Groovy</i18nString>
+        <i18nString name="num_arguments_groovy">Anzahl der Argumente - Groovy</i18nString>
         <i18nString name="validation_definition_javascript">Validierungsdefinition - JavaScript</i18nString>
+        <i18nString name="num_arguments_javascript">Anzahl der Argumente - JavaScript</i18nString>
         <i18nString name="version">Ausführung</i18nString>
         <i18nString name="active">Ist aktiv</i18nString>
         <i18nString name="detail">Detail</i18nString>
@@ -136,7 +148,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>3</y>
+					<y>4</y>
 					<rows>2</rows>
 					<cols>4</cols>
 					<template>material</template>
@@ -151,6 +163,35 @@
 				<layout>
 					<x>2</x>
 					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>num_arguments_groovy</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>num_arguments_javascript</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>6</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -284,7 +325,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>4</y>
+					<y>5</y>
 					<rows>2</rows>
 					<cols>4</cols>
 					<template>material</template>
@@ -302,6 +343,34 @@
 					<y>2</y>
 					<rows>2</rows>
 					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>num_arguments_groovy</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>num_arguments_javascript</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>7</y>
+					<rows>1</rows>
+					<cols>2</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>

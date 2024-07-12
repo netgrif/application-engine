@@ -24,11 +24,9 @@ public final class ValidationRegistry {
         return validationsMap.get(name);
     }
 
-    public List<String> getValidationNames() {
-        return new ArrayList<>(validationsMap.keySet());
-    }
-
     public Closure<Boolean> removeValidation(String name) {
         return validationsMap.remove(name);
     }
+
+    public void removeAllValidations() { validationsMap.clear(); }
 }
