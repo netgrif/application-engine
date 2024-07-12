@@ -6,6 +6,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 import java.util.List;
@@ -17,6 +18,9 @@ public interface PetriNetRepository extends MongoRepository<PetriNet, String>, Q
     PetriNet findByImportId(String id);
 
     List<PetriNet> findAllByIdentifier(String identifier);
+
+    @Query("{'parentIdentifiers.id' :  ?0}")
+    List<PetriNet> findAllChildrenByParentId(ObjectId id);
 
     PetriNet findByIdentifierAndVersion(String identifier, Version version);
 
