@@ -166,7 +166,7 @@ public class PetriNet extends PetriNetObject {
         transitions = new UniqueKeyMap<>();
         arcs = new UniqueKeyMap<>();
         dataSet = new UniqueKeyMap<>();
-        roles = new UniqueKeyMap<>();
+        roles = new LinkedHashMap<>();
         negativeViewRoles = new LinkedList<>();
         transactions = new UniqueKeyMap<>();
         processEvents = new LinkedHashMap<>();
@@ -430,7 +430,7 @@ public class PetriNet extends PetriNetObject {
         clone.setVersion(this.version == null ? null : this.version.clone());
         clone.setAuthor(this.author == null ? null : this.author.clone());
         clone.setTransitions(this.transitions == null ? null : this.transitions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, UniqueKeyMap::new)));
-        clone.setRoles(this.roles == null ? null : this.roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, UniqueKeyMap::new)));
+        clone.setRoles(this.roles == null ? null : this.roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, LinkedHashMap::new)));
         clone.setTransactions(this.transactions == null ? null : this.transactions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, UniqueKeyMap::new)));
         clone.setImportXmlPath(this.importXmlPath);
         clone.setImportId(this.importId);
