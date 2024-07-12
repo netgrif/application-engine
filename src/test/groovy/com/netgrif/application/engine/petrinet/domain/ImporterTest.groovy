@@ -435,7 +435,9 @@ class ImporterTest {
         assert childNet.dataSet.get("taskref2").defaultValue == ["t0"]
 
         assert childNet.roles.size() == 3
-        assert childNet.roles.containsKey(superParentNet.roles.keySet().first())
+        assert childNet.roles.values().find { processRole ->
+            processRole.importId == superParentNet.roles.values().first().importId
+        } != null
 
         assert childNet.tags.size() == 3
         assert childNet.tags.containsKey("tag0")
@@ -453,6 +455,10 @@ class ImporterTest {
 
     @Test
     void importNetsWithInvalidExtension() {
+        PetriNet superParentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        assert superParentNet
+
         PetriNet parentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
         assert parentNet
