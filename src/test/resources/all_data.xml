@@ -641,7 +641,7 @@
         </dataGroup>
     </transition>
     <transition>
-        <id>2</id>
+        <id>4</id>
         <x>500</x>
         <y>300</y>
         <cols>6</cols>

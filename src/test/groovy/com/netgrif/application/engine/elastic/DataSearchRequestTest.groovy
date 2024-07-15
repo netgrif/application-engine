@@ -140,7 +140,7 @@ class DataSearchRequestTest {
         (_case.dataSet.get("i18n_divider") as I18nField).rawValue.defaultValue = "Modified i18n divider value"
         workflowService.save(_case)
 
-        Task actionTrigger = taskService.searchOne(QTask.task.caseId.eq(_case.stringId).and(QTask.task.transitionId.eq("2")));
+        Task actionTrigger = taskService.searchOne(QTask.task.caseId.eq(_case.stringId).and(QTask.task.transitionId.eq("4")));
         assert actionTrigger != null
         dataService.setData(actionTrigger, new DataSet([
                 "testActionTrigger": new TextField(rawValue: "random value")
