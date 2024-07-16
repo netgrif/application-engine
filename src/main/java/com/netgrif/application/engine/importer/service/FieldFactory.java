@@ -9,6 +9,8 @@ import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyE
 import com.netgrif.application.engine.importer.service.validation.IDataValidator;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.application.engine.petrinet.domain.dataset.Arguments;
+import com.netgrif.application.engine.petrinet.domain.dataset.ArgumentsType;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.Validation;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +59,8 @@ public final class FieldFactory {
         if (data.getValidations() != null) {
             List<com.netgrif.application.engine.importer.model.Validation> list = data.getValidations().getValidation();
             for (com.netgrif.application.engine.importer.model.Validation item : list) {
-                field.addValidation(new Validation(item.getName(), item.getArguments(), importer.toI18NString(item.getMessage())));
+                Arguments arguments = item.getArguments() != null ? new Arguments(ArgumentsType.fromString(item.getArguments().getType().value()), item.getArguments().getArgument()) : null;
+                field.addValidation(new Validation(item.getName(), arguments, importer.toI18NString(item.getMessage())));
             }
         }
         if (data.getComponent() != null) {

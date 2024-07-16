@@ -77,7 +77,7 @@ class NumberFieldValidationTest {
         ValidationDelegate delegate = getValidationDelegate()
         delegate.thisField = new NumberField(rawValue: -4)
 
-        assert delegate.positive()
+        assert !delegate.positive()
     }
 
     @Test

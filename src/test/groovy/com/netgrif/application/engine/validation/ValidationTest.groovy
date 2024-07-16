@@ -608,7 +608,6 @@ class ValidationTest {
 
     // DATE FIELD
     @Test
-    @Disabled
     void dateValid_between_today() {
         PetriNet testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
@@ -621,7 +620,6 @@ class ValidationTest {
     }
 
     @Test
-    @Disabled
     void dateValid_between_today_plusDay() {
         PetriNet testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
@@ -634,7 +632,6 @@ class ValidationTest {
     }
 
     @Test
-    @Disabled
     void dateValid_between_today_Exception() {
         PetriNet testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
@@ -650,7 +647,6 @@ class ValidationTest {
     }
 
     @Test
-    @Disabled
     void dateValid_between_past() {
         PetriNet testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
@@ -663,7 +659,6 @@ class ValidationTest {
     }
 
     @Test
-    @Disabled
     void dateValid_between_past_minusDay() {
         PetriNet testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
@@ -676,7 +671,6 @@ class ValidationTest {
     }
 
     @Test
-    @Disabled
     void dateValid_between_past_Exception() {
         PetriNet testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
@@ -692,7 +686,6 @@ class ValidationTest {
     }
 
     @Test
-    @Disabled
     void dateValid_between_fromDate() {
         PetriNet testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
@@ -705,7 +698,6 @@ class ValidationTest {
     }
 
     @Test
-    @Disabled
     void dateValid_between_fromDate_today() {
         PetriNet testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
@@ -718,7 +710,6 @@ class ValidationTest {
     }
 
     @Test
-    @Disabled
     void dateValid_between_fromDate_Exception() {
         PetriNet testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
@@ -734,7 +725,6 @@ class ValidationTest {
     }
 
     @Test
-    @Disabled
     void dateValid_between_fromDate_past() {
         PetriNet testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
@@ -747,7 +737,6 @@ class ValidationTest {
     }
 
     @Test
-    @Disabled
     void dateValid_between_fromDate_past_minusDay() {
         PetriNet testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
@@ -760,7 +749,6 @@ class ValidationTest {
     }
 
     @Test
-    @Disabled
     void dateValid_between_fromDate_past_Exception() {
         PetriNet testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
@@ -777,7 +765,6 @@ class ValidationTest {
     }
 
     @Test
-    @Disabled
     void dateValid_between_fromDate_toDate() {
         PetriNet testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
@@ -790,7 +777,6 @@ class ValidationTest {
     }
 
     @Test
-    @Disabled
     void dateValid_between_fromDate_toDate2() {
         PetriNet testNet = importDateNet()
         Case aCase = importHelper.createCase("TestCase", testNet)

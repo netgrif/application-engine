@@ -11,7 +11,10 @@
 		<title/>
 		<validations>
 			<validation>
-				<expression>regex ^([0-9]{1,6})$</expression>  <!-- Cislo pocet znakov 1-6 -->
+				<name>regex</name>
+				<arguments type="server">
+					<argument>^([0-9]{1,6})$</argument> <!-- Cislo pocet znakov 1-6 -->
+				</arguments>
 				<message>error-regex01</message>
 			</validation>
 		</validations>
@@ -21,7 +24,10 @@
 		<title/>
 		<validations>
 			<validation>
-				<expression>regex ^([a-zA-Z0-9\-]{10})$</expression> <!-- Cislo alebo pismeno a polcka  10 znakov -->
+				<name>regex</name>
+				<arguments type="server">
+					<argument>^([a-zA-Z0-9\-]{10})$</argument> <!-- Cislo alebo pismeno a polcka  10 znakov -->
+				</arguments>
 				<message>error-regex02</message>
 			</validation>
 		</validations>
@@ -31,7 +37,10 @@
 		<title/>
 		<validations>
 			<validation>
-				<expression>regex ^(TOTOK[a-zA-Z0-9]{7})$</expression> <!-- Prefix max 12 znakov -->
+				<name>regex</name>
+				<arguments type="server">
+					<argument>^(TOTOK[a-zA-Z0-9]{7})$</argument> <!-- Prefix max 12 znakov -->
+				</arguments>
 				<message>error-regex03</message>
 			</validation>
 		</validations>
@@ -41,7 +50,10 @@
 		<title/>
 		<validations>
 			<validation>
-				<expression>regex ^([a-zA-Z0-9 ]{1,10})$</expression> <!-- 10 znakov vratane medzeri -->
+				<name>regex</name>
+				<arguments type="server">
+					<argument>^([a-zA-Z0-9 ]{1,10})$</argument> <!-- 10 znakov vratane medzeri -->
+				</arguments>
 				<message>error-regex04</message>
 			</validation>
 		</validations>
@@ -51,7 +63,10 @@
 		<title/>
 		<validations>
 			<validation>
-				<expression>regex ^([A-ž0-9!@#$%^&amp;*()_+\-=\[\]{};':"\\|,.&lt;&gt;\/? ]{1,100})$</expression> <!-- pismena a specialne znaky  max100 -->
+				<name>regex</name>
+				<arguments type="server">
+					<argument>^([A-ž0-9!@#$%^&amp;*()_+\-=\[\]{};':"\\|,.&lt;&gt;\/? ]{1,100})$</argument> <!-- pismena a specialne znaky  max100 -->
+				</arguments>
 				<message>error-regex05</message>
 			</validation>
 		</validations>
@@ -61,7 +76,10 @@
 		<title/>
 		<validations>
 			<validation>
-				<expression>regex ^[a-zA-Z0-9\._\%\+\-]+@[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,}$</expression> <!-- E-mail -->
+				<name>regex</name>
+				<arguments type="server">
+					<argument>^[a-zA-Z0-9\._\%\+\-]+@[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,}$</argument> <!-- E-mail -->
+				</arguments>
 				<message>error-regex06</message>
 			</validation>
 		</validations>

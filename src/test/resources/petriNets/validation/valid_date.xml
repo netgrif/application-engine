@@ -12,7 +12,11 @@
         <title/>
         <validations>
             <validation>
-                <expression>between today,future</expression> <!-- od dnes do buducnosti-->
+                <name>between</name> <!-- od dnes do buducnosti-->
+                <arguments type="server">
+                    <argument>today</argument>
+                    <argument>future</argument>
+                </arguments>
                 <message>error-date01</message>
             </validation>
         </validations>
@@ -22,7 +26,11 @@
         <title/>
         <validations>
             <validation>
-                <expression>between past,today</expression> <!-- od  minulosti do dnešného dňa -->
+                <name>between</name> <!-- od  minulosti do dnešného dňa -->
+                <arguments type="server">
+                    <argument>past</argument>
+                    <argument>today</argument>
+                </arguments>
                 <message>error-date02</message>
             </validation>
         </validations>
@@ -32,7 +40,11 @@
         <title/>
         <validations>
             <validation>
-                <expression>between 2020-03-03,today</expression> <!-- od datumu do dnešného dňa -->
+                <name>between</name> <!-- od datumu do dnešného dňa -->
+                <arguments type="server">
+                    <argument>2020-03-03</argument>
+                    <argument>today</argument>
+                </arguments>
                 <message>error-date03</message>
             </validation>
         </validations>
@@ -42,7 +54,11 @@
         <title/>
         <validations>
             <validation>
-                <expression>between past,2020-03-03</expression> <!-- od minulosti do datumu -->
+                <name>between</name> <!-- od minulosti do datumu -->
+                <arguments type="server">
+                    <argument>past</argument>
+                    <argument>2020-03-03</argument>
+                </arguments>
                 <message>error-date04</message>
             </validation>
         </validations>
@@ -52,7 +68,11 @@
         <title/>
         <validations>
             <validation>
-                <expression>between 2020-01-01,2022-03-03</expression> <!-- od datumu do datumu -->
+                <name>between</name> <!-- od datumu do datumu -->
+                <arguments type="server">
+                    <argument>2020-01-01</argument>
+                    <argument>2022-03-03</argument>
+                </arguments>
                 <message>error-date05</message>
             </validation>
         </validations>
@@ -62,7 +82,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>workday</expression> <!-- pracovny den -->
+                <name>workday</name> <!-- pracovny den -->
                 <message>error-date06</message>
             </validation>
         </validations>
@@ -72,7 +92,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>weekend</expression> <!-- vikend -->
+                <name>weekend</name> <!-- vikend -->
                 <message>error-date07</message>
             </validation>
         </validations>

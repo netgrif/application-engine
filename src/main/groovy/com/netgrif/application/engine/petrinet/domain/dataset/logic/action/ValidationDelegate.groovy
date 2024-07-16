@@ -22,10 +22,10 @@ class ValidationDelegate {
 
     Field<?> thisField
 
-    Closure<Boolean> notempty = { return thisField.rawValue != null }
+    Boolean notempty() { return thisField.rawValue != null }
 
     // boolean field validations
-    Closure<Boolean> requiredtrue = { return thisField instanceof BooleanField && notempty && thisField.rawValue == true }
+    Boolean requiredtrue() { return thisField instanceof BooleanField && notempty() && thisField.rawValue == true }
 
     // date field validations
     Closure<String> future = { return FUTURE }
@@ -33,58 +33,70 @@ class ValidationDelegate {
     Closure<String> past = { return PAST }
     Closure<String> now = { return NOW }
 
-    Closure<Boolean> between = { def from, def to -> // todo: retype everything into localdatetime
-        if (thisField !instanceof DateField || thisField !instanceof DateTimeField) {
+    Boolean between(def from, def to) {
+        if (!(thisField instanceof DateField || thisField instanceof DateTimeField)) {
             return false
         }
 
-        LocalDateTime updateDate_TODAY = LocalDateTime.now()
+        LocalDateTime updateDate_TODAY = thisField instanceof DateField ? LocalDate.now().atStartOfDay() : LocalDateTime.now()
+        LocalDateTime thisFieldValue = thisField.rawValue instanceof LocalDateTime ? thisField.rawValue : thisField.rawValue.atStartOfDay()
 
-        def fromDate = from instanceof String && parseStringToLocalDate(from) != null ? parseStringToLocalDate(from) : from
-        def toDate = to instanceof String && parseStringToLocalDate(to) != null ? parseStringToLocalDate(to) : to
+        def fromDate = from
+        if (from instanceof String) {
+            LocalDate parsedDate = parseStringToLocalDate(from)
+            fromDate = parsedDate ? parsedDate.atStartOfDay() : from
+        }
+
+        def toDate = to
+        if (to instanceof String) {
+            LocalDate parsedDate = parseStringToLocalDate(to)
+            toDate = parsedDate ? parsedDate.atStartOfDay() : to
+        }
+
+        log.warn("{} > between {}, {}", thisFieldValue, fromDate, toDate)
 
         if ((fromDate == TODAY || fromDate == NOW) && toDate == FUTURE) {
-            if (thisField.rawValue < updateDate_TODAY) {
+            if (thisFieldValue < updateDate_TODAY) {
                 return false
             }
         } else if (fromDate == PAST && (toDate == TODAY || toDate == NOW)) {
-            if (thisField.rawValue > updateDate_TODAY) {
+            if (thisFieldValue > updateDate_TODAY) {
                 return false
             }
-        } else if (fromDate == PAST && (toDate instanceof LocalDate)) {
-            if (thisField.rawValue > toDate) {
+        } else if (fromDate == PAST && (toDate instanceof LocalDateTime)) {
+            if (thisFieldValue > toDate) {
                 return false
             }
-        } else if (fromDate == TODAY && (toDate instanceof LocalDate)) {
-            if (thisField.rawValue < toDate || thisField.rawValue > updateDate_TODAY) {
+        } else if (fromDate == TODAY && (toDate instanceof LocalDateTime)) {
+            if (thisFieldValue > toDate || thisFieldValue < updateDate_TODAY) {
                 return false
             }
-        } else if ((fromDate instanceof LocalDate) && toDate == TODAY) {
-            if (thisField.rawValue < fromDate || thisField.rawValue > updateDate_TODAY) {
+        } else if ((fromDate instanceof LocalDateTime) && toDate == TODAY) {
+            if (thisFieldValue < fromDate || thisFieldValue > updateDate_TODAY) {
                 return false
             }
-        } else if (toDate == FUTURE && (fromDate instanceof LocalDate)) {
-            if (thisField.rawValue < fromDate) {
+        } else if (toDate == FUTURE && (fromDate instanceof LocalDateTime)) {
+            if (thisFieldValue < fromDate) {
                 return false
             }
-        } else if ((fromDate instanceof LocalDate) && (toDate instanceof LocalDate)) {
-            if (thisField.rawValue > toDate || thisField.rawValue < fromDate) {
+        } else if ((fromDate instanceof LocalDateTime) && (toDate instanceof LocalDateTime)) {
+            if (thisFieldValue > toDate || thisFieldValue < fromDate) {
                 return false
             }
         }
         return true
     }
 
-    Closure<Boolean> workday = { return (thisField instanceof DateField || thisField instanceof DateTimeField) && notempty && !thisField.rawValue.dayOfWeek.isWeekend() }
+    Boolean workday() { return (thisField instanceof DateField || thisField instanceof DateTimeField) && notempty() && !thisField.rawValue.dayOfWeek.isWeekend() }
 
 
-    Closure<Boolean> weekend = { return (thisField instanceof DateField || thisField instanceof DateTimeField) && notempty && thisField.rawValue.dayOfWeek.isWeekend() }
+    Boolean weekend() { return (thisField instanceof DateField || thisField instanceof DateTimeField) && notempty() && thisField.rawValue.dayOfWeek.isWeekend() }
 
-    protected static LocalDateTime parseStringToLocalDate(String stringDate) {
+    protected static LocalDate parseStringToLocalDate(String stringDate) {
         if (stringDate == null) {
             return null
         }
-        List<String> patterns = Arrays.asList("dd.MM.yyyy HH:mm:ss", "")
+        List<String> patterns = Arrays.asList("dd.MM.yyyy", "")
         try {
             return LocalDate.parse(stringDate, DateTimeFormatter.BASIC_ISO_DATE)
         } catch (DateTimeParseException ignored) {
@@ -93,7 +105,7 @@ class ValidationDelegate {
             } catch (DateTimeParseException ignored2) {
                 for (String pattern : patterns) {
                     try {
-                        return LocalDate.parse(stringDate, DateTimeFormatter.ofPattern(pattern))
+                        return LocalDateTime.parse(stringDate, DateTimeFormatter.ofPattern(pattern))
                     } catch (DateTimeParseException | IllegalArgumentException ignored3) {
                     }
                 }
@@ -105,17 +117,25 @@ class ValidationDelegate {
     // number field validations
     Closure<String> inf = { return INF }
 
-    Closure<Boolean> odd = { return thisField instanceof NumberField && notempty && thisField.rawValue % 2 != 0 }
+    Boolean odd() { return thisField instanceof NumberField && notempty() && thisField.rawValue as Double % 2 != 0 }
 
-    Closure<Boolean> even = { return thisField instanceof NumberField && notempty && thisField.rawValue % 2 == 0 }
+    Boolean even() { return thisField instanceof NumberField && notempty() && thisField.rawValue as Double % 2 == 0 }
 
-    Closure<Boolean> positive = { return thisField instanceof NumberField && notempty && thisField.rawValue >= 0 }
+    Boolean positive() { return thisField instanceof NumberField && notempty() && thisField.rawValue >= 0 }
 
-    Closure<Boolean> negative = { return thisField instanceof NumberField && notempty && thisField.rawValue <= 0 }
+    Boolean negative() { return thisField instanceof NumberField && notempty() && thisField.rawValue <= 0 }
 
-    Closure<Boolean> decimal = { return thisField instanceof NumberField && notempty && thisField.rawValue % 1 == 0 }
+    Boolean decimal() { return thisField instanceof NumberField && notempty() && thisField.rawValue as Double % 1 == 0 }
 
-    Closure<Boolean> inrange = { def from, def to ->
+    Boolean inrange(def from, def to) {
+        if (from == inf) {
+            from = inf()
+        }
+
+        if (to == inf) {
+            to = inf()
+        }
+
         if (from instanceof String && from.toLowerCase() == INF) {
             from = Double.MIN_VALUE
         }
@@ -123,18 +143,18 @@ class ValidationDelegate {
         if (to instanceof String && to.toLowerCase() == INF) {
             to = Double.MAX_VALUE
         }
-        return thisField instanceof NumberField && notempty && thisField.rawValue >= from as Double && thisField.rawValue <= to as Double
+        return thisField instanceof NumberField && notempty() && thisField.rawValue >= from as Double && thisField.rawValue <= to as Double
     }
 
     // text field validations
-    Closure<Boolean> regex = { String pattern -> return thisField instanceof TextField && notempty && thisField.rawValue ==~ pattern }
+    Boolean regex(String pattern) { return thisField instanceof TextField && notempty() && thisField.rawValue ==~ pattern }
 
-    Closure<Boolean> minlength = { Integer minLength -> return thisField instanceof TextField && notempty && (thisField.rawValue as String).length() >= minLength }
+    Boolean minlength(Integer minLength) { return thisField instanceof TextField && notempty() && (thisField.rawValue as String).length() >= minLength }
 
-    Closure<Boolean> maxlength = { Integer maxLength -> return thisField instanceof TextField && notempty && (thisField.rawValue as String).length() <= maxLength }
+    Boolean maxlength(Integer maxLength) { return thisField instanceof TextField && notempty() && (thisField.rawValue as String).length() <= maxLength }
 
-    Closure<Boolean> telnumber = { -> return regex(TEL_NUMBER_REGEX) }
+    Boolean telnumber() { return regex(TEL_NUMBER_REGEX) }
 
-    Closure<Boolean> email = { -> return regex(EMAIL_REGEX) }
+    Boolean email() { return regex(EMAIL_REGEX) }
 
 }
