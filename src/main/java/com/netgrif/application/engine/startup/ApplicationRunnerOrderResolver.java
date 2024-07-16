@@ -3,16 +3,14 @@ package com.netgrif.application.engine.startup;
 import com.netgrif.application.engine.startup.annotation.AfterRunner;
 import com.netgrif.application.engine.startup.annotation.BeforeRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -37,68 +35,123 @@ public class ApplicationRunnerOrderResolver {
 
     @EventListener
     public void onApplicationEvent(final ContextRefreshedEvent event) {
-        List<Class<? extends AbstractOrderedApplicationRunner>> unresolved = new ArrayList<>();
         Map<String, AbstractOrderedApplicationRunner> applicationRunners = event.getApplicationContext().getBeansOfType(AbstractOrderedApplicationRunner.class);
-        TreeMap<Integer, List<Class<? extends AbstractOrderedApplicationRunner>>> orderedRunners = new TreeMap<>();
-        applicationRunners.forEach((k, v) -> {
-            Class<? extends AbstractOrderedApplicationRunner> runnerClass = AopUtils.isAopProxy(v) ? (Class<? extends AbstractOrderedApplicationRunner>) AopUtils.getTargetClass(v) : v.getClass();
+        order.clear();
+        SortedRunners<AbstractOrderedApplicationRunner> runners = sortByRunnerOrderAnnotation(applicationRunners.values());
+        runners.sortUnresolvedRunners();
+        runners.getSorted().forEach(r -> order.add((Class<? extends AbstractOrderedApplicationRunner>) resolveClass(r)));
+        if (!runners.getUnresolved().isEmpty()) {
+            log.warn("Not all application runner were registered, unresolved application runners: {}", runners.getUnresolved());
+        }
+    }
+
+    /**
+     * Sorts the given collection of runners by the {@link RunnerOrder} annotation.
+     *
+     * @param <T>     the type of the runners
+     * @param runners the collection of runners to be sorted
+     * @return a {@link SortedRunners} object containing two lists: one with the sorted runners and one with the unresolved runners.
+     * To resolve order of the unresolved list call {@link SortedRunners#sortUnresolvedRunners()} method.
+     */
+    public static <T> SortedRunners<T> sortByRunnerOrderAnnotation(Collection<T> runners) {
+        if (runners == null) return null;
+        if (runners.isEmpty()) return new SortedRunners<>();
+        List<T> unresolved = new ArrayList<>();
+        TreeMap<Integer, List<T>> ordered = new TreeMap<>();
+        runners.forEach(runner -> {
+            Class<?> runnerClass = resolveClass(runner);
             RunnerOrder order = runnerClass.getAnnotation(RunnerOrder.class);
             if (order == null) {
-                unresolved.add(runnerClass);
+                unresolved.add(runner);
                 return;
             }
-            if (!orderedRunners.containsKey(order.value())) {
-                orderedRunners.put(order.value(), new ArrayList<>());
+            if (!ordered.containsKey(order.value())) {
+                ordered.put(order.value(), new ArrayList<>());
             }
-            orderedRunners.get(order.value()).add(runnerClass);
+            ordered.get(order.value()).add(runner);
         });
-        order.clear();
-        order.addAll(orderedRunners.values().stream().flatMap(List::stream).toList());
-        sortUnresolvedRunner(unresolved);
-        if (!unresolved.isEmpty()) {
-            log.warn("Not all application runner were registered, unresolved application runners: {}", unresolved);
-        }
+        return new SortedRunners<>(ordered.values().stream().flatMap(List::stream).toList(), unresolved);
     }
 
-    protected boolean sortUnresolvedRunner(List<Class<? extends AbstractOrderedApplicationRunner>> unresolved) {
-        boolean changed = false;
-        for (int i = unresolved.size() - 1; i >= 0; i--) {
-            Class<? extends AbstractOrderedApplicationRunner> runner = unresolved.get(i);
-            boolean inserted = false;
-            if (runner.isAnnotationPresent(BeforeRunner.class)) {
-                inserted = insertBeforeRunner(runner);
-            } else if (runner.isAnnotationPresent(AfterRunner.class)) {
-                inserted = insertAfterRunner(runner);
+    protected static <T> Class<?> resolveClass(T object) {
+        if (object instanceof Class) return (Class<?>) object;
+        else return AopUtils.isAopProxy(object) ? AopUtils.getTargetClass(object) : object.getClass();
+    }
+
+    @Getter
+    public static class SortedRunners<T> {
+        private final List<T> sorted;
+        private final List<T> unresolved;
+
+        public SortedRunners() {
+            sorted = new ArrayList<>();
+            unresolved = new ArrayList<>();
+        }
+
+        public SortedRunners(List<T> sorted) {
+            this.sorted = sorted;
+            unresolved = new ArrayList<>();
+        }
+
+        public SortedRunners(List<T> sorted, List<T> unresolved) {
+            this.sorted = sorted;
+            this.unresolved = unresolved;
+        }
+
+        public SortedRunners<T> addSorted(T item) {
+            sorted.add(item);
+            return this;
+        }
+
+        public SortedRunners<T> addUnresolved(T item) {
+            unresolved.add(item);
+            return this;
+        }
+
+        public boolean sortUnresolvedRunners() {
+            boolean changed = false;
+            for (int i = unresolved.size() - 1; i >= 0; i--) {
+                T runner = unresolved.get(i);
+                Class<?> runnerClass = resolveClass(runner);
+                boolean inserted = false;
+                if (runnerClass.isAnnotationPresent(BeforeRunner.class)) {
+                    inserted = insertBeforeRunner(runner);
+                } else if (runnerClass.isAnnotationPresent(AfterRunner.class)) {
+                    inserted = insertAfterRunner(runner);
+                }
+                if (!inserted) continue;
+                unresolved.remove(i);
+                changed = true;
             }
-            if (!inserted) continue;
-            unresolved.remove(i);
-            changed = true;
+            if (unresolved.isEmpty()) return true;
+            if (changed) changed = sortUnresolvedRunners();
+            return changed;
         }
-        if (unresolved.isEmpty()) return true;
-        if (changed) changed = sortUnresolvedRunner(unresolved);
-        return changed;
-    }
 
-    protected boolean insertBeforeRunner(Class<? extends AbstractOrderedApplicationRunner> runner) {
-        if (!runner.isAnnotationPresent(BeforeRunner.class)) return false;
-        Class<? extends AbstractOrderedApplicationRunner> orderedRunner = runner.getAnnotation(BeforeRunner.class).value();
-        int orderedRunnerIndex = order.indexOf(orderedRunner);
-        if (orderedRunnerIndex == -1) return false;
-        order.add(orderedRunnerIndex, runner);
-        return true;
-    }
-
-    protected boolean insertAfterRunner(Class<? extends AbstractOrderedApplicationRunner> runner) {
-        if (!runner.isAnnotationPresent(AfterRunner.class)) return false;
-        Class<? extends AbstractOrderedApplicationRunner> orderedRunner = runner.getAnnotation(AfterRunner.class).value();
-        int orderedRunnerIndex = order.indexOf(orderedRunner);
-        if (orderedRunnerIndex == -1) return false;
-        if (orderedRunnerIndex + 1 == order.size()) {
-            order.add(runner);
-        } else {
-            order.add(orderedRunnerIndex + 1, runner);
+        protected boolean insertBeforeRunner(T item) {
+            Class<?> runner = resolveClass(item);
+            if (!runner.isAnnotationPresent(BeforeRunner.class)) return false;
+            Class<?> orderedRunner = runner.getAnnotation(BeforeRunner.class).value();
+            int orderedRunnerIndex = sorted.indexOf(orderedRunner);
+            if (orderedRunnerIndex == -1) return false;
+            sorted.add(orderedRunnerIndex, item);
+            return true;
         }
-        return true;
+
+        protected boolean insertAfterRunner(T item) {
+            Class<?> runner = resolveClass(item);
+            if (!runner.isAnnotationPresent(AfterRunner.class)) return false;
+            Class<?> orderedRunner = runner.getAnnotation(AfterRunner.class).value();
+            int orderedRunnerIndex = sorted.indexOf(orderedRunner);
+            if (orderedRunnerIndex == -1) return false;
+            if (orderedRunnerIndex + 1 == sorted.size()) {
+                sorted.add(item);
+            } else {
+                sorted.add(orderedRunnerIndex + 1, item);
+            }
+            return true;
+        }
+
     }
 
 }

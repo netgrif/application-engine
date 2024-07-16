@@ -2,16 +2,13 @@ package com.netgrif.application.engine.startup;
 
 import com.netgrif.application.engine.configuration.ApplicationContextProvider;
 import com.netgrif.application.engine.startup.annotation.BeforeRunner;
-import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import com.netgrif.application.engine.startup.runner.FinisherSuperCreatorRunner;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 @Slf4j
 @Component
@@ -33,18 +30,11 @@ public class ProcessApplicationStartupRunnerExecutor extends AbstractOrderedAppl
         });
     }
 
-    protected List<ProcessApplicationStartupRunner> resolveRunners() { // TODO recognise AOP, implement other annotation ordering
+    protected List<ProcessApplicationStartupRunner> resolveRunners() {
         Map<String, ProcessApplicationStartupRunner> customRunners = ApplicationContextProvider.getAppContext().getBeansOfType(ProcessApplicationStartupRunner.class);
-        TreeMap<Integer, List<ProcessApplicationStartupRunner>> orderedRunners = new TreeMap<>();
-        customRunners.forEach((k, v) -> {
-            RunnerOrder orderAnnotation = v.getClass().getAnnotation(RunnerOrder.class);
-            int order = orderAnnotation == null ? Integer.MAX_VALUE : orderAnnotation.value();
-            if (!orderedRunners.containsKey(order)) {
-                orderedRunners.put(order, new ArrayList<>());
-            }
-            orderedRunners.get(order).add(v);
-        });
-        return orderedRunners.values().stream().flatMap(List::stream).toList();
+        ApplicationRunnerOrderResolver.SortedRunners<ProcessApplicationStartupRunner> runners = ApplicationRunnerOrderResolver.sortByRunnerOrderAnnotation(customRunners.values());
+        runners.sortUnresolvedRunners();
+        return runners.getSorted();
     }
 
 }
