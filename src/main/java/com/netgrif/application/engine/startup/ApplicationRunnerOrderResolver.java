@@ -2,6 +2,7 @@ package com.netgrif.application.engine.startup;
 
 import com.netgrif.application.engine.startup.annotation.AfterRunner;
 import com.netgrif.application.engine.startup.annotation.BeforeRunner;
+import com.netgrif.application.engine.startup.annotation.ReplaceRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ public class ApplicationRunnerOrderResolver {
     /**
      * Retrieves the order index of the specified class within the registered application runners.
      *
-     * @param clazz the class to find the order index for, which must extend {@code AbstractOrderedApplicationRunner}
+     * @param clazz the class to find the order index for, which must extend {@link AbstractOrderedApplicationRunner}
      * @return the order index of the specified class
      * @throws IllegalArgumentException if the specified class is not registered as an application runner
      */
@@ -118,6 +119,8 @@ public class ApplicationRunnerOrderResolver {
                     inserted = insertBeforeRunner(runner);
                 } else if (runnerClass.isAnnotationPresent(AfterRunner.class)) {
                     inserted = insertAfterRunner(runner);
+                } else if(runnerClass.isAnnotationPresent(ReplaceRunner.class)){
+                    inserted = replaceRunner(runner);
                 }
                 if (!inserted) continue;
                 unresolved.remove(i);
@@ -149,6 +152,16 @@ public class ApplicationRunnerOrderResolver {
             } else {
                 sorted.add(orderedRunnerIndex + 1, item);
             }
+            return true;
+        }
+
+        protected boolean replaceRunner(T item){
+            Class<?> runner = resolveClass(item);
+            if(runner.isAnnotationPresent(ReplaceRunner.class)) return false;
+            Class<?> runnerToReplace = runner.getAnnotation(ReplaceRunner.class).value();
+            int runnerToReplaceIndex = sorted.indexOf(runnerToReplace);
+            if(runnerToReplaceIndex == -1) return false;
+            sorted.add(runnerToReplaceIndex, item);
             return true;
         }
 
