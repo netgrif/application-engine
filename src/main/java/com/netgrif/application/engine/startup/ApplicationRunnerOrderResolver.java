@@ -90,25 +90,26 @@ public class ApplicationRunnerOrderResolver {
         }
 
         public SortedRunners(List<T> sorted) {
-            this.sorted = sorted;
+            this.sorted = new ArrayList<>(sorted);
             unresolved = new ArrayList<>();
         }
 
         public SortedRunners(List<T> sorted, List<T> unresolved) {
-            this.sorted = sorted;
-            this.unresolved = unresolved;
+            this.sorted = new ArrayList<>(sorted);
+            this.unresolved = new ArrayList<>(unresolved);
         }
 
-        public SortedRunners<T> addSorted(T item) {
-            sorted.add(item);
-            return this;
-        }
-
-        public SortedRunners<T> addUnresolved(T item) {
-            unresolved.add(item);
-            return this;
-        }
-
+        /**
+         * Attempts to sort the unresolved runners by processing annotations on their classes.
+         * The method iterates through the list of unresolved runners and checks for the presence
+         * of specific annotations: {@link BeforeRunner}, {@link AfterRunner}, and {@link ReplaceRunner}.
+         * Depending on the annotation found, the runner is inserted into the appropriate position
+         * in the sorted list. If a runner is successfully inserted, it is removed from the unresolved list.
+         * The method recursively calls itself if changes are made to ensure all runners are processed.
+         *
+         * @return {@code true} if all unresolved runners have been successfully sorted and the unresolved list is empty;
+         *         {@code false} otherwise.
+         */
         public boolean sortUnresolvedRunners() {
             boolean changed = false;
             for (int i = unresolved.size() - 1; i >= 0; i--) {
@@ -119,7 +120,7 @@ public class ApplicationRunnerOrderResolver {
                     inserted = insertBeforeRunner(runner);
                 } else if (runnerClass.isAnnotationPresent(AfterRunner.class)) {
                     inserted = insertAfterRunner(runner);
-                } else if(runnerClass.isAnnotationPresent(ReplaceRunner.class)){
+                } else if (runnerClass.isAnnotationPresent(ReplaceRunner.class)) {
                     inserted = replaceRunner(runner);
                 }
                 if (!inserted) continue;
@@ -132,20 +133,20 @@ public class ApplicationRunnerOrderResolver {
         }
 
         protected boolean insertBeforeRunner(T item) {
-            Class<?> runner = resolveClass(item);
-            if (!runner.isAnnotationPresent(BeforeRunner.class)) return false;
-            Class<?> orderedRunner = runner.getAnnotation(BeforeRunner.class).value();
-            int orderedRunnerIndex = sorted.indexOf(orderedRunner);
+            Class<?> itemClass = resolveClass(item);
+            if (!itemClass.isAnnotationPresent(BeforeRunner.class)) return false;
+            Class<?> orderedRunner = itemClass.getAnnotation(BeforeRunner.class).value();
+            int orderedRunnerIndex = indexOfClass(sorted, orderedRunner);
             if (orderedRunnerIndex == -1) return false;
             sorted.add(orderedRunnerIndex, item);
             return true;
         }
 
         protected boolean insertAfterRunner(T item) {
-            Class<?> runner = resolveClass(item);
-            if (!runner.isAnnotationPresent(AfterRunner.class)) return false;
-            Class<?> orderedRunner = runner.getAnnotation(AfterRunner.class).value();
-            int orderedRunnerIndex = sorted.indexOf(orderedRunner);
+            Class<?> itemClass = resolveClass(item);
+            if (!itemClass.isAnnotationPresent(AfterRunner.class)) return false;
+            Class<?> orderedRunner = itemClass.getAnnotation(AfterRunner.class).value();
+            int orderedRunnerIndex = indexOfClass(sorted, orderedRunner);
             if (orderedRunnerIndex == -1) return false;
             if (orderedRunnerIndex + 1 == sorted.size()) {
                 sorted.add(item);
@@ -155,14 +156,37 @@ public class ApplicationRunnerOrderResolver {
             return true;
         }
 
-        protected boolean replaceRunner(T item){
-            Class<?> runner = resolveClass(item);
-            if(runner.isAnnotationPresent(ReplaceRunner.class)) return false;
-            Class<?> runnerToReplace = runner.getAnnotation(ReplaceRunner.class).value();
-            int runnerToReplaceIndex = sorted.indexOf(runnerToReplace);
-            if(runnerToReplaceIndex == -1) return false;
+        protected boolean replaceRunner(T item) {
+            Class<?> itemClass = resolveClass(item);
+            if (itemClass.isAnnotationPresent(ReplaceRunner.class)) return false;
+            Class<?> runnerToReplace = itemClass.getAnnotation(ReplaceRunner.class).value();
+            int runnerToReplaceIndex = indexOfClass(sorted, runnerToReplace);
+            if (runnerToReplaceIndex == -1) return false;
             sorted.add(runnerToReplaceIndex, item);
             return true;
+        }
+
+        /**
+         * Returns the index of the first occurrence of the specified class in the given list.
+         * If the list contains an element whose class matches the specified class, the index of that element is returned.
+         * If the specified class is {@code null}, the method returns the index of the first {@code null} element in the list.
+         * If the list is {@code null} or empty, or if the class is not found, the method returns {@code -1}.
+         *
+         * @param <I>   the type of elements in the list
+         * @param list  the list to search for the specified class
+         * @param clazz the class to search for in the list
+         * @return the index of the first occurrence of the specified class in the list, or {@code -1} if the class is not found
+         */
+        public static <I> int indexOfClass(List<I> list, Class<?> clazz) {
+            if (list == null) return -1;
+            if (list.isEmpty()) return -1;
+            if (clazz == null) return list.indexOf(null);
+            for (int i = 0; i < list.size(); i++) {
+                if (resolveClass(list.get(i)).equals(clazz)) {
+                    return i;
+                }
+            }
+            return -1;
         }
 
     }
