@@ -200,7 +200,7 @@ public class ApplicationRunnerOrderResolver {
 
         protected boolean replaceRunner(T item) {
             Class<?> itemClass = resolveClass(item);
-            if (itemClass.isAnnotationPresent(ReplaceRunner.class)) return false;
+            if (!itemClass.isAnnotationPresent(ReplaceRunner.class)) return false;
             Class<?> runnerToReplace = itemClass.getAnnotation(ReplaceRunner.class).value();
             int runnerToReplaceIndex = indexOfClass(sorted, runnerToReplace);
             if (runnerToReplaceIndex == -1) return false;
