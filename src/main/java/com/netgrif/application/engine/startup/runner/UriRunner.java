@@ -17,7 +17,7 @@ public class UriRunner extends AbstractOrderedApplicationRunner {
     private final IUriService uriService;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void apply(ApplicationArguments args) throws Exception {
         uriService.createDefault();
     }
 

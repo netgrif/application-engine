@@ -39,7 +39,7 @@ public class SystemUserRunner extends AbstractOrderedApplicationRunner {
     }
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void apply(ApplicationArguments args) throws Exception {
         this.systemUser = createSystemUser();
     }
 

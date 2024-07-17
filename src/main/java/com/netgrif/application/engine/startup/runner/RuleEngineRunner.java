@@ -38,7 +38,7 @@ public class RuleEngineRunner extends AbstractOrderedApplicationRunner {
     private final IRuleEngineGlobalsProvider sessionInitializer;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void apply(ApplicationArguments args) throws Exception {
         log.info("Rule engine runner starting");
         if (generate) {
             log.info("Generating template to {}", generatedTemplatePath);

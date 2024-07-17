@@ -18,7 +18,7 @@ public class FinisherSuperCreatorRunner extends AbstractOrderedApplicationRunner
     private final SuperCreatorRunner superCreator;
 
     @Override
-    public void run(ApplicationArguments strings) throws Exception {
+    public void apply(ApplicationArguments strings) throws Exception {
         superCreator.setAllToSuperUser();
         log.info("Super Creator update");
     }

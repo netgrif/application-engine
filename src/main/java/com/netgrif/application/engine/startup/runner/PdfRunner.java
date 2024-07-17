@@ -17,7 +17,7 @@ public class PdfRunner extends AbstractOrderedApplicationRunner {
     private final PdfResource resource;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void apply(ApplicationArguments args) throws Exception {
         assert resource.getFontTitleResource().exists();
         assert resource.getFontLabelResource().exists();
         assert resource.getFontValueResource().exists();

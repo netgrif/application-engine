@@ -18,7 +18,7 @@ public class AuthorityRunner extends AbstractOrderedApplicationRunner {
     private final IAuthorityService service;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void apply(ApplicationArguments args) throws Exception {
         service.getOrCreate(Authority.user);
         service.getOrCreate(Authority.admin);
         service.getOrCreate(Authority.systemAdmin);

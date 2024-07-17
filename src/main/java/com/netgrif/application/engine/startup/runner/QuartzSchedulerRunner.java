@@ -21,7 +21,7 @@ public class QuartzSchedulerRunner extends AbstractOrderedApplicationRunner {
     private final Scheduler scheduler;
 
     @Override
-    public void run(ApplicationArguments strings) throws Exception {
+    public void apply(ApplicationArguments strings) throws Exception {
         if (start) {
             log.info("Starting Quartz scheduler");
             scheduler.start();

@@ -27,25 +27,25 @@ public class MongoDbRunner extends AbstractOrderedApplicationRunner {
     @Value("${spring.data.mongodb.database}")
     private String name;
 
-    @Value("${spring.data.mongodb.host:null}")
+    @Value("${spring.data.mongodb.host:#{null}}")
     private String host;
 
-    @Value("${spring.data.mongodb.port:null}")
+    @Value("${spring.data.mongodb.port:#{null}}")
     private String port;
 
-    @Value("${spring.data.mongodb.uri:null}")
+    @Value("${spring.data.mongodb.uri:#{null}}")
     private String uri;
 
-    @Value("${spring.data.mongodb.drop}")
+    @Value("${spring.data.mongodb.drop:false}")
     private boolean dropDatabase;
 
-    @Value("${spring.data.mongodb.runner-ensure-index}")
+    @Value("${spring.data.mongodb.runner-ensure-index:true}")
     private boolean resolveIndexesOnStartup;
 
     private final MongoTemplate mongoTemplate;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void apply(ApplicationArguments args) throws Exception {
         if (dropDatabase) {
             if (host != null && port != null)
                 log.info("Dropping Mongo database {}:{}/{}", host, port, name);

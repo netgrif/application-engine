@@ -24,7 +24,7 @@ public class AnonymousRoleRunner extends AbstractOrderedApplicationRunner {
     private final ProcessRoleRepository repository;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void apply(ApplicationArguments args) throws Exception {
         log.info("Creating anonymous process role");
         Set<ProcessRole> role = repository.findAllByImportId(ProcessRole.ANONYMOUS_ROLE);
         if (role != null && !role.isEmpty()) {

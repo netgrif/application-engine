@@ -39,7 +39,7 @@ public class SuperCreatorRunner extends AbstractOrderedApplicationRunner {
     private IUser superUser;
 
     @Override
-    public void run(ApplicationArguments strings) {
+    public void apply(ApplicationArguments strings) {
         log.info("Creating Super user");
         createSuperUser();
     }
