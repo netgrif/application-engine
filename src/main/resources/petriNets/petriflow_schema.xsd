@@ -593,7 +593,8 @@
     <xs:complexType name="validation">
         <xs:sequence>
             <xs:element type="xs:string" name="name"/>
-            <xs:element name="arguments" type="arguments" minOccurs="0"/>
+            <xs:element name="clientArguments" type="arguments" minOccurs="0"/>
+            <xs:element name="serverArguments" type="arguments" minOccurs="0"/>
             <xs:element name="message" type="i18nStringType" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
@@ -781,16 +782,16 @@
     </xs:complexType>
     <xs:complexType name="arguments">
         <xs:sequence>
-            <xs:element type="xs:string" name="argument" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="argument" name="argument" maxOccurs="unbounded" minOccurs="0"/>
         </xs:sequence>
-        <xs:attribute type="argumentType" name="type" use="required"/>
     </xs:complexType>
-    <xs:simpleType name="argumentType">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="client"/>
-            <xs:enumeration value="server"/>
-        </xs:restriction>
-    </xs:simpleType>
+    <xs:complexType name="argument">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="dynamic" type="xs:boolean"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
     <!-- UTILS -->
     <xs:simpleType name="empty">
         <xs:restriction base="xs:string">

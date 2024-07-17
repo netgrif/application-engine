@@ -12,9 +12,9 @@
 		<validations>
 			<validation>
 				<name>regex</name>
-				<arguments type="server">
+				<serverArguments>
 					<argument>^([0-9]{1,6})$</argument> <!-- Cislo pocet znakov 1-6 -->
-				</arguments>
+				</serverArguments>
 				<message>error-regex01</message>
 			</validation>
 		</validations>
@@ -25,9 +25,9 @@
 		<validations>
 			<validation>
 				<name>regex</name>
-				<arguments type="server">
+				<serverArguments>
 					<argument>^([a-zA-Z0-9\-]{10})$</argument> <!-- Cislo alebo pismeno a polcka  10 znakov -->
-				</arguments>
+				</serverArguments>
 				<message>error-regex02</message>
 			</validation>
 		</validations>
@@ -38,9 +38,9 @@
 		<validations>
 			<validation>
 				<name>regex</name>
-				<arguments type="server">
+				<serverArguments>
 					<argument>^(TOTOK[a-zA-Z0-9]{7})$</argument> <!-- Prefix max 12 znakov -->
-				</arguments>
+				</serverArguments>
 				<message>error-regex03</message>
 			</validation>
 		</validations>
@@ -51,9 +51,9 @@
 		<validations>
 			<validation>
 				<name>regex</name>
-				<arguments type="server">
+				<serverArguments>
 					<argument>^([a-zA-Z0-9 ]{1,10})$</argument> <!-- 10 znakov vratane medzeri -->
-				</arguments>
+				</serverArguments>
 				<message>error-regex04</message>
 			</validation>
 		</validations>
@@ -64,9 +64,9 @@
 		<validations>
 			<validation>
 				<name>regex</name>
-				<arguments type="server">
+				<serverArguments>
 					<argument>^([A-ž0-9!@#$%^&amp;*()_+\-=\[\]{};':"\\|,.&lt;&gt;\/? ]{1,100})$</argument> <!-- pismena a specialne znaky  max100 -->
-				</arguments>
+				</serverArguments>
 				<message>error-regex05</message>
 			</validation>
 		</validations>
@@ -77,9 +77,9 @@
 		<validations>
 			<validation>
 				<name>regex</name>
-				<arguments type="server">
+				<serverArguments>
 					<argument>^[a-zA-Z0-9\._\%\+\-]+@[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,}$</argument> <!-- E-mail -->
-				</arguments>
+				</serverArguments>
 				<message>error-regex06</message>
 			</validation>
 		</validations>

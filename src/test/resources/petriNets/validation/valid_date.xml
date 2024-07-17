@@ -13,10 +13,10 @@
         <validations>
             <validation>
                 <name>between</name> <!-- od dnes do buducnosti-->
-                <arguments type="server">
+                <serverArguments>
                     <argument>today</argument>
                     <argument>future</argument>
-                </arguments>
+                </serverArguments>
                 <message>error-date01</message>
             </validation>
         </validations>
@@ -27,10 +27,10 @@
         <validations>
             <validation>
                 <name>between</name> <!-- od  minulosti do dnešného dňa -->
-                <arguments type="server">
+                <serverArguments>
                     <argument>past</argument>
                     <argument>today</argument>
-                </arguments>
+                </serverArguments>
                 <message>error-date02</message>
             </validation>
         </validations>
@@ -41,10 +41,10 @@
         <validations>
             <validation>
                 <name>between</name> <!-- od datumu do dnešného dňa -->
-                <arguments type="server">
+                <serverArguments>
                     <argument>2020-03-03</argument>
                     <argument>today</argument>
-                </arguments>
+                </serverArguments>
                 <message>error-date03</message>
             </validation>
         </validations>
@@ -55,10 +55,10 @@
         <validations>
             <validation>
                 <name>between</name> <!-- od minulosti do datumu -->
-                <arguments type="server">
+                <serverArguments>
                     <argument>past</argument>
                     <argument>2020-03-03</argument>
-                </arguments>
+                </serverArguments>
                 <message>error-date04</message>
             </validation>
         </validations>
@@ -69,10 +69,10 @@
         <validations>
             <validation>
                 <name>between</name> <!-- od datumu do datumu -->
-                <arguments type="server">
+                <serverArguments>
                     <argument>2020-01-01</argument>
                     <argument>2022-03-03</argument>
-                </arguments>
+                </serverArguments>
                 <message>error-date05</message>
             </validation>
         </validations>

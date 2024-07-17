@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -14,14 +15,16 @@ public class Arguments implements Serializable {
 
     private static final long serialVersionUID = -2385696520525471923L;
 
-    protected ArgumentsType type;
-    protected List<String> argument;
+    protected List<Argument> argument;
 
     @Override
     public Arguments clone() {
         Arguments cloned =  new Arguments();
-        cloned.setType(type);
-        cloned.setArgument(argument);
+        if (argument != null) {
+            List<Argument> clonedArgument = new ArrayList<>();
+            argument.forEach(a -> clonedArgument.add(a.clone()));
+            cloned.setArgument(clonedArgument);
+        }
         return cloned;
     }
 }

@@ -63,10 +63,10 @@
         <validations>
             <validation>
                 <name>inrange</name>
-                <arguments type="server">
+                <serverArguments>
                     <argument>10</argument>
                     <argument>20</argument>
-                </arguments>
+                </serverArguments>
                 <message>error-number06</message>
             </validation>
         </validations>
@@ -82,10 +82,10 @@
             </validation>
             <validation>
                 <name>inrange</name>
-                <arguments type="server">
+                <serverArguments>
                     <argument>inf</argument>
                     <argument>5</argument>
-                </arguments>
+                </serverArguments>
                 <message>error-number07-2</message>
             </validation>
         </validations>

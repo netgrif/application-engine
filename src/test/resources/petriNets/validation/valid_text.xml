@@ -33,9 +33,9 @@
         <validations>
             <validation>
                 <name>maxlength</name>
-                <arguments type="server">
+                <serverArguments>
                     <argument>6</argument>
-                </arguments>
+                </serverArguments>
                 <message>error-text03</message>
             </validation>
         </validations>
@@ -46,9 +46,9 @@
         <validations>
             <validation>
                 <name>minlength</name>
-                <arguments type="server">
+                <serverArguments>
                     <argument>3</argument>
-                </arguments>
+                </serverArguments>
                 <message>error-text04</message>
             </validation>
         </validations>
@@ -59,16 +59,16 @@
         <validations>
             <validation>
                 <name>minlength</name>
-                <arguments type="server">
+                <serverArguments>
                     <argument>3</argument>
-                </arguments>
+                </serverArguments>
                 <message>error-text05</message>
             </validation>
             <validation>
                 <name>maxlength</name>
-                <arguments type="server">
+                <serverArguments>
                     <argument>6</argument>
-                </arguments>
+                </serverArguments>
                 <message>error-text05</message>
             </validation>
         </validations>
@@ -79,9 +79,9 @@
         <validations>
             <validation>
                 <name>aaaa</name>
-                <arguments type="server">
-                    <argument>number01.rawValue</argument>
-                </arguments>
+                <serverArguments>
+                    <argument dynamic="true">number01.rawValue</argument>
+                </serverArguments>
                 <message>error-text06</message>
             </validation>
         </validations>
