@@ -28,10 +28,10 @@ public class RuleEngineRunner extends AbstractOrderedApplicationRunner {
     @Value("${drools.template.generate:true}")
     private boolean generate;
 
-    @Value("${drools.template.path:'rules/templates/template.drl'}")
+    @Value("${drools.template.path:rules/templates/template.drl}")
     private String generatedTemplatePath;
 
-    @Value("${drools.template-resource.classpath:'rules/templates/template.drl'}")
+    @Value("${drools.template-resource.classpath:rules/templates/template.drl}")
     private String templateResource;
 
     private final IRefreshableKieBase refreshableKieBase;
