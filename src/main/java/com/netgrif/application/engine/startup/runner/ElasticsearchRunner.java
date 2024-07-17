@@ -43,7 +43,7 @@ public class ElasticsearchRunner extends AbstractOrderedApplicationRunner {
     private final IElasticIndexService template;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void apply(ApplicationArguments args) throws Exception {
         if (drop) {
             log.info("Dropping Elasticsearch database [{}:{}/{}]", url, port, clusterName);
             template.deleteIndex(ElasticPetriNet.class);

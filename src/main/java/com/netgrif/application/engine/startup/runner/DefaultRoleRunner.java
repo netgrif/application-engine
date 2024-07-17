@@ -26,7 +26,7 @@ public class DefaultRoleRunner extends AbstractOrderedApplicationRunner {
     private final ProcessRoleRepository repository;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void apply(ApplicationArguments args) throws Exception {
         log.info("Creating default process role");
         Set<ProcessRole> role = repository.findAllByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
         if (role != null && !role.isEmpty()) {

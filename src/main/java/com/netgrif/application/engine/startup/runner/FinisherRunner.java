@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class FinisherRunner extends AbstractOrderedApplicationRunner {
 
     @Override
-    public void run(ApplicationArguments strings) throws Exception {
+    public void apply(ApplicationArguments strings) throws Exception {
         log.info("+----------------------------+");
         log.info("| Netgrif Application Engine |");
         log.info("+----------------------------+");

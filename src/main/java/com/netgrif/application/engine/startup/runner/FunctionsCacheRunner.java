@@ -19,7 +19,7 @@ public class FunctionsCacheRunner extends AbstractOrderedApplicationRunner {
     private final IFieldActionsCacheService cacheService;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void apply(ApplicationArguments args) throws Exception {
         log.info("Namespace function caching started");
         petriNetService.getAll().forEach(cacheService::cachePetriNetFunctions);
     }

@@ -21,7 +21,7 @@ public class FlushSessionsRunner extends AbstractOrderedApplicationRunner {
     private final RedisIndexedSessionRepository repository;
 
     @Override
-    public void run(ApplicationArguments args) {
+    public void apply(ApplicationArguments args) {
         log.info("Flushing all users session");
         connectionFactory.getConnection().flushAll();
         repository.cleanUpExpiredSessions();

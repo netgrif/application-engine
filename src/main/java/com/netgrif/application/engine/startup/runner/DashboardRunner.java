@@ -31,7 +31,7 @@ public class DashboardRunner extends AbstractOrderedApplicationRunner {
     private final SystemUserRunner systemCreator;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void apply(ApplicationArguments args) throws Exception {
         createDashboardNet();
         createDashboardTileNet();
     }

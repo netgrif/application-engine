@@ -29,7 +29,7 @@ public class ImpersonationRunner extends AbstractOrderedApplicationRunner {
     protected final SystemUserRunner systemCreator;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void apply(ApplicationArguments args) throws Exception {
         createConfigNets();
     }
 

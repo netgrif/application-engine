@@ -16,7 +16,7 @@ import java.util.Map;
 public class ProcessApplicationStartupRunnerExecutor extends AbstractOrderedApplicationRunner {
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void apply(ApplicationArguments args) throws Exception {
         List<ProcessApplicationStartupRunner> runners = resolveRunners();
         log.info("Detected {} startup runners", runners.size());
         runners.forEach(runner -> {

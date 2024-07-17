@@ -37,7 +37,7 @@ public class GroupRunner extends AbstractOrderedApplicationRunner {
     private final GroupConfigurationProperties groupProperties;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void apply(ApplicationArguments args) throws Exception {
         createDefaultGroup();
     }
 

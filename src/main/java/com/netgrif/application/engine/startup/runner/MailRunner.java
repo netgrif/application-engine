@@ -22,7 +22,7 @@ public class MailRunner extends AbstractOrderedApplicationRunner {
     private final IMailService service;
 
     @Override
-    public void run(ApplicationArguments strings) throws Exception {
+    public void apply(ApplicationArguments strings) throws Exception {
         log.info("Starting test for mail connection");
         host();
         service.testConnection();

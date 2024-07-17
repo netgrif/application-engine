@@ -44,7 +44,7 @@ public class PostalCodeImporter extends AbstractOrderedApplicationRunner {
     private final IPostalCodeService service;
     private final PostalCodeRepository repository;
 
-    public void run(ApplicationArguments strings) throws IOException {
+    public void apply(ApplicationArguments strings) throws IOException {
         if (!importPostalCode) {
             log.info("Skip import postal codes");
             return;

@@ -25,7 +25,7 @@ class StorageRunner extends AbstractOrderedApplicationRunner {
     private final FileStorageConfiguration fileStorageConfiguration;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void apply(ApplicationArguments args) throws Exception {
         log.info("Creating storage folder");
         File storage = new File(fileStorageConfiguration.getStoragePath() + File.separator + "uploadedModels" + File.separator + "model.txt");
         storage.getParentFile().mkdirs();

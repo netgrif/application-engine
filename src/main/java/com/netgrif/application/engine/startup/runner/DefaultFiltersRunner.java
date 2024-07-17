@@ -55,7 +55,7 @@ public class DefaultFiltersRunner extends AbstractOrderedApplicationRunner {
     private final IDataService dataService;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void apply(ApplicationArguments args) throws Exception {
         if (!createDefaultFilters) return;
         // All cases
         createCaseFilter("All cases", "assignment", FILTER_VISIBILITY_PUBLIC, "", new ArrayList<String>(),
