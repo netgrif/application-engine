@@ -5,8 +5,5 @@ import java.lang.annotation.*;
 @Documented
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ReplaceRunner {
-
-    Class<?> value(); // TODO make this array to be able replace multiple runners
-
+public @interface OptionalRunner {
 }

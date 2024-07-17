@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@RunnerOrder(19)
+@RunnerOrder(190)
 @RequiredArgsConstructor
-public class QuartzSchedulerRunner extends AbstractOrderedApplicationRunner {
+public class QuartzSchedulerRunner implements ApplicationEngineStartupRunner {
 
     @Value("${quartz.scheduler.run:true}")
     private boolean start;
@@ -21,7 +21,7 @@ public class QuartzSchedulerRunner extends AbstractOrderedApplicationRunner {
     private final Scheduler scheduler;
 
     @Override
-    public void apply(ApplicationArguments strings) throws Exception {
+    public void run(ApplicationArguments strings) throws Exception {
         if (start) {
             log.info("Starting Quartz scheduler");
             scheduler.start();

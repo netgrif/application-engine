@@ -3,7 +3,7 @@ package com.netgrif.application.engine.startup.runner;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +15,9 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-@RunnerOrder(13)
+@RunnerOrder(130)
 @RequiredArgsConstructor
-public class ImpersonationRunner extends AbstractOrderedApplicationRunner {
+public class ImpersonationRunner implements ApplicationEngineStartupRunner {
 
     public static final String IMPERSONATION_CONFIG_FILE_NAME = "engine-processes/impersonation_config.xml";
     public static final String IMPERSONATION_CONFIG_PETRI_NET_IDENTIFIER = "impersonation_config";
@@ -29,7 +29,7 @@ public class ImpersonationRunner extends AbstractOrderedApplicationRunner {
     protected final SystemUserRunner systemCreator;
 
     @Override
-    public void apply(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) throws Exception {
         createConfigNets();
     }
 

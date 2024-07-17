@@ -19,70 +19,6 @@ import java.util.function.Function;
 @Component
 public class ApplicationRunnerOrderResolver {
 
-    private static final List<Class<? extends AbstractOrderedApplicationRunner>> order = new ArrayList<>();
-    private static final Map<Class<? extends AbstractOrderedApplicationRunner>, Class<? extends AbstractOrderedApplicationRunner>> replaced = new HashMap<>();
-
-    /**
-     * Retrieves the order index of the specified class within the registered application runners.
-     *
-     * @param clazz the class to find the order index for, which must extend {@link AbstractOrderedApplicationRunner}
-     * @return the order index of the specified class
-     * @throws IllegalArgumentException if the specified class is not registered as an application runner
-     */
-    public static int getOrder(Class<? extends AbstractOrderedApplicationRunner> clazz) {
-        int idx = order.indexOf(clazz);
-        if (idx == -1) {
-            boolean isReplaced = isReplaced(clazz);
-            if (!isReplaced) {
-                throw new IllegalArgumentException("Class " + clazz.getSimpleName() + " is not registered as an application runner");
-            } else {
-                return -1;
-            }
-        }
-        return idx;
-    }
-
-    /**
-     * Checks if the specified class has been replaced.
-     *
-     * <p>This method determines whether the given class, which must be a subclass of
-     * {@link AbstractOrderedApplicationRunner}, is present in the {@code replaced} map.
-     *
-     * @param clazz the class to check, which must extend {@link AbstractOrderedApplicationRunner}
-     * @return {@code true} if the class has been replaced (i.e., it is present in the {@code replaced} map),
-     * {@code false} otherwise
-     */
-    public static boolean isReplaced(Class<? extends AbstractOrderedApplicationRunner> clazz) {
-        return replaced.containsKey(clazz);
-    }
-
-    /**
-     * Retrieves the replacement class for the specified class.
-     *
-     * <p>This method looks up the replacement class for the given class in the
-     * internal map. If a replacement exists, it returns the replacement class;
-     * otherwise, it returns {@code null}.
-     *
-     * @param clazz the class for which to retrieve the replacement
-     * @return the replacement class if it exists, or {@code null} if no replacement is found
-     */
-    public static Class<? extends AbstractOrderedApplicationRunner> getReplacement(Class<? extends AbstractOrderedApplicationRunner> clazz) {
-        return replaced.get(clazz);
-    }
-
-    @EventListener
-    public void onApplicationEvent(final ContextRefreshedEvent event) {
-        Map<String, AbstractOrderedApplicationRunner> applicationRunners = event.getApplicationContext().getBeansOfType(AbstractOrderedApplicationRunner.class);
-        order.clear();
-        SortedRunners<AbstractOrderedApplicationRunner> runners = sortByRunnerOrderAnnotation(applicationRunners.values());
-        runners.sortUnresolvedRunners();
-        runners.getSorted().forEach(r -> order.add((Class<? extends AbstractOrderedApplicationRunner>) resolveClass(r)));
-        runners.getReplaced().forEach((k, v) -> replaced.put((Class<? extends AbstractOrderedApplicationRunner>) k, (Class<? extends AbstractOrderedApplicationRunner>) resolveClass(v)));
-        if (!runners.getUnresolved().isEmpty()) {
-            log.warn("Not all application runner were registered, unresolved application runners: {}", runners.getUnresolved());
-        }
-    }
-
     /**
      * Sorts the given collection of runners by the {@link RunnerOrder} annotation.
      *
@@ -120,7 +56,7 @@ public class ApplicationRunnerOrderResolver {
     public static class SortedRunners<T> {
         private final List<T> sorted;
         private final List<T> unresolved;
-        private final Map<Class<?>, T> replaced = new HashMap<>();
+        private final Map<Class<?>, Class<?>> replaced = new HashMap<>(); // key is active runner, value is runner that was replaced
 
         public SortedRunners() {
             sorted = new ArrayList<>();
@@ -150,7 +86,7 @@ public class ApplicationRunnerOrderResolver {
          */
         public boolean sortUnresolvedRunners() {
             boolean changed = false;
-            changed = changed || resolveSortingAnnotation(BeforeRunner.class, this::insertBeforeRunner);
+            changed = changed || resolveSortingAnnotation(BeforeRunner.class, this::insertBeforeRunner); // TODO ošetriť keď sa nenájde tá trieda a teda ostane v unresolved
             changed = changed || resolveSortingAnnotation(AfterRunner.class, this::insertAfterRunner);
             changed = changed || resolveSortingAnnotation(ReplaceRunner.class, this::replaceRunner);
             if (unresolved.isEmpty()) return true;
@@ -205,7 +141,7 @@ public class ApplicationRunnerOrderResolver {
             int runnerToReplaceIndex = indexOfClass(sorted, runnerToReplace);
             if (runnerToReplaceIndex == -1) return false;
             sorted.add(runnerToReplaceIndex, item);
-            replaced.put(runnerToReplace, item);
+            replaced.put(itemClass, runnerToReplace);
             return true;
         }
 

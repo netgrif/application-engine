@@ -3,12 +3,11 @@ package com.netgrif.application.engine.startup.runner;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Component;
 
@@ -16,9 +15,9 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-@RunnerOrder(10)
+@RunnerOrder(100)
 @RequiredArgsConstructor
-public class FilterRunner extends AbstractOrderedApplicationRunner {
+public class FilterRunner implements ApplicationEngineStartupRunner {
 
     public static final String FILTER_PETRI_NET_IDENTIFIER = "filter";
     public static final String PREFERRED_ITEM_NET_IDENTIFIER = "preference_item";
@@ -35,7 +34,7 @@ public class FilterRunner extends AbstractOrderedApplicationRunner {
     private final SystemUserRunner systemCreator;
 
     @Override
-    public void apply(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) throws Exception {
         createFilterNet();
         createPreferenceItemNet();
         createImportFiltersNet();

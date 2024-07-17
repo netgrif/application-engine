@@ -5,7 +5,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +20,10 @@ import java.util.Set;
 
 @Slf4j
 @Component
-@RunnerOrder(15)
+@RunnerOrder(150)
 @RequiredArgsConstructor
 @ConditionalOnProperty(value = "admin.create-super", matchIfMissing = true)
-public class SuperCreatorRunner extends AbstractOrderedApplicationRunner {
+public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
 
     public static final String SUPER_ADMIN_EMAIL = "super@netgrif.com";
 
@@ -39,7 +39,7 @@ public class SuperCreatorRunner extends AbstractOrderedApplicationRunner {
     private IUser superUser;
 
     @Override
-    public void apply(ApplicationArguments strings) {
+    public void run(ApplicationArguments strings) {
         log.info("Creating Super user");
         createSuperUser();
     }

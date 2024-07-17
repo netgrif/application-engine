@@ -3,7 +3,7 @@ package com.netgrif.application.engine.startup.runner;
 import com.netgrif.application.engine.business.IPostalCodeService;
 import com.netgrif.application.engine.business.PostalCode;
 import com.netgrif.application.engine.business.PostalCodeRepository;
-import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -26,10 +26,10 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Component
-@RunnerOrder(18)
+@RunnerOrder(180)
 @Profile("!update")
 @RequiredArgsConstructor
-public class PostalCodeImporter extends AbstractOrderedApplicationRunner {
+public class PostalCodeImporter implements ApplicationEngineStartupRunner {
 
     @Getter
     @Setter
@@ -44,7 +44,7 @@ public class PostalCodeImporter extends AbstractOrderedApplicationRunner {
     private final IPostalCodeService service;
     private final PostalCodeRepository repository;
 
-    public void apply(ApplicationArguments strings) throws IOException {
+    public void run(ApplicationArguments strings) throws IOException {
         if (!importPostalCode) {
             log.info("Skip import postal codes");
             return;

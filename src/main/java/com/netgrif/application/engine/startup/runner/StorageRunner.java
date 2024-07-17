@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +15,9 @@ import java.io.File;
 @Slf4j
 @Component
 @Profile("!test")
-@RunnerOrder(2)
+@RunnerOrder(20)
 @RequiredArgsConstructor
-class StorageRunner extends AbstractOrderedApplicationRunner {
+class StorageRunner implements ApplicationEngineStartupRunner {
 
     @Value("${nae.storage.clean}")
     private boolean cleanStorage;
@@ -25,7 +25,7 @@ class StorageRunner extends AbstractOrderedApplicationRunner {
     private final FileStorageConfiguration fileStorageConfiguration;
 
     @Override
-    public void apply(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) throws Exception {
         log.info("Creating storage folder");
         File storage = new File(fileStorageConfiguration.getStoragePath() + File.separator + "uploadedModels" + File.separator + "model.txt");
         storage.getParentFile().mkdirs();
