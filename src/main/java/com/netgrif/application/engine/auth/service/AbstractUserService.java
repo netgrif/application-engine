@@ -106,7 +106,8 @@ public abstract class AbstractUserService implements IUserService {
         return removeRole(user, processRoleService.findByImportId(roleStringId));
     }
 
-    protected IUser removeRole(IUser user, ProcessRole role) {
+    @Override
+    public IUser removeRole(IUser user, ProcessRole role) {
         user.removeProcessRole(role);
         securityContextService.saveToken(user.getStringId());
         securityContextService.reloadSecurityContext(user.transformToLoggedUser());
