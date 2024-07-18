@@ -7,6 +7,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ReplaceRunner {
 
-    Class<?> value(); // TODO make this array to be able replace multiple runners
+    Class<?>[] value() default {};
 
 }

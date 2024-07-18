@@ -5,10 +5,9 @@ import com.netgrif.application.engine.startup.annotation.BeforeRunner;
 import com.netgrif.application.engine.startup.annotation.ReplaceRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Annotation;
@@ -17,7 +16,10 @@ import java.util.function.Function;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class ApplicationRunnerOrderResolver {
+
+    private final ApplicationRunnerProperties properties;
 
     /**
      * Sorts the given collection of runners by the {@link RunnerOrder} annotation.
@@ -27,27 +29,31 @@ public class ApplicationRunnerOrderResolver {
      * @return a {@link SortedRunners} object containing two lists: one with the sorted runners and one with the unresolved runners.
      * To resolve order of the unresolved list call {@link SortedRunners#sortUnresolvedRunners()} method.
      */
-    public static <T> SortedRunners<T> sortByRunnerOrderAnnotation(Collection<T> runners) {
+    public <T> SortedRunners<T> sortByRunnerOrderAnnotation(Collection<T> runners) {
         if (runners == null) return null;
         if (runners.isEmpty()) return new SortedRunners<>();
         List<T> unresolved = new ArrayList<>();
         TreeMap<Integer, List<T>> ordered = new TreeMap<>();
         runners.forEach(runner -> {
             Class<?> runnerClass = resolveClass(runner);
-            RunnerOrder order = runnerClass.getAnnotation(RunnerOrder.class);
-            if (order == null) {
+            RunnerOrder[] runnerOrders = runnerClass.getAnnotationsByType(RunnerOrder.class);
+            if (runnerOrders == null || runnerOrders.length == 0) {
                 unresolved.add(runner);
                 return;
             }
-            if (!ordered.containsKey(order.value())) {
-                ordered.put(order.value(), new ArrayList<>());
+            int numberOfExecutions = properties.isEnableMultipleExecution() ? runnerOrders.length : 1;
+            for (int i = 0; i < numberOfExecutions; i++) {
+                RunnerOrder order = runnerOrders[i];
+                if (!ordered.containsKey(order.value())) {
+                    ordered.put(order.value(), new ArrayList<>());
+                }
+                ordered.get(order.value()).add(runner);
             }
-            ordered.get(order.value()).add(runner);
         });
         return new SortedRunners<>(ordered.values().stream().flatMap(List::stream).toList(), unresolved);
     }
 
-    protected static <T> Class<?> resolveClass(T object) {
+    public static <T> Class<?> resolveClass(T object) {
         if (object instanceof Class) return (Class<?>) object;
         else return AopUtils.isAopProxy(object) ? AopUtils.getTargetClass(object) : object.getClass();
     }
@@ -86,7 +92,7 @@ public class ApplicationRunnerOrderResolver {
          */
         public boolean sortUnresolvedRunners() {
             boolean changed = false;
-            changed = changed || resolveSortingAnnotation(BeforeRunner.class, this::insertBeforeRunner); // TODO ošetriť keď sa nenájde tá trieda a teda ostane v unresolved
+            changed = changed || resolveSortingAnnotation(BeforeRunner.class, this::insertBeforeRunner);
             changed = changed || resolveSortingAnnotation(AfterRunner.class, this::insertAfterRunner);
             changed = changed || resolveSortingAnnotation(ReplaceRunner.class, this::replaceRunner);
             if (unresolved.isEmpty()) return true;
@@ -137,12 +143,16 @@ public class ApplicationRunnerOrderResolver {
         protected boolean replaceRunner(T item) {
             Class<?> itemClass = resolveClass(item);
             if (!itemClass.isAnnotationPresent(ReplaceRunner.class)) return false;
-            Class<?> runnerToReplace = itemClass.getAnnotation(ReplaceRunner.class).value();
-            int runnerToReplaceIndex = indexOfClass(sorted, runnerToReplace);
-            if (runnerToReplaceIndex == -1) return false;
-            sorted.add(runnerToReplaceIndex, item);
-            replaced.put(itemClass, runnerToReplace);
-            return true;
+            Class<?>[] runnersToReplace = itemClass.getAnnotation(ReplaceRunner.class).value();
+            boolean changed = false;
+            for (Class<?> runnerToReplace : runnersToReplace) {
+                int runnerToReplaceIndex = indexOfClass(sorted, runnerToReplace);
+                if (runnerToReplaceIndex == -1) continue;
+                sorted.add(runnerToReplaceIndex, item);
+                replaced.put(itemClass, runnerToReplace);
+                changed = true;
+            }
+            return changed;
         }
 
         /**

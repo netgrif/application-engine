@@ -1,16 +1,18 @@
 package com.netgrif.application.engine.startup;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
 @Order(0)
-@RequiredArgsConstructor
+@Component
 public class ProcessApplicationStartupRunnerExecutor extends ApplicationRunnerExecutor<ProcessApplicationStartupRunner> {
+
+    public ProcessApplicationStartupRunnerExecutor(ApplicationRunnerOrderResolver orderResolver, ApplicationRunnerProperties properties) {
+        super(orderResolver, properties);
+    }
 
     @Override
     public void executeRunner(ProcessApplicationStartupRunner runner, ApplicationArguments args) throws Exception {

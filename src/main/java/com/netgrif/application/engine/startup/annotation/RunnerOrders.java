@@ -4,10 +4,9 @@ import java.lang.annotation.*;
 
 @Documented
 @Target({ElementType.TYPE})
-@Repeatable(RunnerOrders.class)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RunnerOrder {
+public @interface RunnerOrders {
 
-    int value() default Integer.MAX_VALUE;
+    RunnerOrder[] value();
 
 }
