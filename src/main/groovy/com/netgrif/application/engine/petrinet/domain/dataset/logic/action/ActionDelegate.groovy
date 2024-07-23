@@ -34,6 +34,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.rules.domain.RuleRepository
 import com.netgrif.application.engine.startup.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.FilterRunner
+import com.netgrif.application.engine.transaction.NaeTransaction
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.*
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
@@ -56,15 +57,16 @@ import groovy.util.logging.Slf4j
 import org.bson.types.ObjectId
 import org.quartz.Scheduler
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.mongodb.MongoTransactionManager
 
 import java.text.Normalizer
 import java.util.stream.Collectors
-
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -177,6 +179,9 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     @Autowired
     PublicViewProperties publicViewProperties
 
+    @Autowired
+    MongoTransactionManager transactionManager
+
     FrontendActionOutcome Frontend
 
     /**
@@ -207,6 +212,41 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         this.initTransitionsMap(action.transitionIds)
         this.outcomes = new ArrayList<>()
         this.Frontend = new FrontendActionOutcome(this.useCase, this.task, this.outcomes)
+    }
+
+    /**
+     * todo
+     * */
+    def transaction(boolean forceCreation = false, int timeout, Closure event) {
+        def transactionBuilder = NaeTransaction.builder()
+                .timeout(timeout)
+                .forceCreation(forceCreation)
+                .event(event)
+                .transactionManager(transactionManager)
+        return [
+                onCommit  : { Closure onCommitClosure ->
+                    transactionBuilder.onCommit(onCommitClosure)
+                    [
+                        onRollBack: { Closure onRollBackClosure ->
+                            transactionBuilder.onRollBack(onRollBackClosure)
+                            executeTransaction(transactionBuilder.build())
+                        }
+                    ]
+                },
+                onRollBack: { Closure onRollBackClosure ->
+                    transactionBuilder.onRollBack(onRollBackClosure)
+                    executeTransaction(transactionBuilder.build())
+                }
+        ]
+    }
+
+    protected void executeTransaction(NaeTransaction transaction) {
+        try {
+            transaction.begin()
+        } catch (Exception e) {
+            log.error("Transaction failed with error: %", e.getMessage(), e)
+            // todo log also action.toString()
+        }
     }
 
     void initFieldsMap(Map<String, String> fieldIds, Case useCase) {

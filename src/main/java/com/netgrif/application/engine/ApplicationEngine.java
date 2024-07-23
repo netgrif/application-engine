@@ -17,8 +17,8 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
-import org.springframework.hateoas.server.LinkRelationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +26,7 @@ import java.util.List;
 @EnableCaching
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableTransactionManagement
 @EnableAspectJAutoProxy
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @EnableMongoAuditing
