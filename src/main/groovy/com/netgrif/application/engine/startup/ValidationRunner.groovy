@@ -41,7 +41,7 @@ class ValidationRunner extends AbstractOrderedCommandLineRunner {
         helper.upsertNet(VALIDATION_FILE_NAME, VALIDATION_PETRI_NET_IDENTIFIER)
 
         CaseSearchRequest request = new CaseSearchRequest()
-        request.query = String.format("processIdentifier:%s AND dataSet.%s.value:true", VALIDATION_PETRI_NET_IDENTIFIER, VALIDATION_ACTIVE_FIELD_ID)
+        request.query = String.format("processIdentifier:%s AND dataSet.%s.booleanValue:true", VALIDATION_PETRI_NET_IDENTIFIER, VALIDATION_ACTIVE_FIELD_ID)
         long numberActiveValidations = elasticCaseService.count([request], userService.loggedOrSystem.transformToLoggedUser(), LocaleContextHolder.locale, false)
         int pageCount = (int) (numberActiveValidations / PAGE_SIZE) + 1
         pageCount.times {

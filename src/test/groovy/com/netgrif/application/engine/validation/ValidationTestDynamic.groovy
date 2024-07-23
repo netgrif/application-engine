@@ -7,13 +7,11 @@ import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.startup.ValidationRunner
 import com.netgrif.application.engine.validations.interfaces.IValidationService
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import org.junit.jupiter.api.Assertions
@@ -37,25 +35,19 @@ class ValidationTestDynamic {
     private ImportHelper importHelper
 
     @Autowired
-    private CaseRepository caseRepository
-
-    @Autowired
     private TestHelper testHelper
 
     @Autowired
     private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator
-
-    @Autowired
     private IWorkflowService workflowService
 
     @Autowired
-    private ITaskService taskService
+    private IValidationService validationService
 
     @Autowired
-    private IValidationService validationService
+    protected ValidationRunner validationRunner
 
     @BeforeEach
     void setup() {
@@ -134,5 +126,46 @@ class ValidationTestDynamic {
         })
 
         assert "error-text06" == thrown.getMessage()
+    }
+
+    @Test
+    void textDynamic_validation_conflictWithFieldName() {
+
+        createValidation("number01", "a -> thisField.rawValue.size() == a as Integer", true)
+
+        PetriNet testNet = importTextNet()
+        Case aCase = importHelper.createCase("TestCase", testNet)
+        assert aCase != null
+        Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
+        assert task != null
+
+        Assertions.assertThrows(MissingMethodException.class, () -> {
+            importHelper.setTaskData(task.getStringId(), new DataSet(["text07": new TextField(rawValue: "1234567")]))
+            Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
+            assert taskFinish != null
+        })
+    }
+
+    @Test
+    void dynamicValidation_importActive() {
+        createValidation("test1", "-> thisField.rawValue = 1", true)
+        createValidation("test2", "-> thisField.rawValue = 2", true)
+        createValidation("test3", "-> thisField.rawValue = 3", false)
+
+        assert validationService.getValidation("test1") instanceof Closure<Boolean> && validationService.getValidation("test1") != null
+        assert validationService.getValidation("test2") instanceof Closure<Boolean> && validationService.getValidation("test2") != null
+        assert validationService.getValidation("test3") == null
+
+        validationService.clearValidations()
+
+        assert validationService.getValidation("test1") == null
+        assert validationService.getValidation("test2") == null
+        assert validationService.getValidation("test3") == null
+
+        validationRunner.run()
+
+        assert validationService.getValidation("test1") instanceof Closure<Boolean> && validationService.getValidation("test1") != null
+        assert validationService.getValidation("test2") instanceof Closure<Boolean> && validationService.getValidation("test2") != null
+        assert validationService.getValidation("test3") == null
     }
 }

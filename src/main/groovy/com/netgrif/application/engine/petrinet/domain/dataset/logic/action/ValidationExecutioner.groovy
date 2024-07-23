@@ -1,8 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.event.IGroovyShellFactory
-import com.netgrif.application.engine.petrinet.domain.dataset.Argument
-import com.netgrif.application.engine.petrinet.domain.dataset.Arguments
 
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.Validation
@@ -44,10 +42,15 @@ abstract class ValidationExecutioner {
         return this.registry.getValidation(validationName)
     }
 
+    protected static String escapeSpecialCharacters(String s){
+        return s.replace('\\', '\\\\')
+                .replace('\'', '\\\'')
+    }
+
     protected Closure<Boolean> initCode(Validation validation, ValidationDelegate delegate) {
         List<String> argumentList = []
         if (validation.serverArguments != null) {
-            argumentList = validation.serverArguments.argument.collect { it.isDynamic ? it.value : "\"${it.value}\"" }
+            argumentList = validation.serverArguments.argument.collect { it.isDynamic ? it.value : "'${escapeSpecialCharacters(it.value)}'" }
         }
         String validationCall = "${validation.name}(${argumentList.join(", ")})"
         Closure<Boolean> code = this.shellFactory.getGroovyShell().evaluate("{ -> return " + validationCall + " }") as Closure<Boolean>

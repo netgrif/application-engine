@@ -28,11 +28,6 @@ class ValidationDelegate {
     Boolean requiredtrue() { return thisField instanceof BooleanField && notempty() && thisField.rawValue == true }
 
     // date field validations
-    Closure<String> future = { return FUTURE }
-    Closure<String> today = { return TODAY }
-    Closure<String> past = { return PAST }
-    Closure<String> now = { return NOW }
-
     Boolean between(def from, def to) {
         if (!(thisField instanceof DateField || thisField instanceof DateTimeField)) {
             return false
@@ -52,8 +47,6 @@ class ValidationDelegate {
             LocalDate parsedDate = parseStringToLocalDate(to)
             toDate = parsedDate ? parsedDate.atStartOfDay() : to
         }
-
-        log.warn("{} > between {}, {}", thisFieldValue, fromDate, toDate)
 
         if ((fromDate == TODAY || fromDate == NOW) && toDate == FUTURE) {
             if (thisFieldValue < updateDate_TODAY) {
@@ -115,8 +108,6 @@ class ValidationDelegate {
     }
 
     // number field validations
-    Closure<String> inf = { return INF }
-
     Boolean odd() { return thisField instanceof NumberField && notempty() && thisField.rawValue as Double % 2 != 0 }
 
     Boolean even() { return thisField instanceof NumberField && notempty() && thisField.rawValue as Double % 2 == 0 }
@@ -128,13 +119,6 @@ class ValidationDelegate {
     Boolean decimal() { return thisField instanceof NumberField && notempty() && thisField.rawValue as Double % 1 == 0 }
 
     Boolean inrange(def from, def to) {
-        if (from == inf) {
-            from = inf()
-        }
-
-        if (to == inf) {
-            to = inf()
-        }
 
         if (from instanceof String && from.toLowerCase() == INF) {
             from = Double.MIN_VALUE

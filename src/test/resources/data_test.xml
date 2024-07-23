@@ -10,10 +10,13 @@
         <title>Number</title>
         <placeholder>Number field placeholder</placeholder>
         <desc>Number field description</desc>
-        <valid>inrange 0,inf</valid>
         <validations>
             <validation>
-                <expression>inrange 0,inf</expression>
+                <name>inrange</name>
+                <serverArguments>
+                    <argument>0</argument>
+                    <argument>inf</argument>
+                </serverArguments>
                 <message>Number field validation message</message>
             </validation>
         </validations>
@@ -25,10 +28,9 @@
         <title>Text</title>
         <placeholder>Text field placeholder</placeholder>
         <desc>Text field description</desc>
-        <valid>email</valid>
         <validations>
             <validation>
-                <expression>email</expression>
+                <name>email</name>
                 <message>Mail validation message</message>
             </validation>
         </validations>
@@ -67,10 +69,9 @@
         <title>Boolean</title>
         <placeholder>Boolean field placeholder</placeholder>
         <desc>Boolean field description</desc>
-        <valid>requiredTrue</valid>
         <validations>
             <validation>
-                <expression>requiredTrue</expression>
+                <name>requiredTrue</name>
                 <message>Boolean field validation message</message>
             </validation>
         </validations>
@@ -82,14 +83,21 @@
         <title>Date</title>
         <placeholder>Date field placeholder</placeholder>
         <desc>Date field description</desc>
-        <valid>between today,future</valid>
         <validations>
             <validation>
-                <expression>between today,future</expression>
+                <name>between</name>
+                <serverArguments>
+                    <argument>today</argument>
+                    <argument>future</argument>
+                </serverArguments>
                 <message>Date field validation message</message>
             </validation>
             <validation>
-                <expression>between today,tommorow</expression>
+                <name>between</name>
+                <serverArguments>
+                    <argument>today</argument>
+                    <argument>tommorow</argument>
+                </serverArguments>
                 <message>Date field validation message 2</message>
             </validation>
         </validations>
@@ -114,14 +122,21 @@
         <title>DateTime</title>
         <placeholder>DateTime field placeholder</placeholder>
         <desc>DateTime field description</desc>
-        <valid>between today,future</valid>
         <validations>
             <validation>
-                <expression>between today,future</expression>
+                <name>between</name>
+                <serverArguments>
+                    <argument>today</argument>
+                    <argument>future</argument>
+                </serverArguments>
                 <message>Date field validation message</message>
             </validation>
             <validation>
-                <expression>between today,future</expression>
+                <name>between</name>
+                <serverArguments>
+                    <argument>today</argument>
+                    <argument>future</argument>
+                </serverArguments>
                 <message>Date field validation message 2</message>
             </validation>
         </validations>
@@ -162,11 +177,21 @@
         <init name="i18n_text">Default i18n text value</init>
         <validations>
             <validation>
-                <expression>translationRequired sk,en</expression>
+                <name>translationRequired</name>
+                <serverArguments>
+                    <argument>sk</argument>
+                    <argument>en</argument>
+                </serverArguments>
                 <message>Slovak and English language required</message>
             </validation>
             <validation>
-                <expression>translationOnly sk,en,cz,de</expression>
+                <name>translationOnly</name>
+                <serverArguments>
+                    <argument>sk</argument>
+                    <argument>en</argument>
+                    <argument>cz</argument>
+                    <argument>de</argument>
+                </serverArguments>
                 <message>Only Slovak, English, Czech and German languages allowed</message>
             </validation>
         </validations>

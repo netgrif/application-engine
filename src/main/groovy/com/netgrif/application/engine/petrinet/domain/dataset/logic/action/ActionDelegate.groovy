@@ -1088,8 +1088,8 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         }
     }
 
-    Validation validation(String rule, I18nString message) {
-        return new Validation(rule, message)
+    Validation validation(String name, Arguments clientArguments, Arguments serverArguments, I18nString message) {
+        return new Validation(name, clientArguments, serverArguments, message)
     }
 
     // TODO: release/8.0.0 remove?

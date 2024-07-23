@@ -551,30 +551,6 @@ public class TaskService implements ITaskService {
         return outcomes;
     }
 
-    void validateData(Transition transition, Case useCase) {
-//        TODO: release/8.0.0 fix validation
-//        for (Map.Entry<String, DataFieldLogic> entry : transition.getDataSet().entrySet()) {
-//            if (useCase.getPetriNet().getDataSet().get(entry.getKey()) != null
-//                    && useCase.getPetriNet().getDataSet().get(entry.getKey()).getValidations() != null) {
-//                validation.valid(useCase.getPetriNet().getDataSet().get(entry.getKey()), useCase.getDataField(entry.getKey()));
-//            }
-//            if (!useCase.getDataField(entry.getKey()).isRequired(transition.getImportId()))
-//                continue;
-//            if (useCase.getDataField(entry.getKey()).isUndefined(transition.getImportId()) && !entry.getValue().isRequired())
-//                continue;
-//
-//            Object value = useCase.getDataSet().get(entry.getKey()).getValue();
-//            if (value == null) {
-//                Field field = useCase.getField(entry.getKey());
-//                throw new IllegalArgumentException("Field \"" + field.getName() + "\" has null value");
-//            }
-//            if (value instanceof String && ((String) value).isEmpty()) {
-//                Field field = useCase.getField(entry.getKey());
-//                throw new IllegalArgumentException("Field \"" + field.getName() + "\" has empty value");
-//            }
-//        }
-    }
-
     protected void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase) {
         log.info("[{}]: Task {} scheduled to run at {}", useCase.getStringId(), task.getTitle(), time.toString());
         scheduler.schedule(() -> {

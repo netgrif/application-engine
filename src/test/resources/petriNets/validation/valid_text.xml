@@ -86,6 +86,19 @@
             </validation>
         </validations>
     </data>
+    <data type="text">
+        <id>text07</id>
+        <title/>
+        <validations>
+            <validation>
+                <name>number01</name>
+                <serverArguments>
+                    <argument dynamic="true">number01.rawValue</argument>
+                </serverArguments>
+                <message>error-text07</message>
+            </validation>
+        </validations>
+    </data>
     <data type="number">
         <id>number01</id>
         <title/>
