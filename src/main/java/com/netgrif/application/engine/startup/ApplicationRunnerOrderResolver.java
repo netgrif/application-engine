@@ -5,10 +5,9 @@ import com.netgrif.application.engine.startup.annotation.BeforeRunner;
 import com.netgrif.application.engine.startup.annotation.ReplaceRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Annotation;
@@ -17,71 +16,10 @@ import java.util.function.Function;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class ApplicationRunnerOrderResolver {
 
-    private static final List<Class<? extends AbstractOrderedApplicationRunner>> order = new ArrayList<>();
-    private static final Map<Class<? extends AbstractOrderedApplicationRunner>, Class<? extends AbstractOrderedApplicationRunner>> replaced = new HashMap<>();
-
-    /**
-     * Retrieves the order index of the specified class within the registered application runners.
-     *
-     * @param clazz the class to find the order index for, which must extend {@link AbstractOrderedApplicationRunner}
-     * @return the order index of the specified class
-     * @throws IllegalArgumentException if the specified class is not registered as an application runner
-     */
-    public static int getOrder(Class<? extends AbstractOrderedApplicationRunner> clazz) {
-        int idx = order.indexOf(clazz);
-        if (idx == -1) {
-            boolean isReplaced = isReplaced(clazz);
-            if (!isReplaced) {
-                throw new IllegalArgumentException("Class " + clazz.getSimpleName() + " is not registered as an application runner");
-            } else {
-                return -1;
-            }
-        }
-        return idx;
-    }
-
-    /**
-     * Checks if the specified class has been replaced.
-     *
-     * <p>This method determines whether the given class, which must be a subclass of
-     * {@link AbstractOrderedApplicationRunner}, is present in the {@code replaced} map.
-     *
-     * @param clazz the class to check, which must extend {@link AbstractOrderedApplicationRunner}
-     * @return {@code true} if the class has been replaced (i.e., it is present in the {@code replaced} map),
-     * {@code false} otherwise
-     */
-    public static boolean isReplaced(Class<? extends AbstractOrderedApplicationRunner> clazz) {
-        return replaced.containsKey(clazz);
-    }
-
-    /**
-     * Retrieves the replacement class for the specified class.
-     *
-     * <p>This method looks up the replacement class for the given class in the
-     * internal map. If a replacement exists, it returns the replacement class;
-     * otherwise, it returns {@code null}.
-     *
-     * @param clazz the class for which to retrieve the replacement
-     * @return the replacement class if it exists, or {@code null} if no replacement is found
-     */
-    public static Class<? extends AbstractOrderedApplicationRunner> getReplacement(Class<? extends AbstractOrderedApplicationRunner> clazz) {
-        return replaced.get(clazz);
-    }
-
-    @EventListener
-    public void onApplicationEvent(final ContextRefreshedEvent event) {
-        Map<String, AbstractOrderedApplicationRunner> applicationRunners = event.getApplicationContext().getBeansOfType(AbstractOrderedApplicationRunner.class);
-        order.clear();
-        SortedRunners<AbstractOrderedApplicationRunner> runners = sortByRunnerOrderAnnotation(applicationRunners.values());
-        runners.sortUnresolvedRunners();
-        runners.getSorted().forEach(r -> order.add((Class<? extends AbstractOrderedApplicationRunner>) resolveClass(r)));
-        runners.getReplaced().forEach((k, v) -> replaced.put((Class<? extends AbstractOrderedApplicationRunner>) k, (Class<? extends AbstractOrderedApplicationRunner>) resolveClass(v)));
-        if (!runners.getUnresolved().isEmpty()) {
-            log.warn("Not all application runner were registered, unresolved application runners: {}", runners.getUnresolved());
-        }
-    }
+    private final ApplicationRunnerProperties properties;
 
     /**
      * Sorts the given collection of runners by the {@link RunnerOrder} annotation.
@@ -91,27 +29,31 @@ public class ApplicationRunnerOrderResolver {
      * @return a {@link SortedRunners} object containing two lists: one with the sorted runners and one with the unresolved runners.
      * To resolve order of the unresolved list call {@link SortedRunners#sortUnresolvedRunners()} method.
      */
-    public static <T> SortedRunners<T> sortByRunnerOrderAnnotation(Collection<T> runners) {
+    public <T> SortedRunners<T> sortByRunnerOrderAnnotation(Collection<T> runners) {
         if (runners == null) return null;
         if (runners.isEmpty()) return new SortedRunners<>();
         List<T> unresolved = new ArrayList<>();
         TreeMap<Integer, List<T>> ordered = new TreeMap<>();
         runners.forEach(runner -> {
             Class<?> runnerClass = resolveClass(runner);
-            RunnerOrder order = runnerClass.getAnnotation(RunnerOrder.class);
-            if (order == null) {
+            RunnerOrder[] runnerOrders = runnerClass.getAnnotationsByType(RunnerOrder.class);
+            if (runnerOrders == null || runnerOrders.length == 0) {
                 unresolved.add(runner);
                 return;
             }
-            if (!ordered.containsKey(order.value())) {
-                ordered.put(order.value(), new ArrayList<>());
+            int numberOfExecutions = properties.isEnableMultipleExecution() ? runnerOrders.length : 1;
+            for (int i = 0; i < numberOfExecutions; i++) {
+                RunnerOrder order = runnerOrders[i];
+                if (!ordered.containsKey(order.value())) {
+                    ordered.put(order.value(), new ArrayList<>());
+                }
+                ordered.get(order.value()).add(runner);
             }
-            ordered.get(order.value()).add(runner);
         });
         return new SortedRunners<>(ordered.values().stream().flatMap(List::stream).toList(), unresolved);
     }
 
-    protected static <T> Class<?> resolveClass(T object) {
+    public static <T> Class<?> resolveClass(T object) {
         if (object instanceof Class) return (Class<?>) object;
         else return AopUtils.isAopProxy(object) ? AopUtils.getTargetClass(object) : object.getClass();
     }
@@ -120,7 +62,7 @@ public class ApplicationRunnerOrderResolver {
     public static class SortedRunners<T> {
         private final List<T> sorted;
         private final List<T> unresolved;
-        private final Map<Class<?>, T> replaced = new HashMap<>();
+        private final Map<Class<?>, Class<?>> replaced = new HashMap<>(); // key is active runner, value is runner that was replaced
 
         public SortedRunners() {
             sorted = new ArrayList<>();
@@ -201,12 +143,16 @@ public class ApplicationRunnerOrderResolver {
         protected boolean replaceRunner(T item) {
             Class<?> itemClass = resolveClass(item);
             if (!itemClass.isAnnotationPresent(ReplaceRunner.class)) return false;
-            Class<?> runnerToReplace = itemClass.getAnnotation(ReplaceRunner.class).value();
-            int runnerToReplaceIndex = indexOfClass(sorted, runnerToReplace);
-            if (runnerToReplaceIndex == -1) return false;
-            sorted.add(runnerToReplaceIndex, item);
-            replaced.put(runnerToReplace, item);
-            return true;
+            Class<?>[] runnersToReplace = itemClass.getAnnotation(ReplaceRunner.class).value();
+            boolean changed = false;
+            for (Class<?> runnerToReplace : runnersToReplace) {
+                int runnerToReplaceIndex = indexOfClass(sorted, runnerToReplace);
+                if (runnerToReplaceIndex == -1) continue;
+                sorted.add(runnerToReplaceIndex, item);
+                replaced.put(itemClass, runnerToReplace);
+                changed = true;
+            }
+            return changed;
         }
 
         /**

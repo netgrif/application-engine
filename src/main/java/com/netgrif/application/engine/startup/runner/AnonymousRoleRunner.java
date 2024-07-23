@@ -5,7 +5,7 @@ import com.netgrif.application.engine.petrinet.domain.events.Event;
 import com.netgrif.application.engine.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
-import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,14 +17,14 @@ import java.util.Set;
 
 @Slf4j
 @Component
-@RunnerOrder(5)
+@RunnerOrder(50)
 @RequiredArgsConstructor
-public class AnonymousRoleRunner extends AbstractOrderedApplicationRunner {
+public class AnonymousRoleRunner implements ApplicationEngineStartupRunner {
 
     private final ProcessRoleRepository repository;
 
     @Override
-    public void apply(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) throws Exception {
         log.info("Creating anonymous process role");
         Set<ProcessRole> role = repository.findAllByImportId(ProcessRole.ANONYMOUS_ROLE);
         if (role != null && !role.isEmpty()) {
@@ -38,9 +38,6 @@ public class AnonymousRoleRunner extends AbstractOrderedApplicationRunner {
         anonymousRole.setDescription("Anonymous system process role");
         anonymousRole.setEvents(new LinkedHashMap<EventType, Event>());
         anonymousRole = repository.save(anonymousRole);
-        if (anonymousRole == null) {
-            log.error("Error saving anonymous process role");
-        }
     }
 
 }

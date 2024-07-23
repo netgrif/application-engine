@@ -3,7 +3,7 @@ package com.netgrif.application.engine.startup.runner;
 import com.beust.jcommander.Strings;
 import com.netgrif.application.engine.configuration.drools.interfaces.IRefreshableKieBase;
 import com.netgrif.application.engine.configuration.drools.interfaces.IRuleEngineGlobalsProvider;
-import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import groovy.text.SimpleTemplateEngine;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-@RunnerOrder(3)
+@RunnerOrder(30)
 @RequiredArgsConstructor
-public class RuleEngineRunner extends AbstractOrderedApplicationRunner {
+public class RuleEngineRunner implements ApplicationEngineStartupRunner {
 
     @Value("${drools.template.generate:true}")
     private boolean generate;
@@ -38,7 +38,7 @@ public class RuleEngineRunner extends AbstractOrderedApplicationRunner {
     private final IRuleEngineGlobalsProvider sessionInitializer;
 
     @Override
-    public void apply(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) throws Exception {
         log.info("Rule engine runner starting");
         if (generate) {
             log.info("Generating template to {}", generatedTemplatePath);

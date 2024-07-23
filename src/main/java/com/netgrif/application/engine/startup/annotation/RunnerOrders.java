@@ -5,8 +5,8 @@ import java.lang.annotation.*;
 @Documented
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface BeforeRunner {
+public @interface RunnerOrders {
 
-    Class<?> value();
+    RunnerOrder[] value();
 
 }

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,9 +20,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @Profile("!test")
-@RunnerOrder(1)
+@RunnerOrder(10)
 @RequiredArgsConstructor
-public class MongoDbRunner extends AbstractOrderedApplicationRunner {
+public class MongoDbRunner implements ApplicationEngineStartupRunner {
 
     @Value("${spring.data.mongodb.database}")
     private String name;
@@ -45,7 +45,7 @@ public class MongoDbRunner extends AbstractOrderedApplicationRunner {
     private final MongoTemplate mongoTemplate;
 
     @Override
-    public void apply(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) throws Exception {
         if (dropDatabase) {
             if (host != null && port != null)
                 log.info("Dropping Mongo database {}:{}/{}", host, port, name);

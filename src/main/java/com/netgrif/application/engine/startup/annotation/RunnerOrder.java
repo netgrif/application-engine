@@ -4,6 +4,7 @@ import java.lang.annotation.*;
 
 @Documented
 @Target({ElementType.TYPE})
+@Repeatable(RunnerOrders.class)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RunnerOrder {
 

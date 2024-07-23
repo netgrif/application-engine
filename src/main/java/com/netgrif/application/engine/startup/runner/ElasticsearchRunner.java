@@ -4,7 +4,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNet;
 import com.netgrif.application.engine.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
-import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RunnerOrder(0)
 @RequiredArgsConstructor
-public class ElasticsearchRunner extends AbstractOrderedApplicationRunner {
+public class ElasticsearchRunner implements ApplicationEngineStartupRunner {
 
     @Value("${spring.data.elasticsearch.drop}")
     private boolean drop;
@@ -43,7 +43,7 @@ public class ElasticsearchRunner extends AbstractOrderedApplicationRunner {
     private final IElasticIndexService template;
 
     @Override
-    public void apply(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) throws Exception {
         if (drop) {
             log.info("Dropping Elasticsearch database [{}:{}/{}]", url, port, clusterName);
             template.deleteIndex(ElasticPetriNet.class);

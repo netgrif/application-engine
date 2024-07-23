@@ -5,8 +5,6 @@ import com.netgrif.application.engine.configuration.JsonRootRelProvider;
 import com.netgrif.application.engine.configuration.groovy.converter.GStringToStringConverter;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -37,13 +35,6 @@ import java.util.List;
 @Aspect
 @Slf4j
 public class ApplicationEngine {
-
-    @Around("execution(* com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner+.run(..))")
-    void logRun(ProceedingJoinPoint joinPoint) throws Throwable {
-        log.info(joinPoint.getTarget().getClass().getSimpleName() + " started");
-        joinPoint.proceed();
-        log.info(joinPoint.getTarget().getClass().getSimpleName() + " finished");
-    }
 
     @Bean
     public MongoCustomConversions customConversions() {

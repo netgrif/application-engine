@@ -5,7 +5,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -25,9 +25,9 @@ import java.util.*;
 
 @Slf4j
 @Component
-@RunnerOrder(12)
+@RunnerOrder(120)
 @RequiredArgsConstructor
-public class DefaultFiltersRunner extends AbstractOrderedApplicationRunner {
+public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
 
     public static final String AUTO_CREATE_TRANSITION = "auto_create";
     public static final String DETAILS_TRANSITION = "t2";
@@ -55,7 +55,7 @@ public class DefaultFiltersRunner extends AbstractOrderedApplicationRunner {
     private final IDataService dataService;
 
     @Override
-    public void apply(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) throws Exception {
         if (!createDefaultFilters) return;
         // All cases
         createCaseFilter("All cases", "assignment", FILTER_VISIBILITY_PUBLIC, "", new ArrayList<String>(),

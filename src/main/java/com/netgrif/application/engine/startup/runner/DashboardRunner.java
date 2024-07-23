@@ -3,7 +3,7 @@ package com.netgrif.application.engine.startup.runner;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +16,10 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-@RunnerOrder(14)
+@RunnerOrder(140)
 @RequiredArgsConstructor
 @ConditionalOnProperty(value = "nae.dashboard.enabled", matchIfMissing = false)
-public class DashboardRunner extends AbstractOrderedApplicationRunner {
+public class DashboardRunner implements ApplicationEngineStartupRunner {
 
     public static final String DASHBOARD_NET_IDENTIFIER = "dashboard";
     public static final String DASHBOARD_TILE_NET_IDENTIFIER = "dashboard_tile";
@@ -31,7 +31,7 @@ public class DashboardRunner extends AbstractOrderedApplicationRunner {
     private final SystemUserRunner systemCreator;
 
     @Override
-    public void apply(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) throws Exception {
         createDashboardNet();
         createDashboardTileNet();
     }

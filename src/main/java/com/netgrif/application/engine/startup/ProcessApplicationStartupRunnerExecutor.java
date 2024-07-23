@@ -1,40 +1,22 @@
 package com.netgrif.application.engine.startup;
 
-import com.netgrif.application.engine.configuration.ApplicationContextProvider;
-import com.netgrif.application.engine.startup.annotation.BeforeRunner;
-import com.netgrif.application.engine.startup.runner.FinisherSuperCreatorRunner;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Map;
-
 @Slf4j
+@Order(0)
 @Component
-@BeforeRunner(FinisherSuperCreatorRunner.class)
-public class ProcessApplicationStartupRunnerExecutor extends AbstractOrderedApplicationRunner {
+public class ProcessApplicationStartupRunnerExecutor extends ApplicationRunnerExecutor<ProcessApplicationStartupRunner> {
 
-    @Override
-    public void apply(ApplicationArguments args) throws Exception {
-        List<ProcessApplicationStartupRunner> runners = resolveRunners();
-        log.info("Detected {} startup runners", runners.size());
-        runners.forEach(runner -> {
-            try {
-                log.info("Runner {} starting", runner.getClass().getSimpleName());
-                runner.run(args);
-                log.info("Runner {} ended", runner.getClass().getSimpleName());
-            } catch (Exception e) {
-                log.error("Startup runner {} has failed", runner.getClass().getSimpleName(), e);
-            }
-        });
+    public ProcessApplicationStartupRunnerExecutor(ApplicationRunnerOrderResolver orderResolver, ApplicationRunnerProperties properties) {
+        super(orderResolver, properties);
     }
 
-    protected List<ProcessApplicationStartupRunner> resolveRunners() {
-        Map<String, ProcessApplicationStartupRunner> customRunners = ApplicationContextProvider.getAppContext().getBeansOfType(ProcessApplicationStartupRunner.class);
-        ApplicationRunnerOrderResolver.SortedRunners<ProcessApplicationStartupRunner> runners = ApplicationRunnerOrderResolver.sortByRunnerOrderAnnotation(customRunners.values());
-        runners.sortUnresolvedRunners();
-        return runners.getSorted();
+    @Override
+    public void executeRunner(ProcessApplicationStartupRunner runner, ApplicationArguments args) throws Exception {
+        runner.run(args);
     }
 
 }

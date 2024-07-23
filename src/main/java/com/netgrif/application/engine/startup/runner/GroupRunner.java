@@ -6,7 +6,7 @@ import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupS
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +19,10 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-@RunnerOrder(11)
+@RunnerOrder(110)
 @RequiredArgsConstructor
 @ConditionalOnProperty(value = "nae.group.default.enabled", havingValue = "true", matchIfMissing = true)
-public class GroupRunner extends AbstractOrderedApplicationRunner {
+public class GroupRunner implements ApplicationEngineStartupRunner {
 
     public static final String DEFAULT_GROUP_TITLE = "Default system group";
 
@@ -37,7 +37,7 @@ public class GroupRunner extends AbstractOrderedApplicationRunner {
     private final GroupConfigurationProperties groupProperties;
 
     @Override
-    public void apply(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) throws Exception {
         createDefaultGroup();
     }
 

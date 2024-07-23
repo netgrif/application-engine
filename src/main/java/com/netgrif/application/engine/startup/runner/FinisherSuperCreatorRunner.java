@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.startup.AbstractOrderedApplicationRunner;
+import com.netgrif.application.engine.startup.ApplicationEngineFinishRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,15 +10,15 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@RunnerOrder(21)
+@RunnerOrder(210)
 @RequiredArgsConstructor
 @ConditionalOnProperty(value = "admin.create-super", matchIfMissing = true)
-public class FinisherSuperCreatorRunner extends AbstractOrderedApplicationRunner {
+public class FinisherSuperCreatorRunner implements ApplicationEngineFinishRunner {
 
     private final SuperCreatorRunner superCreator;
 
     @Override
-    public void apply(ApplicationArguments strings) throws Exception {
+    public void run(ApplicationArguments strings) throws Exception {
         superCreator.setAllToSuperUser();
         log.info("Super Creator update");
     }
