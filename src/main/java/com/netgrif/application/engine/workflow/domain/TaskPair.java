@@ -6,9 +6,9 @@ import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import java.io.Serializable;
 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 public class TaskPair implements Serializable {
     private static final long serialVersionUID = -3865322078419904394L;
 

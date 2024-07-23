@@ -10,10 +10,11 @@ public class DataValidator extends ModelValidator implements IDataValidator {
 
     @Override
     public void checkDeprecatedAttributes(Data data) {
-        validateAttribute(data.getView(), "view", data.getId());
-        validateAttribute(data.getValid() != null && !data.getValid().isEmpty() ? data.getValid() : null, "valid", data.getId());
-        validateAttribute(data.getFormat(), "format", data.getId());
-        validateAttribute(data.getValues() != null && !data.getValues().isEmpty() ? data.getValues() : null, "values", data.getId());
+        // TODO: NAE-1969 fix
+//        validateAttribute(data.getView(), "view", data.getId());
+//        validateAttribute(data.getValid() != null && !data.getValid().isEmpty() ? data.getValid() : null, "valid", data.getId());
+//        validateAttribute(data.getFormat(), "format", data.getId());
+//        validateAttribute(data.getValues() != null && !data.getValues().isEmpty() ? data.getValues() : null, "values", data.getId());
     }
 
     protected void validateAttribute(Object attr, String attrName, String fieldName) {

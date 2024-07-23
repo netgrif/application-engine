@@ -8,7 +8,6 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMap
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.history.domain.taskevents.AssignTaskEventLog;
 import com.netgrif.application.engine.history.domain.taskevents.CancelTaskEventLog;
-import com.netgrif.application.engine.history.domain.taskevents.DelegateTaskEventLog;
 import com.netgrif.application.engine.history.domain.taskevents.FinishTaskEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.model.EventType;
@@ -201,9 +200,8 @@ public class TaskService implements ITaskService {
         log.info("[{}]: Assigning task [{}] to user [{}]", useCaseId, task.getTitle(), user.getSelfOrImpersonated().getEmail());
 
         startExecution(transition, useCase);
-        task.setUserId(user.getSelfOrImpersonated().getStringId());
+        task.setAssigneeId(user.getSelfOrImpersonated().getStringId());
         task.setLastAssigned(LocalDateTime.now());
-        task.setUser(user.getSelfOrImpersonated());
 
         workflowService.save(useCase);
         save(task);
@@ -283,7 +281,7 @@ public class TaskService implements ITaskService {
         finishExecution(transition, useCase.getStringId());
         task.setLastFinished(LocalDateTime.now());
         task.setFinishedBy(task.getUserId());
-        task.setUserId(null);
+        task.setAssigneeId(null);
         save(task);
         reloadTasks(workflowService.findOne(task.getCaseId()));
         useCase = workflowService.findOne(task.getCaseId());
@@ -374,7 +372,7 @@ public class TaskService implements ITaskService {
                 });
         workflowService.updateMarking(useCase);
 
-        task.setUserId(null);
+        task.setAssigneeId(null);
         // TODO: NAE-1848 should this be null?
         task.setLastAssigned(null);
         task = save(task);
@@ -404,28 +402,30 @@ public class TaskService implements ITaskService {
 
         log.info("[{}]: Delegating task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), delegatedUser.getEmail());
 
-        List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreDelegateActions(), workflowService.findOne(task.getCaseId()), task, transition, params));
-        task = findOne(task.getStringId());
-        evaluateRules(useCase.getStringId(), task, EventType.DELEGATE, EventPhase.PRE);
-        delegate(delegatedUser, task, useCase);
-        historyService.save(new DelegateTaskEventLog(task, useCase, EventPhase.PRE, delegateUser, delegatedUser.getStringId()));
-        outcomes.addAll(eventService.runActions(transition.getPostDelegateActions(), workflowService.findOne(task.getCaseId()), task, transition, params));
-        evaluateRules(useCase.getStringId(), task, EventType.DELEGATE, EventPhase.POST);
+//        TODO: NAE-1969 fix
+//        List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreDelegateActions(), workflowService.findOne(task.getCaseId()), task, transition, params));
+//        task = findOne(task.getStringId());
+//        evaluateRules(useCase.getStringId(), task, EventType.DELEGATE, EventPhase.PRE);
+//        delegate(delegatedUser, task, useCase);
+//        historyService.save(new DelegateTaskEventLog(task, useCase, EventPhase.PRE, delegateUser, delegatedUser.getStringId()));
+//        outcomes.addAll(eventService.runActions(transition.getPostDelegateActions(), workflowService.findOne(task.getCaseId()), task, transition, params));
+//        evaluateRules(useCase.getStringId(), task, EventType.DELEGATE, EventPhase.POST);
 
         reloadTasks(workflowService.findOne(task.getCaseId()));
 
-        DelegateTaskEventOutcome outcome = new DelegateTaskEventOutcome(workflowService.findOne(task.getCaseId()), task, outcomes);
-        addMessageToOutcome(transition, EventType.DELEGATE, outcome);
-        historyService.save(new DelegateTaskEventLog(task, useCase, EventPhase.POST, delegateUser, delegatedUser.getStringId()));
-        log.info("Task [{}] in case [{}] assigned to [{}] was delegated to [{}]", task.getTitle(), useCase.getTitle(), delegateUser.getSelfOrImpersonated().getEmail(), delegatedUser.getEmail());
-
-        return outcome;
+//        DelegateTaskEventOutcome outcome = new DelegateTaskEventOutcome(workflowService.findOne(task.getCaseId()), task, outcomes);
+//        addMessageToOutcome(transition, EventType.DELEGATE, outcome);
+//        historyService.save(new DelegateTaskEventLog(task, useCase, EventPhase.POST, delegateUser, delegatedUser.getStringId()));
+//        log.info("Task [{}] in case [{}] assigned to [{}] was delegated to [{}]", task.getTitle(), useCase.getTitle(), delegateUser.getSelfOrImpersonated().getEmail(), delegatedUser.getEmail());
+//
+//        return outcome;
+        return null;
     }
 
     protected void delegate(IUser delegated, Task task, Case useCase) throws TransitionNotExecutableException {
         if (task.getUserId() != null) {
-            task.setUserId(delegated.getStringId());
-            task.setUser(delegated);
+            // TODO: release/8.0.0 reassign event?
+            task.setAssigneeId(delegated.getStringId());
             save(task);
         } else {
             assignTaskToUser(delegated, task, useCase.getStringId());
@@ -518,19 +518,20 @@ public class TaskService implements ITaskService {
     protected void execute(Transition transition, Case useCase, Predicate<Arc> predicate) throws TransitionNotExecutableException {
         Supplier<Stream<Arc>> filteredSupplier = () -> useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream().filter(predicate);
 
-        if (!filteredSupplier.get().allMatch(Arc::isExecutable)) {
-            throw new TransitionNotExecutableException("Not all arcs can be executed task [" + transition.getStringId() + "] in case [" + useCase.getTitle() + "]");
-        }
-
-        filteredSupplier.get().sorted((o1, o2) -> ArcOrderComparator.getInstance().compare(o1, o2)).forEach(arc -> {
-            if (arc instanceof ResetArc) {
-                useCase.getConsumedTokens().put(arc.getStringId(), ((Place) arc.getSource()).getTokens());
-            }
-            if (arc.getReference() != null && arc.getSource() instanceof Place) {
-                useCase.getConsumedTokens().put(arc.getStringId(), arc.getReference().getMultiplicity());
-            }
-            arc.execute();
-        });
+        // TODO: NAE-1969 fix
+//        if (!filteredSupplier.get().allMatch(Arc::isExecutable)) {
+//            throw new TransitionNotExecutableException("Not all arcs can be executed task [" + transition.getStringId() + "] in case [" + useCase.getTitle() + "]");
+//        }
+//
+//        filteredSupplier.get().sorted((o1, o2) -> ArcOrderComparator.getInstance().compare(o1, o2)).forEach(arc -> {
+//            if (arc instanceof ResetArc) {
+//                useCase.getConsumedTokens().put(arc.getStringId(), ((Place) arc.getSource()).getTokens());
+//            }
+//            if (arc.getReference() != null && arc.getSource() instanceof Place) {
+//                useCase.getConsumedTokens().put(arc.getStringId(), arc.getReference().getMultiplicity());
+//            }
+//            arc.execute();
+//        });
 
         workflowService.updateMarking(useCase);
     }
@@ -739,21 +740,22 @@ public class TaskService implements ITaskService {
 
     @Override
     public Task resolveUserRef(Task task, Case useCase) {
-        task.getUsers().clear();
-        task.getNegativeViewUsers().clear();
-        task.getUserRefs().forEach((id, permission) -> {
-            UserListField userListField = (UserListField) useCase.getDataSet().get(id);
-            if (userListField.getValue() == null) {
-                return;
-            }
-            List<String> userIds = getExistingUsers(userListField.getValue().getValue());
-            if (userIds != null && userIds.size() != 0 && permission.containsKey(RolePermission.VIEW) && !permission.get(RolePermission.VIEW)) {
-                task.getNegativeViewUsers().addAll(userIds);
-            } else if (userIds != null && userIds.size() != 0) {
-                task.addUsers(new HashSet<>(userIds), permission);
-            }
-        });
-        task.resolveViewUsers();
+        // TODO: NAE-1969 fix
+//        task.getUsers().clear();
+//        task.getNegativeViewUsers().clear();
+//        task.getUserRefs().forEach((id, permission) -> {
+//            UserListField userListField = (UserListField) useCase.getDataSet().get(id);
+//            if (userListField.getValue() == null) {
+//                return;
+//            }
+//            List<String> userIds = getExistingUsers(userListField.getValue().getValue());
+//            if (userIds != null && userIds.size() != 0 && permission.containsKey(RolePermission.VIEW) && !permission.get(RolePermission.VIEW)) {
+//                task.getNegativeViewUsers().addAll(userIds);
+//            } else if (userIds != null && userIds.size() != 0) {
+//                task.addUsers(new HashSet<>(userIds), permission);
+//            }
+//        });
+//        task.resolveViewUsers();
         return taskRepository.save(task);
     }
 
@@ -770,20 +772,16 @@ public class TaskService implements ITaskService {
     }
 
     private Task createFromTransition(Transition transition, Case useCase) {
+        // TODO: NAE-1969 check layout
         final Task task = Task.with()
                 .title(transition.getTitle())
                 .processId(useCase.getPetriNetId())
                 .caseId(useCase.getId().toString())
                 .transitionId(transition.getImportId())
-                .layout(transition.getLayout())
-                .tags(transition.getTags())
-                .caseColor(useCase.getColor())
-                .caseTitle(useCase.getTitle())
-                .priority(transition.getPriority())
+                .properties(transition.getProperties())
                 .icon(transition.getIcon() == null ? useCase.getIcon() : transition.getIcon())
                 .immediateDataFields(transition.getImmediateData())
                 .assignPolicy(transition.getAssignPolicy())
-                .dataFocusPolicy(transition.getDataFocusPolicy())
                 .finishPolicy(transition.getFinishPolicy())
                 .build();
         transition.getEvents().forEach((type, event) -> task.addEventTitle(type, event.getTitle()));
@@ -796,18 +794,19 @@ public class TaskService implements ITaskService {
                 TimeTrigger timeTrigger = (TimeTrigger) taskTrigger;
                 scheduleTaskExecution(task, timeTrigger.getStartDate(), useCase);
             } else if (taskTrigger instanceof AutoTrigger) {
-                task.setUserId(userService.getSystem().getStringId());
+                task.setAssigneeId(userService.getSystem().getStringId());
             }
         }
         ProcessRole defaultRole = processRoleService.defaultRole();
         ProcessRole anonymousRole = processRoleService.anonymousRole();
-        for (Map.Entry<String, Map<RolePermission, Boolean>> entry : transition.getRoles().entrySet()) {
-            if (useCase.getEnabledRoles().contains(entry.getKey())
-                    || defaultRole.getStringId().equals(entry.getKey())
-                    || anonymousRole.getStringId().equals(entry.getKey())) {
-                task.addRole(entry.getKey(), entry.getValue());
-            }
-        }
+        // TODO: NAE-1969 necessary?
+//        for (Map.Entry<String, Map<RolePermission, Boolean>> entry : transition.getRoles().entrySet()) {
+//            if (useCase.getEnabledRoles().contains(entry.getKey())
+//                    || defaultRole.getStringId().equals(entry.getKey())
+//                    || anonymousRole.getStringId().equals(entry.getKey())) {
+//                task.addRole(entry.getKey(), entry.getValue());
+//            }
+//        }
         transition.getNegativeViewRoles().forEach(task::addNegativeViewRole);
 
         for (Map.Entry<String, Map<RolePermission, Boolean>> entry : transition.getUserRefs().entrySet()) {
@@ -815,11 +814,6 @@ public class TaskService implements ITaskService {
         }
         task.resolveViewRoles();
         task.resolveViewUserRefs();
-
-        Transaction transaction = useCase.getPetriNet().getTransactionByTransition(transition);
-        if (transaction != null) {
-            task.setTransactionId(transaction.getStringId());
-        }
 
         Task savedTask = save(task);
 
@@ -831,17 +825,18 @@ public class TaskService implements ITaskService {
     }
 
     private Page<Task> loadUsers(Page<Task> tasks) {
-        Map<String, IUser> users = new HashMap<>();
-        tasks.forEach(task -> {
-            if (task.getUserId() != null) {
-                if (users.containsKey(task.getUserId()))
-                    task.setUser(users.get(task.getUserId()));
-                else {
-                    task.setUser(userService.resolveById(task.getUserId()));
-                    users.put(task.getUserId(), task.getUser());
-                }
-            }
-        });
+        // TODO: NAE-1969
+//        Map<String, IUser> users = new HashMap<>();
+//        tasks.forEach(task -> {
+//            if (task.getUserId() != null) {
+//                if (users.containsKey(task.getUserId()))
+//                    task.setUser(users.get(task.getUserId()));
+//                else {
+//                    task.setUser(userService.resolveById(task.getUserId()));
+//                    users.put(task.getUserId(), task.getUser());
+//                }
+//            }
+//        });
 
         return tasks;
     }
@@ -856,7 +851,6 @@ public class TaskService implements ITaskService {
 
     @Override
     public void delete(List<Task> tasks, String caseId) {
-        workflowService.removeTasksFromCase(tasks, caseId);
         log.info("[{}]: Tasks of case are being deleted", caseId);
         taskRepository.deleteAll(tasks);
         tasks.forEach(t -> elasticTaskService.remove(t.getStringId()));
@@ -876,7 +870,8 @@ public class TaskService implements ITaskService {
         if (task.getUserId() == null) {
             return;
         }
-        task.setUser(userService.resolveById(task.getUserId()));
+        // TODO: NAE-1969
+//        task.setUser(userService.resolveById(task.getUserId()));
     }
 
     private EventOutcome addMessageToOutcome(Transition transition, EventType type, TaskEventOutcome outcome) {

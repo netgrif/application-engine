@@ -20,15 +20,15 @@ public class I18nFieldBuilder extends FieldBuilder<I18nField> {
             field.setInitExpression(new Expression(initExpression, true));
         } else {
             // TODO: release/8.0.0 simplify
-            if (data.getInits() != null && data.getInits().getInit() != null && !data.getInits().getInit().isEmpty()) {
-                field.setDefaultValue(new I18nString(data.getInits().getInit().get(0).getValue()));
-            } else if (data.getInit() != null && (data.getInit().getName() == null || data.getInit().getName().equals(""))) {
-                field.setDefaultValue(new I18nString(data.getInit().getValue()));
-            } else if (data.getInit() != null && data.getInit().getName() != null && !data.getInit().getName().equals("")) {
-                field.setDefaultValue(importer.toI18NString(data.getInit()));
-            } else {
-                field.setDefaultValue(new I18nString(""));
-            }
+//            if (data.getInits() != null && data.getInits().getInit() != null && !data.getInits().getInit().isEmpty()) {
+//                field.setDefaultValue(new I18nString(data.getInits().getInit().get(0).getValue()));
+//            } else if (data.getInit() != null && (data.getInit().getName() == null || data.getInit().getName().equals(""))) {
+//                field.setDefaultValue(new I18nString(data.getInit().getValue()));
+//            } else if (data.getInit() != null && data.getInit().getName() != null && !data.getInit().getName().equals("")) {
+//                field.setDefaultValue(importer.toI18NString(data.getInit()));
+//            } else {
+//                field.setDefaultValue(new I18nString(""));
+//            }
         }
         return field;
     }

@@ -1,11 +1,13 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 
 import java.io.Serializable;
 
 @Data
+@NoArgsConstructor
 public class Expression implements Serializable {
 
     private static final long serialVersionUID = 3687481111847498422L;

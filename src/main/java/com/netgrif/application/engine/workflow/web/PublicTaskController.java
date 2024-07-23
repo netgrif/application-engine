@@ -106,12 +106,13 @@ public class PublicTaskController extends AbstractTaskController {
         return super.cancel(loggedUser, taskId);
     }
 
-    @Override
-    @GetMapping(value = "/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
-    @Operation(summary = "Get all task data")
-    public EntityModel<EventOutcomeWithMessage> getData(@PathVariable("id") String taskId, Locale locale, Authentication auth) {
-        return super.getData(taskId, locale, auth);
-    }
+    // TODO: NAE-1969 fix
+//    @Override
+//    @GetMapping(value = "/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
+//    @Operation(summary = "Get all task data")
+//    public EntityModel<EventOutcomeWithMessage> getData(@PathVariable("id") String taskId, Locale locale, Authentication auth) {
+//        return super.getData(taskId, locale, auth);
+//    }
 
     @Override
     @PreAuthorize("@taskAuthorizationService.canCallSaveData(@userService.getAnonymousLogged(), #taskId)")

@@ -9,6 +9,7 @@ import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.AccessLevel;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -25,9 +26,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Data
 @Document
-@Getter
-@Setter
 public class Case implements Serializable {
 
     private static final long serialVersionUID = 3687481049847498422L;
@@ -35,12 +35,8 @@ public class Case implements Serializable {
     @Id
     @Setter(AccessLevel.NONE)
     private ObjectId id;
-    private String uriNodeId;
     @LastModifiedDate
     private LocalDateTime lastModified;
-    @Indexed
-    @Setter(AccessLevel.NONE)
-    private String visualId;
     @NotNull
     private ObjectId petriNetObjectId;
     @JsonIgnore
@@ -50,12 +46,10 @@ public class Case implements Serializable {
     @NotNull
     @Indexed
     private String processIdentifier;
-    @org.springframework.data.mongodb.core.mapping.Field("activePlaces")
     @JsonIgnore
     private Map<String, Integer> activePlaces = new HashMap<>();
     @NotNull
     private String title;
-    private String color;
     private String icon;
     private LocalDateTime creationDate;
     @JsonIgnore
@@ -76,25 +70,11 @@ public class Case implements Serializable {
     private Map<String, Integer> consumedTokens = new HashMap<>();
     @Indexed
     private Map<String, TaskPair> tasks = new HashMap<>();
-    // TODO: release/8.0.0 review json ignore and refactor to common Permission class
-    private Set<String> enabledRoles = new HashSet<>();
-    //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
+    @JsonIgnore
     private Map<String, Map<ProcessRolePermission, Boolean>> permissions = new HashMap<>();
-    //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
-    private Map<String, Map<ProcessRolePermission, Boolean>> userRefs = new HashMap<>();
-    //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
-    private Map<String, Map<ProcessRolePermission, Boolean>> users = new HashMap<>();
-    //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
-    private List<String> viewRoles = new ArrayList<>();
-    //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
-    private List<String> viewUserRefs = new ArrayList<>();
-    //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
-    private List<String> viewUsers = new ArrayList<>();
-    //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
-    private List<String> negativeViewRoles = new ArrayList<>();
-    //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
-    private List<String> negativeViewUsers = new ArrayList<>();
-    private Map<String, String> tags = new HashMap<>();
+    private Map<String, String> properties = new HashMap<>();
+
+    private String uriNodeId;
 
     public Case() {
         id = new ObjectId();
@@ -106,11 +86,7 @@ public class Case implements Serializable {
         petriNetObjectId = petriNet.getObjectId();
         processIdentifier = petriNet.getIdentifier();
         activePlaces = petriNet.getActivePlaces();
-        visualId = generateVisualId();
-        enabledRoles = petriNet.getRoles().keySet();
-        negativeViewRoles.addAll(petriNet.getNegativeViewRoles());
         icon = petriNet.getIcon();
-        userRefs = petriNet.getUserRefs();
 
         permissions = petriNet.getPermissions().entrySet().stream()
                 .filter(role -> role.getValue().containsKey(ProcessRolePermission.DELETE) || role.getValue().containsKey(ProcessRolePermission.VIEW))
@@ -124,8 +100,6 @@ public class Case implements Serializable {
                     return new AbstractMap.SimpleEntry<>(role.getKey(), permissionMap);
                 })
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
-        resolveViewRoles();
-        resolveViewUserRefs();
     }
 
     public String getStringId() {
@@ -137,38 +111,11 @@ public class Case implements Serializable {
         immediateDataFields = immediateData.stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public void setColor(String color) {
-        // TODO: release/8.0.0
-        this.color = color == null || color.isEmpty() ? "color-fg-fm-500" : color;
-    }
-
-    // TODO: release/8.0.0
-    // populateDataSet
-/*if (field.getComponent() != null) {
-                this.dataSet.get(key).setComponent(field.getComponent());
-            }
- */
-    private String generateVisualId() {
-        SecureRandom random = new SecureRandom();
-        int n = id.getTimestamp() + random.nextInt(99999999);
-        if (this.title != null) {
-            n += title.length();
-        }
-        if (this.petriNet != null) {
-            return petriNet.getInitials() + "-" + n;
-        }
-        return n + "";
-    }
-
     public ObjectId getTaskId(String transitionId) {
-        if (transitionId == null) {
-            throw new IllegalArgumentException("TransitionId cannot be null");
-        }
-        TaskPair taskPair = tasks.get(transitionId);
-        if (taskPair == null) {
+        if (transitionId == null || !tasks.containsKey(transitionId)) {
             throw new IllegalArgumentException("Case does not have task with transitionId [" + transitionId + "]");
         }
-        return taskPair.getTaskId();
+        return tasks.get(transitionId).getTaskId();
     }
 
     public String getTaskStringId(String transitionId) {
@@ -187,50 +134,5 @@ public class Case implements Serializable {
 
     public String getPetriNetId() {
         return petriNetObjectId.toString();
-    }
-
-    public void addUsers(Set<String> userIds, Map<ProcessRolePermission, Boolean> permissions) {
-        userIds.forEach(userId -> {
-            if (users.containsKey(userId) && users.get(userId) != null) {
-                compareExistingUserPermissions(userId, new HashMap<>(permissions));
-            } else {
-                users.put(userId, new HashMap<>(permissions));
-            }
-        });
-    }
-
-    public void resolveViewRoles() {
-        this.viewRoles.clear();
-        this.permissions.forEach((role, perms) -> {
-            if (perms.containsKey(ProcessRolePermission.VIEW) && perms.get(ProcessRolePermission.VIEW)) {
-                viewRoles.add(role);
-            }
-        });
-    }
-
-    public void resolveViewUserRefs() {
-        this.viewUserRefs.clear();
-        this.userRefs.forEach((userRef, perms) -> {
-            if (perms.containsKey(ProcessRolePermission.VIEW) && perms.get(ProcessRolePermission.VIEW)) {
-                viewUserRefs.add(userRef);
-            }
-        });
-    }
-
-    public void resolveViewUsers() {
-        this.viewUsers.clear();
-        this.users.forEach((user, perms) -> {
-            if (perms.containsKey(ProcessRolePermission.VIEW) && perms.get(ProcessRolePermission.VIEW)) {
-                viewUsers.add(user);
-            }
-        });
-    }
-
-    private void compareExistingUserPermissions(String userId, Map<ProcessRolePermission, Boolean> permissions) {
-        permissions.forEach((id, perm) -> {
-            if ((users.containsKey(userId) && !users.get(userId).containsKey(id)) || (users.containsKey(userId) && users.get(userId).containsKey(id) && users.get(userId).get(id))) {
-                users.get(userId).put(id, perm);
-            }
-        });
     }
 }

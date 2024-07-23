@@ -118,13 +118,13 @@ public class ElasticTask {
             this.priority = task.getPriority();
         this.userId = task.getUserId();
         this.startDate = task.getLastAssigned();
-        this.roles = task.getRoles().keySet();
+        this.roles = task.getPermissions().keySet();
         this.viewRoles = new HashSet<>(task.getViewRoles());
         this.viewUserRefs = new HashSet<>(task.getViewUserRefs());
         this.negativeViewRoles = new HashSet<>(task.getNegativeViewRoles());
         this.viewUsers = new HashSet<>(task.getViewUsers());
         this.negativeViewUsers = new HashSet<>(task.getNegativeViewUsers());
-        this.tags = new HashMap<>(task.getTags());
+        this.tags = new HashMap<>(task.getProperties());
     }
 
     public void update(ElasticTask task) {

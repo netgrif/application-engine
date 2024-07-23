@@ -31,8 +31,9 @@ public class TaskResource extends EntityModel<Task> {
                 .finish((Authentication) null, task.getStringId())).withRel("finish"));
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .cancel((Authentication) null, task.getStringId())).withRel("cancel"));
-        add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .getData(task.getStringId(), null, null)).withRel("data"));
+        // TODO: NAE-1969 fix
+//        add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
+//                .getData(task.getStringId(), null, null)).withRel("data"));
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .setData((Authentication) null, task.getStringId(), null)).withRel("data-edit"));
         try {

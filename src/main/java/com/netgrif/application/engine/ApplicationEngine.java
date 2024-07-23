@@ -1,7 +1,5 @@
 package com.netgrif.application.engine;
 
-import com.netgrif.application.engine.petrinet.domain.DataGroupAlignmentConverter;
-import com.netgrif.application.engine.petrinet.domain.layout.LayoutTypeConverter;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -43,8 +41,9 @@ public class ApplicationEngine {
     public MongoCustomConversions customConversions() {
         List<Converter<?, ?>> converters = new ArrayList<>();
         converters.add(new StringToVersionConverter());
-        converters.add(new LayoutTypeConverter());
-        converters.add(new DataGroupAlignmentConverter());
+        // TODO: NAE-1969 check
+//        converters.add(new LayoutTypeConverter());
+//        converters.add(new DataGroupAlignmentConverter());
         return new MongoCustomConversions(converters);
     }
 

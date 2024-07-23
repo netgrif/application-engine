@@ -1,53 +1,46 @@
 package com.netgrif.application.engine.petrinet.domain.arcs;
 
 import com.netgrif.application.engine.petrinet.domain.*;
-import com.netgrif.application.engine.petrinet.domain.arcs.reference.Reference;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Transient;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+@Data
 public class Arc extends PetriNetObject {
 
     @Transient
     protected Node source;
-
-    @Getter
-    @Setter
     protected String sourceId;
-
     @Transient
     protected Node destination;
-
-    @Getter
-    @Setter
     protected String destinationId;
-
-    @Getter
-    @Setter
-    protected Integer multiplicity;
-
-    @Getter
-    @Setter
-    protected Reference reference;
-
-    @Getter
-    @Setter
+    protected Multiplicity multiplicity;
     protected List<Position> breakpoints;
+    protected Map<String, String> properties;
 
     public Arc() {
         this.setObjectId(new ObjectId());
         this.breakpoints = new ArrayList<>();
+        this.properties = new HashMap<>();
     }
 
     public Arc(Node source, Node destination, int multiplicity) {
         this();
         this.setSource(source);
         this.setDestination(destination);
-        this.multiplicity = multiplicity;
+        this.multiplicity = new Multiplicity(multiplicity);
+    }
+
+    public Arc(Node source, Node destination, String multiplicity) {
+        this();
+        this.setSource(source);
+        this.setDestination(destination);
+        this.multiplicity = new Multiplicity(multiplicity, true);
     }
 
     public Place getPlace() {
@@ -58,17 +51,9 @@ public class Arc extends PetriNetObject {
         return (source instanceof Transition) ? ((Transition) source) : ((Transition) destination);
     }
 
-    public Node getSource() {
-        return source;
-    }
-
     public void setSource(Node source) {
         this.source = source;
         this.sourceId = source.getImportId();
-    }
-
-    public Node getDestination() {
-        return destination;
     }
 
     public void setDestination(Node destination) {
@@ -81,46 +66,15 @@ public class Arc extends PetriNetObject {
         return source.getTitle() + " -(" + multiplicity + ")> " + destination.getTitle();
     }
 
-    public boolean isExecutable() {
-        if (source instanceof Transition)
-            return true;
-        if (this.reference != null) {
-            this.multiplicity = this.reference.getMultiplicity();
-        }
-        return ((Place) source).getTokens() >= multiplicity;
-    }
-
-    public void execute() {
-        if (reference != null) {
-            multiplicity = reference.getMultiplicity();
-        }
-        if (source instanceof Transition) {
-            ((Place) destination).addTokens(multiplicity);
-        } else {
-            ((Place) source).removeTokens(multiplicity);
-        }
-    }
-
-    public void rollbackExecution(Integer tokensConsumed) {
-        if (tokensConsumed == null && this.reference != null) {
-            throw new IllegalArgumentException("Cannot rollback variable arc, because it was never executed");
-        }
-        if (this.reference == null) {
-            tokensConsumed = multiplicity;
-        }
-        ((Place) source).addTokens(tokensConsumed);
-    }
-
     @SuppressWarnings("Duplicates")
     public Arc clone() {
         Arc clone = new Arc();
         clone.setSourceId(this.sourceId);
         clone.setDestinationId(this.destinationId);
-        clone.setMultiplicity(this.multiplicity);
         clone.setBreakpoints(this.breakpoints);
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);
-        clone.setReference(this.reference == null ? null : this.reference.clone());
+        clone.setMultiplicity(this.multiplicity.clone());
         return clone;
     }
 }

@@ -28,11 +28,11 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     @Override
     public Boolean userHasAtLeastOneRolePermission(IUser user, Task task, RolePermission... permissions) {
-        if (task.getRoles() == null || task.getRoles().isEmpty()) {
+        if (task.getPermissions() == null || task.getPermissions().isEmpty()) {
             return null;
         }
 
-        Map<RolePermission, Boolean> aggregatePermissions = getAggregateRolePermissions(user, task.getRoles());
+        Map<RolePermission, Boolean> aggregatePermissions = getAggregateRolePermissions(user, task.getPermissions());
 
         for (RolePermission permission : permissions) {
             if (hasRestrictedPermission(aggregatePermissions.get(permission))) {

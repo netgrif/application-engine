@@ -1,20 +1,15 @@
 package com.netgrif.application.engine.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.importer.model.EventType;
 import com.netgrif.application.engine.importer.model.TriggerType;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
-import com.netgrif.application.engine.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.application.engine.petrinet.domain.roles.AssignedUserPermission;
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
-import com.querydsl.core.annotations.PropertyType;
-import com.querydsl.core.annotations.QueryType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -43,35 +38,27 @@ public class Task implements Serializable {
     @Id
     @Builder.Default
     private ObjectId id = new ObjectId();
-
     @Indexed
     private String processId;
-
     @Indexed
     private String caseId;
-
+    @Getter
     @Indexed
     private String transitionId;
-
     @Indexed
     private State state = DISABLED;
-
-    @QueryType(PropertyType.NONE)
-    private TaskLayout layout;
+    @Indexed
+    private String assigneeId;
 
     private I18nString title;
-    // TODO: release/8.0.0: TaskResource concern?
-    private String caseColor;
-    // TODO: release/8.0.0: TaskResource concern?
-    private String caseTitle;
+    @Getter
+    private String icon;
 
-    private Integer priority;
+    @Builder.Default
+    private AssignPolicy assignPolicy = AssignPolicy.MANUAL;
+    @Builder.Default
+    private FinishPolicy finishPolicy = FinishPolicy.MANUAL;
 
-    @Indexed
-    private String userId;
-
-    @org.springframework.data.annotation.Transient
-    private IUser user;
 
     @Builder.Default
     private List<Trigger> triggers = new LinkedList<>();
@@ -80,70 +67,23 @@ public class Task implements Serializable {
      * Role ObjectId : [ RolePermission, true/false ]
      */
     @Builder.Default
-    private Map<String, Map<RolePermission, Boolean>> roles = new HashMap<>();
-
-    @Builder.Default
-    private Map<String, Map<RolePermission, Boolean>> userRefs = new HashMap<>();
-
-    @Builder.Default
-    private Map<String, Map<RolePermission, Boolean>> users = new HashMap<>();
-
-    @Builder.Default
-    private List<String> viewRoles = new LinkedList<>();
-
-    @Builder.Default
-    private List<String> viewUserRefs = new LinkedList<>();
-
-    @Builder.Default
-    private List<String> viewUsers = new LinkedList<>();
-
-    @Builder.Default
-    private List<String> negativeViewRoles = new LinkedList<>();
-
-    @Builder.Default
-    private List<String> negativeViewUsers = new LinkedList<>();
+    private Map<String, Map<RolePermission, Boolean>> permissions = new HashMap<>();
 
     private LocalDateTime lastAssigned;
-
     private LocalDateTime lastFinished;
-
     private String finishedBy;
 
-    private String transactionId;
-
     // TODO: release/8.0.0 remove, dynamically load from dataSet
-    @Getter
-    @Setter
     @JsonIgnore
     @Builder.Default
     private LinkedHashSet<String> immediateDataFields = new LinkedHashSet<>();
-    @Getter
-    @Setter
     @Transient
     @Builder.Default
     private List<Field<?>> immediateData = new LinkedList<>();
 
-    private String icon;
-
-    @Builder.Default
-    private AssignPolicy assignPolicy = AssignPolicy.MANUAL;
-
-    @Builder.Default
-    private DataFocusPolicy dataFocusPolicy = DataFocusPolicy.MANUAL;
-
-    @Builder.Default
-    private FinishPolicy finishPolicy = FinishPolicy.MANUAL;
-
-    @Builder.Default
-    private Map<EventType, I18nString> eventTitles = new HashMap<>();
-
-    @Builder.Default
-    private Map<AssignedUserPermission, Boolean> assignedUserPolicy = new HashMap<>();
-
     private Map<String, Integer> consumedTokens = new HashMap<>();
-
     @Builder.Default
-    private Map<String, String> tags = new HashMap<>();
+    private Map<String, String> properties = new HashMap<>();
 
     public Task() {
     }
@@ -157,19 +97,11 @@ public class Task implements Serializable {
         return id.toString();
     }
 
-    public String getTransitionId() {
-        return transitionId;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
     public void addRole(String roleId, Map<RolePermission, Boolean> permissions) {
-        if (roles.containsKey(roleId) && roles.get(roleId) != null) {
-            roles.get(roleId).putAll(permissions);
+        if (this.permissions.containsKey(roleId) && this.permissions.get(roleId) != null) {
+            this.permissions.get(roleId).putAll(permissions);
         } else {
-            roles.put(roleId, permissions);
+            this.permissions.put(roleId, permissions);
         }
     }
 
@@ -231,7 +163,7 @@ public class Task implements Serializable {
 
     public void resolveViewRoles() {
         this.viewRoles.clear();
-        this.roles.forEach((role, perms) -> {
+        this.permissions.forEach((role, perms) -> {
             if (perms.containsKey(RolePermission.VIEW) && perms.get(RolePermission.VIEW)) {
                 viewRoles.add(role);
             }

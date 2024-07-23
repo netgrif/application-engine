@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.petrinet.domain.dataset;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;

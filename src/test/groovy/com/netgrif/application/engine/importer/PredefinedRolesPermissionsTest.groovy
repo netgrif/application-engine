@@ -445,7 +445,7 @@ class PredefinedRolesPermissionsTest {
         assert instances.aCase.getPermissions() == processPerms
         assert instances.aCase.negativeViewRoles == negativeProcessView
 
-        assert instances.task.getRoles() == taskPerms
+        assert instances.task.getPermissions() == taskPerms
         assert instances.task.negativeViewRoles == negativeTaskView
     }
 

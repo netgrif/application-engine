@@ -3,7 +3,6 @@ package com.netgrif.application.engine.importer.service;
 import com.netgrif.application.engine.configuration.properties.DatabaseProperties;
 import com.netgrif.application.engine.importer.model.Data;
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.importer.model.Valid;
 import com.netgrif.application.engine.importer.service.builder.FieldBuilder;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.importer.service.validation.IDataValidator;
@@ -40,49 +39,49 @@ public final class FieldFactory {
             throw new IllegalArgumentException("Field " + data.getId() + " has unsupported type " + data.getType());
         }
         Field<?> field = builder.build(data, importer);
-        field.setName(importer.toI18NString(data.getTitle()));
-        field.setImportId(data.getId());
-        if (data.isImmediate() != null) {
-            field.setImmediate(data.isImmediate());
-        }
-        if (data.getLength() != null) {
-            field.setLength(data.getLength());
-        }
-        if (data.getDesc() != null)
-            field.setDescription(importer.toI18NString(data.getDesc()));
-
-        if (data.getPlaceholder() != null)
-            field.setPlaceholder(importer.toI18NString(data.getPlaceholder()));
-
-        // TODO: release/8.0.0 validation register
-        // TODO: release/8.0.0 valid deprecated
-        if (data.getValid() != null) {
-            List<Valid> list = data.getValid();
-            for (Valid item : list) {
-                // TODO: release/8.0.0 new I18nString?
-                field.addValidation(new Validation(item.getValue(), new I18nString()));
-            }
-        }
-        if (data.getValidations() != null) {
-            List<com.netgrif.application.engine.importer.model.Validation> list = data.getValidations().getValidation();
-            for (com.netgrif.application.engine.importer.model.Validation item : list) {
-                field.addValidation(new Validation(item.getExpression().getValue(), importer.toI18NString(item.getMessage())));
-            }
-        }
-        if (data.getComponent() != null) {
-            Component component = componentFactory.buildComponent(data.getComponent(), importer, data);
-            field.setComponent(component);
-        }
-        if (data.getView() != null) {
-            log.warn("Data attribute [view] in field [{}] is deprecated.", field.getImportId());
-        }
-        if (data.getFormat() != null) {
-            log.warn("Data attribute [format] in field [{}] is deprecated.", field.getImportId());
-        }
-
-        setEncryption(field, data);
-
-        dataValidator.checkDeprecatedAttributes(data);
+//        field.setName(importer.toI18NString(data.getTitle()));
+//        field.setImportId(data.getId());
+//        if (data.isImmediate() != null) {
+//            field.setImmediate(data.isImmediate());
+//        }
+//        if (data.getLength() != null) {
+//            field.setLength(data.getLength());
+//        }
+//        if (data.getDesc() != null)
+//            field.setDescription(importer.toI18NString(data.getDesc()));
+//
+//        if (data.getPlaceholder() != null)
+//            field.setPlaceholder(importer.toI18NString(data.getPlaceholder()));
+//
+//        // TODO: release/8.0.0 validation register
+//        // TODO: release/8.0.0 valid deprecated
+//        if (data.getValid() != null) {
+//            List<Valid> list = data.getValid();
+//            for (Valid item : list) {
+//                // TODO: release/8.0.0 new I18nString?
+//                field.addValidation(new Validation(item.getValue(), new I18nString()));
+//            }
+//        }
+//        if (data.getValidations() != null) {
+//            List<com.netgrif.application.engine.importer.model.Validation> list = data.getValidations().getValidation();
+//            for (com.netgrif.application.engine.importer.model.Validation item : list) {
+//                field.addValidation(new Validation(item.getExpression().getValue(), importer.toI18NString(item.getMessage())));
+//            }
+//        }
+//        if (data.getComponent() != null) {
+//            Component component = componentFactory.buildComponent(data.getComponent(), importer, data);
+//            field.setComponent(component);
+//        }
+//        if (data.getView() != null) {
+//            log.warn("Data attribute [view] in field [{}] is deprecated.", field.getImportId());
+//        }
+//        if (data.getFormat() != null) {
+//            log.warn("Data attribute [format] in field [{}] is deprecated.", field.getImportId());
+//        }
+//
+//        setEncryption(field, data);
+//
+//        dataValidator.checkDeprecatedAttributes(data);
         return field;
     }
 
@@ -105,12 +104,12 @@ public final class FieldFactory {
     }*/
 
     private void setEncryption(Field<?> field, Data data) {
-        if (data.getEncryption() != null && data.getEncryption().isValue()) {
-            String encryption = data.getEncryption().getAlgorithm();
-            if (encryption == null) {
-                encryption = properties.getAlgorithm();
-            }
-            field.setEncryption(encryption);
-        }
+//        if (data.getEncryption() != null && data.getEncryption().isValue()) {
+//            String encryption = data.getEncryption().getAlgorithm();
+//            if (encryption == null) {
+//                encryption = properties.getAlgorithm();
+//            }
+//            field.setEncryption(encryption);
+//        }
     }
 }

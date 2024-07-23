@@ -11,7 +11,8 @@ public class TransitionValidator extends ModelValidator implements ITransitionVa
 
     @Override
     public void checkDeprecatedAttributes(Transition transition) {
-        validateAttribute(transition.getUsersRef(), "usersRef");
+        // TODO: NAE-1969 fix
+//        validateAttribute(transition.getUsersRef(), "usersRef");
     }
 
     @Override

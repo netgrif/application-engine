@@ -14,9 +14,9 @@ import java.util.Locale;
 public interface IElasticCaseService {
 
     @Async
-    void index(ElasticCase useCase);
+    void index(Case useCase);
 
-    void indexNow(ElasticCase useCase);
+    void indexNow(Case useCase);
 
     Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection);
 

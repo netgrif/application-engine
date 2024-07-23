@@ -17,30 +17,24 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+@Setter
 @Getter
 @Document
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class ProcessRole extends Imported {
 
     public static final String DEFAULT_ROLE = "default";
-
     public static final String ANONYMOUS_ROLE = "anonymous";
 
+    @Getter
     @Id
-    @Setter
     private ObjectId id;
-
+    @Getter
     private I18nString name;
-
     @Getter
-    @Setter
     private String netId;
-
-    @Setter
     private String description;
-
     @Getter
-    @Setter
     private Map<EventType, Event> events;
 
     public ProcessRole() {
@@ -56,33 +50,14 @@ public class ProcessRole extends Imported {
         return id.toString();
     }
 
-    public ObjectId getId() {
-        return id;
-    }
-
-    public void setId(ObjectId id) {
-        this.id = id;
-    }
-
     public void setId(String id) {
         this.id = new ObjectId(id);
     }
 
-    public I18nString getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        setName(new I18nString(name));
-    }
-
-    public void setName(I18nString name) {
-        this.name = name;
-    }
-
     public String getLocalisedName(Locale locale) {
-        if (name == null)
+        if (name == null) {
             return null;
+        }
         return name.getTranslation(locale);
     }
 
@@ -122,7 +97,7 @@ public class ProcessRole extends Imported {
     @Override
     public ProcessRole clone() {
         ProcessRole clone = new ProcessRole();
-        clone.setId(this.id);
+        clone.setId(this.getStringId());
         clone.setImportId(this.importId);
         clone.setName(this.name == null ? null : this.name.clone());
         clone.setNetId(this.netId);

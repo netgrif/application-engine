@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.importer.model.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
@@ -29,7 +28,8 @@ public class DataRef {
     @Transient
     private DataFieldBehavior behavior;
     private Map<DataEventType, DataEvent> events;
-    private FieldLayout layout;
+    // TODO: NAE-1969 fix
+//    private Object layout;
     private Component component;
     @Transient
     protected String parentTaskId;

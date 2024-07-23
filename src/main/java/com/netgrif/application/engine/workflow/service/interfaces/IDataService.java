@@ -12,7 +12,6 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
@@ -95,11 +94,6 @@ public interface IDataService {
     SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name);
 
     SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name, Map<String, String> params);
-
-    // TODO: release/8.0.0 deprecated by forms
-    GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, IUser user);
-
-    GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, LoggedUser loggedUser);
 
     // TODO: release/8.0.0 revision
     Page<Task> setImmediateFields(Page<Task> tasks);

@@ -2312,7 +2312,6 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
             }
             node = uriService.findByUri(uncheckedUri)
         }
-
         return node.uriPath
     }
 

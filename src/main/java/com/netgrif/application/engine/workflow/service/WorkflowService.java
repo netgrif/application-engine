@@ -11,6 +11,7 @@ import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventL
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.model.CaseEventType;
 import com.netgrif.application.engine.importer.service.FieldFactory;
+import com.netgrif.application.engine.petrinet.domain.I18nExpression;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
@@ -25,6 +26,7 @@ import com.netgrif.application.engine.security.service.EncryptionService;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataFieldValue;
+import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
@@ -65,9 +67,6 @@ public class WorkflowService implements IWorkflowService {
     protected CaseRepository repository;
 
     @Autowired
-    protected MongoTemplate mongoTemplate;
-
-    @Autowired
     protected IPetriNetService petriNetService;
 
     @Autowired
@@ -75,9 +74,6 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     protected ITaskService taskService;
-
-    @Autowired
-    protected ApplicationEventPublisher publisher;
 
     @Autowired
     protected EncryptionService encryptionService;
@@ -96,9 +92,6 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     protected IInitValueExpressionEvaluator initValueExpressionEvaluator;
-
-    @Autowired
-    protected IElasticCaseMappingService caseMappingService;
 
     @Lazy
     @Autowired
@@ -126,7 +119,7 @@ public class WorkflowService implements IWorkflowService {
         useCase = repository.save(useCase);
         try {
             useCase.resolveImmediateDataFields();
-            elasticCaseService.indexNow(this.caseMappingService.transform(useCase));
+            elasticCaseService.indexNow(useCase);
         } catch (Exception e) {
             log.error("Indexing failed [{}]", useCase.getStringId(), e);
         }
@@ -292,7 +285,6 @@ public class WorkflowService implements IWorkflowService {
         int rulesExecuted;
         Case useCase = new Case(petriNet);
         dataSetInitializer.populateDataSet(useCase, params);
-        useCase.setColor(color);
         useCase.setAuthor(loggedOrImpersonated.transformToAuthor());
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(makeTitle.apply(useCase));
@@ -333,7 +325,8 @@ public class WorkflowService implements IWorkflowService {
     protected Function<Case, String> resolveDefaultCaseTitle(String netId, Locale locale, Map<String, String> params) {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
         Function<Case, String> makeTitle;
-        if (petriNet.hasDynamicCaseName()) {
+        I18nExpression caseTitle = petriNet.getDefaultCaseName();
+        if (caseTitle.isDynamic()) {
             makeTitle = (u) -> initValueExpressionEvaluator.evaluateCaseName(u, petriNet.getDefaultCaseNameExpression(), params).getTranslation(locale);
         } else {
             makeTitle = (u) -> petriNet.getDefaultCaseName().getTranslation(locale);
@@ -343,13 +336,10 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Page<Case> findAllByAuthor(String authorId, String petriNet, Pageable pageable) {
-        String queryString = "{author.id:" + authorId + ", petriNet:{$ref:\"petriNet\",$id:{$oid:\"" + petriNet + "\"}}}";
-        BasicQuery query = new BasicQuery(queryString);
-        query = (BasicQuery) query.with(pageable);
-//        TODO: release/8.0.0 remove mongoTemplates from project
-        List<Case> cases = mongoTemplate.find(query, Case.class);
+        Predicate query = QCase.case$.author.id.eq(authorId).and(QCase.case$.petriNetId.eq(petriNet));
+        Page<Case> cases = repository.findAll(query, pageable);
         cases.forEach(this::initialize);
-        return new PageImpl<>(cases, pageable, mongoTemplate.count(new BasicQuery(queryString, "{id:1}"), Case.class));
+        return cases;
     }
 
     @Override
@@ -419,25 +409,6 @@ public class WorkflowService implements IWorkflowService {
     public void updateMarking(Case useCase) {
         PetriNet net = useCase.getPetriNet();
         useCase.setActivePlaces(net.getActivePlaces());
-    }
-
-    @Override
-    public void removeTasksFromCase(List<Task> tasks, String caseId) {
-        Optional<Case> caseOptional = repository.findById(caseId);
-        if (caseOptional.isEmpty()) {
-            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
-        }
-        Case useCase = caseOptional.get();
-        removeTasksFromCase(tasks, useCase);
-    }
-
-    @Override
-    public void removeTasksFromCase(List<Task> tasks, Case useCase) {
-        if (tasks == null || tasks.isEmpty()) {
-            return;
-        }
-        useCase.removeTasks(tasks);
-        save(useCase);
     }
 
     @Override

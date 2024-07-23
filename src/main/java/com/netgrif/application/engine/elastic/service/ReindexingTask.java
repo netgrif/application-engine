@@ -39,7 +39,6 @@ public class ReindexingTask {
     private ElasticCaseRepository elasticCaseRepository;
     private IElasticCaseService elasticCaseService;
     private IElasticTaskService elasticTaskService;
-    private IElasticCaseMappingService caseMappingService;
     private IElasticTaskMappingService taskMappingService;
     private IWorkflowService workflowService;
 
@@ -64,7 +63,6 @@ public class ReindexingTask {
         this.elasticCaseRepository = elasticCaseRepository;
         this.elasticCaseService = elasticCaseService;
         this.elasticTaskService = elasticTaskService;
-        this.caseMappingService = caseMappingService;
         this.taskMappingService = taskMappingService;
         this.workflowService = workflowService;
         this.pageSize = pageSize;
@@ -77,7 +75,7 @@ public class ReindexingTask {
 
     @Scheduled(cron = "#{springElasticsearchReindex}")
     public void reindex() {
-        log.info("Reindexing stale cases: started reindexing after " + lastRun);
+        log.info("Reindexing stale cases: started reindexing after {}", lastRun);
 
         BooleanExpression predicate = QCase.case$.lastModified.before(LocalDateTime.now()).and(QCase.case$.lastModified.after(lastRun.minusMinutes(2)));
 
@@ -92,7 +90,7 @@ public class ReindexingTask {
 
     private void reindexAllPages(BooleanExpression predicate, long count) {
         long numOfPages = ((count / pageSize) + 1);
-        log.info("Reindexing " + numOfPages + " pages");
+        log.info("Reindexing {} pages", numOfPages);
 
         for (int page = 0; page < numOfPages; page++) {
             reindexPage(predicate, page, numOfPages, false);
@@ -104,12 +102,12 @@ public class ReindexingTask {
     }
 
     private void reindexPage(Predicate predicate, int page, long numOfPages, boolean forced) {
-        log.info("Reindexing " + (page + 1) + " / " + numOfPages);
+        log.info("Reindexing {} / {}", page + 1, numOfPages);
         Page<Case> cases = this.workflowService.search(predicate, PageRequest.of(page, pageSize));
 
         for (Case aCase : cases) {
             if (forced || elasticCaseRepository.countByStringIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {
-                elasticCaseService.indexNow(this.caseMappingService.transform(aCase));
+                elasticCaseService.indexNow(aCase);
                 List<Task> tasks = taskRepository.findAllByCaseId(aCase.getStringId());
                 for (Task task : tasks) {
                     elasticTaskService.indexNow(this.taskMappingService.transform(task));

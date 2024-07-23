@@ -8,7 +8,6 @@ import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.model.DataEventType;
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.importer.model.LayoutType;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.*;
@@ -25,7 +24,6 @@ import com.netgrif.application.engine.workflow.domain.EventNotExecutableExceptio
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -253,62 +251,62 @@ public class DataService implements IDataService {
         }
         outcome.setMessage(message);
     }
-
-    @Override
-    public GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, LoggedUser loggedUser) {
-        IUser user = userService.getUserFromLoggedUser(loggedUser);
-        return getDataGroups(taskId, locale, user);
-    }
-
-    @Override
-    public GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, IUser user) {
-        return getDataGroups(taskId, locale, new HashSet<>(), 0, null, user);
-    }
-
-    private GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, Set<String> collectedTaskIds, int level, String parentTaskRefId, IUser user) {
-        Task task = taskService.findOne(taskId);
-        Case useCase = workflowService.findOne(task.getCaseId());
-        PetriNet net = useCase.getPetriNet();
-        Transition transition = net.getTransition(task.getTransitionId());
-        GetDataGroupsEventOutcome outcome = new GetDataGroupsEventOutcome(useCase, task);
-        log.info("Getting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level);
-        List<DataGroup> resultDataGroups = new ArrayList<>();
-        List<DataRef> data = getData(task, useCase, user).getData();
-        Map<String, DataRef> dataFieldMap = data.stream().collect(Collectors.toMap(DataRef::getFieldId, field -> field));
-        List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::clone).collect(Collectors.toList());
-        for (DataGroup dataGroup : dataGroups) {
-            resolveTaskRefOrderOnGrid(dataGroup, dataFieldMap);
-            resultDataGroups.add(dataGroup);
-            log.debug("Setting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level + " " + dataGroup.getImportId());
-
-            LinkedHashMap<String, DataRef> resources = new LinkedHashMap<>();
-            for (String dataFieldId : dataGroup.getData()) {
-                Field<?> field = net.getDataSet().get(dataFieldId);
-                if (!dataFieldMap.containsKey(dataFieldId)) {
-                    continue;
-                }
-                DataRef resource = dataFieldMap.get(dataFieldId);
-                if (level != 0) {
-                    dataGroup.setParentCaseId(useCase.getStringId());
-                    resource.setParentCaseId(useCase.getStringId());
-                    dataGroup.setParentTaskId(taskId);
-                    dataGroup.setParentTransitionId(task.getTransitionId());
-                    dataGroup.setParentTaskRefId(parentTaskRefId);
-                    dataGroup.setNestingLevel(level);
-                    resource.setParentTaskId(taskId);
-                }
-                resources.put(dataFieldId, resource);
-                // TODO: release/8.0.0
-                // if (field.getType() == FieldType.TASK_REF && shouldResolveTaskRefData(field, transition.getDataSet().get(field.getStringId()))) {
-                if (field.getType() == DataType.TASK_REF) {
-                    resultDataGroups.addAll(collectTaskRefDataGroups(dataFieldMap.get(dataFieldId), locale, collectedTaskIds, level, user));
-                }
-            }
-            dataGroup.setDataRefs(resources);
-        }
-        outcome.setData(resultDataGroups);
-        return outcome;
-    }
+// TODO: NAE-1969 fix
+//    @Override
+//    public GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, LoggedUser loggedUser) {
+//        IUser user = userService.getUserFromLoggedUser(loggedUser);
+//        return getDataGroups(taskId, locale, user);
+//    }
+//
+//    @Override
+//    public GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, IUser user) {
+//        return getDataGroups(taskId, locale, new HashSet<>(), 0, null, user);
+//    }
+//
+//    private GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, Set<String> collectedTaskIds, int level, String parentTaskRefId, IUser user) {
+//        Task task = taskService.findOne(taskId);
+//        Case useCase = workflowService.findOne(task.getCaseId());
+//        PetriNet net = useCase.getPetriNet();
+//        Transition transition = net.getTransition(task.getTransitionId());
+//        GetDataGroupsEventOutcome outcome = new GetDataGroupsEventOutcome(useCase, task);
+//        log.info("Getting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level);
+//        List<DataGroup> resultDataGroups = new ArrayList<>();
+//        List<DataRef> data = getData(task, useCase, user).getData();
+//        Map<String, DataRef> dataFieldMap = data.stream().collect(Collectors.toMap(DataRef::getFieldId, field -> field));
+//        List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::clone).collect(Collectors.toList());
+//        for (DataGroup dataGroup : dataGroups) {
+//            resolveTaskRefOrderOnGrid(dataGroup, dataFieldMap);
+//            resultDataGroups.add(dataGroup);
+//            log.debug("Setting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level + " " + dataGroup.getImportId());
+//
+//            LinkedHashMap<String, DataRef> resources = new LinkedHashMap<>();
+//            for (String dataFieldId : dataGroup.getData()) {
+//                Field<?> field = net.getDataSet().get(dataFieldId);
+//                if (!dataFieldMap.containsKey(dataFieldId)) {
+//                    continue;
+//                }
+//                DataRef resource = dataFieldMap.get(dataFieldId);
+//                if (level != 0) {
+//                    dataGroup.setParentCaseId(useCase.getStringId());
+//                    resource.setParentCaseId(useCase.getStringId());
+//                    dataGroup.setParentTaskId(taskId);
+//                    dataGroup.setParentTransitionId(task.getTransitionId());
+//                    dataGroup.setParentTaskRefId(parentTaskRefId);
+//                    dataGroup.setNestingLevel(level);
+//                    resource.setParentTaskId(taskId);
+//                }
+//                resources.put(dataFieldId, resource);
+//                // TODO: release/8.0.0
+//                // if (field.getType() == FieldType.TASK_REF && shouldResolveTaskRefData(field, transition.getDataSet().get(field.getStringId()))) {
+//                if (field.getType() == DataType.TASK_REF) {
+//                    resultDataGroups.addAll(collectTaskRefDataGroups(dataFieldMap.get(dataFieldId), locale, collectedTaskIds, level, user));
+//                }
+//            }
+//            dataGroup.setDataRefs(resources);
+//        }
+//        outcome.setData(resultDataGroups);
+//        return outcome;
+//    }
 
     // TODO: release/8.0.0 needed?
 //    private boolean shouldResolveTaskRefData(Field<?> field, DataFieldLogic dataRef) {
@@ -328,51 +326,51 @@ public class DataService implements IDataService {
                 && component.getProperties().get(propertyName).equals(propertyValue);
     }
 
-    private List<DataGroup> collectTaskRefDataGroups(DataRef taskRefField, Locale locale, Set<String> collectedTaskIds, int level, IUser user) {
-        List<String> taskIds = ((TaskField) taskRefField.getField()).getRawValue();
-        if (taskIds == null) {
-            return new ArrayList<>();
-        }
-
-        List<DataGroup> groups = new ArrayList<>();
-        taskIds.stream()
-                .filter(id -> !collectedTaskIds.contains(id))
-                .forEach(id -> {
-                    collectedTaskIds.add(id);
-                    List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1, taskRefField.getFieldId(), user).getData();
-                    resolveTaskRefBehavior(taskRefField, taskRefDataGroups);
-                    groups.addAll(taskRefDataGroups);
-                });
-
-        return groups;
-    }
-
-    private void resolveTaskRefOrderOnGrid(DataGroup dataGroup, Map<String, DataRef> dataFieldMap) {
-        if (dataGroup.getLayout() == null || dataGroup.getLayout().getType() != LayoutType.GRID) {
-            return;
-        }
-        dataGroup.setData(dataGroup.getData().stream().filter(dataFieldMap::containsKey).map(dataFieldMap::get).sorted(Comparator.comparingInt(a -> a.getLayout().getY())).map(DataRef::getFieldId).collect(Collectors.toCollection(LinkedHashSet::new)));
-    }
-
-    private void resolveTaskRefBehavior(DataRef taskRefField, List<DataGroup> taskRefDataGroups) {
-        if (taskRefField.getBehavior().getBehavior() == FieldBehavior.VISIBLE) {
-            taskRefDataGroups.forEach(dataGroup -> {
-                dataGroup.getDataRefs().values().forEach(field -> {
-                    if (field.getBehavior().getBehavior() == FieldBehavior.EDITABLE) {
-                        field.getBehavior().setBehavior(FieldBehavior.VISIBLE);
-                    }
-                });
-            });
-        } else if (taskRefField.getBehavior().getBehavior() == FieldBehavior.HIDDEN) {
-            taskRefDataGroups.forEach(dataGroup -> {
-                dataGroup.getDataRefs().values().forEach(field -> {
-                    if (field.getBehavior().getBehavior() != FieldBehavior.FORBIDDEN) {
-                        field.getBehavior().setBehavior(FieldBehavior.HIDDEN);
-                    }
-                });
-            });
-        }
-    }
+//    private List<DataGroup> collectTaskRefDataGroups(DataRef taskRefField, Locale locale, Set<String> collectedTaskIds, int level, IUser user) {
+//        List<String> taskIds = ((TaskField) taskRefField.getField()).getRawValue();
+//        if (taskIds == null) {
+//            return new ArrayList<>();
+//        }
+//
+//        List<DataGroup> groups = new ArrayList<>();
+//        taskIds.stream()
+//                .filter(id -> !collectedTaskIds.contains(id))
+//                .forEach(id -> {
+//                    collectedTaskIds.add(id);
+//                    List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1, taskRefField.getFieldId(), user).getData();
+//                    resolveTaskRefBehavior(taskRefField, taskRefDataGroups);
+//                    groups.addAll(taskRefDataGroups);
+//                });
+//
+//        return groups;
+//    }
+//
+//    private void resolveTaskRefOrderOnGrid(DataGroup dataGroup, Map<String, DataRef> dataFieldMap) {
+//        if (dataGroup.getLayout() == null || dataGroup.getLayout().getType() != LayoutType.GRID) {
+//            return;
+//        }
+//        dataGroup.setData(dataGroup.getData().stream().filter(dataFieldMap::containsKey).map(dataFieldMap::get).sorted(Comparator.comparingInt(a -> a.getLayout().getY())).map(DataRef::getFieldId).collect(Collectors.toCollection(LinkedHashSet::new)));
+//    }
+//
+//    private void resolveTaskRefBehavior(DataRef taskRefField, List<DataGroup> taskRefDataGroups) {
+//        if (taskRefField.getBehavior().getBehavior() == FieldBehavior.VISIBLE) {
+//            taskRefDataGroups.forEach(dataGroup -> {
+//                dataGroup.getDataRefs().values().forEach(field -> {
+//                    if (field.getBehavior().getBehavior() == FieldBehavior.EDITABLE) {
+//                        field.getBehavior().setBehavior(FieldBehavior.VISIBLE);
+//                    }
+//                });
+//            });
+//        } else if (taskRefField.getBehavior().getBehavior() == FieldBehavior.HIDDEN) {
+//            taskRefDataGroups.forEach(dataGroup -> {
+//                dataGroup.getDataRefs().values().forEach(field -> {
+//                    if (field.getBehavior().getBehavior() != FieldBehavior.FORBIDDEN) {
+//                        field.getBehavior().setBehavior(FieldBehavior.HIDDEN);
+//                    }
+//                });
+//            });
+//        }
+//    }
 
     @Override
     public FileFieldInputStream getFileByTask(String taskId, String fieldId, boolean forPreview) throws FileNotFoundException {

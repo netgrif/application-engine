@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.roles;
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum RolePermission {
@@ -9,8 +8,9 @@ public enum RolePermission {
     CANCEL,
     ASSIGN,
     FINISH,
-    SET,
-    VIEW;
+    VIEW,
+    REASSIGN,
+    VIEW_DISABLED;
 
     @JsonValue
     public String value() {

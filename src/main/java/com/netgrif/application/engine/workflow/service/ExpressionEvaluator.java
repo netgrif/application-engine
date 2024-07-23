@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class InitValueExpressionEvaluator implements IInitValueExpressionEvaluator {
+public class ExpressionEvaluator implements IInitValueExpressionEvaluator {
 
     @Autowired
     private ExpressionRunner runner;

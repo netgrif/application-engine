@@ -6,6 +6,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
@@ -64,6 +65,9 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     protected IElasticCasePrioritySearch iElasticCasePrioritySearch;
 
     @Autowired
+    protected IElasticCaseMappingService mappingService;
+
+    @Autowired
     public ElasticCaseService(ElasticCaseRepository repository, ElasticsearchRestTemplate template, Executor executors) {
         this.repository = repository;
         this.template = template;
@@ -93,27 +97,28 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     @Override
-    public void index(ElasticCase useCase) {
+    public void index(Case useCase) {
         executors.execute(useCase.getStringId(), () -> {
+            ElasticCase elasticCase = mappingService.transform(useCase);
             try {
-                ElasticCase elasticCase = repository.findByStringId(useCase.getStringId());
-                if (elasticCase == null) {
-                    repository.save(useCase);
-                } else {
-                    elasticCase.update(useCase);
+                ElasticCase savedCase = repository.findByStringId(useCase.getStringId());
+                if (savedCase == null) {
                     repository.save(elasticCase);
+                } else {
+                    savedCase.update(elasticCase);
+                    repository.save(savedCase);
                 }
             } catch (InvalidDataAccessApiUsageException ignored) {
                 log.debug("[{}]: Case \"{}\" has duplicates, will be reindexed", useCase.getStringId(), useCase.getTitle());
                 repository.deleteAllByStringId(useCase.getStringId());
-                repository.save(useCase);
+                repository.save(elasticCase);
             }
             log.debug("[{}]: Case \"{}\" indexed", useCase.getStringId(), useCase.getTitle());
         });
     }
 
     @Override
-    public void indexNow(ElasticCase useCase) {
+    public void indexNow(Case useCase) {
         index(useCase);
     }
 

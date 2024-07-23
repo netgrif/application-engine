@@ -172,13 +172,14 @@ public class TaskController extends AbstractTaskController {
         return super.count(query, operation, auth, locale);
     }
 
-    @Override
-    @Operation(summary = "Get all task data", security = {@SecurityRequirement(name = "BasicAuth")})
-    @GetMapping(value = "/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
-    public EntityModel<EventOutcomeWithMessage> getData(@PathVariable("id") String taskId, Locale locale, Authentication auth) {
-        // TODO: release/8.0.0 6.2.5 set order?
-        return super.getData(taskId, locale, auth);
-    }
+    // TODO: NAE-1969 fix
+//    @Override
+//    @Operation(summary = "Get all task data", security = {@SecurityRequirement(name = "BasicAuth")})
+//    @GetMapping(value = "/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
+//    public EntityModel<EventOutcomeWithMessage> getData(@PathVariable("id") String taskId, Locale locale, Authentication auth) {
+//        // TODO: release/8.0.0 6.2.5 set order?
+//        return super.getData(taskId, locale, auth);
+//    }
 
     @PreAuthorize("@taskAuthorizationService.canCallSaveData(#auth.getPrincipal(), #taskId)")
     @Operation(summary = "Set task data",

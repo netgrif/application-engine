@@ -31,64 +31,64 @@ public abstract class FieldBuilder<T extends Field<?>> {
     }
 
     public String getInitExpression(Data data) {
-        if (data.getInit() != null) {
-            if (data.getInit().isDynamic()) {
-                return data.getInit().getValue();
-            }
-        }
+//        if (data.getInit() != null) {
+//            if (data.getInit().isDynamic()) {
+//                return data.getInit().getValue();
+//            }
+//        }
         return null;
     }
 
     public String resolveInit(Data data) {
-        if (data.getInits() != null && data.getInits().getInit() != null) {
-            return data.getInits().getInit().get(0).getValue();
-        }
-        if (data.getInit() != null) return data.getInit().getValue();
+//        if (data.getInits() != null && data.getInits().getInit() != null) {
+//            return data.getInits().getInit().get(0).getValue();
+//        }
+//        if (data.getInit() != null) return data.getInit().getValue();
         return null;
     }
 
     public List<String> resolveInits(Data data) {
-        if (data.getInits() != null && data.getInits().getInit() != null) {
-            return data.getInits().getInit().stream().map(Init::getValue).collect(Collectors.toList());
-        }
-        if (data.getInit() != null) {
-            return List.of(data.getInit().getValue().trim().split("\\s*,\\s*"));
-        }
+//        if (data.getInits() != null && data.getInits().getInit() != null) {
+//            return data.getInits().getInit().stream().map(Init::getValue).collect(Collectors.toList());
+//        }
+//        if (data.getInit() != null) {
+//            return List.of(data.getInit().getValue().trim().split("\\s*,\\s*"));
+//        }
         return Collections.emptyList();
     }
 
     public void setFieldChoices(ChoiceField<?> field, Data data, Importer importer) {
-        if (data.getValues() != null && !data.getValues().isEmpty() && data.getValues().get(0).isDynamic()) {
-            field.setExpression(new Expression(data.getValues().get(0).getValue(), data.getValues().get(0).isDynamic()));
-        } else if (data.getValues() != null) {
-            List<I18nString> choices = data.getValues().stream()
-                    .map(importer::toI18NString)
-                    .collect(Collectors.toList());
-            field.getChoices().addAll(choices);
-        }
+//        if (data.getValues() != null && !data.getValues().isEmpty() && data.getValues().get(0).isDynamic()) {
+//            field.setExpression(new Expression(data.getValues().get(0).getValue(), data.getValues().get(0).isDynamic()));
+//        } else if (data.getValues() != null) {
+//            List<I18nString> choices = data.getValues().stream()
+//                    .map(importer::toI18NString)
+//                    .collect(Collectors.toList());
+//            field.getChoices().addAll(choices);
+//        }
     }
 
     public void setFieldOptions(ChoiceField<?> field, Data data, Importer importer) {
-        if (data.getOptions() != null && data.getOptions().getInit() != null) {
-            field.setExpression(new Expression(data.getOptions().getInit().getValue(), data.getOptions().getInit().isDynamic()));
-            return;
-        }
-
-        List<I18nString> options = (data.getOptions() == null) ? new ArrayList<>() : data.getOptions().getOption().stream()
-                .map(importer::toI18NString)
-                .collect(Collectors.toList());
-        field.getChoices().addAll(options);
+//        if (data.getOptions() != null && data.getOptions().getInit() != null) {
+//            field.setExpression(new Expression(data.getOptions().getInit().getValue(), data.getOptions().getInit().isDynamic()));
+//            return;
+//        }
+//
+//        List<I18nString> options = (data.getOptions() == null) ? new ArrayList<>() : data.getOptions().getOption().stream()
+//                .map(importer::toI18NString)
+//                .collect(Collectors.toList());
+//        field.getChoices().addAll(options);
     }
 
     public void setFieldOptions(MapOptionsField<I18nString, ?> field, Data data, Importer importer) {
-        if (data.getOptions() != null && data.getOptions().getInit() != null) {
-            field.setExpression(new Expression(data.getOptions().getInit().getValue(), data.getOptions().getInit().isDynamic()));
-            return;
-        }
-
-        Map<String, I18nString> choices = (data.getOptions() == null) ? new LinkedHashMap<>() : data.getOptions().getOption().stream()
-                .collect(Collectors.toMap(Option::getKey, importer::toI18NString, (o1, o2) -> o1, LinkedHashMap::new));
-        field.setOptions(choices);
+//        if (data.getOptions() != null && data.getOptions().getInit() != null) {
+//            field.setExpression(new Expression(data.getOptions().getInit().getValue(), data.getOptions().getInit().isDynamic()));
+//            return;
+//        }
+//
+//        Map<String, I18nString> choices = (data.getOptions() == null) ? new LinkedHashMap<>() : data.getOptions().getOption().stream()
+//                .collect(Collectors.toMap(Option::getKey, importer::toI18NString, (o1, o2) -> o1, LinkedHashMap::new));
+//        field.setOptions(choices);
     }
 
     public void setDefaultValue(Field<?> field, Data data, Consumer<String> setDefault) {

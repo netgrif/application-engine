@@ -134,7 +134,7 @@ public class ElasticCase {
         negativeViewRoles = new HashSet<>(useCase.getNegativeViewRoles());
         viewUsers = new HashSet<>(useCase.getViewUsers());
         negativeViewUsers = new HashSet<>(useCase.getNegativeViewUsers());
-        tags = new HashMap<>(useCase.getTags());
+        tags = new HashMap<>(useCase.getProperties());
 
         dataSet = new HashMap<>();
     }
