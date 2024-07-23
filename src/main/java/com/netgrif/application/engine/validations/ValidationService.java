@@ -31,9 +31,9 @@ public class ValidationService implements IValidationService {
 
     @Override
     public void validateTransition(Case useCase, Transition transition) {
-        transition.getDataSet().values().forEach(dataRef -> {
-            if (dataRef.getField() != null) {
-                validationExecutioner.execute(useCase, dataRef.getField(), dataRef.getField().getValidations());
+        transition.getDataSet().keySet().forEach(fieldId -> {
+            if (useCase.getDataSet().get(fieldId) != null) {
+                validationExecutioner.execute(useCase, useCase.getDataSet().get(fieldId), useCase.getDataSet().get(fieldId).getValidations());
             }
         });
     }
