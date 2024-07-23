@@ -149,6 +149,7 @@ public class ApplicationRunnerOrderResolver {
                 int runnerToReplaceIndex = indexOfClass(sorted, runnerToReplace);
                 if (runnerToReplaceIndex == -1) continue;
                 sorted.add(runnerToReplaceIndex, item);
+                sorted.remove(runnerToReplaceIndex + 1);
                 replaced.put(itemClass, runnerToReplace);
                 changed = true;
             }
