@@ -5,9 +5,9 @@ import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.startup.GroupRunner
-import com.netgrif.application.engine.startup.SuperCreator
-import com.netgrif.application.engine.startup.SystemUserRunner
+import com.netgrif.application.engine.startup.runner.GroupRunner
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
+import com.netgrif.application.engine.startup.runner.SystemUserRunner
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -45,7 +45,7 @@ class FieldTest {
     private TestHelper testHelper
 
     @Autowired
-    private SuperCreator superCreator
+    private SuperCreatorRunner superCreator
 
     private def stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)

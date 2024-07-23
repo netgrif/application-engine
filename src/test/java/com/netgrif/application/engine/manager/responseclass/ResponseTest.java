@@ -4,7 +4,7 @@ import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.manager.web.body.response.AllLoggedUsersResponse;
 import com.netgrif.application.engine.manager.web.body.response.MessageLogoutResponse;
-import com.netgrif.application.engine.startup.SuperCreator;
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +25,7 @@ class ResponseTest {
     private TestHelper testHelper;
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreatorRunner superCreator;
 
     @BeforeEach
     public void before() {

@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.netgrif.application.engine.startup.SystemUserRunner.*;
+import static com.netgrif.application.engine.startup.runner.SystemUserRunner.*;
 
 public abstract class AbstractUserService implements IUserService {
 

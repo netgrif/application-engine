@@ -11,7 +11,7 @@ import com.netgrif.application.engine.rules.domain.StoredRule;
 import com.netgrif.application.engine.rules.domain.scheduled.ScheduleOutcome;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEvaluationScheduleService;
 import com.netgrif.application.engine.rules.service.throwable.RuleEvaluationScheduleException;
-import com.netgrif.application.engine.startup.SuperCreator;
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
@@ -53,7 +53,7 @@ class RuleEvaluationScheduleServiceTest {
     private IPetriNetService petriNetService;
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreatorRunner superCreator;
 
     @Autowired
     private IRuleEvaluationScheduleService ruleEvaluationScheduleService;
