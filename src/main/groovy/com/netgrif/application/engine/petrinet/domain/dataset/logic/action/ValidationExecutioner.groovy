@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.event.IGroovyShellFactory
-
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.Validation
 import com.netgrif.application.engine.validations.ValidationRegistry
@@ -25,15 +24,17 @@ abstract class ValidationExecutioner {
     private IGroovyShellFactory shellFactory
 
     void execute(Case useCase, Field<?> field, List<Validation> validations) {
-        if (validations) {
-            log.info("Validations: ${validations.collect { it.name }}")
+        if (!validations) {
+            return
+        }
 
-            ValidationDelegate delegate = initDelegate(useCase, field, validations.collect { it.name })
-            for (Validation validation : validations) {
-                Closure<Boolean> code = initCode(validation, delegate)
-                if (!code()) {
-                    throw new IllegalArgumentException(validation.message.toString())
-                }
+        log.info("Validations: ${validations.collect { it.name }}")
+
+        ValidationDelegate delegate = initDelegate(useCase, field, validations.collect { it.name })
+        for (Validation validation : validations) {
+            Closure<Boolean> code = initCode(validation, delegate)
+            if (!code()) {
+                throw new IllegalArgumentException(validation.message.toString())
             }
         }
     }
@@ -64,16 +65,22 @@ abstract class ValidationExecutioner {
             delegate.metaClass."$field.importId" = field
         }
 
-        Set commonFieldValidationNames = useCase.dataSet.fields.keySet()
-        commonFieldValidationNames.retainAll(validationNames)
-        if (!commonFieldValidationNames.isEmpty()) {
-            log.warn("Ignoring validations {} for case [{}]: field names are identical with validation names", commonFieldValidationNames, useCase.stringId)
-            validationNames -= commonFieldValidationNames
-        }
+        List<String> fieldNames = useCase.dataSet.fields.keySet() as List<String>
+        validationNames = filterConflictedValidationNames(fieldNames, validationNames)
         validationNames.forEach { validationName ->
             delegate.metaClass."$validationName" = getValidationCode(validationName)
         }
+
         delegate.thisField = thisField
         return delegate
+    }
+
+    private List<String> filterConflictedValidationNames(List<String> fieldNames, List<String> validationNames) {
+        fieldNames.retainAll(validationNames)
+        if (!fieldNames.isEmpty()) {
+            log.warn("Ignoring validations {} for case [{}]: field names are identical with validation names", fieldNames, useCase.stringId)
+            validationNames -= fieldNames
+        }
+        return validationNames
     }
 }

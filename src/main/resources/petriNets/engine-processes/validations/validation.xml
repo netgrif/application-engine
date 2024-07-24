@@ -71,32 +71,56 @@
         <id>version</id>
         <title name="version">Version</title>
     </data>
-    <data type="boolean" immediate="true">
-        <id>active</id>
-        <title name="active">Is active</title>
-        <init>false</init>
-    </data>
+	<data type="multichoice_map">
+		<id>validation_type</id>
+		<title name="type">Type</title>
+		<options>
+			<option key="client">Client</option>
+			<option key="server">Server</option>
+		</options>
+		<event type="set">
+			<id>validation_type_set</id>
+			<actions phase="post">
+				<action>
+					validation_type: f.validation_type,
+					validation_definition_groovy: f.validation_definition_groovy,
+					num_arguments_groovy: f.num_arguments_groovy,
+					validation_definition_javascript: f.validation_definition_javascript,
+					num_arguments_javascript: f.num_arguments_javascript,
+					init_trans: t.init,
+					detail_trans: t.detail;
+
+					make [validation_definition_groovy, num_arguments_groovy], editable on init_trans when { validation_type.value &amp;&amp; validation_type.value.contains("server") }
+					make [validation_definition_groovy, num_arguments_groovy], visible on detail_trans when { validation_type.value &amp;&amp; validation_type.value.contains("server") }
+					make [validation_definition_groovy, num_arguments_groovy], hidden on transitions when { validation_type.value &amp;&amp; validation_type.value.contains("server") }
+					make [validation_definition_javascript, num_arguments_javascript], editable on transitions when { validation_type.value &amp;&amp; validation_type.value.contains("client") }
+					make [validation_definition_javascript, num_arguments_javascript], visible on detail_trans when { validation_type.value &amp;&amp; validation_type.value.contains("server") }
+					make [validation_definition_javascript, num_arguments_javascript], hidden on transitions when { validation_type.value &amp;&amp; validation_type.value.contains("client") }
+				</action>
+			</actions>
+		</event>
+	</data>
 
     <i18n locale="sk">
         <i18nString name="name">Meno</i18nString>
+        <i18nString name="type">Typ</i18nString>
         <i18nString name="validation_definition_groovy">Definícia validácie - Groovy</i18nString>
         <i18nString name="num_arguments_groovy">Počet argumentov - Groovy</i18nString>
         <i18nString name="validation_definition_javascript">Definícia validácie - JavaScript</i18nString>
         <i18nString name="num_arguments_javascript">Počet argumentov - JavaScript</i18nString>
         <i18nString name="version">Verzia</i18nString>
-        <i18nString name="active">Je aktívny</i18nString>
         <i18nString name="detail">Detail</i18nString>
         <i18nString name="activate">Aktivovať</i18nString>
         <i18nString name="deactivate">Deaktivovať</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="name">Name</i18nString>
+		<i18nString name="type">Typ</i18nString>
         <i18nString name="validation_definition_groovy">Validierungsdefinition - Groovy</i18nString>
         <i18nString name="num_arguments_groovy">Anzahl der Argumente - Groovy</i18nString>
         <i18nString name="validation_definition_javascript">Validierungsdefinition - JavaScript</i18nString>
         <i18nString name="num_arguments_javascript">Anzahl der Argumente - JavaScript</i18nString>
         <i18nString name="version">Ausführung</i18nString>
-        <i18nString name="active">Ist aktiv</i18nString>
         <i18nString name="detail">Detail</i18nString>
         <i18nString name="activate">Aktivieren</i18nString>
         <i18nString name="deactivate">Deaktivieren</i18nString>
@@ -129,12 +153,11 @@
 			<dataRef>
 				<id>validation_definition_groovy</id>
 				<logic>
-					<behavior>editable</behavior>
-					<behavior>required</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>1</y>
+					<y>2</y>
 					<rows>2</rows>
 					<cols>4</cols>
 					<template>material</template>
@@ -144,11 +167,11 @@
 			<dataRef>
 				<id>validation_definition_javascript</id>
 				<logic>
-					<behavior>editable</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>4</y>
+					<y>5</y>
 					<rows>2</rows>
 					<cols>4</cols>
 					<template>material</template>
@@ -172,12 +195,11 @@
 			<dataRef>
 				<id>num_arguments_groovy</id>
 				<logic>
-					<behavior>editable</behavior>
-					<behavior>required</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>3</y>
+					<y>4</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -187,13 +209,28 @@
 			<dataRef>
 				<id>num_arguments_javascript</id>
 				<logic>
-					<behavior>editable</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>6</y>
+					<y>7</y>
 					<rows>1</rows>
 					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>validation_type</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
@@ -224,18 +261,17 @@
                 <view>true</view>
                 <cancel>true</cancel>
                 <assign>true</assign>
+				<perform>true</perform>
             </logic>
         </roleRef>
         <event type="finish">
             <id>onFinish_activate</id>
-            <actions phase="post">
+            <actions phase="pre">
                 <action>
                     name: f.name,
-                    validation_definition_groovy: f.validation_definition_groovy,
-                    active: f.active;
+                    validation_definition_groovy: f.validation_definition_groovy;
 
                     validationService.registerValidation(name.rawValue, validation_definition_groovy.rawValue)
-                    change active value { true }
                 </action>
             </actions>
         </event>
@@ -258,11 +294,9 @@
             <id>onFinish_deactivate</id>
             <actions phase="post">
                 <action>
-                    name: f.name,
-                    active: f.active;
+                    name: f.name;
 
                     validationService.unregisterValidation(name.rawValue)
-                    change active value { false }
                 </action>
             </actions>
         </event>
@@ -291,20 +325,6 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>active</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
 				<id>version</id>
 				<logic>
 					<behavior>visible</behavior>
@@ -321,7 +341,7 @@
 			<dataRef>
 				<id>validation_definition_javascript</id>
 				<logic>
-					<behavior>editable</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -335,8 +355,7 @@
 			<dataRef>
 				<id>validation_definition_groovy</id>
 				<logic>
-					<behavior>editable</behavior>
-					<behavior>required</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -350,7 +369,7 @@
 			<dataRef>
 				<id>num_arguments_groovy</id>
 				<logic>
-					<behavior>visible</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -364,13 +383,27 @@
 			<dataRef>
 				<id>num_arguments_javascript</id>
 				<logic>
-					<behavior>visible</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
 					<y>7</y>
 					<rows>1</rows>
 					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>validation_type</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>

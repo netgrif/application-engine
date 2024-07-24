@@ -29,7 +29,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class ValidationTestDynamic {
 
     public static final String VALIDATION_PETRI_NET_IDENTIFIER = "validation"
-    public static final String VALIDATION_ACTIVE_FIELD_ID = "active"
 
     @Autowired
     private ImportHelper importHelper
@@ -88,7 +87,7 @@ class ValidationTestDynamic {
         }
 
         validationCase = workflowService.findOne(validationCase.stringId)
-        assert validationCase.dataSet.get(VALIDATION_ACTIVE_FIELD_ID).rawValue == active
+        assert validationCase.tasks.get("deactivate") != null
 
         return validationCase
     }

@@ -20,6 +20,7 @@ class ValidationDelegate {
     public static final String TEL_NUMBER_REGEX = '^(?:\\+?(\\d{1,3}))?([-. (]*(\\d{3})[-. )]*)?((\\d{3})[-. ]*(\\d{2,4})(?:[-.x ]*(\\d+))?)$'
     public static final String EMAIL_REGEX = '^[a-zA-Z0-9\\._\\%\\+\\-]+@[a-zA-Z0-9\\.\\-]+\\.[a-zA-Z]{2,}$'
 
+    // todo NAE-1788: thisField keyword
     Field<?> thisField
 
     Boolean notempty() { return thisField.rawValue != null }

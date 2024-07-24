@@ -1,13 +1,13 @@
 package com.netgrif.application.engine.startup
 
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
-import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.validations.interfaces.IValidationService
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.QCase
+import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import com.querydsl.core.types.Predicate
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 
@@ -18,7 +18,6 @@ class ValidationRunner extends AbstractOrderedCommandLineRunner {
     private static final int PAGE_SIZE = 100
     public static final String VALIDATION_FILE_NAME = "engine-processes/validations/validation.xml"
     public static final String VALIDATION_PETRI_NET_IDENTIFIER = "validation"
-    public static final String VALIDATION_ACTIVE_FIELD_ID = "active"
     public static final String VALIDATION_NAME_FIELD_ID = "name"
     public static final String VALIDATION_GROOVY_DEFINITION_FIELD_ID = "validation_definition_groovy"
 
@@ -32,20 +31,18 @@ class ValidationRunner extends AbstractOrderedCommandLineRunner {
     private IValidationService validationService
 
     @Autowired
-    private IElasticCaseService elasticCaseService
+    private CaseRepository caseRepository
 
     @Override
     void run(String... strings) throws Exception {
         log.info("Starting validation runner")
 
         helper.upsertNet(VALIDATION_FILE_NAME, VALIDATION_PETRI_NET_IDENTIFIER)
-
-        CaseSearchRequest request = new CaseSearchRequest()
-        request.query = String.format("processIdentifier:%s AND dataSet.%s.booleanValue:true", VALIDATION_PETRI_NET_IDENTIFIER, VALIDATION_ACTIVE_FIELD_ID)
-        long numberActiveValidations = elasticCaseService.count([request], userService.loggedOrSystem.transformToLoggedUser(), LocaleContextHolder.locale, false)
+        Predicate predicate = QCase.case$.tasks.get("deactivate").isNotNull()
+        long numberActiveValidations = caseRepository.count(predicate)
         int pageCount = (int) (numberActiveValidations / PAGE_SIZE) + 1
-        pageCount.times {
-            elasticCaseService.search([request], userService.loggedOrSystem.transformToLoggedUser(), PageRequest.of(it, PAGE_SIZE), LocaleContextHolder.locale, false)
+        pageCount.times { pageNum ->
+            caseRepository.findAll(predicate, PageRequest.of(pageNum, PAGE_SIZE))
                     .getContent()
                     .each { Case validationCase ->
                         validationService.registerValidation(
