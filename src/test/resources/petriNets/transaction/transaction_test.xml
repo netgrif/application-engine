@@ -1,0 +1,51 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>transaction_test</id>
+	<version>1.0.0</version>
+	<initials>TRN</initials>
+	<title>transaction_test</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+
+	<data type="text">
+		<id>text_without_action</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>text_2</id>
+		<title/>
+	</data>
+
+	<data type="button">
+		<id>testBasicTransaction</id>
+		<title/>
+		<event type="set">
+			<id>testBasicTransaction</id>
+			<actions phase="post">
+				<action>
+					text_without_action: f.text_without_action;
+
+					transaction(
+						timeout: 1000,
+						forceCreation: false,
+						code: {
+							createCase("test_transaction", "onButton")
+							change text_without_action value { "xxx" }
+						},
+						onCommit: { createCase("test_transaction", "onCommit") },
+						onRollBack: { createCase("test_transaction", "onRollBack1") }
+					)
+					createCase("test_transaction", "onAlways")
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<transition>
+		<id>t2</id>
+		<x>496</x>
+		<y>144</y>
+		<label>t2</label>
+	</transition>
+</document>

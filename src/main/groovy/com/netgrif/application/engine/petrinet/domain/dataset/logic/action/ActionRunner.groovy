@@ -47,6 +47,7 @@ abstract class ActionRunner {
                         .transactionManager(transactionManager)
                         .event(code)
                         .build()
+                transaction.setForceCreation(false)
                 transaction.begin()
             } else {
                 code()

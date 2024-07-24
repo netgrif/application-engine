@@ -57,13 +57,13 @@ import groovy.util.logging.Slf4j
 import org.bson.types.ObjectId
 import org.quartz.Scheduler
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.MongoTransactionManager
+import org.springframework.transaction.TransactionDefinition
 
 import java.text.Normalizer
 import java.util.stream.Collectors
@@ -217,35 +217,37 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     /**
      * todo
      * */
-    def transaction(boolean forceCreation = false, int timeout, Closure event) {
+    @NamedVariant
+    void transaction(int timeout = TransactionDefinition.TIMEOUT_DEFAULT, boolean forceCreation = false, Closure code,
+                     Closure onCommit = null, Closure onRollBack = null) {
         def transactionBuilder = NaeTransaction.builder()
                 .timeout(timeout)
                 .forceCreation(forceCreation)
-                .event(event)
+                .event(code)
+                .onCommit(onCommit)
+                .onRollBack(onRollBack)
                 .transactionManager(transactionManager)
-        return [
-                onCommit  : { Closure onCommitClosure ->
-                    transactionBuilder.onCommit(onCommitClosure)
-                    [
-                        onRollBack: { Closure onRollBackClosure ->
-                            transactionBuilder.onRollBack(onRollBackClosure)
-                            executeTransaction(transactionBuilder.build())
-                        }
-                    ]
-                },
-                onRollBack: { Closure onRollBackClosure ->
-                    transactionBuilder.onRollBack(onRollBackClosure)
-                    executeTransaction(transactionBuilder.build())
-                }
-        ]
+
+        NaeTransaction transaction = transactionBuilder.build()
+        executeTransaction(transaction)
+        throwIfCallBackFailed(transaction)
+    }
+
+    /**
+     * todo
+     * */
+    protected void throwIfCallBackFailed(NaeTransaction transaction) {
+        if (transaction.onCallBackException != null) {
+            log.error("Transaction synchronization call back execution failed with message: {} ", transaction.onCallBackException.getMessage())
+            throw transaction.onCallBackException
+        }
     }
 
     protected void executeTransaction(NaeTransaction transaction) {
         try {
             transaction.begin()
         } catch (Exception e) {
-            log.error("Transaction failed with error: %", e.getMessage(), e)
-            // todo log also action.toString()
+            log.error("Transaction failed with error: {}", e.getMessage(), e)
         }
     }
 
