@@ -30,13 +30,96 @@
 						timeout: 1000,
 						forceCreation: false,
 						code: {
-							createCase("test_transaction", "onButton")
+							createCase("transaction_test", "onButton")
 							change text_without_action value { "xxx" }
 						},
-						onCommit: { createCase("test_transaction", "onCommit") },
-						onRollBack: { createCase("test_transaction", "onRollBack1") }
+						onCommit: { createCase("transaction_test", "onCommit") },
+						onRollBack: { createCase("transaction_test", "onRollBack") }
 					)
-					createCase("test_transaction", "onAlways")
+					createCase("transaction_test", "onAlways")
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<data type="button">
+		<id>testBasicTransactionWithFailure</id>
+		<title/>
+		<event type="set">
+			<id>testBasicTransactionWithFailure</id>
+			<actions phase="post">
+				<action>
+					text_without_action: f.text_without_action;
+
+					transaction(
+						timeout: 1000,
+						forceCreation: false,
+						code: {
+							createCase("transaction_test", "onButton")
+							change text_without_action value { "xxx" }
+							// not runtime exception on purpose
+							throw new IllegalAccessException("error")
+						},
+						onCommit: { createCase("transaction_test", "onCommit") },
+						onRollBack: { createCase("transaction_test", "onRollBack") }
+					)
+					createCase("transaction_test", "onAlways")
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<data type="button">
+		<id>testFailureInCallBackThrowsError</id>
+		<title/>
+		<event type="set">
+			<id>testFailureInCallBackThrowsError</id>
+			<actions phase="post">
+				<action>
+					text_without_action: f.text_without_action;
+
+					transaction(
+						timeout: 1000,
+						forceCreation: false,
+						code: {
+							createCase("transaction_test", "onButton")
+							change text_without_action value { "xxx" }
+							throw new RuntimeException("error")
+						},
+						onCommit: { createCase("transaction_test", "onCommit") },
+						onRollBack: {
+							throw new RuntimeException("error")
+							createCase("transaction_test", "onRollBack")
+						}
+					)
+					createCase("transaction_test", "onAlways")
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<data type="button">
+		<id>testTimeout</id>
+		<title/>
+		<event type="set">
+			<id>testTimeout</id>
+			<actions phase="post">
+				<action>
+					text_without_action: f.text_without_action;
+
+					transaction(
+						timeout: 1,
+						forceCreation: false,
+						code: {
+							createCase("transaction_test", "onButton")
+							println "before sleep ${new Date().toString()}"
+							Thread.sleep(10000)
+							println "after sleep ${new Date().toString()}"
+						},
+						onCommit: { createCase("transaction_test", "onCommit") },
+						onRollBack: { createCase("transaction_test", "onRollBack") }
+					)
+					createCase("transaction_test", "onAlways")
 				</action>
 			</actions>
 		</event>
