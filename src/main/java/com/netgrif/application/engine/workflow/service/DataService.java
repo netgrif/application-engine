@@ -104,7 +104,7 @@ public class DataService implements IDataService {
 
     @Override
     public GetDataEventOutcome getData(String taskId) {
-        return getData(taskId, null);
+        return getData(taskId, new HashMap<>());
     }
 
     @Override
