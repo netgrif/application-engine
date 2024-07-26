@@ -45,6 +45,9 @@ public class ValidationService implements IValidationService {
 
     @Override
     public void registerValidation(String name, String definition) throws ClassCastException, CompilationFailedException {
+        if (definition == null) {
+            throw new IllegalArgumentException("Definition cannot be empty.");
+        }
         Closure<Boolean> code = (Closure<Boolean>) this.shellFactory.getGroovyShell().evaluate("{" + definition + "}");
         validationRegistry.addValidation(name, code);
     }

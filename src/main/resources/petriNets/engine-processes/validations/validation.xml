@@ -90,12 +90,12 @@
 					init_trans: t.init,
 					detail_trans: t.detail;
 
-					make [validation_definition_groovy, num_arguments_groovy], editable on init_trans when { validation_type.value &amp;&amp; validation_type.value.contains("server") }
-					make [validation_definition_groovy, num_arguments_groovy], visible on detail_trans when { validation_type.value &amp;&amp; validation_type.value.contains("server") }
-					make [validation_definition_groovy, num_arguments_groovy], hidden on transitions when { validation_type.value &amp;&amp; validation_type.value.contains("server") }
-					make [validation_definition_javascript, num_arguments_javascript], editable on transitions when { validation_type.value &amp;&amp; validation_type.value.contains("client") }
-					make [validation_definition_javascript, num_arguments_javascript], visible on detail_trans when { validation_type.value &amp;&amp; validation_type.value.contains("server") }
-					make [validation_definition_javascript, num_arguments_javascript], hidden on transitions when { validation_type.value &amp;&amp; validation_type.value.contains("client") }
+					make [validation_definition_groovy, num_arguments_groovy], editable on init_trans when { validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("server") }
+					make [validation_definition_groovy, num_arguments_groovy], editable on detail_trans when { validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("server") }
+					make [validation_definition_groovy, num_arguments_groovy], hidden on transitions when { !validation_type.rawValue || !validation_type.rawValue.contains("server") }
+					make [validation_definition_javascript, num_arguments_javascript], editable on init_trans when { validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("client") }
+					make [validation_definition_javascript, num_arguments_javascript], editable on detail_trans when { validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("client") }
+					make [validation_definition_javascript, num_arguments_javascript], hidden on transitions when { !validation_type.rawValue || !validation_type.rawValue.contains("client") }
 				</action>
 			</actions>
 		</event>
@@ -269,11 +269,29 @@
             <actions phase="pre">
                 <action>
                     name: f.name,
-                    validation_definition_groovy: f.validation_definition_groovy;
+                    validation_definition_groovy: f.validation_definition_groovy,
+					validation_type: f.validation_type;
 
-                    validationService.registerValidation(name.rawValue, validation_definition_groovy.rawValue)
+					if (validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("server")) {
+						validationService.registerValidation(name.rawValue, validation_definition_groovy.rawValue)
+					}
                 </action>
             </actions>
+			<actions phase="post">
+				<action>
+					validation_type: f.validation_type,
+					validation_definition_groovy: f.validation_definition_groovy,
+					num_arguments_groovy: f.num_arguments_groovy,
+					validation_definition_javascript: f.validation_definition_javascript,
+					num_arguments_javascript: f.num_arguments_javascript,
+					detail_trans: t.detail;
+
+					make [validation_definition_groovy, num_arguments_groovy], visible on detail_trans when { validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("server") }
+					make [validation_definition_groovy, num_arguments_groovy], hidden on detail_trans when { !validation_type.rawValue || !validation_type.rawValue.contains("server") }
+					make [validation_definition_javascript, num_arguments_javascript], visible on detail_trans when { validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("client") }
+					make [validation_definition_javascript, num_arguments_javascript], hidden on detail_trans when { !validation_type.rawValue || !validation_type.rawValue.contains("client") }
+				</action>
+			</actions>
         </event>
     </transition>
     <transition>
@@ -294,9 +312,22 @@
             <id>onFinish_deactivate</id>
             <actions phase="post">
                 <action>
-                    name: f.name;
+                    name: f.name,
+					validation_type: f.validation_type,
+					validation_definition_groovy: f.validation_definition_groovy,
+					num_arguments_groovy: f.num_arguments_groovy,
+					validation_definition_javascript: f.validation_definition_javascript,
+					num_arguments_javascript: f.num_arguments_javascript,
+					detail_trans: t.detail;
 
-                    validationService.unregisterValidation(name.rawValue)
+					make [validation_definition_groovy, num_arguments_groovy], editable on detail_trans when { validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("server") }
+					make [validation_definition_groovy, num_arguments_groovy], hidden on detail_trans when { !validation_type.rawValue || !validation_type.rawValue.contains("server") }
+					make [validation_definition_javascript, num_arguments_javascript], editable on detail_trans when { validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("client") }
+					make [validation_definition_javascript, num_arguments_javascript], hidden on detail_trans when { !validation_type.rawValue || !validation_type.rawValue.contains("client") }
+
+					if (validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("server")) {
+						validationService.unregisterValidation(name.rawValue)
+					}
                 </action>
             </actions>
         </event>
@@ -431,7 +462,7 @@
         <static>false</static>
     </place>
     <place>
-        <id>p2</id>
+        <id>inactive</id>
         <x>420</x>
         <y>300</y>
         <label>inactive</label>
@@ -439,7 +470,7 @@
         <static>false</static>
     </place>
     <place>
-        <id>p3</id>
+        <id>active</id>
         <x>740</x>
         <y>300</y>
         <label>active</label>
@@ -447,7 +478,7 @@
         <static>false</static>
     </place>
     <place>
-        <id>p5</id>
+        <id>initialized</id>
         <x>300</x>
         <y>180</y>
         <label>initialized</label>
@@ -465,13 +496,13 @@
 		<id>a2</id>
 		<type>regular</type>
 		<sourceId>init</sourceId>
-		<destinationId>p5</destinationId>
+		<destinationId>initialized</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a3</id>
 		<type>read</type>
-		<sourceId>p5</sourceId>
+		<sourceId>initialized</sourceId>
 		<destinationId>detail</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
@@ -479,13 +510,13 @@
 		<id>a5</id>
 		<type>regular</type>
 		<sourceId>init</sourceId>
-		<destinationId>p2</destinationId>
+		<destinationId>inactive</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a6</id>
 		<type>regular</type>
-		<sourceId>p2</sourceId>
+		<sourceId>inactive</sourceId>
 		<destinationId>activate</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
@@ -493,13 +524,13 @@
 		<id>a7</id>
 		<type>regular</type>
 		<sourceId>activate</sourceId>
-		<destinationId>p3</destinationId>
+		<destinationId>active</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a8</id>
 		<type>regular</type>
-		<sourceId>p3</sourceId>
+		<sourceId>active</sourceId>
 		<destinationId>deactivate</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
@@ -507,7 +538,7 @@
 		<id>a9</id>
 		<type>regular</type>
 		<sourceId>deactivate</sourceId>
-		<destinationId>p2</destinationId>
+		<destinationId>inactive</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 </document>

@@ -31,11 +31,19 @@ abstract class ValidationExecutioner {
         log.info("Validations: ${validations.collect { it.name }}")
 
         ValidationDelegate delegate = initDelegate(useCase, field, validations.collect { it.name })
-        for (Validation validation : validations) {
-            Closure<Boolean> code = initCode(validation, delegate)
-            if (!code()) {
-                throw new IllegalArgumentException(validation.message.toString())
-            }
+        validations.each { validation ->
+            runValidation(field, validation, delegate)
+        }
+    }
+
+    protected void runValidation(Field<?> field, Validation validation, ValidationDelegate delegate) {
+        if (field.rawValue == null) {
+            return
+        }
+
+        Closure<Boolean> code = initCode(validation, delegate)
+        if (!code()) {
+            throw new IllegalArgumentException(validation.message.toString())
         }
     }
 
@@ -65,9 +73,8 @@ abstract class ValidationExecutioner {
             delegate.metaClass."$field.importId" = field
         }
 
-        List<String> fieldNames = useCase.dataSet.fields.keySet() as List<String>
-        validationNames = filterConflictedValidationNames(fieldNames, validationNames)
-        validationNames.forEach { validationName ->
+        validationNames = filterConflictedValidationNames(useCase, validationNames)
+        validationNames.each { validationName ->
             delegate.metaClass."$validationName" = getValidationCode(validationName)
         }
 
@@ -75,7 +82,8 @@ abstract class ValidationExecutioner {
         return delegate
     }
 
-    private List<String> filterConflictedValidationNames(List<String> fieldNames, List<String> validationNames) {
+    private static List<String> filterConflictedValidationNames(Case useCase, List<String> validationNames) {
+        List<String> fieldNames = useCase.dataSet.fields.keySet() as List<String>
         fieldNames.retainAll(validationNames)
         if (!fieldNames.isEmpty()) {
             log.warn("Ignoring validations {} for case [{}]: field names are identical with validation names", fieldNames, useCase.stringId)

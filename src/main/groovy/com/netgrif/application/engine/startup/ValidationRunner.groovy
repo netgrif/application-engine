@@ -18,6 +18,7 @@ class ValidationRunner extends AbstractOrderedCommandLineRunner {
     private static final int PAGE_SIZE = 100
     public static final String VALIDATION_FILE_NAME = "engine-processes/validations/validation.xml"
     public static final String VALIDATION_PETRI_NET_IDENTIFIER = "validation"
+    public static final String VALIDATION_ACTIVE_PLACE_ID = "active"
     public static final String VALIDATION_NAME_FIELD_ID = "name"
     public static final String VALIDATION_GROOVY_DEFINITION_FIELD_ID = "validation_definition_groovy"
 
@@ -38,7 +39,7 @@ class ValidationRunner extends AbstractOrderedCommandLineRunner {
         log.info("Starting validation runner")
 
         helper.upsertNet(VALIDATION_FILE_NAME, VALIDATION_PETRI_NET_IDENTIFIER)
-        Predicate predicate = QCase.case$.tasks.get("deactivate").isNotNull()
+        Predicate predicate = QCase.case$.processIdentifier.eq(VALIDATION_PETRI_NET_IDENTIFIER) & QCase.case$.activePlaces.get(VALIDATION_ACTIVE_PLACE_ID).isNotNull()
         long numberActiveValidations = caseRepository.count(predicate)
         int pageCount = (int) (numberActiveValidations / PAGE_SIZE) + 1
         pageCount.times { pageNum ->

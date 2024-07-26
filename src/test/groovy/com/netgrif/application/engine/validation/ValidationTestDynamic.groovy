@@ -4,6 +4,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
+import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -29,6 +30,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class ValidationTestDynamic {
 
     public static final String VALIDATION_PETRI_NET_IDENTIFIER = "validation"
+    public static final String VALIDATION_NAME_FIELD_ID = "name"
+    public static final String VALIDATION_VALIDATION_TYPE_FIELD_ID = "validation_type"
+    public static final String VALIDATION_DEFINITION_GROOVY_FIELD_ID = "validation_definition_groovy"
+    public static final String VALIDATION_NUM_ARGUMENTS_GROOVY_FIELD_ID = "num_arguments_groovy"
+    public static final String VALIDATION_DEFINITION_JAVASCRIPT_FIELD_ID = "validation_definition_javascript"
+    public static final String VALIDATION_NUM_ARGUMENTS_JAVASCRIPT_FIELD_ID = "num_arguments_javascript"
+    public static final String VALIDATION_INIT_TRANS_ID = "init"
+    public static final String VALIDATION_DETAIL_TRANS_ID = "detail"
 
     @Autowired
     private ImportHelper importHelper
@@ -70,8 +79,9 @@ class ValidationTestDynamic {
         assert validationTask != null
 
         SetDataEventOutcome outcome = importHelper.setTaskData("Init", validationCase.stringId, new DataSet([
-                "name": new TextField(rawValue: name),
-                "validation_definition_groovy": new TextField(rawValue: validationDefinitionGroovy)
+                (VALIDATION_NAME_FIELD_ID): new TextField(rawValue: name),
+                (VALIDATION_VALIDATION_TYPE_FIELD_ID): new MultichoiceMapField(rawValue: ["server"]),
+                (VALIDATION_DEFINITION_GROOVY_FIELD_ID): new TextField(rawValue: validationDefinitionGroovy)
         ] as Map<String, Field<?>>))
         assert outcome != null
 
@@ -146,7 +156,7 @@ class ValidationTestDynamic {
     }
 
     @Test
-    void dynamicValidation_importActive() {
+    void dynamicValidation_process_importActive() {
         createValidation("test1", "-> thisField.rawValue = 1", true)
         createValidation("test2", "-> thisField.rawValue = 2", true)
         createValidation("test3", "-> thisField.rawValue = 3", false)
@@ -166,5 +176,137 @@ class ValidationTestDynamic {
         assert validationService.getValidation("test1") instanceof Closure<Boolean> && validationService.getValidation("test1") != null
         assert validationService.getValidation("test2") instanceof Closure<Boolean> && validationService.getValidation("test2") != null
         assert validationService.getValidation("test3") == null
+    }
+
+    @Test
+    void dynamicValidation_process_behaviors() {
+        PetriNet net = petriNetService.getNewestVersionByIdentifier(VALIDATION_PETRI_NET_IDENTIFIER)
+
+        Case validationCase = importHelper.createCase("Validation test", net)
+        assert validationCase != null
+
+        Task validationTask = importHelper.assignTaskToSuper("Init", validationCase.stringId).getTask()
+        assert validationTask != null
+
+        assert validationCase.dataSet.get(VALIDATION_DEFINITION_GROOVY_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).hidden
+        assert validationCase.dataSet.get(VALIDATION_NUM_ARGUMENTS_GROOVY_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).hidden
+        assert validationCase.dataSet.get(VALIDATION_DEFINITION_GROOVY_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).hidden
+        assert validationCase.dataSet.get(VALIDATION_NUM_ARGUMENTS_GROOVY_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).hidden
+        assert validationCase.dataSet.get(VALIDATION_DEFINITION_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).hidden
+        assert validationCase.dataSet.get(VALIDATION_NUM_ARGUMENTS_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).hidden
+        assert validationCase.dataSet.get(VALIDATION_DEFINITION_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).hidden
+        assert validationCase.dataSet.get(VALIDATION_NUM_ARGUMENTS_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).hidden
+
+        SetDataEventOutcome outcome = importHelper.setTaskData("Init", validationCase.stringId, new DataSet([
+                (VALIDATION_VALIDATION_TYPE_FIELD_ID): new MultichoiceMapField(rawValue: ["client"]),
+        ] as Map<String, Field<?>>))
+        assert outcome != null
+        assert outcome.case.dataSet.get(VALIDATION_DEFINITION_GROOVY_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).hidden
+        assert outcome.case.dataSet.get(VALIDATION_NUM_ARGUMENTS_GROOVY_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).hidden
+        assert outcome.case.dataSet.get(VALIDATION_DEFINITION_GROOVY_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).hidden
+        assert outcome.case.dataSet.get(VALIDATION_NUM_ARGUMENTS_GROOVY_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).hidden
+        assert outcome.case.dataSet.get(VALIDATION_DEFINITION_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).editable
+        assert outcome.case.dataSet.get(VALIDATION_NUM_ARGUMENTS_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).editable
+        assert outcome.case.dataSet.get(VALIDATION_DEFINITION_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).editable
+        assert outcome.case.dataSet.get(VALIDATION_NUM_ARGUMENTS_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).editable
+
+        outcome = importHelper.setTaskData("Init", validationCase.stringId, new DataSet([
+                (VALIDATION_VALIDATION_TYPE_FIELD_ID): new MultichoiceMapField(rawValue: ["server"]),
+        ] as Map<String, Field<?>>))
+        assert outcome != null
+        assert outcome.case.dataSet.get(VALIDATION_DEFINITION_GROOVY_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).editable
+        assert outcome.case.dataSet.get(VALIDATION_NUM_ARGUMENTS_GROOVY_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).editable
+        assert outcome.case.dataSet.get(VALIDATION_DEFINITION_GROOVY_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).editable
+        assert outcome.case.dataSet.get(VALIDATION_NUM_ARGUMENTS_GROOVY_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).editable
+        assert outcome.case.dataSet.get(VALIDATION_DEFINITION_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).hidden
+        assert outcome.case.dataSet.get(VALIDATION_NUM_ARGUMENTS_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).hidden
+        assert outcome.case.dataSet.get(VALIDATION_DEFINITION_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).hidden
+        assert outcome.case.dataSet.get(VALIDATION_NUM_ARGUMENTS_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).hidden
+
+        outcome = importHelper.setTaskData("Init", validationCase.stringId, new DataSet([
+                (VALIDATION_VALIDATION_TYPE_FIELD_ID): new MultichoiceMapField(rawValue: ["server", "client"]),
+        ] as Map<String, Field<?>>))
+        assert outcome != null
+        assert outcome.case.dataSet.get(VALIDATION_DEFINITION_GROOVY_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).editable
+        assert outcome.case.dataSet.get(VALIDATION_NUM_ARGUMENTS_GROOVY_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).editable
+        assert outcome.case.dataSet.get(VALIDATION_DEFINITION_GROOVY_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).editable
+        assert outcome.case.dataSet.get(VALIDATION_NUM_ARGUMENTS_GROOVY_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).editable
+        assert outcome.case.dataSet.get(VALIDATION_DEFINITION_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).editable
+        assert outcome.case.dataSet.get(VALIDATION_NUM_ARGUMENTS_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_INIT_TRANS_ID).editable
+        assert outcome.case.dataSet.get(VALIDATION_DEFINITION_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).editable
+        assert outcome.case.dataSet.get(VALIDATION_NUM_ARGUMENTS_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).editable
+
+        outcome = importHelper.setTaskData("Init", validationCase.stringId, new DataSet([
+                (VALIDATION_NAME_FIELD_ID): new TextField(rawValue: "test"),
+                (VALIDATION_VALIDATION_TYPE_FIELD_ID): new MultichoiceMapField(rawValue: ["server"]),
+                (VALIDATION_DEFINITION_GROOVY_FIELD_ID): new TextField(rawValue: "-> thisField.rawValue == 1")
+        ] as Map<String, Field<?>>))
+        assert outcome != null
+
+        validationTask = importHelper.finishTaskAsSuper("Init", validationCase.stringId).getTask()
+        assert validationTask != null
+
+        validationTask = importHelper.assignTaskToSuper("Activate", validationCase.stringId).getTask()
+        assert validationTask != null
+
+        validationTask = importHelper.finishTaskAsSuper("Activate", validationCase.stringId).getTask()
+        assert validationTask != null
+
+        validationCase = workflowService.findOne(validationCase.stringId)
+
+        assert validationCase.dataSet.get(VALIDATION_DEFINITION_GROOVY_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).visible
+        assert validationCase.dataSet.get(VALIDATION_NUM_ARGUMENTS_GROOVY_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).visible
+        assert validationCase.dataSet.get(VALIDATION_DEFINITION_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).hidden
+        assert validationCase.dataSet.get(VALIDATION_NUM_ARGUMENTS_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).hidden
+
+        validationTask = importHelper.assignTaskToSuper("Deactivate", validationCase.stringId).getTask()
+        assert validationTask != null
+
+        validationTask = importHelper.finishTaskAsSuper("Deactivate", validationCase.stringId).getTask()
+        assert validationTask != null
+
+        validationCase = workflowService.findOne(validationCase.stringId)
+
+        assert validationCase.dataSet.get(VALIDATION_DEFINITION_GROOVY_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).editable
+        assert validationCase.dataSet.get(VALIDATION_NUM_ARGUMENTS_GROOVY_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).editable
+        assert validationCase.dataSet.get(VALIDATION_DEFINITION_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).hidden
+        assert validationCase.dataSet.get(VALIDATION_NUM_ARGUMENTS_JAVASCRIPT_FIELD_ID).behaviors.get(VALIDATION_DETAIL_TRANS_ID).hidden
+    }
+
+    @Test
+    void dynamicValidation_process_create() {
+        PetriNet net = petriNetService.getNewestVersionByIdentifier(VALIDATION_PETRI_NET_IDENTIFIER)
+
+        Case validationCase = importHelper.createCase("Validation test", net)
+        assert validationCase != null
+
+        Task validationTask = importHelper.assignTaskToSuper("Init", validationCase.stringId).getTask()
+        assert validationTask != null
+
+        SetDataEventOutcome outcome = importHelper.setTaskData("Init", validationCase.stringId, new DataSet([
+                (VALIDATION_NAME_FIELD_ID): new TextField(rawValue: "test"),
+                (VALIDATION_VALIDATION_TYPE_FIELD_ID): new MultichoiceMapField(rawValue: ["server"]),
+                (VALIDATION_DEFINITION_GROOVY_FIELD_ID): new TextField(rawValue: null)
+        ] as Map<String, Field<?>>))
+        assert outcome != null
+
+        validationTask = importHelper.finishTaskAsSuper("Init", validationCase.stringId).getTask()
+        assert validationTask != null
+
+        validationTask = importHelper.assignTaskToSuper("Activate", validationCase.stringId).getTask()
+        assert validationTask != null
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            validationTask = importHelper.finishTaskAsSuper("Activate", validationCase.stringId).getTask()
+            assert validationTask != null
+        })
+
+        outcome = importHelper.setTaskData("Detail", validationCase.stringId, new DataSet([
+                (VALIDATION_DEFINITION_GROOVY_FIELD_ID): new TextField(rawValue: "-> thisField.rawValue == 1")
+        ] as Map<String, Field<?>>))
+        assert outcome != null
+
+        validationTask = importHelper.finishTaskAsSuper("Activate", validationCase.stringId).getTask()
+        assert validationTask != null
     }
 }
