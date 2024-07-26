@@ -29,7 +29,7 @@
 					transaction(
 						timeout: 1000,
 						forceCreation: false,
-						code: {
+						event: {
 							createCase("transaction_test", "onButton")
 							change text_without_action value { "xxx" }
 						},
@@ -54,7 +54,7 @@
 					transaction(
 						timeout: 1000,
 						forceCreation: false,
-						code: {
+						event: {
 							createCase("transaction_test", "onButton")
 							change text_without_action value { "xxx" }
 							// not runtime exception on purpose
@@ -81,7 +81,7 @@
 					transaction(
 						timeout: 1000,
 						forceCreation: false,
-						code: {
+						event: {
 							createCase("transaction_test", "onButton")
 							change text_without_action value { "xxx" }
 							throw new RuntimeException("error")
@@ -110,7 +110,7 @@
 					transaction(
 						timeout: 1,
 						forceCreation: false,
-						code: {
+						event: {
 							createCase("transaction_test", "onButton")
 							println "before sleep ${new Date().toString()}"
 							Thread.sleep(10000)
