@@ -52,22 +52,22 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
 
     @Override
     public Boolean userHasUserListPermission(IUser user, Case useCase, ProcessRolePermission... permissions) {
-        if (useCase.getUserRefs() == null || useCase.getUserRefs().isEmpty()) {
-            return null;
-        }
-
-        if (!useCase.getUsers().containsKey(user.getSelfOrImpersonated().getStringId())) {
-            return null;
-        }
-
-        Map<ProcessRolePermission, Boolean> userPermissions = useCase.getUsers().get(user.getSelfOrImpersonated().getStringId());
-
-        for (ProcessRolePermission permission : permissions) {
-            Boolean perm = userPermissions.get(permission);
-            if (hasRestrictedPermission(perm)) {
-                return false;
-            }
-        }
-        return Arrays.stream(permissions).anyMatch(permission -> hasPermission(userPermissions.get(permission)));
+//        TODO: release/8.0.0
+//        if (useCase.getUserRefs() == null || useCase.getUserRefs().isEmpty()) {
+//            return null;
+//        }
+//
+//        if (!useCase.getUsers().containsKey(user.getSelfOrImpersonated().getStringId())) {
+//            return null;
+//        }
+//        Map<ProcessRolePermission, Boolean> userPermissions = useCase.getUsers().get(user.getSelfOrImpersonated().getStringId());
+//        for (ProcessRolePermission permission : permissions) {
+//            Boolean perm = userPermissions.get(permission);
+//            if (hasRestrictedPermission(perm)) {
+//                return false;
+//            }
+//        }
+//        return Arrays.stream(permissions).anyMatch(permission -> hasPermission(userPermissions.get(permission)));
+        return true;
     }
 }

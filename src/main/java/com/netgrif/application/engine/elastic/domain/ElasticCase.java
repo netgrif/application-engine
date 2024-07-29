@@ -119,7 +119,8 @@ public class ElasticCase {
         lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
         processIdentifier = useCase.getProcessIdentifier();
         processId = useCase.getPetriNetId();
-        visualId = useCase.getVisualId();
+//        TODO: release/8.0.0
+//        visualId = useCase.getVisualId();
         title = useCase.getTitle();
         creationDate = useCase.getCreationDate();
         creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
@@ -128,12 +129,13 @@ public class ElasticCase {
         authorEmail = useCase.getAuthor().getEmail();
         taskIds = useCase.getTasks().keySet();
         taskMongoIds = useCase.getTasks().values().stream().map(TaskPair::getTaskStringId).collect(Collectors.toSet());
-        enabledRoles = new HashSet<>(useCase.getEnabledRoles());
-        viewRoles = new HashSet<>(useCase.getViewRoles());
-        viewUserRefs = new HashSet<>(useCase.getViewUserRefs());
-        negativeViewRoles = new HashSet<>(useCase.getNegativeViewRoles());
-        viewUsers = new HashSet<>(useCase.getViewUsers());
-        negativeViewUsers = new HashSet<>(useCase.getNegativeViewUsers());
+//        TODO: release/8.0.0
+//        enabledRoles = new HashSet<>(useCase.getEnabledRoles());
+//        viewRoles = new HashSet<>(useCase.getViewRoles());
+//        viewUserRefs = new HashSet<>(useCase.getViewUserRefs());
+//        negativeViewRoles = new HashSet<>(useCase.getNegativeViewRoles());
+//        viewUsers = new HashSet<>(useCase.getViewUsers());
+//        negativeViewUsers = new HashSet<>(useCase.getNegativeViewUsers());
         tags = new HashMap<>(useCase.getProperties());
 
         dataSet = new HashMap<>();

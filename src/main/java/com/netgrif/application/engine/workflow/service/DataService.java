@@ -187,9 +187,10 @@ public class DataService implements IDataService {
     @Override
     public SetDataEventOutcome setData(Task task, DataSet dataSet, IUser user, Map<String, String> params) {
         log.info("[{}]: Setting data of task {} [{}]", task.getStringId(), task.getTransitionId(), task.getStringId());
-        if (task.getUserId() != null) {
-            task.setUser(userService.findById(task.getUserId()));
-        }
+        // TODO: release/8.0.0 check?
+//        if (task.getAssigneeId() != null) {
+//            task.setAssigneeId(userService.findById(task.getUserId()));
+//        }
         List<EventOutcome> outcomes = new ArrayList<>();
         for (Map.Entry<String, Field<?>> stringFieldEntry : dataSet.getFields().entrySet()) {
             String fieldId = stringFieldEntry.getKey();

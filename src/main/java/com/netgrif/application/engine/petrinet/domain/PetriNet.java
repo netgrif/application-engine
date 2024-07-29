@@ -3,8 +3,6 @@ package com.netgrif.application.engine.petrinet.domain;
 import com.netgrif.application.engine.importer.model.CaseEventType;
 import com.netgrif.application.engine.importer.model.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
-import com.netgrif.application.engine.petrinet.domain.arcs.reference.Referencable;
-import com.netgrif.application.engine.petrinet.domain.arcs.reference.Type;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
@@ -158,26 +156,6 @@ public class PetriNet extends PetriNetObject {
 
     public void initializeTokens(Map<String, Integer> activePlaces) {
         places.values().forEach(place -> place.setTokens(activePlaces.getOrDefault(place.getStringId(), 0)));
-    }
-
-    public void initializeArcs(DataSet dataSet) {
-        arcs.values()
-                .stream()
-                .flatMap(List::stream)
-                .filter(arc -> arc.getMultiplicity() != null)
-                .forEach(arc -> {
-                    String referenceId = arc.getReference().getReference();
-                    arc.getReference().setReferencable(getArcReference(referenceId, arc.getReference().getType(), dataSet));
-                });
-    }
-
-    private Referencable getArcReference(String referenceId, Type type, DataSet dataSet) {
-        if (type == Type.PLACE) {
-            return places.get(referenceId);
-        } else {
-            // TODO: release/8.0.0 check if number field?
-            return (Referencable) dataSet.get(referenceId);
-        }
     }
 
     public Map<String, Integer> getActivePlaces() {

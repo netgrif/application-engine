@@ -28,7 +28,8 @@ public class ArcImportReference extends PetriNetObject {
         this.setImportId(arc.getImportId());
         this.sourceId = arc.getSourceId();
         this.destinationId = arc.getDestinationId();
-        this.multiplicity = arc.getMultiplicity();
+        // TODO: release/8.0.0
+//        this.multiplicity = arc.getMultiplicity();
         this.breakpoints = arc.getBreakpoints();
         this.type = type(arc);
     }

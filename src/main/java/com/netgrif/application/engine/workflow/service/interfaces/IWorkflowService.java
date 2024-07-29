@@ -72,9 +72,9 @@ public interface IWorkflowService {
 
     Map<String, I18nString> listToMap(List<Case> cases);
 
-    void removeTasksFromCase(List<Task> tasks, String caseId);
-
-    void removeTasksFromCase(List<Task> tasks, Case useCase);
+//    TODO: release/8.0.0
+//    void removeTasksFromCase(List<Task> tasks, String caseId);
+//    void removeTasksFromCase(List<Task> tasks, Case useCase);
 
     Case decrypt(Case useCase);
 

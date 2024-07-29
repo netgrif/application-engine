@@ -16,8 +16,9 @@ public class ElasticTaskResourceAssembler implements RepresentationModelAssemble
                 .caseId(entity.getCaseId())
                 .transitionId(entity.getTransitionId())
                 .title(new I18nString(entity.getTitle()))
-                .caseTitle(entity.getCaseTitle())
-                .priority(entity.getPriority())
+//                TODO: release/8.0.0
+//                .caseTitle(entity.getCaseTitle())
+//                .priority(entity.getPriority())
                 .build();
         return new TaskResource(taskModel);
     }

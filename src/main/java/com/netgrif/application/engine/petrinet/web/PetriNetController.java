@@ -150,13 +150,6 @@ public class PetriNetController {
         return new ProcessRolesResource(roleService.findAll(netId), service.getPetriNet(decodeUrl(netId)).getPermissions(), netId, locale);
     }
 
-    @Operation(summary = "Get transactions of process", security = {@SecurityRequirement(name = "BasicAuth")})
-    @GetMapping(value = "/{netId}/transactions", produces = MediaTypes.HAL_JSON_VALUE)
-    public TransactionsResource getTransactions(@PathVariable("netId") String netId, Locale locale) {
-        PetriNet net = service.getPetriNet(decodeUrl(netId));
-        return new TransactionsResource(net.getTransactions().values(), netId, locale);
-    }
-
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Download process model", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{netId}/file", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)

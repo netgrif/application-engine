@@ -185,10 +185,11 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case resolveUserRef(Case useCase) {
-        useCase.getUsers().clear();
-        useCase.getNegativeViewUsers().clear();
-        useCase.getUserRefs().forEach((id, permission) -> resolveUserRefPermissions(useCase, id, permission));
-        useCase.resolveViewUsers();
+//        TODO: release/8.0.0
+//        useCase.getUsers().clear();
+//        useCase.getNegativeViewUsers().clear();
+//        useCase.getUserRefs().forEach((id, permission) -> resolveUserRefPermissions(useCase, id, permission));
+//        useCase.resolveViewUsers();
         taskService.resolveUserRef(useCase);
         return save(useCase);
     }
@@ -197,9 +198,10 @@ public class WorkflowService implements IWorkflowService {
         List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(userListId).getRawValue());
         if (userIds != null && !userIds.isEmpty()) {
             if (permission.containsKey(ProcessRolePermission.VIEW) && !permission.get(ProcessRolePermission.VIEW)) {
-                useCase.getNegativeViewUsers().addAll(userIds);
+//                TODO: release/8.0.0
+//                useCase.getNegativeViewUsers().addAll(userIds);
             } else {
-                useCase.addUsers(new HashSet<>(userIds), permission);
+//                useCase.addUsers(new HashSet<>(userIds), permission);
             }
         }
     }
@@ -302,8 +304,8 @@ public class WorkflowService implements IWorkflowService {
 
         historyService.save(new CreateCaseEventLog(useCase, EventPhase.PRE));
         log.info("[{}]: Case {} created", useCase.getStringId(), useCase.getTitle());
-
-        useCase.getPetriNet().initializeArcs(useCase.getDataSet());
+//TODO: release/8.0.0
+//        useCase.getPetriNet().initializeArcs(useCase.getDataSet());
         taskService.reloadTasks(useCase);
         useCase = findOne(useCase.getStringId());
         resolveTaskRefs(useCase);
@@ -326,11 +328,12 @@ public class WorkflowService implements IWorkflowService {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
         Function<Case, String> makeTitle;
         I18nExpression caseTitle = petriNet.getDefaultCaseName();
-        if (caseTitle.isDynamic()) {
-            makeTitle = (u) -> initValueExpressionEvaluator.evaluateCaseName(u, petriNet.getDefaultCaseNameExpression(), params).getTranslation(locale);
-        } else {
+//        TODO: release/8.0.0
+//        if (caseTitle.isDynamic()) {
+//            makeTitle = (u) -> initValueExpressionEvaluator.evaluateCaseName(u, petriNet.getDefaultCaseName(), params).getTranslation(locale);
+//        } else {
             makeTitle = (u) -> petriNet.getDefaultCaseName().getTranslation(locale);
-        }
+//        }
         return makeTitle;
     }
 
@@ -507,7 +510,8 @@ public class WorkflowService implements IWorkflowService {
             useCase.setPetriNet(model);
         }
         model.initializeTokens(useCase.getActivePlaces());
-        model.initializeArcs(useCase.getDataSet());
+//        TODO: release/8.0.0
+//        model.initializeArcs(useCase.getDataSet());
     }
 
     private EventOutcome addMessageToOutcome(PetriNet net, CaseEventType type, EventOutcome outcome) {

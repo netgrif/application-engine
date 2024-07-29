@@ -112,18 +112,19 @@ public class ElasticTask {
         this.transitionId = task.getTransitionId();
         this.title = task.getTitle().getDefaultValue();
         this.titleSortable = title;
-        this.caseTitle = task.getCaseTitle();
+//        TODO: release/8.0.0
+//        this.caseTitle = task.getCaseTitle();
         this.caseTitleSortable = this.caseTitle;
-        if (task.getPriority() != null)
-            this.priority = task.getPriority();
-        this.userId = task.getUserId();
+//        if (task.getPriority() != null)
+//            this.priority = task.getPriority();
+//        this.userId = task.getUserId();
         this.startDate = task.getLastAssigned();
         this.roles = task.getPermissions().keySet();
-        this.viewRoles = new HashSet<>(task.getViewRoles());
-        this.viewUserRefs = new HashSet<>(task.getViewUserRefs());
-        this.negativeViewRoles = new HashSet<>(task.getNegativeViewRoles());
-        this.viewUsers = new HashSet<>(task.getViewUsers());
-        this.negativeViewUsers = new HashSet<>(task.getNegativeViewUsers());
+//        this.viewRoles = new HashSet<>(task.getViewRoles());
+//        this.viewUserRefs = new HashSet<>(task.getViewUserRefs());
+//        this.negativeViewRoles = new HashSet<>(task.getNegativeViewRoles());
+//        this.viewUsers = new HashSet<>(task.getViewUsers());
+//        this.negativeViewUsers = new HashSet<>(task.getNegativeViewUsers());
         this.tags = new HashMap<>(task.getProperties());
     }
 

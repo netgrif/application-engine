@@ -21,7 +21,8 @@ public class TaskPair implements Serializable {
         this.taskId = task.getId();
         this.transitionId = task.getTransitionId();
         this.state = task.getState();
-        this.userId = task.getUserId();
+        // TODO: release/8.0.0
+        this.userId = task.getAssigneeId();
     }
 
     public String getTaskStringId() {

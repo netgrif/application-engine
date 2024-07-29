@@ -1,28 +1,19 @@
 package com.netgrif.application.engine.importer.service;
 
-import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.model.Process;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.importer.service.validation.IActionValidator;
-import com.netgrif.application.engine.petrinet.domain.Function;
-import com.netgrif.application.engine.petrinet.domain.Place;
-import com.netgrif.application.engine.petrinet.domain.Transition;
-import com.netgrif.application.engine.petrinet.domain.*;
-import com.netgrif.application.engine.petrinet.domain.arcs.reference.Type;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
-import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.ArcFactory;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.xml.bind.JAXBContext;
@@ -30,8 +21,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 public class Importer {
@@ -122,52 +113,52 @@ public class Importer {
     public Path saveNetFile(PetriNet net, InputStream xmlFile) throws IOException {
         File savedFile = new File(fileStorageConfiguration.getStorageArchived() + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
         net.setImportXmlPath(savedFile.getPath());
-        copyInputStreamToFile(xmlFile, savedFile);
+//        copyInputStreamToFile(xmlFile, savedFile);
         return savedFile.toPath();
     }
 
     protected Optional<PetriNet> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
-//        documentValidator.checkConflictingAttributes(process, process.getUsersRef(), process.getUserRef(), "usersRef", "userRef");
-//        documentValidator.checkDeprecatedAttributes(process);
+////        documentValidator.checkConflictingAttributes(process, process.getUsersRef(), process.getUserRef(), "usersRef", "userRef");
+////        documentValidator.checkDeprecatedAttributes(process);
         net = new PetriNet();
-        process.getI18N().forEach(this::addI18N);
-
-        setMetaData();
-        addAllDataTransition();
-
-        process.getRole().forEach(this::createRole);
-        process.getData().forEach(this::createDataSet);
-        process.getPlace().forEach(this::createPlace);
-        process.getTransition().forEach(this::createTransition);
-        process.getArc().forEach(this::createArc);
-        process.getData().forEach(this::resolveDataActions);
-        process.getTransition().forEach(this::resolveTransitionActions);
-        process.getFunction().forEach(this::createFunction);
-        process.getRoleRef().forEach(this::resolveRoleRef);
-
-        addPredefinedRolesWithDefaultPermissions();
-
-        resolveProcessEvents(process.getProcessEvents());
-        resolveCaseEvents(process.getCaseEvents());
-        evaluateFunctions();
-        actions.forEach(this::evaluateActions);
-
-        if (process.getCaseName() != null && process.getCaseName().isDynamic()) {
-            net.setDefaultCaseNameExpression(new Expression(process.getCaseName().getValue(), process.getCaseName().isDynamic()));
-        } else {
-            net.setDefaultCaseName(toI18NString(process.getCaseName()));
-        }
-        createProperties(process.getProperties());
-
+//        process.getI18N().forEach(this::addI18N);
+//
+//        setMetaData();
+//        addAllDataTransition();
+//
+//        process.getRole().forEach(this::createRole);
+//        process.getData().forEach(this::createDataSet);
+//        process.getPlace().forEach(this::createPlace);
+//        process.getTransition().forEach(this::createTransition);
+//        process.getArc().forEach(this::createArc);
+//        process.getData().forEach(this::resolveDataActions);
+//        process.getTransition().forEach(this::resolveTransitionActions);
+//        process.getFunction().forEach(this::createFunction);
+//        process.getRoleRef().forEach(this::resolveRoleRef);
+//
+//        addPredefinedRolesWithDefaultPermissions();
+//
+//        resolveProcessEvents(process.getProcessEvents());
+//        resolveCaseEvents(process.getCaseEvents());
+//        evaluateFunctions();
+//        actions.forEach(this::evaluateActions);
+//
+//        if (process.getCaseName() != null && process.getCaseName().isDynamic()) {
+//            net.setDefaultCaseNameExpression(new Expression(process.getCaseName().getValue(), process.getCaseName().isDynamic()));
+//        } else {
+//            net.setDefaultCaseName(toI18NString(process.getCaseName()));
+//        }
+//        createProperties(process.getProperties());
+//
         return Optional.of(net);
     }
 
-    protected void addAllDataTransition() {
-        com.netgrif.application.engine.importer.model.Transition allDataConfig = allDataConfiguration.getAllData();
-        if (process.getTransition().stream().anyMatch(transition -> allDataConfig.getId().equals(transition.getId()))) {
-            return;
-        }
-        com.netgrif.application.engine.importer.model.Transition allDataTransition = new com.netgrif.application.engine.importer.model.Transition();
+//    protected void addAllDataTransition() {
+//        com.netgrif.application.engine.importer.model.Transition allDataConfig = allDataConfiguration.getAllData();
+//        if (process.getTransition().stream().anyMatch(transition -> allDataConfig.getId().equals(transition.getId()))) {
+//            return;
+//        }
+//        com.netgrif.application.engine.importer.model.Transition allDataTransition = new com.netgrif.application.engine.importer.model.Transition();
 //        TODO: NAE-1969 merge forms from NAE-1966
 //        com.netgrif.application.engine.importer.model.DataGroup configDataGroup = allDataConfig.getDataGroup().get(0);
 //        int y = 0;
@@ -200,8 +191,8 @@ public class Importer {
 //            y++;
 //        }
 //        allDataTransition.getDataGroup().add(allDataGroup);
-        process.getTransition().add(allDataTransition);
-    }
+//        process.getTransition().add(allDataTransition);
+//    }
 
 //    protected void resolveRoleRef(com.netgrif.application.engine.importer.model.CaseRoleRef roleRef) {
 //        com.netgrif.application.engine.importer.model.CaseLogic logic = roleRef.getCaseLogic();
@@ -271,22 +262,22 @@ public class Importer {
 //        action.setTrigger(referenced.getTrigger());
 //    }
 
-    protected void addI18N(com.netgrif.application.engine.importer.model.I18N importI18N) {
-        String locale = importI18N.getLocale();
-        importI18N.getI18NString().forEach(translation -> addTranslation(translation, locale));
-    }
+//    protected void addI18N(com.netgrif.application.engine.importer.model.I18N importI18N) {
+//        String locale = importI18N.getLocale();
+//        importI18N.getI18NString().forEach(translation -> addTranslation(translation, locale));
+//    }
+//
+//    protected void addTranslation(com.netgrif.application.engine.importer.model.I18NStringType i18NStringType, String locale) {
+//        String id = i18NStringType.getId();
+//        I18nString translation = getI18n(id);
+//        if (translation == null) {
+//            translation = new I18nString();
+//            i18n.put(id, translation);
+//        }
+//        translation.addTranslation(locale, i18NStringType.getValue());
+//    }
 
-    protected void addTranslation(com.netgrif.application.engine.importer.model.I18NStringType i18NStringType, String locale) {
-        String id = i18NStringType.getId();
-        I18nString translation = getI18n(id);
-        if (translation == null) {
-            translation = new I18nString();
-            i18n.put(id, translation);
-        }
-        translation.addTranslation(locale, i18NStringType.getValue());
-    }
-
-//    protected void applyMapping(Mapping mapping) throws MissingIconKeyException {
+    //    protected void applyMapping(Mapping mapping) throws MissingIconKeyException {
 //        Transition transition = getTransition(mapping.getTransitionRef());
 //        mapping.getRoleRef().forEach(roleRef -> addRoleLogic(transition, roleRef));
 //        mapping.getDataRef().forEach(dataRef -> addDataLogic(transition, dataRef));
@@ -296,21 +287,21 @@ public class Importer {
 //        mapping.getTrigger().forEach(trigger -> addTrigger(transition, trigger));
 //    }
 //
-    protected void resolveDataActions(Data data) {
-        String fieldId = data.getId();
-        if (data.getEvent() != null && !data.getEvent().isEmpty()) {
-            getField(fieldId).setEvents(buildEvents(fieldId, data.getEvent(), null));
-        }
-        if (data.getAction() != null) {
-            Map<com.netgrif.application.engine.importer.model.DataEventType, DataEvent> events = getField(fieldId).getEvents();
-
-            List<com.netgrif.application.engine.importer.model.Action> filteredActions = filterActionsByTrigger(data.getAction(), com.netgrif.application.engine.importer.model.DataEventType.GET);
-            addActionsToEvent(buildActions(filteredActions, fieldId, null), com.netgrif.application.engine.importer.model.DataEventType.GET, events);
-
-            filteredActions = filterActionsByTrigger(data.getAction(), com.netgrif.application.engine.importer.model.DataEventType.SET);
-            addActionsToEvent(buildActions(filteredActions, fieldId, null), com.netgrif.application.engine.importer.model.DataEventType.SET, events);
-        }
-    }
+//    protected void resolveDataActions(Data data) {
+//        String fieldId = data.getId();
+//        if (data.getEvent() != null && !data.getEvent().isEmpty()) {
+//            getField(fieldId).setEvents(buildEvents(fieldId, data.getEvent(), null));
+//        }
+//        if (data.getAction() != null) {
+//            Map<com.netgrif.application.engine.importer.model.DataEventType, DataEvent> events = getField(fieldId).getEvents();
+//
+//            List<com.netgrif.application.engine.importer.model.Action> filteredActions = filterActionsByTrigger(data.getAction(), com.netgrif.application.engine.importer.model.DataEventType.GET);
+//            addActionsToEvent(buildActions(filteredActions, fieldId, null), com.netgrif.application.engine.importer.model.DataEventType.GET, events);
+//
+//            filteredActions = filterActionsByTrigger(data.getAction(), com.netgrif.application.engine.importer.model.DataEventType.SET);
+//            addActionsToEvent(buildActions(filteredActions, fieldId, null), com.netgrif.application.engine.importer.model.DataEventType.SET, events);
+//        }
+//    }
 //
 //    private List<com.netgrif.application.engine.importer.model.Action> filterActionsByTrigger(List<com.netgrif.application.engine.importer.model.Action> actions, com.netgrif.application.engine.importer.model.DataEventType trigger) {
 //        return actions.stream()
@@ -411,103 +402,86 @@ public class Importer {
 //        return event;
 //    }
 
-    protected void createArc(com.netgrif.application.engine.importer.model.Arc importArc) {
-        com.netgrif.application.engine.petrinet.domain.arcs.Arc arc = arcFactory.getArc(importArc);
-        arc.setImportId(importArc.getId());
-        arc.setSource(getNode(importArc.getSourceId()));
-        arc.setDestination(getNode(importArc.getDestinationId()));
-        // TODO: NAE-1969 multiplicity
-        if (importArc.getBreakpoint() != null) {
-            importArc.getBreakpoint().forEach(position -> arc.getBreakpoints().add(new Position(position.getX(), position.getY())));
-        }
-        createProperties(importArc.getProperties(), arc.getProperties());
-        net.addArc(arc);
-    }
-
-    protected Node getNode(String id) {
-        if (places.containsKey(id)) {
-            return getPlace(id);
-        } else if (transitions.containsKey(id)) {
-            return getTransition(id);
-        }
-        throw new IllegalArgumentException("Node with id [" + id + "] not found.");
-    }
-
-    public Transition getTransition(String id) {
-        Transition transition = transitions.get(id);
-        if (transition == null) {
-            throw new IllegalArgumentException("Transition " + id + " not found");
-        }
-        return transition;
-    }
-
-    public Place getPlace(String id) {
-        Place place = places.get(id);
-        if (place == null) {
-            throw new IllegalArgumentException("Place " + id + " not found");
-        }
-        return place;
-    }
-
-    protected void createDataSet(Data importData) throws MissingIconKeyException {
-        Field<?> field = fieldFactory.getField(importData, this);
-
-        net.addDataSetField(field);
-        fields.put(importData.getId(), field);
-    }
-
-    protected void createTransition(com.netgrif.application.engine.importer.model.Transition importTransition) throws MissingIconKeyException {
+//    protected void createArc(com.netgrif.application.engine.importer.model.Arc importArc) {
+//        com.netgrif.application.engine.petrinet.domain.arcs.Arc arc = arcFactory.getArc(importArc);
+//        arc.setImportId(importArc.getId());
+//        arc.setSource(getNode(importArc.getSourceId()));
+//        arc.setDestination(getNode(importArc.getDestinationId()));
+//        // TODO: NAE-1969 multiplicity
+//        if (importArc.getBreakpoint() != null) {
+//            importArc.getBreakpoint().forEach(position -> arc.getBreakpoints().add(new Position(position.getX(), position.getY())));
+//        }
+//        createProperties(importArc.getProperties(), arc.getProperties());
+//        net.addArc(arc);
+//    }
+//
+//    protected Node getNode(String id) {
+//        if (net.getPlace(id) != null) {
+//            return net.getPlace(id);
+//        } else if (net.getTransition(id) != null) {
+//            return net.getTransition(id);
+//        }
+//        throw new IllegalArgumentException("Node with id [" + id + "] not found.");
+//    }
+//
+//    protected void createDataSet(com.netgrif.application.engine.importer.model.Data importData) throws MissingIconKeyException {
+//        Field<?> field = fieldFactory.getField(importData, this);
+//
+//        net.addDataSetField(field);
+//    }
+//
+//    protected void createTransition(com.netgrif.application.engine.importer.model.Transition importTransition) throws MissingIconKeyException {
 //        TODO: NAE-1969 fix
 //        transitionValidator.checkConflictingAttributes(importTransition, importTransition.getUsersRef(), importTransition.getUserRef(), "usersRef", "userRef");
 //        transitionValidator.checkDeprecatedAttributes(importTransition);
 
-        Transition transition = new Transition();
-        transition.setImportId(importTransition.getId());
-        transition.setTitle(toI18NString(importTransition.getTitle()));
-        transition.setPosition(importTransition.getX(), importTransition.getY());
-        createProperties(importTransition.getProperties(), transition.getProperties());
-        // TODO: NAE-1969
+//        Transition transition = new Transition();
+//        transition.setImportId(importTransition.getId());
+//        transition.setTitle(toI18NString(importTransition.getTitle()));
+//        transition.setPosition(importTransition.getX(), importTransition.getY());
+//        createProperties(importTransition.getProperties(), transition.getProperties());
+    // TODO: NAE-1969
 //        if (importTransition.getLayout() != null) {
 //            transition.setLayout(new TaskLayout(importTransition));
 //        }
-        transition.setIcon(importTransition.getIcon());
-        transition.setAssignPolicy(toAssignPolicy(importTransition.getAssignPolicy()));
-        transition.setFinishPolicy(toFinishPolicy(importTransition.getFinishPolicy()));
-
-        if (importTransition.getRoleRef() != null) {
-            importTransition.getRoleRef().forEach(roleRef ->
-                    addRoleLogic(transition, roleRef)
-            );
-        }
-
-        if (importTransition.getTrigger() != null) {
-            importTransition.getTrigger().forEach(trigger ->
-                    createTrigger(transition, trigger)
-            );
-        }
-
-        addPredefinedRolesWithDefaultPermissions(importTransition, transition);
-
-        if (importTransition.getEvent() != null) {
-            importTransition.getEvent().forEach(event ->
-                    transition.addEvent(createEvent(transition.getImportId(), event))
-            );
-        }
-
-        net.addTransition(transition);
-        transitions.put(importTransition.getId(), transition);
-    }
-
-    protected com.netgrif.application.engine.petrinet.domain.events.Event createEvent(String transitionId, com.netgrif.application.engine.importer.model.Event imported) {
-        com.netgrif.application.engine.petrinet.domain.events.Event event = new com.netgrif.application.engine.petrinet.domain.events.Event();
-        event.setImportId(imported.getId());
-        event.setMessage(toI18NString(imported.getMessage()));
-        event.setTitle(toI18NString(imported.getTitle()));
-        event.setType(com.netgrif.application.engine.importer.model.EventType.valueOf(imported.getType().value().toUpperCase()));
-        event.setPostActions(parsePostActions(transitionId, imported));
-        event.setPreActions(parsePreActions(transitionId, imported));
-        return event;
-    }
+//        transition.setIcon(importTransition.getIcon());
+//        transition.setAssignPolicy(toAssignPolicy(importTransition.getAssignPolicy()));
+//        transition.setFinishPolicy(toFinishPolicy(importTransition.getFinishPolicy()));
+//
+//        if (importTransition.getRoleRef() != null) {
+//            importTransition.getRoleRef().forEach(roleRef ->
+//                    addRoleLogic(transition, roleRef)
+//            );
+//        }
+//
+//        if (importTransition.getTrigger() != null) {
+//            importTransition.getTrigger().forEach(trigger ->
+//                    createTrigger(transition, trigger)
+//            );
+//        }
+//
+//        addPredefinedRolesWithDefaultPermissions(importTransition, transition);
+//
+//        if (importTransition.getEvent() != null) {
+//            importTransition.getEvent().forEach(event ->
+//                    transition.addEvent(createEvent(transition.getImportId(), event))
+//            );
+//        }
+//
+//        net.addTransition(transition);
+//        transitions.put(importTransition.getId(), transition);
+//    }
+//
+//    protected com.netgrif.application.engine.petrinet.domain.events.Event createEvent(String transitionId, com.netgrif.application.engine.importer.model.Event imported) {
+//        com.netgrif.application.engine.petrinet.domain.events.Event event = new com.netgrif.application.engine.petrinet.domain.events.Event();
+//        event.setImportId(imported.getId());
+//        event.setMessage(toI18NString(imported.getMessage()));
+//        event.setTitle(toI18NString(imported.getTitle()));
+//        event.setType(com.netgrif.application.engine.importer.model.EventType.valueOf(imported.getType().value().toUpperCase()));
+//        event.setPostActions(parsePostActions(transitionId, imported));
+//        event.setPreActions(parsePreActions(transitionId, imported));
+//        return event;
+//    }
 
 //    protected com.netgrif.application.engine.petrinet.domain.events.ProcessEvent addProcessEvent(com.netgrif.application.engine.importer.model.ProcessEvent imported) {
 //        com.netgrif.application.engine.petrinet.domain.events.ProcessEvent event = new com.netgrif.application.engine.petrinet.domain.events.ProcessEvent();
@@ -532,21 +506,21 @@ public class Importer {
 //        return event;
 //    }
 
-    protected List<Action> parsePostActions(String transitionId, com.netgrif.application.engine.importer.model.BaseEvent imported) {
-        return parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType.POST, transitionId, imported);
-    }
-
-    protected List<Action> parsePreActions(String transitionId, com.netgrif.application.engine.importer.model.BaseEvent imported) {
-        return parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType.PRE, transitionId, imported);
-    }
-
-    protected List<Action> parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType phase, String transitionId, com.netgrif.application.engine.importer.model.BaseEvent imported) {
-        return imported.getActions().stream()
-                .filter(actions -> actions.getPhase().equals(phase))
-                .flatMap(actions -> actions.getAction().parallelStream()
-                        .map(action -> parseAction(transitionId, action)))
-                .collect(Collectors.toList());
-    }
+//    protected List<Action> parsePostActions(String transitionId, com.netgrif.application.engine.importer.model.BaseEvent imported) {
+//        return parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType.POST, transitionId, imported);
+//    }
+//
+//    protected List<Action> parsePreActions(String transitionId, com.netgrif.application.engine.importer.model.BaseEvent imported) {
+//        return parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType.PRE, transitionId, imported);
+//    }
+//
+//    protected List<Action> parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType phase, String transitionId, com.netgrif.application.engine.importer.model.BaseEvent imported) {
+//        return imported.getActions().stream()
+//                .filter(actions -> actions.getPhase().equals(phase))
+//                .flatMap(actions -> actions.getAction().parallelStream()
+//                        .map(action -> parseAction(transitionId, action)))
+//                .collect(Collectors.toList());
+//    }
 
 //    protected List<Action> parsePhaseActions(String fieldId, com.netgrif.application.engine.importer.model.EventPhaseType phase, com.netgrif.application.engine.importer.model.DataEventType trigger, String transitionId, com.netgrif.application.engine.importer.model.DataEvent dataEvent) {
 //        List<Action> actionList = dataEvent.getActions().stream()
@@ -564,26 +538,26 @@ public class Importer {
 //        return actionList;
 //    }
 
-    protected void addDefaultRole(Transition transition) {
-        if (!net.isDefaultRoleEnabled() || isDefaultRoleReferenced(transition)) {
-            return;
-        }
-
-        RoleRefLogic logic = new RoleRefLogic();
-        logic.setPerform(true);
-        transition.addRole(defaultRole.getStringId(), roleFactory.getPermissions(logic));
-    }
-
-    protected void addAnonymousRole(Transition transition) {
-        // TODO: NAE-1969 refactor
-        if (!net.isAnonymousRoleEnabled() || isAnonymousRoleReferenced(transition)) {
-            return;
-        }
-
-        RoleRefLogic logic = new RoleRefLogic();
-        logic.setPerform(true);
-        transition.addRole(anonymousRole.getStringId(), roleFactory.getPermissions(logic));
-    }
+//    protected void addDefaultRole(Transition transition) {
+//        if (!net.isDefaultRoleEnabled() || isDefaultRoleReferenced(transition)) {
+//            return;
+//        }
+//
+//        com.netgrif.application.engine.importer.model.RoleRefLogic logic = new com.netgrif.application.engine.importer.model.RoleRefLogic();
+//        logic.setPerform(true);
+//        transition.addRole(defaultRole.getStringId(), roleFactory.getPermissions(logic));
+//    }
+//
+//    protected void addAnonymousRole(Transition transition) {
+//        // TODO: NAE-1969 refactor
+//        if (!net.isAnonymousRoleEnabled() || isAnonymousRoleReferenced(transition)) {
+//            return;
+//        }
+//
+//        com.netgrif.application.engine.importer.model.RoleRefLogic logic = new com.netgrif.application.engine.importer.model.RoleRefLogic();
+//        logic.setPerform(true);
+//        transition.addRole(anonymousRole.getStringId(), roleFactory.getPermissions(logic));
+//    }
 
 //
 //    protected void addDefaultPermissions() {
@@ -661,23 +635,21 @@ public class Importer {
 //        transaction.addTransition(transition);
 //    }
 
-    protected void addRoleLogic(Transition transition, com.netgrif.application.engine.importer.model.RoleRef roleRef) {
-        RoleRefLogic logic = roleRef.getLogic();
-        String roleId = getRole(roleRef.getId()).getStringId();
-
-        if (logic == null || roleId == null) {
-            return;
-        }
-
+//    protected void addRoleLogic(Transition transition, com.netgrif.application.engine.importer.model.RoleRef roleRef) {
+//        com.netgrif.application.engine.importer.model.RoleRefLogic logic = roleRef.getLogic();
+//        String roleId = getRole(roleRef.getId()).getStringId();
+//
+//        if (logic == null || roleId == null) {
+//            return;
+//        }
 //      TODO: NAE-1969
 //        logicValidator.checkConflictingAttributes(logic, logic.isAssigned(), logic.isAssign(), "assigned", "assign");
 //        logicValidator.checkDeprecatedAttributes(logic);
-
-        if (logic.isView() != null && !logic.isView()) {
-            transition.addNegativeViewRole(roleId);
-        }
-        transition.addRole(roleId, roleFactory.getPermissions(logic));
-    }
+//        if (logic.isView() != null && !logic.isView()) {
+//            transition.addNegativeViewRole(roleId);
+//        }
+//        transition.addRole(roleId, roleFactory.getPermissions(logic));
+//    }
 
 //    protected void addUserLogic(Transition transition, UserRef userRef) {
 //        Logic logic = userRef.getLogic();
@@ -822,174 +794,174 @@ public class Importer {
 //                .collect(Collectors.toList());
 //    }
 
-    protected Action parseAction(String transitionId, com.netgrif.application.engine.importer.model.Action action) {
-        if (action.getValue().contains("f.this")) {
-            throw new IllegalArgumentException("Event action can not reference field using 'this'");
-        }
-        return parseAction(null, transitionId, action);
-    }
-
-    protected Action parseAction(String fieldId, String transitionId, com.netgrif.application.engine.importer.model.Action importedAction) {
-        if (fieldId != null && importedAction.getTrigger() == null) {
-            throw new IllegalArgumentException("Data field action [" + importedAction.getValue() + "] doesn't have trigger");
-        }
-        try {
-            Action action = createAction(importedAction);
-            parseIds(fieldId, transitionId, importedAction, action);
-            actions.put(action.getImportId(), action);
-            return action;
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Error parsing ids of action [" + importedAction.getValue() + "]", e);
-        }
-    }
-
-    //    // TODO: release/8.0.0 add atribute "type" to set actions
-    protected Action createAction(com.netgrif.application.engine.importer.model.Action importedAction) {
-        Action action = new Action();
-        if (importedAction.getTrigger() != null) {
-            action.setTrigger(com.netgrif.application.engine.importer.model.DataEventType.fromValue(importedAction.getTrigger().toLowerCase()));
-        }
-        action.setImportId(buildActionId(importedAction.getId()));
-        return action;
-    }
-
-    protected String buildActionId(String importedActionId) {
-        String sanitizedImportedId;
-        if (importedActionId != null) {
-            if (actions.containsKey(this.net.getIdentifier() + "-" + importedActionId)) {
-                throw new IllegalArgumentException("Duplicate action id, action with id [" + importedActionId + "] already exists in petri net with identifier [" + this.net.getIdentifier() + "]");
-            }
-            sanitizedImportedId = importedActionId;
-        } else {
-            sanitizedImportedId = new ObjectId().toString();
-        }
-        return this.net.getIdentifier() + "-" + sanitizedImportedId;
-    }
-
-    protected void parseIds(String fieldId, String transitionId, com.netgrif.application.engine.importer.model.Action importedAction, Action action) {
-        String definition = importedAction.getValue();
-        action.setDefinition(definition);
-
-        if (containsParams(definition)) {
-            parseParamsAndObjectIds(action, fieldId, transitionId);
-        }
-        actionValidator.validateAction(action.getDefinition());
-    }
-
-    protected void parseParamsAndObjectIds(Action action, String fieldId, String transitionId) {
-        String[] actionParts = action.getDefinition().split(";", 2);
-        action.setDefinition(actionParts[1]);
-        parseObjectIds(action, fieldId, transitionId, actionParts[0]);
-    }
-
-    protected boolean containsParams(String definition) {
-        return definition.matches("[\\W\\w\\s]*[\\w]*:[\\s]*[ft].[\\w]+;[\\w\\W\\s]*");
-    }
-
-    protected void parseObjectIds(Action action, String fieldId, String transitionId, String definition) {
-        try {
-            Map<String, String> ids = parseParams(definition);
-
-            ids.entrySet().forEach(entry -> replaceImportId(action, fieldId, transitionId, entry));
-        } catch (NullPointerException e) {
-            throw new IllegalArgumentException("Failed to parse action: " + action, e);
-        }
-    }
-
-    protected void replaceImportId(Action action, String fieldId, String transitionId, Map.Entry<String, String> entry) {
-        String[] parts = entry.getValue().split("[.]");
-        if (parts.length != 2) {
-            throw new IllegalArgumentException("Can not parse id of " + entry.getValue());
-        }
-        String key = parts[0];
-        String importId = parts[1];
-        String paramName = entry.getKey().trim();
-
-        if (importId.startsWith("this")) {
-            if (Objects.equals(key.trim(), FIELD_KEYWORD)) {
-                action.addFieldId(paramName, fieldId);
-                return;
-            }
-            if (Objects.equals(key.trim(), TRANSITION_KEYWORD)) {
-                action.addTransitionId(paramName, transitionId);
-                return;
-            }
-        }
-        if (Objects.equals(key.trim(), FIELD_KEYWORD)) {
-            action.addFieldId(paramName, getFieldId(importId));
-            return;
-        }
-        if (Objects.equals(key.trim(), TRANSITION_KEYWORD)) {
-            action.addTransitionId(paramName, importId);
-            return;
-        }
-        throw new IllegalArgumentException("Object " + key + "." + importId + " not supported");
-    }
-
-    protected Map<String, String> parseParams(String definition) {
-        List<String> params = Arrays.asList(definition.split(","));
-        return params.stream()
-                .map(param -> param.split(":"))
-                .collect(Collectors.toMap(o -> o[0], o -> o[1]));
-    }
-
-    protected String getFieldId(String importId) {
-        try {
-            return getField(importId).getStringId();
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Object f." + importId + " does not exists");
-        }
-    }
-
-    protected void createTrigger(Transition transition, com.netgrif.application.engine.importer.model.Trigger importTrigger) {
-        com.netgrif.application.engine.workflow.domain.triggers.Trigger trigger = triggerFactory.buildTrigger(importTrigger);
-
-        transition.addTrigger(trigger);
-    }
-
-    protected void createPlace(com.netgrif.application.engine.importer.model.Place importPlace) {
-        Place place = new Place();
-        place.setImportId(importPlace.getId());
-        if (importPlace.isStatic() == null) {
-            place.setIsStatic(importPlace.isIsStatic());
-        } else {
-            place.setIsStatic(importPlace.isStatic());
-        }
-        place.setTokens(importPlace.getTokens());
-        place.setPosition(importPlace.getX(), importPlace.getY());
-        place.setTitle(toI18NString(importPlace.getTitle()));
-
-        net.addPlace(place);
-        places.put(importPlace.getId(), place);
-    }
-
-    protected void createRole(Role importRole) {
-        if (importRole.getId().equals(ProcessRole.DEFAULT_ROLE)) {
-            throw new IllegalArgumentException("Role ID '" + ProcessRole.DEFAULT_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
-        }
-
-        if (importRole.getId().equals(ProcessRole.ANONYMOUS_ROLE)) {
-            throw new IllegalArgumentException("Role ID '" + ProcessRole.ANONYMOUS_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
-        }
-
-        ProcessRole role = new ProcessRole();
-        role.setImportId(importRole.getId());
-        role.setName(toI18NString(importRole.getTitle()));
-        role.setEvents(createEventsMap(importRole.getEvent()));
-
-        role.setNetId(net.getStringId());
-        net.addRole(role);
-        roles.put(importRole.getId(), role);
-    }
-
-    protected Map<EventType, com.netgrif.application.engine.petrinet.domain.events.Event> createEventsMap(List<com.netgrif.application.engine.importer.model.Event> events) {
-        Map<EventType, com.netgrif.application.engine.petrinet.domain.events.Event> finalEvents = new HashMap<>();
-        events.forEach(event ->
-                finalEvents.put(com.netgrif.application.engine.importer.model.EventType.valueOf(event.getType().value().toUpperCase()), createEvent(null, event))
-        );
-
-        return finalEvents;
-    }
+//    protected Action parseAction(String transitionId, com.netgrif.application.engine.importer.model.Action action) {
+//        if (action.getValue().contains("f.this")) {
+//            throw new IllegalArgumentException("Event action can not reference field using 'this'");
+//        }
+//        return parseAction(null, transitionId, action);
+//    }
+//
+//    protected Action parseAction(String fieldId, String transitionId, com.netgrif.application.engine.importer.model.Action importedAction) {
+//        if (fieldId != null && importedAction.getTrigger() == null) {
+//            throw new IllegalArgumentException("Data field action [" + importedAction.getValue() + "] doesn't have trigger");
+//        }
+//        try {
+//            Action action = createAction(importedAction);
+//            parseIds(fieldId, transitionId, importedAction, action);
+//            actions.put(action.getImportId(), action);
+//            return action;
+//        } catch (NumberFormatException e) {
+//            throw new IllegalArgumentException("Error parsing ids of action [" + importedAction.getValue() + "]", e);
+//        }
+//    }
+//
+//    //    // TODO: release/8.0.0 add atribute "type" to set actions
+//    protected Action createAction(com.netgrif.application.engine.importer.model.Action importedAction) {
+//        Action action = new Action();
+//        if (importedAction.getTrigger() != null) {
+//            action.setTrigger(com.netgrif.application.engine.importer.model.DataEventType.fromValue(importedAction.getTrigger().toLowerCase()));
+//        }
+//        action.setImportId(buildActionId(importedAction.getId()));
+//        return action;
+//    }
+//
+//    protected String buildActionId(String importedActionId) {
+//        String sanitizedImportedId;
+//        if (importedActionId != null) {
+//            if (actions.containsKey(this.net.getIdentifier() + "-" + importedActionId)) {
+//                throw new IllegalArgumentException("Duplicate action id, action with id [" + importedActionId + "] already exists in petri net with identifier [" + this.net.getIdentifier() + "]");
+//            }
+//            sanitizedImportedId = importedActionId;
+//        } else {
+//            sanitizedImportedId = new ObjectId().toString();
+//        }
+//        return this.net.getIdentifier() + "-" + sanitizedImportedId;
+//    }
+//
+//    protected void parseIds(String fieldId, String transitionId, com.netgrif.application.engine.importer.model.Action importedAction, Action action) {
+//        String definition = importedAction.getValue();
+//        action.setDefinition(definition);
+//
+//        if (containsParams(definition)) {
+//            parseParamsAndObjectIds(action, fieldId, transitionId);
+//        }
+//        actionValidator.validateAction(action.getDefinition());
+//    }
+//
+//    protected void parseParamsAndObjectIds(Action action, String fieldId, String transitionId) {
+//        String[] actionParts = action.getDefinition().split(";", 2);
+//        action.setDefinition(actionParts[1]);
+//        parseObjectIds(action, fieldId, transitionId, actionParts[0]);
+//    }
+//
+//    protected boolean containsParams(String definition) {
+//        return definition.matches("[\\W\\w\\s]*[\\w]*:[\\s]*[ft].[\\w]+;[\\w\\W\\s]*");
+//    }
+//
+//    protected void parseObjectIds(Action action, String fieldId, String transitionId, String definition) {
+//        try {
+//            Map<String, String> ids = parseParams(definition);
+//
+//            ids.entrySet().forEach(entry -> replaceImportId(action, fieldId, transitionId, entry));
+//        } catch (NullPointerException e) {
+//            throw new IllegalArgumentException("Failed to parse action: " + action, e);
+//        }
+//    }
+//
+//    protected void replaceImportId(Action action, String fieldId, String transitionId, Map.Entry<String, String> entry) {
+//        String[] parts = entry.getValue().split("[.]");
+//        if (parts.length != 2) {
+//            throw new IllegalArgumentException("Can not parse id of " + entry.getValue());
+//        }
+//        String key = parts[0];
+//        String importId = parts[1];
+//        String paramName = entry.getKey().trim();
+//
+//        if (importId.startsWith("this")) {
+//            if (Objects.equals(key.trim(), FIELD_KEYWORD)) {
+//                action.addFieldId(paramName, fieldId);
+//                return;
+//            }
+//            if (Objects.equals(key.trim(), TRANSITION_KEYWORD)) {
+//                action.addTransitionId(paramName, transitionId);
+//                return;
+//            }
+//        }
+//        if (Objects.equals(key.trim(), FIELD_KEYWORD)) {
+//            action.addFieldId(paramName, getFieldId(importId));
+//            return;
+//        }
+//        if (Objects.equals(key.trim(), TRANSITION_KEYWORD)) {
+//            action.addTransitionId(paramName, importId);
+//            return;
+//        }
+//        throw new IllegalArgumentException("Object " + key + "." + importId + " not supported");
+//    }
+//
+//    protected Map<String, String> parseParams(String definition) {
+//        List<String> params = Arrays.asList(definition.split(","));
+//        return params.stream()
+//                .map(param -> param.split(":"))
+//                .collect(Collectors.toMap(o -> o[0], o -> o[1]));
+//    }
+//
+//    protected String getFieldId(String importId) {
+//        try {
+//            return getField(importId).getStringId();
+//        } catch (Exception e) {
+//            throw new IllegalArgumentException("Object f." + importId + " does not exists");
+//        }
+//    }
+//
+//    protected void createTrigger(Transition transition, com.netgrif.application.engine.importer.model.Trigger importTrigger) {
+//        com.netgrif.application.engine.workflow.domain.triggers.Trigger trigger = triggerFactory.buildTrigger(importTrigger);
+//
+//        transition.addTrigger(trigger);
+//    }
+//
+//    protected void createPlace(com.netgrif.application.engine.importer.model.Place importPlace) {
+//        Place place = new Place();
+//        place.setImportId(importPlace.getId());
+//        // TODO: release/8.0.0 static place
+////        if (importPlace.isStatic() == null) {
+////            place.setIsStatic(importPlace.isIsStatic());
+////        } else {
+////            place.setIsStatic(importPlace.isStatic());
+////        }
+//        place.setTokens(importPlace.getTokens());
+//        place.setPosition(importPlace.getX(), importPlace.getY());
+//        place.setTitle(toI18NString(importPlace.getTitle()));
+//
+//        net.addPlace(place);
+//        places.put(importPlace.getId(), place);
+//    }
+//
+//    protected void createRole(com.netgrif.application.engine.importer.model.Role importRole) {
+//        if (importRole.getId().equals(ProcessRole.DEFAULT_ROLE)) {
+//            throw new IllegalArgumentException("Role ID '" + ProcessRole.DEFAULT_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
+//        }
+//
+//        if (importRole.getId().equals(ProcessRole.ANONYMOUS_ROLE)) {
+//            throw new IllegalArgumentException("Role ID '" + ProcessRole.ANONYMOUS_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
+//        }
+//
+//        ProcessRole role = new ProcessRole();
+//        role.setImportId(importRole.getId());
+//        role.setName(toI18NString(importRole.getTitle()));
+//        role.setEvents(createEventsMap(importRole.getEvent()));
+//
+//        role.setNetId(net.getStringId());
+//        net.addRole(role);
+//    }
+//
+//    protected Map<EventType, com.netgrif.application.engine.petrinet.domain.events.Event> createEventsMap(List<com.netgrif.application.engine.importer.model.Event> events) {
+//        Map<EventType, com.netgrif.application.engine.petrinet.domain.events.Event> finalEvents = new HashMap<>();
+//        events.forEach(event ->
+//                finalEvents.put(com.netgrif.application.engine.importer.model.EventType.valueOf(event.getType().value().toUpperCase()), createEvent(null, event))
+//        );
+//
+//        return finalEvents;
+//    }
 
 //    protected Map<com.netgrif.application.engine.importer.model.ProcessEventType, com.netgrif.application.engine.petrinet.domain.events.ProcessEvent> createProcessEventsMap(List<com.netgrif.application.engine.importer.model.ProcessEvent> events) {
 //        Map<com.netgrif.application.engine.importer.model.ProcessEventType, com.netgrif.application.engine.petrinet.domain.events.ProcessEvent> finalEvents = new HashMap<>();
@@ -1010,43 +982,43 @@ public class Importer {
 //    }
 //
 
-    public I18nString toI18NString(com.netgrif.application.engine.importer.model.I18NStringType imported) {
-        if (imported == null) {
-            return new I18nString("");
-        }
-        String key = imported.getValue();
-        if (imported.getId() != null) {
-            key = imported.getId();
-        }
-        if (imported instanceof Option) {
-            key = ((Option) imported).getKey();
-        }
-        I18nString string = i18n.getOrDefault(imported.getId(), new I18nString(key, imported.getValue()));
-        if (string.getDefaultValue() == null) {
-            string.setDefaultValue(imported.getValue());
-        }
-        return string;
-    }
-
-    protected void addPredefinedRolesWithDefaultPermissions(com.netgrif.application.engine.importer.model.Transition importTransition, Transition transition) {
-        // Don't add if positive roles or triggers or positive user refs
-        if ((importTransition.getRoleRef() != null && importTransition.getRoleRef().stream().anyMatch(this::hasPositivePermission))
-                || (importTransition.getTrigger() != null && !importTransition.getTrigger().isEmpty())) {
-            return;
-        }
-        addDefaultRole(transition);
-        addAnonymousRole(transition);
-    }
-
-    protected boolean hasPositivePermission(com.netgrif.application.engine.importer.model.PermissionRef permissionRef) {
-        return (permissionRef.getLogic().isPerform() != null && permissionRef.getLogic().isPerform())
-                || (permissionRef.getLogic().isView() != null && permissionRef.getLogic().isView())
-                || (permissionRef.getLogic().isAssign() != null && permissionRef.getLogic().isAssign())
-                || (permissionRef.getLogic().isCancel() != null && permissionRef.getLogic().isCancel())
-                || (permissionRef.getLogic().isFinish() != null && permissionRef.getLogic().isFinish())
-                || (permissionRef.getLogic().isReassign() != null && permissionRef.getLogic().isReassign())
-                || (permissionRef.getLogic().isViewDisabled() != null && permissionRef.getLogic().isViewDisabled());
-    }
+//    public I18nString toI18NString(com.netgrif.application.engine.importer.model.I18NStringType imported) {
+//        if (imported == null) {
+//            return new I18nString("");
+//        }
+//        String key = imported.getValue();
+//        if (imported.getId() != null) {
+//            key = imported.getId();
+//        }
+//        if (imported instanceof com.netgrif.application.engine.importer.model.Option) {
+//            key = ((com.netgrif.application.engine.importer.model.Option) imported).getKey();
+//        }
+//        I18nString string = i18n.getOrDefault(imported.getId(), new I18nString(key, imported.getValue()));
+//        if (string.getDefaultValue() == null) {
+//            string.setDefaultValue(imported.getValue());
+//        }
+//        return string;
+//    }
+//
+//    protected void addPredefinedRolesWithDefaultPermissions(com.netgrif.application.engine.importer.model.Transition importTransition, Transition transition) {
+//        // Don't add if positive roles or triggers or positive user refs
+//        if ((importTransition.getRoleRef() != null && importTransition.getRoleRef().stream().anyMatch(this::hasPositivePermission))
+//                || (importTransition.getTrigger() != null && !importTransition.getTrigger().isEmpty())) {
+//            return;
+//        }
+//        addDefaultRole(transition);
+//        addAnonymousRole(transition);
+//    }
+//
+//    protected boolean hasPositivePermission(com.netgrif.application.engine.importer.model.PermissionRef permissionRef) {
+//        return (permissionRef.getLogic().isPerform() != null && permissionRef.getLogic().isPerform())
+//                || (permissionRef.getLogic().isView() != null && permissionRef.getLogic().isView())
+//                || (permissionRef.getLogic().isAssign() != null && permissionRef.getLogic().isAssign())
+//                || (permissionRef.getLogic().isCancel() != null && permissionRef.getLogic().isCancel())
+//                || (permissionRef.getLogic().isFinish() != null && permissionRef.getLogic().isFinish())
+//                || (permissionRef.getLogic().isReassign() != null && permissionRef.getLogic().isReassign())
+//                || (permissionRef.getLogic().isViewDisabled() != null && permissionRef.getLogic().isViewDisabled());
+//    }
 
     //    protected void addPredefinedRolesWithDefaultPermissions() {
 //        // only if no positive role associations and no positive user ref associations
@@ -1059,99 +1031,97 @@ public class Importer {
 //        addAnonymousPermissions();
 //    }
 //
-    protected boolean isDefaultRoleReferenced(Transition transition) {
-        return transition.getRoles().containsKey(defaultRole.getStringId());
-    }
-
-    protected boolean isDefaultRoleReferencedOnNet() {
-        return net.getPermissions().containsKey(defaultRole.getStringId());
-    }
-
-    protected boolean isAnonymousRoleReferenced(Transition transition) {
-        return transition.getRoles().containsKey(anonymousRole.getStringId());
-    }
-
-    protected boolean isAnonymousRoleReferencedOnNet() {
-        return net.getPermissions().containsKey(anonymousRole.getStringId());
-    }
-
-    protected com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy toAssignPolicy(com.netgrif.application.engine.importer.model.AssignPolicy policy) {
-        if (policy == null || policy.value() == null) {
-            return com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy.MANUAL;
-        }
-
-        return com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy.valueOf(policy.value().toUpperCase());
-    }
-
-    protected com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy toFinishPolicy(com.netgrif.application.engine.importer.model.FinishPolicy policy) {
-        if (policy == null || policy.value() == null) {
-            return com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy.MANUAL;
-        }
-
-        return com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy.valueOf(policy.value().toUpperCase());
-    }
-
-    public ProcessRole getRole(String id) {
-        ProcessRole role = roles.get(id);
-        if (role == null) {
-            throw new IllegalArgumentException("Role " + id + " not found");
-        }
-        return role;
-    }
-
-    public Field<?> getField(String id) {
-        Field<?> field = fields.get(id);
-        if (field == null) {
-            throw new IllegalArgumentException("Field " + id + " not found");
-        }
-        return field;
-    }
-
-    public I18nString getI18n(String id) {
-        return i18n.get(id);
-    }
-
-    protected static void copyInputStreamToFile(InputStream inputStream, File file) throws IOException {
-        try (FileOutputStream outputStream = new FileOutputStream(file)) {
-            int read;
-            byte[] bytes = new byte[1024];
-            while ((read = inputStream.read(bytes)) != -1) {
-                outputStream.write(bytes, 0, read);
-            }
-        }
-    }
-
-    protected void setMetaData() throws MissingPetriNetMetaDataException {
-        List<String> missingMetaData = new ArrayList<>();
-
-        if (process.getId() != null) {
-            net.setImportId(process.getId());
-            net.setIdentifier(process.getId());
-        } else {
-            missingMetaData.add("<id>");
-        }
-        if (process.getVersion() != null) {
-            net.setVersion(Version.of(process.getVersion()));
-        } else {
-            missingMetaData.add("<version>");
-        }
-        // TODO: NAE-1969 extension from NAE-1973
-        if (process.getTitle() != null) {
-            net.setTitle(toI18NString(process.getTitle()));
-        } else {
-            missingMetaData.add("<title>");
-        }
-        net.setIcon(process.getIcon());
-        net.setDefaultRoleEnabled(process.isDefaultRole() != null && process.isDefaultRole());
-        net.setAnonymousRoleEnabled(process.isAnonymousRole() != null && process.isAnonymousRole());
-        if (!missingMetaData.isEmpty()) {
-            throw new MissingPetriNetMetaDataException(missingMetaData);
-        }
-    }
-
-    protected void createProperties(com.netgrif.application.engine.importer.model.Properties propertiesXml, Map<String, String> properties) {
-        propertiesXml.getProperty().forEach(property -> {
-            properties.put(property.getKey(), property.getValue());
-        });
-    }
+//    protected boolean isDefaultRoleReferenced(Transition transition) {
+//        return transition.getRoles().containsKey(defaultRole.getStringId());
+//    }
+//
+//    protected boolean isDefaultRoleReferencedOnNet() {
+//        return net.getPermissions().containsKey(defaultRole.getStringId());
+//    }
+//
+//    protected boolean isAnonymousRoleReferenced(Transition transition) {
+//        return transition.getRoles().containsKey(anonymousRole.getStringId());
+//    }
+//
+//    protected boolean isAnonymousRoleReferencedOnNet() {
+//        return net.getPermissions().containsKey(anonymousRole.getStringId());
+//    }
+//
+//    protected com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy toAssignPolicy(com.netgrif.application.engine.importer.model.AssignPolicy policy) {
+//        if (policy == null || policy.value() == null) {
+//            return com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy.MANUAL;
+//        }
+//
+//        return com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy.valueOf(policy.value().toUpperCase());
+//    }
+//
+//    protected com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy toFinishPolicy(com.netgrif.application.engine.importer.model.FinishPolicy policy) {
+//        if (policy == null || policy.value() == null) {
+//            return com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy.MANUAL;
+//        }
+//
+//        return com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy.valueOf(policy.value().toUpperCase());
+//    }
+//
+//    public ProcessRole getRole(String id) {
+//        ProcessRole role = roles.get(id);
+//        if (role == null) {
+//            throw new IllegalArgumentException("Role " + id + " not found");
+//        }
+//        return role;
+//    }
+//
+//    public Field<?> getField(String id) {
+//        Field<?> field = fields.get(id);
+//        if (field == null) {
+//            throw new IllegalArgumentException("Field " + id + " not found");
+//        }
+//        return field;
+//    }
+//
+//    public I18nString getI18n(String id) {
+//        return i18n.get(id);
+//    }
+//
+//    protected static void copyInputStreamToFile(InputStream inputStream, File file) throws IOException {
+//        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+//            int read;
+//            byte[] bytes = new byte[1024];
+//            while ((read = inputStream.read(bytes)) != -1) {
+//                outputStream.write(bytes, 0, read);
+//            }
+//        }
+//    }
+//
+//    protected void setMetaData() throws MissingPetriNetMetaDataException {
+//        List<String> missingMetaData = new ArrayList<>();
+//
+//        if (process.getId() != null) {
+//            net.setImportId(process.getId());
+//            net.setIdentifier(process.getId());
+//        } else {
+//            missingMetaData.add("<id>");
+//        }
+//        if (process.getVersion() != null) {
+//            net.setVersion(Version.of(process.getVersion()));
+//        } else {
+//            missingMetaData.add("<version>");
+//        }
+//        // TODO: NAE-1969 extension from NAE-1973
+//        if (process.getTitle() != null) {
+//            net.setTitle(toI18NString(process.getTitle()));
+//        } else {
+//            missingMetaData.add("<title>");
+//        }
+//        net.setIcon(process.getIcon());
+//        if (!missingMetaData.isEmpty()) {
+//            throw new MissingPetriNetMetaDataException(missingMetaData);
+//        }
+//    }
+//
+//    protected void createProperties(com.netgrif.application.engine.importer.model.Properties propertiesXml, Map<String, String> properties) {
+//        propertiesXml.getProperty().forEach(property -> {
+//            properties.put(property.getKey(), property.getValue());
+//        });
+//    }
 }

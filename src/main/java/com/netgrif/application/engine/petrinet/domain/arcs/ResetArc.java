@@ -17,10 +17,11 @@ public class ResetArc extends PTArc {
      *
      * @return true
      */
-    @Override
-    public boolean isExecutable() {
-        return true;
-    }
+//    TODO: release/8.0.0
+//    @Override
+//    public boolean isExecutable() {
+//        return true;
+//    }
 
     /**
      * Changes the marking on <i>p</i> by firing of <i>t</i>:
@@ -29,16 +30,16 @@ public class ResetArc extends PTArc {
      *     <li><i>m'(p)</i> = <i>W(t,p)</i>, if <i>p</i> is also a postplace of <i>t</i></li>
      * </ul>
      */
-    @Override
-    public void execute() {
-        Place place = ((Place) source);
-        place.removeAllTokens();
-    }
-
-    @Override
-    public void rollbackExecution(Integer tokensConsumed) {
-        ((Place) source).addTokens(tokensConsumed);
-    }
+//    @Override
+//    public void execute() {
+//        Place place = ((Place) source);
+//        place.removeAllTokens();
+//    }
+//
+//    @Override
+//    public void rollbackExecution(Integer tokensConsumed) {
+//        ((Place) source).addTokens(tokensConsumed);
+//    }
 
     @SuppressWarnings("Duplicates")
     @Override

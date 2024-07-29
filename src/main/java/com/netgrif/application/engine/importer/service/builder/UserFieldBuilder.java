@@ -17,17 +17,18 @@ public class UserFieldBuilder extends FieldBuilder<UserField> {
     public UserField build(Data data, Importer importer) {
         UserField field = new UserField();
         initialize(field);
-        if (data.getOptions() != null && data.getOptions().getOption() != null) {
-            Set<String> roles = data.getOptions().getOption().stream()
-                    .map(Option::getKey)
-                    .collect(Collectors.toSet());
-            field.setRoles(roles);
-        } else if (data.getValues() != null) {
-            Set<String> roles = data.getValues().stream()
-                    .map(value -> importer.getRoles().get(value.getValue()).getStringId())
-                    .collect(Collectors.toSet());
-            field.setRoles(roles);
-        }
+//        TODO: release/8.0.0
+//        if (data.getOptions() != null && data.getOptions().getOption() != null) {
+//            Set<String> roles = data.getOptions().getOption().stream()
+//                    .map(Option::getKey)
+//                    .collect(Collectors.toSet());
+//            field.setRoles(roles);
+//        } else if (data.getValues() != null) {
+//            Set<String> roles = data.getValues().stream()
+//                    .map(value -> importer.getRoles().get(value.getValue()).getStringId())
+//                    .collect(Collectors.toSet());
+//            field.setRoles(roles);
+//        }
         // TODO:release/8.0.0 user datafield had roles as choices in 6.x
         setDefaultValue(field, data, inits -> field.setDefaultValue(null));
         return field;

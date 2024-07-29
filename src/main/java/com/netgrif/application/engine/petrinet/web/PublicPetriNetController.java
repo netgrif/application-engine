@@ -85,13 +85,6 @@ public class PublicPetriNetController {
         return new ProcessRolesResource(roleService.findAll(netId), petriNetService.getPetriNet(netId).getPermissions(), netId, locale);
     }
 
-    @Operation(summary = "Get transactions of process")
-    @GetMapping(value = "/{netId}/transactions", produces = MediaTypes.HAL_JSON_VALUE)
-    public TransactionsResource getTransactions(@PathVariable("netId") String netId, Locale locale) {
-        PetriNet net = petriNetService.getPetriNet(decodeUrl(netId));
-        return new TransactionsResource(net.getTransactions().values(), netId, locale);
-    }
-
     @Operation(summary = "Get data fields of transitions")
     @PostMapping(value = "/data", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public DataFieldReferencesResource getDataFieldReferences(@RequestBody List<TransitionReference> referenceBody, Locale locale) {

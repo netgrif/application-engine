@@ -1,8 +1,850 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="xs3p.xsl"?>
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+<xs:schema elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            version="1.1.0">
-    <xs:include schemaLocation="https://petriflow.com/petriflow.schema.xsd"/>
-
+    <!-- ===== PROCESS ELEMENTS ===== -->
+    <xs:element name="process">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element type="xs:string" name="id"/>
+                <xs:element type="xs:string" name="version"/>
+                <xs:element type="extension" name="extends" minOccurs="0"/>
+                <xs:element type="i18nStringType" name="title"/>
+                <xs:element type="xs:string" name="icon" minOccurs="0"/>
+                <xs:element type="xs:boolean" name="defaultRole" minOccurs="0" default="true"/>
+                <xs:element type="xs:boolean" name="anonymousRole" minOccurs="0" default="true"/>
+                <xs:element type="properties" name="properties" minOccurs="0"/>
+                <xs:element type="i18nStringTypeWithExpression" name="caseName" minOccurs="0"/>
+                <xs:element type="caseRoleRef" name="roleRef" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element type="processEvents" name="processEvents" minOccurs="0"/>
+                <xs:element type="caseEvents" name="caseEvents" minOccurs="0"/>
+                <xs:element type="role" name="role" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element type="function" name="function" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element type="data" name="data" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element type="i18n" name="i18n" maxOccurs="unbounded" minOccurs="0">
+                    <xs:unique name="i18nStringUniqueName">
+                        <xs:selector xpath="./i18nString"/>
+                        <xs:field xpath="@name"/>
+                    </xs:unique>
+                </xs:element>
+                <xs:element type="transition" name="transition" maxOccurs="unbounded"/>
+                <xs:element type="place" name="place" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element type="arc" name="arc" maxOccurs="unbounded" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:unique name="globalUniqueId">
+            <xs:selector xpath="./data|./role|./arc|./place|./transition"/>
+            <xs:field xpath="id"/>
+        </xs:unique>
+        <xs:key name="ptIdKey">
+            <xs:selector xpath="./place|./transition"/>
+            <xs:field xpath="id"/>
+        </xs:key>
+        <xs:keyref name="sourceId" refer="ptIdKey">
+            <xs:selector xpath="./arc"/>
+            <xs:field xpath="sourceId"/>
+        </xs:keyref>
+        <xs:keyref name="destinationId" refer="ptIdKey">
+            <xs:selector xpath="./arc"/>
+            <xs:field xpath="destinationId"/>
+        </xs:keyref>
+    </xs:element>
+    <xs:complexType name="extension">
+        <xs:sequence>
+            <xs:element type="xs:string" name="id"/>
+            <xs:element type="xs:string" name="version"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="data">
+        <xs:sequence>
+            <xs:element type="xs:string" name="id"/>
+            <xs:element type="i18nStringType" name="title"/>
+            <xs:element type="i18nStringType" name="placeholder" minOccurs="0"/>
+            <xs:element type="i18nStringType" name="desc" minOccurs="0"/>
+            <xs:choice>
+                <xs:element type="i18nStringTypeWithExpression" name="values" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element type="options" name="options" minOccurs="0">
+                    <xs:unique name="optionUniqueKey">
+                        <xs:selector xpath="./option"/>
+                        <xs:field xpath="@key"/>
+                    </xs:unique>
+                </xs:element>
+            </xs:choice>
+            <xs:element type="validations" name="validations" minOccurs="0"/>
+            <xs:element type="init" name="init" minOccurs="0"/>
+            <xs:element type="component" name="component" minOccurs="0"/>
+            <xs:element type="encryption" name="encryption" minOccurs="0"/>
+            <xs:choice>
+                <xs:element type="action" name="action" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element type="dataEvent" name="event" maxOccurs="unbounded" minOccurs="0"/>
+            </xs:choice>
+            <xs:element type="allowedNets" name="allowedNets" minOccurs="0"/>
+            <xs:element type="properties" name="properties" minOccurs="0">
+                <xs:unique name="dataPropertyUniqueKey">
+                    <xs:selector xpath="./property"/>
+                    <xs:field xpath="@key"/>
+                </xs:unique>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute type="data_type" name="type" use="required"/>
+        <xs:attribute type="xs:boolean" name="immediate"/>
+        <xs:attribute type="scope" name="scope"/>
+    </xs:complexType>
+    <xs:complexType name="function">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="scope" name="scope"/>
+                <xs:attribute type="xs:string" name="name" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="role">
+        <xs:sequence>
+            <xs:element type="xs:string" name="id"/>
+            <xs:element type="i18nStringType" name="title"/>
+            <xs:element type="event" name="event" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="properties" name="properties" minOccurs="0">
+                <xs:unique name="rolePropertyUniqueKey">
+                    <xs:selector xpath="./property"/>
+                    <xs:field xpath="@key"/>
+                </xs:unique>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute type="scope" name="scope"/>
+    </xs:complexType>
+    <xs:complexType name="transition">
+        <xs:sequence>
+            <xs:element type="xs:string" name="id"/>
+            <xs:element type="nonNegativeInteger" name="x"/>
+            <xs:element type="nonNegativeInteger" name="y"/>
+            <xs:element type="i18nStringType" name="title"/>
+            <xs:element type="xs:string" name="icon" minOccurs="0"/>
+            <xs:element type="assignPolicy" name="assignPolicy" minOccurs="0"/>
+            <xs:element type="finishPolicy" name="finishPolicy" minOccurs="0"/>
+            <xs:element type="trigger" name="trigger" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="roleRef" name="roleRef" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:choice minOccurs="0">
+                <xs:element type="flexContainer" name="flex"/>
+                <xs:element type="gridContainer" name="grid"/>
+            </xs:choice>
+            <xs:element type="event" name="event" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="properties" name="properties" minOccurs="0">
+                <xs:unique name="transitionPropertyUniqueKey">
+                    <xs:selector xpath="./property"/>
+                    <xs:field xpath="@key"/>
+                </xs:unique>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="place">
+        <xs:sequence>
+            <xs:element type="xs:string" name="id"/>
+            <xs:element type="nonNegativeInteger" name="x"/>
+            <xs:element type="nonNegativeInteger" name="y"/>
+            <xs:element type="i18nStringType" name="title" minOccurs="0"/>
+            <xs:element type="nonNegativeInteger" name="tokens"/>
+            <xs:choice>
+                <xs:element type="xs:boolean" name="isStatic"/>
+                <xs:element type="xs:boolean" name="static"/>
+            </xs:choice>
+            <xs:element type="properties" name="properties" minOccurs="0">
+                <xs:unique name="placePropertyUniqueKey">
+                    <xs:selector xpath="./property"/>
+                    <xs:field xpath="@key"/>
+                </xs:unique>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute type="scope" name="scope"/>
+    </xs:complexType>
+    <xs:complexType name="arc">
+        <xs:sequence>
+            <xs:element type="xs:string" name="id"/>
+            <xs:element name="type" type="arc_type" default="regular"/>
+            <xs:element type="xs:string" name="sourceId"/>
+            <xs:element type="xs:string" name="destinationId"/>
+            <xs:element type="expression" name="multiplicity"/>
+            <xs:element type="breakpoint" name="breakpoint" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="properties" name="properties" minOccurs="0">
+                <xs:unique name="arcPropertyUniqueKey">
+                    <xs:selector xpath="./property"/>
+                    <xs:field xpath="@key"/>
+                </xs:unique>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="i18n">
+        <xs:sequence>
+            <xs:element type="i18nStringType" name="i18nString" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="locale"/>
+    </xs:complexType>
+    <xs:complexType name="processEvents">
+        <xs:sequence>
+            <xs:element type="processEvent" name="event" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="caseEvents">
+        <xs:sequence>
+            <xs:element type="caseEvent" name="event" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <!-- ===== RESTRICTIONS ===== -->
+    <xs:simpleType name="data_type">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="number"/>
+            <xs:enumeration value="text"/>
+            <xs:enumeration value="stringCollection"/>
+            <xs:enumeration value="enumeration"/>
+            <xs:enumeration value="enumeration_map"/>
+            <xs:enumeration value="multichoice"/>
+            <xs:enumeration value="multichoice_map"/>
+            <xs:enumeration value="boolean"/>
+            <xs:enumeration value="date"/>
+            <xs:enumeration value="file"/>
+            <xs:enumeration value="fileList"/>
+            <xs:enumeration value="user"/>
+            <xs:enumeration value="userList"/>
+            <xs:enumeration value="dateTime"/>
+            <xs:enumeration value="button"/>
+            <xs:enumeration value="taskRef"/>
+            <xs:enumeration value="caseRef"/>
+            <xs:enumeration value="filter"/>
+            <xs:enumeration value="i18n"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="scope">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="namespace"/>
+            <xs:enumeration value="process"/>
+            <xs:enumeration value="useCase"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="arc_type">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="regular"/>
+            <xs:enumeration value="reset"/>
+            <xs:enumeration value="inhibitor"/>
+            <xs:enumeration value="read"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="triggerType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="auto"/>
+            <xs:enumeration value="user"/>
+            <xs:enumeration value="time"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="assignPolicy">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="auto"/>
+            <xs:enumeration value="manual"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="finishPolicy">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="auto_no_data"/>
+            <xs:enumeration value="manual"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="nonNegativeLong">
+        <xs:restriction base="xs:long">
+            <xs:minInclusive value="0"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="nonNegativeInteger">
+        <xs:restriction base="xs:int">
+            <xs:minInclusive value="0"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <!-- ===== INNER ELEMENTS ===== -->
+    <xs:simpleType name="template">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="material"/>
+            <xs:enumeration value="netgrif"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="appearance">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="standard"/>
+            <xs:enumeration value="outline"/>
+            <xs:enumeration value="fill"/>
+            <xs:enumeration value="legacy"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="breakpoint">
+        <xs:sequence>
+            <xs:element type="nonNegativeInteger" name="x"/>
+            <xs:element type="nonNegativeInteger" name="y"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="options">
+        <xs:choice>
+            <xs:element type="option" name="option" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="init" name="init"/>
+        </xs:choice>
+    </xs:complexType>
+    <xs:complexType name="expression">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="dynamic" type="xs:boolean" default="false"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="component">
+        <xs:sequence>
+            <xs:element name="id" type="xs:string"/>
+            <xs:element type="properties" name="properties" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="option">
+        <xs:simpleContent>
+            <xs:extension base="i18nStringType">
+                <xs:attribute name="key" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="icons">
+        <xs:sequence>
+            <xs:element name="icon" type="icon" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="icon">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="key"/>
+                <xs:attribute name="type" type="iconType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:simpleType name="iconType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="material"/>
+            <xs:enumeration value="svg"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="allowedNets">
+        <xs:sequence>
+            <xs:element type="xs:string" name="allowedNet" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="roleRefLogic">
+        <xs:sequence>
+            <xs:element type="xs:boolean" name="perform" minOccurs="0"/>
+            <xs:element type="xs:boolean" name="view" minOccurs="0"/>
+            <xs:element type="xs:boolean" name="assign" minOccurs="0"/>
+            <xs:element type="xs:boolean" name="cancel" minOccurs="0"/>
+            <xs:element type="xs:boolean" name="finish" minOccurs="0"/>
+            <xs:element type="xs:boolean" name="reassign" minOccurs="0"/>
+            <xs:element type="xs:boolean" name="view_disabled" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="dataRefLogic">
+        <xs:sequence>
+            <xs:element name="behavior" type="behavior" minOccurs="0"/>
+            <xs:element name="required" type="xs:boolean" default="false" minOccurs="0"/>
+            <xs:element name="immediate" type="xs:boolean" default="false" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="caseLogic">
+        <xs:sequence>
+            <xs:element type="xs:boolean" name="create" minOccurs="0"/>
+            <xs:element type="xs:boolean" name="delete" minOccurs="0"/>
+            <xs:element type="xs:boolean" name="view" minOccurs="0"/>
+            <xs:element type="action" name="action" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="roleRef">
+        <xs:complexContent>
+            <xs:extension base="permissionRef"/>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="permissionRef">
+        <xs:sequence>
+            <xs:element type="xs:string" name="id"/>
+            <xs:element type="roleRefLogic" name="logic"/>
+            <xs:element type="properties" name="properties" minOccurs="0">
+                <xs:unique name="permissionRefPropertyUniqueKey">
+                    <xs:selector xpath="./property"/>
+                    <xs:field xpath="@key"/>
+                </xs:unique>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="caseRoleRef">
+        <xs:complexContent>
+            <xs:extension base="casePermissionRef"/>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="caseUserRef">
+        <xs:complexContent>
+            <xs:extension base="casePermissionRef"/>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="casePermissionRef">
+        <xs:sequence>
+            <xs:element type="xs:string" name="id"/>
+            <xs:element type="caseLogic" name="caseLogic"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:simpleType name="behavior">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="forbidden"/>
+            <xs:enumeration value="hidden"/>
+            <xs:enumeration value="visible"/>
+            <xs:enumeration value="editable"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="dataRef">
+        <xs:sequence>
+            <xs:element type="xs:string" name="id"/>
+            <xs:element type="dataRefLogic" name="logic"/>
+            <xs:element type="component" name="component" minOccurs="0"/>
+            <xs:element type="dataEvent" name="event" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="properties" name="properties" minOccurs="0">
+                <xs:unique name="dataRefPropertyUniqueKey">
+                    <xs:selector xpath="./property"/>
+                    <xs:field xpath="@key"/>
+                </xs:unique>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="action">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="trigger"/>
+                <xs:attribute name="type" type="actionType"/>
+                <xs:attribute name="id"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="validations">
+        <xs:sequence>
+            <xs:element type="validation" name="validation" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="validation">
+        <xs:sequence>
+            <xs:element type="xs:string" name="name"/>
+            <xs:element name="arguments" type="arguments" minOccurs="0"/>
+            <xs:element name="message" type="i18nStringType" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="init">
+        <xs:simpleContent>
+            <xs:extension base="i18nStringTypeWithExpression"/>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="trigger">
+        <!--todo: only if time -->
+        <xs:choice minOccurs="0">
+            <xs:element name="exact" type="xs:dateTime"/>
+            <xs:element name="delay" type="xs:duration"/>
+        </xs:choice>
+        <xs:attribute name="type" type="triggerType"/>
+    </xs:complexType>
+    <xs:complexType name="encryption">
+        <xs:simpleContent>
+            <xs:extension base="xs:boolean">
+                <xs:attribute name="algorithm"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="i18nStringType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="id" type="xs:string"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="i18nStringTypeWithExpression">
+        <xs:simpleContent>
+            <xs:extension base="i18nStringType">
+                <xs:attribute name="dynamic" type="xs:boolean" default="false"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="event">
+        <xs:complexContent>
+            <xs:extension base="baseEvent">
+                <xs:sequence>
+                    <xs:element type="i18nStringType" name="title" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute name="type" use="required" type="eventType"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="baseEvent">
+        <xs:sequence>
+            <xs:element type="xs:string" name="id"/>
+            <xs:element type="actions" name="actions" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="i18nStringType" name="message" minOccurs="0"/>
+            <xs:element type="properties" name="properties" minOccurs="0">
+                <xs:unique name="eventPropertyUniqueKey">
+                    <xs:selector xpath="./property"/>
+                    <xs:field xpath="@key"/>
+                </xs:unique>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="dataEvent">
+        <xs:complexContent>
+            <xs:extension base="baseEvent">
+                <xs:attribute name="type" use="required" type="dataEventType"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="caseEvent">
+        <xs:complexContent>
+            <xs:extension base="baseEvent">
+                <xs:attribute name="type" use="required" type="caseEventType"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="processEvent">
+        <xs:complexContent>
+            <xs:extension base="baseEvent">
+                <xs:attribute name="type" use="required" type="processEventType"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:simpleType name="eventType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="assign"/>
+            <xs:enumeration value="cancel"/>
+            <xs:enumeration value="finish"/>
+            <xs:enumeration value="reassign"/>
+            <xs:enumeration value="enabled"/>
+            <xs:enumeration value="disabled"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="dataEventType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="set"/>
+            <xs:enumeration value="get"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="caseEventType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="create"/>
+            <xs:enumeration value="delete"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="processEventType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="upload"/>
+            <xs:enumeration value="delete"/>
+            <xs:enumeration value="activate"/>
+            <xs:enumeration value="deactivate"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="eventPhaseType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="pre"/>
+            <xs:enumeration value="post"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="actionType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="defaultValue"/>
+            <xs:enumeration value="initExpression"/>
+            <xs:enumeration value="validations"/>
+            <xs:enumeration value="title"/>
+            <xs:enumeration value="description"/>
+            <xs:enumeration value="placeholder"/>
+            <xs:enumeration value="behavior"/>
+            <xs:enumeration value="value"/>
+            <xs:enumeration value="immediate"/>
+            <xs:enumeration value="component"/>
+            <xs:enumeration value="allowedNets"/>
+            <xs:enumeration value="choices"/>
+            <xs:enumeration value="choicesExpression"/>
+            <xs:enumeration value="options"/>
+            <xs:enumeration value="optionsExpression"/>
+            <xs:enumeration value="roles"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="actions">
+        <xs:sequence>
+            <xs:element type="action" name="action" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="eventPhaseType" name="phase" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="properties">
+        <xs:sequence>
+            <xs:element type="property" name="property" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="property">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="key" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="arguments">
+        <xs:sequence>
+            <xs:element type="xs:string" name="argument" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="argumentType" name="type" use="required"/>
+    </xs:complexType>
+    <xs:simpleType name="argumentType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="client"/>
+            <xs:enumeration value="server"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <!-- UTILS -->
+    <xs:simpleType name="empty">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value=""/>
+        </xs:restriction>
+    </xs:simpleType>
+    <!--  FORMS-->
+    <xs:complexType name="layoutItem">
+        <xs:choice>
+            <xs:element type="dataRef" name="dataRef"/>
+            <xs:element type="flexContainer" name="flex"/>
+            <xs:element type="gridContainer" name="grid"/>
+        </xs:choice>
+    </xs:complexType>
+    <xs:complexType name="flexContainer">
+        <xs:sequence>
+            <xs:element type="xs:string" name="id"/>
+            <xs:element type="flexItem" name="item" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="flexContainerProperties" name="properties" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="flexItem">
+        <xs:complexContent>
+            <xs:extension base="layoutItem">
+                <xs:sequence>
+                    <xs:element type="flexItemProperties" name="properties" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="gridContainer">
+        <xs:sequence>
+            <xs:element type="xs:string" name="id"/>
+            <xs:element type="gridItem" name="item" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="gridContainerProperties" name="properties" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="gridItem">
+        <xs:complexContent>
+            <xs:extension base="layoutItem">
+                <xs:sequence>
+                    <xs:element type="gridItemProperties" name="properties" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="flexContainerProperties">
+        <xs:complexContent>
+            <xs:extension base="properties">
+                <xs:sequence>
+                    <xs:element type="flexLayoutDisplay" name="display" minOccurs="0" default="flex"/>
+                    <xs:element type="flexDirection" name="flex-direction" minOccurs="0" default="row"/>
+                    <xs:element type="flexWrap" name="flex-wrap" minOccurs="0" default="nowrap"/>
+                    <xs:element type="xs:string" name="flex-flow" minOccurs="0"/>
+                    <xs:element type="justifyContent" name="justify-content" minOccurs="0" default="flex-start"/>
+                    <xs:element type="alignItems" name="align-items" minOccurs="0" default="stretch"/>
+                    <xs:element type="alignContent" name="align-content" minOccurs="0" default="normal"/>
+                    <xs:element type="xs:string" name="gap" minOccurs="0"/>
+                    <xs:element type="xs:string" name="row-gap" minOccurs="0"/>
+                    <xs:element type="xs:string" name="column-gap" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="gridContainerProperties">
+        <xs:sequence>
+            <xs:element type="gridLayoutDisplay" name="display" minOccurs="0" default="grid"/>
+            <xs:element type="xs:string" name="grid-template-columns" minOccurs="0"/>
+            <xs:element type="xs:string" name="grid-template-rows" minOccurs="0"/>
+            <xs:element type="xs:string" name="grid-template-areas" minOccurs="0"/>
+            <xs:element type="xs:string" name="grid-template" minOccurs="0"/>
+            <xs:element type="xs:string" name="column-gap" minOccurs="0"/>
+            <xs:element type="xs:string" name="row-gap" minOccurs="0"/>
+            <xs:element type="xs:string" name="grid-column-gap" minOccurs="0"/>
+            <xs:element type="xs:string" name="grid-row-gap" minOccurs="0"/>
+            <xs:element type="xs:string" name="gap" minOccurs="0"/>
+            <xs:element type="xs:string" name="grid-gap" minOccurs="0"/>
+            <xs:element type="justifyItems" name="justify-items" minOccurs="0" default="stretch"/>
+            <xs:element type="gridLayoutAlignItems" name="align-items" minOccurs="0" default="stretch"/>
+            <xs:element type="xs:string" name="place-items" minOccurs="0"/>
+            <xs:element type="gridLayoutJustifyContent" name="justify-content" minOccurs="0" default="stretch"/>
+            <xs:element type="gridLayoutAlignContent" name="align-content" minOccurs="0" default="stretch"/>
+            <xs:element type="xs:string" name="place-content" minOccurs="0"/>
+            <xs:element type="xs:string" name="grid-auto-columns" minOccurs="0"/>
+            <xs:element type="xs:string" name="grid-auto-rows" minOccurs="0"/>
+            <xs:element type="gridAutoFlow" name="grid-auto-flow" minOccurs="0" default="row"/>
+            <xs:element type="xs:string" name="grid" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:simpleType name="flexDirection">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="column"/>
+            <xs:enumeration value="column-reverse"/>
+            <xs:enumeration value="row"/>
+            <xs:enumeration value="row-reverse"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="flexWrap">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="wrap"/>
+            <xs:enumeration value="nowrap"/>
+            <xs:enumeration value="wrap-reverse"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="justifyContent">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="flex-start"/>
+            <xs:enumeration value="flex-end"/>
+            <xs:enumeration value="start"/>
+            <xs:enumeration value="end"/>
+            <xs:enumeration value="left"/>
+            <xs:enumeration value="right"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="space-between"/>
+            <xs:enumeration value="space-around"/>
+            <xs:enumeration value="space-evenly"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="alignItems">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="stretch"/>
+            <xs:enumeration value="flex-start"/>
+            <xs:enumeration value="start"/>
+            <xs:enumeration value="self-start"/>
+            <xs:enumeration value="flex-end"/>
+            <xs:enumeration value="end"/>
+            <xs:enumeration value="self-end"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="baseline"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="alignContent">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="normal"/>
+            <xs:enumeration value="flex-start"/>
+            <xs:enumeration value="start"/>
+            <xs:enumeration value="flex-end"/>
+            <xs:enumeration value="end"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="space-between"/>
+            <xs:enumeration value="space-around"/>
+            <xs:enumeration value="space-evenly"/>
+            <xs:enumeration value="stretch"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="gridLayoutJustifyContent">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="space-evenly"/>
+            <xs:enumeration value="space-around"/>
+            <xs:enumeration value="space-between"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="start"/>
+            <xs:enumeration value="end"/>
+            <xs:enumeration value="stretch"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="gridLayoutAlignContent">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="space-evenly"/>
+            <xs:enumeration value="space-around"/>
+            <xs:enumeration value="space-between"/>
+            <xs:enumeration value="start"/>
+            <xs:enumeration value="end"/>
+            <xs:enumeration value="stretch"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="flexItemProperties">
+        <xs:sequence>
+            <xs:element type="xs:int" name="order" minOccurs="0" default="0"/>
+            <xs:element type="xs:int" name="flex-grow" minOccurs="0" default="0"/>
+            <xs:element type="xs:int" name="flex-shrink" minOccurs="0" default="1"/>
+            <xs:element type="xs:string" name="flex-basis" minOccurs="0" default="auto"/>
+            <xs:element type="xs:string" name="flex" minOccurs="0"/>
+            <xs:element type="flexItemAlignSelf" name="align-self" minOccurs="0" default="auto"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:simpleType name="flexItemAlignSelf">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="auto"/>
+            <xs:enumeration value="stretch"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="flex-start"/>
+            <xs:enumeration value="flex-end"/>
+            <xs:enumeration value="baseline"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="gridItemProperties">
+        <xs:sequence>
+            <xs:element type="xs:string" name="grid-column-start" minOccurs="0"/>
+            <xs:element type="xs:string" name="grid-column-end" minOccurs="0"/>
+            <xs:element type="xs:string" name="grid-row-start" minOccurs="0"/>
+            <xs:element type="xs:string" name="grid-row-end" minOccurs="0"/>
+            <xs:element type="xs:string" name="grid-column" minOccurs="0"/>
+            <xs:element type="xs:string" name="grid-row" minOccurs="0"/>
+            <xs:element type="xs:string" name="grid-area" minOccurs="0"/>
+            <xs:element type="justifySelf" name="justify-self" minOccurs="0" default="stretch"/>
+            <xs:element type="gridItemAlignSelf" name="align-self" minOccurs="0" default="stretch"/>
+            <xs:element type="xs:string" name="place-self" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:simpleType name="gridItemAlignSelf">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="start"/>
+            <xs:enumeration value="end"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="stretch"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="justifySelf">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="start"/>
+            <xs:enumeration value="end"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="stretch"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="flexLayoutDisplay">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="flex"/>
+            <xs:enumeration value="inline-flex"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="gridLayoutDisplay">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="grid"/>
+            <xs:enumeration value="inline-grid"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="justifyItems">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="start"/>
+            <xs:enumeration value="end"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="stretch"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="gridLayoutAlignItems">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="stretch"/>
+            <xs:enumeration value="start"/>
+            <xs:enumeration value="end"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="baseline"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="gridAutoFlow">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="row"/>
+            <xs:enumeration value="column"/>
+            <xs:enumeration value="dense"/>
+        </xs:restriction>
+    </xs:simpleType>
 </xs:schema>

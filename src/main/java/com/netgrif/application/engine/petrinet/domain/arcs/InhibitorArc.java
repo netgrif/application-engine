@@ -17,25 +17,26 @@ public class InhibitorArc extends PTArc {
      * <center><b><i>m(p) < w</i></b><br></center>
      * false otherwise.
      */
-    @Override
-    public boolean isExecutable() {
-        if (this.reference != null) multiplicity = this.reference.getMultiplicity();
-        return ((Place) source).getTokens() < multiplicity;
-    }
+//    TODO: release/8.0.0
+//    @Override
+//    public boolean isExecutable() {
+//        if (this.reference != null) multiplicity = this.reference.getMultiplicity();
+//        return ((Place) source).getTokens() < multiplicity;
+//    }
 
     /**
      * Does nothing. The token situation on <i>p</i> is not changed by the firing of <i>t</i>, i.e. <i>m'(p)</i> = <i>m(p)</i>.
      */
-    @Override
-    public void execute() {
-    }
+//    @Override
+//    public void execute() {
+//    }
 
     /**
      * Does nothing. The token situation on <i>p</i> is not changed by the firing of <i>t</i>, i.e. <i>m'(p)</i> = <i>m(p)</i>.
      */
-    @Override
-    public void rollbackExecution(Integer tokensConsumed) {
-    }
+//    @Override
+//    public void rollbackExecution(Integer tokensConsumed) {
+//    }
 
     @SuppressWarnings("Duplicates")
     @Override
@@ -46,7 +47,7 @@ public class InhibitorArc extends PTArc {
         clone.setMultiplicity(this.multiplicity);
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);
-        clone.setReference(this.reference == null ? null : this.reference.clone());
+//        clone.setReference(this.reference == null ? null : this.reference.clone());
         return clone;
     }
 }

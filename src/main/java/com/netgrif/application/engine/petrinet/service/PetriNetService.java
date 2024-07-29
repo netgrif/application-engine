@@ -230,11 +230,11 @@ public class PetriNetService implements IPetriNetService {
             net.incrementVersion(releaseType);
         }
         processRoleService.saveAll(net.getRoles().values());
-        net.setAuthor(author.transformToAuthor());
+        net.setAuthorId(author.getId());
         functionCacheService.cachePetriNetFunctions(net);
         Path savedPath = getImporter().saveNetFile(net, new ByteArrayInputStream(xmlCopy.toByteArray()));
         xmlCopy.close();
-        log.info("Petri net {} ({} v{}) imported successfully and saved in a folder: {}", net.getTitle(), net.getInitials(), net.getVersion(), savedPath.toString());
+        log.info("Petri net {} (v{}) imported successfully and saved in a folder: {}", net.getTitle(), net.getVersion(), savedPath.toString());
 
         outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params));
         evaluateRules(net, EventPhase.PRE);

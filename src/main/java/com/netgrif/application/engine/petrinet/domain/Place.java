@@ -1,20 +1,13 @@
 package com.netgrif.application.engine.petrinet.domain;
 
-import com.netgrif.application.engine.petrinet.domain.arcs.reference.Referencable;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@Data
 @Document
-public class Place extends Node implements Referencable {
+public class Place extends Node {
 
-    @Getter
-    @Setter
     private Integer tokens;
-
-    @Getter
-    @Setter
-    private Boolean isStatic;
 
     public Place() {
         super();
@@ -47,16 +40,10 @@ public class Place extends Node implements Referencable {
     public Place clone() {
         Place clone = new Place();
         clone.setTokens(this.tokens);
-        clone.setIsStatic(this.isStatic);
         clone.setTitle(this.getTitle());
         clone.setPosition(this.getPosition());
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.getImportId());
         return clone;
-    }
-
-    @Override
-    public int getMultiplicity() {
-        return tokens;
     }
 }

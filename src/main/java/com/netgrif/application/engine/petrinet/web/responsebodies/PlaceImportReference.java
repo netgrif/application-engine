@@ -17,6 +17,5 @@ public class PlaceImportReference extends Node {
         this.setObjectId(place.getObjectId());
         this.setImportId(place.getImportId());
         this.tokens = place.getTokens();
-        this.isStatic = place.getIsStatic();
     }
 }

@@ -248,13 +248,13 @@ public class TaskService implements ITaskService {
         Task task = taskOptional.get();
         IUser user = userService.getUserFromLoggedUser(loggedUser);
 
-        if (task.getUserId() == null) {
-            throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
-        }
-        // TODO: 14. 4. 2017 replace with @PreAuthorize
-        if (!task.getUserId().equals(user.getSelfOrImpersonated().getStringId()) && !loggedUser.isAnonymous()) {
-            throw new IllegalArgumentException("User that is not assigned tried to finish task");
-        }
+//        TODO: release/8.0.0
+//        if (task.getUserId() == null) {
+//            throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
+//        }
+//        if (!task.getUserId().equals(user.getSelfOrImpersonated().getStringId()) && !loggedUser.isAnonymous()) {
+//            throw new IllegalArgumentException("User that is not assigned tried to finish task");
+//        }
 
         return finishTask(task, user, params);
     }
@@ -280,7 +280,8 @@ public class TaskService implements ITaskService {
 
         finishExecution(transition, useCase.getStringId());
         task.setLastFinished(LocalDateTime.now());
-        task.setFinishedBy(task.getUserId());
+//        TODO: release/8.0.0
+//        task.setFinishedBy(task.getUserId());
         task.setAssigneeId(null);
         save(task);
         reloadTasks(workflowService.findOne(task.getCaseId()));
@@ -364,12 +365,13 @@ public class TaskService implements ITaskService {
     private Task returnTokens(Task task, String useCaseId) {
         Case useCase = workflowService.findOne(useCaseId);
         PetriNet net = useCase.getPetriNet();
-        net.getArcsOfTransition(task.getTransitionId()).stream()
-                .filter(arc -> arc.getSource() instanceof Place)
-                .forEach(arc -> {
-                    arc.rollbackExecution(useCase.getConsumedTokens().get(arc.getStringId()));
-                    useCase.getConsumedTokens().remove(arc.getStringId());
-                });
+//        TODO: release/8.0.0
+//        net.getArcsOfTransition(task.getTransitionId()).stream()
+//                .filter(arc -> arc.getSource() instanceof Place)
+//                .forEach(arc -> {
+//                    arc.rollbackExecution(useCase.getConsumedTokens().get(arc.getStringId()));
+//                    useCase.getConsumedTokens().remove(arc.getStringId());
+//                });
         workflowService.updateMarking(useCase);
 
         task.setAssigneeId(null);
@@ -423,13 +425,13 @@ public class TaskService implements ITaskService {
     }
 
     protected void delegate(IUser delegated, Task task, Case useCase) throws TransitionNotExecutableException {
-        if (task.getUserId() != null) {
-            // TODO: release/8.0.0 reassign event?
-            task.setAssigneeId(delegated.getStringId());
-            save(task);
-        } else {
-            assignTaskToUser(delegated, task, useCase.getStringId());
-        }
+//        TODO: release/8.0.0
+//        if (task.getUserId() != null) {
+//            task.setAssigneeId(delegated.getStringId());
+//            save(task);
+//        } else {
+//            assignTaskToUser(delegated, task, useCase.getStringId());
+//        }
     }
 
     protected Case evaluateRules(String caseId, Task task, EventType eventType, EventPhase eventPhase) {
@@ -496,9 +498,11 @@ public class TaskService implements ITaskService {
             return true;
         }
         // TODO: NAE-1858 is this valid check? what about multiple input arcs from same place?
-        return arcsOfTransition.stream()
-                .filter(arc -> arc.getDestination().equals(transition)) // todo: from same source error
-                .allMatch(Arc::isExecutable);
+//        return arcsOfTransition.stream()
+//                .filter(arc -> arc.getDestination().equals(transition)) // todo: from same source error
+//                .allMatch(Arc::isExecutable);
+//        TODO: release/8.0.0
+        return true;
     }
 
     void finishExecution(Transition transition, String useCaseId) throws TransitionNotExecutableException {
@@ -784,8 +788,9 @@ public class TaskService implements ITaskService {
                 .assignPolicy(transition.getAssignPolicy())
                 .finishPolicy(transition.getFinishPolicy())
                 .build();
-        transition.getEvents().forEach((type, event) -> task.addEventTitle(type, event.getTitle()));
-        task.addAssignedUserPolicy(transition.getAssignedUserPolicy());
+//        TODO: release/8.0.0
+//        transition.getEvents().forEach((type, event) -> task.addEventTitle(type, event.getTitle()));
+//        task.addAssignedUserPolicy(transition.getAssignedUserPolicy());
         for (Trigger trigger : transition.getTriggers()) {
             Trigger taskTrigger = trigger.clone();
             task.addTrigger(taskTrigger);
@@ -807,13 +812,13 @@ public class TaskService implements ITaskService {
 //                task.addRole(entry.getKey(), entry.getValue());
 //            }
 //        }
-        transition.getNegativeViewRoles().forEach(task::addNegativeViewRole);
-
-        for (Map.Entry<String, Map<RolePermission, Boolean>> entry : transition.getUserRefs().entrySet()) {
-            task.addUserRef(entry.getKey(), entry.getValue());
-        }
-        task.resolveViewRoles();
-        task.resolveViewUserRefs();
+//        transition.getNegativeViewRoles().forEach(task::addNegativeViewRole);
+//
+//        for (Map.Entry<String, Map<RolePermission, Boolean>> entry : transition.getUserRefs().entrySet()) {
+//            task.addUserRef(entry.getKey(), entry.getValue());
+//        }
+//        task.resolveViewRoles();
+//        task.resolveViewUserRefs();
 
         Task savedTask = save(task);
 
@@ -843,7 +848,8 @@ public class TaskService implements ITaskService {
 
     @Override
     public void delete(List<Task> tasks, Case useCase) {
-        workflowService.removeTasksFromCase(tasks, useCase);
+//        TODO: release/8.0.0
+//        workflowService.removeTasksFromCase(tasks, useCase);
         log.info("[{}]: Tasks of case {} are being deleted", useCase.getStringId(), useCase.getTitle());
         taskRepository.deleteAll(tasks);
         tasks.forEach(t -> elasticTaskService.remove(t.getStringId()));
@@ -867,10 +873,10 @@ public class TaskService implements ITaskService {
     }
 
     private void setUser(Task task) {
-        if (task.getUserId() == null) {
-            return;
-        }
-        // TODO: NAE-1969
+//        TODO: release/8.0.0
+//        if (task.getUserId() == null) {
+//            return;
+//        }
 //        task.setUser(userService.resolveById(task.getUserId()));
     }
 

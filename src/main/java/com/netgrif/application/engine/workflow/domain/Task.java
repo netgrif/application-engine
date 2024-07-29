@@ -105,28 +105,6 @@ public class Task implements Serializable {
         }
     }
 
-    public void addNegativeViewRole(String roleId) {
-        negativeViewRoles.add(roleId);
-    }
-
-    public void addUserRef(String userRefId, Map<RolePermission, Boolean> permissions) {
-        userRefs.put(userRefId, permissions);
-    }
-
-    public void addUsers(Set<String> userIds, Map<RolePermission, Boolean> permissions) {
-        userIds.forEach(userId -> {
-            if (users.containsKey(userId) && users.get(userId) != null) {
-                compareExistingUserPermissions(userId, new HashMap<>(permissions));
-            } else {
-                users.put(userId, new HashMap<>(permissions));
-            }
-        });
-    }
-
-    public void addAssignedUserPolicy(Map<AssignedUserPermission, Boolean> assignedUser) {
-        assignedUserPolicy.putAll(assignedUser);
-    }
-
     @JsonIgnore
     public List<Trigger> getTriggers() {
         return triggers;
@@ -134,17 +112,6 @@ public class Task implements Serializable {
 
     public void addTrigger(Trigger trigger) {
         triggers.add(trigger);
-    }
-
-    public void addEventTitle(EventType type, I18nString title) {
-        if (type == null || title == null)
-            return;
-        eventTitles.put(type, title);
-    }
-
-    @JsonIgnore
-    public String getUserId() {
-        return userId;
     }
 
     // TODO: release/8.0.0
@@ -161,39 +128,12 @@ public class Task implements Serializable {
         return triggers.stream().anyMatch(trigger -> trigger != null && TriggerType.AUTO.equals(trigger.getType()));
     }
 
-    public void resolveViewRoles() {
-        this.viewRoles.clear();
-        this.permissions.forEach((role, perms) -> {
-            if (perms.containsKey(RolePermission.VIEW) && perms.get(RolePermission.VIEW)) {
-                viewRoles.add(role);
-            }
-        });
-    }
-
-    public void resolveViewUserRefs() {
-        this.viewUserRefs.clear();
-        this.userRefs.forEach((userRef, perms) -> {
-            if (perms.containsKey(RolePermission.VIEW) && perms.get(RolePermission.VIEW)) {
-                viewUserRefs.add(userRef);
-            }
-        });
-    }
-
-    public void resolveViewUsers() {
-        this.viewUsers.clear();
-        this.users.forEach((role, perms) -> {
-            if (perms.containsKey(RolePermission.VIEW) && perms.get(RolePermission.VIEW)) {
-                viewUsers.add(role);
-            }
-        });
-    }
-
     private void compareExistingUserPermissions(String userId, Map<RolePermission, Boolean> permissions) {
         // TODO: release/8.0.0 check if possible to reduce duplicated code, possible solution is to have abstraction on permissions map
-        permissions.forEach((id, perm) -> {
-            if ((users.containsKey(userId) && !users.get(userId).containsKey(id)) || (users.containsKey(userId) && users.get(userId).containsKey(id) && users.get(userId).get(id))) {
-                users.get(userId).put(id, perm);
-            }
-        });
+//        permissions.forEach((id, perm) -> {
+//            if ((users.containsKey(userId) && !users.get(userId).containsKey(id)) || (users.containsKey(userId) && users.get(userId).containsKey(id) && users.get(userId).get(id))) {
+//                users.get(userId).put(id, perm);
+//            }
+//        });
     }
 }
