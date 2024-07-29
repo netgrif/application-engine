@@ -32,9 +32,11 @@ public class NaeTransaction {
     private Closure<?> event;
     private Closure<?> onCommit;
     private Closure<?> onRollBack;
+
     private Exception onCallBackException;
     private Propagation propagation;
     private Date deadline;
+    private boolean wasRolledBack;
 
     /**
      * todo
@@ -68,6 +70,7 @@ public class NaeTransaction {
                 if (canCallOnCommit(status)) {
                     runTransactionCallBack(onCommit);
                 } else if (canCallOnRollBack(status)) {
+                    wasRolledBack = true;
                     runTransactionCallBack(onRollBack);
                 }
             }

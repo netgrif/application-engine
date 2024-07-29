@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Lookup
 import org.springframework.data.mongodb.MongoTransactionManager
 import org.springframework.stereotype.Component
+import org.springframework.transaction.TransactionDefinition
 import org.springframework.transaction.support.TransactionSynchronizationManager
 
 @Slf4j
@@ -43,6 +44,7 @@ abstract class ActionRunner {
             code.init(action, useCase, task, changes, this, params)
             if (TransactionSynchronizationManager.isSynchronizationActive()) {
                 def transaction = NaeTransaction.builder()
+                        .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
                         .forceCreation(false)
                         .transactionManager(transactionManager)
                         .event(code)

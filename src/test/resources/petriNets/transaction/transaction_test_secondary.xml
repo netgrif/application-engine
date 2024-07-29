@@ -1,0 +1,34 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>transaction_test_secondary</id>
+	<version>1.0.0</version>
+	<initials>TRS</initials>
+	<title>transaction_test_secondary</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+
+	<data type="text">
+		<id>text_without_action</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>text_2</id>
+		<title/>
+	</data>
+
+	<transition>
+		<id>t1</id>
+		<x>496</x>
+		<y>144</y>
+		<label>t1</label>
+		<event type="assign">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					createCase("transaction_test", "toBeRemovedNestedOnFailure")
+				</action>
+			</actions>
+		</event>
+	</transition>
+</document>

@@ -3,33 +3,40 @@ package com.netgrif.application.engine.workflow.service;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.workflow.domain.Task;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.mongodb.core.mapping.event.AfterDeleteEvent;
 import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @Component
-public class TaskEventHandler extends AbstractMongoEventListener<Task> {
+@RequiredArgsConstructor
+public class TaskEventHandler {
 
-    @Autowired
-    private IElasticTaskService service;
+    private final IElasticTaskService service;
+    private final IElasticTaskMappingService taskMappingService;
 
-    @Autowired
-    private IElasticTaskMappingService taskMappingService;
-
-    @Async
-    @Override
+    /**
+     * todo
+     * todo does not need to be async
+     * todo condition because generic
+     * */
+    // todo collectionName from properties
+    @TransactionalEventListener(fallbackExecution = true, condition = "#event.collectionName == 'task'")
     public void onAfterSave(AfterSaveEvent<Task> event) {
         service.index(this.taskMappingService.transform(event.getSource()));
     }
 
-    @Override
+    /**
+     * todo
+     * todo condition because generic
+     * */
+    // todo collectionName from properties
+    @TransactionalEventListener(fallbackExecution = true, condition = "#event.collectionName == 'task'")
     public void onAfterDelete(AfterDeleteEvent<Task> event) {
         Document document = event.getDocument();
         if (document == null) {

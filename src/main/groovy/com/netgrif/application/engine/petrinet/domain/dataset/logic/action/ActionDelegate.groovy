@@ -218,7 +218,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      * todo
      * */
     @NamedVariant
-    void transaction(int timeout = TransactionDefinition.TIMEOUT_DEFAULT, boolean forceCreation = false, Closure event,
+    NaeTransaction transaction(int timeout = TransactionDefinition.TIMEOUT_DEFAULT, boolean forceCreation = false, Closure event,
                      Closure onCommit = null, Closure onRollBack = null) {
         def transactionBuilder = NaeTransaction.builder()
                 .timeout(timeout)
@@ -231,6 +231,8 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         NaeTransaction transaction = transactionBuilder.build()
         executeTransaction(transaction)
         throwIfCallBackFailed(transaction)
+
+        return transaction
     }
 
     /**

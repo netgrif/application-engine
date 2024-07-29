@@ -125,9 +125,6 @@ public class PetriNetService implements IPetriNetService {
     private IPetriNetService self;
 
     @Autowired
-    private IElasticPetriNetMappingService petriNetMappingService;
-
-    @Autowired
     private IUriService uriService;
 
     private IElasticPetriNetService elasticPetriNetService;
@@ -267,12 +264,6 @@ public class PetriNetService implements IPetriNetService {
         petriNet.initializeArcs();
         this.evictCache(petriNet);
         petriNet = repository.save(petriNet);
-
-        try {
-            elasticPetriNetService.indexNow(this.petriNetMappingService.transform(petriNet));
-        } catch (Exception e) {
-            log.error("Indexing failed [{}]", petriNet.getStringId(), e);
-        }
 
         return Optional.of(petriNet);
     }

@@ -3,7 +3,6 @@ package com.netgrif.application.engine.workflow.service;
 import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventLog;
@@ -97,9 +96,6 @@ public class WorkflowService implements IWorkflowService {
     @Autowired
     protected IInitValueExpressionEvaluator initValueExpressionEvaluator;
 
-    @Autowired
-    protected IElasticCaseMappingService caseMappingService;
-
     @Lazy
     @Autowired
     private IEventService eventService;
@@ -124,12 +120,7 @@ public class WorkflowService implements IWorkflowService {
         }
         encryptDataSet(useCase);
         useCase = repository.save(useCase);
-        try {
-            useCase.resolveImmediateDataFields();
-            elasticCaseService.indexNow(this.caseMappingService.transform(useCase));
-        } catch (Exception e) {
-            log.error("Indexing failed [{}]", useCase.getStringId(), e);
-        }
+
         return useCase;
     }
 

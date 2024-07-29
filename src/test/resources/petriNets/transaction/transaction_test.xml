@@ -17,6 +17,11 @@
 		<title/>
 	</data>
 
+	<data type="boolean">
+		<id>was_transaction_rolled_back</id>
+		<title/>
+	</data>
+
 	<data type="button">
 		<id>testBasicTransaction</id>
 		<title/>
@@ -24,11 +29,10 @@
 			<id>testBasicTransaction</id>
 			<actions phase="post">
 				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
 					text_without_action: f.text_without_action;
 
-					transaction(
-						timeout: 1000,
-						forceCreation: false,
+					def myTransaction = transaction(
 						event: {
 							createCase("transaction_test", "onButton")
 							change text_without_action value { "xxx" }
@@ -37,6 +41,8 @@
 						onRollBack: { createCase("transaction_test", "onRollBack") }
 					)
 					createCase("transaction_test", "onAlways")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
 				</action>
 			</actions>
 		</event>
@@ -49,12 +55,12 @@
 			<id>testBasicTransactionWithFailure</id>
 			<actions phase="post">
 				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
 					text_without_action: f.text_without_action;
 
-					transaction(
-						timeout: 1000,
-						forceCreation: false,
+					def myTransaction = transaction(
 						event: {
+							workflowService.deleteCase(findCase({it.title.eq("toBeRemoved")}))
 							createCase("transaction_test", "onButton")
 							change text_without_action value { "xxx" }
 							// not runtime exception on purpose
@@ -64,6 +70,8 @@
 						onRollBack: { createCase("transaction_test", "onRollBack") }
 					)
 					createCase("transaction_test", "onAlways")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
 				</action>
 			</actions>
 		</event>
@@ -76,11 +84,10 @@
 			<id>testFailureInCallBackThrowsError</id>
 			<actions phase="post">
 				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
 					text_without_action: f.text_without_action;
 
-					transaction(
-						timeout: 1000,
-						forceCreation: false,
+					def myTransaction = transaction(
 						event: {
 							createCase("transaction_test", "onButton")
 							change text_without_action value { "xxx" }
@@ -93,6 +100,8 @@
 						}
 					)
 					createCase("transaction_test", "onAlways")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
 				</action>
 			</actions>
 		</event>
@@ -105,30 +114,93 @@
 			<id>testTimeout</id>
 			<actions phase="post">
 				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
 					text_without_action: f.text_without_action;
 
-					transaction(
-						timeout: 1,
-						forceCreation: false,
+					def myTransaction = transaction(
+						timeout: 1, // in millis
 						event: {
 							createCase("transaction_test", "onButton")
-							println "before sleep ${new Date().toString()}"
-							Thread.sleep(10000)
-							println "after sleep ${new Date().toString()}"
+							Thread.sleep(50) // make sure it will time-out
 						},
 						onCommit: { createCase("transaction_test", "onCommit") },
 						onRollBack: { createCase("transaction_test", "onRollBack") }
 					)
 					createCase("transaction_test", "onAlways")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<data type="button">
+		<id>testElasticIndexingOnTransactionFailure</id>
+		<title/>
+		<event type="set">
+			<id>testElasticIndexingOnTransactionFailure</id>
+			<actions phase="post">
+				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
+					text_without_action: f.text_without_action;
+
+					def myTransaction = transaction(
+						event: {
+							petriNetService.importPetriNet(new java.io.FileInputStream("src/test/resources/petriNets/transaction/transaction_test_secondary.xml"),
+									com.netgrif.application.engine.petrinet.domain.VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+							def toBeRemovedCase = createCase("transaction_test_secondary", "toBeRemoved")
+							assignTask("t1", toBeRemovedCase)
+							workflowService.deleteCase(toBeRemovedCase.stringId)
+
+							createCase("transaction_test", "onButton")
+							throw new RuntimeException("error")
+						},
+						onCommit: { createCase("transaction_test", "onCommit") },
+						onRollBack: { createCase("transaction_test", "onRollBack") }
+					)
+					createCase("transaction_test", "onAlways")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<data type="button">
+		<id>testElasticIndexingOnTransactionSuccess</id>
+		<title/>
+		<event type="set">
+			<id>testElasticIndexingOnTransactionSuccess</id>
+			<actions phase="post">
+				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
+					text_without_action: f.text_without_action;
+
+					def myTransaction = transaction(
+							event: {
+								petriNetService.importPetriNet(new java.io.FileInputStream("src/test/resources/petriNets/transaction/transaction_test_secondary.xml"),
+										com.netgrif.application.engine.petrinet.domain.VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+								def toBeRemovedCase = createCase("transaction_test_secondary", "toBeRemoved")
+								assignTask("t1", toBeRemovedCase)
+								workflowService.deleteCase(toBeRemovedCase.stringId)
+
+								createCase("transaction_test", "onButton")
+							},
+							onCommit: { createCase("transaction_test", "onCommit") },
+							onRollBack: { createCase("transaction_test", "onRollBack") }
+					)
+					createCase("transaction_test", "onAlways")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
 				</action>
 			</actions>
 		</event>
 	</data>
 
 	<transition>
-		<id>t2</id>
+		<id>t1</id>
 		<x>496</x>
 		<y>144</y>
-		<label>t2</label>
+		<label>t1</label>
 	</transition>
 </document>

@@ -4,8 +4,6 @@ import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.history.domain.taskevents.AssignTaskEventLog;
 import com.netgrif.application.engine.history.domain.taskevents.CancelTaskEventLog;
 import com.netgrif.application.engine.history.domain.taskevents.DelegateTaskEventLog;
@@ -102,23 +100,13 @@ public class TaskService implements ITaskService {
     protected IProcessRoleService processRoleService;
 
     @Autowired
-    protected IElasticTaskMappingService taskMappingService;
-
-    @Autowired
     protected IEventService eventService;
-
-    protected IElasticTaskService elasticTaskService;
 
     @Autowired
     protected IHistoryService historyService;
 
     @Autowired
     protected IValidationService validation;
-
-    @Autowired
-    public void setElasticTaskService(IElasticTaskService elasticTaskService) {
-        this.elasticTaskService = elasticTaskService;
-    }
 
     @Autowired
     private IRuleEngine ruleEngine;
@@ -718,14 +706,12 @@ public class TaskService implements ITaskService {
     @Override
     public Task save(Task task) {
         task = taskRepository.save(task);
-        elasticTaskService.index(this.taskMappingService.transform(task));
         return task;
     }
 
     @Override
     public List<Task> save(List<Task> tasks) {
         tasks = taskRepository.saveAll(tasks);
-        tasks.forEach(task -> elasticTaskService.index(this.taskMappingService.transform(task)));
         return tasks;
     }
 
@@ -851,7 +837,6 @@ public class TaskService implements ITaskService {
         workflowService.removeTasksFromCase(tasks, useCase);
         log.info("[{}]: Tasks of case {} are being deleted", useCase.getStringId(), useCase.getTitle());
         taskRepository.deleteAll(tasks);
-        tasks.forEach(t -> elasticTaskService.remove(t.getStringId()));
     }
 
     @Override
@@ -859,7 +844,6 @@ public class TaskService implements ITaskService {
         workflowService.removeTasksFromCase(tasks, caseId);
         log.info("[{}]: Tasks of case are being deleted", caseId);
         taskRepository.deleteAll(tasks);
-        tasks.forEach(t -> elasticTaskService.remove(t.getStringId()));
     }
 
     @Override
