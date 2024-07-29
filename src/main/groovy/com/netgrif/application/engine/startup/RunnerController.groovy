@@ -23,6 +23,7 @@ class RunnerController {
             ImpersonationRunner,
             DashboardRunner,
             SuperCreator,
+            LanguageRunner,
             FlushSessionsRunner,
             MailRunner,
             DemoRunner,
