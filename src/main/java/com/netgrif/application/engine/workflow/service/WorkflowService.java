@@ -523,25 +523,25 @@ public class WorkflowService implements IWorkflowService {
         save(useCase);
     }
 
-    @Deprecated
-    public List<Field> getData(String caseId) {
-        ObjectId objectId = extractObjectId(caseId);
-        Optional<Case> optionalUseCase = repository.findByIdObjectId(objectId);
-        if (!optionalUseCase.isPresent())
-            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
-        Case useCase = optionalUseCase.get();
-        List<Field> fields = new ArrayList<>();
-        useCase.getDataSet().forEach((id, dataField) -> {
-            if (dataField.isDisplayable() || useCase.getPetriNet().isDisplayableInAnyTransition(id)) {
-                Field field = fieldFactory.buildFieldWithoutValidation(useCase, id, null);
-                field.setBehavior(dataField.applyOnlyVisibleBehavior());
-                fields.add(field);
-            }
-        });
-
-        LongStream.range(0L, fields.size()).forEach(l -> fields.get((int) l).setOrder(l));
-        return fields;
-    }
+//    @Deprecated
+//    public List<Field> getData(String caseId) {
+//        ObjectId objectId = extractObjectId(caseId);
+//        Optional<Case> optionalUseCase = repository.findByIdObjectId(objectId);
+//        if (!optionalUseCase.isPresent())
+//            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
+//        Case useCase = optionalUseCase.get();
+//        List<Field> fields = new ArrayList<>();
+//        useCase.getDataSet().forEach((id, dataField) -> {
+//            if (dataField.isDisplayable() || useCase.getPetriNet().isDisplayableInAnyTransition(id)) {
+//                Field field = fieldFactory.buildFieldWithoutValidation(useCase, id, null);
+//                field.setBehavior(dataField.applyOnlyVisibleBehavior());
+//                fields.add(field);
+//            }
+//        });
+//
+//        LongStream.range(0L, fields.size()).forEach(l -> fields.get((int) l).setOrder(l));
+//        return fields;
+//    }
 
     private void setImmediateDataFieldsReadOnly(Case useCase) {
         List<Field> immediateData = new ArrayList<>();

@@ -68,8 +68,8 @@ public interface IWorkflowService {
 
     Map<String, I18nString> listToMap(List<Case> cases);
 
-    @Deprecated
-    List<Field> getData(String caseId);
+//    @Deprecated
+//    List<Field> getData(String caseId);
 
     Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale);
 

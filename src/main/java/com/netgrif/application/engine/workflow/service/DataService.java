@@ -303,7 +303,8 @@ public class DataService implements IDataService {
         return getDataGroups(taskId, locale, new HashSet<>(), 0, null);
     }
 
-    private GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, Set<String> collectedTaskIds, int level, String parentTaskRefId) {
+    @Override
+    public GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, Set<String> collectedTaskIds, int level, String parentTaskRefId) {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
         PetriNet net = useCase.getPetriNet();
@@ -320,7 +321,7 @@ public class DataService implements IDataService {
             resultDataGroups.add(dataGroup);
             log.debug("Setting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level + " " + dataGroup.getImportId());
 
-            List<Field> resources = new LinkedList<>();
+            LinkedList<Field> resources = new LinkedList<>();
             for (String dataFieldId : dataGroup.getData()) {
                 Field field = net.getDataSet().get(dataFieldId);
                 if (dataFieldMap.containsKey(dataFieldId)) {

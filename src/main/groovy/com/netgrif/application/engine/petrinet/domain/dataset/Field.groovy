@@ -20,8 +20,11 @@ import org.springframework.data.annotation.Transient
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-abstract class Field<T> extends Imported {
+abstract class Field<T> extends Imported implements Serializable {
 
+    @Serial
+    static final long serialVersionUID = 8315043110342747937L
+    
     @Id
     protected ObjectId _id
 
