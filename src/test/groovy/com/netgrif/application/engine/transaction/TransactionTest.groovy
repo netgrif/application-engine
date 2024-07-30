@@ -207,47 +207,124 @@ class TransactionTest {
     }
 
     @Test
-    void testTransactionRaceCondition() {
-        // assert failure in one of two concurrent transactions
+    void testTransactionWriteConflict() {
+        Case useCase = createTestCaseAndSetButton("test", "testTransactionWriteConflict")
+
+        assert findAllByIdentifier("transaction_test").size() == 5
+
+        assert findCaseByTitle("onRollBackNested")
+        assert findTaskByCaseTitle("onRollBackNested")
+
+        assert !findCaseByTitle("onCommitNested")
+        assert !findTaskByCaseTitle("onCommitNested")
+
+        assert findCaseByTitle("onAlwaysNested")
+        assert findTaskByCaseTitle("onAlwaysNested")
+
+        assert findCaseByTitle("onCommit")
+        assert findTaskByCaseTitle("onCommit")
+
+        assert findCaseByTitle("onAlways")
+        assert findTaskByCaseTitle("onAlways")
+
+        useCase = workflowService.findOne(useCase.stringId)
+        assert useCase.getDataSet().get("text_without_action").getValue().getValue() == "not nested"
     }
 
     @Test
     void testNestedJoinedTransactions() {
-        // assert if all happy paths are executed
-        // consider onAlways
+        Case useCase = createTestCaseAndSetButton("test", "testNestedJoinedTransactions")
+
+        assert findAllByIdentifier("transaction_test").size() == 7
+        assert findCaseByTitle("onButton")
+        assert findCaseByTitle("onCommit")
+        assert findCaseByTitle("onAlways")
+        assert findCaseByTitle("onButtonNested")
+        assert findCaseByTitle("onCommitNested")
+        assert findCaseByTitle("onAlwaysNested")
+        assert !findCaseByTitle("onRollBack")
+        assert !findCaseByTitle("onRollBackNested")
+        assert useCase.getDataSet().get("was_transaction_rolled_back").getValue().getValue() == false
     }
 
     @Test
     void testNestedDifferentTransactions() {
-        // assert if all happy paths are executed
-        // consider onAlways
+        Case useCase = createTestCaseAndSetButton("test", "testNestedDifferentTransactions")
+
+        assert findAllByIdentifier("transaction_test").size() == 7
+        assert findCaseByTitle("onButton")
+        assert findCaseByTitle("onCommit")
+        assert findCaseByTitle("onAlways")
+        assert findCaseByTitle("onButtonNested")
+        assert findCaseByTitle("onCommitNested")
+        assert findCaseByTitle("onAlwaysNested")
+        assert !findCaseByTitle("onRollBack")
+        assert !findCaseByTitle("onRollBackNested")
+        assert useCase.getDataSet().get("was_transaction_rolled_back").getValue().getValue() == false
     }
 
     @Test
     void testNestedJoinedTransactionsWithFailureInParentTransaction() {
-        // assert if runtime exception causes all onRollBacks
-        // consider onAlways
+        Case useCase = createTestCaseAndSetButton("test", "testNestedJoinedTransactionsWithFailureInParentTransaction")
+
+        assert findAllByIdentifier("transaction_test").size() == 4
+        assert !findCaseByTitle("onButton")
+        assert !findCaseByTitle("onCommit")
+        assert findCaseByTitle("onAlways")
+        assert !findCaseByTitle("onButtonNested")
+        assert !findCaseByTitle("onCommitNested")
+        assert !findCaseByTitle("onAlwaysNested")
+        assert findCaseByTitle("onRollBack")
+        assert findCaseByTitle("onRollBackNested")
+        assert useCase.getDataSet().get("was_transaction_rolled_back").getValue().getValue() == true
     }
 
     @Test
     void testNestedJoinedTransactionsWithFailureInNestedTransaction() {
-        // assert if runtime exception causes all onRollBacks
-        // consider onAlways
+        Case useCase = createTestCaseAndSetButton("test", "testNestedJoinedTransactionsWithFailureInNestedTransaction")
+
+        assert findAllByIdentifier("transaction_test").size() == 4
+        assert !findCaseByTitle("onButton")
+        assert !findCaseByTitle("onCommit")
+        assert findCaseByTitle("onAlways")
+        assert !findCaseByTitle("onButtonNested")
+        assert !findCaseByTitle("onCommitNested")
+        assert !findCaseByTitle("onAlwaysNested")
+        assert findCaseByTitle("onRollBack")
+        assert findCaseByTitle("onRollBackNested")
+        assert useCase.getDataSet().get("was_transaction_rolled_back").getValue().getValue() == true
     }
 
     @Test
     void testNestedDifferentTransactionsWithFailureInParentTransaction() {
-        // assert if runtime exception (in parent action) causes only relevant onRollBacks
-        // consider onAlways
+        Case useCase = createTestCaseAndSetButton("test", "testNestedDifferentTransactionsWithFailureInParentTransaction")
 
-        // assert if runtime exception (in action where definition of different transition is) causes only relevant onRollBacks
-        // consider onAlways
+        assert findAllByIdentifier("transaction_test").size() == 5
+        assert !findCaseByTitle("onButton")
+        assert !findCaseByTitle("onCommit")
+        assert findCaseByTitle("onAlways")
+        assert findCaseByTitle("onButtonNested")
+        assert findCaseByTitle("onCommitNested")
+        assert !findCaseByTitle("onAlwaysNested")
+        assert findCaseByTitle("onRollBack")
+        assert !findCaseByTitle("onRollBackNested")
+        assert useCase.getDataSet().get("was_transaction_rolled_back").getValue().getValue() == true // is overridden from false to true
     }
 
     @Test
     void testNestedDifferentTransactionsWithFailureInNestedTransaction() {
-        // assert if runtime exception causes only relevant onRollBacks
-        // consider onAlways
+        Case useCase = createTestCaseAndSetButton("test", "testNestedDifferentTransactionsWithFailureInNestedTransaction")
+
+        assert findAllByIdentifier("transaction_test").size() == 6
+        assert findCaseByTitle("onButton")
+        assert findCaseByTitle("onCommit")
+        assert findCaseByTitle("onAlways")
+        assert !findCaseByTitle("onButtonNested")
+        assert !findCaseByTitle("onCommitNested")
+        assert findCaseByTitle("onAlwaysNested")
+        assert !findCaseByTitle("onRollBack")
+        assert findCaseByTitle("onRollBackNested")
+        assert useCase.getDataSet().get("was_transaction_rolled_back").getValue().getValue() == false // is overridden from true to false
     }
 
     private Case createTestCaseAndSetButton(String title, String buttonFieldId) {

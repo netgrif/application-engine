@@ -12,10 +12,6 @@
 		<id>text_without_action</id>
 		<title/>
 	</data>
-	<data type="text">
-		<id>text_2</id>
-		<title/>
-	</data>
 
 	<data type="boolean">
 		<id>was_transaction_rolled_back</id>
@@ -190,6 +186,372 @@
 							onRollBack: { createCase("transaction_test", "onRollBack") }
 					)
 					createCase("transaction_test", "onAlways")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<data type="button">
+		<id>testTransactionWriteConflict</id>
+		<title/>
+		<event type="set">
+			<id>testTransactionWriteConflict</id>
+			<actions phase="post">
+				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
+					testTransactionWriteConflictNested: f.testTransactionWriteConflictNested,
+					text_without_action: f.text_without_action;
+
+					def myTransaction = transaction(
+							event: {
+								change testTransactionWriteConflictNested value { "some text value" }
+								change text_without_action value { "not nested" } // should be conflicted
+							},
+							onCommit: { createCase("transaction_test", "onCommit") },
+							onRollBack: { createCase("transaction_test", "onRollBack") }
+					)
+					createCase("transaction_test", "onAlways")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>testTransactionWriteConflictNested</id>
+		<title/>
+		<event type="set">
+			<id>testTransactionWriteConflictNested</id>
+			<actions phase="post">
+				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
+					testTransactionWriteConflictNested: f.testTransactionWriteConflictNested,
+					text_without_action: f.text_without_action;
+
+					def myTransaction = transaction(
+							forceCreation: true,
+							event: {
+								change text_without_action value { "nested" }
+							},
+							onCommit: { createCase("transaction_test", "onCommitNested") },
+							onRollBack: { createCase("transaction_test", "onRollBackNested") }
+					)
+					createCase("transaction_test", "onAlwaysNested")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<data type="button">
+		<id>testNestedJoinedTransactions</id>
+		<title/>
+		<event type="set">
+			<id>testNestedJoinedTransactions</id>
+			<actions phase="post">
+				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
+					testNestedJoinedTransactionsNested: f.testNestedJoinedTransactionsNested,
+					text_without_action: f.text_without_action;
+
+					def myTransaction = transaction(
+							event: {
+								change testNestedJoinedTransactionsNested value { "some text value" }
+								createCase("transaction_test", "onButton")
+							},
+							onCommit: { createCase("transaction_test", "onCommit") },
+							onRollBack: { createCase("transaction_test", "onRollBack") }
+					)
+					createCase("transaction_test", "onAlways")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>testNestedJoinedTransactionsNested</id>
+		<title/>
+		<event type="set">
+			<id>testNestedJoinedTransactionsNested</id>
+			<actions phase="post">
+				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
+					text_without_action: f.text_without_action;
+
+					def myTransaction = transaction(
+							event: {
+								createCase("transaction_test", "onButtonNested")
+							},
+							onCommit: { createCase("transaction_test", "onCommitNested") },
+							onRollBack: { createCase("transaction_test", "onRollBackNested") }
+					)
+					createCase("transaction_test", "onAlwaysNested")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<data type="button">
+		<id>testNestedDifferentTransactions</id>
+		<title/>
+		<event type="set">
+			<id>testNestedDifferentTransactions</id>
+			<actions phase="post">
+				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
+					testNestedDifferentTransactionsNested: f.testNestedDifferentTransactionsNested,
+					text_without_action: f.text_without_action;
+
+					def myTransaction = transaction(
+							event: {
+								change testNestedDifferentTransactionsNested value { "some text value" }
+								createCase("transaction_test", "onButton")
+							},
+							onCommit: { createCase("transaction_test", "onCommit") },
+							onRollBack: { createCase("transaction_test", "onRollBack") }
+					)
+					createCase("transaction_test", "onAlways")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>testNestedDifferentTransactionsNested</id>
+		<title/>
+		<event type="set">
+			<id>testNestedDifferentTransactionsNested</id>
+			<actions phase="post">
+				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
+					text_without_action: f.text_without_action;
+
+					def myTransaction = transaction(
+							forceCreation: true,
+							event: {
+								createCase("transaction_test", "onButtonNested")
+							},
+							onCommit: { createCase("transaction_test", "onCommitNested") },
+							onRollBack: { createCase("transaction_test", "onRollBackNested") }
+					)
+					createCase("transaction_test", "onAlwaysNested")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<data type="button">
+		<id>testNestedJoinedTransactionsWithFailureInParentTransaction</id>
+		<title/>
+		<event type="set">
+			<id>testNestedJoinedTransactionsWithFailureInParentTransaction</id>
+			<actions phase="post">
+				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
+					testNestedJoinedTransactionsWithFailureInParentTransactionNested: f.testNestedJoinedTransactionsWithFailureInParentTransactionNested,
+					text_without_action: f.text_without_action;
+
+					def myTransaction = transaction(
+							event: {
+								change testNestedJoinedTransactionsWithFailureInParentTransactionNested value { "some text value" }
+								createCase("transaction_test", "onButton")
+								throw new RuntimeException("error") // exception must be thrown after execution of nested action
+							},
+							onCommit: { createCase("transaction_test", "onCommit") },
+							onRollBack: { createCase("transaction_test", "onRollBack") }
+					)
+					createCase("transaction_test", "onAlways")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>testNestedJoinedTransactionsWithFailureInParentTransactionNested</id>
+		<title/>
+		<event type="set">
+			<id>testNestedJoinedTransactionsWithFailureInParentTransactionNested</id>
+			<actions phase="post">
+				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
+					text_without_action: f.text_without_action;
+
+					def myTransaction = transaction(
+							event: {
+								createCase("transaction_test", "onButtonNested")
+							},
+							onCommit: { createCase("transaction_test", "onCommitNested") },
+							onRollBack: { createCase("transaction_test", "onRollBackNested") }
+					)
+					createCase("transaction_test", "onAlwaysNested")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<data type="button">
+		<id>testNestedJoinedTransactionsWithFailureInNestedTransaction</id>
+		<title/>
+		<event type="set">
+			<id>testNestedJoinedTransactionsWithFailureInNestedTransaction</id>
+			<actions phase="post">
+				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
+					testNestedJoinedTransactionsWithFailureInNestedTransactionNested: f.testNestedJoinedTransactionsWithFailureInNestedTransactionNested,
+					text_without_action: f.text_without_action;
+
+					def myTransaction = transaction(
+							event: {
+								change testNestedJoinedTransactionsWithFailureInNestedTransactionNested value { "some text value" }
+								createCase("transaction_test", "onButton")
+							},
+							onCommit: { createCase("transaction_test", "onCommit") },
+							onRollBack: { createCase("transaction_test", "onRollBack") }
+					)
+					createCase("transaction_test", "onAlways")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>testNestedJoinedTransactionsWithFailureInNestedTransactionNested</id>
+		<title/>
+		<event type="set">
+			<id>testNestedJoinedTransactionsWithFailureInNestedTransactionNested</id>
+			<actions phase="post">
+				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
+					text_without_action: f.text_without_action;
+
+					def myTransaction = transaction(
+							event: {
+								createCase("transaction_test", "onButtonNested")
+								throw new RuntimeException("error")
+							},
+							onCommit: { createCase("transaction_test", "onCommitNested") },
+							onRollBack: { createCase("transaction_test", "onRollBackNested") }
+					)
+					createCase("transaction_test", "onAlwaysNested")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<data type="button">
+		<id>testNestedDifferentTransactionsWithFailureInParentTransaction</id>
+		<title/>
+		<event type="set">
+			<id>testNestedDifferentTransactionsWithFailureInParentTransaction</id>
+			<actions phase="post">
+				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
+					testNestedDifferentTransactionsWithFailureInParentTransactionNested: f.testNestedDifferentTransactionsWithFailureInParentTransactionNested,
+					text_without_action: f.text_without_action;
+
+					def myTransaction = transaction(
+							event: {
+								change testNestedDifferentTransactionsWithFailureInParentTransactionNested value { "some text value" }
+								createCase("transaction_test", "onButton")
+								throw new RuntimeException("error")
+							},
+							onCommit: { createCase("transaction_test", "onCommit") },
+							onRollBack: { createCase("transaction_test", "onRollBack") }
+					)
+					createCase("transaction_test", "onAlways")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>testNestedDifferentTransactionsWithFailureInParentTransactionNested</id>
+		<title/>
+		<event type="set">
+			<id>testNestedDifferentTransactionsWithFailureInParentTransactionNested</id>
+			<actions phase="post">
+				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
+					text_without_action: f.text_without_action;
+
+					def myTransaction = transaction(
+							forceCreation: true,
+							event: {
+								createCase("transaction_test", "onButtonNested")
+							},
+							onCommit: { createCase("transaction_test", "onCommitNested") },
+							onRollBack: { createCase("transaction_test", "onRollBackNested") }
+					)
+					createCase("transaction_test", "onAlwaysNested")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<data type="button">
+		<id>testNestedDifferentTransactionsWithFailureInNestedTransaction</id>
+		<title/>
+		<event type="set">
+			<id>testNestedDifferentTransactionsWithFailureInNestedTransaction</id>
+			<actions phase="post">
+				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
+					testNestedDifferentTransactionsWithFailureInNestedTransactionNested: f.testNestedDifferentTransactionsWithFailureInNestedTransactionNested,
+					text_without_action: f.text_without_action;
+
+					def myTransaction = transaction(
+							event: {
+								change testNestedDifferentTransactionsWithFailureInNestedTransactionNested value { "some text value" }
+								createCase("transaction_test", "onButton")
+							},
+							onCommit: { createCase("transaction_test", "onCommit") },
+							onRollBack: { createCase("transaction_test", "onRollBack") }
+					)
+					createCase("transaction_test", "onAlways")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>testNestedDifferentTransactionsWithFailureInNestedTransactionNested</id>
+		<title/>
+		<event type="set">
+			<id>testNestedDifferentTransactionsWithFailureInNestedTransactionNested</id>
+			<actions phase="post">
+				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
+					text_without_action: f.text_without_action;
+
+					def myTransaction = transaction(
+							forceCreation: true,
+							event: {
+								createCase("transaction_test", "onButtonNested")
+								throw new RuntimeException("error")
+							},
+							onCommit: { createCase("transaction_test", "onCommitNested") },
+							onRollBack: { createCase("transaction_test", "onRollBackNested") }
+					)
+					createCase("transaction_test", "onAlwaysNested")
 
 					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
 				</action>

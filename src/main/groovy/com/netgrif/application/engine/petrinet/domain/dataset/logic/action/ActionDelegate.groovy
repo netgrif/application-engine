@@ -249,6 +249,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         try {
             transaction.begin()
         } catch (Exception e) {
+            log.warn("Transaction failed in action: $action.definition")
             log.error("Transaction failed with error: {}", e.getMessage(), e)
         }
     }
