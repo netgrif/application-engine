@@ -327,6 +327,18 @@ class TransactionTest {
         assert useCase.getDataSet().get("was_transaction_rolled_back").getValue().getValue() == false // is overridden from true to false
     }
 
+    @Test
+    void testRollBackErrorCurrying() {
+        Case useCase = createTestCaseAndSetButton("test", "testRollBackErrorCurrying")
+
+        assert findAllByIdentifier("transaction_test").size() == 3
+        assert !findCaseByTitle("onButton")
+        assert !findCaseByTitle("onCommit")
+        assert findCaseByTitle("onAlways")
+        assert findCaseByTitle("argument is initialized")
+        assert useCase.getDataSet().get("was_transaction_rolled_back").getValue().getValue() == true
+    }
+
     private Case createTestCaseAndSetButton(String title, String buttonFieldId) {
         Case useCase = importHelper.createCase(title, testNet)
         return dataService.setData(useCase, new DataSet([(buttonFieldId): new ButtonField(rawValue: 1)]

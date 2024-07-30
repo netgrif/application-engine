@@ -34,6 +34,7 @@ public class NaeTransaction {
     private Closure<?> onRollBack;
 
     private Exception onCallBackException;
+    private Exception onEventException;
     private Propagation propagation;
     private Date deadline;
     private boolean wasRolledBack;
@@ -53,9 +54,14 @@ public class NaeTransaction {
 
         transactionTemplate.execute(new TransactionCallbackWithoutResult() {
             protected void doInTransactionWithoutResult(TransactionStatus status) {
-                registerTransactionCallBacks();
-                event.call();
-                throwIfDeadlineReached(); // Transaction API does not check the timeout declared in transaction template
+                try {
+                    registerTransactionCallBacks();
+                    event.call();
+                    throwIfDeadlineReached(); // Transaction API does not check the timeout declared in transaction template
+                } catch (Exception rethrow) {
+                    onEventException = rethrow;
+                    throw rethrow;
+                }
             }
         });
     }
@@ -71,6 +77,9 @@ public class NaeTransaction {
                     runTransactionCallBack(onCommit);
                 } else if (canCallOnRollBack(status)) {
                     wasRolledBack = true;
+                    if (onEventException != null) {
+                        onRollBack = onRollBack.curry(onEventException);
+                    }
                     runTransactionCallBack(onRollBack);
                 }
             }

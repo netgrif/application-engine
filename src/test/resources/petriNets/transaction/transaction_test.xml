@@ -559,6 +559,36 @@
 		</event>
 	</data>
 
+	<data type="button">
+		<id>testRollBackErrorCurrying</id>
+		<title/>
+		<event type="set">
+			<id>testRollBackErrorCurrying</id>
+			<actions phase="post">
+				<action>
+					was_transaction_rolled_back: f.was_transaction_rolled_back,
+					text_without_action: f.text_without_action;
+
+					def myTransaction = transaction(
+							event: {
+								createCase("transaction_test", "onButton")
+								throw new IllegalArgumentException("argument is initialized")
+							},
+							onCommit: { createCase("transaction_test", "onCommit") },
+							onRollBack: { e ->
+								if (e != null &amp;&amp; e instanceof IllegalArgumentException) {
+									createCase("transaction_test", e.getMessage())
+								}
+							}
+					)
+					createCase("transaction_test", "onAlways")
+
+					change was_transaction_rolled_back value { myTransaction.wasRolledBack }
+				</action>
+			</actions>
+		</event>
+	</data>
+
 	<transition>
 		<id>t1</id>
 		<x>496</x>
