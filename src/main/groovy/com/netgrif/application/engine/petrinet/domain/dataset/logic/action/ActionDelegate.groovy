@@ -215,7 +215,52 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     /**
-     * todo
+     * Method runs provided code in database transaction. If the provided code fails, the rollback callback is called
+     * and no exception is thrown. If the callback fails the subject exception is thrown.
+     * <br>
+     * Simple example:
+     * <pre>
+     *     trans: t.t1,
+     *     text: f.textId;
+     *
+     *     transactional {
+     *         change text value { "some text value" }
+     *         make text, visible on trans when { true }
+     *     }
+     *     createCase("my_process", "My case")
+     * </pre>
+     * Complex example:
+     * <pre>
+     *     trans: t.t1,
+     *     result: f.resultId,
+     *     text: f.textId;
+     *
+     *     def myTransaction = transactional (
+     *          timeout: 1000,
+     *          forceCreation: true,
+     *          event: {
+     *              createCase("my_process", "My case")
+     *              change text value { "some text value" }
+     *          },
+     *          onCommit: {
+     *              make text, editable on trans when { true }
+     *          },
+     *          onRollBack: { error ->
+     *              handleError(error)
+     *          }
+     *     )
+     *     change result value { myTransaction.wasRolledBack }
+     * </pre>
+     *
+     * @param timeout timeout in milliseconds. If the time is reached, transaction fails. The default value is
+     * {@link TransactionDefinition#TIMEOUT_DEFAULT}
+     * @param forceCreation if set to true, new transaction is created under any situation. If set to false new
+     * transaction is created only if none transaction is active
+     * @param event code to be run in transaction
+     * @param onCommit callback, that is called after the successful commit
+     * @param onRollBack callback, that is called after event failure
+     *
+     * @returns {@link NaeTransaction} with state after the commit and callback execution
      * */
     @NamedVariant
     NaeTransaction transaction(int timeout = TransactionDefinition.TIMEOUT_DEFAULT, boolean forceCreation = false, Closure event,
@@ -236,13 +281,16 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     /**
-     * todo
+     * Logs and throws an exception if the transaction failed on callback execution.
+     *
+     * @param transaction object after the commit / rollback
      * */
     protected void throwIfCallBackFailed(NaeTransaction transaction) {
-        if (transaction.onCallBackException != null) {
-            log.error("Transaction synchronization call back execution failed with message: {} ", transaction.onCallBackException.getMessage())
-            throw transaction.onCallBackException
+        if (transaction.onCallBackException == null){
+            return
         }
+        log.error("Transaction synchronization call back execution failed with message: {} ", transaction.onCallBackException.getMessage())
+        throw transaction.onCallBackException
     }
 
     protected void executeTransaction(NaeTransaction transaction) {

@@ -20,22 +20,11 @@ public class TaskEventHandler {
     private final IElasticTaskService service;
     private final IElasticTaskMappingService taskMappingService;
 
-    /**
-     * todo
-     * todo does not need to be async
-     * todo condition because generic
-     * */
-    // todo collectionName from properties
     @TransactionalEventListener(fallbackExecution = true, condition = "#event.collectionName == 'task'")
     public void onAfterSave(AfterSaveEvent<Task> event) {
         service.index(this.taskMappingService.transform(event.getSource()));
     }
 
-    /**
-     * todo
-     * todo condition because generic
-     * */
-    // todo collectionName from properties
     @TransactionalEventListener(fallbackExecution = true, condition = "#event.collectionName == 'task'")
     public void onAfterDelete(AfterDeleteEvent<Task> event) {
         Document document = event.getDocument();

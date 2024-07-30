@@ -589,6 +589,37 @@
 		</event>
 	</data>
 
+	<data type="button">
+		<id>testCreateCaseInTransactionPerformance</id>
+		<title/>
+		<event type="set">
+			<id>testCreateCaseInTransactionPerformance</id>
+			<actions phase="post">
+				<action>
+					transaction {
+						createCase("transaction_test", "transactional create case")
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>testCreateCasePerformance</id>
+		<title/>
+		<event type="set">
+			<id>testCreateCasePerformance</id>
+			<actions phase="post">
+				<action>
+					createCase("transaction_test", "non transactional create case")
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="number">
+		<id>iterations</id>
+		<title/>
+	</data>
+
 	<transition>
 		<id>t1</id>
 		<x>496</x>

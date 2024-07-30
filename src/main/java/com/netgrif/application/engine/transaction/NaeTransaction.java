@@ -10,27 +10,40 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.TransactionTimedOutException;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.support.*;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate;
 
 import java.util.Date;
 
 import static org.springframework.transaction.support.TransactionSynchronization.STATUS_COMMITTED;
 import static org.springframework.transaction.support.TransactionSynchronization.STATUS_ROLLED_BACK;
 
-/**
- * todo
- * */
+
 @Data
 @Slf4j
 @Builder
 public class NaeTransaction {
 
     /**
-     * todo
+     * Timeout for the transaction in milliseconds. When the timeout is reached, transaction fails on commit.
      * */
     private int timeout;
+    /**
+     * If set to true, new transaction is created in any situation (uses {@link Propagation#REQUIRES_NEW}). If set to
+     * false, transaction is created only if none exists (uses {@link Propagation#REQUIRED}).
+     * */
     private boolean forceCreation;
+    /**
+     * Transaction code to be executed under transaction.
+     * */
     private Closure<?> event;
+    /**
+     * Callback, that is called when {@link NaeTransaction#event} is successful.
+     * */
     private Closure<?> onCommit;
+    /**
+     * Callback, that is called when {@link NaeTransaction#event} fails. The closure can contain input attribute. If so,
+     * the input attribute is initialized by the subject exception ({@link NaeTransaction#onEventException})
+     * */
     private Closure<?> onRollBack;
 
     private Exception onCallBackException;
@@ -40,12 +53,15 @@ public class NaeTransaction {
     private boolean wasRolledBack;
 
     /**
-     * todo
+     * Singleton bean of Mongo transaction manager provided from {@link ActionDelegate#getTransactionManager}
      * */
     private final MongoTransactionManager transactionManager;
 
     /**
-     * todo
+     * Does additional setups for transaction by {@link TransactionTemplate} and executes provided {@link NaeTransaction#event}.
+     * <br>
+     * If the execution is successful callback {@link NaeTransaction#onCommit} is called. Otherwise {@link NaeTransaction#onRollBack}
+     * is called. If any of the callback fails, exception isn't thrown, but saved in {@link NaeTransaction#onCallBackException}
      * */
     public void begin() {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
@@ -67,8 +83,9 @@ public class NaeTransaction {
     }
 
     /**
-     * todo
-     * does not log the error in the callback
+     * Registers callbacks for the active transaction. Must be called under active transaction. Callbacks are registered
+     * by {@link TransactionSynchronizationManager#registerSynchronization(TransactionSynchronization)}. If any of the
+     * callbacks fails the exception is not thrown. It's saved in {@link NaeTransaction#onCallBackException}.
      * */
     private void registerTransactionCallBacks() {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization(){
@@ -91,11 +108,14 @@ public class NaeTransaction {
     }
 
     private boolean canCallOnRollBack(int status) {
-        return status == STATUS_ROLLED_BACK && onCommit != null;
+        return status == STATUS_ROLLED_BACK && onRollBack != null;
     }
 
     /**
-     * todo
+     * Runs the provided callback. If the callback fails, the exception is saved in {@link NaeTransaction#onCallBackException}
+     * and thrown.
+     *
+     * @param callBack callback to be executed
      * */
     private void runTransactionCallBack(Closure<?> callBack) {
         try {
@@ -108,7 +128,9 @@ public class NaeTransaction {
     }
 
     /**
-     * todo
+     * Initializes the {@link NaeTransaction#deadline} field by the provided timeout in milliseconds.
+     *
+     * @param millis timeout in milliseconds. Can be {@link TransactionDefinition#TIMEOUT_DEFAULT} or positive number
      * */
     private void setTimeoutInMillis(long millis) throws IllegalArgumentException {
         if (timeout == TransactionDefinition.TIMEOUT_DEFAULT) {
@@ -122,7 +144,7 @@ public class NaeTransaction {
     }
 
     /**
-     * todo
+     * Throws the {@link TransactionTimedOutException} if the {@link NaeTransaction#deadline} is reached
      */
     private void throwIfDeadlineReached() throws TransactionTimedOutException {
         if (this.deadline == null) {
@@ -135,7 +157,8 @@ public class NaeTransaction {
     }
 
     /**
-     * todo
+     * Builder extension of the {@link Builder} implementation for {@link }. Containing additional logic over the native builder
+     * implementation
      * */
     public static class NaeTransactionBuilder {
         public NaeTransactionBuilder forceCreation(boolean forceCreation) {

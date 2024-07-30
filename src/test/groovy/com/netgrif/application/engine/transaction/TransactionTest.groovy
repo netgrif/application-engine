@@ -22,7 +22,10 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -337,6 +340,36 @@ class TransactionTest {
         assert findCaseByTitle("onAlways")
         assert findCaseByTitle("argument is initialized")
         assert useCase.getDataSet().get("was_transaction_rolled_back").getValue().getValue() == true
+    }
+
+    @Test
+    @Disabled
+    void testPerformance() {
+        int iterations = 1000
+        Case useCase = importHelper.createCase("performance test case", testNet)
+
+        long totalTransactionalDuration = 0
+        (0..iterations).each {
+            Date startTime = new Date()
+            dataService.setData(useCase, new DataSet(["testCreateCaseInTransactionPerformance": new ButtonField(rawValue: 1)]
+                    as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+            Date endTime = new Date()
+            TimeDuration elapsedTimeTransactional = TimeCategory.minus( endTime, startTime )
+            totalTransactionalDuration += elapsedTimeTransactional.toMilliseconds()
+        }
+
+        long totalNonTransactionalDuration = 0
+        (0..iterations).each {
+            Date startTime = new Date()
+            dataService.setData(useCase, new DataSet(["testCreateCasePerformance": new ButtonField(rawValue: 1)]
+                    as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+            Date endTime = new Date()
+            TimeDuration elapsedTimeTransactional = TimeCategory.minus( endTime, startTime )
+            totalNonTransactionalDuration += elapsedTimeTransactional.toMilliseconds()
+        }
+
+        println("AVG transactional for 1 create case: " + totalTransactionalDuration / iterations + "ms")
+        println("AVG non-transactional for 1 create case: " + totalNonTransactionalDuration / iterations + "ms")
     }
 
     private Case createTestCaseAndSetButton(String title, String buttonFieldId) {

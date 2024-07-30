@@ -3,13 +3,10 @@ package com.netgrif.application.engine.petrinet.service;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.mongodb.core.mapping.event.AfterDeleteEvent;
 import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 import org.springframework.stereotype.Component;
@@ -23,12 +20,6 @@ public class PetriNetEventHandler {
     private final IElasticPetriNetService service;
     private final IElasticPetriNetMappingService petriNetMappingService;
 
-    /**
-     * todo
-     * todo does not need to be async
-     * todo condition because generic
-     * */
-    // todo collectionName from properties
     @TransactionalEventListener(fallbackExecution = true, condition = "#event.collectionName == 'petriNet'")
     public void onAfterSave(AfterSaveEvent<PetriNet> event) {
         PetriNet net = event.getSource();
@@ -39,12 +30,6 @@ public class PetriNetEventHandler {
         }
     }
 
-    /**
-     * todo
-     * todo does not need to be async
-     * todo condition because generic
-     * */
-    // todo collectionName from properties
     @TransactionalEventListener(fallbackExecution = true, condition = "#event.collectionName == 'petriNet'")
     public void onAfterDelete(AfterDeleteEvent<PetriNet> event) {
         Document document = event.getDocument();

@@ -20,12 +20,6 @@ public class CaseEventHandler {
     private final IElasticCaseService service;
     private final IElasticCaseMappingService caseMappingService;
 
-    /**
-     * todo
-     * todo does not need to be async
-     * todo condition because generic
-     * */
-    // todo collectionName from properties
     @TransactionalEventListener(fallbackExecution = true, condition = "#event.collectionName == 'case'")
     public void onAfterSave(AfterSaveEvent<Case> event) {
         Case useCase = event.getSource();
@@ -37,10 +31,6 @@ public class CaseEventHandler {
         }
     }
 
-    /**
-     * todo
-     * */
-    // todo collectionName from properties
     @TransactionalEventListener(fallbackExecution = true, condition = "#event.collectionName == 'case'")
     public void onAfterDelete(AfterDeleteEvent<Case> event) {
         Document document = event.getDocument();
