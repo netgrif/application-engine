@@ -3,8 +3,15 @@ version: "3.3"
 services:
   docker-mongo:
     image: mongo:4.4
+    command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
+    hostname: 127.0.0.1
     ports:
       - "27017:27017"
+    healthcheck:
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'host.docker.internal:27017'}]}) }" | mongosh --port 27017 --quiet
+      interval: 5s
+      timeout: 30s
+      retries: 10
     deploy:
       resources:
         limits:
