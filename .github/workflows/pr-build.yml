@@ -38,7 +38,7 @@ jobs:
         image: mongo:4.4
         ports:
           - 27017:27017
-        options: --replSet rs0 --bind_ip_all
+        command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
 
       redis:
         image: redis
@@ -84,9 +84,23 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
+      - name: Wait for MongoDB to be ready
+        run: |
+          for i in {1..30}; do
+            if mongo --eval "print(\"waited for connection\")" &>/dev/null; then
+              echo "MongoDB is up"
+              break
+            fi
+            echo "Waiting for MongoDB..."
+            sleep 2
+          done
+
+      - name: Initialize MongoDB Replica Set
+        run: |
+          echo 'rs.initiate({_id: "rs0", members: [{_id: 0, host: "localhost:27017"}]})' | mongo
+
       - name: Generate certificates
         run: cd src/main/resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl rsa -in keypair.pem -pubout -out public.crt && openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der && cd ../../../..
-
 
       - name: Build
         run: mvn clean package install -DskipTests=true
