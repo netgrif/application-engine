@@ -49,10 +49,12 @@ jobs:
 
     steps:
       - name: Start MongoDB
-        uses: MongoCamp/mongodb-github-action@1.0.0
+        uses: MongoCamp/mongodb-github-action@1.2.0
         with:
           mongodb-version: 4.4
           mongodb-replica-set: rs0
+
+      - run: curl http://localhost:27017
 
       - name: Test Database
         env:
