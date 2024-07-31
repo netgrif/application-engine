@@ -15,7 +15,7 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     private final MongoProperties properties;
 
     @Bean
-    MongoTransactionManager transactionManager(MongoDatabaseFactory dbFactory) {
+    public MongoTransactionManager transactionManager(MongoDatabaseFactory dbFactory) {
         return new MongoTransactionManager(dbFactory);
     }
 

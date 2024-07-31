@@ -26,7 +26,8 @@ abstract class ActionRunner {
     @Autowired
     private IFieldActionsCacheService actionsCacheService
 
-    @Autowired MongoTransactionManager transactionManager
+    @Autowired
+    private MongoTransactionManager transactionManager
 
     private Map<String, Object> actionsCache = new HashMap<>()
 
