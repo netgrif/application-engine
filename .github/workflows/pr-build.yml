@@ -38,7 +38,10 @@ jobs:
         image: mongo:4.4
         ports:
           - 27017:27017
-        command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+        options: >-
+          --entrypoint "/usr/bin/mongod" 
+          --replSet rs0 
+          --bind_ip_all
 
       redis:
         image: redis
