@@ -54,6 +54,30 @@ jobs:
           mongodb-version: 4.4
           mongodb-replica-set: rs0
 
+      - name: Wait for Elasticsearch to be ready
+        run: |
+          echo "Waiting for Elasticsearch to be ready..."
+          for i in {1..30}; do
+            if curl -fsSL http://localhost:9200/_cluster/health | grep '"status":"green"' &>/dev/null; then
+              echo "Elasticsearch is up"
+              break
+            fi
+            echo "Waiting for Elasticsearch..."
+            sleep 2
+          done
+
+      - name: Wait for MongoDB to be ready
+        run: |
+          echo "Waiting for MongoDB to be ready..."
+          for i in {1..30}; do
+            if mongo --eval "print(\"MongoDB is up\")" &>/dev/null; then
+              echo "MongoDB is up"
+              break
+            fi
+            echo "Waiting for MongoDB..."
+            sleep 2
+          done
+
       - name: Test Database
         env:
           ELASTIC_SEARCH_URL: http://localhost:${{ job.services.elasticsearch.ports[9200] }}
