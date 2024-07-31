@@ -505,6 +505,14 @@
             <artifactId>jackson-module-jsonSchema</artifactId>
             <version>2.13.2</version>
         </dependency>
+
+        <!--    ANTLR (query language)    -->
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>4.13.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -778,6 +786,22 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <version>2.0.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>4.7.1</version>
+                <configuration>
+                    <sourceDirectory>src/main/resources/antlr4</sourceDirectory>
+                    <outputDirectory>${project.build.directory}/generated-sources/java/com/netgrif/application/engine/antlr4</outputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
