@@ -38,6 +38,12 @@ jobs:
         image: mongo:4.4
         ports:
           - 27017:27017
+        options: --replSet rs0 --bind_ip_all
+        healthcheck:
+          test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]}) }" | mongo --quiet
+          interval: 5s
+          timeout: 30s
+          retries: 10
 
       redis:
         image: redis
