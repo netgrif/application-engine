@@ -34,8 +34,8 @@ public class CaseEventHandler {
     @TransactionalEventListener(fallbackExecution = true, condition = "#event.collectionName == 'case'")
     public void onAfterDelete(AfterDeleteEvent<Case> event) {
         Document document = event.getDocument();
-        if (document == null) {
-            log.warn("Trying to delete null document!");
+        if (document == null || document.isEmpty()) {
+            log.warn("Trying to delete null or empty document!");
             return;
         }
 

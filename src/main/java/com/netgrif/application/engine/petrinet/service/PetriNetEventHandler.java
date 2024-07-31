@@ -33,8 +33,8 @@ public class PetriNetEventHandler {
     @TransactionalEventListener(fallbackExecution = true, condition = "#event.collectionName == 'petriNet'")
     public void onAfterDelete(AfterDeleteEvent<PetriNet> event) {
         Document document = event.getDocument();
-        if (document == null) {
-            log.warn("Trying to delete null document!");
+        if (document == null || document.isEmpty()) {
+            log.warn("Trying to delete null or empty document!");
             return;
         }
 
