@@ -3,7 +3,7 @@ package com.netgrif.application.engine.importer
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.AllDataConfiguration
 import com.netgrif.application.engine.importer.service.RoleFactory
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission
@@ -459,7 +459,7 @@ class PredefinedRolesPermissionsTest {
 
         assert importOutcome.getNet() != null
 
-        PetriNet net = importOutcome.getNet()
+        Process net = importOutcome.getNet()
 
         CreateCaseEventOutcome createCaseOutcome = workflowService.createCase(net.stringId, '', '', superCreator.loggedSuper)
         assert createCaseOutcome.getCase() != null
@@ -489,11 +489,11 @@ class PredefinedRolesPermissionsTest {
     }
 
     private class NetCaseTask {
-        PetriNet net
+        Process net
         Case aCase
         Task task
 
-        NetCaseTask(PetriNet net, Case aCase, Task task) {
+        NetCaseTask(Process net, Case aCase, Task task) {
             this.net = net
             this.aCase = aCase
             this.task = task

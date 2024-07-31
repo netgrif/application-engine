@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.service.interfaces;
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 
 import java.util.List;
@@ -34,5 +34,5 @@ public interface IProcessRoleService {
 
     ProcessRole anonymousRole();
 
-    void deleteRolesOfNet(PetriNet net, LoggedUser loggedUser);
+    void deleteRolesOfNet(Process net, LoggedUser loggedUser);
 }

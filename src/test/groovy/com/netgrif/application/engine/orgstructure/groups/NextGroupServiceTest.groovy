@@ -6,7 +6,7 @@ import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.startup.GroupRunner
 import com.netgrif.application.engine.startup.ImportHelper
@@ -53,7 +53,7 @@ class NextGroupServiceTest {
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
 
-        Optional<PetriNet> groupNet = importGroup()
+        Optional<Process> groupNet = importGroup()
         assert groupNet.isPresent()
 
 
@@ -75,7 +75,7 @@ class NextGroupServiceTest {
         assert !removedUserGroup.getDataSet().get("members").getOptions().isEmpty()
     }
 
-    Optional<PetriNet> importGroup() {
+    Optional<Process> importGroup() {
         return groupRunner.createDefaultGroup()
     }
 

@@ -4,7 +4,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticPetriNet;
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +71,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
     }
 
     @Override
-    public String findUriNodeId(PetriNet net) {
+    public String findUriNodeId(Process net) {
         if (net == null) {
             return null;
         }
@@ -85,7 +85,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
     }
 
     @Override
-    public List<PetriNet> findAllByUriNodeId(String uriNodeId) {
+    public List<Process> findAllByUriNodeId(String uriNodeId) {
         List<ElasticPetriNet> elasticPetriNets = repository.findAllByUriNodeId(uriNodeId);
         return petriNetService.findAllById(elasticPetriNets.stream().map(ElasticPetriNet::getStringId).collect(Collectors.toList()));
     }

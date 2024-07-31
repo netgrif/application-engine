@@ -5,7 +5,7 @@ import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap;
 import com.netgrif.application.engine.event.IGroovyShellFactory;
 import com.netgrif.application.engine.petrinet.domain.Function;
 import com.netgrif.application.engine.petrinet.domain.FunctionScope;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.domain.CachedFunction;
@@ -51,7 +51,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     }
 
     @Override
-    public void cachePetriNetFunctions(PetriNet petriNet) {
+    public void cachePetriNetFunctions(Process petriNet) {
         if (petriNet == null) {
             return;
         }
@@ -69,7 +69,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     }
 
     @Override
-    public void reloadCachedFunctions(PetriNet petriNet) {
+    public void reloadCachedFunctions(Process petriNet) {
         namespaceFunctionsCache.remove(petriNet.getIdentifier());
         cachePetriNetFunctions(petriNetService.getNewestVersionByIdentifier(petriNet.getIdentifier()));
     }

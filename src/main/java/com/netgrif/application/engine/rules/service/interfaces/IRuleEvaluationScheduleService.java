@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.rules.service.interfaces;
 
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.rules.domain.scheduled.ScheduleOutcome;
 import com.netgrif.application.engine.rules.service.throwable.RuleEvaluationScheduleException;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -16,7 +16,7 @@ public interface IRuleEvaluationScheduleService {
 
     Map<String, ScheduleOutcome> scheduleRuleEvaluationForCase(Case useCase, List<String> ruleIdentifiers, TriggerBuilder<? extends Trigger> trigger) throws RuleEvaluationScheduleException;
 
-    ScheduleOutcome scheduleRuleEvaluationForNet(PetriNet petriNet, String ruleIdentifier, TriggerBuilder<? extends Trigger> trigger) throws RuleEvaluationScheduleException;
+    ScheduleOutcome scheduleRuleEvaluationForNet(Process petriNet, String ruleIdentifier, TriggerBuilder<? extends Trigger> trigger) throws RuleEvaluationScheduleException;
 
-    Map<String, ScheduleOutcome> scheduleRuleEvaluationForNet(PetriNet petriNet, List<String> ruleIdentifiers, TriggerBuilder<? extends Trigger> trigger) throws RuleEvaluationScheduleException;
+    Map<String, ScheduleOutcome> scheduleRuleEvaluationForNet(Process petriNet, List<String> ruleIdentifiers, TriggerBuilder<? extends Trigger> trigger) throws RuleEvaluationScheduleException;
 }

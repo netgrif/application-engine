@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow
 
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -42,8 +42,8 @@ class TaskRefPropagationTest {
     @Autowired
     private ITaskService taskService
 
-    PetriNet netParent
-    PetriNet netChild
+    Process netParent
+    Process netChild
 
     @BeforeEach
     void beforeAll() {

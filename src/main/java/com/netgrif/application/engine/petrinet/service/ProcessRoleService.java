@@ -6,7 +6,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.event.events.user.UserRoleChangeEvent;
 import com.netgrif.application.engine.importer.model.EventPhaseType;
 import com.netgrif.application.engine.importer.model.EventType;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.Event;
@@ -96,7 +96,7 @@ public class ProcessRoleService implements IProcessRoleService {
             return;
         }
 
-        PetriNet petriNet = petriNetService.getPetriNet(idOfPetriNetContainingRole);
+        Process petriNet = petriNetService.getPetriNet(idOfPetriNetContainingRole);
 
         Set<String> rolesNewToUserIds = mapUserRolesToIds(rolesNewToUser);
         Set<String> rolesRemovedFromUserIds = mapUserRolesToIds(rolesRemovedFromUser);
@@ -168,17 +168,17 @@ public class ProcessRoleService implements IProcessRoleService {
                 .collect(Collectors.toSet());
     }
 
-    private void runAllPreActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles, IUser user, PetriNet petriNet, Map<String, String> params) {
+    private void runAllPreActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles, IUser user, Process petriNet, Map<String, String> params) {
         runAllSuitableActionsOnRoles(newRoles, EventType.ASSIGN, EventPhaseType.PRE, user, petriNet, params);
         runAllSuitableActionsOnRoles(removedRoles, EventType.CANCEL, EventPhaseType.PRE, user, petriNet, params);
     }
 
-    private void runAllPostActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles, IUser user, PetriNet petriNet, Map<String, String> params) {
+    private void runAllPostActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles, IUser user, Process petriNet, Map<String, String> params) {
         runAllSuitableActionsOnRoles(newRoles, EventType.ASSIGN, EventPhaseType.POST, user, petriNet, params);
         runAllSuitableActionsOnRoles(removedRoles, EventType.CANCEL, EventPhaseType.POST, user, petriNet, params);
     }
 
-    private void runAllSuitableActionsOnRoles(Set<ProcessRole> roles, EventType requiredEventType, EventPhaseType requiredPhase, IUser user, PetriNet petriNet, Map<String, String> params) {
+    private void runAllSuitableActionsOnRoles(Set<ProcessRole> roles, EventType requiredEventType, EventPhaseType requiredPhase, IUser user, Process petriNet, Map<String, String> params) {
         roles.forEach(role -> {
             runAllSuitableActionsOnOneRole(role.getEvents(), requiredEventType, requiredPhase, params);
         });
@@ -227,14 +227,14 @@ public class ProcessRoleService implements IProcessRoleService {
 
     @Override
     public List<ProcessRole> findAll(String netId) {
-        Optional<PetriNet> netOptional = netRepository.findById(netId);
+        Optional<Process> netOptional = netRepository.findById(netId);
         if (netOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find model with id [" + netId + "]");
         }
         return findAll(netOptional.get());
     }
 
-    private List<ProcessRole> findAll(PetriNet net) {
+    private List<ProcessRole> findAll(Process net) {
         return new LinkedList<>(net.getRoles().values());
     }
 
@@ -296,7 +296,7 @@ public class ProcessRoleService implements IProcessRoleService {
     }
 
     @Override
-    public void deleteRolesOfNet(PetriNet net, LoggedUser loggedUser) {
+    public void deleteRolesOfNet(Process net, LoggedUser loggedUser) {
         log.info("[{}]: Initiating deletion of all roles of Petri net {} version {}", net.getStringId(), net.getIdentifier(), net.getVersion().toString());
         List<ObjectId> deletedRoleIds = this.findAll(net).stream().map(ProcessRole::getId).collect(Collectors.toList());
         Set<String> deletedRoleStringIds = deletedRoleIds.stream().map(ObjectId::toString).collect(Collectors.toSet());

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class Arc extends PetriNetObject {
+public class Arc extends ProcessObject {
 
     @Transient
     protected Node source;

@@ -2,14 +2,11 @@ package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.TaskField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.QTask
-import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
@@ -41,8 +38,8 @@ class TaskRefInitTest {
     @Autowired
     private TestHelper testHelper
 
-    PetriNet net = null
-    PetriNet autoTrigger = null
+    Process net = null
+    Process autoTrigger = null
 
     @BeforeEach
     void initNet() {

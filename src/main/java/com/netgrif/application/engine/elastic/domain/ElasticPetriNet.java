@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -50,7 +50,7 @@ public class ElasticPetriNet {
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     private LocalDateTime creationDate;
 
-    public ElasticPetriNet(PetriNet net) {
+    public ElasticPetriNet(Process net) {
         this.identifier = net.getIdentifier();
         this.version = net.getVersion();
         this.uriNodeId = net.getUriNodeId();

@@ -3,11 +3,16 @@ package com.netgrif.application.engine.petrinet.domain;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Map;
+
 @Data
 @Document
 public class Place extends Node {
 
     private Integer tokens;
+    // TODO: release/8.0.0 unique key map
+    // TODO: release/8.0.0 move to node?
+    private Map<String, String> properties;
 
     public Place() {
         super();
@@ -42,7 +47,6 @@ public class Place extends Node {
         clone.setTokens(this.tokens);
         clone.setTitle(this.getTitle());
         clone.setPosition(this.getPosition());
-        clone.setObjectId(this.getObjectId());
         clone.setImportId(this.getImportId());
         return clone;
     }

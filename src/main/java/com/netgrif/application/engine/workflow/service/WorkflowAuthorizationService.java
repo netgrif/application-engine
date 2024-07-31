@@ -2,7 +2,7 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -33,12 +33,12 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
 
     @Override
     public boolean canCallCreate(LoggedUser user, String netId) {
-        PetriNet net = petriNetService.getPetriNet(netId);
+        Process net = petriNetService.getPetriNet(netId);
         return user.getSelfOrImpersonated().isAdmin() || userHasAtLeastOneRolePermission(user.transformToUser(), net, ProcessRolePermission.CREATE);
     }
 
     @Override
-    public Boolean userHasAtLeastOneRolePermission(IUser user, PetriNet net, ProcessRolePermission... permissions) {
+    public Boolean userHasAtLeastOneRolePermission(IUser user, Process net, ProcessRolePermission... permissions) {
         Map<ProcessRolePermission, Boolean> aggregatePermissions = getAggregateProcessRolePermissions(user, net.getPermissions());
 
         for (ProcessRolePermission permission : permissions) {

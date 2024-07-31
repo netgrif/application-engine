@@ -4,7 +4,7 @@ import com.netgrif.application.engine.auth.domain.Author;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
@@ -82,7 +82,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
         String netImportId = processField.getValue().getValue().split(":")[0];
         String versionString = processField.getValue().getValue().split(":")[1].replace("-", ".");
         Version version = converter.convert(versionString);
-        PetriNet net = petriNetService.getPetriNet(netImportId, version);
+        Process net = petriNetService.getPetriNet(netImportId, version);
         return net.getRoles().values().stream()
                 .filter(role -> (!permittedRoles.getOptions().containsKey(role.getImportId() + ":" + netImportId)
                         && !bannedRoles.getOptions().containsKey(role.getImportId() + ":" + netImportId)))

@@ -104,7 +104,7 @@ class PetriNetServiceTest {
         ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert testNetOptional.getNet() != null
         assert petriNetRepository.count() == processCount + 1
-        PetriNet testNet = testNetOptional.getNet()
+        Process testNet = testNetOptional.getNet()
         Thread.sleep(5000)
         ElasticPetriNet elasticTestNet = elasticPetriNetRepository.findByStringId(testNet.stringId)
         assert elasticTestNet != null && elasticTestNet.getUriNodeId() == uriService.getRoot().id.toString()
@@ -155,7 +155,7 @@ class PetriNetServiceTest {
 
         Thread.sleep(2000)
 
-        List<PetriNet> petriNets = petriNetService.findAllByUriNodeId(myNode.id.toString())
+        List<Process> petriNets = petriNetService.findAllByUriNodeId(myNode.id.toString())
         assert petriNets.size() == 2
     }
 

@@ -3,9 +3,8 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -71,7 +70,7 @@ class ChangeBehaviorTest {
     String TEST_TRANSITION_3 = "t2"
     String RESOURCE_PATH = "src/test/resources/change_behavior_update.xml"
 
-    PetriNet net = null
+    Process net = null
 
     @BeforeEach
     void initNet() {

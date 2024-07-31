@@ -62,7 +62,7 @@ class EncryptionTest {
     }
 
     private void assertCorrectEncrypting(Case useCase) {
-        def nameField = useCase.petriNet.dataSet.values().find { v -> v.name == FIELD_NAME }
+        def nameField = useCase.petriNet.dataSet.values().find { v -> v.title == FIELD_NAME }
 //        TODO: release/8.0.0
 //        DataField field = useCase.dataSet.get(nameField.stringId)
 //        assert field.value == FIELD_VALUE
@@ -85,7 +85,7 @@ class EncryptionTest {
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
         def useCase = workflowService.createCase(net.getNet().stringId, "Encryption test", "color", mockLoggedUser()).getCase()
-        def nameField = useCase.petriNet.dataSet.values().find { v -> v.name.defaultValue == FIELD_NAME }
+        def nameField = useCase.petriNet.dataSet.values().find { v -> v.title.defaultValue == FIELD_NAME }
 //        TODO: release/8.0.0
 //        useCase.dataSet.put(nameField.stringId, new DataField(FIELD_VALUE))
         return workflowService.save(useCase).stringId

@@ -73,7 +73,7 @@ class ChoiceFieldTest {
                 "bool": new BooleanField(rawValue: true)
         ] as Map<String, Field<?>>))
         List<DataRef> fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
-        choices = ((EnumerationField) fields.find { it.field.name.defaultValue == "Enum" }.field).choices
+        choices = ((EnumerationField) fields.find { it.field.title.defaultValue == "Enum" }.field).choices
 
         assert choices.size() == 3
         assert choices.find { it.defaultValue == "Choice 1" }
@@ -85,7 +85,7 @@ class ChoiceFieldTest {
         ] as Map<String, Field<?>>))
 
         fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
-        choices = ((EnumerationField) fields.find { it.field.name.defaultValue == "Enum" }.field).choices
+        choices = ((EnumerationField) fields.find { it.field.title.defaultValue == "Enum" }.field).choices
 
         assert choices.size() == 3
         assert choices.find { it.defaultValue == "Choice A" }
@@ -97,7 +97,7 @@ class ChoiceFieldTest {
         ] as Map<String, Field<?>>))
 
         fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
-        choices = ((EnumerationField) fields.find { it.field.name.defaultValue == "Enum" }.field).choices
+        choices = ((EnumerationField) fields.find { it.field.title.defaultValue == "Enum" }.field).choices
 
         assert choices.size() == 3
         assert choices.find { it.defaultValue == "Choice 1" }

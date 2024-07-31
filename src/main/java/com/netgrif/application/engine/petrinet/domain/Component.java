@@ -1,55 +1,32 @@
 package com.netgrif.application.engine.petrinet.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+@Data
+@AllArgsConstructor
 public class Component implements Serializable {
 
     private static final long serialVersionUID = 5852012111111766631L;
 
-    public static final String DIVIDER = "divider";
-
-    @Getter
-    @Setter
-    private String name;
-
-    @Getter
-    @Setter
+    private String id;
     private Map<String, String> properties;
 
-    @Getter
-    @Setter
-    private List<Icon> optionIcons;
-
     public Component() {
-    }
-
-    public Component(String name) {
-        this.name = name;
         this.properties = new HashMap<>();
-        this.optionIcons = new ArrayList<>();
     }
 
-    public Component(String name, Map<String, String> properties) {
-        this(name);
-        this.properties = properties;
-    }
-
-    public Component(String name, Map<String, String> properties, List<Icon> optionIcons) {
-        this(name);
-        this.properties = properties;
-        this.optionIcons = optionIcons;
+    public Component(String id) {
+        this();
+        this.id = id;
     }
 
     @Override
     public Component clone() {
-        return new Component(this.name, new HashMap<>(this.properties), this.optionIcons == null ? new ArrayList<>() : this.optionIcons.stream().map(Icon::clone).collect(Collectors.toList()));
+        return new Component(this.id, new HashMap<>(this.properties));
     }
 }

@@ -53,7 +53,7 @@ class MapFieldTest {
 
         EnumerationMapField field = net.dataSet["enumeration"] as EnumerationMapField
         assert field != null
-        assert field.name.defaultValue == "Enumeration map"
+        assert field.title.defaultValue == "Enumeration map"
         assert field.options.size() == 3
         assert field.options["first"].defaultValue == "First option"
         assert field.options["first"].getTranslation("sk") == "Prvá možnosť"
@@ -113,7 +113,7 @@ class MapFieldTest {
         assert net.dataSet.size() == 1
 
         MultichoiceMapField field = net.dataSet.get("multichoice") as MultichoiceMapField
-        assert field.name.defaultValue == "Multichoice map"
+        assert field.title.defaultValue == "Multichoice map"
         assert field.options.size() == 3
         assert field.options["first"].defaultValue == "First option"
         assert field.options["first"].getTranslation("sk") == "Prvá možnosť"

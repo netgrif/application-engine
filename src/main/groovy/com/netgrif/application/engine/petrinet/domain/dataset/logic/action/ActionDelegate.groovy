@@ -713,7 +713,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return workflowService.createCaseByIdentifier(identifier, title, color, author.transformToLoggedUser(), locale, params).getCase()
     }
 
-    Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
+    Case createCase(Process net, String title = net.defaultCaseName.getTranslation(locale), String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
         CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser(), params)
         this.outcomes.add(outcome)
         return outcome.getCase()
@@ -799,18 +799,18 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     IUser assignRole(String roleId, String netId, IUser user = userService.loggedUser) {
-        List<PetriNet> nets = petriNetService.getByIdentifier(netId)
+        List<Process> nets = petriNetService.getByIdentifier(netId)
         nets.forEach({ net -> user = assignRole(roleId, net, user) })
         return user
     }
 
-    IUser assignRole(String roleId, PetriNet net, IUser user = userService.loggedUser) {
+    IUser assignRole(String roleId, Process net, IUser user = userService.loggedUser) {
         IUser actualUser = userService.addRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
         return actualUser
     }
 
     IUser assignRole(String roleId, String netId, Version version, IUser user = userService.loggedUser) {
-        PetriNet net = petriNetService.getPetriNet(netId, version)
+        Process net = petriNetService.getPetriNet(netId, version)
         return assignRole(roleId, net, user)
     }
 
@@ -820,18 +820,18 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     IUser removeRole(String roleId, String netId, IUser user = userService.loggedUser) {
-        List<PetriNet> nets = petriNetService.getByIdentifier(netId)
+        List<Process> nets = petriNetService.getByIdentifier(netId)
         nets.forEach({ net -> user = removeRole(roleId, net, user) })
         return user
     }
 
-    IUser removeRole(String roleId, PetriNet net, IUser user = userService.loggedUser) {
+    IUser removeRole(String roleId, Process net, IUser user = userService.loggedUser) {
         IUser actualUser = userService.removeRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
         return actualUser
     }
 
     IUser removeRole(String roleId, String netId, Version version, IUser user = userService.loggedUser) {
-        PetriNet net = petriNetService.getPetriNet(netId, version)
+        Process net = petriNetService.getPetriNet(netId, version)
         return removeRole(roleId, net, user)
     }
 
@@ -1963,18 +1963,18 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     private Map<String, I18nString> collectRolesForPreferenceItem(List<ProcessRole> roles) {
         return roles.collectEntries { role ->
-            PetriNet net = petriNetService.get(new ObjectId(role.netId))
+            Process net = petriNetService.get(new ObjectId(role.netId))
             return [(role.importId + ":" + net.identifier), ("$role.name ($net.title)" as String)]
         } as Map<String, I18nString>
     }
 
     private Map<String, I18nString> collectRolesForPreferenceItem(Map<String, String> roles) {
-        Map<String, PetriNet> temp = [:]
+        Map<String, Process> temp = [:]
         return roles.collectEntries { entry ->
             if (!temp.containsKey(entry.value)) {
                 temp.put(entry.value, petriNetService.getNewestVersionByIdentifier(entry.value))
             }
-            PetriNet net = temp[entry.value]
+            Process net = temp[entry.value]
             ProcessRole role = net.roles.find { it.value.importId == entry.key }.value
             return [(role.importId + ":" + net.identifier), ("$role.name ($net.title)" as String)]
         } as Map<String, I18nString>

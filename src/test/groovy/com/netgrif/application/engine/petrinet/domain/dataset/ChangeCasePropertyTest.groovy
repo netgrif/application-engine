@@ -2,7 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -56,7 +56,7 @@ class ChangeCasePropertyTest {
     String TEST_TRANSITION = "t1"
     String RESOURCE_PATH = "src/test/resources/case_name_change_test.xml"
 
-    PetriNet net = null
+    Process net = null
 
     @BeforeEach
     void initNet() {

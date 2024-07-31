@@ -10,9 +10,7 @@ import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
-import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import lombok.Data;
-import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -23,16 +21,15 @@ import java.util.stream.Collectors;
 
 @Data
 @Document
-public class PetriNet extends PetriNetObject {
+public class Process extends ProcessObject {
 
     private String identifier;
     private Version version;
     // TODO: NAE-1969 extends - merge NAE-1973
-    @Setter
     private I18nString title;
     private String icon;
-    private Map<String, String> properties;
     private I18nExpression defaultCaseName;
+    // TODO: release/8.0.0 - default + anonymous role, roleref
     private Map<String, Map<ProcessRolePermission, Boolean>> permissions;
     private Map<ProcessEventType, ProcessEvent> processEvents;
     private Map<CaseEventType, CaseEvent> caseEvents;
@@ -44,6 +41,7 @@ public class PetriNet extends PetriNetObject {
     private LinkedHashMap<String, Place> places;
     // TODO: release/8.0.0 save sorted by execution priority
     private LinkedHashMap<String, List<Arc>> arcs;//todo: import id
+    private Map<String, String> properties;
 
     // TODO: 18. 3. 2017 replace with Spring auditing
     private LocalDateTime creationDate;
@@ -51,7 +49,7 @@ public class PetriNet extends PetriNetObject {
     private String importXmlPath;
     private String uriNodeId;
 
-    public PetriNet() {
+    public Process() {
         this.id = new ObjectId();
         this.identifier = "Default";
         this.title = new I18nString("");
@@ -161,7 +159,7 @@ public class PetriNet extends PetriNetObject {
     public Map<String, Integer> getActivePlaces() {
         return places.values().stream()
                 .filter(Place::hasAnyTokens)
-                .collect(Collectors.toMap(PetriNetObject::getStringId, Place::getTokens));
+                .collect(Collectors.toMap(ProcessObject::getStringId, Place::getTokens));
     }
 
     public List<Field<?>> getImmediateFields() {
@@ -245,8 +243,8 @@ public class PetriNet extends PetriNetObject {
         return id.toString();
     }
 
-    public PetriNet clone() {
-        PetriNet clone = new PetriNet();
+    public Process clone() {
+        Process clone = new Process();
         clone.setIdentifier(this.identifier);
         clone.setUriNodeId(this.uriNodeId);
         clone.setTitle(this.title.clone());

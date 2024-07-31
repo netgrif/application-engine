@@ -7,7 +7,7 @@ import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.configuration.properties.CacheProperties
 import com.netgrif.application.engine.ipc.TaskApiTest
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -70,10 +70,10 @@ class CachePetriNetServiceTest {
         assert cacheManager.getCache(cacheProperties.getPetriNetNewest()).get("processDeleteTest") == null
         ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert testNetOptional.getNet() != null
-        PetriNet testNet = testNetOptional.getNet()
+        Process testNet = testNetOptional.getNet()
 
         assert cacheManager.getCache(cacheProperties.getPetriNetNewest()).get(testNet.getIdentifier()) == null
-        PetriNet test = petriNetService.getNewestVersionByIdentifier(testNet.getIdentifier())
+        Process test = petriNetService.getNewestVersionByIdentifier(testNet.getIdentifier())
         assert cacheManager.getCache(cacheProperties.getPetriNetNewest()).get(testNet.getIdentifier()).get().equals(test)
     }
 }

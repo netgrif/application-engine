@@ -7,12 +7,9 @@ import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
@@ -28,7 +25,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import com.netgrif.application.engine.workflow.web.TaskController
 import com.netgrif.application.engine.workflow.web.WorkflowController
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
-import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
@@ -91,7 +87,7 @@ class TaskControllerTest {
     @Autowired
     private TaskController taskController
 
-    private PetriNet net
+    private Process net
 
     private Case useCase
 
@@ -174,7 +170,7 @@ class TaskControllerTest {
     }
 
     void importNet() {
-        PetriNet netOptional = helper.createNet("all_data_refs.xml", VersionType.MAJOR).get()
+        Process netOptional = helper.createNet("all_data_refs.xml", VersionType.MAJOR).get()
         assert netOptional != null
         net = netOptional
     }

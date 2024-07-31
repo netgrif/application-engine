@@ -1,8 +1,7 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
 
-import com.netgrif.application.engine.auth.domain.Author;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataFieldReference;
 import lombok.Data;
 
@@ -35,7 +34,7 @@ public class PetriNetReference extends Reference {
         this.author = author;
     }
 
-    public PetriNetReference(PetriNet net, Locale locale) {
+    public PetriNetReference(Process net, Locale locale) {
         this(net.getStringId(), net.getIdentifier(), net.getVersion().toString(), net.getTitle().getTranslation(locale), net.getAuthorId(), net.getTranslatedDefaultCaseName(locale));
         this.icon = net.getIcon();
         this.createdDate = net.getCreationDate();

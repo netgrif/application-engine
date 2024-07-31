@@ -4,7 +4,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest
 import com.netgrif.application.engine.export.service.interfaces.IExportService
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -60,13 +60,13 @@ class ExportServiceTest {
     @Autowired
     private IExportService exportService
 
-    PetriNet testNet
+    Process testNet
     Case mainCase
 
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
-        Optional<PetriNet> optionalTestNet = importHelper.createNet("NAE-1290_Export_actions.xml", VersionType.MAJOR)
+        Optional<Process> optionalTestNet = importHelper.createNet("NAE-1290_Export_actions.xml", VersionType.MAJOR)
         assert optionalTestNet.isPresent()
         testNet = optionalTestNet.get()
         mainCase = importHelper.createCase("export test main", testNet)

@@ -7,7 +7,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -223,7 +223,7 @@ public class MenuImportExportService implements IMenuImportExportService {
                 String roleImportId = menuEntryRole.getRoleImportId();
                 String netImportId = menuEntryRole.getNetImportId();
                 if (netImportId != null) {
-                    PetriNet net = petriNetService.getNewestVersionByIdentifier(netImportId);
+                    Process net = petriNetService.getNewestVersionByIdentifier(netImportId);
                     if (net == null) {
                         resultMessage.append("\n- Missing net with import ID: \"").append(netImportId).append("\"").append("for role ").append(roleImportId).append("\n");
                         netCheck.set(false);

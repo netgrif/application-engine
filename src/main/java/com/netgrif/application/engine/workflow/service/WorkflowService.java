@@ -3,7 +3,6 @@ package com.netgrif.application.engine.workflow.service;
 import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventLog;
@@ -13,7 +12,7 @@ import com.netgrif.application.engine.importer.model.CaseEventType;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.I18nExpression;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
@@ -27,7 +26,6 @@ import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataFieldValue;
 import com.netgrif.application.engine.workflow.domain.QCase;
-import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
@@ -41,15 +39,11 @@ import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -247,7 +241,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale, Map<String, String> params) {
-        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier);
+        Process net = petriNetService.getNewestVersionByIdentifier(identifier);
         if (net == null) {
             throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
         }
@@ -261,7 +255,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Map<String, String> params) {
-        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier);
+        Process net = petriNetService.getNewestVersionByIdentifier(identifier);
         if (net == null) {
             throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
         }
@@ -270,7 +264,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user) {
-        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier);
+        Process net = petriNetService.getNewestVersionByIdentifier(identifier);
         if (net == null) {
             throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
         }
@@ -283,7 +277,7 @@ public class WorkflowService implements IWorkflowService {
 
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user, Map<String, String> params) {
         LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
-        PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
+        Process petriNet = petriNetService.clone(new ObjectId(netId));
         int rulesExecuted;
         Case useCase = new Case(petriNet);
         dataSetInitializer.populateDataSet(useCase, params);
@@ -325,7 +319,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     protected Function<Case, String> resolveDefaultCaseTitle(String netId, Locale locale, Map<String, String> params) {
-        PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
+        Process petriNet = petriNetService.clone(new ObjectId(netId));
         Function<Case, String> makeTitle;
         I18nExpression caseTitle = petriNet.getDefaultCaseName();
 //        TODO: release/8.0.0
@@ -377,7 +371,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public void deleteInstancesOfPetriNet(PetriNet net) {
+    public void deleteInstancesOfPetriNet(Process net) {
         log.info("[{}]: User {} is deleting all cases and tasks of Petri net {} version {}", net.getStringId(), userService.getLoggedOrSystem().getStringId(), net.getIdentifier(), net.getVersion().toString());
 
         taskService.deleteTasksByPetriNetId(net.getStringId());
@@ -410,7 +404,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public void updateMarking(Case useCase) {
-        PetriNet net = useCase.getPetriNet();
+        Process net = useCase.getPetriNet();
         useCase.setActivePlaces(net.getActivePlaces());
     }
 
@@ -490,7 +484,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private Map<Field<?>, String> getEncryptedDataSet(Case useCase) {
-        PetriNet net = useCase.getPetriNet();
+        Process net = useCase.getPetriNet();
         Map<Field<?>, String> encryptedDataSet = new HashMap<>();
 
         for (Map.Entry<String, Field<?>> entry : net.getDataSet().entrySet()) {
@@ -504,7 +498,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private void setPetriNet(Case useCase) {
-        PetriNet model = useCase.getPetriNet();
+        Process model = useCase.getPetriNet();
         if (model == null) {
             model = petriNetService.clone(useCase.getPetriNetObjectId());
             useCase.setPetriNet(model);
@@ -514,7 +508,7 @@ public class WorkflowService implements IWorkflowService {
 //        model.initializeArcs(useCase.getDataSet());
     }
 
-    private EventOutcome addMessageToOutcome(PetriNet net, CaseEventType type, EventOutcome outcome) {
+    private EventOutcome addMessageToOutcome(Process net, CaseEventType type, EventOutcome outcome) {
         if (net.getCaseEvents().containsKey(type)) {
             outcome.setMessage(net.getCaseEvents().get(type).getMessage());
         }

@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.migration
 
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
@@ -25,7 +25,7 @@ class ActionMigration {
     void migrateActions(String petriNetPath) {
         InputStream netStream = new ClassPathResource(petriNetPath).inputStream
         ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(netStream, VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser())
-        List<PetriNet> oldPetriNets
+        List<Process> oldPetriNets
 
         if(newPetriNet.getNet() != null) {
             String message = "Petri net from file [" + petriNetPath + "] was not imported"
@@ -50,7 +50,7 @@ class ActionMigration {
         }
     }
 
-    private void migrateDataSetActions(PetriNet newPetriNet, PetriNet oldPetriNet) {
+    private void migrateDataSetActions(Process newPetriNet, Process oldPetriNet) {
         newPetriNet.dataSet.each { key, data ->
             if (data.events != null && data.events.size() > 0) {
                 oldPetriNet.dataSet[key].events = data.events
@@ -58,7 +58,7 @@ class ActionMigration {
         }
     }
 
-    private void migrateDataRefActions(PetriNet newPetriNet, PetriNet oldPetriNet) {
+    private void migrateDataRefActions(Process newPetriNet, Process oldPetriNet) {
         newPetriNet.transitions.each { transKey, trans ->
             trans.dataSet.each { dataKey, data ->
                 if (data.events != null && data.events.size() > 0) {

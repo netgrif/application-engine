@@ -1,10 +1,9 @@
 package com.netgrif.application.engine.importer.service;
 
-import com.netgrif.application.engine.importer.model.Process;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.importer.service.validation.IActionValidator;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
@@ -30,7 +29,7 @@ public class Importer {
     public static final String FILE_EXTENSION = ".xml";
 
     protected com.netgrif.application.engine.importer.model.Process process;
-    protected PetriNet net;
+    protected Process net;
     protected ProcessRole defaultRole;
     protected ProcessRole anonymousRole;
 
@@ -75,7 +74,7 @@ public class Importer {
     @Autowired
     protected IFieldActionsCacheService actionsCacheService;
 
-    public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
+    public Optional<Process> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
             initialize();
             unmarshallXml(xml);
@@ -86,7 +85,7 @@ public class Importer {
         return Optional.empty();
     }
 
-    public Optional<PetriNet> importPetriNet(File xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
+    public Optional<Process> importPetriNet(File xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
             return importPetriNet(new FileInputStream(xml));
         } catch (FileNotFoundException e) {
@@ -102,25 +101,25 @@ public class Importer {
         this.net.addRole(anonymousRole);
     }
 
-    public Process unmarshallXml(InputStream xml) throws JAXBException {
-        JAXBContext jaxbContext = JAXBContext.newInstance(Process.class);
+    public com.netgrif.application.engine.importer.model.Process unmarshallXml(InputStream xml) throws JAXBException {
+        JAXBContext jaxbContext = JAXBContext.newInstance(com.netgrif.application.engine.importer.model.Process.class);
 
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-        process = (Process) jaxbUnmarshaller.unmarshal(xml);
+        process = (com.netgrif.application.engine.importer.model.Process) jaxbUnmarshaller.unmarshal(xml);
         return process;
     }
 
-    public Path saveNetFile(PetriNet net, InputStream xmlFile) throws IOException {
+    public Path saveNetFile(Process net, InputStream xmlFile) throws IOException {
         File savedFile = new File(fileStorageConfiguration.getStorageArchived() + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
         net.setImportXmlPath(savedFile.getPath());
 //        copyInputStreamToFile(xmlFile, savedFile);
         return savedFile.toPath();
     }
 
-    protected Optional<PetriNet> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
+    protected Optional<Process> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
 ////        documentValidator.checkConflictingAttributes(process, process.getUsersRef(), process.getUserRef(), "usersRef", "userRef");
 ////        documentValidator.checkDeprecatedAttributes(process);
-        net = new PetriNet();
+        net = new Process();
 //        process.getI18N().forEach(this::addI18N);
 //
 //        setMetaData();

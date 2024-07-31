@@ -10,7 +10,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
@@ -76,8 +76,8 @@ class ElasticSearchViewPermissionTest {
 
     private static final String USER_EMAIL = "user123987645@test.com"
 
-    private PetriNet net
-    private PetriNet netWithUserRefs
+    private Process net
+    private Process netWithUserRefs
     private IUser testUser
     private Authority userAuthority
 

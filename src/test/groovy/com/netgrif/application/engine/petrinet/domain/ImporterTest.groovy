@@ -120,7 +120,7 @@ class ImporterTest {
             })[it].importId == ("newVariable_${it + 1}" as String)
             assert net.dataSet.values().toSorted({ a, b ->
                 return a.importId <=> b.importId
-            })[it].name.defaultValue == ("newVariable_${it + 1}" as String)
+            })[it].title.defaultValue == ("newVariable_${it + 1}" as String)
         }
         assert net.transitions.size() == 3
         2.times {
@@ -160,7 +160,7 @@ class ImporterTest {
             })[it].importId == ("newVariable_${it + 1}" as String)
             assert net.dataSet.values().toSorted({ a, b ->
                 return a.importId <=> b.importId
-            })[it].name.defaultValue == ("newVariable_${it + 1}" as String)
+            })[it].title.defaultValue == ("newVariable_${it + 1}" as String)
         }
         assert net.transitions.size() == 3
         2.times {
@@ -202,7 +202,7 @@ class ImporterTest {
             })[it].importId == ("newVariable_${it + 6}" as String)
             assert net2.dataSet.values().toSorted({ a, b ->
                 return a.importId <=> b.importId
-            })[it].name.defaultValue == ("newVariable_${it + 6}" as String)
+            })[it].title.defaultValue == ("newVariable_${it + 6}" as String)
         }
         assert net2.transitions.size() == 2
         net2.transitions.values()[0].importId == "task3"
@@ -230,7 +230,7 @@ class ImporterTest {
             })[it].importId == ("newVariable_${it + 6}" as String)
             assert net2.dataSet.values().toSorted({ a, b ->
                 return a.importId <=> b.importId
-            })[it].name.defaultValue == ("newVariable_${it + 6}" as String)
+            })[it].title.defaultValue == ("newVariable_${it + 6}" as String)
         }
         assert net2.transitions.size() == 2
         net2.transitions.values()[0].importId == "task3"
@@ -264,7 +264,7 @@ class ImporterTest {
             })[it].importId == ("newVariable_${it + 1}" as String)
             assert net.dataSet.values().toSorted({ a, b ->
                 return a.importId <=> b.importId
-            })[it].name.defaultValue == ("newVariable_${it + 1}" as String)
+            })[it].title.defaultValue == ("newVariable_${it + 1}" as String)
         }
         assert net.transitions.size() == 3
         2.times {
@@ -280,9 +280,9 @@ class ImporterTest {
 
     @Test
     void upsertTest() {
-        Optional<PetriNet> netOptional = importHelper.upsertNet(FILE_NAME, IDENTIFIER)
+        Optional<Process> netOptional = importHelper.upsertNet(FILE_NAME, IDENTIFIER)
         assert netOptional.present
-        PetriNet net = petriNetService.getNewestVersionByIdentifier(IDENTIFIER)
+        Process net = petriNetService.getNewestVersionByIdentifier(IDENTIFIER)
 
         def upserted = importHelper.upsertNet(FILE_NAME, IDENTIFIER)
         assert upserted.present
@@ -294,7 +294,7 @@ class ImporterTest {
 
     @Test
     void thisKeywordInDataEventsTest() {
-        PetriNet net = petriNetService.importPetriNet(new ClassPathResource("/this_kw_test.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        Process net = petriNetService.importPetriNet(new ClassPathResource("/this_kw_test.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
 
         assert net != null
         Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper).getCase()
@@ -306,7 +306,7 @@ class ImporterTest {
 
     @Test
     void initialBehaviorTest() {
-        PetriNet net = petriNetService.importPetriNet(new ClassPathResource("/initial_behavior.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        Process net = petriNetService.importPetriNet(new ClassPathResource("/initial_behavior.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
 
         assert net
         Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper).getCase()
@@ -336,7 +336,7 @@ class ImporterTest {
 
     @Test
     void enumerationMultichoiceOptionsTest() throws IOException, MissingPetriNetMetaDataException {
-        PetriNet net = petriNetService.importPetriNet(new ClassPathResource("/enumeration_multichoice_options.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        Process net = petriNetService.importPetriNet(new ClassPathResource("/enumeration_multichoice_options.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
 
         assert net != null
 
@@ -373,9 +373,9 @@ class ImporterTest {
 
     @Test
     void createTransitionNoLabel() {
-        PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/NoLabel.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        Process net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/NoLabel.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
         assert net
-        PetriNet importNet = petriNetService.findByImportId(net.getImportId()).get()
+        Process importNet = petriNetService.findByImportId(net.getImportId()).get()
         assert importNet
         assert importNet.getTransition("1").getTitle()
         assert importNet.getTransition("layout").getTitle()

@@ -31,10 +31,9 @@ public class DataRef {
     // TODO: NAE-1969 fix
 //    private Object layout;
     private Component component;
-    @Transient
-    protected String parentTaskId;
-    @Transient
-    protected String parentCaseId;
+    // TODO: release/8.0.0 parentCaseId
+    // TODO: release/8.0.0 uniqeue key map
+    private Map<String, String> properties;
 
     public DataRef(Field<?> field, DataFieldBehavior behavior) {
         this.field = field;

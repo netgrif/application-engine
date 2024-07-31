@@ -8,7 +8,7 @@ import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
@@ -93,7 +93,7 @@ class RemoveActionTest {
     private SuperAdminConfiguration configuration
 
     private MockMvc mvc
-    private PetriNet petriNet
+    private Process petriNet
     private Authentication auth
 
     @BeforeEach

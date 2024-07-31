@@ -11,19 +11,13 @@ import com.netgrif.application.engine.history.domain.taskevents.CancelTaskEventL
 import com.netgrif.application.engine.history.domain.taskevents.FinishTaskEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.model.EventType;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.Place;
-import com.netgrif.application.engine.petrinet.domain.Transaction;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
-import com.netgrif.application.engine.petrinet.domain.arcs.ArcOrderComparator;
-import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListField;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.rules.domain.facts.TransitionEventFact;
@@ -364,7 +358,7 @@ public class TaskService implements ITaskService {
 
     private Task returnTokens(Task task, String useCaseId) {
         Case useCase = workflowService.findOne(useCaseId);
-        PetriNet net = useCase.getPetriNet();
+        Process net = useCase.getPetriNet();
 //        TODO: release/8.0.0
 //        net.getArcsOfTransition(task.getTransitionId()).stream()
 //                .filter(arc -> arc.getSource() instanceof Place)
@@ -462,7 +456,7 @@ public class TaskService implements ITaskService {
     @Override
     public void reloadTasks(Case useCase) {
         log.info("[{}]: Reloading tasks in [{}]", useCase.getStringId(), useCase.getTitle());
-        PetriNet net = useCase.getPetriNet();
+        Process net = useCase.getPetriNet();
         List<Task> tasks;
         // create tasks on first reload (create case)
         if (useCase.getTasks().isEmpty()) {
@@ -491,7 +485,7 @@ public class TaskService implements ITaskService {
         }
     }
 
-    boolean isExecutable(Transition transition, PetriNet net) {
+    boolean isExecutable(Transition transition, Process net) {
         Collection<Arc> arcsOfTransition = net.getArcsOfTransition(transition);
 
         if (arcsOfTransition == null) {
@@ -679,7 +673,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public Page<Task> findByUser(Pageable pageable, IUser user) {
-        return loadUsers(taskRepository.findByUserId(pageable, user.getSelfOrImpersonated().getStringId()));
+        return loadUsers(taskRepository.findByAssigneeId(pageable, user.getSelfOrImpersonated().getStringId()));
     }
 
     @Override

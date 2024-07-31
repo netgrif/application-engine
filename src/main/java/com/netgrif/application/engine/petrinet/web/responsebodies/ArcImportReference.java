@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
-import com.netgrif.application.engine.petrinet.domain.PetriNetObject;
+import com.netgrif.application.engine.petrinet.domain.ProcessObject;
 import com.netgrif.application.engine.petrinet.domain.Position;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.InhibitorArc;
@@ -11,7 +11,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ArcImportReference extends PetriNetObject {
+public class ArcImportReference extends ProcessObject {
 
     protected String sourceId;
 

@@ -4,7 +4,7 @@ import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.importer.service.AllDataConfiguration;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
@@ -28,7 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -110,7 +109,7 @@ public class ImporterTest {
                 .hasMessageContaining("doesn't have a layout");
     }
 
-    private void assertExternalMappingImport(PetriNet imported) {
+    private void assertExternalMappingImport(Process imported) {
         assert imported != null;
 
         String[] noDataTransitions = {"2", "3", "4", "36", "49"};
@@ -138,8 +137,8 @@ public class ImporterTest {
 
     private void assertNetProperlyImported() {
         assert repository.count() > 0;
-        Page<PetriNet> nets = repository.findByIdentifier(NET_ID, new FullPageRequest());
-        PetriNet net = nets.getContent().get(0);
+        Page<Process> nets = repository.findByIdentifier(NET_ID, new FullPageRequest());
+        Process net = nets.getContent().get(0);
 //        TODO: release/8.0.0 assertion error
         assert net.getTitle().getDefaultValue().equals(NET_TITLE);
 //        TODO: release/8.0.0

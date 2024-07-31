@@ -2,7 +2,7 @@ package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.AllDataConfiguration
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
@@ -49,7 +49,7 @@ class TaskStateTest {
     void testTaskState() {
         def netOptional = importHelper.createNet("NAE-1858_task_state.xml")
         assert netOptional.isPresent()
-        PetriNet net = netOptional.get()
+        Process net = netOptional.get()
 
         Case useCase = workflowService.createCase(net.stringId, "Test Case", "", superCreator.superUser.transformToLoggedUser())?.case
         assert useCase
@@ -64,7 +64,7 @@ class TaskStateTest {
     void testTaskState2() {
         def netOptional = importHelper.createNet("NAE-1858_task_state_2.xml")
         assert netOptional.isPresent()
-        PetriNet net = netOptional.get()
+        Process net = netOptional.get()
 
         Case useCase = workflowService.createCase(net.stringId, "Test Case", "", superCreator.superUser.transformToLoggedUser())?.case
         assert useCase

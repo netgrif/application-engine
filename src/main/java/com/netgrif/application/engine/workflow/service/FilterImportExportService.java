@@ -9,7 +9,7 @@ import com.google.common.collect.Lists;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.properties.FilterProperties;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -252,7 +252,7 @@ public class FilterImportExportService implements IFilterImportExportService {
         filterFields.forEach(f -> {
             Task importedFilterTask = taskService.findOne(f);
             Case filterCase = workflowService.findOne(importedFilterTask.getCaseId());
-            PetriNet filterNet = petriNetService.getNewestVersionByIdentifier(FILTER_NET_IDENTIFIER);
+            Process filterNet = petriNetService.getNewestVersionByIdentifier(FILTER_NET_IDENTIFIER);
 //            TODO: release/8.0.0
 //            List<String> requiredNets = filterCase.getDataSet().get(FIELD_FILTER).getAllowedNets();
 //            List<String> currentNets = petriNetService.getExistingPetriNetIdentifiersFromIdentifiersList(requiredNets);

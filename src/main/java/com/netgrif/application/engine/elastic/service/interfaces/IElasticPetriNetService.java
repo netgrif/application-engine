@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.elastic.service.interfaces;
 
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNet;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
@@ -15,8 +15,8 @@ public interface IElasticPetriNetService {
 
     void remove(String id);
 
-    String findUriNodeId(PetriNet net);
+    String findUriNodeId(Process net);
 
-    List<PetriNet> findAllByUriNodeId(String uriNodeId);
+    List<Process> findAllByUriNodeId(String uriNodeId);
 
 }

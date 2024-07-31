@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.service;
 
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -12,13 +12,13 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class PetriNetEventHandler extends AbstractMongoEventListener<PetriNet> {
+public class PetriNetEventHandler extends AbstractMongoEventListener<Process> {
 
     @Autowired
     private IElasticPetriNetService service;
 
     @Override
-    public void onAfterDelete(AfterDeleteEvent<PetriNet> event) {
+    public void onAfterDelete(AfterDeleteEvent<Process> event) {
         Document document = event.getDocument();
         if (document == null) {
             log.warn("Trying to delete null document!");

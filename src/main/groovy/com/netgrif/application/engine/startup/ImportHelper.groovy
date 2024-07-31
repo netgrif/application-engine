@@ -5,7 +5,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.DataRef
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
@@ -24,8 +24,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import groovy.util.logging.Slf4j
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.ResourceLoader
@@ -90,31 +88,31 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().stringId) {
+    Optional<Process> createNet(String fileName, String release, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().stringId) {
         return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author, uriNodeId)
     }
 
-    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().stringId) {
+    Optional<Process> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().stringId) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        PetriNet petriNet = petriNetService.importPetriNet(netStream, release, author, uriNodeId).getNet()
+        Process petriNet = petriNetService.importPetriNet(netStream, release, author, uriNodeId).getNet()
         log.info("Imported '${petriNet?.title?.defaultValue}' ['${petriNet?.identifier}', ${petriNet?.stringId}]")
         return Optional.of(petriNet)
     }
 
-    Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser()) {
-        PetriNet petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
+    Optional<Process> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser()) {
+        Process petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
         if (!petriNet) {
             return createNet(filename, release, author)
         }
         return Optional.of(petriNet)
     }
 
-    ProcessRole getProcessRoleByImportId(PetriNet net, String roleId) {
+    ProcessRole getProcessRoleByImportId(Process net, String roleId) {
         ProcessRole role = net.roles.values().find { it -> it.importId == roleId }
         return role
     }
 
-    Map<String, ProcessRole> getProcessRolesByImportId(PetriNet net, Map<String, String> importId) {
+    Map<String, ProcessRole> getProcessRolesByImportId(Process net, Map<String, String> importId) {
         HashMap<String, ProcessRole> roles = new HashMap<>()
         importId.each { it ->
             roles.put(it.getKey(), getProcessRoleByImportId(net, it.getValue()))
@@ -122,7 +120,7 @@ class ImportHelper {
         return roles
     }
 
-    Map<String, ProcessRole> getProcessRoles(PetriNet net) {
+    Map<String, ProcessRole> getProcessRoles(Process net) {
         List<ProcessRole> roles = processRoleService.findAll(net.stringId)
         Map<String, ProcessRole> map = [:]
         net.roles.values().each { netRole ->
@@ -140,15 +138,15 @@ class ImportHelper {
         return user
     }
 
-    Case createCase(String title, PetriNet net, LoggedUser user) {
+    Case createCase(String title, Process net, LoggedUser user) {
         return workflowService.createCase(net.getStringId(), title, "", user).getCase()
     }
 
-    Case createCase(String title, PetriNet net) {
+    Case createCase(String title, Process net) {
         return createCase(title, net, userService.getSystem().transformToLoggedUser())
     }
 
-    Case createCaseAsSuper(String title, PetriNet net) {
+    Case createCaseAsSuper(String title, Process net) {
         return createCase(title, net, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 

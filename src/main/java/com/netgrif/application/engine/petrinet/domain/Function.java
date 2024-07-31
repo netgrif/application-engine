@@ -7,7 +7,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class Function extends PetriNetObject {
+public class Function extends ProcessObject {
 
     @Getter
     @Setter

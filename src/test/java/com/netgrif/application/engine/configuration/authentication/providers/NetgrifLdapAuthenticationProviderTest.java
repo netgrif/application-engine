@@ -10,7 +10,7 @@ import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefServi
 import com.netgrif.application.engine.orgstructure.web.requestbodies.LdapGroupRoleAssignRequestBody;
 import com.netgrif.application.engine.orgstructure.web.requestbodies.LdapGroupSearchBody;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.LdapGroupResponseBody;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -176,7 +176,7 @@ class NetgrifLdapAuthenticationProviderTest {
 
     @Test
     void assignRoleGroup() throws Exception {
-        PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/role_all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet();
+        Process net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/role_all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet();
         assert net != null;
         Map<String, ProcessRole> roles = net.getRoles();
         assert roles != null;
@@ -211,7 +211,7 @@ class NetgrifLdapAuthenticationProviderTest {
         JSONArray countProcessRole = (JSONArray) json.get("processRoles");
         assert countProcessRole.length() == 1;
 
-        PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/role_all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet();
+        Process net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/role_all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet();
         assert net != null;
         Map<String, ProcessRole> roles = net.getRoles();
         assert roles != null;

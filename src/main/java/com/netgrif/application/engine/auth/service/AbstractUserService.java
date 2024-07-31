@@ -5,7 +5,7 @@ import com.netgrif.application.engine.auth.domain.repositories.UserRepository;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
@@ -100,7 +100,7 @@ public abstract class AbstractUserService implements IUserService {
     }
 
     @Override
-    public void removeRoleOfDeletedPetriNet(PetriNet net) {
+    public void removeRoleOfDeletedPetriNet(Process net) {
         List<IUser> users = findAllByProcessRoles(net.getRoles().keySet());
         users.forEach(u -> {
             net.getRoles().forEach((k, role) -> removeRole(u, role));

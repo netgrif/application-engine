@@ -14,7 +14,7 @@ import java.util.List;
  * transitions' ObjectId.
  */
 @Document
-public class Transaction extends PetriNetObject {
+public class Transaction extends ProcessObject {
 
     @Getter
     @Setter

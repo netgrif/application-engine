@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import groovy.util.logging.Slf4j
@@ -36,14 +37,14 @@ class ImpersonationRunner extends AbstractOrderedCommandLineRunner {
         importProcess("Petri net for impersonation user select", IMPERSONATION_CONFIG_USER_SELECT_PETRI_NET_IDENTIFIER, IMPERSONATION_CONFIG_USER_SELECT_FILE_NAME)
     }
 
-    Optional<PetriNet> importProcess(String message, String netIdentifier, String netFileName) {
-        PetriNet foundNet = petriNetService.getNewestVersionByIdentifier(netIdentifier)
+    Optional<Process> importProcess(String message, String netIdentifier, String netFileName) {
+        Process foundNet = petriNetService.getNewestVersionByIdentifier(netIdentifier)
         if (foundNet != null) {
             log.info("${message} has already been imported.")
             return Optional.of(foundNet)
         }
 
-        Optional<PetriNet> net = helper.createNet(netFileName, VersionType.MAJOR, systemCreator.loggedSystem)
+        Optional<Process> net = helper.createNet(netFileName, VersionType.MAJOR, systemCreator.loggedSystem)
         if (!net.isPresent()) {
             log.error("Import of ${message} failed!")
         }

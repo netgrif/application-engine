@@ -6,7 +6,7 @@ import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -84,7 +84,7 @@ class FileFieldTest {
                 .build()
     }
 
-    PetriNet getNet() {
+    Process getNet() {
         def netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/remoteFileField.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
         assert netOptional.getNet() != null
         return netOptional.getNet()
@@ -92,14 +92,14 @@ class FileFieldTest {
 
     @Test
     void testRemoteAttribute() {
-        PetriNet net = getNet()
+        Process net = getNet()
         assert net.getField(FIELD_ID).isPresent()
         assert (net.getField(FIELD_ID).get() as FileField).isRemote()
     }
 
     @Test
     void downloadFileByCase() {
-        PetriNet net = getNet()
+        Process net = getNet()
 
         IUser user = userService.findByEmail(configuration.email, true)
         assert user != null
@@ -119,7 +119,7 @@ class FileFieldTest {
 
     @Test
     void downloadFileByTask() {
-        PetriNet net = getNet()
+        Process net = getNet()
 
         IUser user = userService.findByEmail(configuration.email, true)
         assert user != null

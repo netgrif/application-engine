@@ -2,7 +2,7 @@ package com.netgrif.application.engine.startup
 
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.I18nString
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.FilterField
@@ -17,7 +17,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
-import groovy.transform.CompileStatic
 import lombok.extern.slf4j.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -257,7 +256,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
             boolean viewOrigin,
             boolean isImported
     ) {
-        PetriNet filterNet = this.petriNetService.getNewestVersionByIdentifier('filter')
+        Process filterNet = this.petriNetService.getNewestVersionByIdentifier('filter')
         if (filterNet == null) {
             return Optional.empty()
         }

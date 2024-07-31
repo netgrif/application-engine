@@ -5,7 +5,7 @@ import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.ipc.TaskApiTest
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -63,7 +63,7 @@ class PetriNetControllerTest {
     @Autowired
     private TestHelper testHelper
 
-    private PetriNet net
+    private Process net
 
     private Authentication userAuth
     private Authentication adminAuth

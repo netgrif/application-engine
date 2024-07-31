@@ -4,7 +4,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
@@ -111,8 +111,8 @@ class FilterImportExportTest {
         userAuth = new UsernamePasswordAuthenticationToken(dummyUser.transformToLoggedUser(), DUMMY_USER_PASSWORD)
         SecurityContextHolder.getContext().setAuthentication(userAuth)
 
-        Optional<PetriNet> importNet = this.filterRunner.createImportFiltersNet()
-        Optional<PetriNet> exportNet = this.filterRunner.createExportFiltersNet()
+        Optional<Process> importNet = this.filterRunner.createImportFiltersNet()
+        Optional<Process> exportNet = this.filterRunner.createExportFiltersNet()
         assert importNet.isPresent()
         assert exportNet.isPresent()
 

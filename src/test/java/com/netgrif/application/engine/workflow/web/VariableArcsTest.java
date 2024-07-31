@@ -8,7 +8,7 @@ import com.netgrif.application.engine.auth.domain.User;
 import com.netgrif.application.engine.auth.domain.UserState;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.dataset.NumberField;
@@ -17,7 +17,6 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.application.engine.startup.DefaultRoleRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.startup.SystemUserRunner;
@@ -86,7 +85,7 @@ public class VariableArcsTest {
     @Autowired
     private TestHelper testHelper;
 
-    private PetriNet loaded;
+    private Process loaded;
 
     private IUser testUser;
 
@@ -104,7 +103,7 @@ public class VariableArcsTest {
         ImportPetriNetEventOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), VersionType.MAJOR, superCreator.getLoggedSuper());
 
         assert outcome.getNet() != null;
-        PetriNet net = outcome.getNet();
+        Process net = outcome.getNet();
         this.loaded = service.getPetriNet(net.getStringId());
         User user = new User();
         user.setName("Test");

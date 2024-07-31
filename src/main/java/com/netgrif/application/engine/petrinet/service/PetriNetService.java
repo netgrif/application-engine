@@ -16,7 +16,7 @@ import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
@@ -149,7 +149,7 @@ public class PetriNetService implements IPetriNetService {
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetByIdentifier()), cacheProperties.getPetriNetByIdentifier()).clear();
     }
 
-    public void evictCache(PetriNet net) {
+    public void evictCache(Process net) {
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetById()), cacheProperties.getPetriNetById()).evict(net.getStringId());
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetNewest()), cacheProperties.getPetriNetNewest()).evict(net.getIdentifier());
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetCache()), cacheProperties.getPetriNetCache()).evict(net.getObjectId());
@@ -161,8 +161,8 @@ public class PetriNetService implements IPetriNetService {
      */
     @Override
     @Cacheable(value = "petriNetCache")
-    public PetriNet get(ObjectId petriNetId) {
-        Optional<PetriNet> optional = repository.findById(petriNetId.toString());
+    public Process get(ObjectId petriNetId) {
+        Optional<Process> optional = repository.findById(petriNetId.toString());
         if (optional.isEmpty()) {
             throw new IllegalArgumentException("Petri net with id [" + petriNetId + "] not found");
         }
@@ -170,17 +170,17 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNet> get(Collection<ObjectId> petriNetIds) {
+    public List<Process> get(Collection<ObjectId> petriNetIds) {
         return petriNetIds.stream().map(id -> self.get(id)).collect(Collectors.toList());
     }
 
     @Override
-    public List<PetriNet> get(List<String> petriNetIds) {
+    public List<Process> get(List<String> petriNetIds) {
         return self.get(petriNetIds.stream().map(ObjectId::new).collect(Collectors.toList()));
     }
 
     @Override
-    public PetriNet clone(ObjectId petriNetId) {
+    public Process clone(ObjectId petriNetId) {
         return self.get(petriNetId).clone();
     }
 
@@ -216,15 +216,15 @@ public class PetriNetService implements IPetriNetService {
         ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
         ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
         IOUtils.copy(xmlFile, xmlCopy);
-        Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(xmlCopy.toByteArray()));
+        Optional<Process> imported = getImporter().importPetriNet(new ByteArrayInputStream(xmlCopy.toByteArray()));
         if (imported.isEmpty()) {
             return outcome;
         }
-        PetriNet net = imported.get();
+        Process net = imported.get();
         net.setUriNodeId(uriNodeId);
 
         // TODO: release/8.0.0 fix cacheable
-        PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
+        Process existingNet = getNewestVersionByIdentifier(net.getIdentifier());
         if (existingNet != null) {
             net.setVersion(existingNet.getVersion());
             net.incrementVersion(releaseType);
@@ -248,14 +248,14 @@ public class PetriNetService implements IPetriNetService {
         return outcome;
     }
 
-    private ImportPetriNetEventOutcome addMessageToOutcome(PetriNet net, ProcessEventType type, ImportPetriNetEventOutcome outcome) {
+    private ImportPetriNetEventOutcome addMessageToOutcome(Process net, ProcessEventType type, ImportPetriNetEventOutcome outcome) {
         if (net.getProcessEvents().containsKey(type)) {
             outcome.setMessage(net.getProcessEvents().get(type).getMessage());
         }
         return outcome;
     }
 
-    protected void evaluateRules(PetriNet net, EventPhase phase) {
+    protected void evaluateRules(Process net, EventPhase phase) {
         int rulesExecuted = ruleEngine.evaluateRules(net, new NetImportedFact(net.getStringId(), phase));
         if (rulesExecuted > 0) {
             save(net);
@@ -263,7 +263,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public Optional<PetriNet> save(PetriNet petriNet) {
+    public Optional<Process> save(Process petriNet) {
         petriNet.initializeArcs();
         this.evictCache(petriNet);
         petriNet = repository.save(petriNet);
@@ -279,8 +279,8 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     @Cacheable(value = "petriNetById")
-    public PetriNet getPetriNet(String id) {
-        Optional<PetriNet> net = repository.findById(id);
+    public Process getPetriNet(String id) {
+        Optional<Process> net = repository.findById(id);
         if (net.isEmpty()) {
             throw new IllegalArgumentException("No Petri net with id: " + id + " was found.");
         }
@@ -290,8 +290,8 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     @Cacheable(value = "petriNetByIdentifier", key = "#identifier+#version.toString()", unless = "#result == null")
-    public PetriNet getPetriNet(String identifier, Version version) {
-        PetriNet net = repository.findByIdentifierAndVersion(identifier, version);
+    public Process getPetriNet(String identifier, Version version) {
+        Process net = repository.findByIdentifierAndVersion(identifier, version);
         if (net == null) {
             return null;
         }
@@ -300,28 +300,28 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNet> getByIdentifier(String identifier) {
-        List<PetriNet> nets = repository.findAllByIdentifier(identifier);
-        nets.forEach(PetriNet::initializeArcs);
+    public List<Process> getByIdentifier(String identifier) {
+        List<Process> nets = repository.findAllByIdentifier(identifier);
+        nets.forEach(Process::initializeArcs);
         return nets;
     }
 
     @Override
-    public List<PetriNet> findAllByUriNodeId(String uriNodeId) {
-        List<PetriNet> nets = elasticPetriNetService.findAllByUriNodeId(uriNodeId);
-        nets.forEach(PetriNet::initializeArcs);
+    public List<Process> findAllByUriNodeId(String uriNodeId) {
+        List<Process> nets = elasticPetriNetService.findAllByUriNodeId(uriNodeId);
+        nets.forEach(Process::initializeArcs);
         return nets;
     }
 
     @Override
-    public List<PetriNet> findAllById(List<String> ids) {
+    public List<Process> findAllById(List<String> ids) {
         return StreamSupport.stream(repository.findAllById(ids).spliterator(), false).collect(Collectors.toList());
     }
 
     @Override
     @Cacheable(value = "petriNetNewest", unless = "#result == null")
-    public PetriNet getNewestVersionByIdentifier(String identifier) {
-        List<PetriNet> nets = repository.findByIdentifier(identifier, PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
+    public Process getNewestVersionByIdentifier(String identifier) {
+        List<Process> nets = repository.findByIdentifier(identifier, PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
         if (nets.isEmpty()) {
             return null;
         }
@@ -329,7 +329,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     /**
-     * Determines which of the provided Strings are identifiers of {@link PetriNet}s uploaded in the system.
+     * Determines which of the provided Strings are identifiers of {@link Process}s uploaded in the system.
      *
      * @param identifiers a list of Strings that represent potential PetriNet identifiers
      * @return a list containing a subset of the input strings that correspond to identifiers of PetriNets that are present in the system
@@ -343,7 +343,7 @@ public class PetriNetService implements IPetriNetService {
         );
         AggregationResults<?> groupResults = mongoTemplate.aggregate(
                 agg,
-                PetriNet.class,
+                Process.class,
                 TypeFactory.defaultInstance().constructType(new TypeReference<Map<String, String>>() {
                 }).getRawClass()
         );
@@ -369,9 +369,9 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNet> getAll() {
-        List<PetriNet> nets = repository.findAll();
-        nets.forEach(PetriNet::initializeArcs);
+    public List<Process> getAll() {
+        List<Process> nets = repository.findAll();
+        nets.forEach(Process::initializeArcs);
         return nets;
     }
 
@@ -380,7 +380,7 @@ public class PetriNetService implements IPetriNetService {
         if (title == null || title.isEmpty()) {
             Query query = Query.query(Criteria.where("id").is(new ObjectId(netId)));
             query.fields().include("id").include("title");
-            List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
+            List<Process> nets = mongoTemplate.find(query, Process.class);
             if (nets.isEmpty())
                 return null;
             title = nets.get(0).getTitle().getDefaultValue();
@@ -424,18 +424,18 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public List<PetriNetReference> getReferencesByUsersProcessRoles(LoggedUser user, Locale locale) {
         Query query = Query.query(getProcessRolesCriteria(user));
-        return mongoTemplate.find(query, PetriNet.class).stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
+        return mongoTemplate.find(query, Process.class).stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
     }
 
     @Override
     public PetriNetReference getReference(String identifier, Version version, LoggedUser user, Locale locale) {
-        PetriNet net = version == null ? getNewestVersionByIdentifier(identifier) : getPetriNet(identifier, version);
+        Process net = version == null ? getNewestVersionByIdentifier(identifier) : getPetriNet(identifier, version);
         return net != null ? transformToReference(net, locale) : new PetriNetReference();
     }
 
     @Override
     public List<TransitionReference> getTransitionReferences(List<String> netIds, LoggedUser user, Locale locale) {
-        Iterable<PetriNet> nets = get(netIds);
+        Iterable<Process> nets = get(netIds);
         List<TransitionReference> references = new ArrayList<>();
 
         nets.forEach(net -> references.addAll(net.getTransitions().entrySet().stream()
@@ -446,7 +446,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public List<DataFieldReference> getDataFieldReferences(List<TransitionReference> transitions, Locale locale) {
-        Iterable<PetriNet> nets = repository.findAllById(transitions.stream().map(TransitionReference::getPetriNetId).collect(Collectors.toList()));
+        Iterable<Process> nets = repository.findAllById(transitions.stream().map(TransitionReference::getPetriNetId).collect(Collectors.toList()));
         List<DataFieldReference> dataRefs = new ArrayList<>();
         Map<String, List<TransitionReference>> transitionReferenceMap = transitions.stream()
                 .collect(Collectors.groupingBy(TransitionReference::getPetriNetId));
@@ -465,7 +465,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public Optional<PetriNet> findByImportId(String id) {
+    public Optional<Process> findByImportId(String id) {
         return Optional.of(repository.findByImportId(id));
     }
 
@@ -518,8 +518,8 @@ public class PetriNetService implements IPetriNetService {
         }
 
         query.with(pageable);
-        List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
-        return new PageImpl<>(nets.stream().map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()), pageable, mongoTemplate.count(queryTotal, PetriNet.class));
+        List<Process> nets = mongoTemplate.find(query, Process.class);
+        return new PageImpl<>(nets.stream().map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()), pageable, mongoTemplate.count(queryTotal, Process.class));
     }
 
     private void addValueCriteria(Query query, Query queryTotal, Criteria criteria) {
@@ -530,12 +530,12 @@ public class PetriNetService implements IPetriNetService {
     @Override
     @Transactional
     public void deletePetriNet(String processId, LoggedUser loggedUser) {
-        Optional<PetriNet> petriNetOptional = repository.findById(processId);
+        Optional<Process> petriNetOptional = repository.findById(processId);
         if (!petriNetOptional.isPresent()) {
             throw new IllegalArgumentException("Could not find process with id [" + processId + "]");
         }
 
-        PetriNet petriNet = petriNetOptional.get();
+        Process petriNet = petriNetOptional.get();
         log.info("[{}]: Initiating deletion of Petri net {} version {}", processId, petriNet.getIdentifier(), petriNet.getVersion().toString());
 
         this.userService.removeRoleOfDeletedPetriNet(petriNet);
@@ -564,7 +564,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public void runActions(List<Action> actions, PetriNet petriNet) {
+    public void runActions(List<Action> actions, Process petriNet) {
         log.info("Running actions of net [{}]", petriNet.getStringId());
 
         actions.forEach(action -> {

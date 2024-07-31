@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -43,30 +43,30 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
         createExportFiltersNet()
     }
 
-    Optional<PetriNet> createFilterNet() {
+    Optional<Process> createFilterNet() {
         importProcess("Petri net for filters", FILTER_PETRI_NET_IDENTIFIER, FILTER_FILE_NAME)
     }
 
-    Optional<PetriNet> createPreferenceItemNet() {
+    Optional<Process> createPreferenceItemNet() {
         importProcess("Petri net for filter preferences", PREFERRED_ITEM_NET_IDENTIFIER, PREFERRED_ITEM_FILE_NAME)
     }
 
-    Optional<PetriNet> createImportFiltersNet() {
+    Optional<Process> createImportFiltersNet() {
         importProcess("Petri net for importing filters", IMPORT_NET_IDENTIFIER, IMPORT_FILTER_FILE_NAME)
     }
 
-    Optional<PetriNet> createExportFiltersNet() {
+    Optional<Process> createExportFiltersNet() {
         importProcess("Petri net for exporting filters", EXPORT_NET_IDENTIFIER, EXPORT_FILTER_FILE_NAME)
     }
 
-    Optional<PetriNet> importProcess(String message, String netIdentifier, String netFileName) {
-        PetriNet filter = petriNetService.getNewestVersionByIdentifier(netIdentifier)
+    Optional<Process> importProcess(String message, String netIdentifier, String netFileName) {
+        Process filter = petriNetService.getNewestVersionByIdentifier(netIdentifier)
         if (filter != null) {
             log.info("${message} has already been imported.")
             return Optional.of(filter)
         }
 
-        Optional<PetriNet> filterNet = helper.createNet(netFileName, VersionType.MAJOR, systemCreator.loggedSystem)
+        Optional<Process> filterNet = helper.createNet(netFileName, VersionType.MAJOR, systemCreator.loggedSystem)
 
         if (!filterNet.isPresent()) {
             log.error("Import of ${message} failed!")

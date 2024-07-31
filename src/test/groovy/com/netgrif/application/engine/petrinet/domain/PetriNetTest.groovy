@@ -79,15 +79,15 @@ class PetriNetTest {
     @Test
     void testVersioning() {
         def outcome1 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
-        PetriNet net1 = outcome1.getNet()
+        Process net1 = outcome1.getNet()
         assert net1
 
         def outcome2 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
-        PetriNet net2 = outcome2.getNet()
+        Process net2 = outcome2.getNet()
         assert net2
 
         def outcome3 = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
-        PetriNet net3 = outcome3.getNet()
+        Process net3 = outcome3.getNet()
         assert net3
 
         List<PetriNetReference> nets = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK)

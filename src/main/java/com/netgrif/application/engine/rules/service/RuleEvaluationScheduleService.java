@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.rules.service;
 
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.rules.domain.RuleRepository;
 import com.netgrif.application.engine.rules.domain.StoredRule;
 import com.netgrif.application.engine.rules.domain.scheduled.CaseRuleEvaluationJob;
@@ -41,12 +41,12 @@ public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleSer
     }
 
     @Override
-    public ScheduleOutcome scheduleRuleEvaluationForNet(PetriNet petriNet, String ruleIdentifier, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {
+    public ScheduleOutcome scheduleRuleEvaluationForNet(Process petriNet, String ruleIdentifier, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {
         return scheduleRuleEvaluationForNet(petriNet, Collections.singletonList(ruleIdentifier), triggerBuilder).values().iterator().next();
     }
 
     @Override
-    public Map<String, ScheduleOutcome> scheduleRuleEvaluationForNet(PetriNet petriNet, List<String> ruleIdentifiers, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {
+    public Map<String, ScheduleOutcome> scheduleRuleEvaluationForNet(Process petriNet, List<String> ruleIdentifiers, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {
         Map<String, String> data = new HashMap<>();
         data.put(PetriNetRuleEvaluationJob.NET_ID, petriNet.getStringId());
         return scheduleRuleEvaluation(petriNet.getStringId(), data, ruleIdentifiers, triggerBuilder);

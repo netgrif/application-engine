@@ -5,7 +5,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.history.domain.baseevent.EventLog
 import com.netgrif.application.engine.history.domain.baseevent.repository.EventLogRepository
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
@@ -81,7 +81,7 @@ class TaskApiTest {
 
         assert netOptional.getNet() != null
 
-        PetriNet net = netOptional.getNet()
+        Process net = netOptional.getNet()
         5.times {
             helper.createCase(TASK_EVENTS_NET_TITLE, net)
         }
@@ -112,7 +112,7 @@ class TaskApiTest {
 
         assert netOptional.getNet() != null
 
-        PetriNet net = netOptional.getNet()
+        Process net = netOptional.getNet()
         Case useCase = helper.createCase(TASK_EVENTS_NET_TITLE, net)
         helper.assignTaskToSuper(TASK_EVENTS_TASK, useCase.stringId)
         helper.finishTaskAsSuper(TASK_EVENTS_TASK, useCase.stringId)
@@ -147,8 +147,8 @@ class TaskApiTest {
         assert limitsNetOptional.getNet() != null
         assert leasingNetOptional.getNet() != null
 
-        PetriNet limitsNet = limitsNetOptional.getNet()
-        PetriNet leasingNet = leasingNetOptional.getNet()
+        Process limitsNet = limitsNetOptional.getNet()
+        Process leasingNet = leasingNetOptional.getNet()
 
         Case limits = helper.createCase("Limits BA", limitsNet)
         Case leasing1 = helper.createCase("Leasing 1", leasingNet)
@@ -219,7 +219,7 @@ class TaskApiTest {
         def netOptional = petriNetService.importPetriNet(stream(TASK_BULK_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
 
         assert netOptional.getNet() != null
-        PetriNet net = netOptional.getNet()
+        Process net = netOptional.getNet()
 
         10.times {
             helper.createCase("Case $it", net)
@@ -244,7 +244,7 @@ class TaskApiTest {
         def netOptional = petriNetService.importPetriNet(stream(TASK_GETTER_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
 
         assert netOptional.getNet() != null
-        PetriNet net = netOptional.getNet()
+        Process net = netOptional.getNet()
 
         def case1 = helper.createCase("Case 1", net)
         helper.setTaskData(TASK_GETTER_TASK, case1.stringId, new DataSet([
@@ -273,7 +273,7 @@ class TaskApiTest {
         def netOptional = petriNetService.importPetriNet(stream(TASK_SETTER_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
 
         assert netOptional.getNet() != null
-        PetriNet net = netOptional.getNet()
+        Process net = netOptional.getNet()
 
         def control = helper.createCase("Control case", net)
         def case1 = helper.createCase("Case 1", net)

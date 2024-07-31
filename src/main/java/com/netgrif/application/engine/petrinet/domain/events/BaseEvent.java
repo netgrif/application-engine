@@ -5,7 +5,7 @@ import com.netgrif.application.engine.petrinet.domain.Imported;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import lombok.Data;
 
-import java.util.List;
+import java.util.*;
 
 @Data
 public class BaseEvent extends Imported {
@@ -16,7 +16,9 @@ public class BaseEvent extends Imported {
 
     private I18nString message;
 
-    private List<Action> preActions;
+    private List<Action> preActions = new LinkedList<>();
 
-    private List<Action> postActions;
+    private List<Action> postActions = new LinkedList<>();
+
+    private Map<String, String> properties = new LinkedHashMap<>();
 }

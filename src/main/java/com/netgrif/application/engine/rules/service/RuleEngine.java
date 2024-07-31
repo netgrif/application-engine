@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.rules.service;
 
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.rules.domain.RuleRepository;
 import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.application.engine.rules.domain.facts.NetImportedFact;
@@ -49,12 +49,12 @@ public abstract class RuleEngine implements IRuleEngine {
     }
 
     @Override
-    public int evaluateRules(PetriNet petriNet, NetImportedFact fact) {
+    public int evaluateRules(Process petriNet, NetImportedFact fact) {
         return evaluateWithFacts(Arrays.asList(petriNet, fact));
     }
 
     @Override
-    public int evaluateRules(PetriNet petriNet, ScheduledRuleFact scheduledRuleFact) {
+    public int evaluateRules(Process petriNet, ScheduledRuleFact scheduledRuleFact) {
         return evaluateWithFacts(Arrays.asList(petriNet, scheduledRuleFact));
     }
 

@@ -2,7 +2,7 @@ package com.netgrif.application.engine.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.auth.domain.Author;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
@@ -10,7 +10,6 @@ import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -21,7 +20,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,7 +40,7 @@ public class Case implements Serializable {
     @JsonIgnore
     @Transient
     @QueryType(PropertyType.NONE)
-    private PetriNet petriNet;
+    private Process petriNet;
     @NotNull
     @Indexed
     private String processIdentifier;
@@ -80,7 +78,7 @@ public class Case implements Serializable {
         id = new ObjectId();
     }
 
-    public Case(PetriNet petriNet) {
+    public Case(Process petriNet) {
         this();
         this.petriNet = petriNet;
         petriNetObjectId = petriNet.getObjectId();
