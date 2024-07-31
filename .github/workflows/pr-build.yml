@@ -34,11 +34,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 200
     services:
-      mongo:
-        image: mongo:4.4
-        ports:
-          - 27017:27017
-        options: --entrypoint "/usr/bin/mongod" --replSet "rs0" --bind_ip_all
 
       redis:
         image: redis
@@ -53,6 +48,12 @@ jobs:
         options: -e="discovery.type=single-node" -e="xpack.security.enabled=false" --health-cmd="curl http://localhost:9200/_cluster/health" --health-interval=10s --health-timeout=5s --health-retries=10
 
     steps:
+      - name: Start MongoDB
+        uses: MongoCamp/mongodb-github-action@1.0.0
+        with:
+          mongodb-version: 4.4
+          mongodb-replica-set: rs0
+
       - name: Test Database
         env:
           ELASTIC_SEARCH_URL: http://localhost:${{ job.services.elasticsearch.ports[9200] }}
