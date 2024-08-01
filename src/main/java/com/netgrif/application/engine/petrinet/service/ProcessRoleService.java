@@ -17,6 +17,7 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepositor
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
+import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -283,7 +284,8 @@ public class ProcessRoleService implements IProcessRoleService {
 
     @Override
     public ProcessRole findById(String id) {
-        return processRoleRepository.findById(id).orElse(null);
+        ObjectId objectId = extractObjectId(id);
+        return processRoleRepository.findByIdObjectId(objectId).orElse(null);
     }
 
     @Override
@@ -313,5 +315,15 @@ public class ProcessRoleService implements IProcessRoleService {
     public void clearCache() {
         this.defaultRole = null;
         this.anonymousRole = null;
+    }
+
+    private ObjectId extractObjectId(String caseId) {
+        String[] parts = caseId.split("-");
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Invalid NetgrifId format: " + caseId);
+        }
+        String objectIdPart = parts[1];
+
+        return new ObjectId(objectIdPart);
     }
 }
