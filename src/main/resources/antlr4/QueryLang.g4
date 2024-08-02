@@ -31,8 +31,6 @@ attribute: ID
          | CREATION_DATE
          | PROCESS_ID
          | AUTHOR
-         | PLACES
-         | TASKS
          | TRANSITION_ID
          | STATE
          | USER_ID
@@ -43,6 +41,8 @@ attribute: ID
          | SURNAME
          | EMAIL
          | data
+         | places
+         | tasks
          ;
 
 operator: EQ
@@ -53,13 +53,19 @@ operator: EQ
         | CONTAINS
         ;
 
+// special attribute rules
+data: DATA '.' field_id=JAVA_ID '.' (VALUE | OPTIONS) ;
+places: PLACES '.' place_id=JAVA_ID '.' MARKING ;
+tasks: TASKS '.' task_id=JAVA_ID '.' (STATE | USER_ID) ;
+
 value: STRING
      | NUMBER
      | DATE
+     | DATETIME
+     | VERSION_NUMBER
+     | LIST
+     | BOOLEAN
      ;
-
-// special attribute rules
-data: DATA '.' FIELD_ID '.' (VALUE | OPTIONS) ;
 
 // operators
 AND: A N D | '&' ;
@@ -85,31 +91,36 @@ PROCESSES: P R O C E S S E S ;
 // attributes
 ID: I D ;
 TITLE: T I T L E ;
-IDENTIFIER : I D E N T I F I E R ;
+IDENTIFIER: I D E N T I F I E R ;
 VERSION: V E R S I O N ;
-CREATION_DATE : C R E A T I O N D A T E ;
+CREATION_DATE: C R E A T I O N D A T E ;
 PROCESS_ID: P R O C E S S I D ;
-AUTHOR : A U T H O R ;
-PLACES : P L A C E S ;
-TRANSITION_ID : T R A N S I T I O N I D ;
-STATE : S T A T E ;
-USER_ID : U S E R I D ;
-CASE_ID : C A S E I D ;
-LAST_ASSIGN : L A S T A S S I G N ;
-LAST_FINISH : L A S T F I N I S H ;
-NAME : N A M E ;
-SURNAME : S U R N A M E ;
-EMAIL : E M A I L ;
+AUTHOR: A U T H O R ;
+PLACES: P L A C E S ;
+TRANSITION_ID: T R A N S I T I O N I D ;
+STATE: S T A T E ;
+USER_ID: U S E R I D ;
+CASE_ID: C A S E I D ;
+LAST_ASSIGN: L A S T A S S I G N ;
+LAST_FINISH: L A S T F I N I S H ;
+NAME: N A M E ;
+SURNAME: S U R N A M E ;
+EMAIL: E M A I L ;
 
-DATA : D A T A ;
+DATA: D A T A ;
 VALUE: V A L U E ;
 OPTIONS: O P T I O N S ;
+MARKING: M A R K I N G ;
 
 // basic types
+LIST: '[' SPACE? ((STRING | NUMBER) SPACE? (',' SPACE? (STRING | NUMBER) SPACE? )* )? SPACE? ']' ;
 STRING: '\'' (~('\'' | '\r' | '\n'))* '\'' ;
 NUMBER: DIGIT+ ('.' DIGIT+)? ;
+DATETIME: DATE SPACE DIGIT DIGIT ':' DIGIT DIGIT ':' DIGIT DIGIT ; // 2020-03-03 20:00:00 todo NAE-1997 better recognition
 DATE: DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT ; // 2020-03-03, todo NAE-1997 better recognition
-FIELD_ID: [a-zA-Z0-9\-_]+ ;
+BOOLEAN: T R U E | F A L S E ;
+VERSION_NUMBER: DIGIT+ '.' DIGIT+ '.' DIGIT+ ;
+JAVA_ID: [a-zA-Z$_] [a-zA-Z0-9$_]* ;
 SPACE: [ ]+ ;
 ANY: . ;
 
