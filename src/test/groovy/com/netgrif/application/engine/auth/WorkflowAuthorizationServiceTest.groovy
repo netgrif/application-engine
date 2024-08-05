@@ -17,6 +17,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowAuthorizationService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -168,7 +169,13 @@ class WorkflowAuthorizationServiceTest {
     void testCanCallDelete() {
         ProcessRole positiveDeleteRole = this.net.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
         userService.addRole(testUser, positiveDeleteRole.getStringId())
-        Case case_ = workflowService.createCase(net.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(net)
+                .title("Test delete")
+                .color("")
+                .loggedUser(testUser.transformToLoggedUser())
+                .build()
+        Case case_ = workflowService.createCase(createCaseParams).getCase()
         assert workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
         userService.removeRole(testUser, positiveDeleteRole.getStringId())
     }
@@ -185,7 +192,13 @@ class WorkflowAuthorizationServiceTest {
     void testCanCallDeleteFalse() {
         ProcessRole deleteRole = this.net.getRoles().values().find(v -> v.getImportId() == "delete_neg_role")
         userService.addRole(testUser, deleteRole.getStringId())
-        Case case_ = workflowService.createCase(net.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(net)
+                .title("Test delete")
+                .color("")
+                .loggedUser(testUser.transformToLoggedUser())
+                .build()
+        Case case_ = workflowService.createCase(createCaseParams).getCase()
         assert !workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
         userService.removeRole(testUser, deleteRole.getStringId())
     }
@@ -199,7 +212,13 @@ class WorkflowAuthorizationServiceTest {
         userService.addRole(testUser, posDeleteRole.getStringId())
         userService.addRole(testUser, negDeleteRole.getStringId())
 
-        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(net)
+                .title("Test delete")
+                .color("")
+                .loggedUser(testUser.transformToLoggedUser())
+                .build()
+        Case case_ = workflowService.createCase(createCaseParams).getCase()
         String taskId = case_.getTaskStringId("1")
         case_ = dataService.setData(taskId, new DataSet([
                 "pos_user_list": new UserListField(rawValue: new UserListFieldValue(userValues: [dataService.makeUserFieldValue(testUser.stringId)])),
@@ -220,7 +239,13 @@ class WorkflowAuthorizationServiceTest {
         userService.addRole(testUser, posDeleteRole.getStringId())
         userService.addRole(testUser, negDeleteRole.getStringId())
 
-        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(netWithUserRefs)
+                .title("Test delete")
+                .color("")
+                .loggedUser(testUser.transformToLoggedUser())
+                .build()
+        Case case_ = workflowService.createCase(createCaseParams).getCase()
         String taskId = case_.getTaskStringId("1")
         case_ = dataService.setData(taskId, new DataSet([
                 "pos_user_list": new UserListField(rawValue: new UserListFieldValue(userValues: [dataService.makeUserFieldValue(testUser.stringId)])),

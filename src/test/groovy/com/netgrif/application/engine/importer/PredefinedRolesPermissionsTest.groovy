@@ -15,6 +15,7 @@ import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.TaskPair
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
@@ -456,7 +457,13 @@ class PredefinedRolesPermissionsTest {
 
         PetriNet net = importOutcome.getNet()
 
-        CreateCaseEventOutcome createCaseOutcome = workflowService.createCase(net.stringId, '', '', superCreator.loggedSuper)
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(net)
+                .title("")
+                .color("")
+                .loggedUser(superCreator.loggedSuper)
+                .build()
+        CreateCaseEventOutcome createCaseOutcome = workflowService.createCase(createCaseParams)
         assert createCaseOutcome.getCase() != null
         Case aCase = createCaseOutcome.getCase()
 

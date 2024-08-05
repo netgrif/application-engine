@@ -6,6 +6,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -40,10 +41,24 @@ class DynamicCaseNameTest {
     @Test
     void testInitValues() {
         ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_case_name_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        Case useCase = workflowService.createCase(optNet.getNet().stringId, null, "", superCreator.loggedSuper, Locale.forLanguageTag("sk-SK")).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(optNet.getNet())
+                .title(null)
+                .color("")
+                .loggedUser(superCreator.loggedSuper)
+                .locale(Locale.forLanguageTag("sk-SK"))
+                .build()
+        Case useCase = workflowService.createCase(createCaseParams).getCase()
         assert useCase.title == "SK text value 6"
 
-        Case useCase2 = workflowService.createCase(optNet.getNet().stringId, null, "", superCreator.loggedSuper, Locale.ENGLISH).getCase()
+        CreateCaseParams createCaseParams2 = CreateCaseParams.builder()
+                .petriNet(optNet.getNet())
+                .title(null)
+                .color("")
+                .loggedUser(superCreator.loggedSuper)
+                .locale(Locale.ENGLISH)
+                .build()
+        Case useCase2 = workflowService.createCase(createCaseParams2).getCase()
         assert useCase2.title == "EN text value 6"
     }
 }

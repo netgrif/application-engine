@@ -28,19 +28,20 @@ import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcome.CreateTasksOutcome;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.service.initializer.DataSetInitializer;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
 import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -49,6 +50,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -134,11 +136,7 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public Case findOneNoNet(String caseId) {
         Optional<Case> caseOptional = repository.findById(caseId);
-        if (caseOptional.isEmpty()) {
-            throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
-        }
-        // TODO: release/8.0.0 get or throw?
-        return caseOptional.get();
+        return caseOptional.orElseThrow(() -> new IllegalArgumentException("Could not find Case with id [" + caseId + "]"));
     }
 
     protected void initialize(Case useCase) {
@@ -215,117 +213,108 @@ public class WorkflowService implements IWorkflowService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * todo javadoc
+     * */
     @Override
-    public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale, Map<String, String> params) {
-        if (locale == null) {
-            locale = LocaleContextHolder.getLocale();
-        }
-        if (title == null) {
-            return this.createCase(netId, resolveDefaultCaseTitle(netId, locale, params), color, user, params);
-        }
-        return this.createCase(netId, title, color, user, params);
-    }
+    @Transactional
+    public CreateCaseEventOutcome createCase(CreateCaseParams createCaseParams) {
+        fillMissingAttributes(createCaseParams);
 
-    @Override
-    public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale) {
-        return this.createCase(netId, title, color, user, locale, new HashMap<>());
-    }
+        Case useCase = createCaseObject(createCaseParams);
+        CreateTasksOutcome createTasksOutcome = taskService.createAndSetTasksInCase(useCase);
+        save(useCase); // must be after tasks creation for effectivity reasons
 
-    @Override
-    public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Map<String, String> params) {
-        return createCase(netId, (u) -> title, color, user, params);
-    }
-
-    @Override
-    public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user) {
-        return this.createCase(netId, (u) -> title, color, user);
-    }
-
-    @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale, Map<String, String> params) {
-        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier);
-        if (net == null) {
-            throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
-        }
-        return this.createCase(net.getStringId(), title != null && !title.equals("") ? title : net.getDefaultCaseName().getTranslation(locale), color, user, params);
-    }
-
-    @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale) {
-        return this.createCaseByIdentifier(identifier, title, color, user, locale, new HashMap<>());
-    }
-
-    @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Map<String, String> params) {
-        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier);
-        if (net == null) {
-            throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
-        }
-        return this.createCase(net.getStringId(), title, color, user, params);
-    }
-
-    @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user) {
-        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier);
-        if (net == null) {
-            throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
-        }
-        return this.createCase(net.getStringId(), title, color, user);
-    }
-
-    public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
-        return this.createCase(netId, makeTitle, color, user, new HashMap<>());
-    }
-
-    public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user, Map<String, String> params) {
-        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
-        PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
-        int rulesExecuted;
-        Case useCase = new Case(petriNet);
-        dataSetInitializer.populateDataSet(useCase, params);
-        useCase.setColor(color);
-        useCase.setAuthor(loggedOrImpersonated.transformToAuthor());
-        useCase.setCreationDate(LocalDateTime.now());
-        useCase.setTitle(makeTitle.apply(useCase));
-        // TODO: release/7.0.0 6.2.5
-        // TODO: release/8.0.0 useCase.setUriNodeId(petriNet.getUriNodeId());
-//        UriNode uriNode = uriService.getOrCreate(petriNet, UriContentType.CASE);
-//        useCase.setUriNodeId(uriNode.getId());
-
+        PetriNet petriNet = createCaseParams.getPetriNet();
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
-        outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty(), params));
-        rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
+
+        outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty(),
+                createCaseParams.getParams()));
+
+        int rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         if (rulesExecuted > 0) {
             useCase = save(useCase);
         }
 
         historyService.save(new CreateCaseEventLog(useCase, EventPhase.PRE));
-        log.info("[{}]: Case {} created", useCase.getStringId(), useCase.getTitle());
 
-        useCase.getPetriNet().initializeArcs(useCase.getDataSet());
-        taskService.reloadTasks(useCase);
-        useCase = findOne(useCase.getStringId());
-        resolveTaskRefs(useCase);
+        if (createTasksOutcome.getAutoTriggerTask() != null) {
+            taskService.executeTask(createTasksOutcome.getAutoTriggerTask(), useCase);
+            useCase = findOne(useCase.getStringId());
+        }
 
-        useCase = findOne(useCase.getStringId());
-        outcome.addOutcomes(eventService.runActions(petriNet.getPostCreateActions(), useCase, Optional.empty(), params));
-        useCase = findOne(useCase.getStringId());
+        // TODO release/8.0.0 resolving init of taskRefs is going to be done differently
+        // resolveTaskRefs(useCase);
+
+        List<EventOutcome> eventPostOutcomes = eventService.runActions(petriNet.getPostCreateActions(), useCase, Optional.empty(),
+                createCaseParams.getParams());
+        if (!eventPostOutcomes.isEmpty()) {
+            outcome.addOutcomes(eventPostOutcomes);
+            useCase = findOne(useCase.getStringId());
+        }
+
         rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
         if (rulesExecuted > 0) {
             useCase = save(useCase);
         }
 
         historyService.save(new CreateCaseEventLog(useCase, EventPhase.POST));
+
+        log.info("[{}]: Case {} created", useCase.getStringId(), useCase.getTitle());
+
         outcome.setCase(useCase);
         addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
         return outcome;
     }
 
-    protected Function<Case, String> resolveDefaultCaseTitle(String netId, Locale locale, Map<String, String> params) {
-        PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
+    /**
+     * todo javadoc
+     * */
+    private Case createCaseObject(CreateCaseParams createCaseParams) {
+        LoggedUser loggedOrImpersonated = createCaseParams.getLoggedUser().getSelfOrImpersonated();
+
+        Case useCase = new Case(createCaseParams.getPetriNet());
+        dataSetInitializer.populateDataSet(useCase, createCaseParams.getParams());
+        useCase.setColor(createCaseParams.getColor());
+        useCase.setAuthor(loggedOrImpersonated.transformToAuthor());
+        useCase.setCreationDate(LocalDateTime.now());
+        useCase.setTitle(createCaseParams.getMakeTitle().apply(useCase));
+        useCase.setUriNodeId(createCaseParams.getPetriNet().getUriNodeId());
+
+        useCase.getPetriNet().initializeArcs(useCase.getDataSet());
+
+        return useCase;
+    }
+
+    /**
+     * todo javadoc
+     * makeTitle, petriNet
+     * */
+    private void fillMissingAttributes(CreateCaseParams createCaseParams) throws IllegalArgumentException {
+        if (createCaseParams.getLoggedUser() == null) {
+            throw new IllegalArgumentException("Logged user cannot be null on Case creation.");
+        }
+        if (createCaseParams.getMakeTitle() == null && createCaseParams.getPetriNetId() != null) {
+            createCaseParams.setMakeTitle(resolveDefaultCaseTitle(createCaseParams));
+        }
+        if (createCaseParams.getPetriNet() == null) {
+            PetriNet petriNet = null;
+            if (createCaseParams.getPetriNetId() != null) {
+                petriNet = petriNetService.get(new ObjectId(createCaseParams.getPetriNetId())).clone();
+            } else if (createCaseParams.getPetriNetIdentifier() != null) {
+                petriNet = petriNetService.getNewestVersionByIdentifier(createCaseParams.getPetriNetIdentifier()).clone();
+            }
+            createCaseParams.setPetriNet(petriNet);
+        }
+    }
+
+    private Function<Case, String> resolveDefaultCaseTitle(CreateCaseParams createCaseParams) {
+        Locale locale = createCaseParams.getLocale();
+        PetriNet petriNet = petriNetService.clone(new ObjectId(createCaseParams.getPetriNetId()));
         Function<Case, String> makeTitle;
         if (petriNet.hasDynamicCaseName()) {
-            makeTitle = (u) -> initValueExpressionEvaluator.evaluateCaseName(u, petriNet.getDefaultCaseNameExpression(), params).getTranslation(locale);
+            makeTitle = (u) -> initValueExpressionEvaluator.evaluateCaseName(u, petriNet.getDefaultCaseNameExpression(),
+                    createCaseParams.getParams()).getTranslation(locale);
         } else {
             makeTitle = (u) -> petriNet.getDefaultCaseName().getTranslation(locale);
         }

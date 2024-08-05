@@ -7,6 +7,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -95,7 +96,13 @@ class FunctionsTest {
         assert functionResNet
         assert functionTestNet
 
-        Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(functionTestNet)
+                .title("Test")
+                .color("")
+                .loggedUser(userService.getLoggedOrSystem().transformToLoggedUser())
+                .build()
+        Case aCase = workflowService.createCase(createCaseParams).getCase()
         dataService.setData(aCase.getTaskStringId("1"), new DataSet(["createUser": new BooleanField(rawValue: true)] as Map<String, Field<?>>), superCreator.getLoggedSuper())
 
         IUser user = userService.findByEmail("test@test.com", true)
@@ -113,7 +120,13 @@ class FunctionsTest {
         assert functionResNet
         assert functionTestNet
 
-        Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(functionTestNet)
+                .title("Test")
+                .color("")
+                .loggedUser(userService.getLoggedOrSystem().transformToLoggedUser())
+                .build()
+        Case aCase = workflowService.createCase(createCaseParams).getCase()
         dataService.setData(aCase.getTaskStringId("1"), new DataSet((["enum": new EnumerationField(rawValue: new I18nString("ano"))] as Map<String, Field<?>>)), superCreator.getLoggedSuper())
         aCase = workflowService.findOne(aCase.getStringId())
 
@@ -141,7 +154,13 @@ class FunctionsTest {
             def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
             assert functionTestNet
 
-            Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+            CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                    .petriNet(functionTestNet)
+                    .title("Test")
+                    .color("")
+                    .loggedUser(userService.getLoggedOrSystem().transformToLoggedUser())
+                    .build()
+            Case aCase = workflowService.createCase(createCaseParams).getCase()
             dataService.setData(aCase.getTaskStringId("1"), new DataSet((["number": new NumberField(rawValue: 20d)] as Map<String, Field<?>>)), superCreator.getLoggedSuper())
         })
     }
@@ -159,7 +178,13 @@ class FunctionsTest {
             def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
             assert functionTestNet
 
-            Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+            CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                    .petriNet(functionTestNet)
+                    .title("Test")
+                    .color("")
+                    .loggedUser(userService.getLoggedOrSystem().transformToLoggedUser())
+                    .build()
+            Case aCase = workflowService.createCase(createCaseParams).getCase()
             dataService.setData(aCase.getTaskStringId("1"), new DataSet((["text": new TextField(rawValue: "20")] as Map<String, Field<?>>)), superCreator.getLoggedSuper())
 
             functionTestNet = petriNetService.importPetriNet(functionTestNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
@@ -175,7 +200,13 @@ class FunctionsTest {
             def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
             assert functionTestNet
 
-            Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+            CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                    .petriNet(functionTestNet)
+                    .title("Test")
+                    .color("")
+                    .loggedUser(userService.getLoggedOrSystem().transformToLoggedUser())
+                    .build()
+            Case aCase = workflowService.createCase(createCaseParams).getCase()
             dataService.setData(aCase.getTaskStringId("1"), new DataSet((["number3": new NumberField(rawValue: 20d)] as Map<String, Field<?>>)), superCreator.getLoggedSuper())
         })
     }
@@ -188,7 +219,13 @@ class FunctionsTest {
         assert functionResNet
         assert functionTestNet
 
-        Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(functionTestNet)
+                .title("Test")
+                .color("")
+                .loggedUser(userService.getLoggedOrSystem().transformToLoggedUser())
+                .build()
+        Case aCase = workflowService.createCase(createCaseParams).getCase()
         dataService.setData(aCase.getTaskStringId("1"), new DataSet((["number": new NumberField(rawValue: 20d)] as Map<String, Field<?>>)), superCreator.getLoggedSuper())
         aCase = workflowService.findOne(aCase.getStringId())
 
@@ -215,7 +252,13 @@ class FunctionsTest {
         def functionResV2Net = petriNetService.importPetriNet(functionResNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
         def functionTestV2Net = petriNetService.importPetriNet(functionTestNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
 
-        Case aCase = workflowService.createCase(functionTestV2Net.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(functionTestV2Net)
+                .title("Test")
+                .color("")
+                .loggedUser(userService.getLoggedOrSystem().transformToLoggedUser())
+                .build()
+        Case aCase = workflowService.createCase(createCaseParams).getCase()
         dataService.setData(aCase.getTaskStringId("0"), new DataSet((["updateOtherField": new BooleanField(rawValue: true)] as Map<String, Field<?>>)), superCreator.getLoggedSuper())
 
         aCase = workflowService.findOne(aCase.stringId)
@@ -244,7 +287,13 @@ class FunctionsTest {
         def petriNet = petriNetService.importPetriNet(resource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
         assert petriNet
 
-        Case aCase = workflowService.createCase(petriNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(petriNet)
+                .title("Test")
+                .color("")
+                .loggedUser(userService.getLoggedOrSystem().transformToLoggedUser())
+                .build()
+        Case aCase = workflowService.createCase(createCaseParams).getCase()
         dataService.setData(aCase.getTaskStringId("1"), new DataSet((["number": new NumberField(rawValue: 20d)] as Map<String, Field<?>>)), superCreator.getLoggedSuper())
         aCase = workflowService.findOne(aCase.getStringId())
         NumberField numberField2 = aCase.dataSet.get("number2") as NumberField

@@ -6,26 +6,28 @@ import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExe
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.DelegateTaskEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcome.CreateTasksOutcome;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 // TODO: release/8.0.0 remove LoggedUser, create TaskEventContext class to merge all params
 public interface ITaskService {
 
     void reloadTasks(Case useCase);
+
+    CreateTasksOutcome createAndSetTasksInCase(Case useCase);
 
     Task findOne(String taskId);
 
@@ -50,6 +52,8 @@ public interface ITaskService {
     Page<Task> search(com.querydsl.core.types.Predicate predicate, Pageable pageable);
 
     Task searchOne(com.querydsl.core.types.Predicate predicate);
+
+    List<EventOutcome> executeTask(Task task, Case useCase);
 
     List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException;
 

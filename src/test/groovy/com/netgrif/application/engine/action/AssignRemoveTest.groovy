@@ -9,6 +9,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
@@ -72,7 +73,13 @@ class AssignRemoveTest {
         def roleCount = userService.system.processRoles.size()
 
         // create
-        Case caze = workflowService.createCase(net.stringId, 'TEST', '', userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(net)
+                .title("TEST")
+                .color("")
+                .loggedUser(userService.getLoggedOrSystem().transformToLoggedUser())
+                .build()
+        Case caze = workflowService.createCase(createCaseParams).getCase()
         assert userService.system.processRoles.size() == roleCount + 4
 
         // delete

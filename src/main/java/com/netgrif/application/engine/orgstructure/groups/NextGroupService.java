@@ -21,11 +21,11 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
-import com.netgrif.application.engine.workflow.web.responsebodies.TaskDataSets;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
@@ -106,8 +106,13 @@ public class NextGroupService implements INextGroupService {
         if (userDefaultGroup != null && userDefaultGroup.getTitle().equals(title)) {
             return null;
         }
-        PetriNet orgGroupNet = petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER);
-        CreateCaseEventOutcome outcome = workflowService.createCase(orgGroupNet.getStringId(), title, "", author.transformToLoggedUser());
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER))
+                .title(title)
+                .color("")
+                .loggedUser(author.transformToLoggedUser())
+                .build();
+        CreateCaseEventOutcome outcome = workflowService.createCase(createCaseParams);
 
         DataSet taskData = getInitialGroupData(author, title, outcome.getCase());
         Task initTask = getGroupInitTask(outcome.getCase());

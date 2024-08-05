@@ -20,6 +20,7 @@ import com.netgrif.application.engine.startup.UriRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -91,14 +92,26 @@ public class TaskServiceTest {
 
         petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
         PetriNet net = petriNetRepository.findAll().get(0);
-        workflowService.createCase(net.getStringId(), "Storage Unit", "color", mockLoggedUser());
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(net)
+                .title("Storage Unit")
+                .color("color")
+                .loggedUser(mockLoggedUser())
+                .build();
+        workflowService.createCase(createCaseParams);
     }
 
     @Test
     public void resetArcTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
         PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet();
         LoggedUser loggedUser = mockLoggedUser();
-        CreateCaseEventOutcome outcome = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(net)
+                .title("Reset test")
+                .color("color")
+                .loggedUser(loggedUser)
+                .build();
+        CreateCaseEventOutcome outcome = workflowService.createCase(createCaseParams);
         User user = new User();
         user.setName("name");
         user.setPassword("password");

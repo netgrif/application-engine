@@ -13,6 +13,7 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -271,7 +272,13 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
             }
         }
 
-        Case filterCase = this.workflowService.createCase(filterNet.getStringId(), title, null, loggedUser.transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(filterNet)
+                .title(title)
+                .color(null)
+                .loggedUser(loggedUser.transformToLoggedUser())
+                .build()
+        Case filterCase = this.workflowService.createCase(createCaseParams).getCase()
         filterCase.setIcon(icon)
         filterCase = this.workflowService.save(filterCase)
         Task newFilterTask = this.taskService.searchOne(QTask.task.transitionId.eq(AUTO_CREATE_TRANSITION).and(QTask.task.caseId.eq(filterCase.getStringId())))

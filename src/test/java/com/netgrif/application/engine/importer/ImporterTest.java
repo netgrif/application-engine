@@ -13,6 +13,7 @@ import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -74,7 +74,13 @@ public class ImporterTest {
         ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/priority_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
         assert outcome.getNet() != null;
 
-        CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), outcome.getNet().getTitle().getDefaultValue(), "color", superCreator.getLoggedSuper());
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(outcome.getNet())
+                .title(outcome.getNet().getTitle().getDefaultValue())
+                .color("color")
+                .loggedUser(superCreator.getLoggedSuper())
+                .build();
+        CreateCaseEventOutcome caseOutcome = workflowService.createCase(createCaseParams);
 
         assert caseOutcome.getCase() != null;
     }

@@ -7,10 +7,10 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -65,7 +65,13 @@ class HistoryServiceTest {
 
     @Test
     void findAllAssignTaskEventLogsByCaseIdTest() {
-        Case caze = workflowService.createCase(net.getStringId(), "Test assign", "", superCreator.getLoggedSuper()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(net)
+                .title("Test assign")
+                .color("")
+                .loggedUser(superCreator.getLoggedSuper())
+                .build()
+        Case caze = workflowService.createCase(createCaseParams).getCase()
         int count = historyService.findAllAssignTaskEventLogsByCaseId(caze.getStringId()).size()
         assert count == 0
         String task = caze.tasks.values().find { it.transitionId == "1" }.taskStringId
@@ -76,7 +82,13 @@ class HistoryServiceTest {
 
     @Test
     void findAllFinishTaskEventLogsByCaseId() {
-        Case caze = workflowService.createCase(net.getStringId(), "Test finish", "", superCreator.getLoggedSuper()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(net)
+                .title("Test finish")
+                .color("")
+                .loggedUser(superCreator.getLoggedSuper())
+                .build()
+        Case caze = workflowService.createCase(createCaseParams).getCase()
         int count = historyService.findAllFinishTaskEventLogsByCaseId(caze.getStringId()).size()
         assert count == 0
         String task = caze.tasks.values().find { it.transitionId == "1" }.taskStringId
@@ -89,7 +101,13 @@ class HistoryServiceTest {
 
     @Test
     void findAllSetDataEventLogsByCaseId() {
-        Case caze = workflowService.createCase(net.getStringId(), "Test set data", "", superCreator.getLoggedSuper()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(net)
+                .title("Test set data")
+                .color("")
+                .loggedUser(superCreator.getLoggedSuper())
+                .build()
+        Case caze = workflowService.createCase(createCaseParams).getCase()
         int count = historyService.findAllSetDataEventLogsByCaseId(caze.getStringId()).size()
         assert count == 0
         String task = caze.tasks.values().find { it.transitionId == "1" }.taskStringId

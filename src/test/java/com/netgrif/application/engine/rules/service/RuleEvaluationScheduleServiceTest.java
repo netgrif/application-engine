@@ -15,6 +15,7 @@ import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
@@ -78,7 +79,13 @@ class RuleEvaluationScheduleServiceTest {
                 .build();
         ruleRepository.save(rule);
 
-        CreateCaseEventOutcome caseOutcome = workflowService.createCase(importOutcome.getNet().getStringId(), "Original title", "original color", user);
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(importOutcome.getNet())
+                .title("Original title")
+                .color("original color")
+                .loggedUser(user)
+                .build();
+        CreateCaseEventOutcome caseOutcome = workflowService.createCase(createCaseParams);
         ScheduleOutcome outcome = ruleEvaluationScheduleService.scheduleRuleEvaluationForCase(caseOutcome.getCase(), "rule2", TriggerBuilder.newTrigger().withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1).withRepeatCount(5)));
 
         assert outcome.getJobDetail() != null;

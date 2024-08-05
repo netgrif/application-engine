@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.properties.CacheProperties;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
 import com.netgrif.application.engine.history.domain.petrinetevents.DeletePetriNetEventLog;
 import com.netgrif.application.engine.history.domain.petrinetevents.ImportPetriNetEventLog;
@@ -273,7 +272,7 @@ public class PetriNetService implements IPetriNetService {
     public PetriNet getPetriNet(String id) {
         Optional<PetriNet> net = repository.findById(id);
         if (net.isEmpty()) {
-            throw new IllegalArgumentException("No Petri net with id: " + id + " was found.");
+            throw new IllegalArgumentException("Petri net with id [" + id + "] was found.");
         }
         net.get().initializeArcs();
         return net.get();

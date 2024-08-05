@@ -45,6 +45,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.menu.MenuItemBody
 import com.netgrif.application.engine.workflow.domain.menu.MenuItemConstants
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.*
@@ -801,11 +802,25 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
-        return workflowService.createCaseByIdentifier(identifier, title, color, author.transformToLoggedUser(), locale, params).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNetIdentifier(identifier)
+                .title(title)
+                .color(color)
+                .loggedUser(author.transformToLoggedUser())
+                .params(params)
+                .build()
+        return workflowService.createCase(createCaseParams).getCase()
     }
 
     Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
-        CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser(), params)
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(net)
+                .title(title)
+                .color(color)
+                .loggedUser(author.transformToLoggedUser())
+                .params(params)
+                .build()
+        CreateCaseEventOutcome outcome = workflowService.createCase(createCaseParams)
         this.outcomes.add(outcome)
         return outcome.getCase()
     }

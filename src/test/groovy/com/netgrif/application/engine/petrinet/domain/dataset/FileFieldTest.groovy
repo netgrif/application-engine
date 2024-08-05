@@ -12,6 +12,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -104,7 +105,13 @@ class FileFieldTest {
         IUser user = userService.findByEmail(configuration.email, true)
         assert user != null
 
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black", user.transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(net)
+                .title("Test file download")
+                .color("black")
+                .loggedUser(user.transformToLoggedUser())
+                .build()
+        Case useCase = workflowService.createCase(createCaseParams).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
         mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file")
@@ -124,7 +131,13 @@ class FileFieldTest {
         IUser user = userService.findByEmail(configuration.email, true)
         assert user != null
 
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black", user.transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(net)
+                .title("Test file download")
+                .color("black")
+                .loggedUser(user.transformToLoggedUser())
+                .build()
+        Case useCase = workflowService.createCase(createCaseParams).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
         mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file")

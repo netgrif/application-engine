@@ -5,7 +5,6 @@ import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.drools.RefreshableKieBase;
-import com.netgrif.application.engine.importer.model.EventType;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
@@ -19,6 +18,7 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
@@ -197,7 +197,13 @@ class RuleEngineTest {
         ruleRepository.save(rule3);
         ruleRepository.save(rule4);
 
-        CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color", superUser);
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(outcome.getNet())
+                .title("Original title")
+                .color("original color")
+                .loggedUser(superUser)
+                .build();
+        CreateCaseEventOutcome caseOutcome = workflowService.createCase(createCaseParams);
         // TODO: release/8.0.0 AssertionError
         assert caseOutcome.getCase().getTitle().equals(NEW_CASE_TITLE);
 
@@ -375,7 +381,13 @@ class RuleEngineTest {
 
     private Case newCase() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superUser);
-        return workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color", superUser).getCase();
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(outcome.getNet())
+                .title("Original title")
+                .color("original color")
+                .loggedUser(superUser)
+                .build();
+        return workflowService.createCase(createCaseParams).getCase();
     }
 
     private Task findTask(Case caze, String trans) {

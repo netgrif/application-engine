@@ -179,6 +179,13 @@ public class Case implements Serializable {
         this.tasks.put(task.getTransitionId(), new TaskPair(task));
     }
 
+    public void addTasks(Collection<Task> tasks) {
+        if (tasks == null) {
+            return;
+        }
+        tasks.forEach(this::addTask);
+    }
+
     public void removeTasks(List<Task> tasks) {
         tasks.forEach(task ->
                 this.tasks.remove(task.getTransitionId())

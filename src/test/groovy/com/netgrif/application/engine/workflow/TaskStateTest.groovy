@@ -7,6 +7,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
@@ -51,7 +52,13 @@ class TaskStateTest {
         assert netOptional.isPresent()
         PetriNet net = netOptional.get()
 
-        Case useCase = workflowService.createCase(net.stringId, "Test Case", "", superCreator.superUser.transformToLoggedUser())?.case
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(net)
+                .title("Test Case")
+                .color("")
+                .loggedUser(superCreator.superUser.transformToLoggedUser())
+                .build()
+        Case useCase = workflowService.createCase(createCaseParams)?.case
         assert useCase
 
         List<Task> tasks = taskService.findAllByCase(useCase.stringId)
@@ -66,7 +73,13 @@ class TaskStateTest {
         assert netOptional.isPresent()
         PetriNet net = netOptional.get()
 
-        Case useCase = workflowService.createCase(net.stringId, "Test Case", "", superCreator.superUser.transformToLoggedUser())?.case
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(net)
+                .title("Test Case")
+                .color("")
+                .loggedUser(superCreator.superUser.transformToLoggedUser())
+                .build()
+        Case useCase = workflowService.createCase(createCaseParams)?.case
         assert useCase
 
         4.times { index ->

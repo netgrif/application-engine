@@ -9,6 +9,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -55,9 +56,15 @@ class ReindexTest {
         int countTread = Thread.activeCount()
         List<Thread> threads = []
         List<Case> savedCase = []
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(net.getNet())
+                .title("Test")
+                .color("color")
+                .loggedUser(superCreator.getLoggedSuper())
+                .build()
         for (int i in 1..2000) {
             threads << Thread.start {
-                def useCase = workflowService.createCase(net.getNet().stringId, "Test", "color", superCreator.getLoggedSuper()).getCase()
+                def useCase = workflowService.createCase(createCaseParams).getCase()
                 savedCase.add(useCase)
             }
         }
@@ -69,7 +76,7 @@ class ReindexTest {
         threads = []
         for (int i in 1..4000) {
             threads << Thread.start {
-                def useCase = workflowService.createCase(net.getNet().stringId, "Test", "color", superCreator.getLoggedSuper()).getCase()
+                def useCase = workflowService.createCase(createCaseParams).getCase()
                 savedCase.add(useCase)
             }
         }

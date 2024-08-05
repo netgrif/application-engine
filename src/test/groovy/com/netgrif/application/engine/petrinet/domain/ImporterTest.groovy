@@ -12,6 +12,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
@@ -292,7 +293,13 @@ class ImporterTest {
         PetriNet net = petriNetService.importPetriNet(new ClassPathResource("/this_kw_test.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
 
         assert net != null
-        Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(net)
+                .title("Test case")
+                .color("")
+                .loggedUser(superCreator.loggedSuper)
+                .build()
+        Case testCase = workflowService.createCase(createCaseParams).getCase()
         taskService.assignTask(testCase.getTaskStringId("t1"))
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.getDataSet().get("text_field").getRawValue() == "Hello world!"
@@ -304,7 +311,13 @@ class ImporterTest {
         PetriNet net = petriNetService.importPetriNet(new ClassPathResource("/initial_behavior.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
 
         assert net
-        Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(net)
+                .title("Test case")
+                .color("")
+                .loggedUser(superCreator.loggedSuper)
+                .build()
+        Case testCase = workflowService.createCase(createCaseParams).getCase()
 
         assertBehaviors(testCase.dataSet.get(NUMBER_FIELD).behaviors.get("1"), FORBIDDEN)
         assertBehaviors(testCase.dataSet.get(TEXT_FIELD).behaviors.get("1"), HIDDEN)

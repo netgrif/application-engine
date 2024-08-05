@@ -19,6 +19,7 @@ import com.netgrif.application.engine.workflow.domain.menu.Menu;
 import com.netgrif.application.engine.workflow.domain.menu.MenuAndFilters;
 import com.netgrif.application.engine.workflow.domain.menu.MenuEntry;
 import com.netgrif.application.engine.workflow.domain.menu.MenuEntryRole;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.*;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import lombok.extern.slf4j.Slf4j;
@@ -246,12 +247,13 @@ public class MenuImportExportService implements IMenuImportExportService {
             });
         }
         //Creating new Case of preference_filter_item net and setting its data...
-        Case menuItemCase = workflowService.createCase(
-                petriNetService.getNewestVersionByIdentifier("preference_filter_item").getStringId(),
-                item.getEntryName() + "_" + menuIdentifier,
-                "",
-                userService.getSystem().transformToLoggedUser()
-        ).getCase();
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(petriNetService.getNewestVersionByIdentifier("preference_filter_item"))
+                .title(item.getEntryName() + "_" + menuIdentifier)
+                .color("")
+                .loggedUser(userService.getSystem().transformToLoggedUser())
+                .build();
+        Case menuItemCase = workflowService.createCase(createCaseParams).getCase();
 
         QTask qTask = new QTask("task");
         Task task = taskService.searchOne(qTask.transitionId.eq("init").and(qTask.caseId.eq(menuItemCase.getStringId())));

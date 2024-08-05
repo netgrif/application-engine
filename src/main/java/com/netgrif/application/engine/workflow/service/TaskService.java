@@ -30,13 +30,11 @@ import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.State;
-import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
+import com.netgrif.application.engine.workflow.domain.*;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.*;
+import com.netgrif.application.engine.workflow.domain.outcome.CreateTasksOutcome;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.domain.triggers.AutoTrigger;
 import com.netgrif.application.engine.workflow.domain.triggers.TimeTrigger;
@@ -110,6 +108,26 @@ public class TaskService implements ITaskService {
 
     @Autowired
     private IRuleEngine ruleEngine;
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public List<EventOutcome> executeTask(Task task, Case useCase) {
+        log.info("[{}]: executeTask [{}] in case [{}]", useCase.getStringId(), task.getTransitionId(), useCase.getTitle());
+        List<EventOutcome> outcomes = new ArrayList<>();
+        try {
+            log.info("assignTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
+            outcomes.add(assignTask(task.getStringId()));
+            log.info("getData [{}] in case [{}]", task.getTitle(), useCase.getTitle());
+            outcomes.add(dataService.getData(task.getStringId(), userService.getSystem()));
+            log.info("finishTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
+            outcomes.add(finishTask(task.getStringId()));
+        } catch (TransitionNotExecutableException e) {
+            log.error("execution of task [{}] in case [{}] failed: ", task.getTitle(), useCase.getTitle(), e);
+        }
+        return outcomes;
+    }
 
     @Override
     public List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException {
@@ -431,6 +449,7 @@ public class TaskService implements ITaskService {
     }
 
     /**
+     * todo javadoc
      * Reloads all unassigned tasks of given case:
      * <table border="1">
      * <tr>
@@ -444,40 +463,125 @@ public class TaskService implements ITaskService {
      * </tr>
      * </table>
      */
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public void reloadTasks(Case useCase) {
         log.info("[{}]: Reloading tasks in [{}]", useCase.getStringId(), useCase.getTitle());
-        PetriNet net = useCase.getPetriNet();
-        List<Task> tasks;
-        // create tasks on first reload (create case)
-        if (useCase.getTasks().isEmpty()) {
-            tasks = net.getTransitions().values().stream()
-                    .map(transition -> createFromTransition(transition, useCase))
-                    .collect(Collectors.toList());
-        } else {
-            tasks = taskRepository.findAllByCaseId(useCase.getStringId());
-        }
-        // update tasks state
+        List<String> taskIds = useCase.getTasks().values().stream()
+                .map(taskPair -> taskPair.getTaskId().toString())
+                .collect(Collectors.toList());
+
+        Optional<Task> autoTriggerTaskOpt = reloadAndSaveTasks((List<Task>) taskRepository.findAllById(taskIds), useCase);
+
+        autoTriggerTaskOpt.ifPresent(task -> executeTask(task, workflowService.findOne(useCase.getStringId())));
+    }
+
+    /**
+     * todo javadoc
+     * */
+    private Optional<Task> reloadAndSaveTasks(List<Task> tasks, Case useCase) {
         Task autoTriggered = null;
+        PetriNet net = useCase.getPetriNet();
         for (Task task : tasks) {
             Transition transition = net.getTransition(task.getTransitionId());
-            if (isExecutable(transition, net)) {
-                task.setState(State.ENABLED);
-                if (task.isAutoTriggered()) {
-                    autoTriggered = task;
-                }
-            } else {
-                task.setState(State.DISABLED);
+            if (updateStateOfTask(task, transition, net)) {
+                autoTriggered = task;
             }
-            save(task);
         }
-        if (autoTriggered != null) {
-            executeTransition(autoTriggered, workflowService.findOne(useCase.getStringId()));
+        save(tasks);
+
+        return autoTriggered == null ? Optional.empty() : Optional.of(autoTriggered);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public CreateTasksOutcome createAndSetTasksInCase(Case useCase) {
+        List<Task> tasks = useCase.getPetriNet().getTransitions().values().stream()
+                .map(transition -> createTaskFromTransition(transition, useCase))
+                .collect(Collectors.toList());
+
+        useCase.addTasks(tasks);
+
+        Optional<Task> autoTriggerTaskOpt = reloadAndSaveTasks(tasks, useCase);
+
+        return new CreateTasksOutcome(tasks, autoTriggerTaskOpt.orElse(null));
+    }
+
+    /**
+     * todo javadoc
+     * */
+    private Task createTaskFromTransition(Transition transition, Case useCase) {
+        final Task task = Task.with()
+                .title(transition.getTitle())
+                .processId(useCase.getPetriNetId())
+                .caseId(useCase.getId().toString())
+                .transitionId(transition.getImportId())
+                .layout(transition.getLayout())
+                .tags(transition.getTags())
+                .caseColor(useCase.getColor())
+                .caseTitle(useCase.getTitle())
+                .priority(transition.getPriority())
+                .icon(transition.getIcon() == null ? useCase.getIcon() : transition.getIcon())
+                .immediateDataFields(transition.getImmediateData())
+                .assignPolicy(transition.getAssignPolicy())
+                .dataFocusPolicy(transition.getDataFocusPolicy())
+                .finishPolicy(transition.getFinishPolicy())
+                .build();
+        transition.getEvents().forEach((type, event) -> task.addEventTitle(type, event.getTitle()));
+        task.addAssignedUserPolicy(transition.getAssignedUserPolicy());
+        for (Trigger trigger : transition.getTriggers()) {
+            Trigger taskTrigger = trigger.clone();
+            task.addTrigger(taskTrigger);
+
+            if (taskTrigger instanceof TimeTrigger) {
+                TimeTrigger timeTrigger = (TimeTrigger) taskTrigger;
+                scheduleTaskExecution(task, timeTrigger.getStartDate(), useCase);
+            } else if (taskTrigger instanceof AutoTrigger) {
+                task.setUserId(userService.getSystem().getStringId());
+            }
+        }
+        ProcessRole defaultRole = processRoleService.defaultRole();
+        ProcessRole anonymousRole = processRoleService.anonymousRole();
+        for (Map.Entry<String, Map<RolePermission, Boolean>> entry : transition.getRoles().entrySet()) {
+            if (useCase.getEnabledRoles().contains(entry.getKey())
+                    || defaultRole.getStringId().equals(entry.getKey())
+                    || anonymousRole.getStringId().equals(entry.getKey())) {
+                task.addRole(entry.getKey(), entry.getValue());
+            }
+        }
+        transition.getNegativeViewRoles().forEach(task::addNegativeViewRole);
+
+        for (Map.Entry<String, Map<RolePermission, Boolean>> entry : transition.getUserRefs().entrySet()) {
+            task.addUserRef(entry.getKey(), entry.getValue());
+        }
+        task.resolveViewRoles();
+        task.resolveViewUserRefs();
+
+        Transaction transaction = useCase.getPetriNet().getTransactionByTransition(transition);
+        if (transaction != null) {
+            task.setTransactionId(transaction.getStringId());
+        }
+
+        return task;
+    }
+
+
+    /**
+     * todo javadoc
+     * returns true if it is autotrigger
+     * */
+    private boolean updateStateOfTask(Task task, Transition transition, PetriNet net) {
+        if (isExecutable(transition, net)) {
+            task.setState(State.ENABLED);
+            return task.isAutoTriggered();
+        } else {
+            task.setState(State.DISABLED);
+            return false;
         }
     }
 
-    boolean isExecutable(Transition transition, PetriNet net) {
+    private boolean isExecutable(Transition transition, PetriNet net) {
         Collection<Arc> arcsOfTransition = net.getArcsOfTransition(transition);
 
         if (arcsOfTransition == null) {
@@ -489,7 +593,7 @@ public class TaskService implements ITaskService {
                 .allMatch(Arc::isExecutable);
     }
 
-    void finishExecution(Transition transition, String useCaseId) throws TransitionNotExecutableException {
+    private void finishExecution(Transition transition, String useCaseId) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(useCaseId);
         log.info("[{}]: Finish execution of task [{}] in case [{}]", useCaseId, transition.getTitle(), useCase.getTitle());
         execute(transition, useCase, arc -> arc.getSource().equals(transition));
@@ -498,7 +602,7 @@ public class TaskService implements ITaskService {
         workflowService.save(useCase);
     }
 
-    public void startExecution(Transition transition, Case useCase) throws TransitionNotExecutableException {
+    private void startExecution(Transition transition, Case useCase) throws TransitionNotExecutableException {
         log.info("[{}]: Start execution of {} in case {}", useCase.getStringId(), transition.getTitle(), useCase.getTitle());
         execute(transition, useCase, arc -> arc.getDestination().equals(transition));
     }
@@ -523,23 +627,7 @@ public class TaskService implements ITaskService {
         workflowService.updateMarking(useCase);
     }
 
-    protected List<EventOutcome> executeTransition(Task task, Case useCase) {
-        log.info("[{}]: executeTransition [{}] in case [{}]", useCase.getStringId(), task.getTransitionId(), useCase.getTitle());
-        List<EventOutcome> outcomes = new ArrayList<>();
-        try {
-            log.info("assignTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
-            outcomes.add(assignTask(task.getStringId()));
-            log.info("getData [{}] in case [{}]", task.getTitle(), useCase.getTitle());
-            outcomes.add(dataService.getData(task.getStringId(), userService.getSystem()));
-            log.info("finishTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
-            outcomes.add(finishTask(task.getStringId()));
-        } catch (TransitionNotExecutableException e) {
-            log.error("execution of task [{}] in case [{}] failed: ", task.getTitle(), useCase.getTitle(), e);
-        }
-        return outcomes;
-    }
-
-    void validateData(Transition transition, Case useCase) {
+    private void validateData(Transition transition, Case useCase) {
 //        TODO: release/8.0.0 fix validation
 //        for (Map.Entry<String, DataFieldLogic> entry : transition.getDataSet().entrySet()) {
 //            if (useCase.getPetriNet().getDataSet().get(entry.getKey()) != null
@@ -563,11 +651,11 @@ public class TaskService implements ITaskService {
 //        }
     }
 
-    protected void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase) {
+    private void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase) {
         log.info("[{}]: Task {} scheduled to run at {}", useCase.getStringId(), task.getTitle(), time.toString());
         scheduler.schedule(() -> {
             try {
-                executeTransition(task, useCase);
+                executeTask(task, useCase);
             } catch (Exception e) {
                 log.info("[{}]: Scheduled task [{}] of case [{}] could not be executed: {}", useCase.getStringId(), task.getTitle(), useCase.getTitle(), e.toString());
             }
@@ -753,67 +841,6 @@ public class TaskService implements ITaskService {
                 .map(UserFieldValue::getId)
                 .filter(id -> id != null && userService.existsById(id))
                 .collect(Collectors.toList());
-    }
-
-    private Task createFromTransition(Transition transition, Case useCase) {
-        final Task task = Task.with()
-                .title(transition.getTitle())
-                .processId(useCase.getPetriNetId())
-                .caseId(useCase.getId().toString())
-                .transitionId(transition.getImportId())
-                .layout(transition.getLayout())
-                .tags(transition.getTags())
-                .caseColor(useCase.getColor())
-                .caseTitle(useCase.getTitle())
-                .priority(transition.getPriority())
-                .icon(transition.getIcon() == null ? useCase.getIcon() : transition.getIcon())
-                .immediateDataFields(transition.getImmediateData())
-                .assignPolicy(transition.getAssignPolicy())
-                .dataFocusPolicy(transition.getDataFocusPolicy())
-                .finishPolicy(transition.getFinishPolicy())
-                .build();
-        transition.getEvents().forEach((type, event) -> task.addEventTitle(type, event.getTitle()));
-        task.addAssignedUserPolicy(transition.getAssignedUserPolicy());
-        for (Trigger trigger : transition.getTriggers()) {
-            Trigger taskTrigger = trigger.clone();
-            task.addTrigger(taskTrigger);
-
-            if (taskTrigger instanceof TimeTrigger) {
-                TimeTrigger timeTrigger = (TimeTrigger) taskTrigger;
-                scheduleTaskExecution(task, timeTrigger.getStartDate(), useCase);
-            } else if (taskTrigger instanceof AutoTrigger) {
-                task.setUserId(userService.getSystem().getStringId());
-            }
-        }
-        ProcessRole defaultRole = processRoleService.defaultRole();
-        ProcessRole anonymousRole = processRoleService.anonymousRole();
-        for (Map.Entry<String, Map<RolePermission, Boolean>> entry : transition.getRoles().entrySet()) {
-            if (useCase.getEnabledRoles().contains(entry.getKey())
-                    || defaultRole.getStringId().equals(entry.getKey())
-                    || anonymousRole.getStringId().equals(entry.getKey())) {
-                task.addRole(entry.getKey(), entry.getValue());
-            }
-        }
-        transition.getNegativeViewRoles().forEach(task::addNegativeViewRole);
-
-        for (Map.Entry<String, Map<RolePermission, Boolean>> entry : transition.getUserRefs().entrySet()) {
-            task.addUserRef(entry.getKey(), entry.getValue());
-        }
-        task.resolveViewRoles();
-        task.resolveViewUserRefs();
-
-        Transaction transaction = useCase.getPetriNet().getTransactionByTransition(transition);
-        if (transaction != null) {
-            task.setTransactionId(transaction.getStringId());
-        }
-
-        Task savedTask = save(task);
-
-        useCase.addTask(savedTask);
-        // TODO: release/8.0.0 remove?
-        workflowService.resolveUserRef(useCase);
-
-        return savedTask;
     }
 
     private Page<Task> loadUsers(Page<Task> tasks) {

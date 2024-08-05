@@ -10,6 +10,7 @@ import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetM
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
@@ -46,7 +47,13 @@ class NewInitTest {
     @Test
     void newInitTest() throws IOException, MissingIconKeyException, MissingPetriNetMetaDataException {
         petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/nae_1276_Init_value_as_choice.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        Case initTestCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier("new_init_test").stringId, "New init test", "", superCreator.getLoggedSuper()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+                .petriNet(petriNetService.getNewestVersionByIdentifier("new_init_test"))
+                .title("New init test")
+                .color("")
+                .loggedUser(superCreator.getLoggedSuper())
+                .build()
+        Case initTestCase = workflowService.createCase(createCaseParams).getCase()
 //        TODO: release/8.0.0
 //        assert (initTestCase.dataSet["new_init_multichoice"].value as List<I18nString>).stream().any { ((I18nString) it).defaultValue == "Bob" }
 //        assert (initTestCase.dataSet["new_init_multichoice"].value as List<I18nString>).stream().any { ((I18nString) it).defaultValue == "Alice" }
