@@ -4,9 +4,10 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,21 +27,15 @@ public interface IWorkflowService {
 
     Page<Case> getAll(Pageable pageable);
 
+    Page<Case> findAllByAuthor(String authorId, String petriNet, Pageable pageable);
+
     Case resolveUserRef(Case useCase);
 
     CreateCaseEventOutcome createCase(CreateCaseParams createCaseParams);
 
-    Page<Case> findAllByAuthor(String authorId, String petriNet, Pageable pageable);
-
-    DeleteCaseEventOutcome deleteCase(String caseId, Map<String, String> params);
-
-    DeleteCaseEventOutcome deleteCase(String caseId);
+    DeleteCaseEventOutcome deleteCase(DeleteCaseParams deleteCaseParams);
 
     DeleteCaseEventOutcome deleteSubtreeRootedAt(String caseId);
-
-    DeleteCaseEventOutcome deleteCase(Case useCase, Map<String, String> params);
-
-    DeleteCaseEventOutcome deleteCase(Case useCase);
 
     void deleteInstancesOfPetriNet(PetriNet net);
 

@@ -1,9 +1,9 @@
-package com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes;
+package com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes;
 
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.PetriNetEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.EventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.PetriNetEventOutcome;
 
 import java.util.List;
 

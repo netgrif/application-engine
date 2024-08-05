@@ -60,11 +60,12 @@ class WorkflowServiceTest {
 
     @Test
     @Disabled
+    // todo remove
     void testblabla() {
         def testNetWithTriggers = petriNetService.importPetriNet(stream("petriNets/test_with_triggers.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
-        def testNet = petriNetService.importPetriNet(stream("petriNets/mortgage.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        def testNet = petriNetService.importPetriNet(stream("petriNets/test_without_triggers.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
 
-        int iterations = 2
+        int iterations = 1000
         def paramsWithoutTrigger = CreateCaseParams.builder()
                 .petriNet(testNet)
                 .loggedUser(superCreator.getLoggedSuper())

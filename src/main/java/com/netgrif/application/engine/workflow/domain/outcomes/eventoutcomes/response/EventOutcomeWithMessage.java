@@ -1,6 +1,6 @@
-package com.netgrif.application.engine.workflow.domain.eventoutcomes.response;
+package com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response;
 
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.web.responsebodies.ResponseMessage;
 import lombok.Data;
 

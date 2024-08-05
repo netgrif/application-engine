@@ -17,6 +17,7 @@ import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.menu.MenuItemConstants
+import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -320,7 +321,10 @@ class MenuItemApiTest {
         assert workflowService.findOne(testFolder.stringId) != null
         assert workflowService.findOne(leafItemId) != null
 
-        workflowService.deleteCase(testFolder)
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(testFolder)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
         sleep(2000)
         netgrifFolder = workflowService.findOne(netgrifFolderId)
         assert !(netgrifFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as ArrayList).contains(testFolder.stringId)

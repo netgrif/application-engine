@@ -5,7 +5,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.transaction.NaeTransaction
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired

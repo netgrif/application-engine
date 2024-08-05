@@ -37,15 +37,16 @@ import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.transaction.NaeTransaction
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.*
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.EventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.GetDataEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.TaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.menu.MenuItemBody
 import com.netgrif.application.engine.workflow.domain.menu.MenuItemConstants
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.*
@@ -1519,7 +1520,10 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      * @return
      */
     def deleteFilter(Case filter) {
-        workflowService.deleteCase(filter.stringId)
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(filter)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
     }
 
     /**
@@ -1838,7 +1842,10 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      */
     def deleteMenuItem(Case item) {
         async.run {
-            workflowService.deleteCase(item.stringId)
+            DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                    .useCase(item)
+                    .build()
+            workflowService.deleteCase(deleteCaseParams)
         }
     }
 

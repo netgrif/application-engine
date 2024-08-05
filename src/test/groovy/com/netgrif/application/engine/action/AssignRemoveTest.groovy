@@ -8,8 +8,9 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
@@ -83,7 +84,10 @@ class AssignRemoveTest {
         assert userService.system.processRoles.size() == roleCount + 4
 
         // delete
-        workflowService.deleteCase(caze.stringId)
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(caze)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
         assert userService.system.processRoles.size() == roleCount
     }
 }

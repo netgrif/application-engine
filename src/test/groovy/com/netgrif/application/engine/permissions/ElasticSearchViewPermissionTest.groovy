@@ -20,8 +20,9 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -114,7 +115,10 @@ class ElasticSearchViewPermissionTest {
         Page<Case> casePage = elasticCaseService.search([caseSearchRequest] as List, testUser.transformToLoggedUser(), PageRequest.of(0, 20), LocaleContextHolder.getLocale(), false)
 
         assert casePage.getContent().size() == 0
-        workflowService.deleteCase(case_.getStringId())
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(case_)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
     }
 
     @Test
@@ -138,7 +142,10 @@ class ElasticSearchViewPermissionTest {
         assert casePage.getContent().size() == 1
         assert casePage.getContent()[0].stringId == case_.stringId
         userService.removeRole(testUser, posViewRole.getStringId())
-        workflowService.deleteCase(case_.getStringId())
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(case_)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
     }
 
     @Test
@@ -159,7 +166,10 @@ class ElasticSearchViewPermissionTest {
 
         assert casePage.getContent().size() == 0 && case_.negativeViewRoles.contains(negViewRole.stringId)
         userService.removeRole(testUser, negViewRole.getStringId())
-        workflowService.deleteCase(case_.getStringId())
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(case_)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
     }
 
     @Test
@@ -177,7 +187,10 @@ class ElasticSearchViewPermissionTest {
         Page<Case> casePage = elasticCaseService.search([caseSearchRequest] as List, testUser.transformToLoggedUser(), PageRequest.of(0, 20), LocaleContextHolder.getLocale(), false)
 
         assert casePage.getContent().size() == 0
-        workflowService.deleteCase(case_.getStringId())
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(case_)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
     }
 
     @Test
@@ -201,7 +214,10 @@ class ElasticSearchViewPermissionTest {
         Page<Case> casePage = elasticCaseService.search([caseSearchRequest] as List, testUser.transformToLoggedUser(), PageRequest.of(0, 20), LocaleContextHolder.getLocale(), false)
 
         assert casePage.getContent().size() == 1 && casePage.getContent()[0].stringId == case_.stringId && case_.viewUsers.contains(testUser.getStringId())
-        workflowService.deleteCase(case_.getStringId())
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(case_)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
     }
 
     @Test
@@ -225,7 +241,10 @@ class ElasticSearchViewPermissionTest {
         Page<Case> casePage = elasticCaseService.search([caseSearchRequest] as List, testUser.transformToLoggedUser(), PageRequest.of(0, 20), LocaleContextHolder.getLocale(), false)
 
         assert casePage.getContent().size() == 0 && case_.negativeViewUsers.contains(testUser.getStringId())
-        workflowService.deleteCase(case_.getStringId())
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(case_)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
     }
 
     @Test
@@ -252,6 +271,9 @@ class ElasticSearchViewPermissionTest {
 
         assert casePage.getContent().size() == 1 && case_.viewUsers.contains(testUser.stringId)
         userService.removeRole(testUser, negViewRole.getStringId())
-        workflowService.deleteCase(case_.getStringId())
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(case_)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
     }
 }

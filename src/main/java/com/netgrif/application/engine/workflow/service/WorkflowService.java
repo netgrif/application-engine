@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
+import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
@@ -22,10 +23,11 @@ import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataFieldValue;
 import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
-import com.netgrif.application.engine.workflow.domain.outcome.CreateTasksOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.EventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.CreateTasksOutcome;
+import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.service.initializer.DataSetInitializer;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
@@ -278,29 +280,33 @@ public class WorkflowService implements IWorkflowService {
         if (createCaseParams.getLoggedUser() == null) {
             throw new IllegalArgumentException("Logged user cannot be null on Case creation.");
         }
-        if (createCaseParams.getMakeTitle() == null && createCaseParams.getPetriNetId() != null) {
-            createCaseParams.setMakeTitle(resolveDefaultCaseTitle(createCaseParams));
-        }
         if (createCaseParams.getPetriNet() == null) {
-            PetriNet petriNet = null;
+            PetriNet petriNet;
             if (createCaseParams.getPetriNetId() != null) {
                 petriNet = petriNetService.get(new ObjectId(createCaseParams.getPetriNetId())).clone();
             } else if (createCaseParams.getPetriNetIdentifier() != null) {
                 petriNet = petriNetService.getNewestVersionByIdentifier(createCaseParams.getPetriNetIdentifier()).clone();
+            } else {
+                throw new IllegalArgumentException("Could not find the PetriNet for the Case from provided inputs on case creation.");
             }
             createCaseParams.setPetriNet(petriNet);
+        }
+        if (createCaseParams.getMakeTitle() == null && createCaseParams.getPetriNet() != null) {
+            createCaseParams.setMakeTitle(resolveDefaultCaseTitle(createCaseParams));
         }
     }
 
     private Function<Case, String> resolveDefaultCaseTitle(CreateCaseParams createCaseParams) {
         Locale locale = createCaseParams.getLocale();
-        PetriNet petriNet = petriNetService.clone(new ObjectId(createCaseParams.getPetriNetId()));
+        PetriNet petriNet = createCaseParams.getPetriNet();
         Function<Case, String> makeTitle;
         if (petriNet.hasDynamicCaseName()) {
             makeTitle = (u) -> initValueExpressionEvaluator.evaluateCaseName(u, petriNet.getDefaultCaseNameExpression(),
                     createCaseParams.getParams()).getTranslation(locale);
-        } else {
+        } else if (petriNet.hasDefaultCaseName()) {
             makeTitle = (u) -> petriNet.getDefaultCaseName().getTranslation(locale);
+        } else {
+            makeTitle = (u) -> null;
         }
         return makeTitle;
     }
@@ -316,67 +322,91 @@ public class WorkflowService implements IWorkflowService {
         return new PageImpl<>(cases, pageable, mongoTemplate.count(new BasicQuery(queryString, "{id:1}"), Case.class));
     }
 
+    /**
+     * todo javadoc
+     * */
     @Override
-    public DeleteCaseEventOutcome deleteCase(String caseId) {
-        return deleteCase(caseId, new HashMap<>());
-    }
+    @Transactional
+    public DeleteCaseEventOutcome deleteCase(DeleteCaseParams deleteCaseParams) {
+        fillMissingAttributes(deleteCaseParams);
 
-    @Override
-    public DeleteCaseEventOutcome deleteCase(String caseId, Map<String, String> params) {
-        Case useCase = findOne(caseId);
-        return deleteCase(useCase, params);
-    }
+        Case useCase = deleteCaseParams.getUseCase();
 
-    @Override
-    public DeleteCaseEventOutcome deleteCase(Case useCase, Map<String, String> params) {
-        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty(), params));
+        List<EventOutcome> preEventOutcomes = eventService.runActions(useCase.getPetriNet().getPreDeleteActions(),
+                useCase, Optional.empty(), deleteCaseParams.getParams());
+
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
-        log.info("[{}]: User [{}] is deleting case {}", useCase.getStringId(), userService.getLoggedOrSystem().getStringId(), useCase.getTitle());
+
+        log.info("[{}]: User [{}] is deleting case {}", useCase.getStringId(), userService.getLoggedOrSystem().getStringId(),
+                useCase.getTitle());
 
         taskService.deleteTasksByCase(useCase.getStringId());
         repository.delete(useCase);
 
-        outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty(), params));
+        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, preEventOutcomes);
+        outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null,
+                Optional.empty(), deleteCaseParams.getParams()));
         addMessageToOutcome(useCase.getPetriNet(), CaseEventType.DELETE, outcome);
+
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.POST));
+
         return outcome;
     }
 
-    @Override
-    public DeleteCaseEventOutcome deleteCase(Case useCase) {
-        return deleteCase(useCase, new HashMap<>());
+    /**
+     * todo javadoc
+     * */
+    private void fillMissingAttributes(DeleteCaseParams deleteCaseParams) throws IllegalArgumentException {
+        if (deleteCaseParams.getUseCase() == null) {
+            if (deleteCaseParams.getUseCaseId() != null) {
+                deleteCaseParams.setUseCase(findOne(deleteCaseParams.getUseCaseId()));
+            } else {
+                throw new IllegalArgumentException("At least case id must be provided on case removal.");
+            }
+        }
     }
 
     @Override
+    @Transactional
     public void deleteInstancesOfPetriNet(PetriNet net) {
-        log.info("[{}]: User {} is deleting all cases and tasks of Petri net {} version {}", net.getStringId(), userService.getLoggedOrSystem().getStringId(), net.getIdentifier(), net.getVersion().toString());
+        final IUser user = userService.getLoggedOrSystem();
+        final LoggedUser loggedUser = user.transformToLoggedUser();
+
+        log.info("[{}]: User {} is deleting all cases and tasks of Petri net {} version {}", net.getStringId(),
+                user.getStringId(), net.getIdentifier(), net.getVersion().toString());
 
         taskService.deleteTasksByPetriNetId(net.getStringId());
+
         CaseSearchRequest request = new CaseSearchRequest();
         CaseSearchRequest.PetriNet netRequest = new CaseSearchRequest.PetriNet();
         netRequest.processId = net.getStringId();
         request.process = Collections.singletonList(netRequest);
-        long countCases = elasticCaseService.count(Collections.singletonList(request), userService.getLoggedOrSystem().transformToLoggedUser(), Locale.getDefault(), false);
-        log.info("[{}]: User {} is deleting {} cases of Petri net {} version {}", net.getStringId(), userService.getLoggedOrSystem().getStringId(), countCases, net.getIdentifier(), net.getVersion().toString());
+        long countCases = elasticCaseService.count(Collections.singletonList(request), loggedUser, Locale.getDefault(), false);
+
+        log.info("[{}]: User {} is deleting {} cases of Petri net {} version {}", net.getStringId(), user.getStringId(),
+                countCases, net.getIdentifier(), net.getVersion().toString());
+
         long pageCount = (countCases / 100) + 1;
         LongStream.range(0, pageCount)
                 .forEach(i -> elasticCaseService.search(
                                 Collections.singletonList(request),
-                                userService.getLoggedOrSystem().transformToLoggedUser(),
+                                loggedUser,
                                 PageRequest.of((int) i, 100),
                                 Locale.getDefault(),
                                 false)
                         .getContent()
-                        .forEach(this::deleteCase));
+                        .forEach(useCase -> deleteCase(new DeleteCaseParams(useCase))));
     }
 
     @Override
+    @Transactional
     public DeleteCaseEventOutcome deleteSubtreeRootedAt(String subtreeRootCaseId) {
         Case subtreeRoot = findOne(subtreeRootCaseId);
         if (subtreeRoot.getImmediateDataFields().contains("treeChildCases")) {
             ((List<String>) subtreeRoot.getDataSet().get("treeChildCases").getValue()).forEach(this::deleteSubtreeRootedAt);
         }
-        return deleteCase(subtreeRootCaseId);
+
+        return deleteCase(new DeleteCaseParams(subtreeRoot));
     }
 
     @Override

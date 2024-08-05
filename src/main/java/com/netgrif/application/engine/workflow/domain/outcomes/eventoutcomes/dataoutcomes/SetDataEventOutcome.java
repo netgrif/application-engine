@@ -1,10 +1,10 @@
-package com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes;
+package com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes;
 
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.EventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.TaskEventOutcome;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import lombok.Data;
 

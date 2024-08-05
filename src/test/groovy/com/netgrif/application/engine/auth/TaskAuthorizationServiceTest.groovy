@@ -17,8 +17,9 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskAuthorizationService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -284,7 +285,10 @@ class TaskAuthorizationServiceTest {
         Case case_ = workflowService.createCase(createCaseParams).getCase()
         assert taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), case_.getTaskStringId("1"))
         userService.removeRole(testUser, positiveRole.getStringId())
-        workflowService.deleteCase(case_.stringId)
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(case_)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
     }
 
     @Test
@@ -300,7 +304,10 @@ class TaskAuthorizationServiceTest {
         Case case_ = workflowService.createCase(createCaseParams).getCase()
         assert !taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), case_.getTaskStringId("1"))
         userService.removeRole(testUser, negativeRole.getStringId())
-        workflowService.deleteCase(case_.stringId)
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(case_)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
     }
 
     @Test
@@ -320,7 +327,10 @@ class TaskAuthorizationServiceTest {
         sleep(4000)
 
         assert taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), taskId)
-        workflowService.deleteCase(case_.stringId)
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(case_)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
     }
 
     @Test
@@ -339,7 +349,7 @@ class TaskAuthorizationServiceTest {
         sleep(4000)
 
         assert !taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), taskId)
-        workflowService.deleteCase(case_.stringId)
+        workflowService.deleteCase(new DeleteCaseParams(case_))
     }
 
     @Test
@@ -361,7 +371,10 @@ class TaskAuthorizationServiceTest {
 
         assert taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), taskId)
         userService.removeRole(testUser, positiveRole.getStringId())
-        workflowService.deleteCase(case_.stringId)
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(case_)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
     }
 
     @Test
@@ -380,7 +393,10 @@ class TaskAuthorizationServiceTest {
         taskService.assignTask(testUser.transformToLoggedUser(), taskId)
         assert taskAuthorizationService.canCallFinish(testUser.transformToLoggedUser(), taskId)
         userService.removeRole(testUser, positiveRole.getStringId())
-        workflowService.deleteCase(case_.stringId)
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(case_)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
     }
 
     @Test
@@ -399,7 +415,10 @@ class TaskAuthorizationServiceTest {
         taskService.assignTask(testUser.transformToLoggedUser(), taskId)
         assert !taskAuthorizationService.canCallFinish(testUser.transformToLoggedUser(), taskId)
         userService.removeRole(testUser, negativeRole.getStringId())
-        workflowService.deleteCase(case_.stringId)
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(case_)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
     }
 
     @Test
@@ -419,7 +438,10 @@ class TaskAuthorizationServiceTest {
 
         taskService.assignTask(testUser.transformToLoggedUser(), taskId)
         assert taskAuthorizationService.canCallFinish(testUser.transformToLoggedUser(), taskId)
-        workflowService.deleteCase(case_.stringId)
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(case_)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
     }
 
     @Test
@@ -439,7 +461,10 @@ class TaskAuthorizationServiceTest {
 
         taskService.assignTask(testUser.transformToLoggedUser(), taskId)
         assert !taskAuthorizationService.canCallFinish(testUser.transformToLoggedUser(), taskId)
-        workflowService.deleteCase(case_.stringId)
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(case_)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
     }
 
     @Test
@@ -462,7 +487,10 @@ class TaskAuthorizationServiceTest {
         taskService.assignTask(testUser.transformToLoggedUser(), taskId)
         assert taskAuthorizationService.canCallFinish(testUser.transformToLoggedUser(), taskId)
         userService.removeRole(testUser, positiveRole.getStringId())
-        workflowService.deleteCase(case_.stringId)
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+                .useCase(case_)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
     }
 
 }

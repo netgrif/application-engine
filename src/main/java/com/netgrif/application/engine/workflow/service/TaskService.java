@@ -29,12 +29,11 @@ import com.netgrif.application.engine.rules.domain.facts.TransitionEventFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.*;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.*;
-import com.netgrif.application.engine.workflow.domain.outcome.CreateTasksOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.EventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.CreateTasksOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.*;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.domain.triggers.AutoTrigger;
 import com.netgrif.application.engine.workflow.domain.triggers.TimeTrigger;
@@ -48,7 +47,6 @@ import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -70,41 +68,35 @@ import java.util.stream.Stream;
 public class TaskService implements ITaskService {
 
     @Autowired
-    protected ApplicationEventPublisher publisher;
+    private TaskRepository taskRepository;
 
     @Autowired
-    protected TaskRepository taskRepository;
+    private IUserService userService;
 
     @Autowired
-    protected IUserService userService;
+    private MongoTemplate mongoTemplate;
 
     @Autowired
-    protected MongoTemplate mongoTemplate;
-
-    @Autowired
-    protected TaskSearchService searchService;
+    private TaskSearchService searchService;
 
     @Autowired
     @Qualifier("taskScheduler")
-    protected TaskScheduler scheduler;
+    private TaskScheduler scheduler;
 
     @Autowired
-    protected IWorkflowService workflowService;
+    private IWorkflowService workflowService;
 
     @Autowired
-    protected IDataService dataService;
+    private IDataService dataService;
 
     @Autowired
-    protected IProcessRoleService processRoleService;
+    private IProcessRoleService processRoleService;
 
     @Autowired
-    protected IEventService eventService;
+    private IEventService eventService;
 
     @Autowired
-    protected IHistoryService historyService;
-
-    @Autowired
-    protected IValidationService validation;
+    private IHistoryService historyService;
 
     @Autowired
     private IRuleEngine ruleEngine;
