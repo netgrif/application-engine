@@ -792,8 +792,9 @@
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <version>4.7.1</version>
                 <configuration>
-                    <sourceDirectory>src/main/resources/antlr4</sourceDirectory>
-                    <outputDirectory>${project.build.directory}/generated-sources/java/com/netgrif/application/engine/antlr4</outputDirectory>
+                    <sourceDirectory>src/main/java</sourceDirectory>
+                    <outputDirectory>${project.build.directory}/generated-sources/java/</outputDirectory>
+                    <visitor>true</visitor>
                 </configuration>
                 <executions>
                     <execution>
