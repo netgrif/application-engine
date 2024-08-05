@@ -70,7 +70,7 @@ jobs:
         run: |
           echo "Waiting for MongoDB to be ready..."
           for i in {1..30}; do
-            if mongo --eval "print(\"MongoDB is up\")" &>/dev/null; then
+            if mongo --eval "printjson(db.serverStatus())" &>/dev/null; then
               echo "MongoDB is up"
               break
             fi
