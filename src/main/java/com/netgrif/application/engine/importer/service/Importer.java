@@ -97,8 +97,6 @@ public class Importer {
     protected void initialize() {
         this.defaultRole = processRoleService.defaultRole();
         this.anonymousRole = processRoleService.anonymousRole();
-        this.net.addRole(defaultRole);
-        this.net.addRole(anonymousRole);
     }
 
     public com.netgrif.application.engine.importer.model.Process unmarshallXml(InputStream xml) throws JAXBException {
@@ -120,6 +118,8 @@ public class Importer {
 ////        documentValidator.checkConflictingAttributes(process, process.getUsersRef(), process.getUserRef(), "usersRef", "userRef");
 ////        documentValidator.checkDeprecatedAttributes(process);
         net = new Process();
+        net.addRole(defaultRole);
+        net.addRole(anonymousRole);
 //        process.getI18N().forEach(this::addI18N);
 //
 //        setMetaData();

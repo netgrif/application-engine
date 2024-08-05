@@ -13,7 +13,6 @@ public class CaseField extends FieldWithAllowedNets<List<String>> {
 
     public CaseField(List<String> allowedNets) {
         super(allowedNets);
-        super.defaultValue = new ArrayList<>();
     }
 
     @Override

@@ -8,7 +8,6 @@ public class BooleanField extends Field<Boolean> {
 
     public BooleanField() {
         super();
-        defaultValue = false;
     }
 
     @Override

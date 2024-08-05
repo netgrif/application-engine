@@ -17,13 +17,14 @@ public class MultichoiceMapFieldBuilder extends FieldBuilder<MultichoiceMapField
         MultichoiceMapField field = new MultichoiceMapField();
         initialize(field);
         setFieldOptions(field, data, importer);
-        setDefaultValues(field, data, init -> {
-            Set<String> defaultValue = new HashSet<>();
-            if (init != null && !init.isEmpty()) {
-                defaultValue.addAll(init);
-            }
-            field.setDefaultValue(defaultValue);
-        });
+        // TODO: release/8.0.0
+//        setDefaultValues(field, data, init -> {
+//            Set<String> defaultValue = new HashSet<>();
+//            if (init != null && !init.isEmpty()) {
+//                defaultValue.addAll(init);
+//            }
+//            field.setStaticDefaultValue(defaultValue);
+//        });
         return field;
     }
 

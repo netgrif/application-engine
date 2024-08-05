@@ -11,7 +11,6 @@ public class NumberField extends Field<Double> {
 
     public NumberField() {
         super();
-        super.setDefaultValue(0.0d);
     }
 
     @Override

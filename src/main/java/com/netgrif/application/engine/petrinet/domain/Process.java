@@ -245,6 +245,7 @@ public class Process extends ProcessObject {
 
     public Process clone() {
         Process clone = new Process();
+        clone.setId(this.id);
         clone.setIdentifier(this.identifier);
         clone.setUriNodeId(this.uriNodeId);
         clone.setTitle(this.title.clone());
@@ -256,7 +257,6 @@ public class Process extends ProcessObject {
         clone.setRoles(this.roles == null ? null : this.roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, LinkedHashMap::new)));
         clone.setImportXmlPath(this.importXmlPath);
         clone.setImportId(this.importId);
-        clone.setObjectId(this.id);
         clone.setDataSet(this.dataSet.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x, y) -> y, LinkedHashMap::new))

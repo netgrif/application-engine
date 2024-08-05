@@ -28,4 +28,8 @@ public abstract class ProcessObject extends Imported {
     public ObjectId getObjectId() {
         return id;
     }
+
+    public void setObjectId(ObjectId id) {
+        this.id = id;
+    }
 }

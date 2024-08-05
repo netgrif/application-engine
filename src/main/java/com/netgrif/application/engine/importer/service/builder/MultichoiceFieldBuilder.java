@@ -21,11 +21,12 @@ public class MultichoiceFieldBuilder extends FieldBuilder<MultichoiceField> {
         } else {
             setFieldChoices(field, data, importer);
         }
-        setDefaultValues(field, data, init -> {
-            if (init != null && !init.isEmpty()) {
-                field.setDefaultValue(init.stream().map(I18nString::new).collect(Collectors.toSet()));
-            }
-        });
+        // TODO: release/8.0.0
+//        setDefaultValues(field, data, init -> {
+//            if (init != null && !init.isEmpty()) {
+//                field.setStaticDefaultValue(init.stream().map(I18nString::new).collect(Collectors.toSet()));
+//            }
+//        });
         return field;
     }
 

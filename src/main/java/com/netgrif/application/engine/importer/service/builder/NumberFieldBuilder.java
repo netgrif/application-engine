@@ -13,11 +13,12 @@ public class NumberFieldBuilder extends FieldBuilder<NumberField> {
     public NumberField build(Data data, Importer importer) {
         NumberField field = new NumberField();
         initialize(field);
-        setDefaultValue(field, data, defaultValue -> {
-            if (defaultValue != null) {
-                field.setDefaultValue(Double.parseDouble(defaultValue));
-            }
-        });
+        // TODO: release/8.0.0
+//        setDefaultValue(field, data, defaultValue -> {
+//            if (defaultValue != null) {
+//                field.setDefaultValue(Double.parseDouble(defaultValue));
+//            }
+//        });
         return field;
     }
 

@@ -20,11 +20,12 @@ public class EnumerationFieldBuilder extends FieldBuilder<EnumerationField> {
             setFieldChoices(field, data, importer);
         }
         // TODO: release/8.0.0 double check with NAE-1757 in 6.3.0 and write test, multichoiceFieldBuilder too
-        setDefaultValue(field, data, init -> {
-            if (init != null && !init.equals("")) {
-                field.setDefaultValue(new I18nString(init));
-            }
-        });
+        // TODO: release/8.0.0
+//        setDefaultValue(field, data, init -> {
+//            if (init != null && !init.equals("")) {
+//                field.setDefaultValue(new I18nString(init));
+//            }
+//        });
         return field;
     }
 

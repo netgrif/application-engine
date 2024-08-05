@@ -17,13 +17,14 @@ public class DateFieldBuilder extends FieldBuilder<DateField> {
     public DateField build(Data data, Importer importer) {
         DateField field = new DateField();
         initialize(field);
-        setDefaultValue(field, data, defaultValueString -> {
-            if (defaultValueString == null) {
-                return;
-            }
-            Optional<LocalDate> defaultValue = DateUtils.parseDate(defaultValueString);
-            field.setDefaultValue(defaultValue.orElse(null));
-        });
+        // TODO: release/8.0.0
+//        setDefaultValue(field, data, defaultValueString -> {
+//            if (defaultValueString == null) {
+//                return;
+//            }
+//            Optional<LocalDate> defaultValue = DateUtils.parseDate(defaultValueString);
+//            field.setDefaultValue(defaultValue.orElse(null));
+//        });
         return field;
     }
 

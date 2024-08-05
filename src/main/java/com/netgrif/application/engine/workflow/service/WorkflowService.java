@@ -440,19 +440,20 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private void resolveTaskRefs(Case useCase) {
-        useCase.getPetriNet().getDataSet().values().stream().filter(f -> f instanceof TaskField).map(TaskField.class::cast).forEach(field -> {
-            if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty() && useCase.getDataSet().get(field.getStringId()).getValue() != null &&
-                    useCase.getDataSet().get(field.getStringId()).getRawValue().equals(field.getDefaultValue())) {
-                TaskField taskRef = (TaskField) useCase.getDataSet().get(field.getStringId());
-                taskRef.setRawValue(new ArrayList<>());
-                field.getDefaultValue().forEach(transitionId -> {
-                    if (!useCase.getTasks().containsKey(transitionId)) {
-                        return;
-                    }
-                    taskRef.getRawValue().add(useCase.getTasks().get(transitionId).getTaskStringId());
-                });
-            }
-        });
+        // TODO: release/8.0.0
+//        useCase.getPetriNet().getDataSet().values().stream().filter(f -> f instanceof TaskField).map(TaskField.class::cast).forEach(field -> {
+//            if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty() && useCase.getDataSet().get(field.getStringId()).getValue() != null &&
+//                    useCase.getDataSet().get(field.getStringId()).getRawValue().equals(field.getDefaultValue())) {
+//                TaskField taskRef = (TaskField) useCase.getDataSet().get(field.getStringId());
+//                taskRef.setRawValue(new ArrayList<>());
+//                field.getDefaultValue().forEach(transitionId -> {
+//                    if (!useCase.getTasks().containsKey(transitionId)) {
+//                        return;
+//                    }
+//                    taskRef.getRawValue().add(useCase.getTasks().get(transitionId).getTaskStringId());
+//                });
+//            }
+//        });
         save(useCase);
     }
 

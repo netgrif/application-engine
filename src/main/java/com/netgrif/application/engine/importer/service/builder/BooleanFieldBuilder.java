@@ -17,11 +17,12 @@ public class BooleanFieldBuilder extends FieldBuilder<BooleanField> {
     public BooleanField build(Data data, Importer importer) {
         BooleanField field = new BooleanField();
         initialize(field);
-        setDefaultValue(field, data, defaultValue -> {
-            if (defaultValue != null) {
-                field.setDefaultValue(Boolean.valueOf(defaultValue));
-            }
-        });
+        // TODO: release/8.0.0
+//        setDefaultValue(field, data, defaultValue -> {
+//            if (defaultValue != null) {
+//                field.setDefaultValue(Boolean.valueOf(defaultValue));
+//            }
+//        });
         return field;
     }
 

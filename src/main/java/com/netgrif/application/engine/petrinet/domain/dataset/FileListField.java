@@ -27,19 +27,6 @@ public class FileListField extends Field<FileListFieldValue> {
         this.setRawValue(FileListFieldValue.fromString(value));
     }
 
-    @Override
-    public void setDefaultValue(FileListFieldValue defaultValue) {
-        super.setDefaultValue(defaultValue);
-    }
-
-    public void setDefaultValue(String defaultValue) {
-        this.setDefaultValue(FileListFieldValue.fromString(defaultValue));
-    }
-
-    public void setDefaultValue(List<String> defaultValues) {
-        this.setDefaultValue(FileListFieldValue.fromList(defaultValues));
-    }
-
     public void addValue(String fileName, String path) {
         if (this.getRawValue() == null || this.getRawValue().getNamesPaths() == null) {
             this.setRawValue(new FileListFieldValue());

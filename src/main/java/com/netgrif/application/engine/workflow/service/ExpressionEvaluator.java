@@ -22,7 +22,7 @@ public class ExpressionEvaluator implements IInitValueExpressionEvaluator {
 
     @Override
     public <T> T evaluate(Case useCase, Field<T> defaultField, Map<String, String> params) {
-        return (T) evaluate(useCase, defaultField.getInitExpression(), params);
+        return (T) evaluate(useCase, defaultField.getDefaultValue(), params);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class ExpressionEvaluator implements IInitValueExpressionEvaluator {
     }
 
     @Override
-    public I18nString evaluateCaseName(Case useCase, Expression expression, Map<String, String> params) {
+    public I18nString evaluateCaseName(Case useCase, Expression<?> expression, Map<String, String> params) {
         Object result = evaluate(useCase, expression, params);
         if (result instanceof I18nString) {
             return (I18nString) result;
@@ -60,7 +60,7 @@ public class ExpressionEvaluator implements IInitValueExpressionEvaluator {
     }
 
     @Override
-    public Object evaluate(Case useCase, Expression expression, Map<String, String> params) {
+    public Object evaluate(Case useCase, Expression<?> expression, Map<String, String> params) {
         return runner.run(useCase, expression, params);
     }
 }

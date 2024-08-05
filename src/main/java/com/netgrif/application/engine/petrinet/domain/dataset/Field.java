@@ -67,9 +67,7 @@ public abstract class Field<T> extends Imported {
     private DataFieldBehaviors behaviors;
     private DataFieldValue<T> value;
     @JsonIgnore
-    protected T staticDefaultValue;
-    @JsonIgnore
-    protected Expression dynamicDefaultValue;
+    protected Expression<T> defaultValue;
     protected List<Validation> validations;
     @JsonIgnore
     private boolean immediate;
@@ -88,6 +86,7 @@ public abstract class Field<T> extends Imported {
     public Field() {
         this.validations = new LinkedList<>();
         this.events = new LinkedHashMap<>();
+        this.properties = new HashMap<>();
     }
 
     public String getStringId() {
@@ -144,10 +143,6 @@ public abstract class Field<T> extends Imported {
         this.value = null;
     }
 
-    public boolean hasDefault() {
-        return dynamicDefaultValue != null;
-    }
-
     public boolean isNewerThen(Field<?> field) {
         return version > field.version;
     }
@@ -161,16 +156,21 @@ public abstract class Field<T> extends Imported {
         clone.importId = this.importId;
         clone.id = this.id;
 //        TODO: release/8.0.0 clone value? events
-        // TODO: release/8.0.0 static default value
-        if (dynamicDefaultValue != null) {
-            clone.dynamicDefaultValue = this.dynamicDefaultValue.clone();
+        if (this.defaultValue != null) {
+            clone.defaultValue = this.defaultValue.clone();
         }
         if (this.validations != null) {
             clone.validations = this.validations.stream().map(Validation::clone).collect(Collectors.toList());
         }
-        clone.title = this.title;
-        clone.description = this.description;
-        clone.placeholder = this.placeholder;
+        if (this.title != null) {
+            clone.title = this.title.clone();
+        }
+        if (this.description != null) {
+            clone.description = this.description.clone();
+        }
+        if (this.placeholder != null) {
+            clone.placeholder = this.placeholder.clone();
+        }
         if (this.behaviors != null) {
             clone.behaviors = this.behaviors.clone();
         }
@@ -181,7 +181,9 @@ public abstract class Field<T> extends Imported {
                     .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
         }
         clone.encryption = this.encryption;
-        clone.component = this.component.clone();
+        if (this.component != null) {
+            clone.component = this.component.clone();
+        }
     }
 
     public abstract Field<T> clone();

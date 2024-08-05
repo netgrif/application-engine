@@ -17,12 +17,13 @@ public class TextFieldBuilder extends FieldBuilder<TextField> {
         TextField field = new TextField();
         initialize(field);
         String value = null;
-        List<I18NStringTypeWithExpression> values = data.getValues();
-        if (values != null && !values.isEmpty()) {
-            value = values.get(0).getValue();
-        }
-        field.setRawValue(value); // TODO: release/8.0.0 is it necessary?
-        setDefaultValue(field, data, field::setDefaultValue);
+        // TODO: release/8.0.0
+//        List<I18NStringTypeWithExpression> values = data.getValues();
+//        if (values != null && !values.isEmpty()) {
+//            value = values.get(0).getValue();
+//        }
+//        field.setRawValue(value); // TODO: release/8.0.0 is it necessary?
+//        setDefaultValue(field, data, field::setDefaultValue);
         return field;
     }
 

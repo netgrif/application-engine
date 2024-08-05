@@ -15,10 +15,11 @@ public class I18nFieldBuilder extends FieldBuilder<I18nField> {
     public I18nField build(Data data, Importer importer) {
         I18nField field = new I18nField();
         initialize(field);
+        // TODO: release/8.0.0
         String initExpression = getInitExpression(data);
-        if (initExpression != null) {
-            field.setInitExpression(new Expression(initExpression, true));
-        } else {
+//        if (initExpression != null) {
+//            field.setDynamicDefaultValue(new Expression(initExpression, true));
+//        } else {
             // TODO: release/8.0.0 simplify
 //            if (data.getInits() != null && data.getInits().getInit() != null && !data.getInits().getInit().isEmpty()) {
 //                field.setDefaultValue(new I18nString(data.getInits().getInit().get(0).getValue()));
@@ -29,7 +30,7 @@ public class I18nFieldBuilder extends FieldBuilder<I18nField> {
 //            } else {
 //                field.setDefaultValue(new I18nString(""));
 //            }
-        }
+//        }
         return field;
     }
 

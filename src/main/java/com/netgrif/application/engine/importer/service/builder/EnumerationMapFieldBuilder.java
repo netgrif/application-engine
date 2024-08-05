@@ -14,11 +14,12 @@ public class EnumerationMapFieldBuilder extends FieldBuilder<EnumerationMapField
         EnumerationMapField field = new EnumerationMapField();
         initialize(field);
         setFieldOptions(field, data, importer);
-        setDefaultValue(field, data, init -> {
-            if (init != null && !init.isEmpty()) {
-                field.setDefaultValue(init);
-            }
-        });
+        // TODO: release/8.0.0
+//        setDefaultValue(field, data, init -> {
+//            if (init != null && !init.isEmpty()) {
+//                field.setDefaultValue(init);
+//            }
+//        });
         return field;
     }
 

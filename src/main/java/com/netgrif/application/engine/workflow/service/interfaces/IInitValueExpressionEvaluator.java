@@ -18,7 +18,7 @@ public interface IInitValueExpressionEvaluator {
 
     Set<I18nString> evaluateChoices(Case useCase, ChoiceField field, Map<String, String> params);
 
-    I18nString evaluateCaseName(Case useCase, Expression expression, Map<String, String> params);
+    I18nString evaluateCaseName(Case useCase, Expression<?> expression, Map<String, String> params);
 
-    Object evaluate(Case useCase, Expression expression, Map<String, String> params);
+    Object evaluate(Case useCase, Expression<?> expression, Map<String, String> params);
 }

@@ -40,7 +40,7 @@ public class Arc extends ProcessObject {
         this();
         this.setSource(source);
         this.setDestination(destination);
-        this.multiplicity = new Multiplicity(multiplicity, true);
+        this.multiplicity = new Multiplicity(multiplicity);
     }
 
     public Place getPlace() {

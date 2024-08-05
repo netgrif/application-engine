@@ -18,18 +18,18 @@ public class TaskRefFieldBuilder extends FieldBuilder<TaskField> {
     public TaskField build(Data data, Importer importer) {
         TaskField field = new TaskField();
         initialize(field);
-        setDefaultValues(field, data, defaultValues -> {
-            if (defaultValues != null && !defaultValues.isEmpty()) {
-                List<String> defaults = new ArrayList<>();
-                defaultValues.forEach(s -> {
 //                    TODO: release/8.0.0
+//        setDefaultValues(field, data, defaultValues -> {
+//            if (defaultValues != null && !defaultValues.isEmpty()) {
+//                List<String> defaults = new ArrayList<>();
+//                defaultValues.forEach(s -> {
 //                    if (importer.getProcess().getTransition().stream().noneMatch(t -> t.getId().equals(s)))
 //                        log.warn("There is no transition with id [" + s + "]");
-                    defaults.add(s);
-                });
-                field.setDefaultValue(defaults);
-            }
-        });
+//                    defaults.add(s);
+//                });
+//                field.setDefaultValue(defaults);
+//            }
+//        });
         return field;
     }
 

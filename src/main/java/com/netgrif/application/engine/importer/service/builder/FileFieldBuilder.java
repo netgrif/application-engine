@@ -13,13 +13,13 @@ public class FileFieldBuilder extends FieldBuilder<FileField> {
     public FileField build(Data data, Importer importer) {
         FileField field = new FileField();
         initialize(field);
-        // TODO: NAE-1969 fix
+        // TODO: release/8.0.0 NAE-1969 fix
 //        field.setRemote(data.getRemote() != null);
-        setDefaultValue(field, data, defaultValue -> {
-            if (defaultValue != null) {
-                field.setDefaultValue(defaultValue);
-            }
-        });
+//        setDefaultValue(field, data, defaultValue -> {
+//            if (defaultValue != null) {
+//                field.setDefaultValue(defaultValue);
+//            }
+//        });
         return field;
     }
 

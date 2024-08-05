@@ -94,8 +94,9 @@ public abstract class FieldBuilder<T extends Field<?>> {
     public void setDefaultValue(Field<?> field, Data data, Consumer<String> setDefault) {
         String initExpression = getInitExpression(data);
         if (initExpression != null) {
-            field.setInitExpression(new Expression(initExpression, true));
+            field.setDefaultValue(Expression.ofDynamic(initExpression));
         } else {
+            // TODO: release/8.0.0
             setDefault.accept(resolveInit(data));
         }
     }
@@ -103,8 +104,9 @@ public abstract class FieldBuilder<T extends Field<?>> {
     public void setDefaultValues(Field<?> field, Data data, Consumer<List<String>> setDefault) {
         String initExpression = getInitExpression(data);
         if (initExpression != null) {
-            field.setInitExpression(new Expression(initExpression, true));
+            field.setDefaultValue(Expression.ofDynamic(initExpression));
         } else {
+            // TODO: release/8.0.0
             setDefault.accept(resolveInits(data));
         }
     }

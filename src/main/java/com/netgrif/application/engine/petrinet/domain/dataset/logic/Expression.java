@@ -8,18 +8,26 @@ import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
-public class Expression implements Serializable {
+public class Expression<T> implements Serializable {
 
     private static final long serialVersionUID = 3687481111847498422L;
 
     private String id;
+    private T defaultValue;
     private String definition;
-    private boolean dynamic;
 
-    public Expression(String definition, boolean dynamic) {
+    protected Expression(T defaultValue, String definition) {
         this.id = new ObjectId().toString();
+        this.defaultValue = defaultValue;
         this.definition = definition;
-        this.dynamic = dynamic;
+    }
+
+    public static <T> Expression<T> ofStatic(T defaultValue) {
+        return new Expression<>(defaultValue, null);
+    }
+
+    public static <T> Expression<T> ofDynamic(String definition) {
+        return new Expression<>(null, definition);
     }
 
     @Override
@@ -28,7 +36,10 @@ public class Expression implements Serializable {
     }
 
     @Override
-    public Expression clone() {
-        return new Expression(this.definition, this.dynamic);
+    public Expression<T> clone() {
+        if (defaultValue != null) {
+            return Expression.ofStatic(defaultValue);
+        }
+        return Expression.ofDynamic(definition);
     }
 }

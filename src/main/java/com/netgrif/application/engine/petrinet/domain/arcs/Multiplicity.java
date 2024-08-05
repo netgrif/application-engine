@@ -2,28 +2,29 @@ package com.netgrif.application.engine.petrinet.domain.arcs;
 
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
 
 @Data
 @NoArgsConstructor
-public class Multiplicity extends Expression {
+@EqualsAndHashCode(callSuper = true)
+public class Multiplicity extends Expression<Integer> {
     private Integer multiplicity;
 
     public Multiplicity(int multiplicity) {
-        super("", false);
+        super(multiplicity, null);
         this.multiplicity = multiplicity;
     }
 
-    public Multiplicity(String definition, boolean dynamic) {
-        super(definition, dynamic);
-    }
-
-    private Multiplicity(Integer multiplicity, String definition, boolean dynamic) {
-        super(definition, dynamic);
-        this.multiplicity = multiplicity;
+    public Multiplicity(String definition) {
+        super(null, definition);
     }
 
     public Multiplicity clone() {
-        return new Multiplicity(this.multiplicity, this.getDefinition(), this.isDynamic());
+        if (this.getDefaultValue() != null) {
+            return new Multiplicity(this.multiplicity);
+        }
+        return new Multiplicity(this.getDefinition());
     }
 }

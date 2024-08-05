@@ -26,10 +26,6 @@ public class FileField extends Field<FileFieldValue> {
         this.setRawValue(FileFieldValue.fromString(value));
     }
 
-    public void setDefaultValue(String defaultValue) {
-        this.setDefaultValue(FileFieldValue.fromString(defaultValue));
-    }
-
     /**
      * Get complete file path to the file
      * Path is generated as follow:

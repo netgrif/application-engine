@@ -13,13 +13,13 @@ public class FileListFieldBuilder extends FieldBuilder<FileListField> {
     public FileListField build(Data data, Importer importer) {
         FileListField field = new FileListField();
         initialize(field);
-        // TODO: NAE-1969 fix
+        // TODO: release/8.0.0 NAE-1969 fix
 //        field.setRemote(data.getRemote() != null);
-        setDefaultValues(field, data, defaultValues -> {
-            if (defaultValues != null && !defaultValues.isEmpty()) {
-                field.setDefaultValue(defaultValues);
-            }
-        });
+//        setDefaultValues(field, data, defaultValues -> {
+//            if (defaultValues != null && !defaultValues.isEmpty()) {
+//                field.setDefaultValue(defaultValues);
+//            }
+//        });
         return field;
     }
 
