@@ -9,15 +9,12 @@ import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventL
 import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.model.CaseEventType;
-import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.security.service.EncryptionService;
@@ -40,7 +37,6 @@ import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -63,40 +59,28 @@ import java.util.stream.LongStream;
 public class WorkflowService implements IWorkflowService {
 
     @Autowired
-    protected CaseRepository repository;
+    private CaseRepository repository;
 
     @Autowired
-    protected MongoTemplate mongoTemplate;
+    private MongoTemplate mongoTemplate;
 
     @Autowired
-    protected IPetriNetService petriNetService;
+    private IPetriNetService petriNetService;
 
     @Autowired
-    protected IProcessRoleService processRoleService;
+    private ITaskService taskService;
 
     @Autowired
-    protected ITaskService taskService;
+    private EncryptionService encryptionService;
 
     @Autowired
-    protected ApplicationEventPublisher publisher;
+    private IRuleEngine ruleEngine;
 
     @Autowired
-    protected EncryptionService encryptionService;
+    private IUserService userService;
 
     @Autowired
-    protected FieldFactory fieldFactory;
-
-    @Autowired
-    protected IRuleEngine ruleEngine;
-
-    @Autowired
-    protected ActionRunner actionsRunner;
-
-    @Autowired
-    protected IUserService userService;
-
-    @Autowired
-    protected IInitValueExpressionEvaluator initValueExpressionEvaluator;
+    private IInitValueExpressionEvaluator initValueExpressionEvaluator;
 
     @Lazy
     @Autowired
@@ -105,7 +89,7 @@ public class WorkflowService implements IWorkflowService {
     @Autowired
     private IHistoryService historyService;
 
-    protected IElasticCaseService elasticCaseService;
+    private IElasticCaseService elasticCaseService;
 
     @Autowired
     private DataSetInitializer dataSetInitializer;
@@ -139,7 +123,7 @@ public class WorkflowService implements IWorkflowService {
         return caseOptional.orElseThrow(() -> new IllegalArgumentException("Could not find Case with id [" + caseId + "]"));
     }
 
-    protected void initialize(Case useCase) {
+    private void initialize(Case useCase) {
         setPetriNet(useCase);
         decryptDataSet(useCase);
         useCase.resolveImmediateDataFields();
