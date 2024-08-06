@@ -13,6 +13,7 @@ import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -91,8 +92,8 @@ class SetDataOnButtonTest {
         Task parentTask = taskService.searchOne(QTask.task.caseTitle.eq(PARENT_CASE) & QTask.task.transitionId.eq(TEST_TRANSITION))
         assert parentTask != null
 
-        taskService.assignTask(parentTask.getStringId())
-        taskService.finishTask(parentTask.getStringId())
+        taskService.assignTask(new TaskParams(parentTask))
+        taskService.finishTask(new TaskParams(parentTask))
 
         childCase = workflowService.findOne(childCase.getStringId())
         assert childCase.dataSet.get(TEXT_0_FIELD_ID).rawValue.toString() == OUTPUT_TEXT_0

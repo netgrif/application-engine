@@ -69,7 +69,7 @@ class EventTest {
     private SystemUserRunner userRunner
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
     @Autowired
     private TestHelper testHelper
 

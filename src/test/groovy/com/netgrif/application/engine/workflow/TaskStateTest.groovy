@@ -8,6 +8,7 @@ import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
@@ -89,12 +90,12 @@ class TaskStateTest {
                 assert t.transitionId in [transitionId, allDataConfiguration.allData.id] ? t.state == ENABLED : t.state == DISABLED
             }
             Task task = tasks.find {it.transitionId == transitionId}
-            taskService.assignTask(task.stringId)
+            taskService.assignTask(new TaskParams(task))
             tasks = taskService.findAllByCase(useCase.stringId)
             tasks.each { t->
                 assert t.transitionId in [allDataConfiguration.allData.id] ? t.state == ENABLED : t.state == DISABLED
             }
-            taskService.finishTask(task.stringId)
+            taskService.finishTask(new TaskParams(task))
         }
     }
 }

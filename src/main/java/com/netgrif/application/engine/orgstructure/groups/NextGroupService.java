@@ -21,6 +21,7 @@ import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -118,8 +119,8 @@ public class NextGroupService implements INextGroupService {
         dataService.setData(initTask.getStringId(), taskData, author);
 
         try {
-            taskService.assignTask(author.transformToLoggedUser(), initTask.getStringId());
-            taskService.finishTask(author.transformToLoggedUser(), initTask.getStringId());
+            taskService.assignTask(new TaskParams(initTask, author));
+            taskService.finishTask(new TaskParams(initTask, author));
         } catch (TransitionNotExecutableException e) {
             log.error(e.getMessage());
         }

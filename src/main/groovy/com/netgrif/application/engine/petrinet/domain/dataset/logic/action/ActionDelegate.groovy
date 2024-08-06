@@ -38,6 +38,7 @@ import com.netgrif.application.engine.transaction.NaeTransaction
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.*
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.EventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CaseEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.GetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome
@@ -47,6 +48,7 @@ import com.netgrif.application.engine.workflow.domain.menu.MenuItemBody
 import com.netgrif.application.engine.workflow.domain.menu.MenuItemConstants
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.*
@@ -605,9 +607,11 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     private addTaskOutcomes(Task task, DataSet dataSet) {
-        this.outcomes.add(taskService.assignTask(task.stringId))
-        this.outcomes.add(dataService.setData(task.stringId, dataSet, userService.loggedOrSystem))
-        this.outcomes.add(taskService.finishTask(task.stringId))
+        AssignTaskEventOutcome assignOutcome = taskService.assignTask(new TaskParams(task))
+        this.outcomes.add(assignOutcome)
+        SetDataEventOutcome setDataOutcome = dataService.setData(assignOutcome.getTask(), dataSet, userService.loggedOrSystem)
+        this.outcomes.add(setDataOutcome)
+        this.outcomes.add(taskService.finishTask(new TaskParams(setDataOutcome.getTask())))
     }
 
     List<String> searchCases(Closure<Predicate> predicates) {
@@ -828,14 +832,22 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     Task assignTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        AssignTaskEventOutcome outcome = taskService.assignTask(user.transformToLoggedUser(), taskId, params)
-        this.outcomes.add(outcome)
-        updateCase()
-        return outcome.getTask()
+        TaskParams taskParams = TaskParams.builder()
+                .taskId(taskId)
+                .useCase(aCase)
+                .user(user)
+                .params(params)
+                .build()
+        return addTaskOutcomeAndReturnTask(taskService.assignTask(taskParams))
     }
 
     Task assignTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        return addTaskOutcomeAndReturnTask(taskService.assignTask(task, user, params))
+        TaskParams taskParams = TaskParams.builder()
+                .task(task)
+                .user(user)
+                .params(params)
+                .build()
+        return addTaskOutcomeAndReturnTask(taskService.assignTask(taskParams))
     }
 
     void assignTasks(List<Task> tasks, IUser assignee = userService.loggedOrSystem, Map<String, String> params = [:]) {
@@ -844,11 +856,22 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     Task cancelTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        return addTaskOutcomeAndReturnTask(taskService.cancelTask(user.transformToLoggedUser(), taskId, params))
+        TaskParams taskParams = TaskParams.builder()
+                .taskId(taskId)
+                .useCase(aCase)
+                .user(user)
+                .params(params)
+                .build()
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(taskParams))
     }
 
     Task cancelTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, user, params))
+        TaskParams taskParams = TaskParams.builder()
+                .task(task)
+                .user(user)
+                .params(params)
+                .build()
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(taskParams))
     }
 
     void cancelTasks(List<Task> tasks, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
@@ -857,17 +880,28 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     private Task addTaskOutcomeAndReturnTask(TaskEventOutcome outcome) {
         this.outcomes.add(outcome)
-        updateCase()
+        updateCase(outcome)
         return outcome.getTask()
     }
 
     void finishTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        addTaskOutcomeAndReturnTask(taskService.finishTask(user.transformToLoggedUser(), taskId, params))
+        TaskParams taskParams = TaskParams.builder()
+                .taskId(taskId)
+                .useCase(aCase)
+                .user(user)
+                .params(params)
+                .build()
+        addTaskOutcomeAndReturnTask(taskService.finishTask(taskParams))
     }
 
     void finishTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        addTaskOutcomeAndReturnTask(taskService.finishTask(task, user, params))
+        TaskParams taskParams = TaskParams.builder()
+                .task(task)
+                .user(user)
+                .params(params)
+                .build()
+        addTaskOutcomeAndReturnTask(taskService.finishTask(taskParams))
     }
 
     void finishTasks(List<Task> tasks, IUser finisher = userService.loggedOrSystem, Map<String, String> params = [:]) {
@@ -1161,7 +1195,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     void deleteUser(IUser user) {
         List<Task> tasks = taskService.findByUser(new FullPageRequest(), user).toList()
         if (tasks != null && tasks.size() > 0)
-            taskService.cancelTasks(tasks, user)
+            taskService.cancelTasks(tasks, user, params)
 
         QCase qCase = new QCase("case")
         List<Case> cases = workflowService.searchAll(qCase.author.eq(user.transformToAuthor())).toList()
@@ -2106,6 +2140,14 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
             return
         }
         useCase = workflowService.findOne(useCase.stringId)
+        initFieldsMap(action.fieldIds, useCase)
+    }
+
+    void updateCase(CaseEventOutcome outcome) {
+        if (!useCase) {
+            return
+        }
+        useCase = outcome.getCase()
         initFieldsMap(action.fieldIds, useCase)
     }
 

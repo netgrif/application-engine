@@ -11,6 +11,7 @@ import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dat
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessageResource;
+import com.netgrif.application.engine.workflow.domain.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -89,7 +90,11 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> assign(LoggedUser loggedUser, String taskId) {
         try {
-            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName(), taskService.assignTask(loggedUser, taskId));
+            TaskParams taskParams = TaskParams.builder()
+                    .taskId(taskId)
+                    .user(loggedUser.transformToUser())
+                    .build();
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName(), taskService.assignTask(taskParams));
         } catch (TransitionNotExecutableException e) {
             log.error("Assigning task [{}] failed: ", taskId, e);
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
@@ -107,7 +112,11 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> finish(LoggedUser loggedUser, String taskId) {
         try {
-            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " finished", taskService.finishTask(loggedUser, taskId));
+            TaskParams taskParams = TaskParams.builder()
+                    .taskId(taskId)
+                    .user(loggedUser.transformToUser())
+                    .build();
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " finished", taskService.finishTask(taskParams));
         } catch (Exception e) {
             log.error("Finishing task [{}] failed: ", taskId, e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
@@ -120,7 +129,11 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> cancel(LoggedUser loggedUser, String taskId) {
         try {
-            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " canceled", taskService.cancelTask(loggedUser, taskId));
+            TaskParams taskParams = TaskParams.builder()
+                    .taskId(taskId)
+                    .user(loggedUser.transformToUser())
+                    .build();
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " canceled", taskService.cancelTask(taskParams));
         } catch (Exception e) {
             log.error("Canceling task [{}] failed: ", taskId, e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {

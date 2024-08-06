@@ -21,6 +21,7 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.TaskParams;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -128,14 +129,14 @@ public class TaskServiceTest {
 
         assert task != null;
 
-        service.assignTask(user.transformToLoggedUser(), task.getStringId());
+        service.assignTask(new TaskParams(task, user));
         Case useCase = caseRepository.findById(outcome.getCase().getStringId()).get();
 
         assert useCase.getConsumedTokens().size() == 1;
         assert useCase.getConsumedTokens().values().contains(5);
         assert useCase.getActivePlaces().size() == 0;
 
-        service.cancelTask(user.transformToLoggedUser(), task.getStringId());
+        service.cancelTask(new TaskParams(task, user));
         useCase = caseRepository.findById(useCase.getStringId()).get();
 
         assert useCase.getConsumedTokens().size() == 0;

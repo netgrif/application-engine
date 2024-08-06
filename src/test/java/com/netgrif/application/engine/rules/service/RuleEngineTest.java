@@ -19,6 +19,7 @@ import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
@@ -208,8 +209,8 @@ class RuleEngineTest {
         assert caseOutcome.getCase().getTitle().equals(NEW_CASE_TITLE);
 
         Task task = findTask(caseOutcome.getCase(), TRANS_1);
-        taskService.assignTask(task, superUser.transformToUser());
-        taskService.finishTask(task, superUser.transformToUser());
+        taskService.assignTask(new TaskParams(task, superUser.transformToUser()));
+        taskService.finishTask(new TaskParams(task, superUser.transformToUser()));
         Case newCase = workflowService.findOne(caseOutcome.getCase().getStringId());
         assert newCase.getTitle().equals(NEW_CASE_TITLE);
         assert !newCase.getColor().equals(NEW_CASE_TITLE_2);
@@ -219,8 +220,8 @@ class RuleEngineTest {
         assert facts.size() == 1 && facts.get(0) instanceof TestFact && ((TestFact) facts.get(0)).number == 1;
 
         Task task2 = findTask(newCase, TRANS_2);
-        taskService.assignTask(task2, superUser.transformToUser());
-        taskService.finishTask(task2, superUser.transformToUser());
+        taskService.assignTask(new TaskParams(task2, superUser.transformToUser()));
+        taskService.finishTask(new TaskParams(task2, superUser.transformToUser()));
         newCase = workflowService.findOne(newCase.getStringId());
 
         assert newCase.getTitle().equals(NEW_CASE_TITLE_2);
@@ -238,7 +239,7 @@ class RuleEngineTest {
         assert caze != null;
 
         Task task = findTask(caze, TRANS_1);
-        taskService.assignTask(task, superUser.transformToUser());
+        taskService.assignTask(new TaskParams(task, superUser.transformToUser()));
 
         caze = workflowService.findOne(caze.getStringId());
 
@@ -260,7 +261,7 @@ class RuleEngineTest {
 
         Task task = findTask(caze, TRANS_1);
         IUser user = superUser.transformToUser();
-        taskService.assignTask(task, user);
+        taskService.assignTask(new TaskParams(task, user));
         taskService.delegateTask(user.transformToLoggedUser(), user.getStringId(), task.getStringId());
         caze = workflowService.findOne(caze.getStringId());
 
@@ -281,8 +282,8 @@ class RuleEngineTest {
 
         Task task = findTask(caze, TRANS_1);
         IUser user = superUser.transformToUser();
-        taskService.assignTask(task, user);
-        taskService.finishTask(task, user);
+        taskService.assignTask(new TaskParams(task, user));
+        taskService.finishTask(new TaskParams(task, user));
         caze = workflowService.findOne(caze.getStringId());
 
         assert caze.getDataSet().get("text_data").getValue().getValue().equals(TEXT_VALUE);
@@ -303,8 +304,8 @@ class RuleEngineTest {
         Task task = findTask(caze, TRANS_1);
         IUser user = superUser.transformToUser();
 
-        taskService.assignTask(task, user);
-        taskService.cancelTask(task, user);
+        taskService.assignTask(new TaskParams(task, user));
+        taskService.cancelTask(new TaskParams(task, user));
         caze = workflowService.findOne(caze.getStringId());
 
         assert caze.getDataSet().get("text_data").getValue().getValue().equals(TEXT_VALUE);

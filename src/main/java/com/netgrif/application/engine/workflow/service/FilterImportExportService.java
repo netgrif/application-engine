@@ -249,7 +249,8 @@ public class FilterImportExportService implements IFilterImportExportService {
 //            filterCase.get().getDataSet().get(FIELD_FILTER).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.VISIBLE));
             workflowService.save(filterCase.get());
         });
-        taskService.assignTasks(taskService.findAllById(new ArrayList<>(importedFilterTaskIds.values())), userService.getLoggedUser());
+        taskService.assignTasks(taskService.findAllById(new ArrayList<>(importedFilterTaskIds.values())),
+                userService.getLoggedUser(), new HashMap<>());
         changeFilterField(importedFilterTaskIds.values());
         return importedFilterTaskIds;
     }

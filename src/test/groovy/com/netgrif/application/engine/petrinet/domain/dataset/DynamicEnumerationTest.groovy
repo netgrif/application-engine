@@ -67,7 +67,7 @@ class DynamicEnumerationTest {
         assert aCase != null
 
         Task task = taskService.findByCases(new FullPageRequest(), Collections.singletonList(aCase.getStringId())).stream().collect(Collectors.toList()).get(0);
-        importHelper.assignTask("Autocomplete", aCase.getStringId(), superCreator.getLoggedSuper())
+        importHelper.assignTask("Autocomplete", aCase.getStringId(), superCreator.getSuperUser())
 
         def dataSet = new DataSet([
                 "autocomplete": new EnumerationField(rawValue: new I18nString("Case"))

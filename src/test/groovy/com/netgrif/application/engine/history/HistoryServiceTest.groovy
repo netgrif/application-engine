@@ -11,6 +11,7 @@ import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -75,7 +76,7 @@ class HistoryServiceTest {
         int count = historyService.findAllAssignTaskEventLogsByCaseId(caze.getStringId()).size()
         assert count == 0
         String task = caze.tasks.values().find { it.transitionId == "1" }.taskStringId
-        taskService.assignTask(superCreator.getLoggedSuper(), task)
+        taskService.assignTask(new TaskParams(task, superCreator.getSuperUser()))
         Thread.sleep(1000) // HistoryService::save is @Async
         assert historyService.findAllAssignTaskEventLogsByCaseId(caze.getStringId()).size() == count + 2 // 2 PRE POST
     }
@@ -92,9 +93,9 @@ class HistoryServiceTest {
         int count = historyService.findAllFinishTaskEventLogsByCaseId(caze.getStringId()).size()
         assert count == 0
         String task = caze.tasks.values().find { it.transitionId == "1" }.taskStringId
-        taskService.assignTask(superCreator.getLoggedSuper(), task)
+        taskService.assignTask(new TaskParams(task, superCreator.getSuperUser()))
         assert historyService.findAllFinishTaskEventLogsByCaseId(caze.getStringId()).size() == count
-        taskService.finishTask(superCreator.getLoggedSuper(), task)
+        taskService.finishTask(new TaskParams(task, superCreator.getSuperUser()))
         Thread.sleep(1000) // HistoryService::save is @Async
         assert historyService.findAllFinishTaskEventLogsByCaseId(caze.getStringId()).size() == count + 2  // 2 PRE POST
     }

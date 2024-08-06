@@ -136,7 +136,7 @@
                 <action>
                     importedFilters: f.imported_filters;
 
-                    taskService.finishTasks(taskService.findAllById(importedFilters.value), userService.getLoggedUser())
+                    taskService.finishTasks(taskService.findAllById(importedFilters.value), userService.getLoggedUser(), new HashMap&lt;>())
                     change importedFilters value { [] }
                 </action>
             </actions>

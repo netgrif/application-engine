@@ -65,12 +65,12 @@ class WorkflowServiceTest {
         def testNetWithTriggers = petriNetService.importPetriNet(stream("petriNets/test_with_triggers.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
         def testNet = petriNetService.importPetriNet(stream("petriNets/test_without_triggers.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
 
-        int iterations = 1000
-        def paramsWithoutTrigger = CreateCaseParams.builder()
+        int iterations = 200
+        def paramsWithoutTrigger = builder()
                 .petriNet(testNet)
                 .loggedUser(superCreator.getLoggedSuper())
                 .build()
-        def paramsWithTrigger = CreateCaseParams.builder()
+        def paramsWithTrigger = builder()
                 .petriNet(testNetWithTriggers)
                 .loggedUser(superCreator.getLoggedSuper())
                 .build()
@@ -85,13 +85,13 @@ class WorkflowServiceTest {
         }
 
         long totalWithTriggers = 0
-//        (0..iterations).each {
-//            Date startTime = new Date()
-//            workflowService.createCase(paramsWithTrigger)
-//            Date endTime = new Date()
-//            TimeDuration elapsedTimeTransactional = TimeCategory.minus( endTime, startTime )
-//            totalWithTriggers += elapsedTimeTransactional.toMilliseconds()
-//        }
+        (0..iterations).each {
+            Date startTime = new Date()
+            workflowService.createCase(paramsWithTrigger)
+            Date endTime = new Date()
+            TimeDuration elapsedTimeTransactional = TimeCategory.minus( endTime, startTime )
+            totalWithTriggers += elapsedTimeTransactional.toMilliseconds()
+        }
 
         println("AVG without triggers for 1 create case: " + totalWithoutTriggers / iterations + "ms")
         println("AVG with triggers for 1 create case: " + totalWithTriggers / iterations + "ms")
@@ -124,8 +124,8 @@ class WorkflowServiceTest {
                 .loggedUser(superCreator.getLoggedSuper())
                 .build()
         Case aCase = workflowService.createCase(createCaseParams).getCase()
-        importHelper.assignTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
-        importHelper.finishTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
+        importHelper.assignTask("Manual", aCase.getStringId(), superCreator.getSuperUser())
+        importHelper.finishTask("Manual", aCase.getStringId(), superCreator.getSuperUser())
 
         assert workflowService.findOne(aCase.stringId).getActivePlaces().containsKey("p3")
         assert workflowService.findOne(aCase.stringId).getActivePlaces().size() == 1
@@ -142,11 +142,11 @@ class WorkflowServiceTest {
                 .loggedUser(superCreator.getLoggedSuper())
                 .build()
         Case aCase = workflowService.createCase(createCaseParams).getCase()
-        importHelper.assignTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
-        importHelper.finishTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
+        importHelper.assignTask("Manual", aCase.getStringId(), superCreator.getSuperUser())
+        importHelper.finishTask("Manual", aCase.getStringId(), superCreator.getSuperUser())
 
-        importHelper.assignTask("Manuel", aCase.getStringId(), superCreator.getLoggedSuper())
-        importHelper.finishTask("Manuel", aCase.getStringId(), superCreator.getLoggedSuper())
+        importHelper.assignTask("Manuel", aCase.getStringId(), superCreator.getSuperUser())
+        importHelper.finishTask("Manuel", aCase.getStringId(), superCreator.getSuperUser())
 
         assert workflowService.findOne(aCase.stringId).getActivePlaces().containsKey("p3")
         assert workflowService.findOne(aCase.stringId).getActivePlaces().size() == 1

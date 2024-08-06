@@ -18,6 +18,7 @@ import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.tas
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.CancelTaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -108,12 +109,12 @@ class ImportHelper {
         return Optional.of(petriNet)
     }
 
-    ProcessRole getProcessRoleByImportId(PetriNet net, String roleId) {
+    static ProcessRole getProcessRoleByImportId(PetriNet net, String roleId) {
         ProcessRole role = net.roles.values().find { it -> it.importId == roleId }
         return role
     }
 
-    Map<String, ProcessRole> getProcessRolesByImportId(PetriNet net, Map<String, String> importId) {
+    static Map<String, ProcessRole> getProcessRolesByImportId(PetriNet net, Map<String, String> importId) {
         HashMap<String, ProcessRole> roles = new HashMap<>()
         importId.each { it ->
             roles.put(it.getKey(), getProcessRoleByImportId(net, it.getValue()))
@@ -130,7 +131,7 @@ class ImportHelper {
         return map
     }
 
-    IUser createUser(User user, Authority[] authorities, ProcessRole[] roles) {
+    IUser createUser(IUser user, Authority[] authorities, ProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
         roles.each { user.addProcessRole(it) }
         user.state = UserState.ACTIVE
@@ -157,28 +158,28 @@ class ImportHelper {
         return createCase(title, net, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
-    AssignTaskEventOutcome assignTask(String taskTitle, String caseId, LoggedUser author) {
-        return taskService.assignTask(author, getTaskId(taskTitle, caseId))
+    AssignTaskEventOutcome assignTask(String taskTitle, String caseId, IUser author) {
+        return taskService.assignTask(new TaskParams(getTaskId(taskTitle, caseId), author))
     }
 
     AssignTaskEventOutcome assignTaskToSuper(String taskTitle, String caseId) {
-        return assignTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
+        return assignTask(taskTitle, caseId, superCreator.superUser ?: userService.getSystem())
     }
 
-    FinishTaskEventOutcome finishTask(String taskTitle, String caseId, LoggedUser author) {
-        return taskService.finishTask(author, getTaskId(taskTitle, caseId))
+    FinishTaskEventOutcome finishTask(String taskTitle, String caseId, IUser author) {
+        return taskService.finishTask(new TaskParams(getTaskId(taskTitle, caseId), author))
     }
 
     FinishTaskEventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
-        return finishTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
+        return finishTask(taskTitle, caseId, superCreator.superUser ?: userService.getSystem())
     }
 
-    CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, LoggedUser user) {
-        return taskService.cancelTask(user, getTaskId(taskTitle, caseId))
+    CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, IUser user) {
+        return taskService.cancelTask(new TaskParams(getTaskId(taskTitle, caseId), user))
     }
 
     CancelTaskEventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {
-        return cancelTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
+        return cancelTask(taskTitle, caseId, superCreator.superUser ?: userService.getSystem())
     }
 
     String getTaskId(String taskTitle, String caseId) {
@@ -199,6 +200,6 @@ class ImportHelper {
     }
 
     void updateSuperUser() {
-        superCreator.setAllToSuperUser();
+        superCreator.setAllToSuperUser()
     }
 }

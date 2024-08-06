@@ -112,7 +112,7 @@ class FileFieldTest {
                 .loggedUser(user.transformToLoggedUser())
                 .build()
         Case useCase = workflowService.createCase(createCaseParams).getCase()
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user)
 
         mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file")
                 .param("fieldId", FIELD_ID)
@@ -138,7 +138,7 @@ class FileFieldTest {
                 .loggedUser(user.transformToLoggedUser())
                 .build()
         Case useCase = workflowService.createCase(createCaseParams).getCase()
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user)
 
         mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file")
                 .param("fieldId", FIELD_ID)

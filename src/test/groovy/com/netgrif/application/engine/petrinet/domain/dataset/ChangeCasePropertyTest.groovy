@@ -10,6 +10,7 @@ import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -74,8 +75,8 @@ class ChangeCasePropertyTest {
         Task testCaseTask = taskService.searchOne(QTask.task.caseTitle.eq(TEST_CASE_TITLE) & QTask.task.transitionId.eq(TEST_TRANSITION))
         assert testCaseTask
 
-        taskService.assignTask(testCaseTask.getStringId())
-        taskService.finishTask(testCaseTask.getStringId())
+        taskService.assignTask(new TaskParams(testCaseTask))
+        taskService.finishTask(new TaskParams(testCaseTask))
 
         testCase = workflowService.findOne(testCase.getStringId())
         testCaseTask = taskService.findOne(testCaseTask.getStringId())
@@ -93,11 +94,11 @@ class ChangeCasePropertyTest {
         Task testCaseTask = taskService.searchOne(QTask.task.caseTitle.eq(TEST_CASE_TITLE) & QTask.task.transitionId.eq(TEST_TRANSITION))
         assert testCaseTask
 
-        taskService.assignTask(testCaseTask.getStringId())
+        taskService.assignTask(new TaskParams(testCaseTask))
         dataService.setData(testCaseTask.stringId, new DataSet([
                 "bln": new BooleanField(rawValue: true)
         ] as Map<String, Field<?>>), superCreator.getSuperUser())
-        taskService.finishTask(testCaseTask.getStringId())
+        taskService.finishTask(new TaskParams(testCaseTask))
 
         testCase = workflowService.findOne(testCase.getStringId())
         testCaseTask = taskService.findOne(testCaseTask.getStringId())

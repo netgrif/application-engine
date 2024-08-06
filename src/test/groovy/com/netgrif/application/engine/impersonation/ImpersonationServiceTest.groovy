@@ -22,6 +22,7 @@ import com.netgrif.application.engine.startup.ImpersonationRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.*
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest
@@ -119,7 +120,7 @@ class ImpersonationServiceTest {
     void before() {
         testHelper.truncateDbs()
 
-        SessionRepositoryFilter<?> filter = wac.getBean(SessionRepositoryFilter.class);
+        SessionRepositoryFilter<?> filter = wac.getBean(SessionRepositoryFilter.class)
         mvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(filter).apply(springSecurity()).build()
 
         testNet = helper.createNet("impersonation_test.xml").get()
@@ -218,7 +219,11 @@ class ImpersonationServiceTest {
         assert tasks.content[0].stringId == testTask1.stringId
 
         assert taskAuthorizationService.canCallAssign(userService.loggedUserFromContext, testTask1.stringId)
-        taskService.assignTask(userService.loggedUser.transformToLoggedUser(), testTask1.stringId)
+        TaskParams taskParams = TaskParams.builder()
+                .taskId(testTask1.stringId)
+                .user(userService.loggedUser)
+                .build()
+        taskService.assignTask(taskParams)
         testTask1 = reloadTask(testTask1)
         assert testTask1.userId == user2.stringId
 
@@ -226,7 +231,11 @@ class ImpersonationServiceTest {
         assert taskAuthorizationService.canCallSaveFile(userService.loggedUserFromContext, testTask1.stringId)
 
         assert taskAuthorizationService.canCallFinish(userService.loggedUserFromContext, testTask1.stringId)
-        taskService.finishTask(userService.loggedUser.transformToLoggedUser(), testTask1.stringId)
+        taskParams = TaskParams.builder()
+                .taskId(testTask1.stringId)
+                .user(userService.loggedUser)
+                .build()
+        taskService.finishTask(taskParams)
     }
 
     @Test
@@ -317,8 +326,16 @@ class ImpersonationServiceTest {
         ((MultichoiceMapField) caze.dataSet.get("impersonated_authorities")).options = (caze.dataSet.get("impersonated_authorities").rawValue as List).collectEntries { [(it): new I18nString(it as String)] } as Map<String, I18nString>
         caze = workflowService.save(caze)
         def initTask = caze.getTaskStringId("t2")
-        taskService.assignTask(userService.system.transformToLoggedUser(), initTask)
-        taskService.finishTask(userService.system.transformToLoggedUser(), initTask)
+        TaskParams taskParams = TaskParams.builder()
+                .taskId(initTask)
+                .user(userService.system)
+                .build()
+        taskService.assignTask(taskParams)
+        taskParams = TaskParams.builder()
+                .taskId(initTask)
+                .user(userService.system)
+                .build()
+        taskService.finishTask(taskParams)
         return workflowService.findOne(caze.stringId)
     }
 

@@ -20,12 +20,12 @@ import com.netgrif.application.engine.workflow.domain.menu.MenuAndFilters;
 import com.netgrif.application.engine.workflow.domain.menu.MenuEntry;
 import com.netgrif.application.engine.workflow.domain.menu.MenuEntryRole;
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.*;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
@@ -179,8 +179,8 @@ public class MenuImportExportService implements IMenuImportExportService {
             Task importedFilterTask = taskService.findOne(taskId);
             Case filterCase = workflowService.findOne(importedFilterTask.getCaseId());
             try {
-                taskService.assignTask(importedFilterTask.getStringId());
-                taskService.finishTask(importedFilterTask.getStringId());
+                taskService.assignTask(new TaskParams(importedFilterTask));
+                taskService.finishTask(new TaskParams(importedFilterTask));
                 workflowService.save(filterCase);
             } catch (TransitionNotExecutableException e) {
                 log.error("Failed to execute \"import_filter\" task with id: " + taskId, e);
@@ -258,7 +258,7 @@ public class MenuImportExportService implements IMenuImportExportService {
         QTask qTask = new QTask("task");
         Task task = taskService.searchOne(qTask.transitionId.eq("init").and(qTask.caseId.eq(menuItemCase.getStringId())));
         try {
-            taskService.assignTask(task, userService.getLoggedUser());
+            taskService.assignTask(new TaskParams(task, userService.getLoggedUser()));
 //            TODO: release/8.0.0
 //            menuItemCase.getDataSet().get(MENU_IDENTIFIER).setValue(menuIdentifier);
 //            menuItemCase.getDataSet().get(PARENT_ID).setValue(parentId);
@@ -275,8 +275,7 @@ public class MenuImportExportService implements IMenuImportExportService {
         return task.getCaseId() + "," + filterCase.getStringId() + "," + item.getUseIcon().toString();
     }
 
-    @Transactional
-    protected MenuAndFilters loadFromXML(FileFieldValue ffv) throws IOException, IllegalMenuFileException {
+    private MenuAndFilters loadFromXML(FileFieldValue ffv) throws IOException, IllegalMenuFileException {
         File f = new File(ffv.getPath());
         validateFilterXML(new FileInputStream(f));
         SimpleModule module = new SimpleModule().addDeserializer(Object.class, FilterDeserializer.getInstance());
@@ -285,8 +284,7 @@ public class MenuImportExportService implements IMenuImportExportService {
         return xmlMapper.readValue(xml, MenuAndFilters.class);
     }
 
-    @Transactional
-    protected FileFieldValue createXML(MenuAndFilters menuAndFilters, String parentId, FileField fileField) throws IOException {
+    private FileFieldValue createXML(MenuAndFilters menuAndFilters, String parentId, FileField fileField) throws IOException {
         FileFieldValue ffv = new FileFieldValue();
         try {
             ffv.setName("menu_" + userService.getLoggedUser().getFullName().replaceAll("\\s+", "") + ".xml");

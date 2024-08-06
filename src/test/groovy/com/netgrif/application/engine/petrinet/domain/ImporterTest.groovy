@@ -13,6 +13,7 @@ import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
@@ -300,7 +301,7 @@ class ImporterTest {
                 .loggedUser(superCreator.loggedSuper)
                 .build()
         Case testCase = workflowService.createCase(createCaseParams).getCase()
-        taskService.assignTask(testCase.getTaskStringId("t1"))
+        taskService.assignTask(new TaskParams(testCase.getTaskStringId("t1")))
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.getDataSet().get("text_field").getRawValue() == "Hello world!"
         assert testCase.getDataSet().get("tester_text_field").getRawValue() == "Hello world!"
