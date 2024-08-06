@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.importer.model.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.DataRef;
+import com.netgrif.application.engine.petrinet.domain.Function;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
@@ -12,6 +13,7 @@ import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -21,13 +23,10 @@ import java.util.*;
 @Slf4j
 @Lazy
 @Service
+@RequiredArgsConstructor
 public class EventService implements IEventService {
 
     private final ActionRunner actionsRunner;
-
-    public EventService(ActionRunner actionsRunner) {
-        this.actionsRunner = actionsRunner;
-    }
 
     @Override
     public List<EventOutcome> runActions(List<Action> actions, Case useCase, Task task, Transition transition, Map<String, String> params) {
@@ -43,9 +42,11 @@ public class EventService implements IEventService {
     @Override
     public List<EventOutcome> runActions(List<Action> actions, Case useCase, Optional<Task> task, Map<String, String> params) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
+        List<Function> functions = useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions();
         actions.forEach(action -> {
-            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, null, params, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
-            outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
+            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, null, params, functions);
+            outcomes.stream()
+                    .filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
                         if (((SetDataEventOutcome) outcome).getChangedFields().getFields().isEmpty()) {
                             return;
@@ -58,12 +59,15 @@ public class EventService implements IEventService {
     }
 
     @Override
-    public List<EventOutcome> runEventActions(Case useCase, Task task, Field<?> newDataField, List<Action> actions, DataEventType trigger, Map<String, String> params) {
+    public List<EventOutcome> runEventActions(Case useCase, Task task, Field<?> newDataField, List<Action> actions,
+                                              DataEventType trigger, Map<String, String> params) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
+        List<Function> functions = useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions();
+        Optional<Task> taskOpt = task == null ? Optional.empty() : Optional.of(task);
         actions.stream()
                 .filter(a -> a.getSetDataType().isTriggered(newDataField))
                 .forEach(action -> {
-                    List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), newDataField, params, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
+                    List<EventOutcome> outcomes = actionsRunner.run(action, useCase, taskOpt, newDataField, params, functions);
                     outcomes.stream()
                             .filter(SetDataEventOutcome.class::isInstance)
                             .filter(outcome -> !((SetDataEventOutcome) outcome).getChangedFields().getFields().isEmpty())
@@ -74,7 +78,8 @@ public class EventService implements IEventService {
     }
 
     @Override
-    public List<EventOutcome> processDataEvents(Field<?> field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task, Field<?> newDataField, Map<String, String> params) {
+    public List<EventOutcome> processDataEvents(Field<?> field, DataEventType actionTrigger, EventPhase phase, Case useCase,
+                                                Task task, Field<?> newDataField, Map<String, String> params) {
         LinkedList<Action> fieldActions = new LinkedList<>();
         if (field.getEvents() != null && field.getEvents().containsKey(actionTrigger)) {
             fieldActions.addAll(DataRef.getEventAction(field.getEvents().get(actionTrigger), phase));
@@ -108,7 +113,7 @@ public class EventService implements IEventService {
                 .forEach(entry -> {
                     String fieldId = entry.getKey();
                     Field<?> field = outcome.getCase().getDataSet().get(fieldId);
-                    log.info("[" + outcome.getCase().getStringId() + "] " + outcome.getCase().getTitle() + ": Running actions on changed field " + fieldId);
+                    log.info("[{}] {}: Running actions on changed field {}", outcome.getCase().getStringId(), outcome.getCase().getTitle(), fieldId);
                     // TODO: release/8.0.0 changed fields
                     outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, outcome.getCase(), outcome.getTask(), null, params));
                     outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.POST, outcome.getCase(), outcome.getTask(), null, params));
