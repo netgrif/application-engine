@@ -8,6 +8,7 @@ import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.GetDataParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -77,7 +78,7 @@ class DynamicValidationPerformanceTest {
 
     Map<String, Field> getData(Case useCase) {
         Task task = task(useCase)
-        return dataService.getData(task, useCase, superCreator.getSuperUser()).getData().collectEntries { [(it.fieldId): (it)] }
+        return dataService.getData(new GetDataParams(task, useCase, superCreator.getSuperUser())).getData().collectEntries { [(it.fieldId): (it)] }
     }
 
     Task task(Case useCase) {

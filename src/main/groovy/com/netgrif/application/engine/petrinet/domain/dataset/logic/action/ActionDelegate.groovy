@@ -48,6 +48,7 @@ import com.netgrif.application.engine.workflow.domain.menu.MenuItemBody
 import com.netgrif.application.engine.workflow.domain.menu.MenuItemConstants
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams
+import com.netgrif.application.engine.workflow.domain.params.GetDataParams
 import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.TaskService
@@ -1024,13 +1025,22 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     Map<String, Field> getData(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         def useCase = workflowService.findOne(task.caseId)
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, user, params)))
+        GetDataParams getDataParams = GetDataParams.builder()
+                .task(task)
+                .useCase(useCase)
+                .user(user)
+                .params(params)
+                .build()
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(getDataParams)))
     }
 
     Map<String, Field> getData(String taskId, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        Task task = taskService.findById(taskId)
-        def useCase = workflowService.findOne(task.caseId)
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, user, params)))
+        GetDataParams getDataParams = GetDataParams.builder()
+                .taskId(taskId)
+                .user(user)
+                .params(params)
+                .build()
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(getDataParams)))
     }
 
     Map<String, Field> getData(Transition transition, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
@@ -1043,7 +1053,13 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         if (!task) {
             return new HashMap<String, Field>()
         }
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, user, params)))
+        GetDataParams getDataParams = GetDataParams.builder()
+                .task(task)
+                .useCase(useCase)
+                .user(user)
+                .params(params)
+                .build()
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(getDataParams)))
     }
 
     private List<DataRef> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome) {

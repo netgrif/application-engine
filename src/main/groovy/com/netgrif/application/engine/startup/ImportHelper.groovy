@@ -18,6 +18,7 @@ import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.tas
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.CancelTaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.GetDataParams
 import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
@@ -196,7 +197,7 @@ class ImportHelper {
     }
 
     List<DataRef> getTaskData(String taskTitle, String caseId) {
-        return dataService.getData(getTaskId(taskTitle, caseId), superCreator.getSuperUser()).getData()
+        return dataService.getData(new GetDataParams(getTaskId(taskTitle, caseId), superCreator.getSuperUser())).getData()
     }
 
     void updateSuperUser() {

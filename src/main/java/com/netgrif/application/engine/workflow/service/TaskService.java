@@ -37,6 +37,7 @@ import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dat
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.CreateTasksOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.*;
+import com.netgrif.application.engine.workflow.domain.params.GetDataParams;
 import com.netgrif.application.engine.workflow.domain.params.TaskParams;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.domain.triggers.AutoTrigger;
@@ -119,8 +120,7 @@ public class TaskService implements ITaskService {
             AssignTaskEventOutcome assignOutcome = assignTask(new TaskParams(task));
             outcomes.add(assignOutcome);
             log.info("getData [{}] in case [{}]", task.getTitle(), useCase.getTitle());
-            GetDataEventOutcome getDataOutcome = dataService.getData(assignOutcome.getTask(), assignOutcome.getCase(),
-                    userService.getSystem());
+            GetDataEventOutcome getDataOutcome = dataService.getData(new GetDataParams(task, useCase, userService.getSystem()));
             outcomes.add(getDataOutcome);
             log.info("finishTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
             outcomes.add(finishTask(new TaskParams(getDataOutcome.getTask())));

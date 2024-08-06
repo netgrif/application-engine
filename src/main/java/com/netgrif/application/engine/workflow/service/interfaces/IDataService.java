@@ -11,6 +11,7 @@ import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.GetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome;
+import com.netgrif.application.engine.workflow.domain.params.GetDataParams;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import org.springframework.data.domain.Page;
@@ -25,13 +26,7 @@ import java.util.Map;
 
 public interface IDataService {
 
-    GetDataEventOutcome getData(String taskId, IUser user);
-
-    GetDataEventOutcome getData(String taskId, IUser user, Map<String, String> params);
-
-    GetDataEventOutcome getData(Task task, Case useCase, IUser user);
-
-    GetDataEventOutcome getData(Task task, Case useCase, IUser user, Map<String, String> params);
+    GetDataEventOutcome getData(GetDataParams getDataParams);
 
     SetDataEventOutcome setData(String taskId, DataSet values, IUser user);
 

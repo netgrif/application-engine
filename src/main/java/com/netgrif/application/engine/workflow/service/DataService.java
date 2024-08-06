@@ -9,7 +9,6 @@ import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.model.DataEventType;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.model.LayoutType;
-import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
@@ -17,7 +16,6 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavio
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
@@ -28,6 +26,7 @@ import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dat
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.TaskEventOutcome;
+import com.netgrif.application.engine.workflow.domain.params.GetDataParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -41,9 +40,9 @@ import org.apache.poi.util.IOUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
@@ -60,62 +59,46 @@ import java.util.stream.Collectors;
 public class DataService implements IDataService {
 
     @Autowired
-    protected ApplicationEventPublisher publisher;
+    private ITaskService taskService;
 
     @Autowired
-    protected ITaskService taskService;
+    private IWorkflowService workflowService;
 
     @Autowired
-    protected IWorkflowService workflowService;
+    private IUserService userService;
 
     @Autowired
-    protected IUserService userService;
+    private ActionRunner actionsRunner;
 
     @Autowired
-    protected FieldFactory fieldFactory;
+    private IEventService eventService;
 
     @Autowired
-    protected ActionRunner actionsRunner;
+    private IHistoryService historyService;
 
     @Autowired
-    protected IEventService eventService;
-
-    @Autowired
-    protected IHistoryService historyService;
-
-    @Autowired
-    protected IPetriNetService petriNetService;
-
-    @Autowired
-    protected IValidationService validation;
+    private IValidationService validation;
 
     @Value("${nae.image.preview.scaling.px:400}")
-    protected int imageScale;
+    private int imageScale;
 
     @Value("${nae.validation.setData.enable:false}")
-    protected boolean validationEnable;
+    private boolean validationEnable;
 
+    /**
+     * todo javadoc
+     * */
     @Override
-    public GetDataEventOutcome getData(String taskId, IUser user) {
-        return getData(taskId, user, new HashMap<>());
-    }
+    @Transactional
+    public GetDataEventOutcome getData(GetDataParams getDataParams) {
+        fillMissingAttributes(getDataParams);
 
-    @Override
-    public GetDataEventOutcome getData(String taskId, IUser user, Map<String, String> params) {
-        Task task = taskService.findOne(taskId);
-        Case useCase = workflowService.findOne(task.getCaseId());
+        Case useCase = getDataParams.getUseCase();
+        Task task = getDataParams.getTask();
+        IUser user = getDataParams.getUser();
 
-        return getData(task, useCase, user, params);
-    }
-
-    @Override
-    public GetDataEventOutcome getData(Task task, Case useCase, IUser user) {
-        return getData(task, useCase, user, new HashMap<>());
-    }
-
-    @Override
-    public GetDataEventOutcome getData(Task task, Case useCase, IUser user, Map<String, String> params) {
         log.info("[{}]: Getting data of task {} [{}]", useCase.getStringId(), task.getTransitionId(), task.getStringId());
+
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         Map<String, DataRef> dataRefs = transition.getDataSet();
         List<DataRef> dataSetFields = new ArrayList<>();
@@ -128,7 +111,9 @@ public class DataService implements IDataService {
             if (behavior.isForbidden()) {
                 return;
             }
-            outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, null, params));
+            outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, null,
+                    getDataParams.getParams()));
+
             historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE, user));
 
             if (outcome.getMessage() == null) {
@@ -139,13 +124,29 @@ public class DataService implements IDataService {
             dataRef.setBehavior(behavior);
             dataSetFields.add(dataRef);
             // TODO: release/8.0.0 params into outcome?
-            outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task, null, params));
+            outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task, null,
+                    getDataParams.getParams()));
+
             historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST, user));
         });
 
         workflowService.save(useCase);
         outcome.setData(dataSetFields);
         return outcome;
+    }
+
+    private void fillMissingAttributes(GetDataParams getDataParams) throws IllegalArgumentException {
+        if (getDataParams.getUser() == null) {
+            throw new IllegalArgumentException("User must be provided on get data.");
+        }
+        if (getDataParams.getTask() == null) {
+            Task task = taskService.findOne(getDataParams.getTaskId());
+            getDataParams.setTask(task);
+        }
+        if (getDataParams.getUseCase() == null) {
+            Case useCase = workflowService.findOne(getDataParams.getTask().getCaseId());
+            getDataParams.setUseCase(useCase);
+        }
     }
 
     @Override
@@ -255,12 +256,14 @@ public class DataService implements IDataService {
     }
 
     @Override
+    @Transactional
     public GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, LoggedUser loggedUser) {
         IUser user = userService.getUserFromLoggedUser(loggedUser);
         return getDataGroups(taskId, locale, user);
     }
 
     @Override
+    @Transactional
     public GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, IUser user) {
         return getDataGroups(taskId, locale, new HashSet<>(), 0, null, user);
     }
@@ -273,7 +276,7 @@ public class DataService implements IDataService {
         GetDataGroupsEventOutcome outcome = new GetDataGroupsEventOutcome(useCase, task);
         log.info("Getting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level);
         List<DataGroup> resultDataGroups = new ArrayList<>();
-        List<DataRef> data = getData(task, useCase, user).getData();
+        List<DataRef> data = getData(new GetDataParams(task, useCase, user)).getData();
         Map<String, DataRef> dataFieldMap = data.stream().collect(Collectors.toMap(DataRef::getFieldId, field -> field));
         List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::clone).collect(Collectors.toList());
         for (DataGroup dataGroup : dataGroups) {
@@ -661,19 +664,19 @@ public class DataService implements IDataService {
         fout.close();
     }
 
-    protected boolean upload(Case useCase, FileField field, MultipartFile multipartFile) {
+    private boolean upload(Case useCase, FileField field, MultipartFile multipartFile) {
         throw new UnsupportedOperationException("Upload new file to the remote storage is not implemented yet.");
     }
 
-    protected boolean upload(Case useCase, FileListField field, MultipartFile[] multipartFiles) {
+    private boolean upload(Case useCase, FileListField field, MultipartFile[] multipartFiles) {
         throw new UnsupportedOperationException("Upload new files to the remote storage is not implemented yet.");
     }
 
-    protected boolean deleteRemote(Case useCase, FileField field) {
+    private boolean deleteRemote(Case useCase, FileField field) {
         throw new UnsupportedOperationException("Delete file from the remote storage is not implemented yet.");
     }
 
-    protected boolean deleteRemote(Case useCase, FileListField field, String name) {
+    private boolean deleteRemote(Case useCase, FileListField field, String name) {
         throw new UnsupportedOperationException("Delete file from the remote storage is not implemented yet.");
     }
 
