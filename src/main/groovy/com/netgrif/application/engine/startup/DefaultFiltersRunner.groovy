@@ -10,6 +10,7 @@ import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -291,11 +292,11 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
         }
 
         // TODO: release/8.0.0 join setData to one call
-        this.dataService.setData(newFilterTask, dataSet, superCreator.getSuperUser())
+        this.dataService.setData(new SetDataParams(newFilterTask, dataSet, superCreator.getSuperUser()))
         if (isImported) {
-            this.dataService.setData(newFilterTask, new DataSet([
+            this.dataService.setData(new SetDataParams(newFilterTask, new DataSet([
                     (IS_IMPORTED): new NumberField(rawValue: 1)
-            ] as Map<String, Field<?>>), superCreator.getSuperUser())
+            ] as Map<String, Field<?>>), superCreator.getSuperUser()))
         }
 
         I18nString translatedTitle = new I18nString(title)

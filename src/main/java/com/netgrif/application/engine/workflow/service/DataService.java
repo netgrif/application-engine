@@ -27,6 +27,7 @@ import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dat
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.TaskEventOutcome;
 import com.netgrif.application.engine.workflow.domain.params.GetDataParams;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -149,58 +150,50 @@ public class DataService implements IDataService {
         }
     }
 
+    /**
+     * todo javadoc
+     * */
     @Override
-    public SetDataEventOutcome setData(String taskId, DataSet dataSet, IUser user) {
-        return setData(taskId, dataSet, user, new HashMap<>());
-    }
+    @Transactional
+    public SetDataEventOutcome setData(SetDataParams setDataParams) {
+        fillMissingAttributes(setDataParams);
 
-    @Override
-    public SetDataEventOutcome setData(String taskId, DataSet dataSet, IUser user, Map<String, String> params) {
-        Task task = taskService.findOne(taskId);
-        return setData(task, dataSet, user, params);
-    }
+        Task task = setDataParams.getTask();
 
-    @Override
-    public SetDataEventOutcome setData(String taskId, DataSet values, LoggedUser loggedUser) {
-        return setData(taskId, values, loggedUser, new HashMap<>());
-    }
-
-    @Override
-    public SetDataEventOutcome setData(String taskId, DataSet dataSet, LoggedUser loggedUser, Map<String, String> params) {
-        IUser user = userService.getUserFromLoggedUser(loggedUser);
-        return setData(taskId, dataSet, user, params);
-    }
-
-    @Override
-    public SetDataEventOutcome setData(Case target, DataSet dataSet, IUser user) {
-        return setData(target, dataSet, user, new HashMap<>());
-    }
-
-    @Override
-    public SetDataEventOutcome setData(Case target, DataSet dataSet, IUser user, Map<String, String> params) {
-        Task fake = Task.with().id(new ObjectId()).caseId(target.getStringId()).title(new I18nString("Fake")).transitionId("fake").build();
-        return setData(fake, dataSet, user, params);
-    }
-
-    @Override
-    public SetDataEventOutcome setData(Task task, DataSet dataSet, IUser user) {
-        return setData(task, dataSet, user, new HashMap<>());
-    }
-
-    @Override
-    public SetDataEventOutcome setData(Task task, DataSet dataSet, IUser user, Map<String, String> params) {
         log.info("[{}]: Setting data of task {} [{}]", task.getStringId(), task.getTransitionId(), task.getStringId());
         if (task.getUserId() != null) {
             task.setUser(userService.findById(task.getUserId(), false));
         }
         List<EventOutcome> outcomes = new ArrayList<>();
-        for (Map.Entry<String, Field<?>> stringFieldEntry : dataSet.getFields().entrySet()) {
+        for (Map.Entry<String, Field<?>> stringFieldEntry : setDataParams.getDataSet().getFields().entrySet()) {
             String fieldId = stringFieldEntry.getKey();
             Field<?> newDataField = stringFieldEntry.getValue();
-            outcomes.add(setDataField(task, fieldId, newDataField, user));
+            outcomes.add(setDataField(task, fieldId, newDataField, setDataParams.getUser()));
         }
         Case useCase = workflowService.findOne(task.getCaseId());
         return new SetDataEventOutcome(useCase, task, outcomes);
+    }
+
+    private void fillMissingAttributes(SetDataParams setDataParams) {
+        if (setDataParams.getTask() == null) {
+            if (setDataParams.getTaskId() != null) {
+                Task task = taskService.findOne(setDataParams.getTaskId());
+                setDataParams.setTask(task);
+            } else if (setDataParams.getUseCase() != null) {
+                Task fakeTask = Task.with()
+                        .id(new ObjectId())
+                        .caseId(setDataParams.getUseCase().getStringId())
+                        .title(new I18nString("Fake"))
+                        .transitionId("fake")
+                        .build();
+                setDataParams.setTask(fakeTask);
+            } else {
+                throw new IllegalArgumentException("Cannot set data without provided task.");
+            }
+        }
+        if (setDataParams.getUser() == null) {
+            throw new IllegalArgumentException("User must be provided on set data.");
+        }
     }
 
     @Override
@@ -220,9 +213,14 @@ public class DataService implements IDataService {
         }
         Field<?> field = fieldOptional.get();
         // PRE
-        outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task, newDataField, params));
-        useCase = workflowService.findOne(task.getCaseId());
+        List<EventOutcome> preSetOutcomes = resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task,
+                newDataField, params);
+        if (!preSetOutcomes.isEmpty()) {
+            outcome.addOutcomes(preSetOutcomes);
+            useCase = workflowService.findOne(task.getCaseId());
+        }
         historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE, DataSet.of(fieldId, newDataField), user));
+
         // EXECUTION
         if (outcome.getMessage() == null) {
             setOutcomeMessage(task, useCase, outcome, fieldId, field, DataEventType.SET);
@@ -234,10 +232,16 @@ public class DataService implements IDataService {
         useCase = workflowService.save(useCase);
         outcome.addChangedField(fieldId, newDataField);
         historyService.save(new SetDataEventLog(task, useCase, EventPhase.EXECUTION, DataSet.of(fieldId, newDataField), user));
+
         // POST
-        outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, newDataField, params));
-        useCase = workflowService.findOne(task.getCaseId());
+        List<EventOutcome> postSetOutcomes = resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task,
+                newDataField, params);
+        if (!postSetOutcomes.isEmpty()) {
+            outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, newDataField, params));
+            useCase = workflowService.findOne(task.getCaseId());
+        }
         historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, DataSet.of(fieldId, newDataField), user));
+
         useCase = applyFieldConnectedChanges(useCase, field);
         outcome.setCase(useCase);
 

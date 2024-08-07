@@ -12,7 +12,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.TaskPair
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
@@ -79,9 +79,9 @@ class UserRefsTest {
             def _case = importHelper.createCase("$it" as String, net)
             String id = userService.findByEmail(userEmails[it % 2], true).getStringId()
             String taskId = _case.getTaskStringId("t1")
-            dataService.setData(taskId, new DataSet([
+            dataService.setData(new SetDataParams(taskId, new DataSet([
                     "user_list_1": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(id)]))
-            ] as Map<String, Field<?>>), superCreator.getLoggedSuper()).getCase()
+            ] as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
             userIds.add(id)
         }
     }

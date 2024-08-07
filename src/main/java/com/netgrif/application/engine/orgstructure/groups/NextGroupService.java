@@ -21,6 +21,7 @@ import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
 import com.netgrif.application.engine.workflow.domain.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -116,7 +117,7 @@ public class NextGroupService implements INextGroupService {
 
         DataSet taskData = getInitialGroupData(author, title, outcome.getCase());
         Task initTask = getGroupInitTask(outcome.getCase());
-        dataService.setData(initTask.getStringId(), taskData, author);
+        dataService.setData(new SetDataParams(initTask, taskData, author));
 
         try {
             taskService.assignTask(new TaskParams(initTask, author));

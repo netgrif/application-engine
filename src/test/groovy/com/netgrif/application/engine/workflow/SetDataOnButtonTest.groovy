@@ -13,6 +13,7 @@ import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -107,11 +108,11 @@ class SetDataOnButtonTest {
 
         Task testCaseTask = taskService.searchOne(QTask.task.caseTitle.eq(PARENT_CASE) & QTask.task.transitionId.eq(TEST_TRANSITION))
         assert testCaseTask != null
-        dataService.setData(testCaseTask.stringId, new DataSet([
+        dataService.setData(new SetDataParams(testCaseTask.stringId, new DataSet([
                 "button_0": new ButtonField(rawValue: 42),
                 "button_1": new ButtonField(rawValue: 42),
                 "button_2": new ButtonField(rawValue: 42)
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper())
+        ] as Map<String, Field<?>>), superCreator.getSuperUser()))
 
         testCase = workflowService.findOne(testCase.getStringId())
 

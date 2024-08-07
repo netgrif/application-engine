@@ -20,6 +20,7 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskAuthorizationService
@@ -321,9 +322,9 @@ class TaskAuthorizationServiceTest {
                 .build()
         Case case_ = workflowService.createCase(createCaseParams).getCase()
         String taskId = case_.getTaskStringId("1")
-        case_ = dataService.setData(taskId, new DataSet([
+        case_ = dataService.setData(new SetDataParams(taskId, new DataSet([
                 "assign_pos_ul":new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+        ] as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
         workflowService.save(case_)
         sleep(4000)
 
@@ -344,9 +345,9 @@ class TaskAuthorizationServiceTest {
                 .build()
         Case case_ = workflowService.createCase(createCaseParams).getCase()
         String taskId = case_.getTaskStringId("1")
-        case_ = dataService.setData(taskId, new DataSet([
+        case_ = dataService.setData(new SetDataParams(taskId, new DataSet([
                 "assign_neg_ul": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+        ] as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
         sleep(4000)
 
         assert !taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), taskId)
@@ -365,9 +366,9 @@ class TaskAuthorizationServiceTest {
                 .build()
         Case case_ = workflowService.createCase(createCaseParams).getCase()
         String taskId = case_.getTaskStringId("1")
-        case_ = dataService.setData(taskId, new DataSet([
+        case_ = dataService.setData(new SetDataParams(taskId, new DataSet([
                 "assign_pos_ul": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper()).getCase()
+        ] as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
         sleep(4000)
 
         assert taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), taskId)
@@ -440,9 +441,9 @@ class TaskAuthorizationServiceTest {
                 .build()
         Case case_ = workflowService.createCase(createCaseParams).getCase()
         String taskId = case_.getTaskStringId("1")
-        case_ = dataService.setData(taskId, new DataSet([
+        case_ = dataService.setData(new SetDataParams(taskId, new DataSet([
                 "finish_pos_ul": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+        ] as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
         sleep(4000)
 
         TaskParams taskParams = TaskParams.builder()
@@ -467,9 +468,9 @@ class TaskAuthorizationServiceTest {
                 .build()
         Case case_ = workflowService.createCase(createCaseParams).getCase()
         String taskId = case_.getTaskStringId("1")
-        case_ = dataService.setData(taskId, new DataSet([
+        case_ = dataService.setData(new SetDataParams(taskId, new DataSet([
                 "finish_neg_ul": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+        ] as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
         sleep(4000)
 
         TaskParams taskParams = TaskParams.builder()
@@ -496,9 +497,9 @@ class TaskAuthorizationServiceTest {
                 .build()
         Case case_ = workflowService.createCase(createCaseParams).getCase()
         String taskId = case_.getTaskStringId("1")
-        case_ = dataService.setData(taskId, new DataSet([
+        case_ = dataService.setData(new SetDataParams(taskId, new DataSet([
                 "finish_pos_ul": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+        ] as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
         sleep(4000)
 
         TaskParams taskParams = TaskParams.builder()

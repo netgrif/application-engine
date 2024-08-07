@@ -14,6 +14,7 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -36,22 +37,22 @@ import java.util.stream.Collectors
 class UserListTest {
 
     @Autowired
-    private TestHelper testHelper;
+    private TestHelper testHelper
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreator superCreator
 
     @Autowired
-    private CaseRepository caseRepository;
+    private CaseRepository caseRepository
 
     @Autowired
-    private IDataService dataService;
+    private IDataService dataService
 
     @Autowired
-    private ITaskService taskService;
+    private ITaskService taskService
 
     @BeforeEach
     void before() {
@@ -60,19 +61,19 @@ class UserListTest {
 
     @Test
     void testUserList() throws MissingPetriNetMetaDataException, IOException {
-        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/user_list.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/user_list.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
 
-        assert net.getNet() != null;
-        Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("User List"));
+        assert net.getNet() != null
+        Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("User List"))
 
-        assert caseOpt.isPresent();
-        assert caseOpt.get().getDataSet().get("text").getRawValue() == "Its working...";
+        assert caseOpt.isPresent()
+        assert caseOpt.get().getDataSet().get("text").getRawValue() == "Its working..."
 
         Task task = taskService.findByCases(new FullPageRequest(), Collections.singletonList(caseOpt.get().getStringId())).stream().collect(Collectors.toList()).get(0)
 
-        dataService.setData(task.stringId, new DataSet([
+        dataService.setData(new SetDataParams(task.stringId, new DataSet([
                 "users_1": new UserListField(rawValue: new UserListFieldValue(new UserFieldValue(superCreator.getSuperUser())))
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper())
+        ] as Map<String, Field<?>>), superCreator.getSuperUser()))
 
         assert taskService.findById(task.stringId).users.get(superCreator.getSuperUser().getStringId())
         assert caseRepository.findById(caseOpt.get().stringId).get().users.get(superCreator.getSuperUser().getStringId())

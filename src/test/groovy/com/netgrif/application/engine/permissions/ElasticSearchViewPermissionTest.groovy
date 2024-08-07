@@ -23,6 +23,7 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -203,9 +204,9 @@ class ElasticSearchViewPermissionTest {
                 .build()
         Case case_ = workflowService.createCase(createCaseParams).getCase()
         String taskId = case_.getTaskStringId("1")
-        dataService.setData(taskId, new DataSet([
+        dataService.setData(new SetDataParams(taskId, new DataSet([
                 "view_ul_pos": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser())
+        ] as Map<String, Field<?>>), superCreator.getSuperUser()))
         case_ = workflowService.findOne(case_.stringId)
         sleep(4000)
 
@@ -230,9 +231,9 @@ class ElasticSearchViewPermissionTest {
                 .build()
         Case case_ = workflowService.createCase(createCaseParams).getCase()
         String taskId = case_.getTaskStringId("1")
-        dataService.setData(taskId, new DataSet([
+        dataService.setData(new SetDataParams(taskId, new DataSet([
                 "view_ul_neg": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser())
+        ] as Map<String, Field<?>>), superCreator.getSuperUser()))
         case_ = workflowService.findOne(case_.stringId)
         sleep(4000)
 
@@ -259,9 +260,9 @@ class ElasticSearchViewPermissionTest {
         ProcessRole negViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
         userService.addRole(testUser, negViewRole.getStringId())
         String taskId = case_.getTaskStringId("1")
-        dataService.setData(taskId, new DataSet([
+        dataService.setData(new SetDataParams(taskId, new DataSet([
                 "view_ul_pos": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser())
+        ] as Map<String, Field<?>>), superCreator.getSuperUser()))
         case_ = workflowService.findOne(case_.stringId)
         sleep(4000)
 

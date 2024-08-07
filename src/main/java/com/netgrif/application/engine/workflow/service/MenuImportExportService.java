@@ -20,6 +20,7 @@ import com.netgrif.application.engine.workflow.domain.menu.MenuAndFilters;
 import com.netgrif.application.engine.workflow.domain.menu.MenuEntry;
 import com.netgrif.application.engine.workflow.domain.menu.MenuEntryRole;
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
 import com.netgrif.application.engine.workflow.domain.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.*;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
@@ -150,7 +151,7 @@ public class MenuImportExportService implements IMenuImportExportService {
             Case caseToRemove = workflowService.findOne(id);
             QTask qTask = new QTask("task");
             Task task = taskService.searchOne(qTask.transitionId.eq("view").and(qTask.caseId.eq(caseToRemove.getStringId())));
-            dataService.setData(task, caseToRemoveData, userService.getLoggedOrSystem());
+            dataService.setData(new SetDataParams(task, caseToRemoveData, userService.getLoggedOrSystem()));
         });
 
         //Import filters
@@ -172,7 +173,7 @@ public class MenuImportExportService implements IMenuImportExportService {
 //            DataField groupImportResultMessage = new DataField();
 //            groupImportResultMessage.setValue(resultMessage.toString());
 //            groupData.getFields().put("import_results", groupImportResultMessage);
-            dataService.setData(task, groupData, userService.getLoggedOrSystem());
+            dataService.setData(new SetDataParams(task, groupData, userService.getLoggedOrSystem()));
         });
 
         importedFilterTaskIds.values().forEach(taskId -> {

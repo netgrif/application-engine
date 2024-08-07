@@ -11,6 +11,7 @@ import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -112,7 +113,8 @@ class HistoryServiceTest {
         int count = historyService.findAllSetDataEventLogsByCaseId(caze.getStringId()).size()
         assert count == 0
         String task = caze.tasks.values().find { it.transitionId == "1" }.taskStringId
-        dataService.setData(task, DataSet.of("number", new NumberField(rawValue: 110101116103114105102)), userService.loggedOrSystem)
+        dataService.setData(new SetDataParams(task, DataSet.of("number", new NumberField(rawValue: 110101116103114105102)),
+                userService.loggedOrSystem))
         Thread.sleep(1000) // HistoryService::save is @Async
         assert historyService.findAllSetDataEventLogsByCaseId(caze.getStringId()).size() == count + 3  // 3 PRE EXECUTION POST
     }

@@ -17,6 +17,7 @@ import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.*
 import com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.UserFilterSearchService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
@@ -149,15 +150,15 @@ class FilterImportExportTest {
         validateFilterXML(new FileInputStream(exportedFiltersField.getPath()))
         importedTasksIds.forEach({ taskId ->
             Task filterTask = this.taskService.findOne(taskId)
-            this.dataService.setData(filterTask, new DataSet([
+            this.dataService.setData(new SetDataParams(filterTask, new DataSet([
                     (VISIBILITY_FIELD): new EnumerationMapField(rawValue: FILTER_VISIBILITY_PRIVATE),
                     (NEW_TITLE_FIELD) : new TextField(rawValue: this.workflowService.findOne(filterTask.caseId).title + " new")
-            ] as Map<String, Field<?>>))
+            ] as Map<String, Field<?>>), dummyUser))
         })
         Task importTask = this.taskService.searchOne(QTask.task.caseId.eq(importCase.stringId).and(QTask.task.transitionId.eq("importFilter")))
-        this.dataService.setData(importTask, new DataSet([
+        this.dataService.setData(new SetDataParams(importTask, new DataSet([
                 (IMPORTED_FILTERS_FIELD): new TaskField(rawValue: importedTasksIds)
-        ] as Map<String, Field<?>>))
+        ] as Map<String, Field<?>>), dummyUser))
         this.taskService.finishTask(new TaskParams(importTask, dummyUser))
         Thread.sleep(1000)
         filterCases = this.userFilterSearchService.autocompleteFindFilters("")

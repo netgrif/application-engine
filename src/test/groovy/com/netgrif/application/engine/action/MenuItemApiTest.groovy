@@ -18,6 +18,7 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.menu.MenuItemConstants
 import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -350,7 +351,7 @@ class MenuItemApiTest {
     }
 
     def setData(Case caze, DataSet dataSet) {
-        dataService.setData(caze.tasks["t1"].taskStringId, dataSet, superCreator.superUser)
+        dataService.setData(new SetDataParams(caze.tasks["t1"].taskStringId, dataSet, superCreator.superUser))
         return workflowService.findOne(caze.stringId)
     }
 }

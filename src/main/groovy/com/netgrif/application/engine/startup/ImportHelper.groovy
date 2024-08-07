@@ -19,6 +19,7 @@ import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.tas
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.domain.params.GetDataParams
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
@@ -189,7 +190,7 @@ class ImportHelper {
     }
 
     SetDataEventOutcome setTaskData(String taskId, DataSet dataSet) {
-        dataService.setData(taskId, dataSet, superCreator.getSuperUser())
+        dataService.setData(new SetDataParams(taskId, dataSet, superCreator.getSuperUser()))
     }
 
     SetDataEventOutcome setTaskData(String taskTitle, String caseId, DataSet data) {

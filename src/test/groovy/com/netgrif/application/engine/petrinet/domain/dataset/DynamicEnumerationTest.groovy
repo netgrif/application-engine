@@ -9,6 +9,7 @@ import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -31,48 +32,48 @@ import java.util.stream.Collectors
 class DynamicEnumerationTest {
 
     @Autowired
-    private TestHelper testHelper;
+    private TestHelper testHelper
 
     @Autowired
     private ImportHelper importHelper
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreator superCreator
 
     @Autowired
-    private IDataService dataService;
+    private IDataService dataService
 
     @Autowired
-    private ITaskService taskService;
+    private ITaskService taskService
 
     @Autowired
-    private CaseRepository caseRepository;
+    private CaseRepository caseRepository
 
     @BeforeEach
-    public void before() {
-        testHelper.truncateDbs();
+    void before() {
+        testHelper.truncateDbs()
     }
 
     @Test
     void testDynamicEnum() {
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/test_autocomplete_dynamic.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/test_autocomplete_dynamic.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
 
-        assert optNet.getNet() != null;
+        assert optNet.getNet() != null
         def net = optNet.getNet()
 
         def aCase = importHelper.createCase("Case", net)
         assert aCase != null
 
-        Task task = taskService.findByCases(new FullPageRequest(), Collections.singletonList(aCase.getStringId())).stream().collect(Collectors.toList()).get(0);
+        Task task = taskService.findByCases(new FullPageRequest(), Collections.singletonList(aCase.getStringId())).stream().collect(Collectors.toList()).get(0)
         importHelper.assignTask("Autocomplete", aCase.getStringId(), superCreator.getSuperUser())
 
         def dataSet = new DataSet([
                 "autocomplete": new EnumerationField(rawValue: new I18nString("Case"))
         ] as Map<String, Field<?>>)
-        dataService.setData(task.stringId, dataSet, superCreator.getSuperUser())
+        dataService.setData(new SetDataParams(task.stringId, dataSet, superCreator.getSuperUser()))
 
         def caseOpt = caseRepository.findById(aCase.stringId)
         assert caseOpt.isPresent()

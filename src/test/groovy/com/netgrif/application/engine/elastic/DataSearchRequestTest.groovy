@@ -24,6 +24,7 @@ import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -142,9 +143,9 @@ class DataSearchRequestTest {
 
         Task actionTrigger = taskService.searchOne(QTask.task.caseId.eq(_case.stringId).and(QTask.task.transitionId.eq("2")));
         assert actionTrigger != null
-        dataService.setData(actionTrigger, new DataSet([
+        dataService.setData(new SetDataParams(actionTrigger, new DataSet([
                 "testActionTrigger": new TextField(rawValue: "random value")
-        ] as Map<String, Field<?>>), superCreator.getSuperUser())
+        ] as Map<String, Field<?>>), superCreator.getSuperUser()))
 
         10.times {
             _case = importHelper.createCase("wrong${it}", net.getNet())

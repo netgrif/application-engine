@@ -18,6 +18,7 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -81,8 +82,8 @@ class TransactionTest {
     @Test
     void testBasicTransaction() {
         Case useCase = importHelper.createCase("test", testNet)
-        useCase = dataService.setData(useCase, new DataSet(["testBasicTransaction": new ButtonField(rawValue: 1)]
-                as Map<String, Field<?>>), superCreator.getSuperUser()).case
+        useCase = dataService.setData(new SetDataParams(useCase, new DataSet(["testBasicTransaction": new ButtonField(rawValue: 1)]
+                as Map<String, Field<?>>), superCreator.getSuperUser())).case
 
         assert findAllByIdentifier("transaction_test").size() == 4
 
@@ -351,8 +352,8 @@ class TransactionTest {
         long totalTransactionalDuration = 0
         (0..iterations).each {
             Date startTime = new Date()
-            dataService.setData(useCase, new DataSet(["testCreateCaseInTransactionPerformance": new ButtonField(rawValue: 1)]
-                    as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+            dataService.setData(new SetDataParams(useCase, new DataSet(["testCreateCaseInTransactionPerformance": new ButtonField(rawValue: 1)]
+                    as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
             Date endTime = new Date()
             TimeDuration elapsedTimeTransactional = TimeCategory.minus( endTime, startTime )
             totalTransactionalDuration += elapsedTimeTransactional.toMilliseconds()
@@ -361,8 +362,8 @@ class TransactionTest {
         long totalNonTransactionalDuration = 0
         (0..iterations).each {
             Date startTime = new Date()
-            dataService.setData(useCase, new DataSet(["testCreateCasePerformance": new ButtonField(rawValue: 1)]
-                    as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+            dataService.setData(new SetDataParams(useCase, new DataSet(["testCreateCasePerformance": new ButtonField(rawValue: 1)]
+                    as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
             Date endTime = new Date()
             TimeDuration elapsedTimeTransactional = TimeCategory.minus( endTime, startTime )
             totalNonTransactionalDuration += elapsedTimeTransactional.toMilliseconds()
@@ -374,8 +375,8 @@ class TransactionTest {
 
     private Case createTestCaseAndSetButton(String title, String buttonFieldId) {
         Case useCase = importHelper.createCase(title, testNet)
-        return dataService.setData(useCase, new DataSet([(buttonFieldId): new ButtonField(rawValue: 1)]
-                as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+        return dataService.setData(new SetDataParams(useCase, new DataSet([(buttonFieldId): new ButtonField(rawValue: 1)]
+                as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
     }
 
     private Case findCaseByTitle(String title) {

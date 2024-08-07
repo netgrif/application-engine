@@ -49,6 +49,7 @@ import com.netgrif.application.engine.workflow.domain.menu.MenuItemConstants
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams
 import com.netgrif.application.engine.workflow.domain.params.GetDataParams
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.TaskService
@@ -528,11 +529,11 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     SetDataEventOutcome setData(Field<?> field, Map changes, IUser user = userService.loggedOrSystem) {
-        SetDataEventOutcome outcome = dataService.setData(useCase, new DataSet([
+        SetDataEventOutcome outcome = dataService.setData(new SetDataParams(useCase, new DataSet([
                 (field.stringId): field.class.newInstance(changes)
-        ] as Map<String, Field<?>>), user)
+        ] as Map<String, Field<?>>), user))
         this.outcomes.add(outcome)
-        updateCase()
+        updateCase(outcome)
         return outcome
     }
 
@@ -610,7 +611,8 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     private addTaskOutcomes(Task task, DataSet dataSet) {
         AssignTaskEventOutcome assignOutcome = taskService.assignTask(new TaskParams(task))
         this.outcomes.add(assignOutcome)
-        SetDataEventOutcome setDataOutcome = dataService.setData(assignOutcome.getTask(), dataSet, userService.loggedOrSystem)
+        SetDataEventOutcome setDataOutcome = dataService.setData(new SetDataParams(assignOutcome.getTask(), dataSet,
+                userService.loggedOrSystem))
         this.outcomes.add(setDataOutcome)
         this.outcomes.add(taskService.finishTask(new TaskParams(setDataOutcome.getTask())))
     }
@@ -979,7 +981,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     // TODO: release/8.0.0 merge check, params x dataset
     SetDataEventOutcome setData(DataSet dataSet, IUser user = userService.loggedOrSystem) {
-        return addSetDataOutcomeToOutcomes(dataService.setData(useCase, dataSet, user))
+        return addSetDataOutcomeToOutcomes(dataService.setData(new SetDataParams(useCase, dataSet, user)))
     }
 
     SetDataEventOutcome setData(Task task, DataSet dataSet, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
@@ -987,7 +989,13 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     SetDataEventOutcome setData(String taskId, DataSet dataSet, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        return addSetDataOutcomeToOutcomes(dataService.setData(taskId, dataSet, user, params))
+        SetDataParams setDataParams = SetDataParams.builder()
+                .taskId(taskId)
+                .dataSet(dataSet)
+                .user(user)
+                .params(params)
+                .build()
+        return addSetDataOutcomeToOutcomes(dataService.setData(setDataParams))
     }
 
     SetDataEventOutcome setData(Transition transition, DataSet dataSet, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
@@ -997,7 +1005,13 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     SetDataEventOutcome setData(String transitionId, Case useCase, DataSet dataSet, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
-        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, dataSet, user, params))
+        SetDataParams setDataParams = SetDataParams.builder()
+                .task(task)
+                .dataSet(dataSet)
+                .user(user)
+                .params(params)
+                .build()
+        return addSetDataOutcomeToOutcomes(dataService.setData(setDataParams))
     }
 
     @Deprecated

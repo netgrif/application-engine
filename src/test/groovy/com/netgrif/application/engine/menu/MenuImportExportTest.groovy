@@ -16,6 +16,7 @@ import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.menu.MenuAndFilters
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.UserFilterSearchService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
@@ -207,7 +208,7 @@ class MenuImportExportTest {
 
 
     private SetDataEventOutcome setData(task, Map<String, Map<String, Object>> values) {
-        return dataService.setData(task, ImportHelper.populateDataset(values))
+        return dataService.setData(new SetDataParams(task, ImportHelper.populateDataset(values), superCreator.getSuperUser()))
     }
 
 

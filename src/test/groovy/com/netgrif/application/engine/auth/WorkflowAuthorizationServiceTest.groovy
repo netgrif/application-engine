@@ -18,6 +18,7 @@ import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowAuthorizationService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -220,9 +221,9 @@ class WorkflowAuthorizationServiceTest {
                 .build()
         Case case_ = workflowService.createCase(createCaseParams).getCase()
         String taskId = case_.getTaskStringId("1")
-        case_ = dataService.setData(taskId, new DataSet([
+        case_ = dataService.setData(new SetDataParams(taskId, new DataSet([
                 "pos_user_list": new UserListField(rawValue: new UserListFieldValue(userValues: [dataService.makeUserFieldValue(testUser.stringId)])),
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+        ] as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
         workflowService.save(case_)
 
         assert workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
@@ -247,10 +248,10 @@ class WorkflowAuthorizationServiceTest {
                 .build()
         Case case_ = workflowService.createCase(createCaseParams).getCase()
         String taskId = case_.getTaskStringId("1")
-        case_ = dataService.setData(taskId, new DataSet([
+        case_ = dataService.setData(new SetDataParams(taskId, new DataSet([
                 "pos_user_list": new UserListField(rawValue: new UserListFieldValue(userValues: [dataService.makeUserFieldValue(testUser.stringId)])),
                 "neg_user_list": new UserListField(rawValue: new UserListFieldValue(userValues: [dataService.makeUserFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+        ] as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
 
         assert !workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
 

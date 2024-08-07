@@ -10,6 +10,7 @@ import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -95,9 +96,9 @@ class ChangeCasePropertyTest {
         assert testCaseTask
 
         taskService.assignTask(new TaskParams(testCaseTask))
-        dataService.setData(testCaseTask.stringId, new DataSet([
+        dataService.setData(new SetDataParams(testCaseTask.stringId, new DataSet([
                 "bln": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>), superCreator.getSuperUser())
+        ] as Map<String, Field<?>>), superCreator.getSuperUser()))
         taskService.finishTask(new TaskParams(testCaseTask))
 
         testCase = workflowService.findOne(testCase.getStringId())

@@ -11,6 +11,7 @@ import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dat
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessageResource;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
 import com.netgrif.application.engine.workflow.domain.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -213,7 +214,8 @@ public abstract class AbstractTaskController {
     public EntityModel<EventOutcomeWithMessage> setData(String taskId, TaskDataSets dataBody, Authentication auth) {
         try {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
-            dataBody.getBody().forEach((task, dataSet) -> outcomes.put(task, dataService.setData(task, dataSet, (LoggedUser) auth.getPrincipal())));
+            dataBody.getBody().forEach((task, dataSet) -> outcomes.put(task, dataService.setData(new SetDataParams(task,
+                    dataSet, ((LoggedUser) auth.getPrincipal()).transformToUser()))));
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set", mainOutcome);
         } catch (IllegalArgumentWithChangedFieldsException e) {

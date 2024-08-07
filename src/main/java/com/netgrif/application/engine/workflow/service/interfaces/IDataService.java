@@ -12,6 +12,7 @@ import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dat
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.params.GetDataParams;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import org.springframework.data.domain.Page;
@@ -28,21 +29,7 @@ public interface IDataService {
 
     GetDataEventOutcome getData(GetDataParams getDataParams);
 
-    SetDataEventOutcome setData(String taskId, DataSet values, IUser user);
-
-    SetDataEventOutcome setData(String taskId, DataSet values, IUser user, Map<String, String> params);
-
-    SetDataEventOutcome setData(String taskId, DataSet values, LoggedUser loggedUser);
-
-    SetDataEventOutcome setData(String taskId, DataSet values, LoggedUser loggedUser, Map<String, String> params);
-
-    SetDataEventOutcome setData(Case useCase, DataSet dataSet, IUser user);
-
-    SetDataEventOutcome setData(Case useCase, DataSet dataSet, IUser user, Map<String, String> params);
-
-    SetDataEventOutcome setData(Task task, DataSet values, IUser user);
-
-    SetDataEventOutcome setData(Task task, DataSet values, IUser user, Map<String, String> params);
+    SetDataEventOutcome setData(SetDataParams setDataParams);
 
     SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField, IUser user);
     
