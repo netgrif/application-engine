@@ -5,6 +5,7 @@ import com.netgrif.application.engine.importer.service.AllDataConfiguration
 import com.netgrif.application.engine.importer.service.RoleFactory
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -115,7 +116,7 @@ class PredefinedRolesPermissionsTest {
     private String ANONYMOUS_ROLE_ID
 
     @BeforeEach
-    public void before() {
+    void before() {
         testHelper.truncateDbs()
         assert processRoleService.defaultRole() != null
         DEFAULT_ROLE_ID = processRoleService.defaultRole().stringId
@@ -228,7 +229,7 @@ class PredefinedRolesPermissionsTest {
     void reservedDefaultRole() {
         assertThrows(IllegalArgumentException.class, () -> {
             importAndCreate(reservedDefaultRoleNet)
-        });
+        })
     }
 
     @Test()
@@ -357,7 +358,7 @@ class PredefinedRolesPermissionsTest {
     void reservedAnonymousRole() {
         assertThrows(IllegalArgumentException.class, () -> {
             importAndCreate(reservedAnonymousRoleNet)
-        });
+        })
     }
 
     @Test()
@@ -427,8 +428,8 @@ class PredefinedRolesPermissionsTest {
         NetCaseTask instances = importAndCreate(model)
         String netRoleId = instances.net.getRoles().keySet().find({ it -> it != DEFAULT_ROLE_ID && it != ANONYMOUS_ROLE_ID })
 
-        Map<String, Map<ProcessRolePermission, Boolean>> processPerms = transformProcessRolePermissionMap(processPermissions, netRoleId);
-        Map<String, Map<RolePermission, Boolean>> taskPerms = transformRolePermissionMap(taskPermissions, netRoleId);
+        Map<String, Map<ProcessRolePermission, Boolean>> processPerms = transformProcessRolePermissionMap(processPermissions, netRoleId)
+        Map<String, Map<RolePermission, Boolean>> taskPerms = transformRolePermissionMap(taskPermissions, netRoleId)
 
         def negativeProcessView = processPerms.findAll { it -> it.value.containsKey(ProcessRolePermission.VIEW) && !it.value.get(ProcessRolePermission.VIEW) }.collect { it -> it.key }
         def negativeTaskView = taskPerms.findAll { it -> it.value.containsKey(RolePermission.VIEW) && !it.value.get(RolePermission.VIEW) }.collect { it -> it.key }
@@ -451,7 +452,8 @@ class PredefinedRolesPermissionsTest {
     }
 
     private NetCaseTask importAndCreate(Resource model) {
-        ImportPetriNetEventOutcome importOutcome = petriNetService.importPetriNet(model.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        ImportPetriNetEventOutcome importOutcome = petriNetService.importPetriNet(new ImportPetriNetParams(
+                model.inputStream, VersionType.MAJOR, superCreator.loggedSuper))
 
         assert importOutcome.getNet() != null
 

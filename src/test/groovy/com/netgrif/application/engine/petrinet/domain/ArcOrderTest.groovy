@@ -4,6 +4,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.arcs.ArcOrderComparator
 import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -30,7 +31,7 @@ class ArcOrderTest {
     private ImportHelper helper
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
 
     @Autowired
     private SuperCreator superCreator
@@ -50,7 +51,8 @@ class ArcOrderTest {
 
     @Test
     void testOrder() {
-        def net = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        def net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
 
         def arcs = net.getArcsOfTransition(NET_TASK)
         def sorted = arcs.sort { a1, a2 -> ArcOrderComparator.getInstance().compare(a1, a2) }

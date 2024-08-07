@@ -3,6 +3,7 @@ package com.netgrif.application.engine.action
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -67,7 +68,8 @@ class AssignRemoveTest {
     @Test
     @Disabled("Create functions or update test")
     void testAssignAndRemoveRole() throws MissingPetriNetMetaDataException, IOException {
-        ImportPetriNetEventOutcome netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/role_assign_remove_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome netOptional = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/petriNets/role_assign_remove_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
 
         assert netOptional.getNet() != null
         def net = netOptional.getNet()

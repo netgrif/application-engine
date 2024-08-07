@@ -8,6 +8,7 @@ import com.netgrif.application.engine.configuration.properties.SuperAdminConfigu
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -69,10 +70,10 @@ class FileFieldTest {
     private WebApplicationContext context
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreator superCreator
 
     private MockMvc mockMvc
 
@@ -86,7 +87,8 @@ class FileFieldTest {
     }
 
     PetriNet getNet() {
-        def netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/remoteFileField.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        def netOptional = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/remoteFileField.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert netOptional.getNet() != null
         return netOptional.getNet()
     }

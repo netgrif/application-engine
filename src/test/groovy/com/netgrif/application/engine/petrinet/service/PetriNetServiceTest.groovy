@@ -10,6 +10,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.*
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
@@ -101,7 +102,8 @@ class PetriNetServiceTest {
         long processCount = petriNetRepository.count()
         long taskCount = taskRepository.count()
 
-        ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert testNetOptional.getNet() != null
         assert petriNetRepository.count() == processCount + 1
         PetriNet testNet = testNetOptional.getNet()
@@ -150,8 +152,10 @@ class PetriNetServiceTest {
     @Test
     void findAllByUriNodeIdTest() {
         UriNode myNode = uriService.getOrCreate("/test", UriContentType.DEFAULT)
-        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), myNode.id.toString())
-        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), myNode.id.toString())
+        petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), myNode.id.toString()))
+        petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), myNode.id.toString()))
 
         Thread.sleep(2000)
 
@@ -165,8 +169,10 @@ class PetriNetServiceTest {
 
         def user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
         assert user != null
-        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        petriNetService.importPetriNet(stream(NET_SEARCH_FILE), VersionType.MAJOR, user.transformToLoggedUser())
+        petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()))
+        petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(NET_SEARCH_FILE), VersionType.MAJOR, user.transformToLoggedUser()))
 
         assert petriNetRepository.count() == processCount + 2
 

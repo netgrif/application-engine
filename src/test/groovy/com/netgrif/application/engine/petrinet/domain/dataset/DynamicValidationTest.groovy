@@ -42,7 +42,7 @@ class DynamicValidationTest {
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs();
+        testHelper.truncateDbs()
     }
 
 //    @Test

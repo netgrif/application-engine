@@ -6,6 +6,7 @@ import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -66,13 +67,13 @@ class ProcessRoleTest {
     private ImportHelper importHelper
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
 
     @Autowired
     private ProcessRoleRepository userProcessRoleRepository
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreator superCreator
 
     @Autowired
     TestHelper testHelper
@@ -86,7 +87,8 @@ class ProcessRoleTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rolref_view.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/rolref_view.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert net.getNet() != null
 
         String netId = net.getNet().getStringId()

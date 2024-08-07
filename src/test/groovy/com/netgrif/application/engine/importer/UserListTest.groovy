@@ -6,6 +6,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
@@ -61,7 +62,8 @@ class UserListTest {
 
     @Test
     void testUserList() throws MissingPetriNetMetaDataException, IOException {
-        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/user_list.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/user_list.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
 
         assert net.getNet() != null
         Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("User List"))

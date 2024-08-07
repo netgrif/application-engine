@@ -10,6 +10,7 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.ButtonField
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -75,8 +76,9 @@ class TransactionTest {
     @BeforeEach
     void before() throws IOException, MissingPetriNetMetaDataException {
         testHelper.truncateDbs()
-        testNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/transaction/transaction_test.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        testNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/petriNets/transaction/transaction_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
     }
 
     @Test

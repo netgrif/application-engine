@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -45,7 +46,8 @@ class MapFieldTest {
 
     @Test
     void testImport() {
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(new ImportPetriNetParams(
+                netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper))
         assert netOptional.getNet() != null
 
         def net = netOptional.getNet()
@@ -69,7 +71,8 @@ class MapFieldTest {
 
     @Test
     void testValue() {
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(new ImportPetriNetParams(
+                netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper))
         assert netOptional.getNet() != null
 
         Case aCase = importHelper.createCase("Case", netOptional.getNet())
@@ -106,7 +109,8 @@ class MapFieldTest {
 
     @Test
     void testImportMultichoice() {
-        def netOptional = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(new ImportPetriNetParams(
+                netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper))
         assert netOptional.getNet() != null
 
         def net = netOptional.getNet()
@@ -130,7 +134,8 @@ class MapFieldTest {
 
     @Test
     void testValueMultichoice() {
-        def netOptional = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(new ImportPetriNetParams(
+                netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper))
         assert netOptional.getNet() != null
 
         Case aCase = importHelper.createCase("Case", netOptional.getNet())

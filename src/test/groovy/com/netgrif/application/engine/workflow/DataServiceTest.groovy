@@ -6,6 +6,7 @@ import com.netgrif.application.engine.petrinet.domain.DataGroup
 import com.netgrif.application.engine.petrinet.domain.DataRef
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -29,9 +30,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @CompileStatic
 class DataServiceTest {
 
-    private static final String TASK_TITLE = "Transition";
-    private static final String FILE_FIELD_TITLE = "File";
-    private static final String TEXT_FIELD_TITLE = "Result";
+    private static final String TASK_TITLE = "Transition"
+    private static final String FILE_FIELD_TITLE = "File"
+    private static final String TEXT_FIELD_TITLE = "Result"
 
     @Autowired
     private ImportHelper importHelper
@@ -58,20 +59,24 @@ class DataServiceTest {
     @BeforeEach
     void beforeAll() {
         testHelper.truncateDbs()
-        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_referenced.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/data_service_referenced.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert net.getNet() != null
 
-        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_taskref.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/data_service_taskref.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert net.getNet() != null
         this.net = net.getNet()
 
-        ImportPetriNetEventOutcome agreementNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/agreement.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome agreementNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/agreement.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert agreementNet.getNet() != null
         this.agreementNet = agreementNet.getNet()
 
-        ImportPetriNetEventOutcome netoutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/test_setData.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
-        assert netoutcome.getNet() != null;
-        this.setDataNet = netoutcome.getNet();
+        ImportPetriNetEventOutcome netoutcome = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/test_setData.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
+        assert netoutcome.getNet() != null
+        this.setDataNet = netoutcome.getNet()
     }
 
     @Test

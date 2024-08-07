@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -23,36 +24,37 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class DynamicChoicesTest {
 
     @Autowired
-    private TestHelper testHelper;
+    private TestHelper testHelper
 
     @Autowired
     private ImportHelper importHelper
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreator superCreator
 
     @Autowired
-    private IDataService dataService;
+    private IDataService dataService
 
     @Autowired
-    private ITaskService taskService;
+    private ITaskService taskService
 
     @Autowired
-    private CaseRepository caseRepository;
+    private CaseRepository caseRepository
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs();
+        testHelper.truncateDbs()
     }
 
     @Test
     void testDynamicEnum() {
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_choices.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/petriNets/dynamic_choices.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
 
-        assert optNet.getNet() != null;
+        assert optNet.getNet() != null
         def net = optNet.getNet()
 
         def aCase = importHelper.createCase("Case", net)

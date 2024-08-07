@@ -6,6 +6,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
@@ -33,7 +34,7 @@ class EncryptionTest {
     private CaseRepository caseRepository
 
     @Autowired
-    private IWorkflowService workflowService;
+    private IWorkflowService workflowService
 
     @Autowired
     private Importer importer
@@ -83,7 +84,8 @@ class EncryptionTest {
     }
 
     private String createCase() {
-        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/mapping_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert net.getNet() != null
         CreateCaseParams createCaseParams = CreateCaseParams.builder()
                 .petriNet(net.getNet())

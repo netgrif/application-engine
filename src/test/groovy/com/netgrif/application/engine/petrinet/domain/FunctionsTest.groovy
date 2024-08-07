@@ -4,6 +4,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.dataset.*
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
@@ -91,8 +92,10 @@ class FunctionsTest {
     void testNamespaceFunction() {
         assert userService.findByEmail("test@test.com", true) == null
 
-        def functionResNet = petriNetService.importPetriNet(functionResNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
-        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+        def functionResNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                functionResNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
+        def functionTestNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
 
         assert functionResNet
         assert functionTestNet
@@ -117,8 +120,10 @@ class FunctionsTest {
 
     @Test
     void testProcessFunctions() {
-        def functionResNet = petriNetService.importPetriNet(functionResNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
-        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+        def functionResNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                functionResNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
+        def functionTestNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
         assert functionResNet
         assert functionTestNet
 
@@ -145,7 +150,8 @@ class FunctionsTest {
     @Test
     void testNamespaceFunctionException() {
         assertThrows(NullPointerException.class, () -> {
-            def functionResNet = petriNetService.importPetriNet(functionResNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+            def functionResNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                    functionResNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
             assert functionResNet
 
             def nets = petriNetService.getByIdentifier(FUNCTION_RES_IDENTIFIER)
@@ -155,7 +161,8 @@ class FunctionsTest {
                 }
             }
 
-            def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+            def functionTestNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                    functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
             assert functionTestNet
 
             CreateCaseParams createCaseParams = CreateCaseParams.builder()
@@ -180,7 +187,8 @@ class FunctionsTest {
                 }
             }
 
-            def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+            def functionTestNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                    functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
             assert functionTestNet
 
             CreateCaseParams createCaseParams = CreateCaseParams.builder()
@@ -193,7 +201,8 @@ class FunctionsTest {
             dataService.setData(new SetDataParams(aCase.getTaskStringId("1"),
                     new DataSet((["text": new TextField(rawValue: "20")] as Map<String, Field<?>>)), superCreator.getSuperUser()))
 
-            functionTestNet = petriNetService.importPetriNet(functionTestNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+            functionTestNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                    functionTestNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
             assert functionTestNet
 
             dataService.setData(new SetDataParams(aCase.getTaskStringId("1"),
@@ -204,7 +213,8 @@ class FunctionsTest {
     @Test
     void testProcessFunctionException() {
         assertThrows(MissingMethodException.class, () -> {
-            def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+            def functionTestNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                    functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
             assert functionTestNet
 
             CreateCaseParams createCaseParams = CreateCaseParams.builder()
@@ -221,8 +231,10 @@ class FunctionsTest {
 
     @Test
     void testNewVersionOfNamespaceFunction() {
-        def functionResNet = petriNetService.importPetriNet(functionResNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
-        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+        def functionResNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                functionResNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
+        def functionTestNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
 
         assert functionResNet
         assert functionTestNet
@@ -240,7 +252,8 @@ class FunctionsTest {
 
         assert aCase.getDataSet().get("number2").rawValue == 20 + 20
 
-        functionResNet = petriNetService.importPetriNet(functionResNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+        functionResNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                functionResNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
         assert functionResNet
 
         dataService.setData(new SetDataParams(aCase.getTaskStringId("1"),
@@ -253,14 +266,17 @@ class FunctionsTest {
     @Test
     void testNamespaceMethodOverloadingFail() {
         assertThrows(IllegalArgumentException.class, () -> {
-            petriNetService.importPetriNet(functionOverloadingFailNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+            petriNetService.importPetriNet(new ImportPetriNetParams(
+                    functionOverloadingFailNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()))
         })
     }
 
     @Test
     void testNamespaceUseCaseUpdate() {
-        def functionResV2Net = petriNetService.importPetriNet(functionResNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
-        def functionTestV2Net = petriNetService.importPetriNet(functionTestNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+        def functionResV2Net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                functionResNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
+        def functionTestV2Net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                functionTestNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
 
         CreateCaseParams createCaseParams = CreateCaseParams.builder()
                 .petriNet(functionTestV2Net)
@@ -285,7 +301,8 @@ class FunctionsTest {
     @Test
     void testProcessMethodOverloadingFail() {
         assertThrows(IllegalArgumentException.class, () -> {
-            petriNetService.importPetriNet(functionOverloadingFailNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+            petriNetService.importPetriNet(new ImportPetriNetParams(
+                    functionOverloadingFailNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()))
         })
     }
 
@@ -295,7 +312,8 @@ class FunctionsTest {
     }
 
     private void testMethodOverloading(Resource resource) {
-        def petriNet = petriNetService.importPetriNet(resource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+        def petriNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                resource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
         assert petriNet
 
         CreateCaseParams createCaseParams = CreateCaseParams.builder()

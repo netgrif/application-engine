@@ -3,6 +3,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -63,7 +64,8 @@ class CaseFieldTest {
 
     @Test
     void testAllowedNets() {
-        def testNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def testNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert testNet.getNet() != null
 
         Case aCase = importHelper.createCase("Case 1", testNet.getNet())
@@ -113,7 +115,8 @@ class CaseFieldTest {
 
     @Test
     void testImmediateAllowedNets() {
-        def testNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def testNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert testNet.getNet() != null
 
         Case aCase = importHelper.createCase("Case 1", testNet.getNet())
@@ -160,10 +163,12 @@ class CaseFieldTest {
     @Test
     @Disabled("Please fix this test")
     void testChangeValueAction() {
-        def notAllowedNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def notAllowedNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert notAllowedNet.getNet() != null
 
-        def testNet = petriNetService.importPetriNet(stream(CHANGE_VALUE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def testNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(CHANGE_VALUE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert testNet.getNet() != null
 
         Case aCase = importHelper.createCase("Case 1", testNet.getNet())

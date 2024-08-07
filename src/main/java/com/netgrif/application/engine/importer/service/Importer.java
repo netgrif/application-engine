@@ -725,7 +725,7 @@ public class Importer {
     protected void addDataGroup(Transition transition, com.netgrif.application.engine.importer.model.DataGroup importDataGroup, int index) throws MissingIconKeyException {
         DataGroup dataGroup = new DataGroup();
 
-        if (importDataGroup.getId() != null && importDataGroup.getId().length() > 0) {
+        if (importDataGroup.getId() != null && !importDataGroup.getId().isEmpty()) {
             dataGroup.setImportId(importDataGroup.getId());
         } else {
             dataGroup.setImportId(transition.getImportId() + "_dg_" + index);
@@ -1321,9 +1321,7 @@ public class Importer {
     protected Map<String, String> buildTagsMap(List<Tag> tagsList) {
         Map<String, String> tags = new HashMap<>();
         if (tagsList != null) {
-            tagsList.forEach(tag -> {
-                tags.put(tag.getKey(), tag.getValue());
-            });
+            tagsList.forEach(tag -> tags.put(tag.getKey(), tag.getValue()));
         }
         return tags;
     }

@@ -7,6 +7,7 @@ import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupS
 import com.netgrif.application.engine.petrinet.domain.DataRef
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.ProcessRoleService
@@ -98,7 +99,7 @@ class ImportHelper {
 
     Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().stringId) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        PetriNet petriNet = petriNetService.importPetriNet(netStream, release, author, uriNodeId).getNet()
+        PetriNet petriNet = petriNetService.importPetriNet(new ImportPetriNetParams(netStream, release, author, uriNodeId)).getNet()
         log.info("Imported '${petriNet?.title?.defaultValue}' ['${petriNet?.identifier}', ${petriNet?.stringId}]")
         return Optional.of(petriNet)
     }

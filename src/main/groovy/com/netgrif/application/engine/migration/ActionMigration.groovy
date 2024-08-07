@@ -3,6 +3,7 @@ package com.netgrif.application.engine.migration
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import groovy.util.logging.Slf4j
@@ -20,11 +21,12 @@ class ActionMigration {
     private IPetriNetService petriNetService
 
     @Autowired
-    private IUserService userService;
+    private IUserService userService
 
     void migrateActions(String petriNetPath) {
         InputStream netStream = new ClassPathResource(petriNetPath).inputStream
-        ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(netStream, VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser())
+        ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(new ImportPetriNetParams(netStream,
+                VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()))
         List<PetriNet> oldPetriNets
 
         if(newPetriNet.getNet() != null) {
@@ -50,7 +52,7 @@ class ActionMigration {
         }
     }
 
-    private void migrateDataSetActions(PetriNet newPetriNet, PetriNet oldPetriNet) {
+    private static void migrateDataSetActions(PetriNet newPetriNet, PetriNet oldPetriNet) {
         newPetriNet.dataSet.each { key, data ->
             if (data.events != null && data.events.size() > 0) {
                 oldPetriNet.dataSet[key].events = data.events
@@ -58,7 +60,7 @@ class ActionMigration {
         }
     }
 
-    private void migrateDataRefActions(PetriNet newPetriNet, PetriNet oldPetriNet) {
+    private static void migrateDataRefActions(PetriNet newPetriNet, PetriNet oldPetriNet) {
         newPetriNet.transitions.each { transKey, trans ->
             trans.dataSet.each { dataKey, data ->
                 if (data.events != null && data.events.size() > 0) {

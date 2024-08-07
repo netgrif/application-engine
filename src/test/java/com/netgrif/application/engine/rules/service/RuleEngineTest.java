@@ -7,6 +7,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.drools.RefreshableKieBase;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -100,7 +101,8 @@ class RuleEngineTest {
                 .build();
         ruleRepository.save(rule);
 
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superUser);
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superUser));
 
         assert outcome.getNet() != null;
         assert outcome.getNet().getTitle().getDefaultValue().equals(NET_TITLE_PRE);
@@ -137,7 +139,8 @@ class RuleEngineTest {
 
         assert refreshableKieBase.shouldRefresh();
 
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superUser);
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superUser));
 
         assert !refreshableKieBase.shouldRefresh();
 
@@ -158,7 +161,8 @@ class RuleEngineTest {
         final String NEW_CASE_TITLE_2 = "new case title 2";
         final String TEXT_VALUE = "TEXT FIELD VALUE";
 
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superUser);
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superUser));
         assert outcome != null;
 
         StoredRule rule = StoredRule.builder()
@@ -381,7 +385,8 @@ class RuleEngineTest {
     }
 
     private Case newCase() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superUser);
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superUser));
         CreateCaseParams createCaseParams = CreateCaseParams.builder()
                 .petriNet(outcome.getNet())
                 .title("Original title")

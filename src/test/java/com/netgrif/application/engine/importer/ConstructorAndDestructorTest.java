@@ -3,6 +3,7 @@ package com.netgrif.application.engine.importer;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.SuperCreator;
@@ -46,7 +47,9 @@ public class ConstructorAndDestructorTest {
 
     @Test
     public void testConstructorAndDestructor() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/constructor_destructor.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/constructor_destructor.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()
+        ));
 
         assert outcome.getNet() != null;
         Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("Construct"));

@@ -10,6 +10,7 @@ import com.netgrif.application.engine.configuration.properties.SuperAdminConfigu
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -91,7 +92,8 @@ public class TaskServiceTest {
         userRunner.run("");
         uriRunner.run();
 
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()));
         PetriNet net = petriNetRepository.findAll().get(0);
         CreateCaseParams createCaseParams = CreateCaseParams.builder()
                 .petriNet(net)
@@ -104,7 +106,8 @@ public class TaskServiceTest {
 
     @Test
     public void resetArcTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet();
+        PetriNet net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet();
         LoggedUser loggedUser = mockLoggedUser();
         CreateCaseParams createCaseParams = CreateCaseParams.builder()
                 .petriNet(net)
@@ -121,9 +124,9 @@ public class TaskServiceTest {
         user.setState(UserState.ACTIVE);
         user = userRepository.save(user);
 
-        assert outcome.getCase().getConsumedTokens().size() == 0;
+        assert outcome.getCase().getConsumedTokens().isEmpty();
         assert outcome.getCase().getActivePlaces().size() == 1;
-        assert outcome.getCase().getActivePlaces().values().contains(5);
+        assert outcome.getCase().getActivePlaces().containsValue(5);
 
         Task task = taskRepository.findAll().stream().filter(t -> t.getTitle().getDefaultValue().equalsIgnoreCase("reset")).findFirst().orElse(null);
 
@@ -133,15 +136,15 @@ public class TaskServiceTest {
         Case useCase = caseRepository.findById(outcome.getCase().getStringId()).get();
 
         assert useCase.getConsumedTokens().size() == 1;
-        assert useCase.getConsumedTokens().values().contains(5);
-        assert useCase.getActivePlaces().size() == 0;
+        assert useCase.getConsumedTokens().containsValue(5);
+        assert useCase.getActivePlaces().isEmpty();
 
         service.cancelTask(new TaskParams(task, user));
         useCase = caseRepository.findById(useCase.getStringId()).get();
 
-        assert useCase.getConsumedTokens().size() == 0;
+        assert useCase.getConsumedTokens().isEmpty();
         assert useCase.getActivePlaces().size() == 1;
-        assert useCase.getActivePlaces().values().contains(5);
+        assert useCase.getActivePlaces().containsValue(5);
     }
 
     public LoggedUser mockLoggedUser() {

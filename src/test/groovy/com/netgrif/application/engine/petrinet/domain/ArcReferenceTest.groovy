@@ -49,6 +49,6 @@ class ArcReferenceTest {
     void testInvalidReference() {
         assertThrows(IllegalArgumentException.class, () -> {
             importer.importPetriNet(stream(NET_INVALID_FILE)).get()
-        });
+        })
     }
 }

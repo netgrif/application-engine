@@ -1,13 +1,14 @@
 package com.netgrif.application.engine.elastic
 
-import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -17,7 +18,6 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -102,8 +102,10 @@ class ElasticSearchTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
-        def net2 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        def net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
+        def net2 = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
         assert net
         assert net2
 
@@ -115,7 +117,7 @@ class ElasticSearchTest {
                 [auths.get("user")] as Authority[],
                 [net.roles.values().find { it.importId == "process_role" }] as ProcessRole[])
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSW)
-        auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
+        auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
         CASE_NUMBER.times {
             def _case = importHelper.createCaseAsSuper("$it" as String, it % 2 == 0 ? net : net2)

@@ -12,6 +12,7 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.dataset.NumberField;
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -102,7 +103,8 @@ public class VariableArcsTest {
         repository.deleteAll();
         assertNotNull(processRoleService.defaultRole());
         testHelper.truncateDbs();
-        ImportPetriNetEventOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), VersionType.MAJOR, superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = service.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream(NET_PATH), VersionType.MAJOR, superCreator.getLoggedSuper()));
 
         assert outcome.getNet() != null;
         PetriNet net = outcome.getNet();
