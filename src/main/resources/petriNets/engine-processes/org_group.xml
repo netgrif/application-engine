@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<!--TODO: release/8.0.0 change schema location-->
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
 	<id>org_group</id>
 	<version>1.0.0</version>
-	<initials>GRP</initials>
 	<title>Organization group</title>
 	<icon>home</icon>
 	<defaultRole>true</defaultRole>
-	<transitionRole>false</transitionRole>
-	<!-- TRANSACTIONS -->
-	<!-- ROLES -->
-	<!-- PROCESS ROLE REFS -->
-	<!-- PROCESS USER REFS -->
 	<!-- FUNCTIONS -->
 	<function scope="process" name="updateAvailableEntries">
 		{
@@ -22,6 +17,7 @@
 			change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
 		}
 	</function>
+	<!-- ROLES -->
 	<role>
 		<id>system</id>
 		<title>System</title>
@@ -72,15 +68,15 @@
 		<title>Members</title>
 		<desc>Members of current organization group</desc>
 		<component>
-			<name>list</name>
+			<id>list</id>
 		</component>
 	</data>
 	<data type="enumeration_map">
 		<id>user_action_selection</id>
-		<title name="user_action_selection">Select action</title>
+		<title id="user_action_selection">Select action</title>
 		<options>
-			<option key="add" name="user_action_selection_add">Add existing user</option>
-			<option key="invite" name="user_action_selection_invite">Invite new user</option>
+			<option key="add" id="user_action_selection_add">Add existing user</option>
+			<option key="invite" id="user_action_selection_invite">Invite new user</option>
 		</options>
 		<init>add</init>
 		<action trigger="set">
@@ -98,30 +94,27 @@
 	</data>
 	<data type="text">
 		<id>invite_by_mail</id>
-		<title name="invite_by_mail">Add e-mail address</title>
+		<title id="invite_by_mail">Add e-mail address</title>
 		<placeholder>example@example.com</placeholder>
-		<desc name="invite_by_mail_desc">Add e-meail address to send invitation</desc>
+		<desc id="invite_by_mail_desc">Add e-meail address to send invitation</desc>
 		<validations>
 			<validation>
-				<expression>email</expression>
-				<message/>
+				<name>email</name>
 			</validation>
 		</validations>
 	</data>
 	<data type="taskRef">
 		<id>imported_menu_ids</id>
-		<title></title>
 	</data>
 	<data type="file">
 		<id>export_menu_file</id>
-		<title name="export_file">Exported menu file</title>
-		<placeholder name="export_file_placeholder">Your XML file with menus</placeholder>
-		<desc name="export_file_desc">Download exported file with menus in XML format.</desc>
+		<title id="export_file">Exported menu file</title>
+		<placeholder id="export_file_placeholder">Your XML file with menus</placeholder>
+		<desc id="export_file_desc">Download exported file with menus in XML format.</desc>
 	</data>
 	<data type="button">
 		<id>update_available_entries_btn</id>
-		<title></title>
-		<placeholder name="update_available_entries_btn_placeholder">Update entries</placeholder>
+		<placeholder id="update_available_entries_btn_placeholder">Update entries</placeholder>
 		<action trigger="set">
 			availableEntries: f.available_export_entries;
 
@@ -130,8 +123,7 @@
 	</data>
 	<data type="button">
 		<id>clear_menu_selection_btn</id>
-		<title></title>
-		<placeholder name="clear_menu_selection_btn_placeholder">Clear menu configurations</placeholder>
+		<placeholder id="clear_menu_selection_btn_placeholder">Clear menu configurations</placeholder>
 		<action trigger="set">
 			menusForExport: f.menus_for_export;
 
@@ -140,8 +132,8 @@
 	</data>
 	<data type="text">
 		<id>export_menu_name</id>
-		<title name="exported_menu_id">Exported menu identifier</title>
-		<desc name="exported_menu_id_desc">Unique name menu configuration for selected entries.</desc>
+		<title id="exported_menu_id">Exported menu identifier</title>
+		<desc id="exported_menu_id_desc">Unique name menu configuration for selected entries.</desc>
 		<action trigger="set">
 			addToExportBtn: f.add_to_export_btn,
 			exportMenuName: f.this,
@@ -156,13 +148,12 @@
 	</data>
 	<data type="multichoice_map">
 		<id>available_export_entries</id>
-		<title name="available_export_entries">Available entries for export</title>
-		<placeholder name="available_export_entries_placeholder">Export menu</placeholder>
+		<title id="available_export_entries">Available entries for export</title>
+		<placeholder id="available_export_entries_placeholder">Export menu</placeholder>
 	</data>
 	<data type="button">
 		<id>add_to_export_btn</id>
-		<title></title>
-		<placeholder name="add_to_export_placeholder">Add entries to export</placeholder>
+		<placeholder id="add_to_export_placeholder">Add entries to export</placeholder>
 		<action trigger="set">
 			selectedEntries: f.available_export_entries,
 			addToExportBtn: f.this,
@@ -174,24 +165,24 @@
 			change selectedEntries value {[]}
 		</action>
 		<component>
-			<name>raised</name>
+			<id>raised</id>
 		</component>
 	</data>
 	<data type="enumeration_map">
 		<id>menus_for_export</id>
-		<title name="menus_for_export">Menus to be exported</title>
+		<title id="menus_for_export">Menus to be exported</title>
 	</data>
 	<data type="text">
 		<id>import_results</id>
-		<title name="import_results">Import results</title>
+		<title id="import_results">Import results</title>
 		<component>
-			<name>area</name>
+			<id>area</id>
 		</component>
 	</data>
 	<data type="button">
 		<id>export_menu_btn</id>
 		<title/>
-		<placeholder name="export_menu_btn_placeholder">Export menu</placeholder>
+		<placeholder id="export_menu_btn_placeholder">Export menu</placeholder>
 		<action trigger="set">
 			export_file: f.export_menu_file,
 			menuIdentifier: f.export_menu_name,
@@ -202,20 +193,20 @@
 			change menusForExport options {[:]}
 		</action>
 		<component>
-			<name>raised</name>
+			<id>raised</id>
 		</component>
 	</data>
 	<data type="file">
 		<id>import_menu_file</id>
 		<title>Import menu</title>
-		<placeholder name="import_file_placeholder">Menu file to import</placeholder>
-		<desc name="import_file_desc">Upload XML file containing menu here</desc>
+		<placeholder id="import_file_placeholder">Menu file to import</placeholder>
+		<desc id="import_file_desc">Upload XML file containing menu here</desc>
 	</data>
 	<data type="button">
 		<id>import_menu_btn</id>
 		<title/>
-		<placeholder name="import_menu_btn_placeholder">Import menu</placeholder>
-		<desc name="import_menu_btn_desc">Import menu from provided XML file</desc>
+		<placeholder id="import_menu_btn_placeholder">Import menu</placeholder>
+		<desc id="import_menu_btn_desc">Import menu from provided XML file</desc>
 		<action trigger="set">
 			import_file: f.import_menu_file,
 			groupId: f.group_id,
@@ -239,7 +230,7 @@
 		change newIdsActionSetter value { "triggerAction" }
 		</action>
 		<component>
-			<name>raised</name>
+			<id>raised</id>
 		</component>
 	</data>
 	<data type="text">
@@ -272,119 +263,117 @@
 	</data>
 	<!-- I18NS -->
 	<i18n locale="sk">
-		<i18nString name="author">Autor grupy</i18nString>
-		<i18nString name="group_id">ID grupy</i18nString>
-		<i18nString name="group_id_desc">ID organizačnej grupy</i18nString>
-		<i18nString name="group_id_placeh">Zadajte ID grupy</i18nString>
-		<i18nString name="group_name">Názov grupy</i18nString>
-		<i18nString name="group_name_desc">Názov organizačnej grupy</i18nString>
-		<i18nString name="group_name_placeh">Zadajte názov grupy</i18nString>
-		<i18nString name="user_selection">Vyberte nového používateľa</i18nString>
-		<i18nString name="user_selection_desc">Vyberte nového používateľa pre pridanie do grupy</i18nString>
-		<i18nString name="user_selection_placeh">Nebol vybraný žiadny používateľ</i18nString>
-		<i18nString name="members">Členovia grupy</i18nString>
-		<i18nString name="members_desc">Členovia organizačnej grupy</i18nString>
-		<i18nString name="user_action_selection">Vyberte akciu</i18nString>
-		<i18nString name="user_action_selection_add">Pridať existujúceho používateľa</i18nString>
-		<i18nString name="user_action_selection_invite">Pozvať nového používateľa</i18nString>
-		<i18nString name="invite_by_mail">Zadaj e-mail adresu</i18nString>
-		<i18nString name="invite_by_mail_desc">Zadaj e-mail adresu</i18nString>
-		<i18nString name="select_menu_item_filter">Zvoľte filter</i18nString>
-		<i18nString name="add_menu_item">Pridať ako položku menu</i18nString>
-		<i18nString name="menu_configuration">Konfigurácia menu</i18nString>
-		<i18nString name="export_file">Exportovaný súbor s menu</i18nString>
-		<i18nString name="export_file_desc">Stiahnite exportovaný XML súbor s menu položkami.</i18nString>
-		<i18nString name="export_file_placeholder">Váš XML súbor s vybranou menu konfiguráciou.</i18nString>
-		<i18nString name="exported_menu_id">Identifikátor menu nakonfigurovaného na export</i18nString>
-		<i18nString name="exported_menu_id_desc">Unikátny názov menu pre zvolenú konfiguráciu.</i18nString>
-		<i18nString name="available_export_entries">Dostupné menu položky pre export</i18nString>
-		<i18nString name="available_export_entries_placeholder">Export menu</i18nString>
-		<i18nString name="add_to_export_placeholder">Pridať menu na export</i18nString>
-		<i18nString name="menus_for_export">Menu položky pripravené na export</i18nString>
-		<i18nString name="import_results">Výsledky importu</i18nString>
-		<i18nString name="export_menu_btn_placeholder">Exportovať menu</i18nString>
-		<i18nString name="update_available_entries_btn_placeholder">Aktualizovať dostupné položky</i18nString>
-		<i18nString name="clear_menu_selection_btn_placeholder">Zmazať vytvorené konfigurácie</i18nString>
-		<i18nString name="import_export_dg">Import a export položiek menu</i18nString>
+		<i18nString id="author">Autor grupy</i18nString>
+		<i18nString id="group_id">ID grupy</i18nString>
+		<i18nString id="group_id_desc">ID organizačnej grupy</i18nString>
+		<i18nString id="group_id_placeh">Zadajte ID grupy</i18nString>
+		<i18nString id="group_name">Názov grupy</i18nString>
+		<i18nString id="group_name_desc">Názov organizačnej grupy</i18nString>
+		<i18nString id="group_name_placeh">Zadajte názov grupy</i18nString>
+		<i18nString id="user_selection">Vyberte nového používateľa</i18nString>
+		<i18nString id="user_selection_desc">Vyberte nového používateľa pre pridanie do grupy</i18nString>
+		<i18nString id="user_selection_placeh">Nebol vybraný žiadny používateľ</i18nString>
+		<i18nString id="members">Členovia grupy</i18nString>
+		<i18nString id="members_desc">Členovia organizačnej grupy</i18nString>
+		<i18nString id="user_action_selection">Vyberte akciu</i18nString>
+		<i18nString id="user_action_selection_add">Pridať existujúceho používateľa</i18nString>
+		<i18nString id="user_action_selection_invite">Pozvať nového používateľa</i18nString>
+		<i18nString id="invite_by_mail">Zadaj e-mail adresu</i18nString>
+		<i18nString id="invite_by_mail_desc">Zadaj e-mail adresu</i18nString>
+		<i18nString id="select_menu_item_filter">Zvoľte filter</i18nString>
+		<i18nString id="add_menu_item">Pridať ako položku menu</i18nString>
+		<i18nString id="menu_configuration">Konfigurácia menu</i18nString>
+		<i18nString id="export_file">Exportovaný súbor s menu</i18nString>
+		<i18nString id="export_file_desc">Stiahnite exportovaný XML súbor s menu položkami.</i18nString>
+		<i18nString id="export_file_placeholder">Váš XML súbor s vybranou menu konfiguráciou.</i18nString>
+		<i18nString id="exported_menu_id">Identifikátor menu nakonfigurovaného na export</i18nString>
+		<i18nString id="exported_menu_id_desc">Unikátny názov menu pre zvolenú konfiguráciu.</i18nString>
+		<i18nString id="available_export_entries">Dostupné menu položky pre export</i18nString>
+		<i18nString id="available_export_entries_placeholder">Export menu</i18nString>
+		<i18nString id="add_to_export_placeholder">Pridať menu na export</i18nString>
+		<i18nString id="menus_for_export">Menu položky pripravené na export</i18nString>
+		<i18nString id="import_results">Výsledky importu</i18nString>
+		<i18nString id="export_menu_btn_placeholder">Exportovať menu</i18nString>
+		<i18nString id="update_available_entries_btn_placeholder">Aktualizovať dostupné položky</i18nString>
+		<i18nString id="clear_menu_selection_btn_placeholder">Zmazať vytvorené konfigurácie</i18nString>
+		<i18nString id="import_export_dg">Import a export položiek menu</i18nString>
 	</i18n>
 	<i18n locale="de">
-		<i18nString name="select_menu_item_filter">Filter auswählen</i18nString>
-		<i18nString name="add_menu_item">Als Menüpunkt hinzufügen</i18nString>
-		<i18nString name="menu_configuration">Menükonfiguration</i18nString>
-		<i18nString name="export_file">Exportierte Datei mit Menüs</i18nString>
-		<i18nString name="export_file_desc">Exportierte XML-Datei mit Menüs herunterladen.</i18nString>
-		<i18nString name="export_file_placeholder">Ihre XML-Datei mit Menüs</i18nString>
-		<i18nString name="exported_menu_id">Name des für den Export konfigurierten Menüs</i18nString>
-		<i18nString name="exported_menu_id_desc">Eindeutiger Name des Menüs für die gewählte Konfiguration.</i18nString>
-		<i18nString name="available_export_entries">Verfügbare Menüeinträge für den Export</i18nString>
-		<i18nString name="available_export_entries_placeholder">Menü exportieren</i18nString>
-		<i18nString name="add_to_export_placeholder">Menü zum Export hinzufügen</i18nString>
-		<i18nString name="menus_for_export">Menüeinträge bereit für den Export</i18nString>
-		<i18nString name="import_results">Import Ergebnisse</i18nString>
-		<i18nString name="export_menu_btn_placeholder">Menü exportieren</i18nString>
-		<i18nString name="update_available_entries_btn_placeholder">Verfügbare Menüeinträge aktualisieren</i18nString>
-		<i18nString name="clear_menu_selection_btn_placeholder">Menükonfigurationen löschen</i18nString>
-		<i18nString name="import_export_dg">Import und Export von Menüeinträge</i18nString>
+		<i18nString id="select_menu_item_filter">Filter auswählen</i18nString>
+		<i18nString id="add_menu_item">Als Menüpunkt hinzufügen</i18nString>
+		<i18nString id="menu_configuration">Menükonfiguration</i18nString>
+		<i18nString id="export_file">Exportierte Datei mit Menüs</i18nString>
+		<i18nString id="export_file_desc">Exportierte XML-Datei mit Menüs herunterladen.</i18nString>
+		<i18nString id="export_file_placeholder">Ihre XML-Datei mit Menüs</i18nString>
+		<i18nString id="exported_menu_id">Name des für den Export konfigurierten Menüs</i18nString>
+		<i18nString id="exported_menu_id_desc">Eindeutiger Name des Menüs für die gewählte Konfiguration.</i18nString>
+		<i18nString id="available_export_entries">Verfügbare Menüeinträge für den Export</i18nString>
+		<i18nString id="available_export_entries_placeholder">Menü exportieren</i18nString>
+		<i18nString id="add_to_export_placeholder">Menü zum Export hinzufügen</i18nString>
+		<i18nString id="menus_for_export">Menüeinträge bereit für den Export</i18nString>
+		<i18nString id="import_results">Import Ergebnisse</i18nString>
+		<i18nString id="export_menu_btn_placeholder">Menü exportieren</i18nString>
+		<i18nString id="update_available_entries_btn_placeholder">Verfügbare Menüeinträge aktualisieren</i18nString>
+		<i18nString id="clear_menu_selection_btn_placeholder">Menükonfigurationen löschen</i18nString>
+		<i18nString id="import_export_dg">Import und Export von Menüeinträge</i18nString>
 	</i18n>
 	<!-- TRANSITIONS -->
 	<transition>
 		<id>2</id>
 		<x>220</x>
 		<y>220</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>Initialize group</label>
+		<title>Initialize group</title>
 		<assignPolicy>auto</assignPolicy>
-		<dataGroup>
-			<id>DataGroup_0</id>
-			<layout>grid</layout>
-			<dataRef>
-				<id>group_id</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>6</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>author</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>6</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>group_name</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>6</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
+		<!--// TODO: release/8.0.0-->
+		<!--<dataGroup>-->
+		<!--	<id>DataGroup_0</id>-->
+		<!--	<layout>grid</layout>-->
+		<!--	<dataRef>-->
+		<!--		<id>group_id</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>visible</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>0</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>4</cols>-->
+		<!--			<offset>6</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>author</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>visible</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>1</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>4</cols>-->
+		<!--			<offset>6</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>group_name</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>editable</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>2</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>4</cols>-->
+		<!--			<offset>6</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--</dataGroup>-->
 		<event type="finish">
 			<id>1</id>
 			<actions phase="pre">
@@ -417,149 +406,145 @@
 		<id>6</id>
 		<x>740</x>
 		<y>100</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>Group info</label>
+		<title>Group info</title>
 		<assignPolicy>auto</assignPolicy>
-		<dataGroup>
-			<id>DataGroup_0</id>
-			<layout>grid</layout>
-			<dataRef>
-				<id>group_id</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>author</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>group_name</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>members</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>3</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
+		<!--// TODO: release/8.0.0-->
+		<!--<dataGroup>-->
+		<!--	<id>DataGroup_0</id>-->
+		<!--	<layout>grid</layout>-->
+		<!--	<dataRef>-->
+		<!--		<id>group_id</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>visible</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>0</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>4</cols>-->
+		<!--			<offset>0</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>author</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>visible</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>1</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>4</cols>-->
+		<!--			<offset>0</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>group_name</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>visible</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>2</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>4</cols>-->
+		<!--			<offset>0</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>members</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>visible</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>3</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>4</cols>-->
+		<!--			<offset>0</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--</dataGroup>-->
 	</transition>
 	<transition>
 		<id>8</id>
 		<x>500</x>
 		<y>340</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>Add user</label>
+		<title>Add user</title>
 		<assignPolicy>auto</assignPolicy>
-		<dataGroup>
-			<id>DataGroup_0</id>
-			<layout>grid</layout>
-			<dataRef>
-				<id>user_action_selection</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>2</rows>
-					<cols>4</cols>
-					<offset>6</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>user_selection</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>6</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>invite_by_mail</id>
-				<logic>
-					<behavior>hidden</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>3</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>6</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>members</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>4</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>6</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
+		<!--// TODO: release/8.0.0-->
+		<!--<dataGroup>-->
+		<!--	<id>DataGroup_0</id>-->
+		<!--	<layout>grid</layout>-->
+		<!--	<dataRef>-->
+		<!--		<id>user_action_selection</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>editable</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>0</y>-->
+		<!--			<rows>2</rows>-->
+		<!--			<cols>4</cols>-->
+		<!--			<offset>6</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>user_selection</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>editable</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>2</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>4</cols>-->
+		<!--			<offset>6</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>invite_by_mail</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>hidden</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>3</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>4</cols>-->
+		<!--			<offset>6</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>members</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>visible</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>4</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>4</cols>-->
+		<!--			<offset>6</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--</dataGroup>-->
 		<event type="finish">
 			<id>invite_new_user</id>
 			<actions phase="pre">
@@ -579,89 +564,85 @@
 		<id>25</id>
 		<x>740</x>
 		<y>340</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>Edit group info</label>
+		<title>Edit group info</title>
 		<assignPolicy>auto</assignPolicy>
-		<dataGroup>
-			<id>DataGroup_0</id>
-			<layout>grid</layout>
-			<dataRef>
-				<id>group_id</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>6</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>author</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>6</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>group_name</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>6</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
+		<!--// TODO: release/8.0.0-->
+		<!--<dataGroup>-->
+		<!--	<id>DataGroup_0</id>-->
+		<!--	<layout>grid</layout>-->
+		<!--	<dataRef>-->
+		<!--		<id>group_id</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>visible</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>0</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>4</cols>-->
+		<!--			<offset>6</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>author</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>visible</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>1</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>4</cols>-->
+		<!--			<offset>6</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>group_name</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>editable</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>2</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>4</cols>-->
+		<!--			<offset>6</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--</dataGroup>-->
 	</transition>
 	<transition>
 		<id>28</id>
 		<x>500</x>
 		<y>100</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>Remove user</label>
+		<title>Remove user</title>
 		<assignPolicy>auto</assignPolicy>
-		<dataGroup>
-			<id>DataGroup_0</id>
-			<layout>grid</layout>
-			<dataRef>
-				<id>members</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>6</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
+		<!--// TODO: release/8.0.0-->
+		<!--<dataGroup>-->
+		<!--	<id>DataGroup_0</id>-->
+		<!--	<layout>grid</layout>-->
+		<!--	<dataRef>-->
+		<!--		<id>members</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>editable</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>0</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>4</cols>-->
+		<!--			<offset>6</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--</dataGroup>-->
 		<event type="finish">
 			<id>remove_user</id>
 			<actions phase="pre">
@@ -677,182 +658,179 @@
 		<id>navigationMenuConfig</id>
 		<x>380</x>
 		<y>100</y>
-		<layout>
-			<cols>5</cols>
-			<offset>0</offset>
-		</layout>
-		<label name="menu_configuration">Configure menu</label>
+		<title id="menu_configuration">Configure menu</title>
 		<assignPolicy>auto</assignPolicy>
-		<dataGroup>
-			<id>dg2</id>
-			<layout>grid</layout>
-			<title name="import_export_dg">Import &amp; export of menu entries</title>
-			<dataRef>
-				<id>available_export_entries</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>export_menu_name</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>1</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>update_available_entries_btn</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>3</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>add_to_export_btn</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>4</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>menus_for_export</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>3</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>clear_menu_selection_btn</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>3</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>export_menu_btn</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>4</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>export_menu_file</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>3</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>import_menu_file</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>3</y>
-					<rows>1</rows>
-					<cols>3</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>import_menu_btn</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>4</x>
-					<y>3</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>import_results</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>4</y>
-					<rows>1</rows>
-					<cols>5</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
+		<!--// TODO: release/8.0.0-->
+		<!--<dataGroup>-->
+		<!--	<id>dg2</id>-->
+		<!--	<layout>grid</layout>-->
+		<!--	<title id="import_export_dg">Import &amp; export of menu entries</title>-->
+		<!--	<dataRef>-->
+		<!--		<id>available_export_entries</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>editable</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>0</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>1</cols>-->
+		<!--			<offset>0</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>export_menu_name</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>editable</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>1</x>-->
+		<!--			<y>0</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>2</cols>-->
+		<!--			<offset>0</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>update_available_entries_btn</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>editable</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>3</x>-->
+		<!--			<y>0</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>1</cols>-->
+		<!--			<offset>0</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>add_to_export_btn</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>visible</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>4</x>-->
+		<!--			<y>0</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>1</cols>-->
+		<!--			<offset>0</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>menus_for_export</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>editable</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>1</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>3</cols>-->
+		<!--			<offset>0</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>clear_menu_selection_btn</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>editable</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>3</x>-->
+		<!--			<y>1</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>1</cols>-->
+		<!--			<offset>0</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>export_menu_btn</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>editable</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>4</x>-->
+		<!--			<y>1</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>1</cols>-->
+		<!--			<offset>0</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>export_menu_file</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>visible</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>2</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>3</cols>-->
+		<!--			<offset>0</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>import_menu_file</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>editable</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>3</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>3</cols>-->
+		<!--			<offset>0</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>import_menu_btn</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>editable</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>4</x>-->
+		<!--			<y>3</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>1</cols>-->
+		<!--			<offset>0</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--	<dataRef>-->
+		<!--		<id>import_results</id>-->
+		<!--		<logic>-->
+		<!--			<behavior>visible</behavior>-->
+		<!--		</logic>-->
+		<!--		<layout>-->
+		<!--			<x>0</x>-->
+		<!--			<y>4</y>-->
+		<!--			<rows>1</rows>-->
+		<!--			<cols>5</cols>-->
+		<!--			<offset>0</offset>-->
+		<!--			<template>material</template>-->
+		<!--			<appearance>outline</appearance>-->
+		<!--		</layout>-->
+		<!--	</dataRef>-->
+		<!--</dataGroup>-->
 	</transition>
 
 	<!-- PLACES -->
@@ -860,7 +838,7 @@
 		<id>1</id>
 		<x>100</x>
 		<y>220</y>
-		<label>#init</label>
+		<title>#init</title>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>
@@ -868,7 +846,7 @@
 		<id>4</id>
 		<x>620</x>
 		<y>220</y>
-		<label>Group created</label>
+		<title>Group created</title>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -876,7 +854,6 @@
 		<id>p1</id>
 		<x>300</x>
 		<y>100</y>
-		<label></label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -958,4 +935,4 @@
 		<destinationId>navigationMenuConfig</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
-</document>
+</process>

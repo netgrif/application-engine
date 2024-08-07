@@ -132,6 +132,10 @@ public abstract class Field<T> extends Imported {
         }
     }
 
+    public void addEvent(DataEvent event) {
+        events.put(event.getType(), event);
+    }
+
     public void addValidation(Validation validation) {
         if (validations == null) {
             this.validations = new ArrayList<>();

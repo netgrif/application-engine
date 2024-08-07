@@ -198,7 +198,6 @@ public class Transition extends Node {
         // TODO: release/8.0.0
         Transition clone = new Transition();
         clone.setTitle(this.getTitle() == null ? null : this.getTitle().clone());
-        clone.setPosition(this.getPosition().getX(), this.getPosition().getY());
         clone.setImportId(this.importId);
         clone.setDataSet(this.dataSet == null ? null : dataSet.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y.clone(), LinkedHashMap::new)));
         clone.setTriggers(this.triggers == null ? null : triggers.stream().map(Trigger::clone).collect(Collectors.toList()));

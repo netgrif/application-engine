@@ -29,7 +29,8 @@ class ImpersonationRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... args) throws Exception {
-        createConfigNets()
+        // TODO: release/8.0.0
+//        createConfigNets()
     }
 
     void createConfigNets() {

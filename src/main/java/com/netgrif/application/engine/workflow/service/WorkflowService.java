@@ -301,7 +301,8 @@ public class WorkflowService implements IWorkflowService {
 //TODO: release/8.0.0
 //        useCase.getPetriNet().initializeArcs(useCase.getDataSet());
         taskService.reloadTasks(useCase);
-        useCase = findOne(useCase.getStringId());
+        //TODO: release/8.0.0
+//        useCase = findOne(useCase.getStringId());
         resolveTaskRefs(useCase);
 
         useCase = findOne(useCase.getStringId());

@@ -1,8 +1,12 @@
 package com.netgrif.application.engine.startup
 
+import com.netgrif.application.engine.importer.model.Process
+import com.netgrif.application.engine.importer.model.Transition
+import com.netgrif.application.engine.importer.service.AllDataConfiguration
+
 //import com.netgrif.application.engine.importer.model.Document
 //import com.netgrif.application.engine.importer.model.Transition
-import com.netgrif.application.engine.importer.service.AllDataConfiguration
+
 import com.netgrif.application.engine.importer.service.Importer
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -38,12 +42,10 @@ class AllDataTransitionRunner extends AbstractOrderedCommandLineRunner {
             return
         }
         InputStream netStream = configurationFile.inputStream
-        // TODO: NAE-1969 fix
-//        Document document = getImporter().unmarshallXml(netStream)
-//
-//        Transition allData = document.getTransition().first()
-//        configuration.allData = allData
-//
+        Process document = getImporter().unmarshallXml(netStream)
+        Transition allData = document.getTransition().first()
+        configuration.allData = allData
+
         log.info("'All Data' transition configuration created")
     }
 }

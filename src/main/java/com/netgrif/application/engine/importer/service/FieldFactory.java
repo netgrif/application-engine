@@ -6,10 +6,7 @@ import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.service.builder.FieldBuilder;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.importer.service.validation.IDataValidator;
-import com.netgrif.application.engine.petrinet.domain.Component;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.Validation;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -39,8 +36,8 @@ public final class FieldFactory {
             throw new IllegalArgumentException("Field " + data.getId() + " has unsupported type " + data.getType());
         }
         Field<?> field = builder.build(data, importer);
-//        field.setName(importer.toI18NString(data.getTitle()));
-//        field.setImportId(data.getId());
+        field.setImportId(data.getId());
+        field.setTitle(importer.toI18NString(data.getTitle()));
 //        if (data.isImmediate() != null) {
 //            field.setImmediate(data.isImmediate());
 //        }

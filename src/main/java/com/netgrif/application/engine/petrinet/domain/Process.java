@@ -93,6 +93,14 @@ public class Process extends ProcessObject {
         functions.add(function);
     }
 
+    public void addProcessEvent(ProcessEvent processEvent) {
+        processEvents.put(processEvent.getType(), processEvent);
+    }
+
+    public void addCaseEvent(CaseEvent caseEvent) {
+        caseEvents.put(caseEvent.getType(), caseEvent);
+    }
+
     public List<Arc> getArcsOfTransition(Transition transition) {
         return getArcsOfTransition(transition.getStringId());
     }
@@ -236,6 +244,10 @@ public class Process extends ProcessObject {
             return processEvents.get(type).getPostActions();
         }
         return new LinkedList<>();
+    }
+
+    public ProcessRole getRole(String id) {
+        return roles.get(id);
     }
 
     @Override

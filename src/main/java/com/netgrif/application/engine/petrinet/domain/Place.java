@@ -46,7 +46,6 @@ public class Place extends Node {
         Place clone = new Place();
         clone.setTokens(this.tokens);
         clone.setTitle(this.getTitle());
-        clone.setPosition(this.getPosition());
         clone.setImportId(this.getImportId());
         return clone;
     }

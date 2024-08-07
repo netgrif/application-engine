@@ -202,9 +202,8 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         this.task = task
         this.fieldChanges = fieldChanges
         this.params = params
+        // TODO: release/8.0.0 init net resources as delegate properties
         this.actionsRunner = actionsRunner
-        this.initFieldsMap(action.fieldIds, useCase)
-        this.initTransitionsMap(action.transitionIds)
         this.outcomes = new ArrayList<>()
         this.Frontend = new FrontendActionOutcome(this.useCase, this.task, this.outcomes)
     }
