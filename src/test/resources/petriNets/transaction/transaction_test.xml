@@ -56,7 +56,7 @@
 
 					def myTransaction = transaction(
 						event: {
-							workflowService.deleteCase(findCase({it.title.eq("toBeRemoved")}))
+							deleteCase(findCase({it.title.eq("toBeRemoved")}))
 							createCase("transaction_test", "onButton")
 							change text_without_action value { "xxx" }
 							// not runtime exception on purpose
@@ -146,7 +146,7 @@
 									com.netgrif.application.engine.petrinet.domain.VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
 							def toBeRemovedCase = createCase("transaction_test_secondary", "toBeRemoved")
 							assignTask("t1", toBeRemovedCase)
-							workflowService.deleteCase(toBeRemovedCase.stringId)
+							deleteCase(toBeRemovedCase)
 
 							createCase("transaction_test", "onButton")
 							throw new RuntimeException("error")
@@ -178,7 +178,7 @@
 										com.netgrif.application.engine.petrinet.domain.VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
 								def toBeRemovedCase = createCase("transaction_test_secondary", "toBeRemoved")
 								assignTask("t1", toBeRemovedCase)
-								workflowService.deleteCase(toBeRemovedCase.stringId)
+								deleteCase(toBeRemovedCase)
 
 								createCase("transaction_test", "onButton")
 							},

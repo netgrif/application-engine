@@ -40,6 +40,7 @@ import com.netgrif.application.engine.workflow.domain.*
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CaseEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.GetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
@@ -831,6 +832,16 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         CreateCaseEventOutcome outcome = workflowService.createCase(createCaseParams)
         this.outcomes.add(outcome)
         return outcome.getCase()
+    }
+
+    Case deleteCase(Case useCase) {
+        DeleteCaseEventOutcome outcome = workflowService.deleteCase(new DeleteCaseParams(useCase))
+        return outcome.case
+    }
+
+    Case deleteCase(String caseId) {
+        DeleteCaseEventOutcome outcome = workflowService.deleteCase(new DeleteCaseParams(caseId))
+        return outcome.case
     }
 
     Task assignTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
