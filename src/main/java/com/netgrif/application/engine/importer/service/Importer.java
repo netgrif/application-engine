@@ -21,10 +21,8 @@ import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
-import com.netgrif.application.engine.petrinet.service.ArcFactory;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +61,7 @@ public class Importer {
     protected IProcessRoleService processRoleService;
 
     @Autowired
-    protected ArcFactory arcFactory;
+    protected ArcImporter arcImporter;
 
     @Autowired
     protected RoleFactory roleFactory;
@@ -76,9 +74,6 @@ public class Importer {
 
     @Autowired
     protected ActionRunner actionsRunner;
-
-    @Autowired
-    protected FileStorageConfiguration fileStorageConfiguration;
 
     @Autowired
     protected ComponentFactory componentFactory;
@@ -380,13 +375,7 @@ public class Importer {
 //    }
 
     protected void createArc(com.netgrif.application.engine.importer.model.Arc importArc) {
-        com.netgrif.application.engine.petrinet.domain.arcs.Arc arc = arcFactory.getArc(importArc);
-        arc.setImportId(importArc.getId());
-        arc.setSource(getNode(importArc.getSourceId()));
-        arc.setDestination(getNode(importArc.getDestinationId()));
-        arc.setMultiplicity(createMultiplicity(importArc.getMultiplicity()));
-        createProperties(importArc.getProperties(), arc.getProperties());
-        net.addArc(arc);
+        net.addArc(arcImporter.getArc(importArc, this));
     }
 
     protected Node getNode(String id) {
@@ -396,13 +385,6 @@ public class Importer {
             return net.getTransition(id);
         }
         throw new IllegalArgumentException("Node with id [" + id + "] not found.");
-    }
-
-    private Multiplicity createMultiplicity(Expression multiplicity) {
-        if (multiplicity.isDynamic()) {
-            return new Multiplicity(multiplicity.getValue());
-        }
-        return new Multiplicity(Integer.parseInt(multiplicity.getValue()));
     }
 
     protected void createDataSet(com.netgrif.application.engine.importer.model.Data importData) throws MissingIconKeyException {
