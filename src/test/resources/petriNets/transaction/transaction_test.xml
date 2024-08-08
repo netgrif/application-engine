@@ -142,8 +142,10 @@
 
 					def myTransaction = transaction(
 						event: {
-							petriNetService.importPetriNet(new java.io.FileInputStream("src/test/resources/petriNets/transaction/transaction_test_secondary.xml"),
-									com.netgrif.application.engine.petrinet.domain.VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+							petriNetService.importPetriNet(new com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams(
+									new java.io.FileInputStream("src/test/resources/petriNets/transaction/transaction_test_secondary.xml"),
+									com.netgrif.application.engine.petrinet.domain.VersionType.MAJOR,
+									userService.getLoggedOrSystem().transformToLoggedUser()))
 							def toBeRemovedCase = createCase("transaction_test_secondary", "toBeRemoved")
 							assignTask("t1", toBeRemovedCase)
 							deleteCase(toBeRemovedCase)

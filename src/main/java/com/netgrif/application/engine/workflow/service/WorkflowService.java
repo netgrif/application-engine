@@ -48,7 +48,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -203,7 +202,6 @@ public class WorkflowService implements IWorkflowService {
      * todo javadoc
      * */
     @Override
-    @Transactional
     public CreateCaseEventOutcome createCase(CreateCaseParams createCaseParams) {
         fillMissingAttributes(createCaseParams);
 
@@ -326,7 +324,6 @@ public class WorkflowService implements IWorkflowService {
      * todo javadoc
      * */
     @Override
-    @Transactional
     public DeleteCaseEventOutcome deleteCase(DeleteCaseParams deleteCaseParams) {
         fillMissingAttributes(deleteCaseParams);
 
@@ -367,7 +364,6 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    @Transactional
     public void deleteInstancesOfPetriNet(PetriNet net) {
         final IUser user = userService.getLoggedOrSystem();
         final LoggedUser loggedUser = user.transformToLoggedUser();
@@ -399,7 +395,6 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    @Transactional
     public DeleteCaseEventOutcome deleteSubtreeRootedAt(String subtreeRootCaseId) {
         Case subtreeRoot = findOne(subtreeRootCaseId);
         if (subtreeRoot.getImmediateDataFields().contains("treeChildCases")) {

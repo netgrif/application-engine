@@ -60,7 +60,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -111,7 +110,6 @@ public class TaskService implements ITaskService {
      * todo javadoc
      * */
     @Override
-    @Transactional
     public List<EventOutcome> executeTask(Task task, Case useCase) {
         log.info("[{}]: executeTask [{}] in case [{}]", useCase.getStringId(), task.getTransitionId(), useCase.getTitle());
         List<EventOutcome> outcomes = new ArrayList<>();
@@ -120,7 +118,8 @@ public class TaskService implements ITaskService {
             AssignTaskEventOutcome assignOutcome = assignTask(new TaskParams(task));
             outcomes.add(assignOutcome);
             log.info("getData [{}] in case [{}]", task.getTitle(), useCase.getTitle());
-            GetDataEventOutcome getDataOutcome = dataService.getData(new GetDataParams(task, useCase, userService.getSystem()));
+            GetDataEventOutcome getDataOutcome = dataService.getData(new GetDataParams(assignOutcome.getTask(),
+                    assignOutcome.getCase(), userService.getSystem()));
             outcomes.add(getDataOutcome);
             log.info("finishTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
             outcomes.add(finishTask(new TaskParams(getDataOutcome.getTask())));
@@ -134,7 +133,6 @@ public class TaskService implements ITaskService {
      * todo javadoc
      * */
     @Override
-    @Transactional
     public List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, IUser user, Map<String, String> params) throws TransitionNotExecutableException {
         List<AssignTaskEventOutcome> outcomes = new ArrayList<>();
         for (Task task : tasks) {
@@ -153,7 +151,6 @@ public class TaskService implements ITaskService {
      * todo javadoc
      * */
     @Override
-    @Transactional
     public AssignTaskEventOutcome assignTask(TaskParams taskParams) throws TransitionNotExecutableException {
         fillMissingAttributes(taskParams);
 
@@ -223,7 +220,6 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    @Transactional
     public List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, IUser user, Map<String, String> params) throws TransitionNotExecutableException {
         List<FinishTaskEventOutcome> outcomes = new ArrayList<>();
         for (Task task : tasks) {
@@ -242,7 +238,6 @@ public class TaskService implements ITaskService {
      * todo javadoc
      * */
     @Override
-    @Transactional
     public FinishTaskEventOutcome finishTask(TaskParams taskParams) throws TransitionNotExecutableException {
         fillMissingAttributes(taskParams);
 
@@ -313,7 +308,6 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    @Transactional
     public List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, IUser user, Map<String, String> params) {
         List<CancelTaskEventOutcome> outcomes = new ArrayList<>();
         for (Task task : tasks) {
@@ -332,7 +326,6 @@ public class TaskService implements ITaskService {
      * todo javadoc
      * */
     @Override
-    @Transactional
     public CancelTaskEventOutcome cancelTask(TaskParams taskParams) {
         fillMissingAttributes(taskParams);
 
@@ -405,13 +398,11 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    @Transactional
     public DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId) throws TransitionNotExecutableException {
         return delegateTask(loggedUser, delegatedId, taskId, new HashMap<>());
     }
 
     @Override
-    @Transactional
     public DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId, Map<String, String> params) throws TransitionNotExecutableException {
         IUser delegatedUser = userService.resolveById(delegatedId, true);
         IUser delegateUser = userService.getUserFromLoggedUser(loggedUser);
@@ -495,7 +486,6 @@ public class TaskService implements ITaskService {
      * </table>
      */
     @Override
-    @Transactional
     public boolean reloadTasks(Case useCase) {
         log.info("[{}]: Reloading tasks in [{}]", useCase.getStringId(), useCase.getTitle());
         List<String> taskIds = useCase.getTasks().values().stream()

@@ -43,7 +43,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
@@ -90,7 +89,6 @@ public class DataService implements IDataService {
      * todo javadoc
      * */
     @Override
-    @Transactional
     public GetDataEventOutcome getData(GetDataParams getDataParams) {
         fillMissingAttributes(getDataParams);
 
@@ -154,7 +152,6 @@ public class DataService implements IDataService {
      * todo javadoc
      * */
     @Override
-    @Transactional
     public SetDataEventOutcome setData(SetDataParams setDataParams) {
         fillMissingAttributes(setDataParams);
 
@@ -237,7 +234,7 @@ public class DataService implements IDataService {
         List<EventOutcome> postSetOutcomes = resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task,
                 newDataField, params);
         if (!postSetOutcomes.isEmpty()) {
-            outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, newDataField, params));
+            outcome.addOutcomes(postSetOutcomes);
             useCase = workflowService.findOne(task.getCaseId());
         }
         historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, DataSet.of(fieldId, newDataField), user));
@@ -260,14 +257,12 @@ public class DataService implements IDataService {
     }
 
     @Override
-    @Transactional
     public GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, LoggedUser loggedUser) {
         IUser user = userService.getUserFromLoggedUser(loggedUser);
         return getDataGroups(taskId, locale, user);
     }
 
     @Override
-    @Transactional
     public GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, IUser user) {
         return getDataGroups(taskId, locale, new HashSet<>(), 0, null, user);
     }

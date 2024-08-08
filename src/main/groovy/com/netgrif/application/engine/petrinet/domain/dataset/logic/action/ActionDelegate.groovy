@@ -534,7 +534,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
                 (field.stringId): field.class.newInstance(changes)
         ] as Map<String, Field<?>>), user))
         this.outcomes.add(outcome)
-        updateCase(outcome)
+        updateCase()
         return outcome
     }
 
@@ -894,7 +894,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     private Task addTaskOutcomeAndReturnTask(TaskEventOutcome outcome) {
         this.outcomes.add(outcome)
-        updateCase(outcome)
+        updateCase()
         return outcome.getTask()
     }
 
@@ -2181,14 +2181,6 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
             return
         }
         useCase = workflowService.findOne(useCase.stringId)
-        initFieldsMap(action.fieldIds, useCase)
-    }
-
-    void updateCase(CaseEventOutcome outcome) {
-        if (!useCase) {
-            return
-        }
-        useCase = outcome.getCase()
         initFieldsMap(action.fieldIds, useCase)
     }
 

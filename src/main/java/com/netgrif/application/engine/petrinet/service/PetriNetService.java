@@ -53,7 +53,6 @@ import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.inject.Provider;
@@ -183,7 +182,6 @@ public class PetriNetService implements IPetriNetService {
      * todo javadoc
      * */
     @Override
-    @Transactional
     public ImportPetriNetEventOutcome importPetriNet(ImportPetriNetParams importPetriNetParams) throws IOException,
             MissingPetriNetMetaDataException, MissingIconKeyException {
         fillMissingAttributes(importPetriNetParams);
@@ -522,7 +520,6 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Transactional
     public void deletePetriNet(String processId, LoggedUser loggedUser) {
         Optional<PetriNet> petriNetOptional = repository.findById(processId);
         if (petriNetOptional.isEmpty()) {
