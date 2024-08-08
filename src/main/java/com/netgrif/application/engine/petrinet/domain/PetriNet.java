@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 public class PetriNet extends PetriNetObject {
 
 
+    private static final long serialVersionUID = 5849897508207680440L;
+
     @Getter
     @Setter
     private String identifier; //combination of identifier and version must be unique ... maybe use @CompoundIndex?

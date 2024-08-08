@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 @Document
 public class Transition extends Node {
 
+    private static final long serialVersionUID = 7641117995165357950L;
+
     @Field("dataGroups")
     @Getter
     @Setter

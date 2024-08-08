@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public abstract class Node extends PetriNetObject {
 
+    private static final long serialVersionUID = 4795702733361909003L;
+
     @Getter
     private Position position;
 
