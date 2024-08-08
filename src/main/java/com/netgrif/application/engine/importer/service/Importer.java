@@ -1,13 +1,15 @@
 package com.netgrif.application.engine.importer.service;
 
 import com.netgrif.application.engine.importer.model.*;
+import com.netgrif.application.engine.importer.service.evaluation.IActionEvaluator;
+import com.netgrif.application.engine.importer.service.evaluation.IFunctionEvaluator;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.importer.service.validation.IActionValidator;
-import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.Function;
 import com.netgrif.application.engine.petrinet.domain.Place;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.Transition;
+import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.arcs.Multiplicity;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
@@ -23,7 +25,6 @@ import com.netgrif.application.engine.petrinet.service.ArcFactory;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
-import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.*;
-import java.nio.file.Path;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,6 +48,7 @@ public class Importer {
 
     protected Map<String, I18nString> i18n;
     protected List<String> missingMetaData;
+    protected List<Action> actions;
 
     @Autowired
     protected AllDataConfiguration allDataConfiguration;
@@ -83,11 +84,15 @@ public class Importer {
     protected ComponentFactory componentFactory;
 
     @Autowired
-    protected IFieldActionsCacheService actionsCacheService;
+    protected IActionEvaluator actionEvaluator;
+
+    @Autowired
+    protected IFunctionEvaluator functionEvaluator;
 
     public Importer() {
         this.i18n = new HashMap<>();
         this.missingMetaData = new ArrayList<>();
+        this.actions = new LinkedList<>();
     }
 
     public Optional<Process> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
@@ -101,15 +106,6 @@ public class Importer {
         return Optional.empty();
     }
 
-    public Optional<Process> importPetriNet(File xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
-        try {
-            return importPetriNet(new FileInputStream(xml));
-        } catch (FileNotFoundException e) {
-            log.error("Importing Petri net failed: ", e);
-        }
-        return Optional.empty();
-    }
-
     protected void initialize() {
         this.defaultRole = processRoleService.defaultRole();
         this.anonymousRole = processRoleService.anonymousRole();
@@ -117,17 +113,9 @@ public class Importer {
 
     public com.netgrif.application.engine.importer.model.Process unmarshallXml(InputStream xml) throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(com.netgrif.application.engine.importer.model.Process.class);
-
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         process = (com.netgrif.application.engine.importer.model.Process) jaxbUnmarshaller.unmarshal(xml);
         return process;
-    }
-
-    public Path saveNetFile(Process net, InputStream xmlFile) throws IOException {
-        File savedFile = new File(fileStorageConfiguration.getStorageArchived() + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
-        net.setImportXmlPath(savedFile.getPath());
-//        copyInputStreamToFile(xmlFile, savedFile);
-        return savedFile.toPath();
     }
 
     protected Optional<Process> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
@@ -160,9 +148,8 @@ public class Importer {
             process.getCaseEvents().getEvent().forEach(this::createCaseEvent);
         }
 
-        // TODO: release/8.0.0 configurable for performance
-//        evaluateFunctions();
-//        actions.forEach(this::evaluateActions);
+        functionEvaluator.evaluate(net.getFunctions());
+        actionEvaluator.evaluate(actions, net.getFunctions());
 
         return Optional.of(net);
     }
@@ -188,22 +175,6 @@ public class Importer {
 //    protected void resolveCaseEvents(com.netgrif.application.engine.importer.model.CaseEvents caseEvents) {
 //        if (caseEvents != null && caseEvents.getEvent() != null) {
 //            net.setCaseEvents(createCaseEventsMap(caseEvents.getEvent()));
-//        }
-//    }
-//
-//    protected void evaluateFunctions() {
-//        try {
-//            actionsCacheService.evaluateFunctions(functions);
-//        } catch (Exception e) {
-//            throw new IllegalArgumentException("Could not evaluate functions: " + e.getMessage(), e);
-//        }
-//    }
-//
-//    protected void evaluateActions(String s, Action action) {
-//        try {
-//            actionsRunner.getActionCode(action, functions, true);
-//        } catch (Exception e) {
-//            throw new IllegalArgumentException("Could not evaluate action[" + action.getImportId() + "]: \n " + action.getDefinition(), e);
 //        }
 //    }
 //
@@ -450,7 +421,7 @@ public class Importer {
         transition.setImportId(importTransition.getId());
         transition.setTitle(toI18NString(importTransition.getTitle()));
         createProperties(importTransition.getProperties(), transition.getProperties());
-    // TODO: release/8.0.0 layout, dataref actions
+        // TODO: release/8.0.0 layout, dataref actions
 //            transition.setLayout(new TaskLayout(importTransition));
         transition.setIcon(importTransition.getIcon());
         transition.setAssignPolicy(toAssignPolicy(importTransition.getAssignPolicy()));
@@ -477,15 +448,19 @@ public class Importer {
         net.addTransition(transition);
     }
 
-    protected Event createEvent(com.netgrif.application.engine.importer.model.Event imported) {
+    protected Event createEvent(com.netgrif.application.engine.importer.model.Event importedEvent) {
         Event event = new Event();
+        event.setTitle(toI18NString(importedEvent.getTitle()));
+        event.setType(com.netgrif.application.engine.importer.model.EventType.valueOf(importedEvent.getType().value().toUpperCase()));
+        this.addBaseEventProperties(event, importedEvent);
+        return event;
+    }
+
+    protected void addBaseEventProperties(com.netgrif.application.engine.petrinet.domain.events.BaseEvent event, com.netgrif.application.engine.importer.model.BaseEvent imported) {
         event.setImportId(imported.getId());
         event.setMessage(toI18NString(imported.getMessage()));
-        event.setTitle(toI18NString(imported.getTitle()));
-        event.setType(com.netgrif.application.engine.importer.model.EventType.valueOf(imported.getType().value().toUpperCase()));
         event.setPostActions(parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType.POST, imported));
         event.setPreActions(parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType.PRE, imported));
-        return event;
     }
 
     protected List<Action> parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType phase, com.netgrif.application.engine.importer.model.BaseEvent imported) {
@@ -506,11 +481,8 @@ public class Importer {
 
     protected DataEvent createDataEvent(com.netgrif.application.engine.importer.model.DataEvent importedEvent) {
         DataEvent event = new DataEvent();
-        event.setImportId(importedEvent.getId());
-        event.setMessage(toI18NString(importedEvent.getMessage()));
         event.setType(DataEventType.valueOf(importedEvent.getType().value().toUpperCase()));
-        event.setPostActions(parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType.POST, importedEvent));
-        event.setPreActions(parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType.PRE, importedEvent));
+        this.addBaseEventProperties(event, importedEvent);
         return event;
     }
 
@@ -520,11 +492,8 @@ public class Importer {
             return;
         }
         ProcessEvent event = new ProcessEvent();
-        event.setImportId(importedEvent.getId());
-        event.setMessage(toI18NString(importedEvent.getMessage()));
         event.setType(ProcessEventType.valueOf(importedEvent.getType().value().toUpperCase()));
-        event.setPostActions(parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType.POST, importedEvent));
-        event.setPreActions(parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType.PRE, importedEvent));
+        this.addBaseEventProperties(event, importedEvent);
         net.addProcessEvent(event);
     }
 
@@ -533,11 +502,8 @@ public class Importer {
             return;
         }
         CaseEvent event = new CaseEvent();
-        event.setImportId(importedEvent.getId());
-        event.setMessage(toI18NString(importedEvent.getMessage()));
         event.setType(CaseEventType.valueOf(importedEvent.getType().value().toUpperCase()));
-        event.setPostActions(parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType.POST, importedEvent));
-        event.setPreActions(parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType.PRE, importedEvent));
+        this.addBaseEventProperties(event, importedEvent);
         net.addCaseEvent(event);
     }
 
@@ -693,7 +659,7 @@ public class Importer {
 //                .collect(Collectors.toList());
 //    }
 
-//
+    //
     protected String buildActionId(String actionId) {
         if (actionId == null) {
             actionId = new ObjectId().toString();
@@ -701,7 +667,8 @@ public class Importer {
         // TODO: release/8.0.0 optimize ids of actions to not use strings
         return this.net.getIdentifier() + "-" + actionId;
     }
-//
+
+    //
 //    protected void parseIds(String fieldId, String transitionId, com.netgrif.application.engine.importer.model.Action importedAction, Action action) {
 //        String definition = importedAction.getValue();
 //        action.setDefinition(definition);
@@ -902,7 +869,8 @@ public class Importer {
 
         return com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy.valueOf(policy.value().toUpperCase());
     }
-//
+
+    //
 //    public ProcessRole getRole(String id) {
 //        ProcessRole role = roles.get(id);
 //        if (role == null) {
