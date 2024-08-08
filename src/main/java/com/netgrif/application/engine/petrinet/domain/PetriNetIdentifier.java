@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 @Getter
 @Setter
@@ -13,6 +14,7 @@ public class PetriNetIdentifier {
 
     private ObjectId id;
 
+    @Indexed
     private String identifier;
 
     private Version version;

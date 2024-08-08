@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.auth.domain.Author;
+import com.netgrif.application.engine.petrinet.domain.PetriNetIdentifier;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
@@ -44,6 +45,10 @@ public class Case implements Serializable {
     @NotNull
     @Indexed
     private String processIdentifier;
+    /**
+     * Contains identifiers of super petri nets. The last element is the closest parent, the first is the furthest parent.
+     * */
+    private List<PetriNetIdentifier> parentPetriNetIdentifiers;
     @JsonIgnore
     private Map<String, Integer> activePlaces = new HashMap<>();
     @NotNull
@@ -83,6 +88,7 @@ public class Case implements Serializable {
         this.petriNet = petriNet;
         petriNetObjectId = petriNet.getObjectId();
         processIdentifier = petriNet.getIdentifier();
+        parentPetriNetIdentifiers = new ArrayList<>(petriNet.getParentIdentifiers());
         activePlaces = petriNet.getActivePlaces();
         icon = petriNet.getIcon();
 

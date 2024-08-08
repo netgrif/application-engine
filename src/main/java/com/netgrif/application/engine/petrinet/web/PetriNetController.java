@@ -103,7 +103,7 @@ public class PetriNetController {
 
     @Operation(summary = "Get all processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
-    public PetriNetReferenceResources getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Authentication auth, Locale locale) {
+    public PetriNetReferenceResources getAll(@RequestParam(value = "identifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Authentication auth, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         if (identifier != null && version == null) {
             return new PetriNetReferenceResources(service.getReferencesByIdentifier(identifier, user, locale));
