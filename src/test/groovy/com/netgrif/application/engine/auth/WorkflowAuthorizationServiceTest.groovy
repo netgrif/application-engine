@@ -217,7 +217,7 @@ class WorkflowAuthorizationServiceTest {
         userService.addRole(testUser, negDeleteRole.getStringId())
 
         CreateCaseParams createCaseParams = CreateCaseParams.builder()
-                .petriNet(net)
+                .petriNet(netWithUserRefs)
                 .title("Test delete")
                 .color("")
                 .loggedUser(testUser.transformToLoggedUser())
