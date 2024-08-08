@@ -5,7 +5,6 @@ import com.netgrif.application.engine.importer.model.Data;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.service.builder.FieldBuilder;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.application.engine.importer.service.validation.IDataValidator;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,14 +19,12 @@ public final class FieldFactory {
 
     private final DatabaseProperties properties;
     private final ComponentFactory componentFactory;
-    private final IDataValidator dataValidator;
     private final Map<DataType, FieldBuilder<?>> builders;
 
-    public FieldFactory(DatabaseProperties properties, List<FieldBuilder<?>> builders, ComponentFactory componentFactory, IDataValidator dataValidator) {
+    public FieldFactory(DatabaseProperties properties, List<FieldBuilder<?>> builders, ComponentFactory componentFactory) {
         this.properties = properties;
         this.builders = builders.stream().collect(Collectors.toMap(FieldBuilder::getType, Function.identity()));
         this.componentFactory = componentFactory;
-        this.dataValidator = dataValidator;
     }
 
     Field<?> getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {

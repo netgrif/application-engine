@@ -545,27 +545,27 @@ public class PetriNetService implements IPetriNetService {
         deletePetriNet(petriNet, loggedUser);
     }
 
-    private void deletePetriNet(Process petriNet, LoggedUser loggedUser) {
-        log.info("[{}]: Initiating deletion of Petri net {} version {}", processId, petriNet.getIdentifier(), petriNet.getVersion().toString());
+    private void deletePetriNet(Process process, LoggedUser loggedUser) {
+        log.info("[{}]: Initiating deletion of Petri net {} version {}", process.getStringId(), process.getIdentifier(), process.getVersion().toString());
 
-        this.userService.removeRoleOfDeletedPetriNet(petriNet);
-        this.workflowService.deleteInstancesOfPetriNet(petriNet);
-        this.processRoleService.deleteRolesOfNet(petriNet, loggedUser);
+        this.userService.removeRoleOfDeletedPetriNet(process);
+        this.workflowService.deleteInstancesOfPetriNet(process);
+        this.processRoleService.deleteRolesOfNet(process, loggedUser);
         try {
-            ldapGroupService.deleteProcessRoleByPetrinet(petriNet.getStringId());
+            ldapGroupService.deleteProcessRoleByPetrinet(process.getStringId());
         } catch (NullPointerException e) {
             log.info("LdapGroup and ProcessRole mapping are not activated...");
         } catch (Exception ex) {
             log.error("LdapGroup", ex);
         }
 
-        log.info("[{}]: User [{}] is deleting Petri net {} version {}", petriNet.getStringId(),
-                userService.getLoggedOrSystem().getStringId(), petriNet.getIdentifier(), petriNet.getVersion().toString());
-        this.repository.deleteById(petriNet.getObjectId());
-        this.evictCache(petriNet);
+        log.info("[{}]: User [{}] is deleting Petri net {} version {}", process.getStringId(),
+                userService.getLoggedOrSystem().getStringId(), process.getIdentifier(), process.getVersion().toString());
+        this.repository.deleteById(process.getObjectId());
+        this.evictCache(process);
         // net functions must be removed from cache after it was deleted from repository
-        this.functionCacheService.reloadCachedFunctions(petriNet);
-        historyService.save(new DeletePetriNetEventLog(null, EventPhase.PRE, petriNet.getObjectId()));
+        this.functionCacheService.reloadCachedFunctions(process);
+        historyService.save(new DeletePetriNetEventLog(null, EventPhase.PRE, process.getObjectId()));
     }
 
     private Criteria getProcessRolesCriteria(LoggedUser user) {

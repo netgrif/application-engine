@@ -10,6 +10,7 @@ import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
+import com.netgrif.application.engine.utils.UniqueKeyMap;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Data
 @Document
 @CompoundIndex(name = "cmp-idx-one", def = "{'identifier': 1, 'version.major': -1, 'version.minor': -1, 'version.patch': -1}")
 public class Process extends ProcessObject {
@@ -34,8 +36,8 @@ public class Process extends ProcessObject {
     private I18nExpression defaultCaseName;
     // TODO: release/8.0.0 - default + anonymous role, roleref
     private UniqueKeyMap<String, Map<ProcessRolePermission, Boolean>> permissions;
-    private UniqueKeyMap<ProcessEventType, ProcessEvent> processEvents;
-    private UniqueKeyMap<CaseEventType, CaseEvent> caseEvents;
+    private Map<ProcessEventType, ProcessEvent> processEvents;
+    private Map<CaseEventType, CaseEvent> caseEvents;
     @DBRef
     private UniqueKeyMap<String, ProcessRole> roles;
     private List<Function> functions;
@@ -66,8 +68,8 @@ public class Process extends ProcessObject {
         arcs = new UniqueKeyMap<>();
         dataSet = new UniqueKeyMap<>();
         roles = new UniqueKeyMap<>();
-        processEvents = new UniqueKeyMap<>();
-        caseEvents = new UniqueKeyMap<>();
+        processEvents = new HashMap<>();
+        caseEvents = new HashMap<>();
         permissions = new UniqueKeyMap<>();
         functions = new LinkedList<>();
         properties = new UniqueKeyMap<>();
@@ -295,7 +297,8 @@ public class Process extends ProcessObject {
         clone.initializeArcs();
         clone.setCaseEvents(this.caseEvents == null ? null : this.caseEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
         clone.setProcessEvents(this.processEvents == null ? null : this.processEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
-        clone.setPermissions(this.permissions == null ? null : this.permissions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
+        // TODO: release/8.0.0
+//        clone.setPermissions(this.permissions == null ? null : this.permissions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new UniqueKeyMap<>(e.getValue()))));
         this.getFunctions().forEach(clone::addFunction);
         clone.setProperties(new UniqueKeyMap<>(this.properties));
         return clone;

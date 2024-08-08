@@ -177,10 +177,12 @@ public class Importer {
         LinkedHashMap<String, ProcessRole> processRolesWithNewIds = new LinkedHashMap<>();
         for (Map.Entry<String, ProcessRole> entry : process.getRoles().entrySet()) {
             ObjectId newId = new ObjectId();
-            entry.getValue().setId(newId);
+            // TODO: release/8.0.0
+//            entry.getValue().setId(newId);
             processRolesWithNewIds.put(newId.toString(), entry.getValue());
         }
-        process.setRoles(processRolesWithNewIds);
+        // TODO: release/8.0.0
+//        process.setRoles(processRolesWithNewIds);
     }
 
     protected static boolean areExtensionAttributesEmpty(Extension extension) {

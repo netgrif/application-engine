@@ -68,14 +68,6 @@ public class Version implements Serializable {
         }
     }
 
-    public static Version of(String versionString) {
-        if (versionString == null || !versionString.matches("[0-9]+\\.[0-9]+\\.[0-9]+")) {
-            return null;
-        }
-        String[] versionParts = versionString.split("\\.");
-        return new Version(Integer.parseInt(versionParts[0]), Integer.parseInt(versionParts[1]), Integer.parseInt(versionParts[2]));
-    }
-
     @Override
     public Version clone() {
         Version clone = new Version();
