@@ -4,16 +4,14 @@ import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.service.evaluation.IActionEvaluator;
 import com.netgrif.application.engine.importer.service.evaluation.IFunctionEvaluator;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.application.engine.importer.service.validation.IActionValidator;
+import com.netgrif.application.engine.importer.service.validation.IProcessValidator;
 import com.netgrif.application.engine.petrinet.domain.Function;
 import com.netgrif.application.engine.petrinet.domain.Place;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.*;
-import com.netgrif.application.engine.petrinet.domain.arcs.Multiplicity;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.Event;
@@ -39,8 +37,8 @@ public class Importer {
 
     public static final String FILE_EXTENSION = ".xml";
 
-    protected com.netgrif.application.engine.importer.model.Process process;
-    protected Process net;
+    protected com.netgrif.application.engine.importer.model.Process importedProcess;
+    protected Process process;
     protected ProcessRole defaultRole;
     protected ProcessRole anonymousRole;
 
@@ -70,12 +68,6 @@ public class Importer {
     protected TriggerFactory triggerFactory;
 
     @Autowired
-    protected IActionValidator actionValidator;
-
-    @Autowired
-    protected ActionRunner actionsRunner;
-
-    @Autowired
     protected ComponentFactory componentFactory;
 
     @Autowired
@@ -83,6 +75,9 @@ public class Importer {
 
     @Autowired
     protected IFunctionEvaluator functionEvaluator;
+
+    @Autowired
+    protected IProcessValidator processValidator;
 
     public Importer() {
         this.i18n = new HashMap<>();
@@ -109,44 +104,42 @@ public class Importer {
     public com.netgrif.application.engine.importer.model.Process unmarshallXml(InputStream xml) throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(com.netgrif.application.engine.importer.model.Process.class);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-        process = (com.netgrif.application.engine.importer.model.Process) jaxbUnmarshaller.unmarshal(xml);
-        return process;
+        importedProcess = (com.netgrif.application.engine.importer.model.Process) jaxbUnmarshaller.unmarshal(xml);
+        return importedProcess;
     }
 
     protected Optional<Process> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
-        // TODO: release/8.0.0 configurable validation for PROD
-////        documentValidator.checkConflictingAttributes(process, process.getUsersRef(), process.getUserRef(), "usersRef", "userRef");
-////        documentValidator.checkDeprecatedAttributes(process);
-        net = new Process();
-        net.addRole(defaultRole);
-        net.addRole(anonymousRole);
-        process.getI18N().forEach(this::addI18N);
+        process = new Process();
+        process.addRole(defaultRole);
+        process.addRole(anonymousRole);
+        importedProcess.getI18N().forEach(this::addI18N);
 
         setMetaData();
         addAllDataTransition();
 
         // TODO: release/8.0.0 static resources
-        process.getRole().forEach(this::createRole);
-        process.getData().forEach(this::createDataSet);
-        process.getPlace().forEach(this::createPlace);
-        process.getTransition().forEach(this::createTransition);
-        process.getArc().forEach(this::createArc);
-        process.getFunction().forEach(this::createFunction);
-        process.getRoleRef().forEach(this::createRoleRef);
+        importedProcess.getRole().forEach(this::createRole);
+        importedProcess.getData().forEach(this::createDataSet);
+        importedProcess.getPlace().forEach(this::createPlace);
+        importedProcess.getTransition().forEach(this::createTransition);
+        importedProcess.getArc().forEach(this::createArc);
+        importedProcess.getFunction().forEach(this::createFunction);
+        importedProcess.getRoleRef().forEach(this::createRoleRef);
 
 //        addPredefinedRolesWithDefaultPermissions();
 
-        if (process.getProcessEvents() != null) {
-            process.getProcessEvents().getEvent().forEach(this::createProcessEvent);
+        if (importedProcess.getProcessEvents() != null) {
+            importedProcess.getProcessEvents().getEvent().forEach(this::createProcessEvent);
         }
-        if (process.getCaseEvents() != null) {
-            process.getCaseEvents().getEvent().forEach(this::createCaseEvent);
+        if (importedProcess.getCaseEvents() != null) {
+            importedProcess.getCaseEvents().getEvent().forEach(this::createCaseEvent);
         }
 
-        functionEvaluator.evaluate(net.getFunctions());
-        actionEvaluator.evaluate(actions, net.getFunctions());
+        functionEvaluator.evaluate(process.getFunctions());
+        actionEvaluator.evaluate(actions, process.getFunctions());
+        processValidator.validate(process);
 
-        return Optional.of(net);
+        return Optional.of(process);
     }
 
 //
@@ -212,23 +205,23 @@ public class Importer {
     }
 
     protected void setMetaData() throws MissingPetriNetMetaDataException {
-        checkMetaData(process.getId(), () -> {
-            net.setImportId(process.getId());
-            net.setIdentifier(process.getId());
+        checkMetaData(importedProcess.getId(), () -> {
+            process.setImportId(importedProcess.getId());
+            process.setIdentifier(importedProcess.getId());
         }, "<id>");
-        checkMetaData(process.getVersion(), () -> {
-            net.setVersion(Version.of(process.getVersion()));
+        checkMetaData(importedProcess.getVersion(), () -> {
+            process.setVersion(Version.of(importedProcess.getVersion()));
         }, "<version>");
-        checkMetaData(process.getTitle(), () -> {
-            net.setTitle(toI18NString(process.getTitle()));
+        checkMetaData(importedProcess.getTitle(), () -> {
+            process.setTitle(toI18NString(importedProcess.getTitle()));
         }, "<title>");
         // TODO: release/8.0.0 extension from NAE-1973
-        net.setIcon(process.getIcon());
+        process.setIcon(importedProcess.getIcon());
 
-        if (process.getCaseName() != null) {
+        if (importedProcess.getCaseName() != null) {
             // TODO: release/8.0.0 case name expresion
         }
-        createProperties(process.getProperties(), net.getProperties());
+        createProperties(importedProcess.getProperties(), process.getProperties());
 
         if (!missingMetaData.isEmpty()) {
             throw new MissingPetriNetMetaDataException(missingMetaData);
@@ -246,7 +239,7 @@ public class Importer {
     protected void addAllDataTransition() {
         // TODO: release/8.0.0 extend default Object process
         com.netgrif.application.engine.importer.model.Transition allDataConfig = allDataConfiguration.getAllData();
-        if (process.getTransition().stream().anyMatch(transition -> allDataConfig.getId().equals(transition.getId()))) {
+        if (importedProcess.getTransition().stream().anyMatch(transition -> allDataConfig.getId().equals(transition.getId()))) {
             return;
         }
         com.netgrif.application.engine.importer.model.Transition allDataTransition = new com.netgrif.application.engine.importer.model.Transition();
@@ -260,7 +253,7 @@ public class Importer {
         allDataTransition.setFinishPolicy(allDataConfig.getFinishPolicy());
         // TODO: release/8.0.0 all properties
         FlexContainer flex = new FlexContainer();
-        for (com.netgrif.application.engine.importer.model.Data field : process.getData()) {
+        for (com.netgrif.application.engine.importer.model.Data field : importedProcess.getData()) {
             FlexItem flexItem = new FlexItem();
             com.netgrif.application.engine.importer.model.DataRef dataRef = new com.netgrif.application.engine.importer.model.DataRef();
 
@@ -273,20 +266,9 @@ public class Importer {
             flex.getItem().add(flexItem);
         }
         allDataTransition.setFlex(flex);
-        process.getTransition().add(allDataTransition);
+        importedProcess.getTransition().add(allDataTransition);
     }
 
-    //    protected void applyMapping(Mapping mapping) throws MissingIconKeyException {
-//        Transition transition = getTransition(mapping.getTransitionRef());
-//        mapping.getRoleRef().forEach(roleRef -> addRoleLogic(transition, roleRef));
-//        mapping.getDataRef().forEach(dataRef -> addDataLogic(transition, dataRef));
-//        for (com.netgrif.application.engine.importer.model.DataGroup dataGroup : mapping.getDataGroup()) {
-//            addDataGroup(transition, dataGroup, mapping.getDataGroup().indexOf(dataGroup));
-//        }
-//        mapping.getTrigger().forEach(trigger -> addTrigger(transition, trigger));
-//    }
-//
-//
 //    private List<com.netgrif.application.engine.importer.model.Action> filterActionsByTrigger(List<com.netgrif.application.engine.importer.model.Action> actions, com.netgrif.application.engine.importer.model.DataEventType trigger) {
 //        return actions.stream()
 //                .filter(action -> action.getTrigger().equalsIgnoreCase(trigger.toString()))
@@ -307,26 +289,6 @@ public class Importer {
 //            return event;
 //        });
 //    }
-//
-//    protected void addActionRefs(Data data) {
-//        if (data.getActionRef() != null) {
-//            List<Action> actions = buildActionRefs(data.getActionRef());
-//            getField(data.getId()).addActions(actions.stream().filter(action -> action.getTrigger() == com.netgrif.application.engine.importer.model.DataEventType.GET).collect(Collectors.toList()), com.netgrif.application.engine.importer.model.DataEventType.GET);
-//            getField(data.getId()).addActions(actions.stream().filter(action -> action.getTrigger() == com.netgrif.application.engine.importer.model.DataEventType.SET).collect(Collectors.toList()), com.netgrif.application.engine.importer.model.DataEventType.SET);
-//        }
-//    }
-//
-//    protected List<Action> buildActionRefs(List<ActionRef> actionRefs) {
-//        return actionRefs.stream().map(ref -> actions.get(ref.getId())).collect(Collectors.toList());
-//    }
-//
-//    protected Action fromActionRef(ActionRef actionRef) {
-//        Action placeholder = new Action();
-//        placeholder.setImportId(actionRef.getId());
-//        this.actionRefs.put(actionRef.getId(), placeholder);
-//        return placeholder;
-//    }
-//
 //
 //    protected void resolveDataRefActions(List<DataRef> dataRef, com.netgrif.application.engine.importer.model.Transition trans) {
 //        dataRef.forEach(ref -> {
@@ -366,23 +328,15 @@ public class Importer {
 //        }
 //    }
 //
-//    protected DataEvent createDefaultEvent(List<Action> actions, com.netgrif.application.engine.importer.model.DataEventType type) {
-//        DataEvent event = new DataEvent();
-//        event.setType(type);
-//        event.setId(new ObjectId().toString());
-//        event.addToActionsByDefaultPhase(actions);
-//        return event;
-//    }
-
     protected void createArc(com.netgrif.application.engine.importer.model.Arc importArc) {
-        net.addArc(arcImporter.getArc(importArc, this));
+        process.addArc(arcImporter.getArc(importArc, this));
     }
 
     protected Node getNode(String id) {
-        if (net.getPlace(id) != null) {
-            return net.getPlace(id);
-        } else if (net.getTransition(id) != null) {
-            return net.getTransition(id);
+        if (process.getPlace(id) != null) {
+            return process.getPlace(id);
+        } else if (process.getTransition(id) != null) {
+            return process.getTransition(id);
         }
         throw new IllegalArgumentException("Node with id [" + id + "] not found.");
     }
@@ -392,13 +346,10 @@ public class Importer {
         if (importData.getEvent() != null) {
             importData.getEvent().forEach(event -> field.addEvent(createDataEvent(event)));
         }
-        net.addDataSetField(field);
+        process.addDataSetField(field);
     }
 
     protected void createTransition(com.netgrif.application.engine.importer.model.Transition importTransition) throws MissingIconKeyException {
-//        transitionValidator.checkConflictingAttributes(importTransition, importTransition.getUsersRef(), importTransition.getUserRef(), "usersRef", "userRef");
-//        transitionValidator.checkDeprecatedAttributes(importTransition);
-
         Transition transition = new Transition();
         transition.setImportId(importTransition.getId());
         transition.setTitle(toI18NString(importTransition.getTitle()));
@@ -427,7 +378,7 @@ public class Importer {
             importTransition.getEvent().forEach(event -> transition.addEvent(createEvent(event))
             );
         }
-        net.addTransition(transition);
+        process.addTransition(transition);
     }
 
     protected Event createEvent(com.netgrif.application.engine.importer.model.Event importedEvent) {
@@ -476,7 +427,7 @@ public class Importer {
         ProcessEvent event = new ProcessEvent();
         event.setType(ProcessEventType.valueOf(importedEvent.getType().value().toUpperCase()));
         this.addBaseEventProperties(event, importedEvent);
-        net.addProcessEvent(event);
+        process.addProcessEvent(event);
     }
 
     protected void createCaseEvent(com.netgrif.application.engine.importer.model.CaseEvent importedEvent) {
@@ -486,7 +437,7 @@ public class Importer {
         CaseEvent event = new CaseEvent();
         event.setType(CaseEventType.valueOf(importedEvent.getType().value().toUpperCase()));
         this.addBaseEventProperties(event, importedEvent);
-        net.addCaseEvent(event);
+        process.addCaseEvent(event);
     }
 
     protected void createFunction(com.netgrif.application.engine.importer.model.Function importedFunction) {
@@ -494,7 +445,7 @@ public class Importer {
         function.setDefinition(importedFunction.getValue());
         function.setName(importedFunction.getName());
         function.setScope(FunctionScope.valueOf(importedFunction.getScope().name()));
-        net.addFunction(function);
+        process.addFunction(function);
     }
 
     protected void createRoleRef(com.netgrif.application.engine.importer.model.CaseRoleRef roleRef) {
@@ -564,9 +515,6 @@ public class Importer {
 //        if (logic == null || roleId == null) {
 //            return;
 //        }
-//      TODO: NAE-1969
-//        logicValidator.checkConflictingAttributes(logic, logic.isAssigned(), logic.isAssign(), "assigned", "assign");
-//        logicValidator.checkDeprecatedAttributes(logic);
 //        if (logic.isView() != null && !logic.isView()) {
 //            transition.addNegativeViewRole(roleId);
 //        }
@@ -580,10 +528,6 @@ public class Importer {
 //        if (logic == null || userRefId == null) {
 //            return;
 //        }
-//
-//        logicValidator.checkConflictingAttributes(logic, logic.isAssigned(), logic.isAssign(), "assigned", "assign");
-//        logicValidator.checkDeprecatedAttributes(logic);
-//
 //        transition.addUserRef(userRefId, roleFactory.getPermissions(logic));
 //    }
 //
@@ -641,90 +585,14 @@ public class Importer {
 //                .collect(Collectors.toList());
 //    }
 
-    //
     protected String buildActionId(String actionId) {
         if (actionId == null) {
             actionId = new ObjectId().toString();
         }
         // TODO: release/8.0.0 optimize ids of actions to not use strings
-        return this.net.getIdentifier() + "-" + actionId;
+        return this.process.getIdentifier() + "-" + actionId;
     }
 
-    //
-//    protected void parseIds(String fieldId, String transitionId, com.netgrif.application.engine.importer.model.Action importedAction, Action action) {
-//        String definition = importedAction.getValue();
-//        action.setDefinition(definition);
-//
-//        if (containsParams(definition)) {
-//            parseParamsAndObjectIds(action, fieldId, transitionId);
-//        }
-//        actionValidator.validateAction(action.getDefinition());
-//    }
-//
-//    protected void parseParamsAndObjectIds(Action action, String fieldId, String transitionId) {
-//        String[] actionParts = action.getDefinition().split(";", 2);
-//        action.setDefinition(actionParts[1]);
-//        parseObjectIds(action, fieldId, transitionId, actionParts[0]);
-//    }
-//
-//    protected boolean containsParams(String definition) {
-//        return definition.matches("[\\W\\w\\s]*[\\w]*:[\\s]*[ft].[\\w]+;[\\w\\W\\s]*");
-//    }
-//
-//    protected void parseObjectIds(Action action, String fieldId, String transitionId, String definition) {
-//        try {
-//            Map<String, String> ids = parseParams(definition);
-//
-//            ids.entrySet().forEach(entry -> replaceImportId(action, fieldId, transitionId, entry));
-//        } catch (NullPointerException e) {
-//            throw new IllegalArgumentException("Failed to parse action: " + action, e);
-//        }
-//    }
-//
-//    protected void replaceImportId(Action action, String fieldId, String transitionId, Map.Entry<String, String> entry) {
-//        String[] parts = entry.getValue().split("[.]");
-//        if (parts.length != 2) {
-//            throw new IllegalArgumentException("Can not parse id of " + entry.getValue());
-//        }
-//        String key = parts[0];
-//        String importId = parts[1];
-//        String paramName = entry.getKey().trim();
-//
-//        if (importId.startsWith("this")) {
-//            if (Objects.equals(key.trim(), FIELD_KEYWORD)) {
-//                action.addFieldId(paramName, fieldId);
-//                return;
-//            }
-//            if (Objects.equals(key.trim(), TRANSITION_KEYWORD)) {
-//                action.addTransitionId(paramName, transitionId);
-//                return;
-//            }
-//        }
-//        if (Objects.equals(key.trim(), FIELD_KEYWORD)) {
-//            action.addFieldId(paramName, getFieldId(importId));
-//            return;
-//        }
-//        if (Objects.equals(key.trim(), TRANSITION_KEYWORD)) {
-//            action.addTransitionId(paramName, importId);
-//            return;
-//        }
-//        throw new IllegalArgumentException("Object " + key + "." + importId + " not supported");
-//    }
-//
-//    protected Map<String, String> parseParams(String definition) {
-//        List<String> params = Arrays.asList(definition.split(","));
-//        return params.stream()
-//                .map(param -> param.split(":"))
-//                .collect(Collectors.toMap(o -> o[0], o -> o[1]));
-//    }
-//
-//    protected String getFieldId(String importId) {
-//        try {
-//            return getField(importId).getStringId();
-//        } catch (Exception e) {
-//            throw new IllegalArgumentException("Object f." + importId + " does not exists");
-//        }
-//    }
 //
 //    protected void createTrigger(Transition transition, com.netgrif.application.engine.importer.model.Trigger importTrigger) {
 //        com.netgrif.application.engine.workflow.domain.triggers.Trigger trigger = triggerFactory.buildTrigger(importTrigger);
@@ -739,7 +607,7 @@ public class Importer {
         place.setTitle(toI18NString(importPlace.getTitle()));
         // TODO: release/8.0.0 scope
         createProperties(importPlace.getProperties(), place.getProperties());
-        net.addPlace(place);
+        process.addPlace(place);
     }
 
     protected void createRole(com.netgrif.application.engine.importer.model.Role importRole) {
@@ -852,34 +720,6 @@ public class Importer {
         return com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy.valueOf(policy.value().toUpperCase());
     }
 
-    //
-//    public ProcessRole getRole(String id) {
-//        ProcessRole role = roles.get(id);
-//        if (role == null) {
-//            throw new IllegalArgumentException("Role " + id + " not found");
-//        }
-//        return role;
-//    }
-//
-//    public Field<?> getField(String id) {
-//        Field<?> field = fields.get(id);
-//        if (field == null) {
-//            throw new IllegalArgumentException("Field " + id + " not found");
-//        }
-//        return field;
-//    }
-//
-//    protected static void copyInputStreamToFile(InputStream inputStream, File file) throws IOException {
-//        try (FileOutputStream outputStream = new FileOutputStream(file)) {
-//            int read;
-//            byte[] bytes = new byte[1024];
-//            while ((read = inputStream.read(bytes)) != -1) {
-//                outputStream.write(bytes, 0, read);
-//            }
-//        }
-//    }
-//
-//
     protected void createProperties(com.netgrif.application.engine.importer.model.Properties propertiesXml, Map<String, String> properties) {
         if (propertiesXml == null) {
             return;
