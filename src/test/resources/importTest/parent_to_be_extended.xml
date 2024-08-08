@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document>
+    <id>parent_to_be_extended</id>
+    <version>1.0.0</version>
+    <initials>PTE</initials>
+    <title>Parent test net to be extended</title>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+
+    <extends>
+        <id>super_parent_to_be_extended</id>
+        <version>1.0.0</version>
+    </extends>
+
+    <tags>
+        <tag key="tag1">tag1</tag>
+    </tags>
+
+    <role>
+        <id>role1</id>
+        <title>Role 1</title>
+    </role>
+
+    <data type="text">
+        <id>variable1</id>
+        <title>Attribute1</title>
+    </data>
+
+    <transition>
+        <id>t1</id>
+        <label>Test</label>
+        <x>0</x>
+        <y>0</y>
+        <dataGroup>
+            <id>dg</id>
+            <layout>legacy</layout>
+            <dataRef>
+                <id>variable1</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+
+    <place>
+        <id>p1</id>
+        <x>0</x>
+        <y>0</y>
+        <tokens>1</tokens>
+    </place>
+
+    <arc>
+        <id>a1</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>t1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+
+</document>

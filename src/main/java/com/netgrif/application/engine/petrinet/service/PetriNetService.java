@@ -532,11 +532,20 @@ public class PetriNetService implements IPetriNetService {
     @Transactional
     public void deletePetriNet(String processId, LoggedUser loggedUser) {
         Optional<Process> petriNetOptional = repository.findById(processId);
-        if (!petriNetOptional.isPresent()) {
+        if (petriNetOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find process with id [" + processId + "]");
         }
 
         Process petriNet = petriNetOptional.get();
+        List<Process> childPetriNets = repository.findAllChildrenByParentId(petriNet.getObjectId());
+
+        for (Process childPetriNet : childPetriNets) {
+            deletePetriNet(childPetriNet, loggedUser);
+        }
+        deletePetriNet(petriNet, loggedUser);
+    }
+
+    private void deletePetriNet(Process petriNet, LoggedUser loggedUser) {
         log.info("[{}]: Initiating deletion of Petri net {} version {}", processId, petriNet.getIdentifier(), petriNet.getVersion().toString());
 
         this.userService.removeRoleOfDeletedPetriNet(petriNet);
@@ -550,8 +559,8 @@ public class PetriNetService implements IPetriNetService {
             log.error("LdapGroup", ex);
         }
 
-
-        log.info("[{}]: User [{}] is deleting Petri net {} version {}", processId, userService.getLoggedOrSystem().getStringId(), petriNet.getIdentifier(), petriNet.getVersion().toString());
+        log.info("[{}]: User [{}] is deleting Petri net {} version {}", petriNet.getStringId(),
+                userService.getLoggedOrSystem().getStringId(), petriNet.getIdentifier(), petriNet.getVersion().toString());
         this.repository.deleteById(petriNet.getObjectId());
         this.evictCache(petriNet);
         // net functions must be removed from cache after it was deleted from repository

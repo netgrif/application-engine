@@ -29,6 +29,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,6 +58,9 @@ public class Importer {
 
     @Autowired
     protected IProcessRoleService processRoleService;
+
+    @Autowired
+    protected IPetriNetService petriNetService;
 
     @Autowired
     protected ArcImporter arcImporter;
@@ -109,7 +113,8 @@ public class Importer {
     }
 
     protected Optional<Process> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
-        process = new Process();
+        initializePetriNet();
+
         process.addRole(defaultRole);
         process.addRole(anonymousRole);
         importedProcess.getI18N().forEach(this::addI18N);
@@ -142,6 +147,46 @@ public class Importer {
         return Optional.of(process);
     }
 
+    protected void initializePetriNet() throws IllegalArgumentException {
+        Extension extension = importedProcess.getExtends();
+        if (extension != null) {
+            initializeWithChildPetriNet(extension);
+        } else {
+            process = new Process();
+        }
+    }
+
+    protected void initializeWithChildPetriNet(Extension extension) {
+        if (areExtensionAttributesEmpty(extension)) {
+            throw new IllegalArgumentException("Parent identifier or version is empty.");
+        }
+        Process parentNet = petriNetService.getPetriNet(extension.getId(), Version.of(extension.getVersion()));
+        if (parentNet == null) {
+            throw new IllegalArgumentException("Parent petri net not found.");
+        }
+        process = parentNet.clone();
+        // transition must be removed since it's going to be added later with proper data
+        process.setCreationDate(LocalDateTime.now());
+        process.getTransitions().remove(allDataConfiguration.getAllData().getId());
+        process.setObjectId(new ObjectId());
+        process.addParentIdentifier(new PetriNetIdentifier(
+                parentNet.getIdentifier(),
+                parentNet.getVersion(),
+                parentNet.getObjectId()
+        ));
+        LinkedHashMap<String, ProcessRole> processRolesWithNewIds = new LinkedHashMap<>();
+        for (Map.Entry<String, ProcessRole> entry : process.getRoles().entrySet()) {
+            ObjectId newId = new ObjectId();
+            entry.getValue().setId(newId);
+            processRolesWithNewIds.put(newId.toString(), entry.getValue());
+        }
+        process.setRoles(processRolesWithNewIds);
+    }
+
+    protected static boolean areExtensionAttributesEmpty(Extension extension) {
+        return extension.getId() == null || extension.getId().isBlank()
+                || extension.getVersion() == null || extension.getVersion().isBlank();
+    }
 //
 //    protected void resolveUserRef(com.netgrif.application.engine.importer.model.CaseUserRef userRef) {
 //        com.netgrif.application.engine.importer.model.CaseLogic logic = userRef.getCaseLogic();

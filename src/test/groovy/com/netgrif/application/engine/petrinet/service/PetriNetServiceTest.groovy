@@ -18,6 +18,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
@@ -116,12 +117,12 @@ class PetriNetServiceTest {
         assert taskRepository.count() == taskCount + 3
         assert processRoleRepository.count() == processRoleCount + 2
 
-        def user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
+        def user = userService.findByEmail(CUSTOMER_USER_MAIL)
         assert user != null
         assert user.processRoles.size() == 1
 
         userService.addRole(user, testNet.roles.values().collect().get(0).stringId)
-        user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
+        user = userService.findByEmail(CUSTOMER_USER_MAIL)
         assert user != null
         assert user.processRoles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
@@ -133,7 +134,7 @@ class PetriNetServiceTest {
         assert caseRepository.findAllByProcessIdentifier(testNetOptional.getNet().getImportId()).size() == 0
         assert taskRepository.count() == taskCount
         assert processRoleRepository.count() == processRoleCount
-        user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
+        user = userService.findByEmail(CUSTOMER_USER_MAIL)
         assert user != null
         assert user.processRoles.size() == 1
 
@@ -161,9 +162,9 @@ class PetriNetServiceTest {
 
     @Test
     void processSearch() {
-        long processCount = petriNetRepository.count()
+        int processCount = (int) petriNetRepository.count()
 
-        def user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
+        def user = userService.findByEmail(CUSTOMER_USER_MAIL)
         assert user != null
         petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         petriNetService.importPetriNet(stream(NET_SEARCH_FILE), VersionType.MAJOR, user.transformToLoggedUser())
@@ -217,5 +218,46 @@ class PetriNetServiceTest {
         search8.setInitials("PST")
         search8.setAuthor(author)
         assert petriNetService.search(search8, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
+    }
+
+    @Test
+    void deleteParentPetriNet() {
+        PetriNet superParentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        Case superParentCase = importHelper.createCase("Super parent case", superParentNet)
+
+        PetriNet parentNetMajor = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        Case parentMajorCase = importHelper.createCase("Parent major case", parentNetMajor)
+
+        PetriNet parentNetMinor = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
+                VersionType.MINOR, superCreator.getLoggedSuper()).getNet()
+        Case parentMinorCase = importHelper.createCase("Parent minor case", parentNetMinor)
+
+        PetriNet childNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/child_extending_parent.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        Case parentChildCase = importHelper.createCase("Child case", childNet)
+
+        petriNetService.deletePetriNet(parentNetMajor.stringId, superCreator.getLoggedSuper())
+        assert petriNetRepository.findById(superParentNet.stringId).isPresent()
+        assert petriNetRepository.findById(parentNetMajor.stringId).isEmpty()
+        assert petriNetRepository.findById(parentNetMinor.stringId).isPresent()
+        assert petriNetRepository.findById(childNet.stringId).isPresent()
+        assert caseRepository.findById(superParentCase.stringId).isPresent()
+        assert caseRepository.findById(parentMajorCase.stringId).isEmpty()
+        assert caseRepository.findById(parentMinorCase.stringId).isPresent()
+        assert caseRepository.findById(parentChildCase.stringId).isPresent()
+
+        petriNetService.deletePetriNet(parentNetMinor.stringId, superCreator.getLoggedSuper())
+        assert petriNetRepository.findById(superParentNet.stringId).isPresent()
+        assert petriNetRepository.findById(parentNetMinor.stringId).isEmpty()
+        assert petriNetRepository.findById(childNet.stringId).isEmpty()
+        assert caseRepository.findById(superParentCase.stringId).isPresent()
+        assert caseRepository.findById(parentMinorCase.stringId).isEmpty()
+        assert caseRepository.findById(parentChildCase.stringId).isEmpty()
+
+        petriNetService.deletePetriNet(superParentNet.stringId, superCreator.getLoggedSuper())
+        assert petriNetRepository.findById(superParentNet.stringId).isEmpty()
+        assert caseRepository.findById(superParentCase.stringId).isEmpty()
     }
 }

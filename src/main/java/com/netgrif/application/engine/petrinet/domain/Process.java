@@ -12,6 +12,8 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermissio
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import lombok.Data;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -19,29 +21,30 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Data
 @Document
+@CompoundIndex(name = "cmp-idx-one", def = "{'identifier': 1, 'version.major': -1, 'version.minor': -1, 'version.patch': -1}")
 public class Process extends ProcessObject {
 
+    @Indexed
     private String identifier;
     private Version version;
-    // TODO: NAE-1969 extends - merge NAE-1973
+    private List<PetriNetIdentifier> parentIdentifiers;
     private I18nString title;
     private String icon;
     private I18nExpression defaultCaseName;
     // TODO: release/8.0.0 - default + anonymous role, roleref
-    private Map<String, Map<ProcessRolePermission, Boolean>> permissions;
-    private Map<ProcessEventType, ProcessEvent> processEvents;
-    private Map<CaseEventType, CaseEvent> caseEvents;
+    private UniqueKeyMap<String, Map<ProcessRolePermission, Boolean>> permissions;
+    private UniqueKeyMap<ProcessEventType, ProcessEvent> processEvents;
+    private UniqueKeyMap<CaseEventType, CaseEvent> caseEvents;
     @DBRef
-    private LinkedHashMap<String, ProcessRole> roles;
+    private UniqueKeyMap<String, ProcessRole> roles;
     private List<Function> functions;
-    private LinkedHashMap<String, Field<?>> dataSet;
-    private LinkedHashMap<String, Transition> transitions;
-    private LinkedHashMap<String, Place> places;
+    private UniqueKeyMap<String, Field<?>> dataSet;
+    private UniqueKeyMap<String, Transition> transitions;
+    private UniqueKeyMap<String, Place> places;
     // TODO: release/8.0.0 save sorted by execution priority
-    private LinkedHashMap<String, List<Arc>> arcs;//todo: import id
-    private Map<String, String> properties;
+    private UniqueKeyMap<String, List<Arc>> arcs;//todo: import id
+    private UniqueKeyMap<String, String> properties;
 
     // TODO: 18. 3. 2017 replace with Spring auditing
     private LocalDateTime creationDate;
@@ -56,17 +59,22 @@ public class Process extends ProcessObject {
         this.importId = "";
         this.version = new Version();
         defaultCaseName = new I18nExpression("");
+        parentIdentifiers = new ArrayList<>();
         creationDate = LocalDateTime.now();
-        places = new LinkedHashMap<>();
-        transitions = new LinkedHashMap<>();
-        arcs = new LinkedHashMap<>();
-        dataSet = new LinkedHashMap<>();
-        roles = new LinkedHashMap<>();
-        processEvents = new LinkedHashMap<>();
-        caseEvents = new LinkedHashMap<>();
-        permissions = new HashMap<>();
+        places = new UniqueKeyMap<>();
+        transitions = new UniqueKeyMap<>();
+        arcs = new UniqueKeyMap<>();
+        dataSet = new UniqueKeyMap<>();
+        roles = new UniqueKeyMap<>();
+        processEvents = new UniqueKeyMap<>();
+        caseEvents = new UniqueKeyMap<>();
+        permissions = new UniqueKeyMap<>();
         functions = new LinkedList<>();
-        properties = new HashMap<>();
+        properties = new UniqueKeyMap<>();
+    }
+
+    public void addParentIdentifier(PetriNetIdentifier identifier) {
+        parentIdentifiers.add(identifier);
     }
 
     public void addPlace(Place place) {
@@ -259,36 +267,37 @@ public class Process extends ProcessObject {
         Process clone = new Process();
         clone.setId(this.id);
         clone.setIdentifier(this.identifier);
+        clone.setParentIdentifiers(this.parentIdentifiers.stream().map(PetriNetIdentifier::clone).collect(Collectors.toList()));
         clone.setUriNodeId(this.uriNodeId);
         clone.setTitle(this.title.clone());
         clone.setDefaultCaseName(this.defaultCaseName == null ? null : this.defaultCaseName.clone());
         clone.setIcon(this.icon);
         clone.setCreationDate(this.creationDate);
         clone.setVersion(this.version == null ? null : this.version.clone());
-        clone.setTransitions(this.transitions == null ? null : this.transitions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, LinkedHashMap::new)));
-        clone.setRoles(this.roles == null ? null : this.roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, LinkedHashMap::new)));
+        clone.setTransitions(this.transitions == null ? null : this.transitions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, UniqueKeyMap::new)));
+        clone.setRoles(this.roles == null ? null : this.roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, UniqueKeyMap::new)));
         clone.setImportXmlPath(this.importXmlPath);
         clone.setImportId(this.importId);
         clone.setDataSet(this.dataSet.entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x, y) -> y, LinkedHashMap::new))
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x,y)->y, UniqueKeyMap::new))
         );
         clone.setPlaces(this.places.entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x, y) -> y, LinkedHashMap::new))
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x,y)->y, UniqueKeyMap::new))
         );
         clone.setArcs(this.arcs.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
                         .map(Arc::clone)
-                        .collect(Collectors.toList()), (x, y) -> y, LinkedHashMap::new))
+                        .collect(Collectors.toList()), (x,y)->y, UniqueKeyMap::new))
         );
         clone.initializeArcs();
         clone.setCaseEvents(this.caseEvents == null ? null : this.caseEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
         clone.setProcessEvents(this.processEvents == null ? null : this.processEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
         clone.setPermissions(this.permissions == null ? null : this.permissions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
         this.getFunctions().forEach(clone::addFunction);
-        clone.setProperties(new HashMap<>(this.properties));
+        clone.setProperties(new UniqueKeyMap<>(this.properties));
         return clone;
     }
 }

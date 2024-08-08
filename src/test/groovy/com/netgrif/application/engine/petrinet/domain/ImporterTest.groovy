@@ -7,6 +7,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
+import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -27,6 +28,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.*
+import static org.junit.jupiter.api.Assertions.assertThrows
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -383,7 +385,108 @@ class ImporterTest {
         assert importNet.getTransition("layout").getTitle().defaultValue == ""
     }
 
-    private boolean equalSet(Set<I18nString> first, Set<I18nString> second) {
+    @Test
+    void importNetWithParent() {
+        PetriNet superParentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        assert superParentNet
+
+        PetriNet parentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        assert parentNet.version == new Version(1, 0, 0)
+
+        parentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
+                VersionType.MINOR, superCreator.getLoggedSuper()).getNet()
+        assert parentNet.version == new Version(1, 1, 0)
+        assert parentNet.parentIdentifiers.size() == 1
+
+        PetriNet childNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/child_extending_parent.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        assert childNet.identifier == "child_extending_parent"
+        assert childNet.title.defaultValue == "Child extending parent"
+        assert childNet.initials == "CEP"
+        assert childNet.creationDate != parentNet.creationDate
+
+        assert childNet.parentIdentifiers.size() == 2
+        assert childNet.parentIdentifiers.get(0).version == superParentNet.version
+        assert childNet.parentIdentifiers.get(0).identifier == superParentNet.identifier
+        assert childNet.parentIdentifiers.get(0).id == superParentNet.id
+        assert childNet.parentIdentifiers.get(1).version == parentNet.version
+        assert childNet.parentIdentifiers.get(1).identifier == parentNet.identifier
+        assert childNet.parentIdentifiers.get(1).id == parentNet.id
+
+        assert childNet.places.size() == 3
+        assert childNet.places.containsKey("p0")
+        assert childNet.places.containsKey("p1")
+        assert childNet.places.containsKey("p2")
+
+        assert childNet.transitions.size() == 4
+        assert childNet.transitions.containsKey("t0")
+        assert childNet.transitions.containsKey("t1")
+        assert childNet.transitions.containsKey("t2")
+        assert childNet.transitions.get("t2").dataSet.containsKey("variable1")
+        assert childNet.transitions.get("t2").dataSet.get("variable1").field != null
+
+        assert childNet.arcs.size() == 3
+        assert childNet.arcs.containsKey("t0")
+        assert childNet.arcs.get("t0").size() == 2
+        assert childNet.arcs.containsKey("t1")
+        assert childNet.arcs.get("t1").size() == 2
+        assert childNet.arcs.containsKey("t2")
+        assert childNet.arcs.get("t2").size() == 1
+
+        assert childNet.dataSet.containsKey("variable0")
+        assert childNet.dataSet.containsKey("variable1")
+        assert childNet.dataSet.containsKey("variable2")
+        assert childNet.dataSet.containsKey("taskref2")
+        assert childNet.dataSet.get("taskref2").defaultValue == ["t0"]
+
+        assert childNet.roles.size() == 3
+        assert childNet.roles.values().find { processRole ->
+            processRole.importId == superParentNet.roles.values().first().importId
+        } != null
+
+        assert childNet.tags.size() == 3
+        assert childNet.tags.containsKey("tag0")
+        assert childNet.tags.containsKey("tag1")
+        assert childNet.tags.containsKey("tag2")
+    }
+
+    @Test
+    void importNetWithNonExistingParent() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/extending_non_existing_parent.xml"),
+                    VersionType.MAJOR, superCreator.getLoggedSuper())
+        })
+    }
+
+    @Test
+    void importNetsWithInvalidExtension() {
+        PetriNet superParentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        assert superParentNet
+
+        PetriNet parentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        assert parentNet
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/extending_with_invalid_extension_1.xml"),
+                    VersionType.MAJOR, superCreator.getLoggedSuper())
+        })
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/extending_with_invalid_extension_2.xml"),
+                    VersionType.MAJOR, superCreator.getLoggedSuper())
+        })
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/extending_with_invalid_extension_3.xml"),
+                    VersionType.MAJOR, superCreator.getLoggedSuper())
+        })
+    }
+
+    private static boolean equalSet(Set<I18nString> first, Set<I18nString> second) {
         return first.every {
             second.any { that -> it.defaultValue == that.defaultValue }
         }
