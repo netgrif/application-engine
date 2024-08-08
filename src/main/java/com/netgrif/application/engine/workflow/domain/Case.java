@@ -18,13 +18,16 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Document
-public class Case {
+public class Case implements Serializable {
+
+    private static final long serialVersionUID = 3687481049847498422L;
 
     @Id
     @Getter
