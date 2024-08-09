@@ -104,7 +104,7 @@ class FileListFieldTest {
     void downloadFileByCaseAndName() {
         PetriNet net = getNet()
 
-        IUser user = userService.findByEmail(configuration.email, true)
+        IUser user = userService.findByEmail(configuration.email)
         assert user != null
 
         CreateCaseParams createCaseParams = CreateCaseParams.with()
@@ -131,7 +131,7 @@ class FileListFieldTest {
     void downloadFileByTask() {
         PetriNet net = getNet()
 
-        IUser user = userService.findByEmail(configuration.email, true)
+        IUser user = userService.findByEmail(configuration.email)
         assert user != null
 
         CreateCaseParams createCaseParams = CreateCaseParams.with()

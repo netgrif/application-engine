@@ -8,13 +8,13 @@
     <data type="text" immediate="true">
         <id>text</id>
         <title>Text</title>
-        <init dynamic="true">userService.findByEmail("super@netgrif.com", true).name</init>
+        <init dynamic="true">userService.findByEmail("super@netgrif.com").name</init>
     </data>
 
     <data type="number" immediate="true">
         <id>number</id>
         <title>number</title>
-        <init dynamic="true">userService.findByEmail("super@netgrif.com", true).name.length()</init>
+        <init dynamic="true">userService.findByEmail("super@netgrif.com").name.length()</init>
     </data>
 
     <data type="date" immediate="true">

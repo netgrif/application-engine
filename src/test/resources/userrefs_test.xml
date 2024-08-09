@@ -89,7 +89,7 @@
                     <action>
                         userList: f.user_list_1,
                         email: f.email;
-                        change userList value { [userService.findByEmail(email.value, true).id] }
+                        change userList value { [userService.findByEmail(email.value).id] }
                     </action>
                 </actions>
             </event>

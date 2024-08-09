@@ -1,5 +1,5 @@
 Long getDummyUser() {
-   return userService.findByEmail("dummy@netgrif.com", true).id
+   return userService.findByEmail("dummy@netgrif.com").id
 }
 
 void debug() {

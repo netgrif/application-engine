@@ -114,7 +114,7 @@ class DataSearchRequestTest {
                 new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert net.getNet() != null
 
-        def users = userService.findAll(true)
+        def users = userService.findAll()
         assert users.size() >= 2
         def testUser1 = users[0]
         def testUser2 = users[1]
