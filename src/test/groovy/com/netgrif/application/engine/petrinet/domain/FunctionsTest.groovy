@@ -100,7 +100,7 @@ class FunctionsTest {
         assert functionResNet
         assert functionTestNet
 
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(functionTestNet)
                 .title("Test")
                 .color("")
@@ -127,7 +127,7 @@ class FunctionsTest {
         assert functionResNet
         assert functionTestNet
 
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(functionTestNet)
                 .title("Test")
                 .color("")
@@ -165,7 +165,7 @@ class FunctionsTest {
                     functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
             assert functionTestNet
 
-            CreateCaseParams createCaseParams = CreateCaseParams.builder()
+            CreateCaseParams createCaseParams = CreateCaseParams.with()
                     .petriNet(functionTestNet)
                     .title("Test")
                     .color("")
@@ -191,7 +191,7 @@ class FunctionsTest {
                     functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
             assert functionTestNet
 
-            CreateCaseParams createCaseParams = CreateCaseParams.builder()
+            CreateCaseParams createCaseParams = CreateCaseParams.with()
                     .petriNet(functionTestNet)
                     .title("Test")
                     .color("")
@@ -217,7 +217,7 @@ class FunctionsTest {
                     functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
             assert functionTestNet
 
-            CreateCaseParams createCaseParams = CreateCaseParams.builder()
+            CreateCaseParams createCaseParams = CreateCaseParams.with()
                     .petriNet(functionTestNet)
                     .title("Test")
                     .color("")
@@ -239,7 +239,7 @@ class FunctionsTest {
         assert functionResNet
         assert functionTestNet
 
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(functionTestNet)
                 .title("Test")
                 .color("")
@@ -278,7 +278,7 @@ class FunctionsTest {
         def functionTestV2Net = petriNetService.importPetriNet(new ImportPetriNetParams(
                 functionTestNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
 
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(functionTestV2Net)
                 .title("Test")
                 .color("")
@@ -316,7 +316,7 @@ class FunctionsTest {
                 resource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
         assert petriNet
 
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(petriNet)
                 .title("Test")
                 .color("")

@@ -43,7 +43,7 @@ class DynamicCaseNameTest {
     void testInitValues() {
         ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new ImportPetriNetParams(
                 new FileInputStream("src/test/resources/petriNets/dynamic_case_name_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(optNet.getNet())
                 .title(null)
                 .color("")
@@ -53,7 +53,7 @@ class DynamicCaseNameTest {
         Case useCase = workflowService.createCase(createCaseParams).getCase()
         assert useCase.title == "SK text value 6"
 
-        CreateCaseParams createCaseParams2 = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams2 = CreateCaseParams.with()
                 .petriNet(optNet.getNet())
                 .title(null)
                 .color("")

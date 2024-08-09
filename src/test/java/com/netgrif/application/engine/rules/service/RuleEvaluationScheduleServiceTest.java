@@ -81,7 +81,7 @@ class RuleEvaluationScheduleServiceTest {
                 .build();
         ruleRepository.save(rule);
 
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(importOutcome.getNet())
                 .title("Original title")
                 .color("original color")

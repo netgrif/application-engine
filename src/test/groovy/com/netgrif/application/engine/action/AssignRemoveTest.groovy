@@ -76,7 +76,7 @@ class AssignRemoveTest {
         def roleCount = userService.system.processRoles.size()
 
         // create
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("TEST")
                 .color("")
@@ -86,7 +86,7 @@ class AssignRemoveTest {
         assert userService.system.processRoles.size() == roleCount + 4
 
         // delete
-        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
                 .useCase(caze)
                 .build()
         workflowService.deleteCase(deleteCaseParams)

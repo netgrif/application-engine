@@ -69,7 +69,7 @@ class HistoryServiceTest {
 
     @Test
     void findAllAssignTaskEventLogsByCaseIdTest() {
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("Test assign")
                 .color("")
@@ -86,7 +86,7 @@ class HistoryServiceTest {
 
     @Test
     void findAllFinishTaskEventLogsByCaseId() {
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("Test finish")
                 .color("")
@@ -105,7 +105,7 @@ class HistoryServiceTest {
 
     @Test
     void findAllSetDataEventLogsByCaseId() {
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("Test set data")
                 .color("")

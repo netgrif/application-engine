@@ -16,7 +16,7 @@ import java.util.function.Function;
  * todo javadoc
  * */
 @Data
-@Builder
+@Builder(builderMethodName = "with")
 public class CreateCaseParams {
 
     private String petriNetId;

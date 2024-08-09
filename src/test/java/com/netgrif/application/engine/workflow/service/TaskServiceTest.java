@@ -95,7 +95,7 @@ public class TaskServiceTest {
         petriNetService.importPetriNet(new ImportPetriNetParams(
                 new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()));
         PetriNet net = petriNetRepository.findAll().get(0);
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("Storage Unit")
                 .color("color")
@@ -109,7 +109,7 @@ public class TaskServiceTest {
         PetriNet net = petriNetService.importPetriNet(new ImportPetriNetParams(
                 new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet();
         LoggedUser loggedUser = mockLoggedUser();
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("Reset test")
                 .color("color")

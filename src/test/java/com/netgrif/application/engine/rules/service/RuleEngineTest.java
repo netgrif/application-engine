@@ -202,7 +202,7 @@ class RuleEngineTest {
         ruleRepository.save(rule3);
         ruleRepository.save(rule4);
 
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(outcome.getNet())
                 .title("Original title")
                 .color("original color")
@@ -387,7 +387,7 @@ class RuleEngineTest {
     private Case newCase() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new ImportPetriNetParams(
                 new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superUser));
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(outcome.getNet())
                 .title("Original title")
                 .color("original color")

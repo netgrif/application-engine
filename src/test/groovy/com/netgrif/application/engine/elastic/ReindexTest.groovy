@@ -58,7 +58,7 @@ class ReindexTest {
         int countTread = Thread.activeCount()
         List<Thread> threads = []
         List<Case> savedCase = []
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net.getNet())
                 .title("Test")
                 .color("color")

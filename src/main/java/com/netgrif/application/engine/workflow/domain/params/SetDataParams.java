@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Data
-@Builder
 @AllArgsConstructor
+@Builder(builderMethodName = "with")
 public class SetDataParams {
 
     private Task task;

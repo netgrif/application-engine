@@ -219,7 +219,7 @@ class ImpersonationServiceTest {
         assert tasks.content[0].stringId == testTask1.stringId
 
         assert taskAuthorizationService.canCallAssign(userService.loggedUserFromContext, testTask1.stringId)
-        TaskParams taskParams = TaskParams.builder()
+        TaskParams taskParams = TaskParams.with()
                 .taskId(testTask1.stringId)
                 .user(userService.loggedUser)
                 .build()
@@ -231,7 +231,7 @@ class ImpersonationServiceTest {
         assert taskAuthorizationService.canCallSaveFile(userService.loggedUserFromContext, testTask1.stringId)
 
         assert taskAuthorizationService.canCallFinish(userService.loggedUserFromContext, testTask1.stringId)
-        taskParams = TaskParams.builder()
+        taskParams = TaskParams.with()
                 .taskId(testTask1.stringId)
                 .user(userService.loggedUser)
                 .build()
@@ -326,12 +326,12 @@ class ImpersonationServiceTest {
         ((MultichoiceMapField) caze.dataSet.get("impersonated_authorities")).options = (caze.dataSet.get("impersonated_authorities").rawValue as List).collectEntries { [(it): new I18nString(it as String)] } as Map<String, I18nString>
         caze = workflowService.save(caze)
         def initTask = caze.getTaskStringId("t2")
-        TaskParams taskParams = TaskParams.builder()
+        TaskParams taskParams = TaskParams.with()
                 .taskId(initTask)
                 .user(userService.system)
                 .build()
         taskService.assignTask(taskParams)
-        taskParams = TaskParams.builder()
+        taskParams = TaskParams.with()
                 .taskId(initTask)
                 .user(userService.system)
                 .build()

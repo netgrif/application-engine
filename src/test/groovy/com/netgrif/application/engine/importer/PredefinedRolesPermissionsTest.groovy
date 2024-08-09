@@ -459,7 +459,7 @@ class PredefinedRolesPermissionsTest {
 
         PetriNet net = importOutcome.getNet()
 
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("")
                 .color("")

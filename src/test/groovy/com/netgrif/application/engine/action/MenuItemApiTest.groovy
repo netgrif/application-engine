@@ -323,7 +323,7 @@ class MenuItemApiTest {
         assert workflowService.findOne(testFolder.stringId) != null
         assert workflowService.findOne(leafItemId) != null
 
-        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
                 .useCase(testFolder)
                 .build()
         workflowService.deleteCase(deleteCaseParams)

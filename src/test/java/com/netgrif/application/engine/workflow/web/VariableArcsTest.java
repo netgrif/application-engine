@@ -128,7 +128,7 @@ public class VariableArcsTest {
 
         List<Arc> arcs = this.loaded.getArcs().values().stream().flatMap(List::stream).collect(Collectors.toList());
         assert !arcs.isEmpty();
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(this.loaded)
                 .title("VARTEST")
                 .color("red")
@@ -157,7 +157,7 @@ public class VariableArcsTest {
     private void assertInhibArcsFinishTask(List<TaskReference> tasks) throws TransitionNotExecutableException {
         for (TaskReference taskRef : tasks) {
             Task task = taskService.findOne(taskRef.getStringId());
-            TaskParams taskParams = TaskParams.builder()
+            TaskParams taskParams = TaskParams.with()
                     .task(task)
                     .user(testUser)
                     .build();
@@ -165,7 +165,7 @@ public class VariableArcsTest {
             finishCase = workflowService.findOne(task.getCaseId());
             assert !finishCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_start") &&
                     !finishCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_res");
-            taskParams = TaskParams.builder()
+            taskParams = TaskParams.with()
                     .task(task)
                     .user(testUser)
                     .build();
@@ -180,7 +180,7 @@ public class VariableArcsTest {
         for (TaskReference taskRef : tasks) {
             Task task = taskService.findOne(taskRef.getStringId());
             int markingBeforeAssign = finishCase.getActivePlaces().get(task.getTitle().getDefaultValue() + "_start");
-            TaskParams taskParams = TaskParams.builder()
+            TaskParams taskParams = TaskParams.with()
                     .task(task)
                     .user(testUser)
                     .build();
@@ -189,7 +189,7 @@ public class VariableArcsTest {
 
             assert markingBeforeAssign == finishCase.getActivePlaces().get(task.getTitle().getDefaultValue() + "_start");
 
-            taskParams = TaskParams.builder()
+            taskParams = TaskParams.with()
                     .task(task)
                     .user(testUser)
                     .build();
@@ -205,7 +205,7 @@ public class VariableArcsTest {
         List<TaskReference> filteredTasks = tasks.stream().filter(task -> task.getTitle().contains(arcType)).collect(Collectors.toList());
         for (TaskReference taskRef : filteredTasks) {
             Task task = taskService.findOne(taskRef.getStringId());
-            TaskParams taskParams = TaskParams.builder()
+            TaskParams taskParams = TaskParams.with()
                     .task(task)
                     .user(testUser)
                     .build();
@@ -215,7 +215,7 @@ public class VariableArcsTest {
             // TODO: release/8.0.0
             assert !finishCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_start");
 
-            taskParams = TaskParams.builder()
+            taskParams = TaskParams.with()
                     .task(task)
                     .user(testUser)
                     .build();
@@ -231,7 +231,7 @@ public class VariableArcsTest {
         List<TaskReference> filteredTasks = tasks.stream().filter(task -> task.getTitle().equals("var_arc_out") || task.getTitle().equals("place_var_arc_out")).collect(Collectors.toList());
         for (TaskReference taskRef : filteredTasks) {
             Task task = taskService.findOne(taskRef.getStringId());
-            TaskParams taskParams = TaskParams.builder()
+            TaskParams taskParams = TaskParams.with()
                     .task(task)
                     .user(testUser)
                     .build();
@@ -240,7 +240,7 @@ public class VariableArcsTest {
 
             assert !finishCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_end");
 
-            taskParams = TaskParams.builder()
+            taskParams = TaskParams.with()
                     .task(task)
                     .user(testUser)
                     .build();
@@ -280,7 +280,7 @@ public class VariableArcsTest {
             if (!arcType.equals("inhib")) {
                 tokensBeforeAssign = cancelCase.getActivePlaces().get(task.getTitle().getDefaultValue() + "_start");
             }
-            TaskParams taskParams = TaskParams.builder()
+            TaskParams taskParams = TaskParams.with()
                     .task(task)
                     .user(testUser)
                     .build();
@@ -302,19 +302,19 @@ public class VariableArcsTest {
             if (task.getTitle().getDefaultValue().contains("ref")) {
                 QTask qTask = new QTask("task");
                 Task addTokensTask = taskService.searchOne(qTask.transitionId.eq("add_tokens").and(qTask.caseId.eq(cancelCase.getStringId())));
-                taskParams = TaskParams.builder()
+                taskParams = TaskParams.with()
                         .task(addTokensTask)
                         .user(testUser)
                         .build();
                 taskService.assignTask(taskParams);
-                taskParams = TaskParams.builder()
+                taskParams = TaskParams.with()
                         .task(addTokensTask)
                         .user(testUser)
                         .build();
                 taskService.finishTask(taskParams);
             }
             int tokensAfterCancel = 0;
-            taskParams = TaskParams.builder()
+            taskParams = TaskParams.with()
                     .task(task)
                     .user(testUser)
                     .build();
@@ -339,12 +339,12 @@ public class VariableArcsTest {
             if (task.getTitle().getDefaultValue().contains("ref")) {
                 QTask qTask = new QTask("task");
                 Task removeTokensTask = taskService.searchOne(qTask.transitionId.eq("remove_tokens").and(qTask.caseId.eq(cancelCase.getStringId())));
-                taskParams = TaskParams.builder()
+                taskParams = TaskParams.with()
                         .task(removeTokensTask)
                         .user(testUser)
                         .build();
                 taskService.assignTask(taskParams);
-                taskParams = TaskParams.builder()
+                taskParams = TaskParams.with()
                         .task(removeTokensTask)
                         .user(testUser)
                         .build();
@@ -358,7 +358,7 @@ public class VariableArcsTest {
         List<TaskReference> filteredTasks = tasks.stream().filter(task -> task.getTitle().equals("var_arc_out") || task.getTitle().equals("place_var_arc_out")).collect(Collectors.toList());
         for (TaskReference taskRef : filteredTasks) {
             Task task = taskService.findOne(taskRef.getStringId());
-            TaskParams taskParams = TaskParams.builder()
+            TaskParams taskParams = TaskParams.with()
                     .task(task)
                     .user(testUser)
                     .build();
@@ -367,7 +367,7 @@ public class VariableArcsTest {
 
             assert !cancelCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_end");
 
-            taskParams = TaskParams.builder()
+            taskParams = TaskParams.with()
                     .task(task)
                     .user(testUser)
                     .build();

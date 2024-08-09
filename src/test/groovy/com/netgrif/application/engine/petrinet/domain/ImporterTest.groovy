@@ -296,7 +296,7 @@ class ImporterTest {
                 new ClassPathResource("/this_kw_test.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
 
         assert net != null
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("Test case")
                 .color("")
@@ -315,7 +315,7 @@ class ImporterTest {
                 new ClassPathResource("/initial_behavior.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
 
         assert net
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("Test case")
                 .color("")

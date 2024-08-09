@@ -49,7 +49,7 @@ class NewInitTest {
     void newInitTest() throws IOException, MissingIconKeyException, MissingPetriNetMetaDataException {
         petriNetService.importPetriNet(new ImportPetriNetParams(
                 new FileInputStream("src/test/resources/petriNets/nae_1276_Init_value_as_choice.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(petriNetService.getNewestVersionByIdentifier("new_init_test"))
                 .title("New init test")
                 .color("")

@@ -87,7 +87,7 @@ class EncryptionTest {
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new ImportPetriNetParams(
                 new FileInputStream("src/test/resources/mapping_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert net.getNet() != null
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net.getNet())
                 .title("Encryption test")
                 .color("color")

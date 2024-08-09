@@ -107,7 +107,7 @@ class FileFieldTest {
         IUser user = userService.findByEmail(configuration.email, true)
         assert user != null
 
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("Test file download")
                 .color("black")
@@ -133,7 +133,7 @@ class FileFieldTest {
         IUser user = userService.findByEmail(configuration.email, true)
         assert user != null
 
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("Test file download")
                 .color("black")

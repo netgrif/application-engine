@@ -77,7 +77,7 @@ public class ImporterTest {
                 new FileInputStream("src/test/resources/priority_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()));
         assert outcome.getNet() != null;
 
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(outcome.getNet())
                 .title(outcome.getNet().getTitle().getDefaultValue())
                 .color("color")

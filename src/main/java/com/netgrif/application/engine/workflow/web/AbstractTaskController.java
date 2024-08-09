@@ -91,7 +91,7 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> assign(LoggedUser loggedUser, String taskId) {
         try {
-            TaskParams taskParams = TaskParams.builder()
+            TaskParams taskParams = TaskParams.with()
                     .taskId(taskId)
                     .user(loggedUser.transformToUser())
                     .build();
@@ -113,7 +113,7 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> finish(LoggedUser loggedUser, String taskId) {
         try {
-            TaskParams taskParams = TaskParams.builder()
+            TaskParams taskParams = TaskParams.with()
                     .taskId(taskId)
                     .user(loggedUser.transformToUser())
                     .build();
@@ -130,7 +130,7 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> cancel(LoggedUser loggedUser, String taskId) {
         try {
-            TaskParams taskParams = TaskParams.builder()
+            TaskParams taskParams = TaskParams.with()
                     .taskId(taskId)
                     .user(loggedUser.transformToUser())
                     .build();

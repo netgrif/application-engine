@@ -53,7 +53,7 @@ class TaskStateTest {
         assert netOptional.isPresent()
         PetriNet net = netOptional.get()
 
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("Test Case")
                 .color("")
@@ -74,7 +74,7 @@ class TaskStateTest {
         assert netOptional.isPresent()
         PetriNet net = netOptional.get()
 
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("Test Case")
                 .color("")

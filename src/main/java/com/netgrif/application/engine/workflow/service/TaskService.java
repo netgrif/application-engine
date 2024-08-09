@@ -137,7 +137,7 @@ public class TaskService implements ITaskService {
         List<AssignTaskEventOutcome> outcomes = new ArrayList<>();
         for (Task task : tasks) {
             outcomes.add(
-                    assignTask(TaskParams.builder()
+                    assignTask(TaskParams.with()
                             .task(task)
                             .user(user)
                             .params(params)
@@ -224,7 +224,7 @@ public class TaskService implements ITaskService {
         List<FinishTaskEventOutcome> outcomes = new ArrayList<>();
         for (Task task : tasks) {
             outcomes.add(
-                    finishTask(TaskParams.builder()
+                    finishTask(TaskParams.with()
                             .task(task)
                             .user(user)
                             .params(params)
@@ -312,7 +312,7 @@ public class TaskService implements ITaskService {
         List<CancelTaskEventOutcome> outcomes = new ArrayList<>();
         for (Task task : tasks) {
             outcomes.add(
-                    cancelTask(TaskParams.builder()
+                    cancelTask(TaskParams.with()
                             .task(task)
                             .user(user)
                             .params(params)

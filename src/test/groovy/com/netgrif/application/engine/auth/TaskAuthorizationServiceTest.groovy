@@ -281,7 +281,7 @@ class TaskAuthorizationServiceTest {
     void testCanAssign() {
         ProcessRole positiveRole = this.net.getRoles().values().find(v -> v.getImportId() == "assign_pos_role")
         userService.addRole(testUser, positiveRole.getStringId())
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("Test assign")
                 .color("")
@@ -290,7 +290,7 @@ class TaskAuthorizationServiceTest {
         Case case_ = workflowService.createCase(createCaseParams).getCase()
         assert taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), case_.getTaskStringId("1"))
         userService.removeRole(testUser, positiveRole.getStringId())
-        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
                 .useCase(case_)
                 .build()
         workflowService.deleteCase(deleteCaseParams)
@@ -300,7 +300,7 @@ class TaskAuthorizationServiceTest {
     void testCanNotAssign() {
         ProcessRole negativeRole = this.net.getRoles().values().find(v -> v.getImportId() == "assign_neg_role")
         userService.addRole(testUser, negativeRole.getStringId())
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("Test assign")
                 .color("")
@@ -309,7 +309,7 @@ class TaskAuthorizationServiceTest {
         Case case_ = workflowService.createCase(createCaseParams).getCase()
         assert !taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), case_.getTaskStringId("1"))
         userService.removeRole(testUser, negativeRole.getStringId())
-        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
                 .useCase(case_)
                 .build()
         workflowService.deleteCase(deleteCaseParams)
@@ -317,7 +317,7 @@ class TaskAuthorizationServiceTest {
 
     @Test
     void testCanAssignWithUsersRef() {
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(netWithUserRefs)
                 .title("Test assign")
                 .color("")
@@ -332,7 +332,7 @@ class TaskAuthorizationServiceTest {
         sleep(4000)
 
         assert taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), taskId)
-        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
                 .useCase(case_)
                 .build()
         workflowService.deleteCase(deleteCaseParams)
@@ -340,7 +340,7 @@ class TaskAuthorizationServiceTest {
 
     @Test
     void testCannotAssignWithUsersRef() {
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(netWithUserRefs)
                 .title("Test assign")
                 .color("")
@@ -361,7 +361,7 @@ class TaskAuthorizationServiceTest {
     void testCanAssignWithNegRoleAndPosUsersRef() {
         ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "assign_pos_role")
         userService.addRole(testUser, positiveRole.getStringId())
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(netWithUserRefs)
                 .title("Test assign")
                 .color("")
@@ -376,7 +376,7 @@ class TaskAuthorizationServiceTest {
 
         assert taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), taskId)
         userService.removeRole(testUser, positiveRole.getStringId())
-        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
                 .useCase(case_)
                 .build()
         workflowService.deleteCase(deleteCaseParams)
@@ -386,7 +386,7 @@ class TaskAuthorizationServiceTest {
     void testCanFinish() {
         ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "finish_pos_role")
         userService.addRole(testUser, positiveRole.getStringId())
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(netWithUserRefs)
                 .title("Test Finish")
                 .color("")
@@ -395,14 +395,14 @@ class TaskAuthorizationServiceTest {
         Case case_ = workflowService.createCase(createCaseParams).getCase()
 
         String taskId = case_.getTaskStringId("1")
-        TaskParams taskParams = TaskParams.builder()
+        TaskParams taskParams = TaskParams.with()
                 .taskId(taskId)
                 .user(testUser)
                 .build()
         taskService.assignTask(taskParams)
         assert taskAuthorizationService.canCallFinish(testUser.transformToLoggedUser(), taskId)
         userService.removeRole(testUser, positiveRole.getStringId())
-        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
                 .useCase(case_)
                 .build()
         workflowService.deleteCase(deleteCaseParams)
@@ -412,7 +412,7 @@ class TaskAuthorizationServiceTest {
     void testCanNotFinish() {
         ProcessRole negativeRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "finish_neg_role")
         userService.addRole(testUser, negativeRole.getStringId())
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(netWithUserRefs)
                 .title("Test Finish")
                 .color("")
@@ -421,14 +421,14 @@ class TaskAuthorizationServiceTest {
         Case case_ = workflowService.createCase(createCaseParams).getCase()
 
         String taskId = case_.getTaskStringId("1")
-        TaskParams taskParams = TaskParams.builder()
+        TaskParams taskParams = TaskParams.with()
                 .taskId(taskId)
                 .user(testUser)
                 .build()
         taskService.assignTask(taskParams)
         assert !taskAuthorizationService.canCallFinish(testUser.transformToLoggedUser(), taskId)
         userService.removeRole(testUser, negativeRole.getStringId())
-        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
                 .useCase(case_)
                 .build()
         workflowService.deleteCase(deleteCaseParams)
@@ -436,7 +436,7 @@ class TaskAuthorizationServiceTest {
 
     @Test
     void testCanFinishWithUsersRef() {
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(netWithUserRefs)
                 .title("Test Finish")
                 .color("")
@@ -449,13 +449,13 @@ class TaskAuthorizationServiceTest {
         ] as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
         sleep(4000)
 
-        TaskParams taskParams = TaskParams.builder()
+        TaskParams taskParams = TaskParams.with()
                 .taskId(taskId)
                 .user(testUser)
                 .build()
         taskService.assignTask(taskParams)
         assert taskAuthorizationService.canCallFinish(testUser.transformToLoggedUser(), taskId)
-        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
                 .useCase(case_)
                 .build()
         workflowService.deleteCase(deleteCaseParams)
@@ -463,7 +463,7 @@ class TaskAuthorizationServiceTest {
 
     @Test
     void testCannotFinishWithUsersRef() {
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(netWithUserRefs)
                 .title("Test Finish")
                 .color("")
@@ -476,13 +476,13 @@ class TaskAuthorizationServiceTest {
         ] as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
         sleep(4000)
 
-        TaskParams taskParams = TaskParams.builder()
+        TaskParams taskParams = TaskParams.with()
                 .taskId(taskId)
                 .user(testUser)
                 .build()
         taskService.assignTask(taskParams)
         assert !taskAuthorizationService.canCallFinish(testUser.transformToLoggedUser(), taskId)
-        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
                 .useCase(case_)
                 .build()
         workflowService.deleteCase(deleteCaseParams)
@@ -492,7 +492,7 @@ class TaskAuthorizationServiceTest {
     void testCanFinishWithNegRoleAndPosUsersRef() {
         ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "finish_pos_role")
         userService.addRole(testUser, positiveRole.getStringId())
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(netWithUserRefs)
                 .title("Test Finish")
                 .color("")
@@ -505,14 +505,14 @@ class TaskAuthorizationServiceTest {
         ] as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
         sleep(4000)
 
-        TaskParams taskParams = TaskParams.builder()
+        TaskParams taskParams = TaskParams.with()
                 .taskId(taskId)
                 .user(testUser)
                 .build()
         taskService.assignTask(taskParams)
         assert taskAuthorizationService.canCallFinish(testUser.transformToLoggedUser(), taskId)
         userService.removeRole(testUser, positiveRole.getStringId())
-        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
                 .useCase(case_)
                 .build()
         workflowService.deleteCase(deleteCaseParams)

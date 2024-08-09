@@ -87,7 +87,7 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Override
     public void createFilterImport(IUser author) {
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNetIdentifier(IMPORT_NET_IDENTIFIER)
                 .title("Import filters " + author.getFullName())
                 .color("")
@@ -98,7 +98,7 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Override
     public void createFilterExport(IUser author) {
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNetIdentifier(EXPORT_NET_IDENTIFIER)
                 .title("Export filters " + author.getFullName())
                 .color("")

@@ -811,7 +811,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNetIdentifier(identifier)
                 .title(title)
                 .color(color)
@@ -822,7 +822,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title(title)
                 .color(color)
@@ -846,7 +846,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     Task assignTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        TaskParams taskParams = TaskParams.builder()
+        TaskParams taskParams = TaskParams.with()
                 .taskId(taskId)
                 .useCase(aCase)
                 .user(user)
@@ -856,7 +856,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     Task assignTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        TaskParams taskParams = TaskParams.builder()
+        TaskParams taskParams = TaskParams.with()
                 .task(task)
                 .user(user)
                 .params(params)
@@ -870,7 +870,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     Task cancelTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        TaskParams taskParams = TaskParams.builder()
+        TaskParams taskParams = TaskParams.with()
                 .taskId(taskId)
                 .useCase(aCase)
                 .user(user)
@@ -880,7 +880,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     Task cancelTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        TaskParams taskParams = TaskParams.builder()
+        TaskParams taskParams = TaskParams.with()
                 .task(task)
                 .user(user)
                 .params(params)
@@ -900,7 +900,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     void finishTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        TaskParams taskParams = TaskParams.builder()
+        TaskParams taskParams = TaskParams.with()
                 .taskId(taskId)
                 .useCase(aCase)
                 .user(user)
@@ -910,7 +910,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     void finishTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        TaskParams taskParams = TaskParams.builder()
+        TaskParams taskParams = TaskParams.with()
                 .task(task)
                 .user(user)
                 .params(params)
@@ -1000,7 +1000,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     SetDataEventOutcome setData(String taskId, DataSet dataSet, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        SetDataParams setDataParams = SetDataParams.builder()
+        SetDataParams setDataParams = SetDataParams.with()
                 .taskId(taskId)
                 .dataSet(dataSet)
                 .user(user)
@@ -1016,7 +1016,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     SetDataEventOutcome setData(String transitionId, Case useCase, DataSet dataSet, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
-        SetDataParams setDataParams = SetDataParams.builder()
+        SetDataParams setDataParams = SetDataParams.with()
                 .task(task)
                 .dataSet(dataSet)
                 .user(user)
@@ -1050,7 +1050,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     Map<String, Field> getData(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         def useCase = workflowService.findOne(task.caseId)
-        GetDataParams getDataParams = GetDataParams.builder()
+        GetDataParams getDataParams = GetDataParams.with()
                 .task(task)
                 .useCase(useCase)
                 .user(user)
@@ -1060,7 +1060,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     Map<String, Field> getData(String taskId, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        GetDataParams getDataParams = GetDataParams.builder()
+        GetDataParams getDataParams = GetDataParams.with()
                 .taskId(taskId)
                 .user(user)
                 .params(params)
@@ -1078,7 +1078,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         if (!task) {
             return new HashMap<String, Field>()
         }
-        GetDataParams getDataParams = GetDataParams.builder()
+        GetDataParams getDataParams = GetDataParams.with()
                 .task(task)
                 .useCase(useCase)
                 .user(user)
@@ -1595,7 +1595,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      * @return
      */
     def deleteFilter(Case filter) {
-        DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
                 .useCase(filter)
                 .build()
         workflowService.deleteCase(deleteCaseParams)
@@ -1917,7 +1917,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      */
     def deleteMenuItem(Case item) {
         async.run {
-            DeleteCaseParams deleteCaseParams = DeleteCaseParams.builder()
+            DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
                     .useCase(item)
                     .build()
             workflowService.deleteCase(deleteCaseParams)

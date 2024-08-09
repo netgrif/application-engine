@@ -248,7 +248,7 @@ public class MenuImportExportService implements IMenuImportExportService {
             });
         }
         //Creating new Case of preference_filter_item net and setting its data...
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(petriNetService.getNewestVersionByIdentifier("preference_filter_item"))
                 .title(item.getEntryName() + "_" + menuIdentifier)
                 .color("")

@@ -30,7 +30,7 @@
             <!-- @formatter:off -->
             caseref: f.caseref;
             def net = petriNetService.getNewestVersionByIdentifier("change_value")
-            def createCaseParams = CreateCaseParams.builder()
+            def createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("")
                 .color("")
@@ -50,7 +50,7 @@
             <!-- @formatter:off -->
             caseref: f.caseref;
             def net = petriNetService.getNewestVersionByIdentifier("test")
-            def createCaseParams = CreateCaseParams.builder()
+            def createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("")
                 .color("")

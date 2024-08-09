@@ -144,7 +144,7 @@ class ImportHelper {
     }
 
     Case createCase(String title, PetriNet net, LoggedUser user) {
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title(title)
                 .color("")

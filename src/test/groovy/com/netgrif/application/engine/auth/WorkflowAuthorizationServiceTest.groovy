@@ -173,7 +173,7 @@ class WorkflowAuthorizationServiceTest {
     void testCanCallDelete() {
         ProcessRole positiveDeleteRole = this.net.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
         userService.addRole(testUser, positiveDeleteRole.getStringId())
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("Test delete")
                 .color("")
@@ -196,7 +196,7 @@ class WorkflowAuthorizationServiceTest {
     void testCanCallDeleteFalse() {
         ProcessRole deleteRole = this.net.getRoles().values().find(v -> v.getImportId() == "delete_neg_role")
         userService.addRole(testUser, deleteRole.getStringId())
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(net)
                 .title("Test delete")
                 .color("")
@@ -216,7 +216,7 @@ class WorkflowAuthorizationServiceTest {
         userService.addRole(testUser, posDeleteRole.getStringId())
         userService.addRole(testUser, negDeleteRole.getStringId())
 
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(netWithUserRefs)
                 .title("Test delete")
                 .color("")
@@ -243,7 +243,7 @@ class WorkflowAuthorizationServiceTest {
         userService.addRole(testUser, posDeleteRole.getStringId())
         userService.addRole(testUser, negDeleteRole.getStringId())
 
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(netWithUserRefs)
                 .title("Test delete")
                 .color("")

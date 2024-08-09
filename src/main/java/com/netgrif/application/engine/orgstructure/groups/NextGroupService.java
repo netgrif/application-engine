@@ -107,7 +107,7 @@ public class NextGroupService implements INextGroupService {
         if (userDefaultGroup != null && userDefaultGroup.getTitle().equals(title)) {
             return null;
         }
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER))
                 .title(title)
                 .color("")

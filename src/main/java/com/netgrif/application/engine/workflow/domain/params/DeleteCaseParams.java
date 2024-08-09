@@ -12,8 +12,8 @@ import java.util.Map;
  * todo javadoc
  * */
 @Data
-@Builder
 @AllArgsConstructor
+@Builder(builderMethodName = "with")
 public class DeleteCaseParams {
 
     private String useCaseId;

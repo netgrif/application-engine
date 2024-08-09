@@ -48,7 +48,7 @@ public class PublicWorkflowController {
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Locale locale) {
         LoggedUser loggedUser = userService.getAnonymousLogged();
         try {
-            CreateCaseParams createCaseParams = CreateCaseParams.builder()
+            CreateCaseParams createCaseParams = CreateCaseParams.with()
                     .petriNetId(body.netId)
                     .title(body.title)
                     .color(body.color)

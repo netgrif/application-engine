@@ -269,7 +269,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
             }
         }
 
-        CreateCaseParams createCaseParams = CreateCaseParams.builder()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
                 .petriNet(filterNet)
                 .title(title)
                 .color(null)
