@@ -60,47 +60,6 @@ class WorkflowServiceTest {
     }
 
     @Test
-    @Disabled
-    // todo remove
-    void testblabla() {
-        def testNetWithTriggers = petriNetService.importPetriNet(new ImportPetriNetParams(
-                stream("petriNets/test_with_triggers.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
-        def testNet = petriNetService.importPetriNet(new ImportPetriNetParams(
-                stream("petriNets/test_without_triggers.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
-
-        int iterations = 200
-        def paramsWithoutTrigger = builder()
-                .petriNet(testNet)
-                .loggedUser(superCreator.getLoggedSuper())
-                .build()
-        def paramsWithTrigger = builder()
-                .petriNet(testNetWithTriggers)
-                .loggedUser(superCreator.getLoggedSuper())
-                .build()
-
-        long totalWithoutTriggers = 0
-        (0..iterations).each {
-            Date startTime = new Date()
-            workflowService.createCase(paramsWithoutTrigger)
-            Date endTime = new Date()
-            TimeDuration elapsedTimeTransactional = TimeCategory.minus( endTime, startTime )
-            totalWithoutTriggers += elapsedTimeTransactional.toMilliseconds()
-        }
-
-        long totalWithTriggers = 0
-        (0..iterations).each {
-            Date startTime = new Date()
-            workflowService.createCase(paramsWithTrigger)
-            Date endTime = new Date()
-            TimeDuration elapsedTimeTransactional = TimeCategory.minus( endTime, startTime )
-            totalWithTriggers += elapsedTimeTransactional.toMilliseconds()
-        }
-
-        println("AVG without triggers for 1 create case: " + totalWithoutTriggers / iterations + "ms")
-        println("AVG with triggers for 1 create case: " + totalWithTriggers / iterations + "ms")
-    }
-
-    @Test
     void testFindOneImmediateData() {
         def testNet = petriNetService.importPetriNet(new ImportPetriNetParams(
                 stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()))
@@ -122,7 +81,7 @@ class WorkflowServiceTest {
         assert testNet
 
         def net = testNet
-        CreateCaseParams createCaseParams = builder()
+        CreateCaseParams createCaseParams = with()
                 .petriNet(net)
                 .title("autoErr")
                 .color("red")
@@ -141,7 +100,7 @@ class WorkflowServiceTest {
         def net = petriNetService.importPetriNet(new ImportPetriNetParams(
                 stream(SECOND_AUTO_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
 
-        CreateCaseParams createCaseParams = builder()
+        CreateCaseParams createCaseParams = with()
                 .petriNet(net)
                 .title("autoErr")
                 .color("red")
@@ -165,7 +124,7 @@ class WorkflowServiceTest {
         assert testNet.getNet() != null
 
         def net = testNet.getNet()
-        CreateCaseParams createCaseParams = builder()
+        CreateCaseParams createCaseParams = with()
                 .petriNet(net)
                 .title(null)
                 .color(null)
@@ -177,7 +136,7 @@ class WorkflowServiceTest {
         assert aCase.title == "Slovenský preklad"
         assert workflowService.findOne(aCase.stringId).uriNodeId == net.uriNodeId
 
-        createCaseParams = builder()
+        createCaseParams = with()
                 .petriNet(net)
                 .title(null)
                 .color(null)
