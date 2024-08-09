@@ -63,7 +63,7 @@ public class SecurityContextService implements ISecurityContextService {
     private void reloadSecurityContext(LoggedUser loggedUser, boolean forceRefresh) {
         if (isUserLogged(loggedUser) && cachedTokens.contains(loggedUser.getId())) {
             if (forceRefresh) {
-                loggedUser = userService.findById(loggedUser.getId(), false).transformToLoggedUser();
+                loggedUser = userService.findById(loggedUser.getId()).transformToLoggedUser();
             }
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedUser, SecurityContextHolder.getContext().getAuthentication().getCredentials(), loggedUser.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(token);

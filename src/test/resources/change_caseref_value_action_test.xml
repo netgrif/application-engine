@@ -29,17 +29,8 @@
         <action trigger="set">
             <!-- @formatter:off -->
             caseref: f.caseref;
-            def net = petriNetService.getNewestVersionByIdentifier("change_value")
-            def createCaseParams = CreateCaseParams.with()
-                .petriNet(net)
-                .title("")
-                .color("")
-                .loggedUser(userService.getLoggedOrSystem().transformToLoggedUser())
-                .build()
-            def newCase = workflowService.createCase(createCaseParams).getACase()
-            def newValue = new ArrayList(caseref.value)
-            newValue.add(newCase)
-            change caseref value {return newValue}
+            def newCase = createCase("change_value")
+            change caseref value {return caseref.rawValue + [newCase.stringId]}
             <!-- @formatter:on -->
         </action>
     </data>
@@ -49,18 +40,9 @@
         <action trigger="set">
             <!-- @formatter:off -->
             caseref: f.caseref;
-            def net = petriNetService.getNewestVersionByIdentifier("test")
-            def createCaseParams = CreateCaseParams.with()
-                .petriNet(net)
-                .title("")
-                .color("")
-                .loggedUser(userService.getLoggedOrSystem().transformToLoggedUser())
-                .build()
-            def newCase = workflowService.createCase(createCaseParams).getACase()
-            def newValue = new ArrayList(caseref.value)
-            newValue.add(newCase)
+            def newCase = createCase("test");
             try {
-                change caseref value {return newValue}
+                change caseref value {return caseref.rawValue + [newCase.stringId]}
             } catch (IllegalArgumentException e) {}
             <!-- @formatter:on -->
         </action>

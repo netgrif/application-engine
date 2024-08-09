@@ -45,9 +45,6 @@ public class UserService extends AbstractUserService {
     protected IRegistrationService registrationService;
 
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
     private GroupConfigurationProperties groupProperties;
 
     @Autowired
@@ -140,7 +137,7 @@ public class UserService extends AbstractUserService {
 
     @Override
     public IUser findByAuth(Authentication auth) {
-        return findByEmail(auth.getName(), false);
+        return findByEmail(auth.getName());
     }
 
     @Override
@@ -149,7 +146,7 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
-    public IUser findById(String id, boolean small) {
+    public IUser findById(String id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) {
             throw new IllegalArgumentException("Could not find user with id [" + id + "]");
@@ -163,29 +160,29 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
-    public IUser resolveById(String id, boolean small) {
-        return findById(id, small);
+    public IUser resolveById(String id) {
+        return findById(id);
     }
 
     @Override
-    public IUser findByEmail(String email, boolean small) {
+    public IUser findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
     @Override
-    public IUser findAnonymousByEmail(String email, boolean small) {
-        return findByEmail(email, small);
+    public IUser findAnonymousByEmail(String email) {
+        return findByEmail(email);
     }
 
 
     @Override
-    public List<IUser> findAll(boolean small) {
+    public List<IUser> findAll() {
         return changeType(userRepository.findAll());
 
     }
 
     @Override
-    public Page<IUser> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable) {
+    public Page<IUser> findAllCoMembers(LoggedUser loggedUser, Pageable pageable) {
         // TODO: 8/27/18 make all pageable
         Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser());
         members.add(loggedUser.getSelfOrImpersonated().getId());
@@ -194,7 +191,7 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
-    public Page<IUser> searchAllCoMembers(String query, LoggedUser loggedUser, Boolean small, Pageable pageable) {
+    public Page<IUser> searchAllCoMembers(String query, LoggedUser loggedUser, Pageable pageable) {
         Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser());
         members.add(loggedUser.getSelfOrImpersonated().getId());
 
@@ -204,9 +201,9 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
-    public Page<IUser> searchAllCoMembers(String query, List<ObjectId> roleIds, List<ObjectId> negateRoleIds, LoggedUser loggedUser, Boolean small, Pageable pageable) {
+    public Page<IUser> searchAllCoMembers(String query, List<ObjectId> roleIds, List<ObjectId> negateRoleIds, LoggedUser loggedUser, Pageable pageable) {
         if ((roleIds == null || roleIds.isEmpty()) && (negateRoleIds == null || negateRoleIds.isEmpty()))
-            return searchAllCoMembers(query, loggedUser, small, pageable);
+            return searchAllCoMembers(query, loggedUser, pageable);
 
         if (negateRoleIds == null) {
             negateRoleIds = new ArrayList<>();
@@ -239,19 +236,19 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
-    public Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
+    public Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, Pageable pageable) {
         Page<User> users = userRepository.findDistinctByStateAndProcessRoles_IdIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
         return changeType(users, pageable);
     }
 
     @Override
-    public List<IUser> findAllByProcessRoles(Set<String> roleIds, boolean small) {
+    public List<IUser> findAllByProcessRoles(Set<String> roleIds) {
         List<User> users = userRepository.findAllByProcessRoles_IdIn(new ArrayList<>(roleIds));
         return changeType(users);
     }
 
     @Override
-    public List<IUser> findAllByIds(Set<String> ids, boolean small) {
+    public List<IUser> findAllByIds(Set<String> ids) {
         List<User> users = userRepository.findAllByIdIn(ids.stream().map(ObjectId::new).collect(Collectors.toSet()));
         return changeType(users);
     }
@@ -297,7 +294,7 @@ public class UserService extends AbstractUserService {
     public IUser getLoggedUser() {
         LoggedUser loggedUser = getLoggedUserFromContext();
         if (!loggedUser.isAnonymous()) {
-            IUser user = findByEmail(loggedUser.getEmail(), false);
+            IUser user = findByEmail(loggedUser.getEmail());
             if (loggedUser.isImpersonating()) {
                 // cannot be simply reloaded from DB, impersonated user holds a subset of roles and authorities.
                 // this reloads the impersonated user's roles as they are not complete (LoggedUser creates incomplete ProcessRole objects)

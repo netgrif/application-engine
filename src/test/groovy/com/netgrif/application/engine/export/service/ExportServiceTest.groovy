@@ -81,7 +81,7 @@ class ExportServiceTest {
     @Order(2)
     void testCaseMongoExport() {
         String exportTask = mainCase.getTaskStringId("t1")
-        IUser user = userService.findByEmail("super@netgrif.com", false)
+        IUser user = userService.findByEmail("super@netgrif.com")
         taskService.assignTask(new TaskParams(exportTask, user))
         File csvFile = new File("src/test/resources/csv/case_mongo_export.csv")
         assert csvFile.readLines().size() == 11
@@ -97,7 +97,7 @@ class ExportServiceTest {
     void testCaseElasticExport() {
         Thread.sleep(5000)  //Elastic wait
         String exportTask = mainCase.getTaskStringId("t2")
-        IUser user = userService.findByEmail("super@netgrif.com", false)
+        IUser user = userService.findByEmail("super@netgrif.com")
         taskService.assignTask(new TaskParams(exportTask, user))
         File csvFile = new File("src/test/resources/csv/case_elastic_export.csv")
         assert csvFile.readLines().size() == 11
@@ -112,7 +112,7 @@ class ExportServiceTest {
     @Order(4)
     void testTaskMongoExport() {
         String exportTask = mainCase.getTaskStringId("t3")
-        IUser user = userService.findByEmail("super@netgrif.com", false)
+        IUser user = userService.findByEmail("super@netgrif.com")
         taskService.assignTask(new TaskParams(exportTask, user))
         File csvFile = new File("src/test/resources/csv/task_mongo_export.csv")
         assert csvFile.readLines().size() == 11
@@ -130,7 +130,7 @@ class ExportServiceTest {
     void testTaskElasticExport() {
         Thread.sleep(10000)  //Elastic wait
         String exportTask = mainCase.getTaskStringId("t4")
-        IUser user = userService.findByEmail("super@netgrif.com", false)
+        IUser user = userService.findByEmail("super@netgrif.com")
         taskService.assignTask(new TaskParams(exportTask, user))
         Thread.sleep(20000)  //Elastic wait
 
@@ -138,7 +138,7 @@ class ExportServiceTest {
         def taskRequest = new ElasticTaskSearchRequest()
         taskRequest.process = [new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(processId)] as List
         taskRequest.transitionId = ["t4"] as List
-        actionDelegate.exportTasksToFile([taskRequest],"src/test/resources/csv/task_elastic_export.csv",null, userService.findByEmail("super@netgrif.com", false).transformToLoggedUser())
+        actionDelegate.exportTasksToFile([taskRequest],"src/test/resources/csv/task_elastic_export.csv",null, userService.findByEmail("super@netgrif.com").transformToLoggedUser())
         File csvFile = new File("src/test/resources/csv/task_elastic_export.csv")
         int count = ((taskRepository.count(QTask.task.processId.eq(processId).and(QTask.task.transitionId.eq("t4"))) as int) + 1)
         assert csvFile.readLines().size() == count
@@ -154,7 +154,7 @@ class ExportServiceTest {
     void buildDefaultCsvTaskHeaderTest(){
         def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
         String exportTask = mainCase.getTaskStringId("t4")
-        IUser user = userService.findByEmail("super@netgrif.com", false)
+        IUser user = userService.findByEmail("super@netgrif.com")
         taskService.assignTask(new TaskParams(exportTask, user))
         List<Task> task = taskRepository.findAll(QTask.task.processId.eq(processId).and(QTask.task.transitionId.eq("t4"))) as List<Task>
         Set<String> header = exportService.buildDefaultCsvTaskHeader(task)

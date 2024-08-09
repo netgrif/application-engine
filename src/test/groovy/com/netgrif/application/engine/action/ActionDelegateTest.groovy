@@ -49,14 +49,6 @@ class ActionDelegateTest {
     }
 
     @Test
-    @Disabled("Context user")
-    void importFiltersTest(){
-        List<String> actionDelegateList = actionDelegate.importFilters()
-        List<String> importedTasksIds = importExportService.importFilters()
-        assert actionDelegateList.size() == importedTasksIds.size()
-    }
-
-    @Test
     void inviteUser(){
         GreenMail smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
         smtpServer.start()

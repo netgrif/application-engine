@@ -463,7 +463,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId, Map<String, String> params) throws TransitionNotExecutableException {
-        IUser delegatedUser = userService.resolveById(delegatedId, true);
+        IUser delegatedUser = userService.resolveById(delegatedId);
         IUser delegateUser = userService.getUserFromLoggedUser(loggedUser);
 
         Optional<Task> taskOptional = taskRepository.findById(taskId);
@@ -957,7 +957,7 @@ public class TaskService implements ITaskService {
                 if (users.containsKey(task.getUserId()))
                     task.setUser(users.get(task.getUserId()));
                 else {
-                    task.setUser(userService.resolveById(task.getUserId(), true));
+                    task.setUser(userService.resolveById(task.getUserId()));
                     users.put(task.getUserId(), task.getUser());
                 }
             }
@@ -991,9 +991,10 @@ public class TaskService implements ITaskService {
     }
 
     private void setUser(Task task) {
-        if (task.getUserId() != null) {
-            task.setUser(userService.resolveById(task.getUserId(), true));
+        if (task.getUserId() == null) {
+            return;
         }
+        task.setUser(userService.resolveById(task.getUserId()));
     }
 
     private EventOutcome addMessageToOutcome(Transition transition, EventType type, TaskEventOutcome outcome) {

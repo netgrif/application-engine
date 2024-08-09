@@ -36,9 +36,9 @@ public class ApplicationEngine {
 
     @Around("execution(* com.netgrif.application.engine.startup.AbstractOrderedCommandLineRunner+.run(..))")
     void logRun(ProceedingJoinPoint joinPoint) throws Throwable {
-        log.info(joinPoint.getTarget().getClass().getSimpleName() + " started");
+        log.info("{} started", joinPoint.getTarget().getClass().getSimpleName());
         joinPoint.proceed();
-        log.info(joinPoint.getTarget().getClass().getSimpleName() + " finished");
+        log.info("{} finished", joinPoint.getTarget().getClass().getSimpleName());
     }
 
     @Bean

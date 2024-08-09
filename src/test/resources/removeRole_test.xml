@@ -15,7 +15,7 @@
             <id>1</id>
             <actions phase="pre">
                 <action>
-                    assignRole("manager")
+                    assignRole("manager", "test", findUserByEmail("test@mail.sk"))
                 </action>
             </actions>
         </event>
@@ -23,7 +23,7 @@
             <id>1</id>
             <actions phase="pre">
                 <action>
-                    removeRole("manager")
+                    removeRole("manager", "test", findUserByEmail("test@mail.sk") )
                 </action>
             </actions>
         </event>

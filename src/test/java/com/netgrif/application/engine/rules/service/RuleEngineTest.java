@@ -74,7 +74,7 @@ class RuleEngineTest {
     @BeforeEach
     public void before() {
         testHelper.truncateDbs();
-        superUser = userService.findByEmail("super@netgrif.com", false).transformToLoggedUser();
+        superUser = userService.findByEmail("super@netgrif.com").transformToLoggedUser();
     }
 
     @AfterEach

@@ -135,7 +135,6 @@ class TaskAuthorizationServiceTest {
 
 
     @Test
-    @Disabled("Assign Test")
     void testTaskAuthorizationService() {
         def tests = [
                 { -> testAssignAuthorization() },

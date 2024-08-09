@@ -43,6 +43,7 @@ public abstract class AbstractUser implements IUser, Serializable {
     }
 
     public void addAuthority(Authority authority) {
+        // TODO: release/8.0.0 is this needed?
         if (authorities.stream().anyMatch(it -> it.getId().equals(authority.getId())))
             return;
         authorities.add(authority);

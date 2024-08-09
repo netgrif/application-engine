@@ -4,12 +4,11 @@ import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserResourceHelperService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.application.engine.auth.web.responsebodies.AuthoritiesResources;
-import com.netgrif.application.engine.auth.web.responsebodies.IUserFactory;
+import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
@@ -63,9 +62,6 @@ public class UserController {
     private IUserService userService;
 
     @Autowired
-    private IUserResourceHelperService userResourceHelperService;
-
-    @Autowired
     private IProcessRoleService processRoleService;
 
     @Autowired
@@ -78,28 +74,24 @@ public class UserController {
     private ServerAuthProperties serverAuthProperties;
 
     @Autowired
-    private IUserFactory userResponseFactory;
-
-    @Autowired
     private Provider<UserResourceAssembler> userResourceAssemblerProvider;
 
     @Autowired
     private ISecurityContextService securityContextService;
 
-    protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
+    protected UserResourceAssembler getUserResourceAssembler(String selfRel) {
         UserResourceAssembler result = userResourceAssemblerProvider.get();
-        result.initialize(locale, small, selfRel);
+        result.initialize(selfRel);
         return result;
     }
 
     @Operation(summary = "Get all users", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<UserResource> getAll(@RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
-        small = small != null && small;
-        Page<IUser> page = userService.findAllCoMembers((LoggedUser) auth.getPrincipal(), small, pageable);
+    public PagedModel<UserResource> getAll(Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
+        Page<IUser> page = userService.findAllCoMembers((LoggedUser) auth.getPrincipal(), pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
-                .getAll(small, pageable, assembler, auth, locale)).withRel("all");
-        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "all"), selfLink);
+                .getAll(pageable, assembler, auth, locale)).withRel("all");
+        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler("all"), selfLink);
         ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
         return resources;
     }
@@ -107,40 +99,37 @@ public class UserController {
 
     @Operation(summary = "Generic user search", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<UserResource> search(@RequestParam(value = "small", required = false) Boolean small, @RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
-        small = small == null ? false : small;
+    public PagedModel<UserResource> search(@RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
         List<ObjectId> roles = query.getRoles() == null ? null : query.getRoles().stream().map(ObjectId::new).collect(Collectors.toList());
         List<ObjectId> negativeRoles = query.getNegativeRoles() == null ? null : query.getNegativeRoles().stream().map(ObjectId::new).collect(Collectors.toList());
         Page<IUser> page = userService.searchAllCoMembers(query.getFulltext(),
                 roles,
                 negativeRoles,
-                (LoggedUser) auth.getPrincipal(), small, pageable);
+                (LoggedUser) auth.getPrincipal(), pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
-                .search(small, query, pageable, assembler, auth, locale)).withRel("search");
-        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "search"), selfLink);
+                .search(query, pageable, assembler, auth, locale)).withRel("search");
+        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler("search"), selfLink);
         ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
         return resources;
     }
 
     @Operation(summary = "Get user by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public UserResource getUser(@PathVariable("id") String userId, @RequestParam(value = "small", required = false) Boolean small, Locale locale) {
-        small = small != null && small;
+    public UserResource getUser(@PathVariable("id") String userId, Locale locale) {
         LoggedUser actualUser = userService.getLoggedUserFromContext();
         LoggedUser loggedUser = actualUser.getSelfOrImpersonated();
         if (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)) {
-            log.info("User " + actualUser.getUsername() + " trying to get another user with ID " + userId);
+            log.info("User {} trying to get another user with ID {}", actualUser.getUsername(), userId);
             throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
         }
-        IUser user = userService.resolveById(userId, small);
-        return new UserResource(small ? userResponseFactory.getSmallUser(user) : userResponseFactory.getUser(user, locale), "profile");
+        IUser user = userService.resolveById(userId);
+        return new UserResource(new User(user), "profile");
     }
 
     @Operation(summary = "Get logged user", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)
-    public UserResource getLoggedUser(@RequestParam(value = "small", required = false) Boolean small, Authentication auth, Locale locale) {
-        small = small != null && small;
-        return userResourceHelperService.getResource((LoggedUser) auth.getPrincipal(), locale, small);
+    public UserResource getLoggedUser(Authentication auth, Locale locale) {
+        return new UserResource(new User(((LoggedUser)auth.getPrincipal()).transformToUser()), "me");
     }
 
     @Operation(summary = "Update user", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -149,7 +138,7 @@ public class UserController {
         if (!serverAuthProperties.isEnableProfileEdit()) return null;
 
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        IUser user = userService.resolveById(userId, false);
+        IUser user = userService.resolveById(userId);
         if (user == null || (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)))
             throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to modify profile of " + user.transformToLoggedUser().getUsername());
 
@@ -159,18 +148,17 @@ public class UserController {
             loggedUser.setFullName(user.getFullName());
             securityContextService.reloadSecurityContext(loggedUser);
         }
-        log.info("Updating user " + user.getEmail() + " with data " + updates.toString());
-        return new UserResource(userResponseFactory.getUser(user, locale), "profile");
+        log.info("Updating user {} with data {}", user.getEmail(), updates.toString());
+        return new UserResource(new User(user), "profile");
     }
 
     @Operation(summary = "Get all users with specified roles", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/role", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<UserResource> getAllWithRole(@RequestBody Set<String> roleIds, @RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Locale locale) {
-        small = small == null ? false : small;
-        Page<IUser> page = userService.findAllActiveByProcessRoles(roleIds, small, pageable);
+    public PagedModel<UserResource> getAllWithRole(@RequestBody Set<String> roleIds, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Locale locale) {
+        Page<IUser> page = userService.findAllActiveByProcessRoles(roleIds, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
-                .getAllWithRole(roleIds, small, pageable, assembler, locale)).withRel("role");
-        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "role"), selfLink);
+                .getAllWithRole(roleIds, pageable, assembler, locale)).withRel("role");
+        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler("role"), selfLink);
         ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
         return resources;
     }
@@ -185,7 +173,7 @@ public class UserController {
     public MessageResource assignRolesToUser(@PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
         try {
             processRoleService.assignRolesToUser(userId, roleIds, (LoggedUser) auth.getPrincipal());
-            log.info("Process roles " + roleIds + " assigned to user " + userId);
+            log.info("Process roles {} assigned to user {}", roleIds, userId);
             return MessageResource.successMessage("Selected roles assigned to user " + userId);
         } catch (IllegalArgumentException e) {
             log.error(e.getMessage());

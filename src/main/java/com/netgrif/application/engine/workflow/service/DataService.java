@@ -166,7 +166,7 @@ public class DataService implements IDataService {
 
         log.info("[{}]: Setting data of task {} [{}]", task.getStringId(), task.getTransitionId(), task.getStringId());
         if (task.getUserId() != null) {
-            task.setUser(userService.findById(task.getUserId(), false));
+            task.setUser(userService.findById(task.getUserId()));
         }
         List<EventOutcome> outcomes = new ArrayList<>();
         for (Map.Entry<String, Field<?>> stringFieldEntry : setDataParams.getDataSet().getFields().entrySet()) {
@@ -775,7 +775,7 @@ public class DataService implements IDataService {
 
     @Override
     public UserFieldValue makeUserFieldValue(String id) {
-        IUser user = userService.resolveById(id, true);
+        IUser user = userService.resolveById(id);
         return new UserFieldValue(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
     }
 

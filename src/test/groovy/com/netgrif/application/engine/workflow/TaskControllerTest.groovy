@@ -198,7 +198,7 @@ class TaskControllerTest {
 
     void setUserListValue() {
         assert task != null
-        String userId = userService.findByEmail(DUMMY_USER_MAIL, false).getStringId()
+        String userId = userService.findByEmail(DUMMY_USER_MAIL).getStringId()
         // TODO: release/8.0.0 field 'performable_users' does not exist
 //        dataService.setData(task.stringId, new DataSet([
 //                "performable_users": new UserListField(rawValue: new UserListFieldValue(dataService.makeUserFieldValue(userId)))
@@ -213,13 +213,13 @@ class TaskControllerTest {
                 this.role = role
             }
         }
-        processRoleService.assignRolesToUser(userService.findByEmail(DUMMY_USER_MAIL, false).getStringId(), [role.id.toString()] as Set, userService.getLoggedOrSystem().transformToLoggedUser())
+        processRoleService.assignRolesToUser(userService.findByEmail(DUMMY_USER_MAIL).getStringId(), [role.id.toString()] as Set, userService.getLoggedOrSystem().transformToLoggedUser())
     }
 
     Page<Task> findTasksByMongo() {
         List<TaskSearchRequest> taskSearchRequestList = new ArrayList<>()
         taskSearchRequestList.add(new TaskSearchRequest())
-        Page<Task> tasks = taskService.search(taskSearchRequestList, new FullPageRequest(), userService.findByEmail(DUMMY_USER_MAIL, false).transformToLoggedUser(), new Locale("en"), false)
+        Page<Task> tasks = taskService.search(taskSearchRequestList, new FullPageRequest(), userService.findByEmail(DUMMY_USER_MAIL).transformToLoggedUser(), new Locale("en"), false)
         return tasks
     }
 }

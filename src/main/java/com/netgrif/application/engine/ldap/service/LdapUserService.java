@@ -31,7 +31,7 @@ public class LdapUserService extends UserService {
     }
 
     @Override
-    public IUser findByEmail(String email, boolean small) {
+    public IUser findByEmail(String email) {
         IUser user = userRepository.findByEmail(email);
         if (user instanceof LdapUser && (((LdapUser) user).getMemberOf() != null && !(((LdapUser) user).getMemberOf().isEmpty()))) {
             ldapGroupRefService.getProcessRoleByLdapGroup(((LdapUser) user).getMemberOf()).forEach(user::addProcessRole);

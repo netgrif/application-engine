@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.action
 
+import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
@@ -16,20 +17,22 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import groovy.json.JsonOutput
-import groovy.transform.CompileStatic
 import org.junit.Assert
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
+import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
@@ -45,10 +48,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
-@SpringBootTest
-@CompileStatic
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        classes = ApplicationEngine.class
+)
+@AutoConfigureMockMvc
+@TestPropertySource(
+        locations = "classpath:application-test.properties"
+)
 class RemoveActionTest {
-
 
     public static final String USER_EMAIL = "test@mail.sk"
     public static final String USER_PASSWORD = "password"
@@ -105,24 +113,16 @@ class RemoveActionTest {
         this.petriNet = net.getNet()
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
-    }
-
-    private void cleanDatabases() {
-        template.db.drop()
-        userRepository.deleteAll()
-        processRoleRepository.deleteAll()
+        auth = new UsernamePasswordAuthenticationToken(configuration.email, configuration.password)
+        auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
     }
 
     @Test
-    @Disabled(" GroovyRuntime Could not find matching")
     void addAndRemoveRole() {
         User user = userRepository.findByEmail(USER_EMAIL)
-        auth = new UsernamePasswordAuthenticationToken(configuration.email, configuration.password)
-
         String adminRoleId = petriNet.getRoles().find { it.value.name.defaultValue == "admin" }.key
 
         //Has no role, we assign role admin

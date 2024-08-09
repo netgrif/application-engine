@@ -2,8 +2,8 @@ package com.netgrif.application.engine.impersonation.web;
 
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserResourceHelperService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.impersonation.exceptions.IllegalImpersonationAttemptException;
@@ -51,14 +51,11 @@ public class ImpersonationController {
     protected IUserService userService;
 
     @Autowired
-    protected IUserResourceHelperService userResourceHelperService;
-
-    @Autowired
     protected Provider<UserResourceAssembler> userResourceAssemblerProvider;
 
-    protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
+    protected UserResourceAssembler getUserResourceAssembler(String selfRel) {
         UserResourceAssembler result = userResourceAssemblerProvider.get();
-        result.initialize(locale, small, selfRel);
+        result.initialize(selfRel);
         return result;
     }
 
@@ -69,7 +66,7 @@ public class ImpersonationController {
         Page<IUser> page = impersonationAuthorizationService.getConfiguredImpersonationUsers(request.getQuery(), loggedUser, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ImpersonationController.class)
                 .getImpersonationUserOptions(request, pageable, assembler, auth, locale)).withRel("all");
-        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, false, "all"), selfLink);
+        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler("all"), selfLink);
         ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
         return resources;
     }
@@ -82,7 +79,7 @@ public class ImpersonationController {
             throw new IllegalImpersonationAttemptException(loggedUser, configId);
         }
         loggedUser = impersonationService.impersonateByConfig(configId);
-        return userResourceHelperService.getResource(loggedUser, locale, false);
+        return new UserResource(new User(loggedUser.transformToUser()), "");
     }
 
     @Operation(summary = "Impersonate user directly by id", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -93,14 +90,14 @@ public class ImpersonationController {
             throw new IllegalImpersonationAttemptException(loggedUser, userId);
         }
         loggedUser = impersonationService.impersonateUser(userId);
-        return userResourceHelperService.getResource(loggedUser, locale, false);
+        return new UserResource(new User(loggedUser.transformToUser()), "");
     }
 
     @Operation(summary = "Stop impersonating currently impersonated user", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping("/clear")
     public UserResource endImpersonation(Locale locale) {
         LoggedUser loggedUser = impersonationService.endImpersonation();
-        return userResourceHelperService.getResource(loggedUser, locale, false);
+        return new UserResource(new User(loggedUser.transformToUser()), "");
     }
 
 }

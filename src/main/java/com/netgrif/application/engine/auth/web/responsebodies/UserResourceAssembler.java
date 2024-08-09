@@ -8,22 +8,15 @@ import java.util.Locale;
 
 public class UserResourceAssembler implements RepresentationModelAssembler<IUser, UserResource> {
 
-    @Autowired
-    private IUserFactory userFactory;
-
-    private Locale locale;
     private String selfRel;
-    private boolean small;
 
     private boolean initialized = false;
 
     public UserResourceAssembler() {
     }
 
-    public void initialize(Locale locale, boolean small, String selfRel) {
-        this.locale = locale;
+    public void initialize(String selfRel) {
         this.selfRel = selfRel;
-        this.small = small;
         this.initialized = true;
     }
 
@@ -33,6 +26,6 @@ public class UserResourceAssembler implements RepresentationModelAssembler<IUser
             throw new IllegalStateException("You must initialize the UserResourceAssembler before calling the toResource method! To initialize the assembler call the initialize method.");
         }
 
-        return new UserResource(small ? userFactory.getSmallUser(entity) : userFactory.getUser(entity, locale), selfRel);
+        return new UserResource(new User(entity), selfRel);
     }
 }

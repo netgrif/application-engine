@@ -12,22 +12,26 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.startup.SystemUserRunner
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.TaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import com.netgrif.application.engine.workflow.service.TaskService
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
+@TestPropertySource(
+        locations = "classpath:application-test.properties"
+)
 class EventTest {
 
     public static final String EVENT_NET_FILE = "event_test.xml"
@@ -81,9 +85,7 @@ class EventTest {
     Case instance
     TaskEventOutcome outcome
 
-
     @Test
-    @Disabled
     void testEventImport() {
         testHelper.truncateDbs()
 
@@ -103,35 +105,36 @@ class EventTest {
     }
 
     private void assertAssignOutcome() {
-        assertActionsRuned("${EVENT_NET_TASK}_assign", "Uloha priradena")
+        asserOutcome("${EVENT_NET_TASK}_assign", "Task assigned")
     }
 
     private void assertFinishOutcome() {
-        assertActionsRuned("${EVENT_NET_TASK}_finish", "Uloha zrobena")
+        asserOutcome("${EVENT_NET_TASK}_finish", "Task finished")
     }
 
     private void assertCancelOutcome() {
-        assertActionsRuned("${EVENT_NET_TASK}_cancel", "Uloha vzrusena")
-        assert outcome.data.flatten().changedFields["chained"]["value"] == "chained"
+        asserOutcome("${EVENT_NET_TASK}_cancel", "Task cancelled")
+        SetDataEventOutcome preDataChange = outcome.outcomes.get(0).outcomes.get(0) as SetDataEventOutcome
+        SetDataEventOutcome chainedDataChange = preDataChange.outcomes.get(0).outcomes.get(0) as SetDataEventOutcome
+        assert chainedDataChange.changedFields.get('chained').rawValue == "chained"
     }
 
-    private void assertActionsRuned(String fieldIdWithoutPhase, String message) {
+    private void asserOutcome(String fieldIdWithoutPhase, String message) {
         def instanceOptional = caseRepository.findById(instance.stringId)
 
         assert instanceOptional.isPresent()
         instance = instanceOptional.get()
 
-        assert instance.dataSet["${fieldIdWithoutPhase}_pre" as String].value as String == "${fieldIdWithoutPhase}_pre"
-        assert instance.dataSet["${fieldIdWithoutPhase}_post" as String].value as String == "${fieldIdWithoutPhase}_post"
+        assert instance.dataSet.get("${fieldIdWithoutPhase}_pre" as String).rawValue == "${fieldIdWithoutPhase}_pre"
+        assert instance.dataSet.get("${fieldIdWithoutPhase}_post" as String).rawValue == "${fieldIdWithoutPhase}_post"
 
         assert outcome.message.defaultValue == message
-//        assert outcome.data.flatten().changedFields["${fieldIdWithoutPhase}_pre" as String]
-//        assert outcome.data.flatten().changedFields["${fieldIdWithoutPhase}_post" as String]
 
-//        outcome.getOutcomes().each{ SetDataEventOutcome eventOutcome ->
-//            eventOutcome.getChangedFields().
-//        }
-
-
+        SetDataEventOutcome preDataChange = outcome.outcomes.get(0).outcomes.get(0) as SetDataEventOutcome
+        SetDataEventOutcome postDataChange = outcome.outcomes.get(1).outcomes.get(0) as SetDataEventOutcome
+        assert preDataChange.changedFields.get("${fieldIdWithoutPhase}_pre" as String)
+        assert preDataChange.changedFields.get("${fieldIdWithoutPhase}_pre" as String).rawValue == "${fieldIdWithoutPhase}_pre"
+        assert postDataChange.changedFields.get("${fieldIdWithoutPhase}_post" as String)
+        assert postDataChange.changedFields.get("${fieldIdWithoutPhase}_post" as String).rawValue == "${fieldIdWithoutPhase}_post"
     }
 }

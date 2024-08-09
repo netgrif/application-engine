@@ -90,7 +90,7 @@ class FunctionsTest {
 
     @Test
     void testNamespaceFunction() {
-        assert userService.findByEmail("test@test.com", true) == null
+        assert userService.findByEmail("test@test.com") == null
 
         def functionResNet = petriNetService.importPetriNet(new ImportPetriNetParams(
                 functionResNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())).getNet()
@@ -110,7 +110,7 @@ class FunctionsTest {
         dataService.setData(new SetDataParams(aCase.getTaskStringId("1"),
                 new DataSet(["createUser": new BooleanField(rawValue: true)] as Map<String, Field<?>>), superCreator.getSuperUser()))
 
-        IUser user = userService.findByEmail("test@test.com", true)
+        IUser user = userService.findByEmail("test@test.com")
         assert user
 
         userService.deleteUser(user)

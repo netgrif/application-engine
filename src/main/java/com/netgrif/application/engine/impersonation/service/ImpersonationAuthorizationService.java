@@ -26,7 +26,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -56,14 +55,14 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     @Override
     public Page<IUser> getConfiguredImpersonationUsers(String query, LoggedUser impersonator, Pageable pageable) {
         if (impersonator.isAdmin()) {
-            return userService.searchAllCoMembers(query, null, null, impersonator, true, pageable);
+            return userService.searchAllCoMembers(query, impersonator, pageable);
 
         } else {
             Page<Case> cases = searchConfigs(impersonator.getId(), pageable);
             List<IUser> users = cases.getContent().stream()
                     .map(c -> ((UserFieldValue) c.getDataSet().get("impersonated").getRawValue()).getId())
                     .distinct()
-                    .map(id -> userService.findById(id, true))
+                    .map(id -> userService.findById(id))
                     .collect(Collectors.toList());
             return new PageImpl<>(users, pageable, cases.getTotalElements());
         }
@@ -77,7 +76,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
 
     @Override
     public boolean canImpersonateUser(LoggedUser impersonator, String userId) {
-        IUser impersonated = userService.findById(userId, true);
+        IUser impersonated = userService.findById(userId);
         return impersonator.isAdmin() || !searchConfigs(impersonator.getId(), impersonated.getStringId()).isEmpty();
     }
 

@@ -82,7 +82,7 @@ class SecurityContextTest {
 
         // situation 1
         processRoleService.assignRolesToUser(user.getStringId(), roleIds, superCreator.getLoggedSuper())
-        IUser updatedUser = userService.findById(user.getStringId(), false)
+        IUser updatedUser = userService.findById(user.getStringId())
         Set<String> updatedUserRoles = updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
         assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles() != updatedUserRoles
 

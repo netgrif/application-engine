@@ -55,7 +55,7 @@ public abstract class AbstractUserService implements IUserService {
 
     @Override
     public IUser assignAuthority(String userId, String authorityId) {
-        IUser user = resolveById(userId, true);
+        IUser user = resolveById(userId);
         Authority authority = authorityService.getOne(authorityId);
         user.addAuthority(authority);
         authority.addUser(user);
@@ -101,7 +101,7 @@ public abstract class AbstractUserService implements IUserService {
 
     @Override
     public void removeRoleOfDeletedPetriNet(PetriNet net) {
-        List<IUser> users = findAllByProcessRoles(net.getRoles().keySet(), false);
+        List<IUser> users = findAllByProcessRoles(net.getRoles().keySet());
         users.forEach(u -> {
             net.getRoles().forEach((k, role) -> removeRole(u, role));
         });
@@ -128,7 +128,7 @@ public abstract class AbstractUserService implements IUserService {
 
     @Override
     public IUser getUserFromLoggedUser(LoggedUser loggedUser) {
-        IUser user = resolveById(loggedUser.getId(), true);
+        IUser user = resolveById(loggedUser.getId());
         IUser fromLogged = loggedUser.transformToUser();
         user.setImpersonated(fromLogged.getImpersonated());
         return user;
