@@ -107,7 +107,12 @@ public class TaskService implements ITaskService {
     private IRuleEngine ruleEngine;
 
     /**
-     * todo javadoc
+     * Executes provided {@link Task} in provided {@link Case}
+     *
+     * @param task Task to be executed
+     * @param useCase Case where the task exists
+     *
+     * @return list of outcomes from the triggered events during the task execution
      * */
     @Override
     public List<EventOutcome> executeTask(Task task, Case useCase) {
@@ -130,7 +135,13 @@ public class TaskService implements ITaskService {
     }
 
     /**
-     * todo javadoc
+     * Assigns all provided tasks by provided user.
+     *
+     * @param tasks list of tasks to be assigned
+     * @param user assignee of the tasks
+     * @param params additional parameters for the assign task event
+     *
+     * @return list of outcomes of the assign events. The order is the same as the order of the provided list of tasks
      * */
     @Override
     public List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, IUser user, Map<String, String> params) throws TransitionNotExecutableException {
@@ -148,7 +159,17 @@ public class TaskService implements ITaskService {
     }
 
     /**
-     * todo javadoc
+     * Assigns the {@link Task} by provided parameters
+     *
+     * @param taskParams parameters to determine the Task to be assigned
+     * <br>
+     * <b>Required parameters</b>
+     * <ul>
+     *      <li>taskId or task</li>
+     *      <li>user</li>
+     * </ul>
+     *
+     * @return outcome of the assign event
      * */
     @Override
     public AssignTaskEventOutcome assignTask(TaskParams taskParams) throws TransitionNotExecutableException {
@@ -219,6 +240,15 @@ public class TaskService implements ITaskService {
         return new DoEventTaskOutcome(task, useCase);
     }
 
+    /**
+     * Finishes all provided tasks by provided user.
+     *
+     * @param tasks list of tasks to be finished
+     * @param user assignee of the tasks
+     * @param params additional parameters for the finish task event
+     *
+     * @return list of outcomes of the finish events. The order is the same as the order of the provided list of tasks
+     * */
     @Override
     public List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, IUser user, Map<String, String> params) throws TransitionNotExecutableException {
         List<FinishTaskEventOutcome> outcomes = new ArrayList<>();
@@ -235,7 +265,17 @@ public class TaskService implements ITaskService {
     }
 
     /**
-     * todo javadoc
+     * Finishes the {@link Task} by provided parameters
+     *
+     * @param taskParams parameters to determine the Task to be finished
+     * <br>
+     * <b>Required parameters</b>
+     * <ul>
+     *      <li>taskId or task</li>
+     *      <li>user</li>
+     * </ul>
+     *
+     * @return outcome of the finish event
      * */
     @Override
     public FinishTaskEventOutcome finishTask(TaskParams taskParams) throws TransitionNotExecutableException {
@@ -307,6 +347,15 @@ public class TaskService implements ITaskService {
         return new DoEventTaskOutcome(task, useCase);
     }
 
+    /**
+     * Cancels all provided tasks by provided user.
+     *
+     * @param tasks list of tasks to be canceled
+     * @param user by which the task is canceled
+     * @param params additional parameters for the cancel task event
+     *
+     * @return list of outcomes of the cancel events. The order is the same as the order of the provided list of tasks
+     * */
     @Override
     public List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, IUser user, Map<String, String> params) {
         List<CancelTaskEventOutcome> outcomes = new ArrayList<>();
@@ -323,7 +372,17 @@ public class TaskService implements ITaskService {
     }
 
     /**
-     * todo javadoc
+     * Cancels the {@link Task} by provided parameters
+     *
+     * @param taskParams parameters to determine the Task to be canceled
+     * <br>
+     * <b>Required parameters</b>
+     * <ul>
+     *      <li>taskId or task</li>
+     *      <li>user</li>
+     * </ul>
+     *
+     * @return outcome of the cancel event
      * */
     @Override
     public CancelTaskEventOutcome cancelTask(TaskParams taskParams) {
@@ -471,19 +530,11 @@ public class TaskService implements ITaskService {
     }
 
     /**
-     * todo javadoc
-     * Reloads all unassigned tasks of given case:
-     * <table border="1">
-     * <tr>
-     * <td></td><td>Task is present</td><td>Task is not present</td>
-     * </tr>
-     * <tr>
-     * <td>Transition executable</td><td>no action</td><td>create task</td>
-     * </tr>
-     * <tr>
-     * <td>Transition not executable</td><td>destroy task</td><td>no action</td>
-     * </tr>
-     * </table>
+     * Updates the {@link State} of all the {@link Task} objects of the provided {@link Case}
+     *
+     * @param useCase Case where the tasks exist, which are updated
+     *
+     * @return true if at least one auto-trigger Task was executed.
      */
     @Override
     public boolean reloadTasks(Case useCase) {
@@ -503,7 +554,13 @@ public class TaskService implements ITaskService {
     }
 
     /**
-     * todo javadoc
+     * Updates {@link State} of the provided tasks, that exist in provided {@link Case}. Only tasks with the changed
+     * state are updated in database.
+     *
+     * @param tasks list of tasks to be updated
+     * @param useCase Case object where the tasks exist
+     *
+     * @return optional auto-trigger task, that is not yet executed.
      * */
     private Optional<Task> reloadAndSaveTasks(List<Task> tasks, Case useCase) {
         Task autoTriggered = null;
@@ -525,7 +582,13 @@ public class TaskService implements ITaskService {
     }
 
     /**
-     * todo javadoc
+     * For every {@link Transition} in {@link PetriNet} is created {@link Task} and saved into provided {@link Case}.
+     * Tasks are saved into database by {@link #reloadAndSaveTasks(List, Case)}. UseCase is not saved into database by
+     * this method.
+     *
+     * @param useCase Case object, where the new tasks are saved. It must contain {@link Case#getPetriNet()} initialized.
+     *
+     * @return created tasks and auto-trigger task as optional. Auto-trigger task is within the tasks collection
      * */
     @Override
     public CreateTasksOutcome createAndSetTasksInCase(Case useCase) {
@@ -541,7 +604,13 @@ public class TaskService implements ITaskService {
     }
 
     /**
-     * todo javadoc
+     * Creates the {@link Task} object by the provided {@link Transition} and {@link Case}. Task is not saved in database
+     * and Case object.
+     *
+     * @param transition transition, from which the Task is created
+     * @param useCase Case, where the created Task should be later saved
+     *
+     * @return created Task
      * */
     private Task createTaskFromTransition(Transition transition, Case useCase) {
         final Task task = Task.with()
@@ -600,8 +669,13 @@ public class TaskService implements ITaskService {
 
 
     /**
-     * todo javadoc
-     * returns true if it is autotrigger
+     * Updates the {@link State} of provided {@link Task}. The state depends on {@link #isExecutable(Transition, PetriNet)}
+     *
+     * @param task Task, where the state might be updated
+     * @param transition transition, by which the execution is determined
+     * @param net petriNet, by which the execution is determined
+     *
+     * @return boolean value if the state was updated and if the task must be executed
      * */
     private UpdateTaskStateOutcome updateStateOfTask(Task task, Transition transition, PetriNet net) {
         if (isExecutable(transition, net)) {

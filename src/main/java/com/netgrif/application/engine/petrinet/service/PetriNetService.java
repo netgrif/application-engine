@@ -179,7 +179,18 @@ public class PetriNetService implements IPetriNetService {
     }
 
     /**
-     * todo javadoc
+     * Creates {@link PetriNet} and saves it into database.
+     *
+     * @param importPetriNetParams parameters for PetriNet creation
+     * <br>
+     * <b>Required parameters</b>
+     * <ul>
+     *      <li>xmlFile</li>
+     *      <li>releaseType</li>
+     *      <li>author</li>
+     * </ul>
+     *
+     * @return outcome containing the created PetriNet
      * */
     @Override
     public ImportPetriNetEventOutcome importPetriNet(ImportPetriNetParams importPetriNetParams) throws IOException,
@@ -209,7 +220,8 @@ public class PetriNetService implements IPetriNetService {
         log.info("Petri net {} ({} v{}) imported successfully and saved in a folder: {}", net.getTitle(), net.getInitials(),
                 net.getVersion(), savedPath.toString());
 
-        outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), importPetriNetParams.getParams()));
+        outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(),
+                importPetriNetParams.getParams()));
         boolean wasSaved = evaluateRules(net, EventPhase.PRE);
 
         historyService.save(new ImportPetriNetEventLog(null, EventPhase.PRE, net.getObjectId()));
@@ -218,7 +230,8 @@ public class PetriNetService implements IPetriNetService {
             save(net);
         }
 
-        outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), importPetriNetParams.getParams()));
+        outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(),
+                importPetriNetParams.getParams()));
         evaluateRules(net, EventPhase.POST);
 
         historyService.save(new ImportPetriNetEventLog(null, EventPhase.POST, net.getObjectId()));

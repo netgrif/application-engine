@@ -8,9 +8,6 @@ import lombok.Data;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * todo javadoc
- * */
 @Data
 @AllArgsConstructor
 @Builder(builderMethodName = "with")
@@ -32,14 +29,9 @@ public class DeleteCaseParams {
         this.useCaseId = useCaseId;
     }
 
-    /**
-     * todo javadoc
-     * Builder extension of the {@link Builder} implementation for {@link }. Containing additional logic over the native builder
-     * implementation
-     * */
     public static class DeleteCaseParamsBuilder {
         /**
-         * todo javadoc
+         * Sets the {@link #useCase} and {@link #useCaseId}
          * */
         public DeleteCaseParams.DeleteCaseParamsBuilder useCase(Case useCase) {
             this.useCase = useCase;

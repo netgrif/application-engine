@@ -12,9 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 
-/**
- * todo javadoc
- * */
+
 @Data
 @Builder(builderMethodName = "with")
 public class CreateCaseParams {
@@ -31,14 +29,9 @@ public class CreateCaseParams {
     @Builder.Default
     private Map<String, String> params = new HashMap<>();
 
-    /**
-     * todo javadoc
-     * Builder extension of the {@link Builder} implementation for {@link }. Containing additional logic over the native builder
-     * implementation
-     * */
     public static class CreateCaseParamsBuilder {
         /**
-         * todo javadoc
+         * Sets the {@link #title} and {@link #makeTitle} as well
          * */
         public CreateCaseParams.CreateCaseParamsBuilder title(String title) {
             this.title = title;
@@ -51,7 +44,7 @@ public class CreateCaseParams {
         }
 
         /**
-         * todo javadoc
+         * Sets the {@link #petriNet} as clone, {@link #petriNetIdentifier} and {@link #petriNetId}
          * */
         public CreateCaseParams.CreateCaseParamsBuilder petriNet(PetriNet petriNet) {
             this.petriNet = petriNet.clone();

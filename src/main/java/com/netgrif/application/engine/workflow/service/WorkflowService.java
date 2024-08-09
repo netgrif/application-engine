@@ -199,7 +199,19 @@ public class WorkflowService implements IWorkflowService {
     }
 
     /**
-     * todo javadoc
+     * Create {@link Case} object as {@link CreateCaseEventOutcome} by provided parameters as {@link CreateCaseParams}.
+     * Created object is saved into database along with the tasks. Any {@link Task}, that should be executed at the
+     * object creation is executed (auto-trigger tasks).
+     *
+     * @param createCaseParams parameters for {@link Case} creation
+     * <br>
+     * <b>Required parameters:</b>
+     * <ul>
+     *     <li>petriNet or petriNetIdentifier or petriNetId</li>
+     *     <li>loggedUser</li>
+     * </ul>
+     *
+     * @return outcome with up to date {@link} Case object containing sub-outcomes as result of triggered events
      * */
     @Override
     public CreateCaseEventOutcome createCase(CreateCaseParams createCaseParams) {
@@ -252,7 +264,11 @@ public class WorkflowService implements IWorkflowService {
     }
 
     /**
-     * todo javadoc
+     * Creates pure {@link Case} object without any {@link Task} object initialized.
+     *
+     * @param createCaseParams parameters for object creation
+     *
+     * @return created {@link Case} object
      * */
     private Case createCaseObject(CreateCaseParams createCaseParams) {
         LoggedUser loggedOrImpersonated = createCaseParams.getLoggedUser().getSelfOrImpersonated();
@@ -270,10 +286,6 @@ public class WorkflowService implements IWorkflowService {
         return useCase;
     }
 
-    /**
-     * todo javadoc
-     * makeTitle, petriNet
-     * */
     private void fillMissingAttributes(CreateCaseParams createCaseParams) throws IllegalArgumentException {
         if (createCaseParams.getLoggedUser() == null) {
             throw new IllegalArgumentException("Logged user cannot be null on Case creation.");
@@ -321,7 +333,16 @@ public class WorkflowService implements IWorkflowService {
     }
 
     /**
-     * todo javadoc
+     * Deletes the {@link Case} object from database by provided parameters as {@link DeleteCaseParams}
+     *
+     * @param deleteCaseParams parameters to determine the object to be deleted
+     * <br>
+     * <b>Required parameters</b>
+     * <ul>
+     *      <li>useCaseId or useCase</li>
+     * </ul>
+     *
+     * @return outcome with the removed {@link Case} object and sub-outcomes as result of triggered events
      * */
     @Override
     public DeleteCaseEventOutcome deleteCase(DeleteCaseParams deleteCaseParams) {
@@ -350,9 +371,6 @@ public class WorkflowService implements IWorkflowService {
         return outcome;
     }
 
-    /**
-     * todo javadoc
-     * */
     private void fillMissingAttributes(DeleteCaseParams deleteCaseParams) throws IllegalArgumentException {
         if (deleteCaseParams.getUseCase() == null) {
             if (deleteCaseParams.getUseCaseId() != null) {

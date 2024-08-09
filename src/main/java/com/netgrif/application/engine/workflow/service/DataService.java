@@ -86,7 +86,17 @@ public class DataService implements IDataService {
     private boolean validationEnable;
 
     /**
-     * todo javadoc
+     * Gets the data of the {@link Task} provided by {@link GetDataParams}
+     *
+     * @param getDataParams parameters where the Task is specified
+     * <br>
+     * <b>Required parameters</b>
+     * <ul>
+     *      <li>taskId or task</li>
+     *      <li>user</li>
+     * </ul>
+     *
+     * @return outcome containing the fields present in Task
      * */
     @Override
     public GetDataEventOutcome getData(GetDataParams getDataParams) {
@@ -148,9 +158,6 @@ public class DataService implements IDataService {
         }
     }
 
-    /**
-     * todo javadoc
-     * */
     @Override
     public SetDataEventOutcome setData(SetDataParams setDataParams) {
         fillMissingAttributes(setDataParams);
