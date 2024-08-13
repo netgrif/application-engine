@@ -75,12 +75,12 @@ userComparisons: idComparison
 idComparison: ID SPACE stringComparison ;
 titleComparison: TITLE SPACE stringComparison ;
 identifierComparison: IDENTIFIER SPACE stringComparison ;
-versionComparison: VERSION SPACE (EQ | LT | GT | LTE | GTE) SPACE VERSION_NUMBER ;
+versionComparison: VERSION SPACE op=(EQ | LT | GT | LTE | GTE) SPACE VERSION_NUMBER ;
 creationDateComparison: CREATION_DATE SPACE (dateComparison | dateTimeComparison) ; // todo NAE-1997: date/datetime?
 processIdComparison: PROCESS_ID SPACE stringComparison ;
 authorComparison: AUTHOR SPACE stringComparison ;
 transitionIdComparison: TRANSITION_ID SPACE stringComparison ;
-stateComparison: STATE SPACE stringComparison ;
+stateComparison: STATE SPACE EQ state=(ENABLED | DISABLED) ;
 userIdComparison: USER_ID SPACE stringComparison ;
 caseIdComparison: CASE_ID SPACE stringComparison ;
 lastAssignComparison: LAST_ASSIGN SPACE (dateComparison | dateTimeComparison) ; // todo NAE-1997: date/datetime?
@@ -93,10 +93,10 @@ placesComparison: places SPACE numberComparison ;
 tasksComparison: tasks SPACE stringComparison ;
 
 // basic comparisons
-stringComparison: (EQ | CONTAINS) SPACE STRING ;
-numberComparison: (EQ | LT | GT | LTE | GTE) SPACE NUMBER ;
-dateComparison: (EQ | LT | GT | LTE | GTE) SPACE DATE ;
-dateTimeComparison: (EQ | LT | GT | LTE | GTE) SPACE DATETIME ;
+stringComparison: op=(EQ | CONTAINS) SPACE STRING ;
+numberComparison: op=(EQ | LT | GT | LTE | GTE) SPACE NUMBER ;
+dateComparison: op=(EQ | LT | GT | LTE | GTE) SPACE DATE ;
+dateTimeComparison: op=(EQ | LT | GT | LTE | GTE) SPACE DATETIME ;
 booleanComparison: EQ SPACE BOOLEAN ;
 
 // special attribute rules
@@ -148,6 +148,8 @@ DATA: D A T A ;
 VALUE: V A L U E ;
 OPTIONS: O P T I O N S ;
 MARKING: M A R K I N G ;
+ENABLED: E N A B L E D ;
+DISABLED: D I S A B L E D ;
 
 // basic types
 LIST: '[' SPACE? ((STRING | NUMBER) SPACE? (',' SPACE? (STRING | NUMBER) SPACE? )* )? SPACE? ']' ;
