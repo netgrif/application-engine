@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.search;
 
 import com.netgrif.application.engine.antlr4.QueryLangBaseVisitor;
-import com.netgrif.application.engine.antlr4.QueryLangLexer;
 import com.netgrif.application.engine.antlr4.QueryLangParser;
 import com.netgrif.application.engine.auth.domain.QUser;
 import com.netgrif.application.engine.petrinet.domain.QPetriNet;
@@ -10,11 +9,19 @@ import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.domain.State;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.StringPath;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
+import lombok.Getter;
+import org.antlr.v4.runtime.Token;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
+@Getter
 public class QueryLangMongoEvaluator extends QueryLangBaseVisitor<Predicate> {
 
     private QueryType type;
@@ -45,18 +52,16 @@ public class QueryLangMongoEvaluator extends QueryLangBaseVisitor<Predicate> {
 
     @Override
     public Predicate visitProcessOrExpression(QueryLangParser.ProcessOrExpressionContext ctx) {
-        if (ctx.processAndExpression().size() > 1) {
-//            return visit(ctx.processAndExpression(0)) | visit(ctx.processAndExpression(1)); // todo NAE-1997: Operator '|' cannot be applied to 'com. querydsl. core. types. Predicate', 'com. querydsl. core. types. Predicate'
-        }
-        return visit(ctx.processAndExpression(0));
+        BooleanBuilder builder = new BooleanBuilder();
+        ctx.processAndExpression().forEach(processAndExpressionContext -> builder.or(visit(processAndExpressionContext)));
+        return builder;
     }
 
     @Override
     public Predicate visitProcessAndExpression(QueryLangParser.ProcessAndExpressionContext ctx) {
-        if (ctx.processConditionGroup().size() > 1) {
-//            return visit(ctx.processConditionGroup(0)) & visit(ctx.processConditionGroup(1)); // todo NAE-1997: Operator '|' cannot be applied to 'com. querydsl. core. types. Predicate', 'com. querydsl. core. types. Predicate'
-        }
-        return visit(ctx.processConditionGroup(0));
+        BooleanBuilder builder = new BooleanBuilder();
+        ctx.processConditionGroup().forEach(processConditionGroupContext -> builder.and(visit(processConditionGroupContext)));
+        return builder;
     }
 
     @Override
@@ -77,18 +82,16 @@ public class QueryLangMongoEvaluator extends QueryLangBaseVisitor<Predicate> {
 
     @Override
     public Predicate visitCaseOrExpression(QueryLangParser.CaseOrExpressionContext ctx) {
-        if (ctx.caseAndExpression().size() > 1) {
-//            return visit(ctx.caseAndExpression(0)) | visit(ctx.caseAndExpression(1)); // todo NAE-1997: Operator '|' cannot be applied to 'com. querydsl. core. types. Predicate', 'com. querydsl. core. types. Predicate'
-        }
-        return visit(ctx.caseAndExpression(0));
+        BooleanBuilder builder = new BooleanBuilder();
+        ctx.caseAndExpression().forEach(caseAndExpressionContext -> builder.or(visit(caseAndExpressionContext)));
+        return builder;
     }
 
     @Override
     public Predicate visitCaseAndExpression(QueryLangParser.CaseAndExpressionContext ctx) {
-        if (ctx.caseConditionGroup().size() > 1) {
-//            return visit(ctx.caseConditionGroup(0)) & visit(ctx.caseConditionGroup(1)); // todo NAE-1997: Operator '|' cannot be applied to 'com. querydsl. core. types. Predicate', 'com. querydsl. core. types. Predicate'
-        }
-        return visit(ctx.caseConditionGroup(0));
+        BooleanBuilder builder = new BooleanBuilder();
+        ctx.caseConditionGroup().forEach(caseConditionGroupContext -> builder.and(visit(caseConditionGroupContext)));
+        return builder;
     }
 
     @Override
@@ -109,18 +112,16 @@ public class QueryLangMongoEvaluator extends QueryLangBaseVisitor<Predicate> {
 
     @Override
     public Predicate visitTaskOrExpression(QueryLangParser.TaskOrExpressionContext ctx) {
-        if (ctx.taskAndExpression().size() > 1) {
-//            return visit(ctx.taskAndExpression(0)) | visit(ctx.taskAndExpression(1)); // todo NAE-1997: Operator '|' cannot be applied to 'com. querydsl. core. types. Predicate', 'com. querydsl. core. types. Predicate'
-        }
-        return visit(ctx.taskAndExpression(0));
+        BooleanBuilder builder = new BooleanBuilder();
+        ctx.taskAndExpression().forEach(taskAndExpressionContext -> builder.or(visit(taskAndExpressionContext)));
+        return builder;
     }
 
     @Override
     public Predicate visitTaskAndExpression(QueryLangParser.TaskAndExpressionContext ctx) {
-        if (ctx.taskConditionGroup().size() > 1) {
-//            return visit(ctx.taskConditionGroup(0)) & visit(ctx.taskConditionGroup(1)); // todo NAE-1997: Operator '|' cannot be applied to 'com. querydsl. core. types. Predicate', 'com. querydsl. core. types. Predicate'
-        }
-        return visit(ctx.taskConditionGroup(0));
+        BooleanBuilder builder = new BooleanBuilder();
+        ctx.taskConditionGroup().forEach(taskConditionGroupContext -> builder.and(visit(taskConditionGroupContext)));
+        return builder;
     }
 
     @Override
@@ -141,18 +142,16 @@ public class QueryLangMongoEvaluator extends QueryLangBaseVisitor<Predicate> {
 
     @Override
     public Predicate visitUserOrExpression(QueryLangParser.UserOrExpressionContext ctx) {
-        if (ctx.userAndExpression().size() > 1) {
-//            return visit(ctx.userAndExpression(0)) | visit(ctx.userAndExpression(1)); // todo NAE-1997: Operator '|' cannot be applied to 'com. querydsl. core. types. Predicate', 'com. querydsl. core. types. Predicate'
-        }
-        return visit(ctx.userAndExpression(0));
+        BooleanBuilder builder = new BooleanBuilder();
+        ctx.userAndExpression().forEach(userAndExpressionContext -> builder.or(visit(userAndExpressionContext)));
+        return builder;
     }
 
     @Override
     public Predicate visitUserAndExpression(QueryLangParser.UserAndExpressionContext ctx) {
-        if (ctx.userConditionGroup().size() > 1) {
-//            return visit(ctx.userConditionGroup(0)) & visit(ctx.userConditionGroup(1)); // todo NAE-1997: Operator '|' cannot be applied to 'com. querydsl. core. types. Predicate', 'com. querydsl. core. types. Predicate'
-        }
-        return visit(ctx.userConditionGroup(0));
+        BooleanBuilder builder = new BooleanBuilder();
+        ctx.userConditionGroup().forEach(userConditionGroupContext -> builder.and(visit(userConditionGroupContext)));
+        return builder;
     }
 
     @Override
@@ -188,9 +187,8 @@ public class QueryLangMongoEvaluator extends QueryLangBaseVisitor<Predicate> {
                 stringPath = QUser.user.stringId;
                 break;
             default:
-                throw new UnsupportedOperationException();
+                throw new IllegalArgumentException("Search by id is not available for type " + type.name());
         }
-        String string = ctx.stringComparison().STRING().getText();
 
         return evaluateStringComparison(stringPath, ctx.stringComparison());
     }
@@ -209,9 +207,8 @@ public class QueryLangMongoEvaluator extends QueryLangBaseVisitor<Predicate> {
                 stringPath = QTask.task.title.defaultValue;
                 break;
             default:
-                throw new UnsupportedOperationException();
+                throw new IllegalArgumentException("Search by title is not available for type " + type.name());
         }
-        String string = ctx.stringComparison().STRING().getText();
 
         return evaluateStringComparison(stringPath, ctx.stringComparison());
     }
@@ -219,7 +216,6 @@ public class QueryLangMongoEvaluator extends QueryLangBaseVisitor<Predicate> {
     @Override
     public Predicate visitIdentifierComparison(QueryLangParser.IdentifierComparisonContext ctx) {
         StringPath stringPath = QPetriNet.petriNet.identifier;
-        String string = ctx.stringComparison().STRING().getText();
 
         return evaluateStringComparison(stringPath, ctx.stringComparison());
     }
@@ -255,13 +251,24 @@ public class QueryLangMongoEvaluator extends QueryLangBaseVisitor<Predicate> {
                         .or(qVersion.major.eq(major).and(qVersion.minor.eq(minor).and(qVersion.patch.lt(patch))))
                         .or(qVersion.eq(new Version(major, minor, patch)));
         }
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Operator " + ctx.op.getText() + " is not available for version comparison");
     }
 
     @Override
     public Predicate visitCreationDateComparison(QueryLangParser.CreationDateComparisonContext ctx) {
-        // todo NAE-1997: implement date/datetime comparison
-        return super.visitCreationDateComparison(ctx);
+        DateTimePath<LocalDateTime> dateTimePath;
+        switch (type) {
+            case PROCESS:
+                dateTimePath = QPetriNet.petriNet.creationDate;
+                break;
+            case CASE:
+                dateTimePath = QCase.case$.creationDate;
+                break;
+            default:
+                throw new IllegalArgumentException("Search by creation date is not available for type " + type.name());
+        }
+
+        return evaluateDateOrDateTimeComparison(dateTimePath, ctx.dateComparison(), ctx.dateTimeComparison());
     }
 
     @Override
@@ -275,9 +282,8 @@ public class QueryLangMongoEvaluator extends QueryLangBaseVisitor<Predicate> {
                 stringPath = QTask.task.processId;
                 break;
             default:
-                throw new UnsupportedOperationException();
+                throw new IllegalArgumentException("Search by process id is not available for type " + type.name());
         }
-        String string = ctx.stringComparison().STRING().getText();
 
         return evaluateStringComparison(stringPath, ctx.stringComparison());
     }
@@ -285,7 +291,6 @@ public class QueryLangMongoEvaluator extends QueryLangBaseVisitor<Predicate> {
     @Override
     public Predicate visitAuthorComparison(QueryLangParser.AuthorComparisonContext ctx) {
         StringPath stringPath = QCase.case$.author.id;
-        String string = ctx.stringComparison().STRING().getText();
 
         return evaluateStringComparison(stringPath, ctx.stringComparison());
     }
@@ -293,7 +298,6 @@ public class QueryLangMongoEvaluator extends QueryLangBaseVisitor<Predicate> {
     @Override
     public Predicate visitTransitionIdComparison(QueryLangParser.TransitionIdComparisonContext ctx) {
         StringPath stringPath = QTask.task.transitionId;
-        String string = ctx.stringComparison().STRING().getText();
 
         return evaluateStringComparison(stringPath, ctx.stringComparison());
     }
@@ -307,13 +311,12 @@ public class QueryLangMongoEvaluator extends QueryLangBaseVisitor<Predicate> {
                 return QTask.task.state.eq(State.DISABLED);
         }
 
-        throw new UnsupportedOperationException();
+        throw new IllegalArgumentException("Invalid task state: " + ctx.state.getType());
     }
 
     @Override
     public Predicate visitUserIdComparison(QueryLangParser.UserIdComparisonContext ctx) {
         StringPath stringPath = QTask.task.userId;
-        String string = ctx.stringComparison().STRING().getText();
 
         return evaluateStringComparison(stringPath, ctx.stringComparison());
     }
@@ -321,27 +324,27 @@ public class QueryLangMongoEvaluator extends QueryLangBaseVisitor<Predicate> {
     @Override
     public Predicate visitCaseIdComparison(QueryLangParser.CaseIdComparisonContext ctx) {
         StringPath stringPath = QTask.task.caseId;
-        String string = ctx.stringComparison().STRING().getText();
 
         return evaluateStringComparison(stringPath, ctx.stringComparison());
     }
 
     @Override
     public Predicate visitLastAssignComparison(QueryLangParser.LastAssignComparisonContext ctx) {
-        // todo NAE-1997: implement date/datetime comparison
-        return super.visitLastAssignComparison(ctx);
+        DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastAssigned;
+
+        return evaluateDateOrDateTimeComparison(dateTimePath, ctx.dateComparison(), ctx.dateTimeComparison());
     }
 
     @Override
     public Predicate visitLastFinishComparison(QueryLangParser.LastFinishComparisonContext ctx) {
-        // todo NAE-1997: implement date/datetime comparison
-        return super.visitLastFinishComparison(ctx);
+        DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastFinished;
+
+        return evaluateDateOrDateTimeComparison(dateTimePath, ctx.dateComparison(), ctx.dateTimeComparison());
     }
 
     @Override
     public Predicate visitNameComparison(QueryLangParser.NameComparisonContext ctx) {
         StringPath stringPath = QUser.user.name;
-        String string = ctx.stringComparison().STRING().getText();
 
         return evaluateStringComparison(stringPath, ctx.stringComparison());
     }
@@ -349,7 +352,6 @@ public class QueryLangMongoEvaluator extends QueryLangBaseVisitor<Predicate> {
     @Override
     public Predicate visitSurnameComparison(QueryLangParser.SurnameComparisonContext ctx) {
         StringPath stringPath = QUser.user.surname;
-        String string = ctx.stringComparison().STRING().getText();
 
         return evaluateStringComparison(stringPath, ctx.stringComparison());
     }
@@ -357,25 +359,24 @@ public class QueryLangMongoEvaluator extends QueryLangBaseVisitor<Predicate> {
     @Override
     public Predicate visitEmailComparison(QueryLangParser.EmailComparisonContext ctx) {
         StringPath stringPath = QUser.user.email;
-        String string = ctx.stringComparison().STRING().getText();
 
         return evaluateStringComparison(stringPath, ctx.stringComparison());
     }
 
     @Override
     public Predicate visitDataComparison(QueryLangParser.DataComparisonContext ctx) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Case search by data is not available for MongoDB");
     }
 
     @Override
     public Predicate visitPlacesComparison(QueryLangParser.PlacesComparisonContext ctx) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Case search by place is not available for MongoDB");
 
     }
 
     @Override
     public Predicate visitTasksComparison(QueryLangParser.TasksComparisonContext ctx) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Case search by tasks is not available for MongoDB");
     }
 
     private static Predicate evaluateStringComparison(StringPath stringPath, QueryLangParser.StringComparisonContext ctx) {
@@ -387,6 +388,46 @@ public class QueryLangMongoEvaluator extends QueryLangBaseVisitor<Predicate> {
                 return stringPath.contains(string);
         }
 
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Operator " + ctx.op.getText() + " is not available for string comparison");
+    }
+
+    private static Predicate evaluateDateOrDateTimeComparison(DateTimePath<LocalDateTime> dateTimePath, QueryLangParser.DateComparisonContext dateComparisonContext, QueryLangParser.DateTimeComparisonContext dateTimeComparisonContext) {
+        if (dateComparisonContext != null) {
+            return getDateTimePredicate(dateTimePath, dateComparisonContext.op, dateComparisonContext.DATE().getText());
+        } else if (dateTimeComparisonContext != null) {
+            return getDateTimePredicate(dateTimePath, dateTimeComparisonContext.op, dateTimeComparisonContext.DATETIME().getText());
+        }
+        throw new IllegalArgumentException("Date or date time comparison expected");
+    }
+
+    private static Predicate getDateTimePredicate(DateTimePath<LocalDateTime> dateTimePath, Token op, String input) {
+        LocalDateTime localDateTime = getLocalDateTime(input);
+
+        switch (op.getType()) {
+            case QueryLangParser.EQ:
+                return dateTimePath.eq(localDateTime);
+            case QueryLangParser.LT:
+                return dateTimePath.lt(localDateTime);
+            case QueryLangParser.LTE:
+                return dateTimePath.lt(localDateTime).or(dateTimePath.eq(localDateTime));
+            case QueryLangParser.GT:
+                return dateTimePath.gt(localDateTime);
+            case QueryLangParser.GTE:
+                return dateTimePath.gt(localDateTime).or(dateTimePath.eq(localDateTime));
+        }
+
+        throw new UnsupportedOperationException("Operator " + op.getText() + " is not available for date/datetime comparison");
+    }
+
+    private static LocalDateTime getLocalDateTime(String input) {
+        try {
+            return LocalDateTime.parse(input, DateTimeFormatter.ofPattern(SearchService.DATE_TIME_PATTERN));
+        } catch (DateTimeParseException ignored) {
+            try {
+                return LocalDate.parse(input, DateTimeFormatter.ofPattern(SearchService.DATE_PATTERN)).atStartOfDay();
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("Invalid date/datetime format");
+            }
+        }
     }
 }

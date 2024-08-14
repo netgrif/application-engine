@@ -64,6 +64,7 @@
         <drools.version>7.70.0.Final</drools.version>
         <sonar.organization>netgrif-oss</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <antlr4.version>4.13.1</antlr4.version>
     </properties>
 
     <repositories>
@@ -510,7 +511,7 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
-            <version>4.13.1</version>
+            <version>${antlr4.version}</version>
         </dependency>
 
     </dependencies>
@@ -790,7 +791,7 @@
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.7.1</version>
+                <version>${antlr4.version}</version>
                 <configuration>
                     <sourceDirectory>src/main/java</sourceDirectory>
                     <outputDirectory>${project.build.directory}/generated-sources/java/</outputDirectory>
