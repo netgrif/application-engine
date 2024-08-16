@@ -58,7 +58,11 @@ public class JwtService implements IJwtService {
 
     @Override
     public Boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        try {
+            return extractExpiration(token).before(new Date());
+        } catch (ExpiredJwtException e) {
+            return false;
+        }
     }
 
     @Override

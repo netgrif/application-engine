@@ -39,9 +39,9 @@ public class TaskEventHandler extends AbstractMongoEventListener<Task> {
             return;
         }
 
-        ObjectId objectId = document.getObjectId("_id");
-        if (objectId != null) {
-            service.remove(objectId.toString());
+        if (document.get("_id") != null) {
+            String objectId = ((Document)document.get("_id")).get("shortProcessId") + "-" + ((Document)document.get("_id")).get("objectId").toString();
+            service.remove(objectId);
             return;
         }
 

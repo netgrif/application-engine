@@ -409,7 +409,8 @@ public class TaskService implements ITaskService {
         IUser delegatedUser = userService.resolveById(delegatedId, true);
         IUser delegateUser = getUserFromLoggedUser(loggedUser);
 
-        Optional<Task> taskOptional = taskRepository.findById(taskId);
+        ObjectId objectId = extractObjectId(taskId);
+        Optional<Task> taskOptional = taskRepository.findByIdObjectId(objectId);
         if (taskOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         }
@@ -494,7 +495,8 @@ public class TaskService implements ITaskService {
             } else {
                 if (taskId != null) {
                     // task exists - delete task if not assigned
-                    Optional<Task> optionalTask = taskRepository.findById(taskId);
+                    ObjectId objectId = extractObjectId(taskId);
+                    Optional<Task> optionalTask = taskRepository.findByIdObjectId(objectId);
                     if (optionalTask.isEmpty()) {
                         continue;
                     }
@@ -785,8 +787,9 @@ public class TaskService implements ITaskService {
     @Override
     public void resolveUserRef(Case useCase) {
         useCase.getTasks().forEach(taskPair -> {
-            Optional<Task> taskOptional = taskRepository.findById(taskPair.getTask());
-            taskOptional.ifPresent(task -> resolveUserRef(task, useCase));
+            ObjectId objectId = extractObjectId(taskPair.getTask());
+            Optional<Task> optionalTask = taskRepository.findByIdObjectId(objectId);
+            optionalTask.ifPresent(task -> resolveUserRef(task, useCase));
         });
 
     }
@@ -945,5 +948,15 @@ public class TaskService implements ITaskService {
         IUser fromLogged = loggedUser.transformToUser();
         user.setImpersonated(fromLogged.getImpersonated());
         return user;
+    }
+
+    private ObjectId extractObjectId(String taskId) {
+        String[] parts = taskId.split("-");
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Invalid NetgrifId format: " + taskId);
+        }
+        String objectIdPart = parts[1];
+
+        return new ObjectId(objectIdPart);
     }
 }

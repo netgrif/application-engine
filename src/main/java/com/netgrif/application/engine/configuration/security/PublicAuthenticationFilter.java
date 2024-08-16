@@ -110,7 +110,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
                 "Anonymous"
         );
         anonymousUser.setState(UserState.ACTIVE);
-        userService.saveNewAnonymous(anonymousUser);
+        anonymousUser = userService.saveNewAnonymous(anonymousUser);
         return anonymousUser.transformToLoggedUser();
     }
 
