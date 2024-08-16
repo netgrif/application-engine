@@ -1,11 +1,10 @@
 grammar QueryLang;
 
-query: (processQuery | caseQuery | taskQuery | userQuery) EOF ;
-
-processQuery: (PROCESS | PROCESSES) delimeter processConditions ;
-caseQuery: (CASE | CASES) delimeter caseConditions ;
-taskQuery: (TASK | TASKS) delimeter taskConditions ;
-userQuery: (USER | USERS) delimeter userConditions ;
+query: resource=(PROCESS | PROCESSES) delimeter processConditions EOF # processQuery
+     | resource=(CASE | CASES) delimeter caseConditions EOF # caseQuery
+     | resource=(TASK | TASKS) delimeter taskConditions EOF # taskQuery
+     | resource=(USER | USERS) delimeter userConditions EOF # userQuery
+     ;
 
 processConditions: processOrExpression ;
 processOrExpression: processAndExpression (SPACE OR SPACE processAndExpression)* ;
@@ -76,19 +75,30 @@ idComparison: ID SPACE stringComparison ;
 titleComparison: TITLE SPACE stringComparison ;
 identifierComparison: IDENTIFIER SPACE stringComparison ;
 versionComparison: VERSION SPACE op=(EQ | LT | GT | LTE | GTE) SPACE VERSION_NUMBER ;
-creationDateComparison: CREATION_DATE SPACE (dateComparison | dateTimeComparison) ; // todo NAE-1997: date/datetime?
+creationDateComparison: CREATION_DATE SPACE dateComparison # cdDate
+                      | CREATION_DATE SPACE dateTimeComparison # cdDateTime
+                      ; // todo NAE-1997: date/datetime?
 processIdComparison: PROCESS_ID SPACE stringComparison ;
 authorComparison: AUTHOR SPACE stringComparison ;
 transitionIdComparison: TRANSITION_ID SPACE stringComparison ;
 stateComparison: STATE SPACE EQ state=(ENABLED | DISABLED) ;
 userIdComparison: USER_ID SPACE stringComparison ;
 caseIdComparison: CASE_ID SPACE stringComparison ;
-lastAssignComparison: LAST_ASSIGN SPACE (dateComparison | dateTimeComparison) ; // todo NAE-1997: date/datetime?
-lastFinishComparison: LAST_FINISH SPACE (dateComparison | dateTimeComparison) ; // todo NAE-1997: date/datetime?
+lastAssignComparison: LAST_ASSIGN SPACE dateComparison # laDate
+                    | LAST_ASSIGN SPACE dateTimeComparison # laDateTime
+                    ; // todo NAE-1997: date/datetime?
+lastFinishComparison: LAST_FINISH SPACE dateComparison # lfDate
+                    | LAST_FINISH SPACE dateTimeComparison # lfDateTime
+                    ; // todo NAE-1997: date/datetime?
 nameComparison: NAME SPACE stringComparison ;
 surnameComparison: SURNAME SPACE stringComparison ;
 emailComparison: EMAIL SPACE stringComparison ;
-dataComparison: data SPACE (stringComparison | numberComparison | dateComparison | dateTimeComparison | booleanComparison) ;
+dataComparison: data SPACE stringComparison # dataString
+              | data SPACE numberComparison # dataNumber
+              | data SPACE dateComparison # dataDate
+              | data SPACE dateTimeComparison # dataDatetime
+              | data SPACE booleanComparison # dataBoolean
+              ;
 placesComparison: places SPACE numberComparison ;
 tasksComparison: tasks SPACE stringComparison ;
 
@@ -155,7 +165,7 @@ DISABLED: D I S A B L E D ;
 LIST: '[' SPACE? ((STRING | NUMBER) SPACE? (',' SPACE? (STRING | NUMBER) SPACE? )* )? SPACE? ']' ;
 STRING: '\'' (~('\'' | '\r' | '\n'))* '\'' ;
 NUMBER: DIGIT+ ('.' DIGIT+)? ;
-DATETIME: DATE SPACE DIGIT DIGIT ':' DIGIT DIGIT ':' DIGIT DIGIT ; // 2020-03-03 20:00:00 todo NAE-1997 better recognition
+DATETIME: DATE 'T' SPACE DIGIT DIGIT ':' DIGIT DIGIT ':' DIGIT DIGIT ; // 2020-03-03 20:00:00 todo NAE-1997 better recognition
 DATE: DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT ; // 2020-03-03, todo NAE-1997 better recognition
 BOOLEAN: T R U E | F A L S E ;
 VERSION_NUMBER: DIGIT+ '.' DIGIT+ '.' DIGIT+ ;
