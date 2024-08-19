@@ -28,7 +28,7 @@
                         <xs:field xpath="@name"/>
                     </xs:unique>
                 </xs:element>
-                <xs:element type="transition" name="transition" maxOccurs="unbounded"/>
+                <xs:element type="transition" name="transition" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element type="place" name="place" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element type="arc" name="arc" maxOccurs="unbounded" minOccurs="0"/>
             </xs:sequence>
@@ -41,14 +41,6 @@
             <xs:selector xpath="./place|./transition"/>
             <xs:field xpath="id"/>
         </xs:key>
-        <xs:keyref name="sourceId" refer="ptIdKey">
-            <xs:selector xpath="./arc"/>
-            <xs:field xpath="sourceId"/>
-        </xs:keyref>
-        <xs:keyref name="destinationId" refer="ptIdKey">
-            <xs:selector xpath="./arc"/>
-            <xs:field xpath="destinationId"/>
-        </xs:keyref>
     </xs:element>
     <xs:complexType name="extension">
         <xs:sequence>
@@ -144,10 +136,6 @@
             <xs:element type="nonNegativeInteger" name="y"/>
             <xs:element type="i18nStringType" name="title" minOccurs="0"/>
             <xs:element type="nonNegativeInteger" name="tokens"/>
-            <xs:choice>
-                <xs:element type="xs:boolean" name="isStatic"/>
-                <xs:element type="xs:boolean" name="static"/>
-            </xs:choice>
             <xs:element type="properties" name="properties" minOccurs="0">
                 <xs:unique name="placePropertyUniqueKey">
                     <xs:selector xpath="./property"/>

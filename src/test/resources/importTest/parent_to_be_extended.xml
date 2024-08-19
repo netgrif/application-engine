@@ -1,20 +1,19 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<document>
+<?xml version="1.0" encoding="UTF-8"?>
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
     <id>parent_to_be_extended</id>
     <version>1.0.0</version>
-    <initials>PTE</initials>
-    <title>Parent test net to be extended</title>
-    <defaultRole>true</defaultRole>
-    <anonymousRole>false</anonymousRole>
-
     <extends>
         <id>super_parent_to_be_extended</id>
         <version>1.0.0</version>
     </extends>
+    <title>Parent test net to be extended</title>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
 
-    <tags>
-        <tag key="tag1">tag1</tag>
-    </tags>
+    <properties>
+        <property key="tag1">tag1</property>
+    </properties>
 
     <role>
         <id>role1</id>
@@ -28,19 +27,20 @@
 
     <transition>
         <id>t1</id>
-        <label>Test</label>
         <x>0</x>
         <y>0</y>
-        <dataGroup>
+        <title>Test</title>
+        <flex>
             <id>dg</id>
-            <layout>legacy</layout>
-            <dataRef>
-                <id>variable1</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
+            <item>
+                <dataRef>
+                    <id>variable1</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+        </flex>
     </transition>
 
     <place>
@@ -58,4 +58,4 @@
         <multiplicity>1</multiplicity>
     </arc>
 
-</document>
+</process>

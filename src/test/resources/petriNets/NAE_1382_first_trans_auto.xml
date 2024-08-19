@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
 	<id>NAE_1382_first_trans_auto</id>
-	<initials>ERR</initials>
+	<version>1.0.0</version>
 	<title>New Model</title>
 	<defaultRole>true</defaultRole>
-	<transitionRole>false</transitionRole>
 	<!-- TRANSACTIONS -->
 	<!-- ROLES -->
 	<!-- PROCESS ROLE REFS -->
@@ -16,45 +16,33 @@
 		<id>t1</id>
 		<x>295</x>
 		<y>344</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>Auto</label>
+		<title>Auto</title>
 		<trigger type="auto"/>
 	</transition>
 	<transition>
 		<id>t2</id>
 		<x>580</x>
 		<y>355</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>Manual</label>
+		<title>Manual</title>
 	</transition>
 	<!-- PLACES -->
 	<place>
 		<id>p1</id>
 		<x>171</x>
 		<y>343</y>
-		<label></label>
 		<tokens>1</tokens>
-		<static>false</static>
 	</place>
 	<place>
 		<id>p2</id>
 		<x>438</x>
 		<y>339</y>
-		<label></label>
 		<tokens>0</tokens>
-		<static>false</static>
 	</place>
 	<place>
 		<id>p3</id>
 		<x>710</x>
 		<y>343</y>
-		<label></label>
 		<tokens>0</tokens>
-		<static>false</static>
 	</place>
 	<!-- ARCS -->
 	<arc>
@@ -85,4 +73,4 @@
 		<destinationId>p3</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
-</document>
+</process>

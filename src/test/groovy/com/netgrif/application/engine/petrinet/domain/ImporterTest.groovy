@@ -387,11 +387,11 @@ class ImporterTest {
 
     @Test
     void importNetWithParent() {
-        PetriNet superParentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
+        Process superParentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
         assert superParentNet
 
-        PetriNet parentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
+        Process parentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
         assert parentNet.version == new Version(1, 0, 0)
 
@@ -400,11 +400,10 @@ class ImporterTest {
         assert parentNet.version == new Version(1, 1, 0)
         assert parentNet.parentIdentifiers.size() == 1
 
-        PetriNet childNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/child_extending_parent.xml"),
+        Process childNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/child_extending_parent.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
         assert childNet.identifier == "child_extending_parent"
         assert childNet.title.defaultValue == "Child extending parent"
-        assert childNet.initials == "CEP"
         assert childNet.creationDate != parentNet.creationDate
 
         assert childNet.parentIdentifiers.size() == 2
@@ -446,10 +445,10 @@ class ImporterTest {
             processRole.importId == superParentNet.roles.values().first().importId
         } != null
 
-        assert childNet.tags.size() == 3
-        assert childNet.tags.containsKey("tag0")
-        assert childNet.tags.containsKey("tag1")
-        assert childNet.tags.containsKey("tag2")
+        assert childNet.properties.size() == 3
+        assert childNet.properties.containsKey("tag0")
+        assert childNet.properties.containsKey("tag1")
+        assert childNet.properties.containsKey("tag2")
     }
 
     @Test
@@ -462,11 +461,11 @@ class ImporterTest {
 
     @Test
     void importNetsWithInvalidExtension() {
-        PetriNet superParentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
+        Process superParentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
         assert superParentNet
 
-        PetriNet parentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
+        Process parentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
         assert parentNet
 

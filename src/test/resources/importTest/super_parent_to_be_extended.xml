@@ -1,15 +1,15 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<document>
+<?xml version="1.0" encoding="UTF-8"?>
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
     <id>super_parent_to_be_extended</id>
     <version>1.0.0</version>
-    <initials>SPE</initials>
     <title>Super parent test net to be extended</title>
     <defaultRole>true</defaultRole>
     <anonymousRole>false</anonymousRole>
 
-    <tags>
-        <tag key="tag0">tag0</tag>
-    </tags>
+    <properties>
+        <property key="tag0">tag0</property>
+    </properties>
 
     <role>
         <id>role0</id>
@@ -23,28 +23,27 @@
 
     <transition>
         <id>t0</id>
-        <label>Test</label>
         <x>0</x>
         <y>0</y>
-        <dataGroup>
+        <title>Test</title>
+        <flex>
             <id>dg</id>
-            <layout>legacy</layout>
-            <dataRef>
-                <id>variable0</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
+            <item>
+                <dataRef>
+                    <id>variable0</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+        </flex>
     </transition>
-
     <place>
         <id>p0</id>
         <x>0</x>
         <y>0</y>
         <tokens>1</tokens>
     </place>
-
     <arc>
         <id>a0</id>
         <type>regular</type>
@@ -52,5 +51,4 @@
         <destinationId>t0</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
-
-</document>
+</process>

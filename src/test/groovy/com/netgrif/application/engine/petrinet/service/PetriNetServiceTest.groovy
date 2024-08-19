@@ -222,19 +222,19 @@ class PetriNetServiceTest {
 
     @Test
     void deleteParentPetriNet() {
-        PetriNet superParentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
+        Process superParentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
         Case superParentCase = importHelper.createCase("Super parent case", superParentNet)
 
-        PetriNet parentNetMajor = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
+        Process parentNetMajor = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
         Case parentMajorCase = importHelper.createCase("Parent major case", parentNetMajor)
 
-        PetriNet parentNetMinor = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
+        Process parentNetMinor = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
                 VersionType.MINOR, superCreator.getLoggedSuper()).getNet()
         Case parentMinorCase = importHelper.createCase("Parent minor case", parentNetMinor)
 
-        PetriNet childNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/child_extending_parent.xml"),
+        Process childNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/child_extending_parent.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
         Case parentChildCase = importHelper.createCase("Child case", childNet)
 

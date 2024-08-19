@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
 	<id>NAE_1382_first_trans_auto</id>
-	<initials>ERR</initials>
+	<version>1.0.0</version>
 	<title>New Model</title>
 	<defaultRole>true</defaultRole>
-	<transitionRole>false</transitionRole>
 	<!-- TRANSACTIONS -->
 	<!-- ROLES -->
 	<!-- PROCESS ROLE REFS -->
@@ -16,10 +15,7 @@
 		<id>t5</id>
 		<x>740</x>
 		<y>140</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label></label>
+		<title></title>
 		<assignPolicy>auto</assignPolicy>
 		<trigger type="auto"/>
 	</transition>
@@ -27,10 +23,7 @@
 		<id>t4</id>
 		<x>420</x>
 		<y>140</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label></label>
+		<title></title>
 		<assignPolicy>auto</assignPolicy>
 		<trigger type="auto"/>
 	</transition>
@@ -38,36 +31,26 @@
 		<id>first</id>
 		<x>140</x>
 		<y>500</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>Manual</label>
+		<title></title>
 	</transition>
 	<transition>
 		<id>t1</id>
 		<x>300</x>
 		<y>260</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>Auto</label>
+		<title></title>
 		<trigger type="auto"/>
 	</transition>
 	<transition>
 		<id>t2</id>
 		<x>580</x>
 		<y>340</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>Manuel</label>
+		<title></title>
 	</transition>
 	<!-- PLACES -->
 	<place>
 		<id>p9</id>
 		<x>580</x>
 		<y>220</y>
-		<label></label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -75,7 +58,6 @@
 		<id>p8</id>
 		<x>580</x>
 		<y>100</y>
-		<label></label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -83,7 +65,6 @@
 		<id>p1</id>
 		<x>180</x>
 		<y>340</y>
-		<label></label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -91,7 +72,6 @@
 		<id>p3</id>
 		<x>700</x>
 		<y>340</y>
-		<label></label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -99,7 +79,6 @@
 		<id>p4</id>
 		<x>60</x>
 		<y>500</y>
-		<label></label>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>
@@ -107,7 +86,6 @@
 		<id>p7</id>
 		<x>420</x>
 		<y>260</y>
-		<label></label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -182,4 +160,4 @@
 		<destinationId>p7</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
-</document>
+</process>

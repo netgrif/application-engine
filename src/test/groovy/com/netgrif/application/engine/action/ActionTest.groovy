@@ -3,6 +3,7 @@ package com.netgrif.application.engine.action
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.SetDataType
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
@@ -34,11 +35,13 @@ class ActionTest {
     void testActionImports() {
         Case dummy = new Case()
         Task task = Task.with().id(new ObjectId()).transitionId("0").build()
-        Action testAction = new Action('''
+        Action testAction = new Action()
+        testAction.definition = '''
             println LocalDate.now()
             println LocalDate.MAX
             println new ObjectId().toString()
-        ''', "set")
+        '''
+        testAction.setDataType = SetDataType.VALUE
         runner.run(testAction, dummy, Optional.of(task), null, [:])
     }
 

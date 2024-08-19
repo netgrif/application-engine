@@ -2,7 +2,7 @@ package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ipc.TaskApiTest
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -119,11 +119,11 @@ class WorkflowServiceTest {
 
     @Test
     void createCaseOfExtendedPetriNet() {
-        PetriNet superParentNet = petriNetService.importPetriNet(stream(SUPER_PARENT_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()).net
+        Process superParentNet = petriNetService.importPetriNet(stream(SUPER_PARENT_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()).net
         petriNetService.importPetriNet(stream(PARENT_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         // child extends version 1.1.0
-        PetriNet parentNet = petriNetService.importPetriNet(stream(PARENT_NET_FILE), VersionType.MINOR, superCreator.getLoggedSuper()).net
-        PetriNet childNet = petriNetService.importPetriNet(stream(CHILD_NET_FILE), VersionType.MINOR, superCreator.getLoggedSuper()).net
+        Process parentNet = petriNetService.importPetriNet(stream(PARENT_NET_FILE), VersionType.MINOR, superCreator.getLoggedSuper()).net
+        Process childNet = petriNetService.importPetriNet(stream(CHILD_NET_FILE), VersionType.MINOR, superCreator.getLoggedSuper()).net
 
         Case aCase = workflowService.createCase(childNet.stringId, null, null, superCreator.getLoggedSuper()).getCase()
         assert aCase

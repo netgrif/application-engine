@@ -1,7 +1,7 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>case_search_test.xml</id>
-    <initials>TST</initials>
+    <version>1.0.0</version>
     <title>Test</title>
     <defaultRole>true</defaultRole>
     <!-- ========== DATA ========== -->
@@ -24,50 +24,62 @@
     <data type="enumeration" immediate="true">
         <id>5</id>
         <title>enumeration</title>
+        <options>
+            <option key="VALUE1">VALUE1</option>
+            <option key="VALUE2">VALUE2</option>
+            <option key="VALUE3">VALUE3</option>
+            <option key="VALUE4">VALUE4</option>
+        </options>
         <init>VALUE1</init>
-        <values>VALUE1</values>
-        <values>VALUE2</values>
-        <values>VALUE3</values>
-        <values>VALUE4</values>
     </data>
     <!-- ========== TRANSITION ========== -->
     <transition>
         <id>tran</id>
         <x>0</x>
         <y>0</y>
-        <label>tran</label>
-        <dataGroup>
-            <id>1</id>
-            <dataRef>
-                <id>1</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>2</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>3</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>4</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>5</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
+        <title>tran</title>
+        <flex>
+            <id>tran_grid</id>
+            <item>
+                <dataRef>
+                    <id>1</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>2</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>3</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>4</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>5</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+        </flex>
     </transition>
-</document>
+</process>
