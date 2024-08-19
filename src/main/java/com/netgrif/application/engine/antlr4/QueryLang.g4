@@ -107,12 +107,12 @@ stringComparison: op=(EQ | CONTAINS) SPACE STRING ;
 numberComparison: op=(EQ | LT | GT | LTE | GTE) SPACE NUMBER ;
 dateComparison: op=(EQ | LT | GT | LTE | GTE) SPACE DATE ;
 dateTimeComparison: op=(EQ | LT | GT | LTE | GTE) SPACE DATETIME ;
-booleanComparison: EQ SPACE BOOLEAN ;
+booleanComparison: op=EQ SPACE BOOLEAN ;
 
 // special attribute rules
-data: DATA '.' fieldId=JAVA_ID '.' (VALUE | OPTIONS) ;
-places: PLACES '.' placeId=JAVA_ID '.' MARKING ;
-tasks: TASKS '.' taskId=JAVA_ID '.' (STATE | USER_ID) ;
+data: DATA '.' fieldId=JAVA_ID '.' property=(VALUE | OPTIONS) ;
+places: PLACES '.' placeId=JAVA_ID '.' MARKING ; // todo NAE-1997: places structure in elastic
+tasks: TASKS '.' taskId=JAVA_ID '.' property=(STATE | USER_ID) ; // todo NAE-1997: tasks structure in elastic, state comparison?
 
 // operators
 AND: A N D | '&' ;
@@ -165,7 +165,7 @@ DISABLED: D I S A B L E D ;
 LIST: '[' SPACE? ((STRING | NUMBER) SPACE? (',' SPACE? (STRING | NUMBER) SPACE? )* )? SPACE? ']' ;
 STRING: '\'' (~('\'' | '\r' | '\n'))* '\'' ;
 NUMBER: DIGIT+ ('.' DIGIT+)? ;
-DATETIME: DATE 'T' SPACE DIGIT DIGIT ':' DIGIT DIGIT ':' DIGIT DIGIT ; // 2020-03-03 20:00:00 todo NAE-1997 better recognition
+DATETIME: DATE 'T' DIGIT DIGIT ':' DIGIT DIGIT ':' DIGIT DIGIT ('.' DIGIT+)? ; // 2020-03-03T20:00:00 todo NAE-1997 better recognition
 DATE: DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT ; // 2020-03-03, todo NAE-1997 better recognition
 BOOLEAN: T R U E | F A L S E ;
 VERSION_NUMBER: DIGIT+ '.' DIGIT+ '.' DIGIT+ ;

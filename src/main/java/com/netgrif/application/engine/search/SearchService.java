@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -50,11 +51,15 @@ public class SearchService {
     public long count(String input) {
         ParseTree tree = getParseTree(input);
         // todo NAE-1997: implement actual count
-        QueryLangMongoEvaluator evaluator = new QueryLangMongoEvaluator();
+        ParseTreeWalker walker = new ParseTreeWalker();
+        QueryLangEvaluator evaluator2 = new QueryLangEvaluator();
 
         try {
-            Predicate predicate = evaluator.visit(tree);
-            switch (evaluator.getType()) {
+            walker.walk(evaluator2, tree);
+
+            Predicate predicate = evaluator2.getMongoQuery(tree);
+            String elasticQuery = evaluator2.getElasticQuery(tree);
+            switch (evaluator2.getType()) {
                 case PROCESS:
                     return petriNetRepository.count(predicate);
                 case CASE:
@@ -64,7 +69,9 @@ public class SearchService {
                 case USER:
                     return userRepository.count(predicate);
             }
-        } catch (UnsupportedOperationException e) {
+
+
+        } catch (UnsupportedOperationException | IllegalArgumentException e) {
             // todo NAE-1997: count with elastic?
             log.error(e.getMessage());
         }
