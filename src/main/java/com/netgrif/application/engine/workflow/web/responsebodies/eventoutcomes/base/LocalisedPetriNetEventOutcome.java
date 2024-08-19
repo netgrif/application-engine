@@ -6,7 +6,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutc
 import java.util.List;
 import java.util.Locale;
 
-public abstract class LocalisedPetriNetEventOutcome extends LocalisedEventOutcome{
+public abstract class LocalisedPetriNetEventOutcome extends LocalisedEventOutcome {
 
     private PetriNetReference net;
 

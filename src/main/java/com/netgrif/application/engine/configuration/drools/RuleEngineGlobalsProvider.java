@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,10 +26,6 @@ import static com.netgrif.application.engine.configuration.drools.RuleEngineGlob
 public class RuleEngineGlobalsProvider implements IRuleEngineGlobalsProvider {
 
     private static final Logger log = LoggerFactory.getLogger("RuleEngine");
-
-    protected List<RuleEngineGlobal> globals;
-    protected List<String> imports;
-
     private final IRuleEvaluationScheduleService ruleEvaluationScheduleService;
     private final IWorkflowService workflowService;
     private final ITaskService taskService;
@@ -39,6 +35,10 @@ public class RuleEngineGlobalsProvider implements IRuleEngineGlobalsProvider {
     private final IMailService mailService;
     private final IUserService userService;
     private final FactRepository factRepository;
+
+    protected List<RuleEngineGlobal> globals;
+
+    protected List<String> imports;
 
     public RuleEngineGlobalsProvider(@Autowired IRuleEvaluationScheduleService ruleEvaluationScheduleService,
                                      @Autowired IWorkflowService workflowService,

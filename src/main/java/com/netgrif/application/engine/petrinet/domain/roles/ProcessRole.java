@@ -5,6 +5,7 @@ import com.netgrif.application.engine.petrinet.domain.Imported;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.Event;
 import com.netgrif.application.engine.petrinet.domain.events.EventType;
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +29,7 @@ public class ProcessRole extends Imported {
 
     @Id
     @Setter
-    private ObjectId _id;
+    private ProcessResourceId _id;
 
     private I18nString name;
 
@@ -44,11 +45,15 @@ public class ProcessRole extends Imported {
     private Map<EventType, Event> events;
 
     public ProcessRole() {
-        _id = new ObjectId();
+        if (this.getNetId() == null) {
+            _id = new ProcessResourceId();
+        } else {
+            _id = new ProcessResourceId(new ObjectId(this.getNetId()));
+        }
     }
 
     public ProcessRole(String id) {
-        _id = new ObjectId(id);
+        _id = new ProcessResourceId(id);
     }
 
     @EqualsAndHashCode.Include
@@ -56,16 +61,16 @@ public class ProcessRole extends Imported {
         return _id.toString();
     }
 
-    public ObjectId get_id() {
+    public ProcessResourceId get_id() {
         return _id;
     }
 
-    public void set_id(ObjectId _id) {
+    public void set_id(ProcessResourceId _id) {
         this._id = _id;
     }
 
     public void set_id(String id) {
-        this._id = new ObjectId(id);
+        this._id = new ProcessResourceId(id);
     }
 
     public I18nString getName() {
@@ -117,5 +122,16 @@ public class ProcessRole extends Imported {
     @Override
     public String toString() {
         return name.getDefaultValue();
+    }
+
+    @Override
+    public ProcessRole clone() {
+        ProcessRole clone = new ProcessRole();
+        clone.set_id(this._id);
+        clone.setImportId(this.importId);
+        clone.setName(this.name == null ? null : this.name.clone());
+        clone.setNetId(this.netId);
+        clone.setDescription(this.description);
+        return clone;
     }
 }

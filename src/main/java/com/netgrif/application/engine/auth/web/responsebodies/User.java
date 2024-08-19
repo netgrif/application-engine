@@ -30,6 +30,8 @@ public class User {
 
     private Set<String> nextGroups;
 
+    private User impersonated;
+
     protected User(IUser user) {
         id = user.getStringId();
         email = user.getEmail();

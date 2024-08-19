@@ -7,7 +7,6 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -18,17 +17,24 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Document
-public class Case {
+public class Case implements Serializable {
+
+    private static final long serialVersionUID = 3687481049847498422L;
 
     @Id
     @Getter
-    private ObjectId _id;
+    private ProcessResourceId _id;
+
+    @Getter
+    @Setter
+    private String uriNodeId;
 
     @LastModifiedDate
     @Getter
@@ -107,7 +113,6 @@ public class Case {
 
     @Getter
     @Setter
-    @JsonIgnore
     private Set<TaskPair> tasks;
 
     @Getter
@@ -121,12 +126,10 @@ public class Case {
 
     @Getter
     @Setter
-    @Builder.Default
     private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
 
     @Getter
     @Setter
-    @Builder.Default
     private Map<String, Map<String, Boolean>> users = new HashMap<>();
 
     @Getter
@@ -151,14 +154,16 @@ public class Case {
     @Setter
     private List<String> negativeViewUsers;
 
+    @Getter
+    @Setter
+    private Map<String, String> tags;
+
     protected Case() {
-        _id = new ObjectId();
         activePlaces = new HashMap<>();
         dataSet = new LinkedHashMap<>();
         immediateDataFields = new LinkedHashSet<>();
         consumedTokens = new HashMap<>();
         tasks = new HashSet<>();
-        visualId = generateVisualId();
         enabledRoles = new HashSet<>();
         permissions = new HashMap<>();
         userRefs = new HashMap<>();
@@ -168,10 +173,12 @@ public class Case {
         viewUsers = new LinkedList<>();
         negativeViewRoles = new LinkedList<>();
         negativeViewUsers = new ArrayList<>();
+        tags = new HashMap<>();
     }
 
     public Case(PetriNet petriNet) {
         this();
+        this._id = new ProcessResourceId(petriNet.getObjectId());
         petriNetObjectId = petriNet.getObjectId();
         processIdentifier = petriNet.getIdentifier();
         this.petriNet = petriNet;
@@ -182,6 +189,7 @@ public class Case {
         negativeViewRoles.addAll(petriNet.getNegativeViewRoles());
         icon = petriNet.getIcon();
         userRefs = petriNet.getUserRefs();
+        tags = new HashMap<>(petriNet.getTags());
 
         permissions = petriNet.getPermissions().entrySet().stream()
                 .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
@@ -212,7 +220,7 @@ public class Case {
         return this.dataSet.get(field).hasDefinedBehavior(transition);
     }
 
-    public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
+    public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator, Map<String, String> params) {
         List<Field<?>> dynamicInitFields = new LinkedList<>();
         List<MapOptionsField<I18nString, ?>> dynamicOptionsFields = new LinkedList<>();
         List<ChoiceField<?>> dynamicChoicesFields = new LinkedList<>();
@@ -223,8 +231,14 @@ public class Case {
             } else {
                 this.dataSet.put(key, new DataField(field.getDefaultValue()));
             }
+            if (field.getComponent() != null) {
+                this.dataSet.get(key).setComponent(field.getComponent());
+            }
             if (field instanceof UserField) {
                 this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
+            }
+            if (field instanceof UserListField) {
+                this.dataSet.get(key).setChoices(((UserListField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
             }
             if (field instanceof FieldWithAllowedNets) {
                 this.dataSet.get(key).setAllowedNets(((FieldWithAllowedNets) field).getAllowedNets());
@@ -239,16 +253,19 @@ public class Case {
                 dynamicChoicesFields.add((ChoiceField<?>) field);
             }
         });
-        dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field)));
-        dynamicChoicesFields.forEach(field -> this.dataSet.get(field.getImportId()).setChoices(initValueExpressionEvaluator.evaluateChoices(this, field)));
-        dynamicOptionsFields.forEach(field -> this.dataSet.get(field.getImportId()).setOptions(initValueExpressionEvaluator.evaluateOptions(this, field)));
-        populateDataSetBehavior();
+        dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field, params)));
+        dynamicChoicesFields.forEach(field -> this.dataSet.get(field.getImportId()).setChoices(initValueExpressionEvaluator.evaluateChoices(this, field, params)));
+        dynamicOptionsFields.forEach(field -> this.dataSet.get(field.getImportId()).setOptions(initValueExpressionEvaluator.evaluateOptions(this, field, params)));
+        populateDataSetBehaviorAndComponents();
     }
 
-    private void populateDataSetBehavior() {
+    private void populateDataSetBehaviorAndComponents() {
         petriNet.getTransitions().forEach((transitionKey, transitionValue) -> {
             transitionValue.getDataSet().forEach((dataKey, dataValue) -> {
                 getDataSet().get(dataKey).addBehavior(transitionKey, new HashSet<>(dataValue.getBehavior()));
+                if (dataValue.getComponent() != null) {
+                    getDataSet().get(dataKey).addDataRefComponent(transitionKey, dataValue.getComponent());
+                }
             });
         });
     }

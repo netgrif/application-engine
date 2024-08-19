@@ -10,7 +10,7 @@ import org.springframework.ldap.query.LdapQuery;
 import java.util.List;
 import java.util.Set;
 
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public interface ILdapGroupRefService {
 
     public List<LdapGroupRef> findAllGroups();
@@ -20,6 +20,10 @@ public interface ILdapGroupRefService {
     List<LdapGroupRef> searchGroups(LdapQuery ldapQuery);
 
     public List<LdapGroup> getAllLdapGroupRoles();
+
+    void deleteProcessRoleByPetrinet(String petrinet);
+
+    void deleteProcessRole(LdapGroup ldapGroup, String petriNet);
 
     Set<ProcessRole> getProcessRoleByLdapGroup(Set<String> groupDn);
 

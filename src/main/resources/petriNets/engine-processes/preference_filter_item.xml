@@ -137,7 +137,7 @@
 			<allowedNet>filter</allowedNet>
 		</allowedNets>
 	</data>
-	<data type="text">
+	<data type="text" immediate="true">
 		<id>parentId</id>
 		<title></title>
 	</data>
@@ -271,6 +271,54 @@
 		<title name="roles_banned">Banned roles</title>
 		<desc name="roles_banned_desc">List of roles not allowed to view this menu entry.</desc>
 	</data>
+  	<data type="text">
+		<id>new_filter_id</id>
+		<title/>
+	</data>
+	<data type="text" immediate="true">
+		<id>menu_item_identifier</id>
+		<title>Identifikátor (Filter API)</title>
+	</data>
+	<data type="text" immediate="true">
+		<id>create_case_button_title</id>
+		<title name="create_case_button_title">"New case" button title</title>
+	</data>
+	<data type="text" immediate="true">
+		<id>create_case_button_icon_preview</id>
+		<title name="create_case_button_icon_preview">Menu icon preview</title>
+		<component>
+			<name>htmltextarea</name>
+		</component>
+	</data>
+	<data type="text" immediate="true">
+		<id>create_case_button_icon</id>
+		<title name="create_case_button_icon">"New case" button icon identifier</title>
+		<action trigger="set">
+			create_case_button_icon_preview: f.create_case_button_icon_preview,
+			create_case_button_icon: f.create_case_button_icon;
+
+
+			if (create_case_button_icon.value == "") {
+				change create_case_button_icon_preview value {<![CDATA["""<span></span>"""]]>}
+				return;
+			}
+
+			change create_case_button_icon_preview value {
+				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + create_case_button_icon.value + <![CDATA["""</span>"""]]>
+			}
+		</action>
+ 	</data>
+
+<data type="text" immediate="true">
+		<id>default_headers</id>
+		<title name="default_headers">Set default headers</title>
+	</data>
+  
+<data type="multichoice_map">
+		<id>allowed_nets</id>
+		<title name="allowed_nets">Allowed nets</title>
+	</data>
+
 <!--	<data type="boolean">-->
 <!--		<id>use_i18n</id>-->
 <!--		<title>Translate menu item title?</title>-->
@@ -309,6 +357,10 @@
 		<i18nString name="allowed_roles_desc">Zoznam rolí ktoré budú upravovaný menu záznam vidieť.</i18nString>
 		<i18nString name="banned_roles">Zakázané roly</i18nString>
 		<i18nString name="banned_roles_desc">Zoznam rolí pre ktoré bude upravovaný menu záznam skrytý.</i18nString>
+		<i18nString name="create_case_button_title">Názov tlačidla "Nová inštancia"</i18nString>
+		<i18nString name="create_case_button_icon">Identifikátor ikony tlačidla "Nová inštancia"</i18nString>
+		<i18nString name="create_case_button_icon_preview">Náhľad ikony</i18nString>
+		<i18nString name="default_headers">Predvolené hlavičky</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="menu_item_title">Menüpunkttitel</i18nString>
@@ -330,6 +382,10 @@
 		<i18nString name="allowed_roles_desc">Liste der Rollen, die diesen Menüeintrag anzeigen dürfen.</i18nString>
 		<i18nString name="banned_roles">Verbotene Rollen</i18nString>
 		<i18nString name="banned_roles_desc">Liste der Rollen, die diesen Menüeintrag nicht anzeigen dürfen.</i18nString>
+		<i18nString name="create_case_button_title">Schaltflächentitel "Neuer Fall"</i18nString>
+		<i18nString name="create_case_button_icon">Ikone ID</i18nString>
+		<i18nString name="create_case_button_icon_preview">Ikonevorschau</i18nString>
+		<i18nString name="default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
 	</i18n>
 	<!-- TRANSITIONS -->
 	<transition>
@@ -777,7 +833,106 @@
 					<appearance></appearance>
 				</layout>
 			</dataRef>
+			<dataRef>
+				<id>create_case_button_title</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>5</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>create_case_button_icon_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>5</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>create_case_button_icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>5</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>default_headers</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>6</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
 		</dataGroup>
+	</transition>
+
+	<transition>
+		<id>change_filter</id>
+		<x>420</x>
+		<y>350</y>
+		<label>[Change filter]</label>
+
+		<dataRef>
+			<id>new_filter_id</id>
+			<logic>
+				<behavior>editable</behavior>
+				<behavior>required</behavior>
+			</logic>
+			<event type="set">
+				<id>set_event_0</id>
+				<actions phase="post">
+					<action>
+						new_filter_id: f.new_filter_id,
+						filterTaskRef: f.filter_preview,
+						filterCaseRef: f.filter_case,
+						entryDefaultName: f.entry_default_name,
+						entryName: f.entry_name,
+						icon: f.icon_name;
+
+						change filterCaseRef value { [new_filter_id.value] }
+						def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+
+						change entryDefaultName value {return filterCase.title}
+
+						change entryName value {return filterCase.dataSet["i18n_filter_name"].value}
+
+						change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+
+						change icon value {filterCase.icon}
+					</action>
+				</actions>
+			</event>
+		</dataRef>
 	</transition>
 	<!-- PLACES -->
 	<place>
@@ -816,6 +971,13 @@
 		<type>read</type>
 		<sourceId>p2</sourceId>
 		<destinationId>view</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>read</type>
+		<sourceId>p2</sourceId>
+		<destinationId>change_filter</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 </document>

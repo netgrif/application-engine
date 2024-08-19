@@ -14,7 +14,7 @@ import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefServi
 import com.netgrif.application.engine.orgstructure.groups.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.ApplicationEventPublisher;
@@ -36,8 +36,11 @@ import static org.springframework.ldap.query.LdapQueryBuilder.query;
 
 @Service
 @Slf4j
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapUserRefService implements ILdapUserRefService {
+
+    @Autowired
+    protected ILdapGroupRefService ldapGroupRefService;
 
     @Autowired
     private LdapUserRefRepository repository;
@@ -60,9 +63,6 @@ public class LdapUserRefService implements ILdapUserRefService {
     @Autowired
     private LdapConfiguration ldapUserConfiguration;
 
-    @Autowired
-    protected ILdapGroupRefService ldapGroupRefService;
-
     @Override
     public IUser createUser(LdapUserRef ldapUserRef) {
         LdapUser ldapUser = new LdapUser(ldapUserRef.getDn().toString(), ldapUserRef.getCn(), ldapUserRef.getUid(), ldapUserRef.getHomeDirectory(), ldapUserRef.getMail(), ldapUserRef.getFirstName(), ldapUserRef.getSurname(), ldapUserRef.getMemberOf(), ldapUserRef.getTelNumber());
@@ -72,8 +72,8 @@ public class LdapUserRefService implements ILdapUserRefService {
 
         String generatedString = RandomStringUtils.randomAlphanumeric(35);
         ldapUser.setPassword(generatedString);
-        IUser savedUser = ldapUserService.saveNew(ldapUser);
-        ldapUser.setNextGroups(this.groupService.getAllGroupsOfUser(savedUser));
+        LdapUser savedUser = (LdapUser) ldapUserService.saveNew(ldapUser);
+        savedUser.setNextGroups(this.groupService.getAllGroupsOfUser(savedUser));
 
         if (groupProperties.isDefaultEnabled())
             groupService.createGroup(savedUser);
@@ -83,14 +83,14 @@ public class LdapUserRefService implements ILdapUserRefService {
 
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
 
-        return ldapUserService.save(ldapUser);
+        savedUser.setPassword("n/a");
+        return ldapUserService.save(savedUser);
     }
 
     @Override
     public LdapUserRef findById(Name id) {
         DirContextOperations context
                 = ldapUserConfiguration.ldapTemplate().lookupContext(id);
-//        context.setAttributeValues("objectClass", ldapProperties.getPeopleClass());
         LdapUserRef user = new LdapUserRef();
         user.setDn(context.getDn());
         user.setCn(verificationData(context, ldapProperties.getMapCn()));

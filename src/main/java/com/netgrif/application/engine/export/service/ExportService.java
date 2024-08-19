@@ -19,19 +19,21 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-class ExportService implements IExportService {
+public class ExportService implements IExportService {
 
     @Autowired
     private IWorkflowService workflowService;
@@ -136,10 +138,16 @@ class ExportService implements IExportService {
         return buildCaseCsv(exportCases, config, outFile);
     }
 
-    private OutputStream buildCaseCsv(List<Case> exportCases, ExportDataConfig config, File outFile) throws FileNotFoundException {
+    @Override
+    public OutputStream buildCaseCsv(List<Case> exportCases, ExportDataConfig config, File outFile) throws FileNotFoundException {
         Set<String> csvHeader = config == null ? buildDefaultCsvCaseHeader(exportCases) : config.getDataToExport();
         OutputStream outStream = new FileOutputStream(outFile, false);
-        PrintWriter writer = new PrintWriter(outStream, true);
+        PrintWriter writer;
+        if (config == null || config.getStandardCharsets() == null) {
+            writer = new PrintWriter(outStream, true, StandardCharsets.UTF_8);
+        } else {
+            writer = new PrintWriter(outStream, true, config.getStandardCharsets());
+        }
         writer.println(String.join(",", csvHeader));
         for (Case exportCase : exportCases) {
             writer.println(String.join(",", buildRecord(csvHeader, exportCase)).replace("\n", "\\n"));
@@ -208,7 +216,8 @@ class ExportService implements IExportService {
         return buildTaskCsv(exportTasks, config, outFile);
     }
 
-    private OutputStream buildTaskCsv(List<Task> exportTasks, ExportDataConfig config, File outFile) throws FileNotFoundException {
+    @Override
+    public OutputStream buildTaskCsv(List<Task> exportTasks, ExportDataConfig config, File outFile) throws FileNotFoundException {
         Set<String> csvHeader = config == null ? buildDefaultCsvTaskHeader(exportTasks) : config.getDataToExport();
         OutputStream outStream = new FileOutputStream(outFile, false);
         PrintWriter writer = new PrintWriter(outStream, true);
@@ -221,7 +230,8 @@ class ExportService implements IExportService {
         return outStream;
     }
 
-    private List<String> buildRecord(Set<String> csvHeader, Case exportCase) {
+    @Override
+    public List<String> buildRecord(Set<String> csvHeader, Case exportCase) {
         List<String> recordStringList = new LinkedList<>();
         for (String dataFieldId : csvHeader) {
             if (exportCase.getDataSet().containsKey(dataFieldId)) {
@@ -232,45 +242,53 @@ class ExportService implements IExportService {
         return recordStringList;
     }
 
-    private String resolveFieldValue(Case exportCase, String exportFieldId) {
+    @Override
+    public String resolveFieldValue(Case exportCase, String exportFieldId) {
         String fieldValue;
         Field field = exportCase.getField(exportFieldId);
+        Object fieldData = exportCase.getDataField(exportFieldId).getValue();
         if (field.getValue() == null && exportCase.getDataSet().get(exportFieldId).getValue() == null) {
             return "";
         }
         switch (field.getType()) {
             case MULTICHOICE_MAP:
-                fieldValue = ((MultichoiceMapField) field).getValue().stream()
-                        .filter(value -> ((MultichoiceMapField) field).getOptions().containsKey(value.trim()))
-                        .map(value -> ((MultichoiceMapField) field).getOptions().get(value.trim()).getDefaultValue())
+                fieldValue = ((MultichoiceMapField) fieldData).getValue().stream()
+                        .filter(value -> ((MultichoiceMapField) fieldData).getOptions().containsKey(value.trim()))
+                        .map(value -> ((MultichoiceMapField) fieldData).getOptions().get(value.trim()).getDefaultValue())
                         .collect(Collectors.joining(","));
                 break;
             case ENUMERATION_MAP:
-                fieldValue = ((EnumerationMapField) field).getOptions().get(field.getValue()).getDefaultValue();
+                fieldValue = ((EnumerationMapField) fieldData).getOptions().get(fieldData).getDefaultValue();
                 break;
             case MULTICHOICE:
-                fieldValue = String.join(",", ((MultichoiceField) field).getValue().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet()));
+                fieldValue = String.join(",", ((List<I18nString>) fieldData).stream().map(I18nString::toString).collect(Collectors.toList()));
                 break;
             case FILE:
-                fieldValue = ((FileField) field).getValue().toString();
+                fieldValue = ((FileField) fieldData).getValue().toString();
                 break;
             case FILELIST:
-                fieldValue = String.join(",", ((FileListField) field).getValue().getNamesPaths().stream().map(FileFieldValue::toString).collect(Collectors.toSet()));
+                fieldValue = String.join(",", ((FileListField) fieldData).getValue().getNamesPaths().stream().map(FileFieldValue::toString).collect(Collectors.toSet()));
                 break;
             case TASK_REF:
-                fieldValue = String.join(";", ((TaskField) field).getValue());
+                fieldValue = String.join(";", ((TaskField) fieldData).getValue());
                 break;
             case USER:
-                fieldValue = ((UserField) field).getValue().getEmail();
+                fieldValue = ((UserFieldValue) fieldData).getEmail();
+                break;
+            case DATE:
+                fieldValue = ((LocalDate) fieldData).toString();
+                break;
+            case DATETIME:
+                fieldValue = ((Date) fieldData).toString();
                 break;
             case USERLIST:
-                fieldValue = String.join(";", ((UserListField) field).getValue());
+                fieldValue = ((UserListField) fieldData).getValue().getUserValues().stream().map(UserFieldValue::getId).collect(Collectors.joining(";"));
                 break;
             case NUMBER:
-                fieldValue = field.getValue().toString();
+                fieldValue = fieldData.toString();
                 break;
             default:
-                fieldValue = field.getValue() == null ? (String) exportCase.getDataSet().get(exportFieldId).getValue() : (String) field.getValue();
+                fieldValue = fieldData == null ? (String) exportCase.getDataSet().get(exportFieldId).getValue() : (String) fieldData;
                 break;
         }
         return fieldValue;

@@ -6,6 +6,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import lombok.Data;
 import org.bson.types.ObjectId;
 
@@ -21,7 +22,7 @@ import java.util.Map;
 public class Task {
 
     @JsonIgnore
-    private ObjectId _id;
+    private ProcessResourceId _id;
 
     private String caseId;
 
@@ -73,6 +74,8 @@ public class Task {
 
     private Map<String, Boolean> assignedUserPolicy;
 
+    private Map<String, String> tags;
+
     public Task(com.netgrif.application.engine.workflow.domain.Task task, Locale locale) {
         this._id = task.getObjectId();
         this.caseId = task.getCaseId();
@@ -100,10 +103,11 @@ public class Task {
         this.cancelTitle = task.getTranslatedEventTitle(EventType.CANCEL, locale);
         this.delegateTitle = task.getTranslatedEventTitle(EventType.DELEGATE, locale);
         this.assignedUserPolicy = task.getAssignedUserPolicy();
+        this.tags = task.getTags();
     }
 
     public Task(ElasticTask entity) {
-        _id = new ObjectId(entity.getStringId());
+        _id = new ProcessResourceId(entity.getStringId());
         caseId = entity.getCaseId();
         transitionId = entity.getTransitionId();
         title = entity.getTitle();

@@ -12,12 +12,14 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskSer
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
@@ -49,7 +51,7 @@ class ElasticSearchViewPermissionTest {
     private IUserService userService
 
     @Autowired
-    private SuperCreator superCreator
+    private SuperCreatorRunner superCreator
 
     @Autowired
     private ImportHelper importHelper
@@ -62,6 +64,9 @@ class ElasticSearchViewPermissionTest {
 
     @Autowired
     private IElasticTaskService elasticTaskService
+
+    @Autowired
+    private IDataService dataService
 
     @Autowired
     private TestHelper testHelper
@@ -150,7 +155,13 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithPosUserRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
-        case_.dataSet["view_ul_pos"].value = [testUser.stringId]
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_pos": [
+                        "value": [testUser.stringId],
+                        "type": "userList"
+                ]
+        ] as Map)).getCase()
         case_ = workflowService.save(case_)
         sleep(4000)
 
@@ -165,7 +176,13 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithNegUserRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
-        case_.dataSet["view_ul_neg"].value = [testUser.stringId]
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_neg": [
+                        "value": [testUser.stringId],
+                        "type": "userList"
+                ]
+        ] as Map)).getCase()
         case_ = workflowService.save(case_)
         sleep(4000)
 
@@ -182,7 +199,13 @@ class ElasticSearchViewPermissionTest {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
         ProcessRole negViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
         userService.addRole(testUser, negViewRole.getStringId())
-        case_.dataSet["view_ul_pos"].value = [testUser.stringId]
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_pos": [
+                        "value": [testUser.stringId],
+                        "type": "userList"
+                ]
+        ] as Map)).getCase()
         case_ = workflowService.save(case_)
         sleep(4000)
 

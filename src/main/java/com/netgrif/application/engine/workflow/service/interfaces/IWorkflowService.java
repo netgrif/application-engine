@@ -22,25 +22,41 @@ public interface IWorkflowService {
 
     Case findOne(String caseId);
 
+    Case findOneNoNet(String caseId);
+
     List<Case> findAllById(List<String> ids);
 
     Page<Case> getAll(Pageable pageable);
 
     Case resolveUserRef(Case useCase);
 
+    CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale, Map<String, String> params);
+
     CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale);
+
+    CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Map<String, String> params);
 
     CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user);
 
+    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Map<String, String> params);
+
     CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user);
+
+    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale, Map<String, String> params);
 
     CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale);
 
     Page<Case> findAllByAuthor(String authorId, String petriNet, Pageable pageable);
 
+    DeleteCaseEventOutcome deleteCase(String caseId, Map<String, String> params);
+
     DeleteCaseEventOutcome deleteCase(String caseId);
 
     DeleteCaseEventOutcome deleteSubtreeRootedAt(String caseId);
+
+    DeleteCaseEventOutcome deleteCase(Case useCase, Map<String, String> params);
+
+    DeleteCaseEventOutcome deleteCase(Case useCase);
 
     void deleteInstancesOfPetriNet(PetriNet net);
 
@@ -52,8 +68,8 @@ public interface IWorkflowService {
 
     Map<String, I18nString> listToMap(List<Case> cases);
 
-    @Deprecated
-    List<Field> getData(String caseId);
+//    @Deprecated
+//    List<Field> getData(String caseId);
 
     Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale);
 
@@ -61,11 +77,13 @@ public interface IWorkflowService {
 
 //    List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId);
 
-    boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId);
+    boolean removeTasksFromCase(List<Task> tasks, String caseId);
 
-    boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase);
+    boolean removeTasksFromCase(List<Task> tasks, Case useCase);
 
     Case decrypt(Case useCase);
+
+    Page<Case> findAllByUri(String uri, Pageable pageable);
 
     Page<Case> search(Predicate predicate, Pageable pageable);
 }

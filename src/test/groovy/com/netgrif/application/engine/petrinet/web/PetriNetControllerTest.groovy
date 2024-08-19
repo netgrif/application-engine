@@ -10,7 +10,7 @@ import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -55,7 +55,7 @@ class PetriNetControllerTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator
+    private SuperCreatorRunner superCreator
 
     @Autowired
     private ImportHelper importHelper
@@ -88,20 +88,20 @@ class PetriNetControllerTest {
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 
-        importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        def simpleUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
 //                [] as Group[],
                 [] as ProcessRole[])
 
-        userAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
+        userAuth = new UsernamePasswordAuthenticationToken(simpleUser.transformToLoggedUser(), "password",  [auths.get("user")] as List<Authority>)
         userAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
+        def adminUser = importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("admin")] as Authority[],
 //                [] as Group[],
                 [] as ProcessRole[])
 
-        adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
+        adminAuth = new UsernamePasswordAuthenticationToken(adminUser.transformToLoggedUser(), "password", [auths.get("admin")] as List<Authority>)
         adminAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
     }
 

@@ -2,12 +2,20 @@ version: "3.3"
 
 services:
   docker-mongo:
-    image: mongo:4.4
+    image: mongo:7.0.9
     ports:
-    - "27017:27017"
+      - "27017:27017"
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "2G"
+        reservations:
+          cpus: "0.5"
+          memory: "512M"
 
   docker-elastic:
-    image: elasticsearch:7.17.3
+    image: elasticsearch:8.10.4
     environment:
       - cluster.name=elasticsearch
       - discovery.type=single-node
@@ -17,8 +25,25 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "2G"
+        reservations:
+          cpus: "0.5"
+          memory: "512M"
 
   docker-redis:
-    image: redis:6
+    image: redis:7.2.5
     ports:
       - "6379:6379"
+
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:8.10.4
+#    environment:
+#      - ELASTICSEARCH_HOSTS=http://docker-elastic:9200
+#    depends_on:
+#      - docker-elastic
+#    ports:
+#      - "5601:5601"

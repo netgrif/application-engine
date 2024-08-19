@@ -1,7 +1,10 @@
 package com.netgrif.application.engine.ldap.domain;
 
 
-import com.netgrif.application.engine.auth.domain.*;
+import com.netgrif.application.engine.auth.domain.Authority;
+import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.auth.domain.UserState;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +16,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapLoggedUser extends LoggedUser {
 
     @Getter
@@ -51,7 +54,6 @@ public class LdapLoggedUser extends LoggedUser {
         this.homeDirectory = homeDirectory;
     }
 
-
     public IUser transformToUser() {
         LdapUser user = new LdapUser(new ObjectId(this.id));
         user.setEmail(getUsername());
@@ -64,12 +66,17 @@ public class LdapLoggedUser extends LoggedUser {
         user.setMemberOf(this.memberOf);
         user.setHomeDirectory(homeDirectory);
         user.setState(UserState.ACTIVE);
+        user.setPassword("n/a");
         user.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
         user.setProcessRoles(this.getProcessRoles().stream().map(roleId -> {
             ProcessRole role = new ProcessRole();
             role.set_id(roleId);
             return role;
         }).collect(Collectors.toSet()));
+        if (this.isImpersonating()) {
+            user.setImpersonated(this.getImpersonated().transformToUser());
+        }
         return user;
     }
+
 }

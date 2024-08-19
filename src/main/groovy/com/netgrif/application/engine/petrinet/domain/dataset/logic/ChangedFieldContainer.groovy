@@ -3,7 +3,9 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic
 import com.fasterxml.jackson.annotation.JsonInclude
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-class ChangedFieldContainer {
+class ChangedFieldContainer implements Serializable {
+
+    private static final long serialVersionUID = 2299918326411121185L;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Map<String, Map<String, Object>> changedFields

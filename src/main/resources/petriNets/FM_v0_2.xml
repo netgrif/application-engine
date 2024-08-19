@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
+    <id>examples/FM/fm_archivacia</id>
+    <title>FM Archivácia</title>
+    <initials>FM</initials>
+    <caseName>Archivácia</caseName>
     <!-- ========== ROLES ========== -->
     <role>
         <id>1</id>

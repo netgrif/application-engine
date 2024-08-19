@@ -1,0 +1,270 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>filter_api_test</id>
+	<initials>FTT</initials>
+	<title>filter_api_test</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+
+	<role>
+		<id>role_1</id>
+		<title>Role 1</title>
+	</role>
+
+	<role>
+		<id>role_2</id>
+		<title>Role 2</title>
+	</role>
+
+	<processEvents>
+		<event type="upload">
+			<id>upload</id>
+			<actions phase="post">
+				<action>
+					createCase("filter_api_test")
+				</action>
+			</actions>
+		</event>
+	</processEvents>
+
+
+	<data type="text">
+		<id>menu_stringId</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>filter_stringId</id>
+		<title/>
+	</data>
+
+	<data type="text">
+		<id>query</id>
+		<title/>
+		<init>processIdentifier:"filter_api_test"</init>
+	</data>
+	<data type="text">
+		<id>icon</id>
+		<title/>
+		<init>device_hub</init>
+	</data>
+	<data type="text">
+		<id>uri</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>allowed_nets</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>title</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>identifier</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>group</id>
+		<title>Skupina</title>
+	</data>
+
+	<data type="button">
+		<id>create_filter_and_menu</id>
+		<title>create filter and menu</title>
+
+		<event type="set">
+			<actions phase="post">
+				<action>
+					menu_stringId: f.menu_stringId,
+					filter_stringId: f.filter_stringId,
+					uri: f.uri,
+					title: f.title,
+					allowed_nets: f.allowed_nets,
+					query: f.query,
+					identifier: f.identifier,
+					icon: f.icon;
+
+					def filter = createCaseFilter(title.value, query.value, allowed_nets.value.split(",") as List, icon.value)
+					def item = createMenuItem(uri.value, identifier.value, title.value, icon.value, filter,
+									["role_1": "filter_api_test"], ["role_2": "filter_api_test"],
+									["meta-title,meta-title"], ["meta-title,meta-title"])
+
+					change menu_stringId value { item.stringId }
+					change filter_stringId value { filter.stringId }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>change_filter_and_menu</id>
+		<title>change filter and menu</title>
+
+		<event type="set">
+			<actions phase="post">
+				<action>
+					uri: f.uri,
+					title: f.title,
+					allowed_nets: f.allowed_nets,
+					query: f.query,
+					group: f.group,
+					identifier: f.identifier,
+					icon: f.icon;
+
+					def item = findMenuItem(identifier.value)
+					def filter = getFilterFromMenuItem(item)
+
+					changeFilter filter query { query.value }
+					changeFilter filter allowedNets { allowed_nets.value.split(",") as List }
+					changeFilter filter icon { icon.value }
+					changeFilter filter title { title.value }
+					changeFilter filter filterMetadata { [
+							"searchCategories"       : [],
+							"predicateMetadata"      : [],
+							"filterType"             : type,
+							"defaultSearchCategories": false,
+							"inheritAllowedNets"     : false
+					] }
+
+					changeMenuItem item filter { filter }
+					changeMenuItem item allowedRoles { ["role_2": "filter_api_test"] }
+					changeMenuItem item uri { uri.value }
+					changeMenuItem item title { title.value }
+					changeMenuItem item caseDefaultHeaders { "meta-title,meta-title,meta-title" }
+					changeMenuItem item taskDefaultHeaders { "meta-title,meta-title,meta-title" }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>delete_filter_and_menu</id>
+		<title>delete filter and menu</title>
+
+		<event type="set">
+			<actions phase="post">
+				<action>
+					menu_stringId: f.menu_stringId,
+					identifier: f.identifier;
+
+					def item = workflowService.findOne(menu_stringId.value)
+					def filter = getFilterFromMenuItem(item)
+
+					deleteMenuItem(item)
+					deleteFilter(filter)
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>create_filter_in_group</id>
+		<title>create filter in group</title>
+
+		<event type="set">
+			<actions phase="post">
+				<action>
+					menu_stringId: f.menu_stringId,
+					filter_stringId: f.filter_stringId,
+					uri: f.uri,
+					title: f.title,
+					allowed_nets: f.allowed_nets,
+					query: f.query,
+					group: f.group,
+					identifier: f.identifier,
+					icon: f.icon;
+
+					def item = createFilterInMenu(
+							uri.value,
+							identifier.value,
+							title.value,
+							query.value,
+							type.value,
+							allowed_nets.value.split(",") as List,
+							["role_1": "filter_api_test"],
+							[:],
+							icon.value
+					)
+					def filter = getFilterFromMenuItem(item)
+
+					change menu_stringId value { item.stringId }
+					change filter_stringId value { filter.stringId }
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<data type="button">
+		<id>find_filter</id>
+		<title>find filter</title>
+
+		<event type="set">
+			<actions phase="post">
+				<action>
+					title: f.title,
+					found_filter: f.found_filter;
+
+					def filter = findFilter(title.value)
+					change found_filter value { filter.stringId }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>found_filter</id>
+		<title>found filter</title>
+	</data>
+
+	<data type="button">
+		<id>move_item</id>
+		<title>move item</title>
+		<event type="set">
+			<actions phase="post">
+				<action>
+					move_dest_uri: f.move_dest_uri,
+					move_item_id: f.move_item_id,
+					move_folder_path: f.move_folder_path;
+
+					def item
+					if (move_item_id.value) {
+						item = workflowService.findOne(move_item_id.value)
+					} else if (move_folder_path.value) {
+						def node = uriService.findByUri(move_folder_path.value)
+						item = findFolderCase(node)
+					}
+
+					moveMenuItem(item, move_dest_uri.value)
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>move_dest_uri</id>
+		<title>found filter</title>
+	</data>
+	<data type="text">
+		<id>move_item_id</id>
+		<title>View item id to find</title>
+	</data>
+	<data type="text">
+		<id>move_folder_path</id>
+		<title>Folder item path to find</title>
+	</data>
+
+	<transition>
+		<id>t1</id>
+		<x>700</x>
+		<y>180</y>
+		<label>TEST API</label>
+		<event type="assign">
+			<id>t1_assign</id>
+		</event>
+		<event type="finish">
+			<id>t1_finish</id>
+		</event>
+		<event type="cancel">
+			<id>t1_cancel</id>
+		</event>
+		<event type="delegate">
+			<id>t1_delegate</id>
+		</event>
+	</transition>
+</document>

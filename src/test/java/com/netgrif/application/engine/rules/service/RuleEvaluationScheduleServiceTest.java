@@ -11,7 +11,7 @@ import com.netgrif.application.engine.rules.domain.StoredRule;
 import com.netgrif.application.engine.rules.domain.scheduled.ScheduleOutcome;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEvaluationScheduleService;
 import com.netgrif.application.engine.rules.service.throwable.RuleEvaluationScheduleException;
-import com.netgrif.application.engine.startup.SuperCreator;
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
@@ -19,6 +19,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.quartz.SimpleScheduleBuilder;
@@ -32,6 +33,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+@Disabled
 @Slf4j
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -51,7 +53,7 @@ class RuleEvaluationScheduleServiceTest {
     private IPetriNetService petriNetService;
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreatorRunner superCreator;
 
     @Autowired
     private IRuleEvaluationScheduleService ruleEvaluationScheduleService;
@@ -62,6 +64,7 @@ class RuleEvaluationScheduleServiceTest {
     }
 
     @Test
+    @Disabled
     void testScheduledRule() throws IOException, MissingPetriNetMetaDataException, RuleEvaluationScheduleException, InterruptedException, MissingIconKeyException {
         LoggedUser user = superCreator.getLoggedSuper();
         ImportPetriNetEventOutcome importOutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, user);

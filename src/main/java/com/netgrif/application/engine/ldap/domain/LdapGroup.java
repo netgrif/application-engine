@@ -16,7 +16,7 @@ import java.util.Set;
 @Document
 @NoArgsConstructor
 @AllArgsConstructor
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapGroup {
 
     @Id

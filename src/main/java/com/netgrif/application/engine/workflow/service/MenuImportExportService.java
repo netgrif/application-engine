@@ -15,7 +15,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapFiel
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.startup.DefaultFiltersRunner;
+import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.utils.InputStreamToString;
 import com.netgrif.application.engine.workflow.domain.*;

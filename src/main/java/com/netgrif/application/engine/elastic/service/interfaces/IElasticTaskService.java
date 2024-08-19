@@ -11,10 +11,13 @@ import org.springframework.scheduling.annotation.Async;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 public interface IElasticTaskService {
 
-    Map<String, Float> fullTextFields();
+    List<String> fullTextFields();
+
+    Future<ElasticTask> scheduleTaskIndexing(ElasticTask task);
 
     @Async
     void index(ElasticTask task);

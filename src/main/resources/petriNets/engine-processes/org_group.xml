@@ -12,28 +12,20 @@
 	<!-- PROCESS ROLE REFS -->
 	<!-- PROCESS USER REFS -->
 	<!-- FUNCTIONS -->
-	<function scope="process" name="updateFilterAutocompleteOptions">
-	{
-		com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
-		com.netgrif.application.engine.petrinet.domain.dataset.TaskField previewTaskRef,
-		com.netgrif.application.engine.petrinet.domain.dataset.CaseField referencedFiltersList
-		->
-			if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
-				change previewTaskRef value {
-					return [findTask({it.caseId.eq(filterAutocomplete.value).and(it.transitionId.eq("view_filter"))}).stringId]
-				}
-			} else {
-				change filterAutocomplete options {
-					return findFilters(filterAutocomplete.value != null ? filterAutocomplete.value : "")
-							.findAll({filterCase -&gt; !referencedFiltersList.value.contains(filterCase.stringId)})
-							.collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
-				}
-				change previewTaskRef value {
-					return []
-				}
-			}
+	<function scope="process" name="updateAvailableEntries">
+		{
+			com.netgrif.application.engine.workflow.domain.Case useCase ->
+
+			def cases = findCasesElastic(
+							"processIdentifier:\"preference_filter_item\" AND dataSet.parentId.textValue.keyword:\"$useCase.stringId\"" as String,
+							org.springframework.data.domain.PageRequest.of(0, 1000))
+			change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
 		}
 	</function>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
 	<!-- DATA -->
 	<data type="text">
 		<id>group_id</id>
@@ -79,9 +71,9 @@
 		<id>members</id>
 		<title>Members</title>
 		<desc>Members of current organization group</desc>
-		<view>
-			<list/>
-		</view>
+		<component>
+			<name>list</name>
+		</component>
 	</data>
 	<data type="enumeration_map">
 		<id>user_action_selection</id>
@@ -109,77 +101,16 @@
 		<title name="invite_by_mail">Add e-mail address</title>
 		<placeholder>example@example.com</placeholder>
 		<desc name="invite_by_mail_desc">Add e-meail address to send invitation</desc>
-		<valid>email</valid>
-	</data>
-	<data type="taskRef">
-		<id>filter_tasks</id>
-		<title></title>
-	</data>
-	<data type="taskRef">
-		<id>filter_preview</id>
-		<title></title>
+		<validations>
+			<validation>
+				<expression>email</expression>
+				<message/>
+			</validation>
+		</validations>
 	</data>
 	<data type="taskRef">
 		<id>imported_menu_ids</id>
 		<title></title>
-	</data>
-	<data type="enumeration_map">
-		<id>filter_autocomplete_selection</id>
-		<title name="select_menu_item_filter">Select filter</title>
-		<component>
-			<name>autocomplete_dynamic</name>
-		</component>
-		<action trigger="set">
-			filterAutocomplete: f.this,
-			previewTaskRef: f.filter_preview,
-			referencedFiltersList: f.referenced_filters;
-
-			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, referencedFiltersList)
-		</action>
-		<action trigger="get">
-			filterAutocomplete: f.this,
-			previewTaskRef: f.filter_preview,
-			referencedFiltersList: f.referenced_filters;
-
-			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, referencedFiltersList)
-		</action>
-	</data>
-	<data type="button">
-		<id>add_filter_to_menu</id>
-		<title></title>
-		<placeholder name="add_menu_item">Add to menu</placeholder>
-		<component>
-			<name>raised</name>
-		</component>
-		<action trigger="set">
-			filterAutocomplete: f.filter_autocomplete_selection,
-			menuItemsTaskRef: f.filter_tasks,
-			availableEntries: f.available_export_entries,
-			referencedFiltersList: f.referenced_filters;
-
-			if (!filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
-				return;
-			}
-
-			def optionCase = createCase("preference_filter_item")
-			def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(optionCase.stringId))})
-			assignTask(initTask)
-			setData(initTask, [
-				"filter_case": ["type":"caseRef", "value": [filterAutocomplete.value], "allowedNets":["filter"]],
-				"parentId": ["type":"text", "value":useCase.stringId]
-			])
-			finishTask(initTask)
-
-			change referencedFiltersList value {return referencedFiltersList.value + filterAutocomplete.value}
-
-			def viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(optionCase.stringId))})
-
-			change menuItemsTaskRef value {return menuItemsTaskRef.value + viewTask.stringId}
-			change filterAutocomplete value {return ""}
-
-			def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-			change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
-		</action>
 	</data>
 	<data type="file">
 		<id>export_menu_file</id>
@@ -194,8 +125,7 @@
 		<action trigger="set">
 			availableEntries: f.available_export_entries;
 
-			def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-			change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
+			updateAvailableEntries(useCase)
 		</action>
 	</data>
 	<data type="button">
@@ -254,11 +184,13 @@
 	<data type="text">
 		<id>import_results</id>
 		<title name="import_results">Import results</title>
-		<values>area</values>
+		<component>
+			<name>area</name>
+		</component>
 	</data>
 	<data type="button">
 		<id>export_menu_btn</id>
-		<title></title>
+		<title/>
 		<placeholder name="export_menu_btn_placeholder">Export menu</placeholder>
 		<action trigger="set">
 			export_file: f.export_menu_file,
@@ -281,13 +213,11 @@
 	</data>
 	<data type="button">
 		<id>import_menu_btn</id>
-		<title></title>
+		<title/>
 		<placeholder name="import_menu_btn_placeholder">Import menu</placeholder>
 		<desc name="import_menu_btn_desc">Import menu from provided XML file</desc>
 		<action trigger="set">
 			import_file: f.import_menu_file,
-			menuItemsTaskRef: f.filter_tasks,
-			referencedFiltersList: f.referenced_filters,
 			groupId: f.group_id,
 			newEntries: f.imported_menu_ids,
 			newIdsActionSetter: f.new_entries_setter,
@@ -314,48 +244,30 @@
 	</data>
 	<data type="text">
 		<id>new_entries_setter</id>
-		<title></title>
+		<title/>
 		<action trigger="set">
 			import_file: f.import_menu_file,
-			menuItemsTaskRef: f.filter_tasks,
-			referencedFiltersList: f.referenced_filters,
 			groupId: f.group_id,
 			newEntries: f.imported_menu_ids,
 			availableEntries: f.available_export_entries,
 			importResults: f.import_results;
 
-			filterTaskIds = []
-			filterCaseIds = []
-
 			newEntries.value.forEach { itemId -&gt;
-			def idSplit = itemId.split(',')
-			def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(idSplit[0]))})
-			setData(initTask, [
-			"filter_case": ["type":"caseRef", "value": [idSplit[1]], "allowedNets":["filter"]],
-			"use_icon": ["type":"boolean", "value": idSplit[2]]
-			])
+				def idSplit = itemId.split(',')
+				def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(idSplit[0]))})
+
+				setData(initTask, [
+					"filter_case": ["type":"caseRef", "value": [idSplit[1]], "allowedNets":["filter"]],
+					"use_icon": ["type":"boolean", "value": idSplit[2]]
+				])
+			}
 
 			finishTask(initTask)
 
-			def viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(idSplit[0]))})
-			filterTaskIds.add(viewTask.getStringId())
-			filterCaseIds.add(idSplit[1])
-			}
-
-			change menuItemsTaskRef value {return menuItemsTaskRef.value + filterTaskIds}
-			change referencedFiltersList value {return referencedFiltersList.value + filterCaseIds}
 			workflowService.save(useCase)
 
-			def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-			change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
+			updateAvailableEntries(useCase)
 		</action>
-	</data>
-	<data type="caseRef">
-		<id>referenced_filters</id>
-		<title></title>
-		<allowedNets>
-			<allowedNet>filter</allowedNet>
-		</allowedNets>
 	</data>
 	<!-- I18NS -->
 	<i18n locale="sk">
@@ -476,17 +388,12 @@
 			<id>1</id>
 			<actions phase="pre">
 				<action>
-					filtersTaskRef: f.filter_tasks,
-					availableEntries: f.available_export_entries,
-					referencedFiltersList: f.referenced_filters;
+					availableEntries: f.available_export_entries;
 
-                    defaultFilters = findCases({it.processIdentifier.eq("filter").and(it.author.id.eq(userService.getSystem().id))})
-
-					filterTaskIds = []
-					filterCaseIds = []
+                    defaultFilters = findDefaultFilters()
 
 					defaultFilters.forEach { filterCase -&gt;
-						def optionCase = createCase("preference_filter_item")
+						def optionCase = createCase("preference_filter_item", filterCase.title + " filter preference")
 
 						def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(optionCase.stringId))})
 						assignTask(initTask)
@@ -495,19 +402,9 @@
 								"parentId": ["type":"text", "value":useCase.stringId], "menu_identifier": ["type":"text", value:"defaultMenu"]
 						])
 						finishTask(initTask)
-
-						def viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(optionCase.stringId))})
-						filterTaskIds.add(viewTask.stringId)
-						filterCaseIds.add(filterCase.stringId)
 					}
 
-					change filtersTaskRef value {return filterTaskIds}
-					change referencedFiltersList value {return filterCaseIds}
-
-
-					def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-
-					change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
+					updateAvailableEntries(useCase)
 				</action>
 			</actions>
 		</event>
@@ -783,59 +680,6 @@
 		<label name="menu_configuration">Configure menu</label>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
-			<id>dg0</id>
-			<layout>grid</layout>
-			<dataRef>
-				<id>filter_autocomplete_selection</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>add_filter_to_menu</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>4</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-		<dataGroup>
-			<id>dg1</id>
-			<layout>grid</layout>
-			<dataRef>
-				<id>filter_preview</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-		<dataGroup>
 			<id>dg2</id>
 			<layout>grid</layout>
 			<title name="import_export_dg">Import &amp; export of menu entries</title>
@@ -1005,26 +849,8 @@
 				</layout>
 			</dataRef>
 		</dataGroup>
-		<dataGroup>
-			<id>DataGroup_0</id>
-			<layout>grid</layout>
-			<dataRef>
-				<id>filter_tasks</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
 	</transition>
+
 	<!-- PLACES -->
 	<place>
 		<id>1</id>

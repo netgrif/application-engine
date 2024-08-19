@@ -3,11 +3,10 @@ package com.netgrif.application.engine.pdf.generator.service.renderer;
 import com.netgrif.application.engine.pdf.generator.domain.PdfEnumerationField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfSelectionField;
-import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField;
 
 import java.io.IOException;
 
-public class EnumerationRenderer extends SelectionFieldRenderer<EnumerationField> {
+public class EnumerationRenderer extends SelectionFieldRenderer {
 
     public void setFieldParams(PdfEnumerationField field) {
         helperField = new PdfEnumerationField(field.getFieldId(), field.getLabel(), field.getValues(), field.getChoices(), field.getType(), resource.getBaseX() + field.getX(),
@@ -17,7 +16,7 @@ public class EnumerationRenderer extends SelectionFieldRenderer<EnumerationField
     @Override
     public int renderLabel(PdfField field) throws IOException {
         setFieldParams((PdfEnumerationField) field);
-        return renderLabel(helperField, resource.getLabelFont(), fontLabelSize);
+        return renderLabel(helperField, resource.getLabelFont(), fontLabelSize, colorLabelString);
     }
 
     public void renderValue(PdfField field, int lineCounter) throws IOException {

@@ -13,6 +13,8 @@ public class NaeLdapProperties {
 
     private boolean enabled = false;
 
+    private boolean ignorePartial = false;
+
     @Value("${spring.ldap.urls:#{\"\"}}")
     private String url;
 

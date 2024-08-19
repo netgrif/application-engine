@@ -1,9 +1,10 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
@@ -31,7 +32,7 @@ class DynamicChoicesTest {
     private IPetriNetService petriNetService;
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreatorRunner superCreator;
 
     @Autowired
     private IDataService dataService;
@@ -49,7 +50,7 @@ class DynamicChoicesTest {
 
     @Test
     void testDynamicEnum() {
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_choices.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_choices.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
 
         assert optNet.getNet() != null;
         def net = optNet.getNet()

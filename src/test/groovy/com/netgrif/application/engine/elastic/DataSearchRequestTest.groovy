@@ -5,6 +5,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.domain.ElasticCase
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
+import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.elastic.domain.ElasticTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
@@ -14,9 +15,10 @@ import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
@@ -79,7 +81,7 @@ class DataSearchRequestTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator
+    private SuperCreatorRunner superCreator
 
     @Autowired
     private ITaskService taskService
@@ -95,15 +97,6 @@ class DataSearchRequestTest {
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
-//        template.deleteIndex(ElasticCase.class)
-        template.createIndex(ElasticCase.class)
-        template.putMapping(ElasticCase.class)
-
-//        template.deleteIndex(ElasticTask.class)
-        template.createIndex(ElasticTask.class)
-        template.putMapping(ElasticTask.class)
-
-        repository.deleteAll()
 
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
@@ -132,7 +125,7 @@ class DataSearchRequestTest {
         _case.dataSet["multichoice_map"].value = ["alice", "bob"].toSet()
         _case.dataSet["file"].value = FileFieldValue.fromString("singlefile.txt")
         _case.dataSet["fileList"].value = FileListFieldValue.fromString("multifile1.txt,multifile2.pdf")
-        _case.dataSet["userList"].value = [testUser1.id, testUser2.id]
+        _case.dataSet["userList"].value = new UserListFieldValue([dataService.makeUserFieldValue(testUser1.stringId), dataService.makeUserFieldValue(testUser2.stringId)])
         _case.dataSet["i18n_text"].value.defaultValue = "Modified i18n text value"
         _case.dataSet["i18n_divider"].value.defaultValue = "Modified i18n divider value"
         workflowService.save(_case)
@@ -233,6 +226,7 @@ class DataSearchRequestTest {
             log.info(String.format("Testing %s == %s", testCase.getKey(), testCase.getValue()))
 
             Page<Case> result = searchService.search([request] as List, mockService.mockLoggedUser(), PageRequest.of(0, 100), null, false)
+            assert result
             assert result.size() == 1
         }
     }

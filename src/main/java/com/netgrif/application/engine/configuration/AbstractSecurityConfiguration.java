@@ -3,22 +3,35 @@ package com.netgrif.application.engine.configuration;
 import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
 import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;
+import com.netgrif.application.engine.configuration.properties.SecurityConfigProperties;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
+import com.netgrif.application.engine.configuration.properties.enumeration.HSTS;
+import com.netgrif.application.engine.configuration.properties.enumeration.XFrameOptionsMode;
+import com.netgrif.application.engine.configuration.properties.enumeration.XXSSProtection;
 import com.netgrif.application.engine.configuration.security.SessionUtilsProperties;
 import com.netgrif.application.engine.ldap.filters.LoginAttemptsFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
+import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class AbstractSecurityConfiguration extends WebSecurityConfigurerAdapter {
+public abstract class AbstractSecurityConfiguration {
 
     @Autowired
     protected ServerAuthProperties serverAuthProperties;
@@ -32,26 +45,170 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
     @Autowired
     private ApplicationContext context;
 
-    protected void setCsrf(HttpSecurity http) throws Exception {
-        if (isCsrfEnabled()) {
-            http
-                    .csrf()
-                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+    protected void setHeaders(HttpSecurity http) throws Exception {
+        setStrictTransportSecurity(http);
+        setContentSecurityPolicy(http);
+        setXFrameOptions(http);
+        setXXSSProtection(http);
+
+    }
+
+    protected void setStrictTransportSecurity(HttpSecurity http) throws Exception {
+        if (existConfigurationHeaders()
+                && getSecurityConfigProperties().getHeaders().getHsts() != null
+                && getSecurityConfigProperties().getHeaders().getHsts().isEnable()
+                && getSecurityConfigProperties().getHeaders().getHsts().getMaxAge() >= 0) {
+            HSTS headers = getSecurityConfigProperties().getHeaders().getHsts();
+            if (Objects.nonNull(headers.isIncludeSubDomains())
+                    && Objects.nonNull(headers.isPreload())) {
+                http
+                        .headers(headersConfigurer ->
+                                headersConfigurer.httpStrictTransportSecurity(hstsConfig ->
+                                        hstsConfig
+                                                .maxAgeInSeconds(headers.getMaxAge())
+                                                .includeSubDomains(headers.isIncludeSubDomains())
+                                                .preload(headers.isPreload())
+                                ));
+
+            } else if (Objects.nonNull(headers.isIncludeSubDomains())
+                    && Objects.isNull(headers.isPreload())) {
+                http
+                        .headers(headersConfigurer ->
+                                headersConfigurer.httpStrictTransportSecurity(hstsConfig ->
+                                        hstsConfig
+                                                .maxAgeInSeconds(headers.getMaxAge())
+                                                .includeSubDomains(headers.isIncludeSubDomains())
+                                ));
+            } else if (Objects.isNull(headers.isIncludeSubDomains())
+                    && Objects.nonNull(headers.isPreload())) {
+                http
+                        .headers(headersConfigurer ->
+                                headersConfigurer.httpStrictTransportSecurity(hstsConfig ->
+                                        hstsConfig
+                                                .maxAgeInSeconds(headers.getMaxAge())
+                                                .preload(headers.isPreload())
+                                ));
+            } else {
+                http
+                        .headers(headersConfigurer ->
+                                headersConfigurer.httpStrictTransportSecurity(hstsConfig ->
+                                        hstsConfig
+                                                .maxAgeInSeconds(headers.getMaxAge())
+                                ));
+            }
         } else {
             http
-                    .csrf()
-                    .disable();
+                    .headers(headersConfigurer ->
+                            headersConfigurer.httpStrictTransportSecurity(HeadersConfigurer.HstsConfig::disable));
         }
     }
 
-    @Override
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-       List<String> properties = Arrays.stream(naeAuthProperties.getProviders()).map(String::toLowerCase).collect(Collectors.toList());
+    protected void setXXSSProtection(HttpSecurity http) throws Exception {
+        XXSSProtection mode;
+        if (!existConfigurationHeaders()
+                || getSecurityConfigProperties().getHeaders().getXXssProtection() == null) {
+            mode = XXSSProtection.ENABLE;
+        } else {
+            mode = getSecurityConfigProperties().getHeaders().getXXssProtection();
+        }
+        switch (mode) {
+            case DISABLE:
+                http
+                        .headers(headersConfigurer ->
+                                headersConfigurer.xssProtection(HeadersConfigurer.XXssConfig::disable));
+                break;
+            case DISABLE_XSS:
+                http
+                        .headers(headersConfigurer ->
+                                headersConfigurer.xssProtection(Customizer.withDefaults()));
+                break;
+            case ENABLE:
+                http
+                        .headers(headersConfigurer ->
+                                headersConfigurer.xssProtection(xXssConfig ->
+                                        xXssConfig.headerValue(XXssProtectionHeaderWriter.HeaderValue.DISABLED)));
+                break;
+            case ENABLE_MODE:
+                http
+                        .headers(headersConfigurer ->
+                                headersConfigurer.xssProtection(xXssConfig ->
+                                        xXssConfig.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED)));
+                break;
+        }
+    }
+
+    protected void setContentSecurityPolicy(HttpSecurity http) throws Exception {
+        if (!existConfigurationHeaders()
+                || getSecurityConfigProperties().getHeaders().getContentSecurityPolicy() == null
+                || getSecurityConfigProperties().getHeaders().getContentSecurityPolicy().isEmpty()) {
+            http
+                    .headers(headersConfigurer ->
+                            headersConfigurer.addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'")));
+        } else {
+            http
+                    .headers(headersConfigurer ->
+                            headersConfigurer.contentSecurityPolicy(contentSecurityPolicyConfig ->
+                                    contentSecurityPolicyConfig.policyDirectives(getSecurityConfigProperties().getHeaders().getContentSecurityPolicy())));
+        }
+    }
+
+    protected void setXFrameOptions(HttpSecurity http) throws Exception {
+        XFrameOptionsMode mode;
+        if (!existConfigurationHeaders() || getSecurityConfigProperties().getHeaders().getXFrameOptions() == null) {
+            mode = XFrameOptionsMode.DISABLE;
+        } else {
+            mode = getSecurityConfigProperties().getHeaders().getXFrameOptions();
+        }
+        switch (mode) {
+            case SAMEORIGIN:
+                http
+                        .headers(httpSecurityHeadersConfigurer ->
+                                httpSecurityHeadersConfigurer
+                                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
+                break;
+            case DENY:
+                http
+                        .headers(httpSecurityHeadersConfigurer ->
+                                httpSecurityHeadersConfigurer
+                                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny));
+                break;
+            case DISABLE:
+            default:
+                http
+                        .headers(httpSecurityHeadersConfigurer ->
+                                httpSecurityHeadersConfigurer
+                                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
+                break;
+        }
+    }
+
+    protected void setCsrf(HttpSecurity http) throws Exception {
+        if (isCsrfEnabled()) {
+            http
+                    .csrf(httpSecurityCsrfConfigurer ->
+                            httpSecurityCsrfConfigurer.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
+        } else {
+            http
+                    .csrf(AbstractHttpConfigurer::disable);
+        }
+    }
+
+    protected void corsEnable(HttpSecurity http) throws Exception {
+        if (isCorsEnabled()) {
+            http
+                    .cors(Customizer.withDefaults());
+        }
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationManagerBuilder auth) throws Exception {
+        List<String> properties = Arrays.stream(naeAuthProperties.getProviders()).map(String::toLowerCase).collect(Collectors.toList());
         context.getBeansOfType(NetgrifAuthenticationProvider.class)
                 .entrySet().stream()
                 .filter(it -> properties.contains(it.getKey().toLowerCase()))
                 .sorted(Ordering.explicit(properties).onResultOf(entry -> entry.getKey().toLowerCase()))
                 .forEach(it -> auth.authenticationProvider(it.getValue()));
+        return auth.getObject();
     }
 
     protected String[] getPatterns() {
@@ -69,13 +226,12 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
 
     protected void configureSession(HttpSecurity http) throws Exception {
         if (sessionUtilsProperties.isEnabledLimitSession()) {
-            http.sessionManagement()
-                    .maximumSessions(sessionUtilsProperties.getMaxSession())
-                    .and()
-                    .sessionFixation().newSession();
+            http.sessionManagement(httpSecuritySessionManagementConfigurer -> {
+                httpSecuritySessionManagementConfigurer.maximumSessions(sessionUtilsProperties.getMaxSession());
+                httpSecuritySessionManagementConfigurer.sessionFixation().newSession();
+            });
         }
     }
-
 
     protected void configureFilters(HttpSecurity http) {
         if (sessionUtilsProperties.isEnabledFilter()) {
@@ -83,13 +239,22 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
         }
     }
 
+    protected boolean existConfigurationHeaders() {
+        return getSecurityConfigProperties() != null && getSecurityConfigProperties().getHeaders() != null;
+    }
+
     protected abstract boolean isOpenRegistration();
 
     protected abstract boolean isCsrfEnabled();
+
+    protected abstract boolean isCorsEnabled();
 
     protected abstract String[] getStaticPatterns();
 
     protected abstract String[] getServerPatterns();
 
     protected abstract Environment getEnvironment();
+
+    protected abstract SecurityConfigProperties getSecurityConfigProperties();
+
 }

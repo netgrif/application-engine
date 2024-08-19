@@ -8,12 +8,14 @@ import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowAuthorizationService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.json.JsonOutput
@@ -57,7 +59,7 @@ class WorkflowAuthorizationServiceTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator
+    private SuperCreatorRunner superCreator
 
     @Autowired
     private ImportHelper importHelper
@@ -67,6 +69,9 @@ class WorkflowAuthorizationServiceTest {
 
     @Autowired
     private IWorkflowService workflowService
+
+    @Autowired
+    private IDataService dataService
 
     @Autowired
     TestHelper testHelper
@@ -222,7 +227,13 @@ class WorkflowAuthorizationServiceTest {
         userService.addRole(testUser, negDeleteRole.getStringId())
 
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
-        case_.dataSet["pos_user_list"].value = [testUser.stringId]
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "pos_user_list": [
+                        "value": [testUser.stringId],
+                        "type": "userList"
+                ]
+        ] as Map)).getCase()
         workflowService.save(case_)
 
         assert workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
@@ -240,9 +251,17 @@ class WorkflowAuthorizationServiceTest {
         userService.addRole(testUser, negDeleteRole.getStringId())
 
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
-        case_.dataSet["pos_user_list"].value = [testUser.stringId]
-        case_.dataSet["neg_user_list"].value = [testUser.stringId]
-
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "pos_user_list": [
+                        "value": [testUser.stringId],
+                        "type": "userList"
+                ],
+                "neg_user_list": [
+                        "value": [testUser.stringId],
+                        "type": "userList"
+                ]
+        ] as Map)).getCase()
         workflowService.save(case_)
 
         assert !workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())

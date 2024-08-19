@@ -7,13 +7,19 @@ public class ExecutorMaxSizeHashMap extends MaxSizeHashMap<ExecutorService> {
 
     private final long threadShutdownTimeout;
 
-    ExecutorMaxSizeHashMap(long maxSize, long threadShutdownTimeout) {
+    public ExecutorMaxSizeHashMap(long maxSize, long threadShutdownTimeout) {
         super(16, maxSize, eldest -> {
             try {
                 eldest.shutdown();
-                eldest.awaitTermination(threadShutdownTimeout, TimeUnit.SECONDS);
+                if (!eldest.awaitTermination(threadShutdownTimeout, TimeUnit.SECONDS)) {
+                    eldest.shutdownNow();
+                    if (!eldest.awaitTermination(threadShutdownTimeout, TimeUnit.SECONDS)) {
+                        log.error("Executor did not terminate");
+                    }
+                }
             } catch (InterruptedException e) {
                 log.error("Thread was interrupted while waiting for termination: ", e);
+                eldest.shutdownNow();
             }
         });
         this.threadShutdownTimeout = threadShutdownTimeout;

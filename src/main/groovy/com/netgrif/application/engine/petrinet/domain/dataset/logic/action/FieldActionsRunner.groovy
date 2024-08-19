@@ -4,11 +4,9 @@ import com.netgrif.application.engine.business.IPostalCodeService
 import com.netgrif.application.engine.business.orsr.IOrsrService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.petrinet.domain.Function
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
-import org.codehaus.groovy.control.CompilerConfiguration
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -39,18 +37,18 @@ abstract class FieldActionsRunner {
 
     private Map<String, Object> actionsCache = new HashMap<>()
 
-    List<EventOutcome> run(Action action, Case useCase, List<Function> functions = []) {
-        return run(action, useCase, Optional.empty(), functions)
+    List<EventOutcome> run(Action action, Case useCase, Map<String, String> params, List<Function> functions = []) {
+        return run(action, useCase, Optional.empty(), params, functions)
     }
 
-    List<EventOutcome> run(Action action, Case useCase, Optional<Task> task, List<Function> functions = []) {
+    List<EventOutcome> run(Action action, Case useCase, Optional<Task> task, Map<String, String> params, List<Function> functions = []) {
         if (!actionsCache)
             actionsCache = new HashMap<>()
 
         log.debug("Action: $action")
         def code = getActionCode(action, functions)
         try {
-            code.init(action, useCase, task, this)
+            code.init(action, useCase, task, this, params)
             code()
         } catch (Exception e) {
             log.error("Action: $action.definition")
@@ -70,9 +68,9 @@ abstract class FieldActionsRunner {
             actionDelegate.metaClass."${it.function.name}" << it.code
         }
         actionsCacheService.getNamespaceFunctionCache().each { entry ->
-            def namespace = new Object()
+            def namespace = [:]
             entry.getValue().each {
-                namespace.metaClass."${it.function.name}" << it.code.rehydrate(actionDelegate, actionDelegate, actionDelegate)
+                namespace["${it.function.name}"] = it.code.rehydrate(actionDelegate, it.code.owner, it.code.thisObject)
             }
             actionDelegate.metaClass."${entry.key}" = namespace
         }

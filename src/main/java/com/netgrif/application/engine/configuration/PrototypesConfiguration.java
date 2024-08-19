@@ -37,19 +37,19 @@ public class PrototypesConfiguration {
         return new FileStorageConfiguration();
     }
 
-    @Bean("pdfDataHelper")
+    @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public IPdfDataHelper nextPdfDataHelper() {
+    public IPdfDataHelper pdfDataHelper() {
         return new PdfDataHelper();
     }
 
-    @Bean("pdfGenerator")
+    @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public IPdfGenerator pdfGenerator() {
         return new PdfGenerator();
     }
 
-    @Bean("pdfDrawer")
+    @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public IPdfDrawer pdfDrawer() {
         return new PdfDrawer();

@@ -7,17 +7,17 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.Marshaller
-import javax.xml.bind.Unmarshaller
+import jakarta.xml.bind.JAXBContext
+import jakarta.xml.bind.Marshaller
+import jakarta.xml.bind.Unmarshaller
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE
-import static org.springframework.web.bind.annotation.RequestMethod.GET
 
 @RestController
 @RequestMapping("/dev/")
@@ -32,13 +32,13 @@ class DevConsole {
     @Autowired
     private PetriNetRepository netRepository
 
-    @RequestMapping(value = "/dataset/{title}", method = GET, produces = APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/dataset/{title}", produces = APPLICATION_JSON_VALUE)
     String dataset(@PathVariable String title) {
         def useCase = caseRepository.findAll().find { it.title == title }
         return "{ ${useCase?.dataSet?.collect { "\"${useCase?.petriNet?.dataSet?.get(it?.key)?.importId}:${useCase?.petriNet?.dataSet?.get(it?.key)?.name?.toString()?.replaceAll("\n[ ]{2}", "")}\":\"${it?.value?.value as String}\"" }?.join(", ")} }"
     }
 
-    @RequestMapping(value = "/net/{title}", method = GET, produces = APPLICATION_XML_VALUE)
+    @GetMapping(value = "/net/{title}", produces = APPLICATION_XML_VALUE)
     String netSnapshot(@PathVariable String title) {
         try {
             def useCase = caseRepository.findAll().find { it.title == title }
@@ -79,11 +79,4 @@ class DevConsole {
         }
     }
 
-//    @RequestMapping(value = "/login", method = GET)
-//    def login() {
-//        def remote = new HTTPBuilder("http://localhost:8080/user")
-//        remote.auth.basic('agent@company.com', 'password')
-//        remote.request(Method.GET) {}
-//        return new RedirectView("/offers")
-//    }
 }

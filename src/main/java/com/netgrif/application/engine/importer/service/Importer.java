@@ -28,11 +28,12 @@ import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.ArcFactory;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import lombok.Getter;
@@ -41,9 +42,9 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
@@ -88,7 +89,7 @@ public class Importer {
     protected IPetriNetService service;
 
     @Autowired
-    protected ProcessRoleRepository roleRepository;
+    protected IProcessRoleService processRoleService;
 
     @Autowired
     protected ArcFactory arcFactory;
@@ -151,8 +152,8 @@ public class Importer {
         this.places = new HashMap<>();
         this.fields = new HashMap<>();
         this.transactions = new HashMap<>();
-        this.defaultRole = roleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
-        this.anonymousRole = roleRepository.findByName_DefaultValue(ProcessRole.ANONYMOUS_ROLE);
+        this.defaultRole = processRoleService.defaultRole();
+        this.anonymousRole = processRoleService.anonymousRole();
         this.i18n = new HashMap<>();
         this.actions = new HashMap<>();
         this.actionRefs = new HashMap<>();
@@ -189,6 +190,7 @@ public class Importer {
         net.setDefaultRoleEnabled(document.isDefaultRole() != null && document.isDefaultRole());
         net.setAnonymousRoleEnabled(document.isAnonymousRole() != null && document.isAnonymousRole());
 
+
         document.getRole().forEach(this::createRole);
         document.getData().forEach(this::createDataSet);
         document.getTransaction().forEach(this::createTransaction);
@@ -201,8 +203,6 @@ public class Importer {
         document.getData().forEach(this::addActionRefs);
         actionRefs.forEach(this::resolveActionRefs);
         document.getFunction().forEach(this::createFunction);
-        evaluateFunctions();
-        actions.forEach(this::evaluateActions);
         document.getRoleRef().forEach(this::resolveRoleRef);
         document.getUsersRef().forEach(this::resolveUserRef);
         document.getUserRef().forEach(this::resolveUserRef);
@@ -211,11 +211,16 @@ public class Importer {
 
         resolveProcessEvents(document.getProcessEvents());
         resolveCaseEvents(document.getCaseEvents());
+        evaluateFunctions();
+        actions.forEach(this::evaluateActions);
 
         if (document.getCaseName() != null && document.getCaseName().isDynamic()) {
             net.setDefaultCaseNameExpression(new Expression(document.getCaseName().getValue()));
         } else {
             net.setDefaultCaseName(toI18NString(document.getCaseName()));
+        }
+        if (document.getTags() != null) {
+            net.setTags(this.buildTagsMap(document.getTags().getTag()));
         }
 
         return Optional.of(net);
@@ -466,6 +471,9 @@ public class Importer {
         if (arc.getReference() != null) {
             arc.getReference().setType((places.containsKey(arc.getReference().getReference())) ? Type.PLACE : Type.DATA);
         }
+        if (importArc.getBreakpoint() != null) {
+            importArc.getBreakpoint().forEach(position -> arc.getBreakpoints().add(new Position(position.getX(), position.getY())));
+        }
 
         net.addArc(arc);
     }
@@ -487,6 +495,10 @@ public class Importer {
         transition.setImportId(importTransition.getId());
         transition.setTitle(importTransition.getLabel() != null ? toI18NString(importTransition.getLabel()) : new I18nString(""));
         transition.setPosition(importTransition.getX(), importTransition.getY());
+        if (importTransition.getTags() != null) {
+            transition.setTags(this.buildTagsMap(importTransition.getTags().getTag()));
+        }
+
         if (importTransition.getLayout() != null) {
             transition.setLayout(new TaskLayout(importTransition));
         }
@@ -823,11 +835,10 @@ public class Importer {
     @Transactional
     protected void addDataComponent(Transition transition, DataRef dataRef) throws MissingIconKeyException {
         String fieldId = getField(dataRef.getId()).getStringId();
-        Component component;
-        if ((dataRef.getComponent()) == null)
-            component = getField(dataRef.getId()).getComponent();
-        else
+        Component component = null;
+        if ((dataRef.getComponent()) != null) {
             component = componentFactory.buildComponent(dataRef.getComponent(), this, getField(dataRef.getId()));
+        }
         transition.addDataSet(fieldId, null, null, null, component);
     }
 
@@ -1028,7 +1039,7 @@ public class Importer {
         }
         place.setTokens(importPlace.getTokens());
         place.setPosition(importPlace.getX(), importPlace.getY());
-        place.setTitle(toI18NString(importPlace.getLabel()));
+        place.setTitle(importPlace.getLabel() != null ? toI18NString(importPlace.getLabel()) : new I18nString(""));
 
         net.addPlace(place);
         places.put(importPlace.getId(), place);
@@ -1055,7 +1066,7 @@ public class Importer {
         } else {
             role.setName(toI18NString(importRole.getName()));
         }
-        role.set_id(new ObjectId());
+        role.set_id(new ProcessResourceId(new ObjectId(net.getStringId())));
 
         role.setNetId(net.getStringId());
         net.addRole(role);
@@ -1293,5 +1304,15 @@ public class Importer {
         }
         if (!missingMetaData.isEmpty())
             throw new MissingPetriNetMetaDataException(missingMetaData);
+    }
+
+    protected Map<String, String> buildTagsMap(List<Tag> tagsList) {
+        Map<String, String> tags = new HashMap<>();
+        if (tagsList != null) {
+            tagsList.forEach(tag -> {
+                tags.put(tag.getKey(), tag.getValue());
+            });
+        }
+        return tags;
     }
 }

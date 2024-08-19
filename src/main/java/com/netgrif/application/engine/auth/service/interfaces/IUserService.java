@@ -5,6 +5,8 @@ import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,12 +46,14 @@ public interface IUserService {
     Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable);
 
     void addDefaultRole(IUser user);
+    void addAnonymousRole(IUser user);
 
     List<IUser> findAllByProcessRoles(Set<String> roleIds, boolean small);
 
     void addDefaultAuthorities(IUser user);
+    void addAnonymousAuthorities(IUser user);
 
-    void assignAuthority(String userId, String authorityId);
+    IUser assignAuthority(String userId, String authorityId);
 
     IUser getLoggedOrSystem();
 
@@ -59,17 +63,20 @@ public interface IUserService {
 
     LoggedUser getAnonymousLogged();
 
+    LoggedUser getLoggedUserFromContext();
+
     IUser addRole(IUser user, String roleStringId);
 
     Page<IUser> searchAllCoMembers(String query, LoggedUser principal, Boolean small, Pageable pageable);
 
     IUser removeRole(IUser user, String roleStringId);
+    IUser removeRole(IUser user, ProcessRole processRole);
 
     void removeRoleOfDeletedPetriNet(PetriNet net);
 
     void deleteUser(IUser user);
 
-    Page<IUser> searchAllCoMembers(String query, List<ObjectId> roles, List<ObjectId> negateRoleIds, LoggedUser principal, Boolean small, Pageable pageable);
+    Page<IUser> searchAllCoMembers(String query, List<ProcessResourceId> roles, List<ProcessResourceId> negateRoleIds, LoggedUser principal, Boolean small, Pageable pageable);
 
     IUser createSystemUser();
 

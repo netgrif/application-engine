@@ -8,15 +8,19 @@ import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.LocalizedValidation;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation;
-import com.netgrif.application.engine.petrinet.domain.views.View;
 import lombok.Data;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 @Data
-public class LocalisedField {
+public class LocalisedField implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 412530951556364614L;
 
     private String stringId;
 
@@ -38,8 +42,6 @@ public class LocalisedField {
 
     private Format formatFilter;
 
-    private View view;
-
     private Integer length;
 
     private Component component;
@@ -50,7 +52,8 @@ public class LocalisedField {
 
     private String parentCaseId;
 
-    public LocalisedField() {}
+    public LocalisedField() {
+    }
 
     public LocalisedField(Field field, Locale locale) {
         this();
@@ -64,7 +67,6 @@ public class LocalisedField {
         value = field.getValue();
         order = field.getOrder();
         formatFilter = field.getFormat();
-        view = field.getView();
         length = field.getLength();
         component = field.getComponent();
         validations = loadValidations(field, locale);

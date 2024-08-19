@@ -16,21 +16,21 @@ import java.util.Locale;
 @Data
 public class PdfProperties {
 
-    protected int unit = 75;
+    protected int unit = 20;
 
     protected PDRectangle pageSize = PDRectangle.A4;
 
     protected int pageWidth = 600;
 
-    protected int pageHeight = 850;
+    protected int pageHeight = 820;
 
-    protected int lineHeight = 20;
+    protected int lineHeight = 17;
 
-    protected int marginTitle = (int) (0.5 * unit);
+    protected int marginTitle = 0;
 
     protected int marginTop = unit;
 
-    protected int marginBottom = unit;
+    protected int marginBottom = 4 * unit;
 
     protected int marginLeft = (int) (0.5 * unit);
 
@@ -39,6 +39,12 @@ public class PdfProperties {
     protected int padding = 4;
 
     protected int boxPadding = 2;
+
+    protected String colorString = "#666666";
+
+    protected String colorLabelString = "#888888";
+
+    protected String colorDataGroup = "#2297F2";
 
     protected int baseX = marginLeft;
 
@@ -97,18 +103,6 @@ public class PdfProperties {
         formGridColWidth = (pageDrawableWidth / formGridCols);
         formGridRowHeight = ((pageHeight - marginBottom - marginTop) / formGridRows);
         rowGridFree = formGridCols;
-        baseX = marginLeft;
-    }
-
-    public void updateProperties(int unit) {
-        marginTop = unit;
-        marginBottom = unit;
-        marginLeft = (int) (0.5 * unit);
-        marginRight = (int) (0.5 * unit);
-        marginTitle = (int) (0.5 * unit);
-        pageDrawableWidth = pageWidth - marginLeft - marginRight;
-        formGridColWidth = (pageDrawableWidth / formGridCols);
-        formGridRowHeight = ((pageHeight - marginBottom - marginTop) / formGridRows);
         baseX = marginLeft;
     }
 }

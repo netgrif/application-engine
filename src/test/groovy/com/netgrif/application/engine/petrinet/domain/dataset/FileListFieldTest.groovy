@@ -9,7 +9,7 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
@@ -25,6 +25,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.util.MultiValueMap
 import org.springframework.web.context.WebApplicationContext
 
 import static org.hamcrest.core.StringContains.containsString
@@ -72,7 +73,7 @@ class FileListFieldTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator
+    private SuperCreatorRunner superCreator
 
     private MockMvc mockMvc
 
@@ -108,7 +109,9 @@ class FileListFieldTest {
         Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
-        mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/" + FIELD_ID + '/test-file.txt')
+        mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/named")
+                .param("fieldId", FIELD_ID)
+                .param("fileName", "test-file.txt")
                 .with(httpBasic(USER_EMAIL, userPassword)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -127,8 +130,10 @@ class FileListFieldTest {
         Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
-        mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file/" + FIELD_ID + '/test-file-list.txt').
-                with(httpBasic(USER_EMAIL, userPassword)))
+        mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file/named")
+                .param("fieldId", FIELD_ID)
+                .param("fileName", "test-file.txt")
+                .with(httpBasic(USER_EMAIL, userPassword)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))

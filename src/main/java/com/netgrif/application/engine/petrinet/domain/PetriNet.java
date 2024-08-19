@@ -3,7 +3,6 @@ package com.netgrif.application.engine.petrinet.domain;
 import com.netgrif.application.engine.auth.domain.Author;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Referencable;
-import com.netgrif.application.engine.petrinet.domain.arcs.reference.Reference;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Type;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
@@ -29,9 +28,14 @@ import java.util.stream.Collectors;
 @Document
 public class PetriNet extends PetriNetObject {
 
+
     @Getter
     @Setter
     private String identifier; //combination of identifier and version must be unique ... maybe use @CompoundIndex?
+
+    @Getter
+    @Setter
+    private String uriNodeId;
 
     @Getter
     private I18nString title;
@@ -76,33 +80,33 @@ public class PetriNet extends PetriNetObject {
     @org.springframework.data.mongodb.core.mapping.Field("places")
     @Getter
     @Setter
-    private Map<String, Place> places;
+    private LinkedHashMap<String, Place> places;
 
     @org.springframework.data.mongodb.core.mapping.Field("transitions")
     @Getter
     @Setter
-    private Map<String, Transition> transitions;
+    private LinkedHashMap<String, Transition> transitions;
 
     @org.springframework.data.mongodb.core.mapping.Field("arcs")
     @Getter
     @Setter
-    private Map<String, List<Arc>> arcs;//todo: import id
+    private LinkedHashMap<String, List<Arc>> arcs;//todo: import id
 
     @org.springframework.data.mongodb.core.mapping.Field("dataset")
     @Getter
     @Setter
-    private Map<String, Field> dataSet;
+    private LinkedHashMap<String, Field> dataSet;
 
     @org.springframework.data.mongodb.core.mapping.Field("roles")
     @DBRef
     @Getter
     @Setter
-    private Map<String, ProcessRole> roles;
+    private LinkedHashMap<String, ProcessRole> roles;
 
     @org.springframework.data.mongodb.core.mapping.Field("transactions")
     @Getter
     @Setter
-    private Map<String, Transaction> transactions;//todo: import id
+    private LinkedHashMap<String, Transaction> transactions;//todo: import id
 
     @Getter
     @Setter
@@ -135,6 +139,10 @@ public class PetriNet extends PetriNetObject {
     @Setter
     private String importXmlPath;
 
+    @Getter
+    @Setter
+    private Map<String, String> tags;
+
     public PetriNet() {
         this._id = new ObjectId();
         this.identifier = "Default";
@@ -145,11 +153,11 @@ public class PetriNet extends PetriNetObject {
         defaultCaseName = new I18nString("");
         initialized = false;
         creationDate = LocalDateTime.now();
-        places = new HashMap<>();
-        transitions = new HashMap<>();
-        arcs = new HashMap<>();
+        places = new LinkedHashMap<>();
+        transitions = new LinkedHashMap<>();
+        arcs = new LinkedHashMap<>();
         dataSet = new LinkedHashMap<>();
-        roles = new HashMap<>();
+        roles = new LinkedHashMap<>();
         negativeViewRoles = new LinkedList<>();
         transactions = new LinkedHashMap<>();
         processEvents = new LinkedHashMap<>();
@@ -157,6 +165,7 @@ public class PetriNet extends PetriNetObject {
         permissions = new HashMap<>();
         userRefs = new HashMap<>();
         functions = new LinkedList<>();
+        tags = new HashMap<>();
     }
 
     public void addPlace(Place place) {
@@ -183,7 +192,9 @@ public class PetriNet extends PetriNetObject {
         negativeViewRoles.add(roleId);
     }
 
-    public void addFunction(Function function) { functions.add(function); }
+    public void addFunction(Function function) {
+        functions.add(function);
+    }
 
     public void addUserPermission(String usersRefId, Map<String, Boolean> permissions) {
         if (this.userRefs.containsKey(usersRefId) && this.userRefs.get(usersRefId) != null) {
@@ -261,14 +272,14 @@ public class PetriNet extends PetriNetObject {
         arcs.values()
                 .stream()
                 .flatMap(List::stream)
-                .filter(arc -> arc.getReference() !=null)
+                .filter(arc -> arc.getReference() != null)
                 .forEach(arc -> {
-                        String referenceId = arc.getReference().getReference();
-                        arc.getReference().setReferencable(getArcReference(referenceId, arc.getReference().getType(), dataSet));
+                    String referenceId = arc.getReference().getReference();
+                    arc.getReference().setReferencable(getArcReference(referenceId, arc.getReference().getType(), dataSet));
                 });
     }
 
-    private Referencable getArcReference(String referenceId, Type type, Map<String, DataField> dataSet){
+    private Referencable getArcReference(String referenceId, Type type, Map<String, DataField> dataSet) {
         if (type == Type.PLACE) {
             return places.get(referenceId);
         } else {
@@ -400,42 +411,44 @@ public class PetriNet extends PetriNetObject {
     public PetriNet clone() {
         PetriNet clone = new PetriNet();
         clone.setIdentifier(this.identifier);
+        clone.setUriNodeId(this.uriNodeId);
         clone.setInitials(this.initials);
-        clone.setTitle(this.title);
+        clone.setTitle(this.title.clone());
         clone.setDefaultRoleEnabled(this.defaultRoleEnabled);
-        clone.setDefaultCaseName(this.defaultCaseName);
-        clone.setDefaultCaseNameExpression(this.defaultCaseNameExpression);
+        clone.setDefaultCaseName(this.defaultCaseName == null ? null : this.defaultCaseName.clone());
+        clone.setDefaultCaseNameExpression(this.defaultCaseNameExpression == null ? null : this.defaultCaseNameExpression.clone());
         clone.setIcon(this.icon);
         clone.setCreationDate(this.creationDate);
-        clone.setVersion(this.version);
-        clone.setAuthor(this.author);
-        clone.setTransitions(this.transitions);
-        clone.setRoles(this.roles);
-        clone.setTransactions(this.transactions);
+        clone.setVersion(this.version == null ? null : this.version.clone());
+        clone.setAuthor(this.author == null ? null : this.author.clone());
+        clone.setTransitions(this.transitions == null ? null : this.transitions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, LinkedHashMap::new)));
+        clone.setRoles(this.roles == null ? null : this.roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, LinkedHashMap::new)));
+        clone.setTransactions(this.transactions == null ? null : this.transactions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, LinkedHashMap::new)));
         clone.setImportXmlPath(this.importXmlPath);
         clone.setImportId(this.importId);
         clone.setObjectId(this._id);
         clone.setDataSet(this.dataSet.entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()))
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x,y)->y, LinkedHashMap::new))
         );
         clone.setPlaces(this.places.entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()))
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x,y)->y, LinkedHashMap::new))
         );
         clone.setArcs(this.arcs.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
-                        .map(arc -> arc.clone())
-                        .collect(Collectors.toList())))
+                        .map(Arc::clone)
+                        .collect(Collectors.toList()), (x,y)->y, LinkedHashMap::new))
         );
         clone.initializeArcs();
-        clone.setCaseEvents(this.caseEvents);
-        clone.setProcessEvents(this.processEvents);
-        clone.setPermissions(this.permissions);
-        clone.setUserRefs(this.userRefs);
+        clone.setCaseEvents(this.caseEvents == null ? null : this.caseEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
+        clone.setProcessEvents(this.processEvents == null ? null : this.processEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
+        clone.setPermissions(this.permissions == null ? null : this.permissions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
+        clone.setUserRefs(this.userRefs == null ? null : this.userRefs.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
         this.getNegativeViewRoles().forEach(clone::addNegativeViewRole);
         this.getFunctions().forEach(clone::addFunction);
+        clone.setTags(new HashMap<>(this.tags));
         return clone;
     }
 }

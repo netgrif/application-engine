@@ -9,13 +9,14 @@ import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssemb
 import com.netgrif.application.engine.settings.domain.Preferences;
 import com.netgrif.application.engine.settings.service.IPreferencesService;
 import com.netgrif.application.engine.settings.web.PreferencesResource;
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAssembler;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
@@ -28,26 +29,25 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.inject.Provider;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/public/user")
 @ConditionalOnProperty(
-        value = "nae.user.web.enabled",
+        value = "nae.public.user.web.enabled",
         havingValue = "true",
         matchIfMissing = true
 )
-@Api(tags = {"User"})
+@Tag(name = "Public User Controller")
+@RequestMapping("/api/public/user")
 public class PublicUserController {
 
     @Autowired
     private IUserFactory userResponseFactory;
 
     @Autowired
-    private Provider<UserResourceAssembler> userResourceAssemblerProvider;
+    private ObjectFactory<UserResourceAssembler> userResourceAssemblerFactory;
 
     @Autowired
     private IUserService userService;
@@ -59,24 +59,24 @@ public class PublicUserController {
     }
 
     protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
-        UserResourceAssembler result = userResourceAssemblerProvider.get();
+        UserResourceAssembler result = userResourceAssemblerFactory.getObject();
         result.initialize(locale, small, selfRel);
         return result;
     }
 
-    @ApiOperation(value = "Get logged user")
+    @Operation(summary = "Get logged user")
     @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource getLoggedUser(Locale locale) {
         return new UserResource(userResponseFactory.getUser(userService.getAnonymousLogged().transformToAnonymousUser(), locale), "profile");
     }
 
-    @ApiOperation(value = "Generic user search", authorizations = @Authorization("BasicAuth"))
-    @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @Operation(summary = "Generic user search")
+    @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> search(@RequestParam(value = "small", required = false) Boolean small, @RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Locale locale) {
         small = small == null ? false : small;
         Page<IUser> page = userService.searchAllCoMembers(query.getFulltext(),
-                query.getRoles().stream().map(ObjectId::new).collect(Collectors.toList()),
-                query.getNegativeRoles().stream().map(ObjectId::new).collect(Collectors.toList()),
+                query.getRoles().stream().map(ProcessResourceId::new).collect(Collectors.toList()),
+                query.getNegativeRoles().stream().map(ProcessResourceId::new).collect(Collectors.toList()),
                 userService.getAnonymousLogged(), small, pageable);
 
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicUserController.class)
@@ -86,7 +86,7 @@ public class PublicUserController {
         return resources;
     }
 
-    @ApiOperation(value = "Get user's preferences", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Get user's preferences")
     @GetMapping(value = "/preferences", produces = MediaTypes.HAL_JSON_VALUE)
     public PreferencesResource preferences() {
         String userId = userService.getAnonymousLogged().transformToAnonymousUser().getId();
@@ -99,8 +99,8 @@ public class PublicUserController {
         return new PreferencesResource(preferences);
     }
 
-    @ApiOperation(value = "Set user's preferences", authorizations = @Authorization("BasicAuth"))
-    @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @Operation(summary = "Set user's preferences")
+    @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource savePreferences(@RequestBody Preferences preferences) {
         try {
             String userId = userService.getAnonymousLogged().transformToAnonymousUser().getId();

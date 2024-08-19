@@ -9,16 +9,17 @@ import com.netgrif.application.engine.auth.domain.UserState;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.startup.DefaultRoleRunner;
+import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.startup.ImportHelper;
-import com.netgrif.application.engine.startup.SuperCreator;
-import com.netgrif.application.engine.startup.SystemUserRunner;
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
+import com.netgrif.application.engine.startup.runner.SystemUserRunner;
+import com.netgrif.application.engine.startup.runner.DefaultRoleRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -41,6 +42,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.io.FileInputStream;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -69,7 +72,7 @@ public class VariableArcsTest {
     private DefaultRoleRunner defaultRoleRunner;
 
     @Autowired
-    private ProcessRoleRepository roleRepository;
+    private IProcessRoleService processRoleService;
 
     @Autowired
     private ImportHelper importHelper;
@@ -81,7 +84,7 @@ public class VariableArcsTest {
     private SystemUserRunner userRunner;
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreatorRunner superCreator;
 
     @Autowired
     private TestHelper testHelper;
@@ -97,17 +100,11 @@ public class VariableArcsTest {
     @BeforeEach
     public void before() throws Exception {
         testHelper.truncateDbs();
-        userRunner.run("");
+        userRunner.run(null);
         repository.deleteAll();
-        if (roleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE) == null) {
-            try {
-                defaultRoleRunner.run();
-            } catch (Exception e) {
-                log.error("VariableArcsTest failed: ", e);
-            }
-        }
+        assertNotNull(processRoleService.defaultRole());
         testHelper.truncateDbs();
-        ImportPetriNetEventOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), VersionType.MAJOR, superCreator.getLoggedSuper());
 
         assert outcome.getNet() != null;
         PetriNet net = outcome.getNet();

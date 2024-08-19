@@ -6,7 +6,9 @@ import com.querydsl.core.annotations.QueryType
 import org.bson.types.ObjectId
 
 
-class Action {
+class Action implements Serializable{
+
+    private static final long serialVersionUID = 3687481049847555522L;
 
     private String importId;
 
@@ -90,6 +92,18 @@ class Action {
         this.importId = importId
     }
 
+    void setFieldIds(Map<String, String> fieldIds) {
+        this.fieldIds = fieldIds
+    }
+
+    void setTransitionIds(Map<String, String> transitionIds) {
+        this.transitionIds = transitionIds
+    }
+
+    void setId(ObjectId id) {
+        this.id = id
+    }
+
     @Override
     String toString() {
         return "[$trigger] $definition"
@@ -110,5 +124,17 @@ class Action {
     @QueryType(PropertyType.NONE)
     MetaClass getMetaClass() {
         return this.metaClass
+    }
+
+    @Override
+    Action clone() {
+        Action clone = new Action()
+        clone.setId(new ObjectId(this.getId().toString()))
+        clone.setTrigger(this.trigger)
+        clone.setDefinition(this.definition)
+        clone.setImportId(this.importId)
+        clone.setTransitionIds(new HashMap<String, String>(this.transitionIds))
+        clone.setFieldIds(new HashMap<String, String>(this.fieldIds))
+        return clone
     }
 }

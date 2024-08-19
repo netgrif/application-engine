@@ -11,11 +11,14 @@ import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
 
-public class DataFieldLogic {
+public class DataFieldLogic implements Serializable {
+
+    private static final long serialVersionUID = 6561411252131004710L;
 
     @Getter
     @Setter
@@ -48,6 +51,15 @@ public class DataFieldLogic {
             this.component = component;
     }
 
+    public static List<Action> getEventAction(DataEvent event, EventPhase phase) {
+        if (phase == null) phase = event.getDefaultPhase();
+        if (phase.equals(EventPhase.PRE)) {
+            return event.getPreActions();
+        } else {
+            return event.getPostActions();
+        }
+    }
+
     public ObjectNode applyBehavior(ObjectNode jsonNode) {
         behavior.forEach(fieldBehavior -> jsonNode.put(fieldBehavior.toString(), true));
         return jsonNode;
@@ -65,15 +77,6 @@ public class DataFieldLogic {
         return behavior.contains(FieldBehavior.EDITABLE) || behavior.contains(FieldBehavior.VISIBLE) || behavior.contains(FieldBehavior.HIDDEN);
     }
 
-    public static List<Action> getEventAction(DataEvent event, EventPhase phase){
-        if(phase == null) phase = event.getDefaultPhase();
-        if(phase.equals(EventPhase.PRE)){
-            return event.getPreActions();
-        } else {
-            return event.getPostActions();
-        }
-    }
-
     public boolean isRequired() {
         return behavior.contains(FieldBehavior.REQUIRED);
     }
@@ -89,5 +92,15 @@ public class DataFieldLogic {
 
     public boolean layoutExist() {
         return this.layout != null;
+    }
+
+    @Override
+    public DataFieldLogic clone() {
+        DataFieldLogic clone = new DataFieldLogic();
+        clone.setBehavior(new HashSet<>(this.behavior));
+        clone.setLayout(this.layout == null ? null : this.layout.clone());
+        clone.setEvents(this.events == null ? null : this.events.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
+        clone.setComponent(this.component == null ? null : this.component.clone());
+        return clone;
     }
 }

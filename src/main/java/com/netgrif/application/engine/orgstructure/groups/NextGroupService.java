@@ -5,6 +5,8 @@ import com.netgrif.application.engine.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
+import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
@@ -14,6 +16,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
@@ -29,10 +32,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -66,6 +70,9 @@ public class NextGroupService implements INextGroupService {
     protected ITaskService taskService;
 
     @Autowired
+    protected IElasticCaseService elasticCaseService;
+
+    @Autowired
     protected ISecurityContextService securityContextService;
 
 
@@ -78,8 +85,8 @@ public class NextGroupService implements INextGroupService {
     protected final static String GROUP_TITLE_FIELD = "group_name";
 
     @Override
-    public CreateCaseEventOutcome createDefaultSystemGroup(IUser author){
-        if(findDefaultGroup() != null) {
+    public CreateCaseEventOutcome createDefaultSystemGroup(IUser author) {
+        if (findDefaultGroup() != null) {
             log.info("Default system group has already been created.");
             return null;
         }
@@ -87,12 +94,12 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
-    public CreateCaseEventOutcome createGroup(IUser author){
+    public CreateCaseEventOutcome createGroup(IUser author) {
         return createGroup(author.getFullName(), author);
     }
 
     @Override
-    public CreateCaseEventOutcome createGroup(String title, IUser author){
+    public CreateCaseEventOutcome createGroup(String title, IUser author) {
         Case userDefaultGroup = findUserDefaultGroup(author);
         if (userDefaultGroup != null && userDefaultGroup.getTitle().equals(title)) {
             return null;
@@ -100,7 +107,7 @@ public class NextGroupService implements INextGroupService {
         PetriNet orgGroupNet = petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER);
         CreateCaseEventOutcome outcome = workflowService.createCase(orgGroupNet.getStringId(), title, "", author.transformToLoggedUser());
 
-        Map<String, Map<String,String>> taskData = getInitialGroupData(author, title, outcome.getCase());
+        Map<String, Map<String, String>> taskData = getInitialGroupData(author, title, outcome.getCase());
         Task initTask = getGroupInitTask(outcome.getCase());
         dataService.setData(initTask.getStringId(), ImportHelper.populateDataset(taskData));
 
@@ -117,7 +124,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Case findGroup(String groupID) {
-        Case result = workflowService.searchOne(groupCase().and(QCase.case$._id.eq(new ObjectId(groupID))));
+        Case result = workflowService.searchOne(groupCase().and(QCase.case$._id.eq(new ProcessResourceId(groupID))));
         if (!isGroupCase(result)) {
             return null;
         }
@@ -126,7 +133,15 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Case findDefaultGroup() {
-        return workflowService.searchOne(groupCase().and(QCase.case$.title.eq("Default system group")));
+        return findByName("Default system group");
+    }
+
+    @Override
+    public Case findByName(String name) {
+        CaseSearchRequest request = new CaseSearchRequest();
+        request.query = "title.keyword:\"" + name + "\"";
+        List<Case> result = elasticCaseService.search(Collections.singletonList(request), userService.getSystem().transformToLoggedUser(), PageRequest.of(0, 1), LocaleContextHolder.getLocale(), false).getContent();
+        return !result.isEmpty() ? result.get(0) : null;
     }
 
     @Override
@@ -136,7 +151,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public List<Case> findByIds(Collection<String> groupIds) {
-        List<BooleanExpression> groupQueries = groupIds.stream().map(ObjectId::new).map(QCase.case$._id::eq).collect(Collectors.toList());
+        List<BooleanExpression> groupQueries = groupIds.stream().map(ProcessResourceId::new).map(QCase.case$._id::eq).collect(Collectors.toList());
         BooleanBuilder builder = new BooleanBuilder();
         groupQueries.forEach(builder::or);
         return this.workflowService.searchAll(groupCase().and(builder)).getContent();
@@ -182,9 +197,9 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
-    public void addUser(IUser user, String groupId){
+    public void addUser(IUser user, String groupId) {
         Case groupCase = this.findGroup(groupId);
-        if(groupCase != null){
+        if (groupCase != null) {
             this.addUser(user, groupCase);
         }
     }
@@ -209,7 +224,7 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
-    public void removeUser(IUser user, Case groupCase){
+    public void removeUser(IUser user, Case groupCase) {
         HashSet<String> userIds = new HashSet<>();
         Map<String, I18nString> existingUsers = groupCase.getDataField(GROUP_MEMBERS_FIELD).getOptions();
 
@@ -220,7 +235,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Map<String, I18nString> removeUser(HashSet<String> usersToRemove, Map<String, I18nString> existingUsers, Case groupCase) {
-        String authorId = this.getGroupOwnerId(groupCase).toString();
+        String authorId = this.getGroupOwnerId(groupCase);
         usersToRemove.forEach(user -> {
             if (user.equals(authorId)) {
                 log.error("Author with id [" + authorId + "] cannot be removed from group with ID [" + groupCase.get_id().toString() + "]");
@@ -241,7 +256,7 @@ public class NextGroupService implements INextGroupService {
     @Override
     public Set<String> getAllCoMembers(IUser user) {
         Set<String> users = workflowService.searchAll(
-                groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(user.getStringId())))
+                        groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(user.getStringId())))
                 .map(it -> it.getDataSet().get(GROUP_MEMBERS_FIELD).getOptions().keySet()).stream()
                 .collect(HashSet::new, Set::addAll, Set::addAll);
         users.remove(user.getStringId());
@@ -305,8 +320,8 @@ public class NextGroupService implements INextGroupService {
 
     protected boolean authorHasDefaultGroup(IUser author) {
         List<Case> allGroups = findAllGroups();
-        for (Case group : allGroups){
-            if(group.getAuthor().getId().equals(author.getStringId())) {
+        for (Case group : allGroups) {
+            if (group.getAuthor().getId().equals(author.getStringId())) {
                 return true;
             }
         }
@@ -324,10 +339,10 @@ public class NextGroupService implements INextGroupService {
     protected Task getGroupInitTask(Case groupCase) {
         List<TaskReference> taskList = taskService.findAllByCase(groupCase.getStringId(), LocaleContextHolder.getLocale());
         Optional<TaskReference> initTaskReference = taskList.stream().filter(taskReference ->
-                taskReference.getTransitionId().equals(GROUP_INIT_TASK_ID))
+                        taskReference.getTransitionId().equals(GROUP_INIT_TASK_ID))
                 .findFirst();
 
-        if (!initTaskReference.isPresent()) {
+        if (initTaskReference.isEmpty()) {
             log.error("Initial task of group case is not present!");
             return null;
         }

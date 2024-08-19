@@ -132,8 +132,14 @@ gen
 ### Work folder ###
 _issues/
 storage/
-rules/
+/rules/
 *.log*
 log/
 !/src/main/java/com/netgrif/workflow/rules/
 !/src/main/java/com/netgrif/workflow/rules/domain/StoredRuleRepository.java
+
+### CERT ###
+/src/main/resources/certificates/keypair.pem
+/src/main/resources/certificates/private.der
+/src/main/resources/certificates/public.crt
+/modules/

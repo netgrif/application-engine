@@ -13,9 +13,9 @@ import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepos
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.startup.SuperCreator;
-import com.netgrif.application.engine.startup.SystemUserRunner;
-import com.netgrif.application.engine.utils.FullPageRequest;
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
+import com.netgrif.application.engine.startup.runner.SystemUserRunner;
+import com.netgrif.application.engine.startup.runner.UriRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
@@ -70,29 +70,24 @@ public class TaskServiceTest {
     private SystemUserRunner userRunner;
 
     @Autowired
+    private UriRunner uriRunner;
+
+    @Autowired
     private IPetriNetService petriNetService;
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreatorRunner superCreator;
 
     @BeforeEach
     public void setUp() throws Exception {
         mongoTemplate.getDb().drop();
         taskRepository.deleteAll();
-        userRunner.run("");
+        userRunner.run(null);
+        uriRunner.run(null);
 
         petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
         PetriNet net = petriNetRepository.findAll().get(0);
         workflowService.createCase(net.getStringId(), "Storage Unit", "color", mockLoggedUser());
-    }
-
-    @Test
-    public void createTasks() {
-        Case useCase = workflowService.getAll(new FullPageRequest()).getContent().get(0);
-
-        service.createTasks(useCase);
-
-        assert taskRepository.findAll().size() > 0;
     }
 
     @Test

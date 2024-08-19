@@ -9,17 +9,22 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.TaskSearchService
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.web.PublicTaskController
+import com.netgrif.application.engine.workflow.web.TaskController
 import com.netgrif.application.engine.workflow.web.WorkflowController
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
@@ -29,6 +34,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Page
+import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
@@ -64,7 +70,7 @@ class TaskControllerTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator
+    private SuperCreatorRunner superCreator
 
     @Autowired
     private TestHelper testHelper
@@ -74,6 +80,12 @@ class TaskControllerTest {
 
     @Autowired
     private IAuthorityService authorityService
+
+    @Autowired
+    private IWorkflowService workflowService
+
+    @Autowired
+    private TaskController taskController
 
     private PetriNet net
 
@@ -102,6 +114,34 @@ class TaskControllerTest {
         testWithRoleAndUserref()
         testWithUserref()
         testWithRole()
+    }
+
+    @Test
+    void testDeleteFile() {
+        Case testCase = helper.createCase("My case", net)
+        String taskId = testCase.tasks.find {it.transition == "1"}.task
+
+        dataService.saveFile(taskId, "file", new MockMultipartFile("test", new byte[] {}))
+        testCase = workflowService.findOne(testCase.stringId)
+        assert testCase.dataSet["file"].value != null
+
+        taskController.deleteFile(taskId, "file")
+        testCase = workflowService.findOne(testCase.stringId)
+        assert testCase.dataSet["file"].value == null
+    }
+
+    @Test
+    void testDeleteFileByName() {
+        Case testCase = helper.createCase("My case", net)
+        String taskId = testCase.tasks.find {it.transition == "1"}.task
+
+        dataService.saveFiles(taskId, "fileList", new MockMultipartFile[] {new MockMultipartFile("test", "test", null, new byte[] {})})
+        testCase = workflowService.findOne(testCase.stringId)
+        assert testCase.dataSet["fileList"].value != null
+
+        taskController.deleteNamedFile(taskId, "fileList", "test")
+        testCase = workflowService.findOne(testCase.stringId)
+        assert ((FileListFieldValue) testCase.dataSet["fileList"].value).namesPaths == null || ((FileListFieldValue) testCase.dataSet["fileList"].value).namesPaths.size() == 0
     }
 
 

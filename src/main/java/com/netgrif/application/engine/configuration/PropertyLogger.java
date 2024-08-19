@@ -17,6 +17,7 @@ import java.util.stream.StreamSupport;
 public class PropertyLogger {
 
     private static final Logger log = LoggerFactory.getLogger(PropertyLogger.class);
+    private static final String[] SECRET_PROPS = new String[]{"secret", "password", "credentials", "heslo", "pass"};
 
     @EventListener
     public void logProperties(ContextRefreshedEvent event) {
@@ -30,8 +31,19 @@ public class PropertyLogger {
                 .map(ps -> ((EnumerablePropertySource) ps).getPropertyNames())
                 .flatMap(Arrays::stream)
                 .distinct()
-                .filter(prop -> !(prop.contains("credentials") || prop.contains("password")))
-                .forEach(prop -> log.info("{}: {}", prop, env.getProperty(prop)));
+                .forEach(prop -> log.info("{}: {}", prop, getSanitizedProperty(prop, env)));
         log.info("===========================================");
     }
+
+    private String getSanitizedProperty(String property, Environment env) {
+        String value = env.getProperty(property);
+        if (value == null) {
+            return "";
+        }
+        if (Arrays.stream(SECRET_PROPS).anyMatch(s -> property.toLowerCase().endsWith(s))) {
+            return value.isEmpty() ? "" : "**********";
+        }
+        return value;
+    }
+
 }

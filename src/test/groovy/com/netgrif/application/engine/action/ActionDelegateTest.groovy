@@ -1,11 +1,13 @@
 package com.netgrif.application.engine.action
 
+import com.icegreen.greenmail.configuration.GreenMailConfiguration
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
+import com.netgrif.application.engine.configuration.PublicViewProperties
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
@@ -18,7 +20,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-import javax.mail.internet.MimeMessage
+import jakarta.mail.internet.MimeMessage
+
+import static java.util.Base64.*
 
 @SpringBootTest
 @ActiveProfiles(["test"])
@@ -37,6 +41,9 @@ class ActionDelegateTest {
     @Autowired
     private IUserService userService
 
+    @Autowired
+    private PublicViewProperties publicViewProperties
+
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
@@ -52,7 +59,7 @@ class ActionDelegateTest {
 
     @Test
     void inviteUser(){
-        GreenMail smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
+        GreenMail smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp")).withConfiguration(GreenMailConfiguration.aConfig().withDisabledAuthentication())
         smtpServer.start()
 
         MessageResource messageResource = actionDelegate.inviteUser("test@netgrif.com")
@@ -65,7 +72,7 @@ class ActionDelegateTest {
 
     @Test
     void deleteUser(){
-        GreenMail smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
+        GreenMail smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp")).withConfiguration(GreenMailConfiguration.aConfig().withDisabledAuthentication())
         smtpServer.start()
         String mail = "test@netgrif.com";
         MessageResource messageResource = actionDelegate.inviteUser(mail)
@@ -83,7 +90,7 @@ class ActionDelegateTest {
 
     @Test
     void inviteUserNewUserRequest(){
-        GreenMail smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
+        GreenMail smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp")).withConfiguration(GreenMailConfiguration.aConfig().withDisabledAuthentication())
         smtpServer.start()
 
         NewUserRequest newUserRequest = new NewUserRequest()
@@ -99,5 +106,12 @@ class ActionDelegateTest {
         smtpServer.stop()
     }
 
-
+    @Test
+    void makeUrlAction() {
+        final String identifier = "identifier"
+        final String url = "test.public.url/${getEncoder().encodeToString(identifier.bytes)}"
+        assert actionDelegate.makeUrl(identifier) == url
+        assert actionDelegate.makeUrl(publicViewProperties.url, identifier) == url
+        assert actionDelegate.makeUrl("test.netgrif.com/public", "identifier") == "test.netgrif.com/public/${getEncoder().encodeToString(identifier.bytes)}"
+    }
 }

@@ -6,6 +6,7 @@ import com.netgrif.application.engine.auth.domain.User;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashSet;
@@ -14,9 +15,10 @@ import java.util.Set;
 
 @Data
 @Document(collection = "user")
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapUser extends User {
 
+    @Indexed
     private String dn;
 
     private String commonName;
@@ -58,11 +60,14 @@ public class LdapUser extends User {
 
     @Override
     public LoggedUser transformToLoggedUser() {
-        LdapLoggedUser loggedUser = new LdapLoggedUser(this.getStringId(), this.getEmail(), this.getPassword(), getDn(), getCommonName(), getMemberOf(),  getUid(), getHomeDirectory(), this.getAuthorities());
+        LdapLoggedUser loggedUser = new LdapLoggedUser(this.getStringId(), this.getEmail(), this.getPassword(), getDn(), getCommonName(), getMemberOf(), getUid(), getHomeDirectory(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
         if (!this.getProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(this.getProcessRoles());
         loggedUser.setGroups(this.getNextGroups());
+        if (this.isImpersonating()) {
+            loggedUser.impersonate(this.getImpersonated().transformToLoggedUser());
+        }
 
         return loggedUser;
     }

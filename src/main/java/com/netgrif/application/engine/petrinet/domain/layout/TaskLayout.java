@@ -24,4 +24,17 @@ public class TaskLayout extends FormLayout {
         this.offset = data.getLayout().getOffset();
         this.fieldAlignment = data.getLayout().getFieldAlignment() != null ? data.getLayout().getFieldAlignment().value() : null;
     }
+
+    @Override
+    public TaskLayout clone() {
+        TaskLayout clone = new TaskLayout();
+        clone.setCols(this.getCols());
+        clone.setRows(this.getRows());
+        clone.setType(this.getType());
+        clone.setOffset(this.offset);
+        clone.setFieldAlignment(this.fieldAlignment);
+        clone.setCompactDirection(this.getCompactDirection());
+        clone.setHideEmptyRows(this.getHideEmptyRows());
+        return clone;
+    }
 }

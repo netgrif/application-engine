@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
 import java.util.Set;
 
 @Document
@@ -56,6 +57,9 @@ public class Authority implements GrantedAuthority {
     }
 
     public void addUser(IUser user) {
+        if (users == null) {
+            users = new HashSet<>();
+        }
         users.add(user.getStringId());
     }
 

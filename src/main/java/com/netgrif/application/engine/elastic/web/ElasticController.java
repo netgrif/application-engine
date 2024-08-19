@@ -6,7 +6,11 @@ import com.netgrif.application.engine.workflow.service.CaseSearchService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.querydsl.core.types.Predicate;
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +20,9 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Locale;
@@ -31,7 +35,7 @@ import java.util.Map;
         havingValue = "true",
         matchIfMissing = true
 )
-@Api(tags = {"Elasticsearch"}, authorizations = @Authorization("BasicAuth"))
+@Tag(name = "Elasticsearch")
 public class ElasticController {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticController.class.getName());
@@ -45,17 +49,17 @@ public class ElasticController {
     @Autowired
     private ReindexingTask reindexingTask;
 
-    @Value("${spring.data.elasticsearch.reindex-size}")
+    @Value("${spring.data.elasticsearch.reindexExecutor.size:20}")
     private int pageSize;
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @ApiOperation(value = "Reindex specified cases",
-            notes = "Caller must have the ADMIN role",
-            authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/reindex", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @Operation(summary = "Reindex specified cases",
+            description = "Caller must have the ADMIN role",
+            security = {@SecurityRequirement(name = "BasicAuth")})
+    @PostMapping(value = "/reindex", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
-            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public MessageResource reindex(@RequestBody Map<String, Object> searchBody, Authentication auth, Locale locale) {
         try {

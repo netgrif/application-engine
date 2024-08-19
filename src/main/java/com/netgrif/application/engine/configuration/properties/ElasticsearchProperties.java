@@ -2,23 +2,28 @@ package com.netgrif.application.engine.configuration.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
+import jakarta.annotation.PostConstruct;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-@ConfigurationProperties(prefix = "spring.data.elasticsearch")
 @Data
 @Component
+@ConfigurationProperties(prefix = "spring.data.elasticsearch")
 public class ElasticsearchProperties {
 
     private String reindex;
 
-    private int reindexSize;
+    private ExecutorProperties reindexExecutor;
 
     private Duration reindexFrom;
 
-    private int executors;
+    private ExecutorProperties executors;
 
     private boolean drop;
 
@@ -29,4 +34,42 @@ public class ElasticsearchProperties {
     private String url;
 
     private Map<String, String> index;
+
+    private boolean analyzerEnabled = false;
+
+    /**
+     * Example:
+     * spring.data.elasticsearch.analyzer-path-file=file:src/main/resources/elastic/default_analyzer.json
+     */
+    private Resource analyzerPathFile;
+
+    private Map<String, Object> indexSettings = new HashMap<>();
+
+    private Map<String, Map<String, Object>> classSpecificIndexSettings = new HashMap<>();
+
+    private Map<String, Object> mappingSettings = new HashMap<>();
+
+    private List<String> defaultFilters = new ArrayList<>();
+
+    private List<String> defaultSearchFilters = new ArrayList<>();
+
+    @PostConstruct
+    public void init() {
+        indexSettings.putIfAbsent("max_result_window", 10000000);
+
+        mappingSettings.putIfAbsent("date_detection", false);
+
+        if (analyzerEnabled) {
+            if (defaultFilters.isEmpty()) {
+                defaultFilters.addAll(List.of("lowercase", "asciifolding", "keyword_repeat", "unique"));
+            }
+            if (defaultSearchFilters.isEmpty()) {
+                defaultSearchFilters.addAll(List.of("lowercase", "asciifolding", "unique"));
+            }
+        }
+    }
+
+    public Map<String, Object> getClassSpecificSettings(String className) {
+        return classSpecificIndexSettings.getOrDefault(className, new HashMap<>());
+    }
 }

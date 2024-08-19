@@ -3,9 +3,6 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
-import com.netgrif.application.engine.petrinet.domain.events.DataEvent
 import com.netgrif.application.engine.petrinet.domain.Component
 import com.netgrif.application.engine.petrinet.domain.Format
 import com.netgrif.application.engine.petrinet.domain.I18nString
@@ -15,17 +12,20 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runne
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType
-import com.netgrif.application.engine.petrinet.domain.views.View
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
 import org.bson.types.ObjectId
+import org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-abstract class Field<T> extends Imported {
+abstract class Field<T> extends Imported implements Serializable {
 
+    @Serial
+    static final long serialVersionUID = 8315043110342747937L
+    
     @Id
     protected ObjectId _id
 
@@ -56,8 +56,6 @@ abstract class Field<T> extends Imported {
     private String encryption
 
     private Format format
-
-    private View view
 
     private Integer length
 
@@ -197,10 +195,10 @@ abstract class Field<T> extends Imported {
 
     void addAction(Action action, DataEventType type) {
         if (action == null) return
-        if (this.events == null){
+        if (this.events == null) {
             this.events = new HashMap<>()
         }
-        if (!this.events.containsKey(type)){
+        if (!this.events.containsKey(type)) {
             this.events.get(type).addToActionsByDefaultPhase(action)
         } else {
             DataEvent event = new DataEvent()
@@ -303,14 +301,6 @@ abstract class Field<T> extends Imported {
         this.format = format
     }
 
-    View getView() {
-        return view
-    }
-
-    void setView(View view) {
-        this.view = view
-    }
-
     Integer getLength() {
         return length
     }
@@ -327,7 +317,7 @@ abstract class Field<T> extends Imported {
     @Override
     @QueryType(PropertyType.NONE)
     MetaClass getMetaClass() {
-        return this.metaClass
+        return this.metaClass != null ? this.metaClass  : ((MetaClassRegistryImpl) GroovySystem.getMetaClassRegistry()).getMetaClass(this)
     }
 
     void clone(Field clone) {
@@ -340,7 +330,6 @@ abstract class Field<T> extends Imported {
         clone.immediate = this.immediate
         clone.events = this.events
         clone.encryption = this.encryption
-        clone.view = this.view
         clone.format = this.format
         clone.length = this.length
         clone.component = this.component

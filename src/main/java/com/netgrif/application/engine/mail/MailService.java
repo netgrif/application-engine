@@ -8,6 +8,8 @@ import com.netgrif.application.engine.mail.interfaces.IMailService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +21,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
@@ -36,12 +36,6 @@ public class MailService implements IMailService {
     public static final String EXPIRATION = "expiration";
     public static final String SERVER = "server";
     public static final String NAME = "name";
-
-    @Autowired
-    private IRegistrationService registrationService;
-
-    @Autowired
-    private ServerAuthProperties serverAuthProperties;
 
     @Getter
     @Value("${nae.mail.redirect-to.port}")
@@ -67,8 +61,14 @@ public class MailService implements IMailService {
     @Setter
     protected Configuration configuration;
 
+    @Autowired
+    private IRegistrationService registrationService;
+
+    @Autowired
+    private ServerAuthProperties serverAuthProperties;
+
     @Override
-    public void sendRegistrationEmail(RegisteredUser user) throws MessagingException, IOException, TemplateException {
+    public void sendRegistrationEmail(RegisteredUser user) throws IOException, TemplateException, MessagingException {
         List<String> recipients = new LinkedList<>();
         Map<String, Object> model = new HashMap<>();
 
@@ -88,7 +88,7 @@ public class MailService implements IMailService {
     }
 
     @Override
-    public void sendPasswordResetEmail(RegisteredUser user) throws MessagingException, IOException, TemplateException {
+    public void sendPasswordResetEmail(RegisteredUser user) throws IOException, TemplateException, MessagingException {
         Map<String, Object> model = new HashMap<>();
 
         model.put(NAME, user.getName());
@@ -107,6 +107,7 @@ public class MailService implements IMailService {
 
     @Override
     public void testConnection() {
+        //TODO: remove?
 //        try {
 //            ((JavaMailSenderImpl) mailSender).testConnection();
 //            log.info("MAIL: Connection to mail server is stable");
@@ -117,7 +118,7 @@ public class MailService implements IMailService {
 
 
     @Override
-    public void sendMail(MailDraft mailDraft) throws MessagingException, IOException, TemplateException {
+    public void sendMail(MailDraft mailDraft) throws IOException, TemplateException, MessagingException {
         MimeMessage email = buildEmail(mailDraft);
         mailSender.send(email);
 

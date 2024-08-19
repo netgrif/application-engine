@@ -3,7 +3,7 @@ package com.netgrif.application.engine.workflow.service;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
-import com.netgrif.application.engine.startup.FilterRunner;
+import com.netgrif.application.engine.startup.runner.FilterRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IUserFilterSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,15 +27,15 @@ public class UserFilterSearchService implements IUserFilterSearchService {
     @Override
     public List<Case> autocompleteFindFilters(String userInput) {
         Page<Case> page = this.caseSearchService.search(Collections.singletonList(
-                CaseSearchRequest.builder()
-                        .process(Collections.singletonList(new CaseSearchRequest.PetriNet(FilterRunner.FILTER_PETRI_NET_IDENTIFIER)))
-                        .query(
-                                String.format("(title:%s*) AND ((dataSet.visibility.keyValue:private AND authorEmail:%s) OR (dataSet.visibility.keyValue:public))",
-                                userInput,
-                                userService.getLoggedUser().getEmail())
-                        )
-                        .transition(Collections.singletonList("view_filter"))
-                        .build()
+                        CaseSearchRequest.builder()
+                                .process(Collections.singletonList(new CaseSearchRequest.PetriNet(FilterRunner.FILTER_PETRI_NET_IDENTIFIER)))
+                                .query(
+                                        String.format("(title:%s*) AND ((dataSet.visibility.keyValue:private AND authorEmail:%s) OR (dataSet.visibility.keyValue:public))",
+                                                userInput,
+                                                userService.getLoggedUser().getEmail())
+                                )
+                                .transition(Collections.singletonList("view_filter"))
+                                .build()
                 ),
                 this.userService.getLoggedOrSystem().transformToLoggedUser(),
                 PageRequest.of(0, 100),

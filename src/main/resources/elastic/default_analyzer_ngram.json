@@ -1,0 +1,41 @@
+{
+  "analyzer": {
+    "default_search": {
+      "filter": [
+        "lowercase",
+        "asciifolding",
+        "keyword_repeat",
+        "unique"
+      ],
+      "char_filter": [
+        "html_strip"
+      ],
+      "type": "custom",
+      "tokenizer": "standard"
+    },
+    "default": {
+      "filter": [
+        "lowercase",
+        "asciifolding",
+        "keyword_repeat",
+        "unique"
+      ],
+      "char_filter": [
+        "html_strip"
+      ],
+      "type": "custom",
+      "tokenizer": "custom_tokenizer"
+    }
+  },
+  "tokenizer": {
+    "custom_tokenizer": {
+      "type": "edge_ngram",
+      "min_gram": 2,
+      "max_gram": 25,
+      "token_chars": [
+        "letter",
+        "digit"
+      ]
+    }
+  }
+}

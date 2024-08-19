@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.workflow.domain;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlEnum;
+import jakarta.xml.bind.annotation.XmlEnumValue;
+import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType(name = "authorizationType")
 @XmlEnum
@@ -18,10 +18,6 @@ public enum AuthorizationType {
         value = v;
     }
 
-    public String value() {
-        return value;
-    }
-
     public static AuthorizationType fromValue(String v) {
         for (AuthorizationType c : AuthorizationType.values()) {
             if (c.value.equals(v)) {
@@ -29,5 +25,9 @@ public enum AuthorizationType {
             }
         }
         throw new IllegalArgumentException(v);
+    }
+
+    public String value() {
+        return value;
     }
 }

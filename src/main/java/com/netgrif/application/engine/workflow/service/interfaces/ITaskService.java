@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome;
@@ -23,7 +24,6 @@ import java.util.Set;
 
 public interface ITaskService {
 
-    @Transactional
     void reloadTasks(Case useCase);
 
     Task findOne(String taskId);
@@ -38,8 +38,6 @@ public interface ITaskService {
 
     List<Task> findAllById(List<String> ids);
 
-    void createTasks(Case useCase);
-
     Page<Task> findByUser(Pageable pageable, IUser user);
 
     Task findById(String id);
@@ -52,33 +50,49 @@ public interface ITaskService {
 
     Task searchOne(com.querydsl.core.types.Predicate predicate);
 
-    @Transactional(rollbackFor = Exception.class)
     List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException;
 
-    @Transactional
+    List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, IUser user, Map<String, String> params) throws TransitionNotExecutableException;
+
     FinishTaskEventOutcome finishTask(Task task, IUser user) throws TransitionNotExecutableException;
+
+    FinishTaskEventOutcome finishTask(Task task, IUser user, Map<String, String> params) throws TransitionNotExecutableException;
 
     FinishTaskEventOutcome finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
+    FinishTaskEventOutcome finishTask(LoggedUser loggedUser, String taskId, Map<String, String> params) throws IllegalArgumentException, TransitionNotExecutableException;
+
     FinishTaskEventOutcome finishTask(String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
-    @Transactional
+    FinishTaskEventOutcome finishTask(String taskId, Map<String, String> params) throws IllegalArgumentException, TransitionNotExecutableException;
+
     List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException;
 
-    @Transactional
+    List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, IUser user, Map<String, String> params) throws TransitionNotExecutableException;
+
     AssignTaskEventOutcome assignTask(Task task, IUser user) throws TransitionNotExecutableException;
 
-    AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException;
+    AssignTaskEventOutcome assignTask(Task task, IUser user, Map<String, String> params) throws TransitionNotExecutableException;
+
+    AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException, TaskNotFoundException;
+
+    AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId, Map<String, String> params) throws TransitionNotExecutableException, TaskNotFoundException;
 
     AssignTaskEventOutcome assignTask(String taskId) throws TransitionNotExecutableException;
 
-    @Transactional(rollbackFor = Exception.class)
+    AssignTaskEventOutcome assignTask(String taskId, Map<String, String> params) throws TransitionNotExecutableException;
+
     List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, IUser user);
 
-    @Transactional
+    List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, IUser user, Map<String, String> params);
+
     CancelTaskEventOutcome cancelTask(Task task, IUser user);
 
+    CancelTaskEventOutcome cancelTask(Task task, IUser user, Map<String, String> params);
+
     CancelTaskEventOutcome cancelTask(LoggedUser loggedUser, String taskId);
+
+    CancelTaskEventOutcome cancelTask(LoggedUser loggedUser, String taskId, Map<String, String> params);
 
     /**
      * cancel task action
@@ -86,15 +100,19 @@ public interface ITaskService {
     @SuppressWarnings("unused")
     void cancelTasksWithoutReload(Set<String> transitions, String caseId);
 
+    void cancelTasksWithoutReload(Set<String> transitions, String caseId, Map<String, String> params);
+
     DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId) throws TransitionNotExecutableException;
+
+    DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId, Map<String, String> params) throws TransitionNotExecutableException;
 
     void resolveUserRef(Case useCase);
 
     Task resolveUserRef(Task task, Case useCase);
 
-    void delete(Iterable<? extends Task> tasks, Case useCase);
+    void delete(List<Task> tasks, Case useCase);
 
-    void delete(Iterable<? extends Task> tasks, String caseId);
+    void delete(List<Task> tasks, String caseId);
 
     void deleteTasksByCase(String caseId);
 

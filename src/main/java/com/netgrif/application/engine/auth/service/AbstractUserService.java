@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.netgrif.application.engine.startup.SystemUserRunner.*;
+import static com.netgrif.application.engine.startup.runner.SystemUserRunner.*;
 
 public abstract class AbstractUserService implements IUserService {
 
@@ -45,6 +45,11 @@ public abstract class AbstractUserService implements IUserService {
     }
 
     @Override
+    public void addAnonymousRole(IUser user) {
+        user.addProcessRole(processRoleService.defaultRole());
+    }
+
+    @Override
     public void addDefaultAuthorities(IUser user) {
         if (user.getAuthorities().isEmpty()) {
             HashSet<Authority> authorities = new HashSet<>();
@@ -54,13 +59,22 @@ public abstract class AbstractUserService implements IUserService {
     }
 
     @Override
-    public void assignAuthority(String userId, String authorityId) {
+    public void addAnonymousAuthorities(IUser user) {
+        if (user.getAuthorities().isEmpty()) {
+            HashSet<Authority> authorities = new HashSet<>();
+            authorities.add(authorityService.getOrCreate(Authority.anonymous));
+            user.setAuthorities(authorities);
+        }
+    }
+
+    @Override
+    public IUser assignAuthority(String userId, String authorityId) {
         IUser user = resolveById(userId, true);
         Authority authority = authorityService.getOne(authorityId);
         user.addAuthority(authority);
         authority.addUser(user);
 
-        save(user);
+        return save(user);
     }
 
     @Override
@@ -80,12 +94,20 @@ public abstract class AbstractUserService implements IUserService {
         return save(user);
     }
 
+    /**
+     * @param user
+     * @param roleStringId
+     * @return
+     * @deprecated use {@link AbstractUserService#removeRole(IUser, ProcessRole)} instead
+     */
     @Override
+    @Deprecated(since = "6.2.0")
     public IUser removeRole(IUser user, String roleStringId) {
         return removeRole(user, processRoleService.findByImportId(roleStringId));
     }
 
-    protected IUser removeRole(IUser user, ProcessRole role) {
+    @Override
+    public IUser removeRole(IUser user, ProcessRole role) {
         user.removeProcessRole(role);
         securityContextService.saveToken(user.getStringId());
         securityContextService.reloadSecurityContext(user.transformToLoggedUser());

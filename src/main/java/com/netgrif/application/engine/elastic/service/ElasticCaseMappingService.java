@@ -1,22 +1,21 @@
 package com.netgrif.application.engine.elastic.service;
 
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.domain.BooleanField;
 import com.netgrif.application.engine.elastic.domain.ButtonField;
 import com.netgrif.application.engine.elastic.domain.DateField;
 import com.netgrif.application.engine.elastic.domain.FileField;
+import com.netgrif.application.engine.elastic.domain.I18nField;
 import com.netgrif.application.engine.elastic.domain.NumberField;
 import com.netgrif.application.engine.elastic.domain.TextField;
 import com.netgrif.application.engine.elastic.domain.UserField;
+import com.netgrif.application.engine.elastic.domain.UserListField;
 import com.netgrif.application.engine.elastic.domain.*;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -29,9 +28,6 @@ import java.util.*;
 @Slf4j
 @Service
 public class ElasticCaseMappingService implements IElasticCaseMappingService {
-
-    @Autowired
-    private IUserService userService;
 
     @Override
     public ElasticCase transform(Case useCase) {
@@ -79,8 +75,10 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return this.transformFileField(caseField);
         } else if (netField instanceof FileListField) {
             return this.transformFileListField(caseField);
-        } else if (netField instanceof UserListField) {
+        } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.UserListField) {
             return this.transformUserListField(caseField);
+        } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.I18nField) {
+            return this.transformI18nField(caseField, (com.netgrif.application.engine.petrinet.domain.dataset.I18nField) netField);
         } else {
             String string = caseField.getValue().toString();
             if (string == null)
@@ -101,6 +99,13 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             values.add(new AbstractMap.SimpleEntry<>(key, collectTranslations(options.get(key))));
         }
         return Optional.of(new MapField(values));
+    }
+
+    protected Optional<DataField> transformI18nField(com.netgrif.application.engine.workflow.domain.DataField dataField, com.netgrif.application.engine.petrinet.domain.dataset.I18nField netField) {
+        Set<String> keys = ((I18nString) dataField.getValue()).getTranslations().keySet();
+        Set<String> values = new HashSet<>(((I18nString) dataField.getValue()).getTranslations().values());
+        values.add(((I18nString) dataField.getValue()).getDefaultValue());
+        return Optional.of(new I18nField(keys, values));
     }
 
     protected Optional<DataField> transformEnumerationMapField(com.netgrif.application.engine.workflow.domain.DataField enumMap, EnumerationMapField netField) {
@@ -141,7 +146,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         if (multichoice.getValue() instanceof Set) {
             return Optional.of((Set) multichoice.getValue());
         } else if (multichoice.getValue() instanceof Collection) {
-            log.warn(String.format("Multichoice field should have values of type Set! DateField (%s) with %s value found! Value will be converted for indexation.", netField.getImportId(), multichoice.getValue().getClass().getCanonicalName()));
+//            log.warn(String.format("Multichoice field should have values of type Set! DateField (%s) with %s value found! Value will be converted for indexation.", netField.getImportId(), multichoice.getValue().getClass().getCanonicalName()));
             Set values = new HashSet();
             values.addAll((Collection) multichoice.getValue());
             return Optional.of(values);
@@ -167,6 +172,9 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
     protected List<String> collectTranslations(I18nString i18nString) {
         List<String> translations = new ArrayList<>();
+        if (i18nString == null) {
+            return translations;
+        }
         translations.add(i18nString.getDefaultValue());
         translations.addAll(i18nString.getTranslations().values());
         return translations;
@@ -191,17 +199,17 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformUserListField(com.netgrif.application.engine.workflow.domain.DataField userListField) {
-        List<String> userIds = (List<String>) userListField.getValue();
-        List<IUser> users = this.userService.findAllByIds(new HashSet<>(userIds), true);
-        return Optional.of(new UserField(users.stream().map(this::transformUserValue).toArray(UserField.UserMappingData[]::new)));
+        UserListFieldValue userListValue = (UserListFieldValue) userListField.getValue();
+        UserField.UserMappingData[] userMappingData = userListValue.getUserValues().stream().map(this::transformUserListValue).toArray(UserField.UserMappingData[]::new);
+        return Optional.of(new UserListField(userMappingData));
     }
 
     private UserField.UserMappingData transformUserValue(UserFieldValue user) {
         return new UserField.UserMappingData(user.getId(), user.getEmail(), buildFullName(user.getName(), user.getSurname()).toString());
     }
 
-    private UserField.UserMappingData transformUserValue(IUser user) {
-        return new UserField.UserMappingData(user.getStringId(), user.getEmail(), buildFullName(user.getName(), user.getSurname()).toString());
+    private UserListField.UserMappingData transformUserListValue(UserFieldValue user) {
+        return new UserListField.UserMappingData(user.getId(), user.getEmail(), buildFullName(user.getName(), user.getSurname()).toString());
     }
 
     private StringBuilder buildFullName(String name, String surname) {
@@ -221,7 +229,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             LocalDate date = (LocalDate) dateField.getValue();
             return formatDateField(LocalDateTime.of(date, LocalTime.NOON));
         } else if (dateField.getValue() instanceof Date) {
-            log.warn(String.format("DateFields should have LocalDate values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
+//            log.warn(String.format("DateFields should have LocalDate values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
             LocalDateTime transformed = this.transformDateValueField(dateField);
             return formatDateField(LocalDateTime.of(transformed.toLocalDate(), LocalTime.NOON));
         } else {
@@ -235,7 +243,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         if (dateTimeField.getValue() instanceof LocalDateTime) {
             return formatDateField((LocalDateTime) dateTimeField.getValue());
         } else if (dateTimeField.getValue() instanceof Date) {
-            log.warn(String.format("DateTimeFields should have LocalDateTime values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
+//            log.warn(String.format("DateTimeFields should have LocalDateTime values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
             return formatDateField(this.transformDateValueField(dateTimeField));
         } else {
             // TODO throw error?

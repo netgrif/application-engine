@@ -5,11 +5,16 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface IProcessRoleService {
 
     List<ProcessRole> saveAll(Iterable<ProcessRole> entities);
+
+    Set<ProcessRole> findAllByImportId(String importId);
+
+    Set<ProcessRole> findAllByDefaultName(String name);
 
     ProcessRole findById(String id);
 
@@ -18,6 +23,8 @@ public interface IProcessRoleService {
     ProcessRole findByImportId(String importId);
 
     void assignRolesToUser(String userId, Set<String> roleIds, LoggedUser user);
+
+    void assignRolesToUser(String userId, Set<String> roleIds, LoggedUser user, Map<String, String> params);
 
     List<ProcessRole> findAll();
 

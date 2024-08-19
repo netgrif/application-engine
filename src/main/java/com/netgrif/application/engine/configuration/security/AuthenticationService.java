@@ -1,24 +1,32 @@
 package com.netgrif.application.engine.configuration.security;
 
 
+import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.configuration.security.interfaces.IAuthenticationService;
+import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.session.SessionDestroyedEvent;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-
+@Slf4j
 @Service
-public class AuthenticationService implements IAuthenticationService {
+public class AuthenticationService implements IAuthenticationService, ApplicationListener<SessionDestroyedEvent> {
 
 
     @Value("${server.login.attempts:10}")
@@ -27,8 +35,10 @@ public class AuthenticationService implements IAuthenticationService {
     @Value("${server.login.timeout:15}")
     private int loginTimeout;
 
-
     private ConcurrentMap<String, Attempt> cache;
+
+    @Autowired
+    private IImpersonationService impersonationService;
 
     public AuthenticationService() {
         super();
@@ -51,6 +61,13 @@ public class AuthenticationService implements IAuthenticationService {
     @EventListener
     public void onAuthenticationSuccess(AuthenticationSuccessEvent event) {
         loginSucceeded(((WebAuthenticationDetails) event.getAuthentication().getDetails()).getRemoteAddress());
+        resolveImpersonatorOnLogin(event.getAuthentication().getPrincipal());
+    }
+
+    @Override
+    public void onApplicationEvent(SessionDestroyedEvent event) {
+        List<SecurityContext> contexts = event.getSecurityContexts();
+        contexts.forEach(context -> resolveImpersonatorOnLogout(context.getAuthentication().getPrincipal()));
     }
 
     @Override
@@ -82,6 +99,26 @@ public class AuthenticationService implements IAuthenticationService {
         if (ChronoUnit.SECONDS.between(attempt.getBlockTime(), LocalDateTime.now()) >= loginTimeout)
             cache.remove(key);
 
+    }
+
+    protected void resolveImpersonatorOnLogin(Object principal) {
+        try {
+            if (principal instanceof LoggedUser) {
+                impersonationService.removeImpersonator(((LoggedUser) principal).getId());
+            }
+        } catch (Exception e) {
+            log.warn("Failed to resolve impersonator " + principal, e);
+        }
+    }
+
+    protected void resolveImpersonatorOnLogout(Object principal) {
+        try {
+            if (principal instanceof LoggedUser && ((LoggedUser) principal).isImpersonating()) {
+                impersonationService.onSessionDestroy((LoggedUser) principal);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to resolve impersonator " + principal, e);
+        }
     }
 
     @Data
