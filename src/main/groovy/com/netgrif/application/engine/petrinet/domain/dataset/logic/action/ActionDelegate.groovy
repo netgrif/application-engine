@@ -32,6 +32,7 @@ import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.rules.domain.RuleRepository
+import com.netgrif.application.engine.search.interfaces.ISearchService
 import com.netgrif.application.engine.startup.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.utils.FullPageRequest
@@ -176,6 +177,9 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     @Autowired
     PublicViewProperties publicViewProperties
+
+    @Autowired
+    ISearchService searchService
 
     FrontendActionOutcome Frontend
 
@@ -2320,5 +2324,13 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         Task task = taskService.findOne(taskId)
         Case taskCase = workflowService.findOne(task.caseId)
         return taskCase.getPetriNet().getDataSet().get(fieldId)
+    }
+
+    long count(String query) {
+        return searchService.count(query)
+    }
+
+    def search(String query) {
+        return searchService.search(query)
     }
 }
