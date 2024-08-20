@@ -6,6 +6,8 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.application.engine.event.events.workflow.CreateCaseEvent;
+import com.netgrif.application.engine.event.events.workflow.DeleteCaseEvent;
 import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventLog;
 import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
@@ -366,6 +368,7 @@ public class WorkflowService implements IWorkflowService {
         historyService.save(new CreateCaseEventLog(useCase, EventPhase.POST));
         outcome.setCase(setImmediateDataFields(useCase));
         addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
+        publisher.publishEvent(new CreateCaseEvent(outcome));
         return outcome;
     }
 
@@ -414,6 +417,7 @@ public class WorkflowService implements IWorkflowService {
         outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty(), params));
         addMessageToOutcome(useCase.getPetriNet(), CaseEventType.DELETE, outcome);
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.POST));
+        publisher.publishEvent(new DeleteCaseEvent(outcome));
         return outcome;
     }
 

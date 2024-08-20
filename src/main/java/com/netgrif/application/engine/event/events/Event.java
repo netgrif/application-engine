@@ -1,12 +1,11 @@
 package com.netgrif.application.engine.event.events;
 
-import events.IEvent;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 import java.time.LocalDateTime;
 
-public abstract class Event extends ApplicationEvent implements IEvent {
+public abstract class Event extends ApplicationEvent {
 
     @Getter
     protected LocalDateTime time;

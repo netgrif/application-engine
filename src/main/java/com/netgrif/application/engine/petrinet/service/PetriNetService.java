@@ -7,6 +7,8 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.properties.CacheProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
+import com.netgrif.application.engine.event.events.petrinet.ProcessDeleteEvent;
+import com.netgrif.application.engine.event.events.petrinet.ProcessDeployEvent;
 import com.netgrif.application.engine.history.domain.petrinetevents.DeletePetriNetEventLog;
 import com.netgrif.application.engine.history.domain.petrinetevents.ImportPetriNetEventLog;
 import com.netgrif.application.engine.history.domain.taskevents.TaskEventLog;
@@ -47,6 +49,7 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -130,11 +133,14 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     protected IUriService uriService;
 
+    protected ApplicationEventPublisher publisher;
+
     protected IElasticPetriNetService elasticPetriNetService;
 
     @Autowired
-    public void setElasticPetriNetService(IElasticPetriNetService elasticPetriNetService) {
+    public void setElasticPetriNetService(IElasticPetriNetService elasticPetriNetService, ApplicationEventPublisher publisher) {
         this.elasticPetriNetService = elasticPetriNetService;
+        this.publisher = publisher;
     }
 
     protected Importer getImporter() {
@@ -245,6 +251,7 @@ public class PetriNetService implements IPetriNetService {
         historyService.save(new ImportPetriNetEventLog(null, EventPhase.POST, net.getObjectId()));
         addMessageToOutcome(net, ProcessEventType.UPLOAD, outcome);
         outcome.setNet(imported.get());
+        publisher.publishEvent(new ProcessDeployEvent(outcome));
         return outcome;
     }
 
@@ -556,6 +563,7 @@ public class PetriNetService implements IPetriNetService {
         // net functions must be removed from cache after it was deleted from repository
         this.functionCacheService.reloadCachedFunctions(petriNet);
         historyService.save(new DeletePetriNetEventLog(null, EventPhase.PRE, petriNet.getObjectId()));
+        publisher.publishEvent(new ProcessDeleteEvent(petriNet));
     }
 
     private Criteria getProcessRolesCriteria(LoggedUser user) {
