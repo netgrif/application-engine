@@ -1,5 +1,8 @@
 package com.netgrif.application.engine.event.dispatchers;
 
+import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
+import com.netgrif.application.engine.event.dispatchers.common.DispatchMethod;
+import com.netgrif.application.engine.event.dispatchers.common.RegisteredListener;
 import com.netgrif.application.engine.event.events.EventAction;
 import com.netgrif.application.engine.event.events.task.*;
 import org.springframework.context.event.EventListener;
@@ -14,7 +17,6 @@ public class TaskDispatcher extends AbstractDispatcher {
         super(Set.of(EventAction.TASK_ASSIGN,
                 EventAction.TASK_DELEGATE,
                 EventAction.TASK_CREATE,
-                EventAction.CASE_DELETE,
                 EventAction.TASK_FINISH,
                 EventAction.TASK_CANCEL,
                 EventAction.TASK_INDEXED

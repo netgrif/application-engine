@@ -1,8 +1,9 @@
-package com.netgrif.application.engine.event.dispatchers;
+package com.netgrif.application.engine.event.dispatchers.common;
 
 import com.netgrif.application.engine.event.events.Event;
 import com.netgrif.application.engine.event.events.EventAction;
 import com.netgrif.application.engine.event.listeners.Listener;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -15,12 +16,10 @@ import java.util.function.Function;
 @Slf4j
 public abstract class AbstractDispatcher {
 
-    //TODO: 1. Volanie metod dispatch a dispatch ma byt asynchronne v oboch pripadoch
-    //      2. Rozdiel je iba v tom ze dispatch caka na skonecnie vykonavania instrukcii v Listeneroch a
-    //          dispatchAsync nie
+    //TODO: Configure custom executor
 
     private final Set<RegisteredListener> registeredListeners;
-
+    @Getter
     private final Set<EventAction> allowedActions;
 
     protected AbstractDispatcher(Set<EventAction> allowedActions) {
@@ -28,6 +27,14 @@ public abstract class AbstractDispatcher {
         this.registeredListeners = new HashSet<>();
     }
 
+    /***
+     * <p>Registration of a new {@link Listener}. The Listener will listen for events based on the value
+     * of {@link EventAction} and {@link DispatchMethod}. Throws an {@link IllegalArgumentException}
+     * if the listener is already registered or if the dispatcher has no {@link EventAction} value in the allowed events.</p>
+     * @param listener {@link Listener} that will listen to {@link Event} with the onEvent/onAsyncEvent method
+     * @param eventAction {@link EventAction} that the listener will subscribe to
+     * @param dispatchMethod {@link DispatchMethod} The method by which the dispatcher will send the Event
+     */
     public void registerListener(Listener listener, EventAction eventAction, DispatchMethod dispatchMethod) {
         RegisteredListener registeredListener = new RegisteredListener(listener, eventAction, dispatchMethod);
         if (!isRegistrationAllowed(registeredListener)) {
@@ -50,6 +57,14 @@ public abstract class AbstractDispatcher {
 
     }
 
+    /***
+     * <p>Unregister already registered {@link Listener}. The Listener
+     * will be unregister only for event based on the value of {@link EventAction} and {@link DispatchMethod}.
+     * Throws an {@link IllegalArgumentException} if the listener is not registered.</p>
+     * @param listener {@link Listener} that listen to {@link Event} with the onEvent/onAsyncEvent method
+     * @param eventAction {@link EventAction} that the listener is subscribed to
+     * @param dispatchMethod {@link DispatchMethod} The method by which the dispatcher is sending the Event
+     */
     public void unregisterListener(Listener listener, EventAction eventAction, DispatchMethod dispatchMethod) {
         RegisteredListener registeredListener = new RegisteredListener(listener, eventAction, dispatchMethod);
         if (!isListenerRegistered(registeredListener)) {
@@ -62,58 +77,73 @@ public abstract class AbstractDispatcher {
         registeredListeners.remove(registeredListener);
     }
 
+    /***
+     * <p>Check if {@link Listener} is registered to Dispatcher.</p>
+     * @param listener {@link Listener} that listen to {@link Event} with the onEvent/onAsyncEvent method
+     * @param eventAction {@link EventAction} that the listener is subscribed to
+     * @param dispatchMethod {@link DispatchMethod} The method by which the dispatcher is sending the Event
+     * @return true if dispatcher holds record of {@link Listener} to {@link EventAction} with {@link DispatchMethod} else false
+     */
     public boolean isListenerRegistered(Listener listener, EventAction eventAction, DispatchMethod dispatchMethod) {
         return isListenerRegistered(new RegisteredListener(listener, eventAction, dispatchMethod));
     }
 
-    private boolean isListenerRegistered(RegisteredListener registeredListener) {
+    /***
+     * <p>Check if {@link Listener} is registered to Dispatcher.</p>
+     * @param registeredListener {@link RegisteredListener} that holds listening content
+     * @return  true if dispatcher holds record of {@link RegisteredListener} else false
+     */
+    public boolean isListenerRegistered(RegisteredListener registeredListener) {
         return registeredListeners.stream().anyMatch(l -> l.equals(registeredListener));
     }
 
+    /***
+     * <p>Send event object to registered {@link Listener}. This function sends events asynchronously,
+     * but wait until all listeners have finished executing the onEvent method.
+     * See {@link Listener#onEvent}.</p>
+     * @param event Event that the listener is subscribed to
+     * @param dispatcher Dispatcher object that sends the events
+     * @param foo Function to decide to which listener the event should be sent
+     */
     protected void dispatch(Event event, AbstractDispatcher dispatcher, Function<RegisteredListener, Boolean> foo) {
-//        ExecutorService executorService = Executors.newFixedThreadPool(10);
         List<CompletableFuture<Void>> futures = new ArrayList<>();
-
         for (RegisteredListener registeredListener : registeredListeners) {
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 if (foo.apply(registeredListener)) {
-                    log.info("Sending event {} synchronously", event.getMessage());
+                    log.trace("Sending event with message {} synchronously", event.getMessage());
                     registeredListener.listener().onEvent(event, dispatcher);
                 }
             });
-            //custom executor ?
             futures.add(future);
         }
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
-//        executorService.shutdown();
     }
 
+    /***
+     * <p>Send event object to registered {@link Listener}.This function dispatches events asynchronously
+     * and does not wait for the execution of the onAsyncEvent method to complete.
+     * See {@link Listener#onAsyncEvent}.</p>
+     * @param event Event that the listener is subscribed to
+     * @param dispatcher Dispatcher object that sends the events
+     * @param foo Function to decide to which listener the event should be sent
+     */
     protected void dispatchAsync(Event event, AbstractDispatcher dispatcher, Function<RegisteredListener, Boolean> foo) {
         for (RegisteredListener registeredListener : registeredListeners) {
             CompletableFuture.runAsync(() -> {
                 if (foo.apply(registeredListener)) {
-                    log.info("Sending event {} asynchronously", event.getMessage());
-                    registeredListener.listener().onEvent(event, dispatcher);
+                    log.trace("Sending event with message {} asynchronously", event.getMessage());
+                    registeredListener.listener().onAsyncEvent(event, dispatcher);
                 }
             });
-            //custom executor ?
         }
-    }
-
-    private boolean isRegistrationAllowed(RegisteredListener registeredListener) {
-        return allowedActions.contains(registeredListener.eventAction);
-    }
-
-    protected record RegisteredListener(Listener listener, EventAction eventAction, DispatchMethod dispatchMethod) {
     }
 
     protected String getName() {
         return this.getClass().getSimpleName();
     }
 
-    public enum DispatchMethod {
-        SYNC,
-        ASYNC
+    private boolean isRegistrationAllowed(RegisteredListener registeredListener) {
+        return allowedActions.contains(registeredListener.eventAction());
     }
 
 }
