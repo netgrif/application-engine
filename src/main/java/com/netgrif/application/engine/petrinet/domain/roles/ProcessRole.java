@@ -5,9 +5,8 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Imported;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.Event;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,8 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-@Setter
-@Getter
+@Data
 @Document
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class ProcessRole extends Imported {
@@ -26,15 +24,11 @@ public class ProcessRole extends Imported {
     public static final String DEFAULT_ROLE = "default";
     public static final String ANONYMOUS_ROLE = "anonymous";
 
-    @Getter
     @Id
     private ObjectId id;
-    @Getter
     private I18nString name;
-    @Getter
     private String netId;
     private String description;
-    @Getter
     private Map<EventType, Event> events;
 
     public ProcessRole() {
@@ -50,7 +44,7 @@ public class ProcessRole extends Imported {
         return id.toString();
     }
 
-    public void setId(String id) {
+    public void setStringId(String id) {
         this.id = new ObjectId(id);
     }
 
@@ -97,7 +91,7 @@ public class ProcessRole extends Imported {
     @Override
     public ProcessRole clone() {
         ProcessRole clone = new ProcessRole();
-        clone.setId(this.getStringId());
+        clone.setStringId(this.getStringId());
         clone.setImportId(this.importId);
         clone.setName(this.name == null ? null : this.name.clone());
         clone.setNetId(this.netId);

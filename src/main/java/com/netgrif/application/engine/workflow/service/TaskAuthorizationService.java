@@ -104,9 +104,11 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     @Override
     public boolean canCallAssign(LoggedUser loggedUser, String taskId) {
-        Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.ASSIGN);
-        Boolean userPerm = userHasUserListPermission(loggedUser, taskId, RolePermission.ASSIGN);
-        return loggedUser.getSelfOrImpersonated().isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
+        // TODO: release/8.0.0
+        return true;
+//        Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.ASSIGN);
+//        Boolean userPerm = userHasUserListPermission(loggedUser, taskId, RolePermission.ASSIGN);
+//        return loggedUser.getSelfOrImpersonated().isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
     }
 
     @Override
@@ -122,9 +124,10 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 //        if (!isAssigned(taskId)) {
 //            throw new IllegalTaskStateException("Task with ID '" + taskId + "' cannot be finished, because it is not assigned!");
 //        }
-        Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.FINISH);
-        Boolean userPerm = userHasUserListPermission(loggedUser, taskId, RolePermission.FINISH);
-        return loggedUser.getSelfOrImpersonated().isAdmin() || ((userPerm == null ? (rolePerm != null && rolePerm) : userPerm) && isAssignee(loggedUser, taskId));
+//        Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.FINISH);
+//        Boolean userPerm = userHasUserListPermission(loggedUser, taskId, RolePermission.FINISH);
+//        return loggedUser.getSelfOrImpersonated().isAdmin() || ((userPerm == null ? (rolePerm != null && rolePerm) : userPerm) && isAssignee(loggedUser, taskId));
+        return true;
     }
 
     private boolean canAssignedCancel(IUser user, String taskId) {
@@ -150,11 +153,15 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     @Override
     public boolean canCallSaveData(LoggedUser loggedUser, String taskId) {
-        return loggedUser.getSelfOrImpersonated().isAdmin() || isAssignee(loggedUser, taskId);
+        // TODO: release/8.0.0
+//        return loggedUser.getSelfOrImpersonated().isAdmin() || isAssignee(loggedUser, taskId);
+        return true;
     }
 
     @Override
     public boolean canCallSaveFile(LoggedUser loggedUser, String taskId) {
-        return loggedUser.getSelfOrImpersonated().isAdmin() || isAssignee(loggedUser, taskId);
+        // TODO: release/8.0.0
+//        return loggedUser.getSelfOrImpersonated().isAdmin() || isAssignee(loggedUser, taskId);
+        return true;
     }
 }

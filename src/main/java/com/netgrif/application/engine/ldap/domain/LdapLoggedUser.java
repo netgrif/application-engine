@@ -70,7 +70,7 @@ public class LdapLoggedUser extends LoggedUser {
         user.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
         user.setProcessRoles(this.getProcessRoles().stream().map(roleId -> {
             ProcessRole role = new ProcessRole();
-            role.setId(roleId);
+            role.setStringId(roleId);
             return role;
         }).collect(Collectors.toSet()));
         if (this.isImpersonating()) {

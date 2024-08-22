@@ -72,7 +72,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         user.setNextGroups(groups.stream().map(String::new).collect(Collectors.toSet()));
         user.setProcessRoles(processRoles.stream().map(roleId -> {
             ProcessRole role = new ProcessRole();
-            role.setId(roleId);
+            role.setStringId(roleId);
             return role;
         }).collect(Collectors.toSet()));
         if (this.isImpersonating()) {
@@ -92,7 +92,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         anonym.setNextGroups(groups.stream().map(String::new).collect(Collectors.toSet()));
         anonym.setProcessRoles(processRoles.stream().map(roleId -> {
             ProcessRole role = new ProcessRole();
-            role.setId(roleId);
+            role.setStringId(roleId);
             return role;
         }).collect(Collectors.toSet()));
         return anonym;

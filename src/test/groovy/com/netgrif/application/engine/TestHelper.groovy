@@ -76,4 +76,8 @@ class TestHelper {
         superCreator.run()
         finisherRunner.run()
     }
+
+    static InputStream stream(String resource) {
+        return TestHelper.getClassLoader().getResourceAsStream(resource)
+    }
 }

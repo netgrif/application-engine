@@ -473,7 +473,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     def execute(String taskId) {
         [with : { DataSet dataSet ->
-            executeTasks(dataSet, taskId, { it.id.isNotNull() })
+            executeTasks(dataSet, taskId, { it.setStringId.isNotNull() })
         },
          where: { Closure<Predicate> closure ->
              [with: { DataSet dataSet ->
@@ -484,7 +484,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     def execute(Task task) {
         [with : { DataSet dataSet ->
-            executeTasks(dataSet, task.stringId, { it.id.isNotNull() })
+            executeTasks(dataSet, task.stringId, { it.setStringId.isNotNull() })
         },
          where: { Closure<Predicate> closure ->
              [with: { DataSet dataSet ->
@@ -1257,7 +1257,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         if (!createDefaultFilters) {
             return []
         }
-        return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.id.eq(userService.system.stringId)) })
+        return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.setStringId.eq(userService.system.stringId)) })
     }
 
     /**

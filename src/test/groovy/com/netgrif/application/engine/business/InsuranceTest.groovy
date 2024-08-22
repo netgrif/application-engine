@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.insurance.mvc
+package com.netgrif.application.engine.business
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectWriter
@@ -96,31 +96,19 @@ class InsuranceTest {
     private MockMvc mvc
 
     @Autowired
-    private Importer importer
-
-    @Autowired
     private WebApplicationContext wac
-
     @Autowired
     private ImportHelper importHelper
-
     @Autowired
     private IPetriNetService petriNetService
-
     @Autowired
     private SuperCreator superCreator
-
     @Autowired
     private IProcessRoleService processRoleService
-
     @Autowired
     private IUserService userService
-
     @Autowired
     private TestHelper testHelper
-    // TODO: NAE-1858 remove, for test only
-    @Autowired
-    private IWorkflowService workflowService
     @Autowired
     private ObjectMapper objectMapper
 
@@ -133,7 +121,7 @@ class InsuranceTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(TestHelper.stream("insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
 
         netId = net.getNet().getStringId()
@@ -338,7 +326,6 @@ class InsuranceTest {
                 "101001": new TextField(rawValue: "84105")
         ]))
         setData(new DataSet([
-                "301005": new EnumerationField(rawValue: new I18nString("Bratislava")),
                 "101002": new BooleanField(rawValue: false),
                 "101003": new BooleanField(rawValue: false),
                 "101004": new BooleanField(rawValue: false),

@@ -21,6 +21,7 @@ import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetM
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.utils.UniqueKeyMap;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,15 +175,13 @@ public class Importer {
                 parentNet.getVersion(),
                 parentNet.getObjectId()
         ));
-        LinkedHashMap<String, ProcessRole> processRolesWithNewIds = new LinkedHashMap<>();
+        UniqueKeyMap<String, ProcessRole> processRolesWithNewIds = new UniqueKeyMap<>();
         for (Map.Entry<String, ProcessRole> entry : process.getRoles().entrySet()) {
             ObjectId newId = new ObjectId();
-            // TODO: release/8.0.0
-//            entry.getValue().setId(newId);
+            entry.getValue().setId(newId);
             processRolesWithNewIds.put(newId.toString(), entry.getValue());
         }
-        // TODO: release/8.0.0
-//        process.setRoles(processRolesWithNewIds);
+        process.setRoles(processRolesWithNewIds);
     }
 
     protected static boolean areExtensionAttributesEmpty(Extension extension) {
@@ -266,7 +265,11 @@ public class Importer {
         process.setIcon(importedProcess.getIcon());
 
         if (importedProcess.getCaseName() != null) {
-            // TODO: release/8.0.0 case name expresion
+            I18nExpression caseName = new I18nExpression(importedProcess.getCaseName().getValue());
+            caseName.setDynamic(importedProcess.getCaseName().isDynamic());
+            caseName.setKey(importedProcess.getCaseName().getId());
+            caseName.setTranslations(i18n.get(caseName.getKey()).getTranslations());
+            process.setDefaultCaseName(caseName);
         }
         createProperties(importedProcess.getProperties(), process.getProperties());
 
@@ -658,21 +661,21 @@ public class Importer {
     }
 
     protected void createRole(com.netgrif.application.engine.importer.model.Role importRole) {
-//        if (importRole.getId().equals(ProcessRole.DEFAULT_ROLE)) {
-//            throw new IllegalArgumentException("Role ID '" + ProcessRole.DEFAULT_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
-//        }
-//
-//        if (importRole.getId().equals(ProcessRole.ANONYMOUS_ROLE)) {
-//            throw new IllegalArgumentException("Role ID '" + ProcessRole.ANONYMOUS_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
-//        }
-//
-//        ProcessRole role = new ProcessRole();
-//        role.setImportId(importRole.getId());
-//        role.setName(toI18NString(importRole.getTitle()));
+        if (importRole.getId().equals(ProcessRole.DEFAULT_ROLE)) {
+            throw new IllegalArgumentException("Role ID '" + ProcessRole.DEFAULT_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
+        }
+        if (importRole.getId().equals(ProcessRole.ANONYMOUS_ROLE)) {
+            throw new IllegalArgumentException("Role ID '" + ProcessRole.ANONYMOUS_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
+        }
+
+        ProcessRole role = new ProcessRole();
+        role.setImportId(importRole.getId());
+        role.setName(toI18NString(importRole.getTitle()));
+        // TODO: release/8.0.0
 //        role.setEvents(createEventsMap(importRole.getEvent()));
-//
-//        role.setNetId(net.getStringId());
-//        net.addRole(role);
+
+        role.setNetId(process.getStringId());
+        process.addRole(role);
     }
 //
 //    protected Map<EventType, com.netgrif.application.engine.petrinet.domain.events.Event> createEventsMap(List<com.netgrif.application.engine.importer.model.Event> events) {

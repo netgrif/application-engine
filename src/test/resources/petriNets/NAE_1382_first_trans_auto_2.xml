@@ -31,20 +31,20 @@
 		<id>first</id>
 		<x>140</x>
 		<y>500</y>
-		<title></title>
+		<title>Manual</title>
 	</transition>
 	<transition>
 		<id>t1</id>
 		<x>300</x>
 		<y>260</y>
-		<title></title>
+		<title>Auto</title>
 		<trigger type="auto"/>
 	</transition>
 	<transition>
 		<id>t2</id>
 		<x>580</x>
 		<y>340</y>
-		<title></title>
+		<title>Manuel</title>
 	</transition>
 	<!-- PLACES -->
 	<place>
@@ -52,42 +52,36 @@
 		<x>580</x>
 		<y>220</y>
 		<tokens>0</tokens>
-		<static>false</static>
 	</place>
 	<place>
 		<id>p8</id>
 		<x>580</x>
 		<y>100</y>
 		<tokens>0</tokens>
-		<static>false</static>
 	</place>
 	<place>
 		<id>p1</id>
 		<x>180</x>
 		<y>340</y>
 		<tokens>0</tokens>
-		<static>false</static>
 	</place>
 	<place>
 		<id>p3</id>
 		<x>700</x>
 		<y>340</y>
 		<tokens>0</tokens>
-		<static>false</static>
 	</place>
 	<place>
 		<id>p4</id>
 		<x>60</x>
 		<y>500</y>
 		<tokens>1</tokens>
-		<static>false</static>
 	</place>
 	<place>
 		<id>p7</id>
 		<x>420</x>
 		<y>260</y>
 		<tokens>0</tokens>
-		<static>false</static>
 	</place>
 	<!-- ARCS -->
 	<arc>

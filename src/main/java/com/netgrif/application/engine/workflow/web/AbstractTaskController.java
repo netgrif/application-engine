@@ -7,6 +7,7 @@ import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExe
 import com.netgrif.application.engine.workflow.domain.IllegalArgumentWithChangedFieldsException;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
@@ -183,18 +184,18 @@ public abstract class AbstractTaskController {
     }
 
 //// TODO: NAE-1969 fix
-//    public EntityModel<EventOutcomeWithMessage> getData(String taskId, Locale locale, Authentication auth) {
-//        try {
-//            GetDataGroupsEventOutcome outcome = dataService.getDataGroups(taskId, locale, (LoggedUser) auth.getPrincipal());
-//            return EventOutcomeWithMessageResource.successMessage("Get data groups successful", outcome);
-//        } catch (IllegalArgumentWithChangedFieldsException e) {
-//            log.error("Get data on task [{}] failed: ", taskId, e);
-//            return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), e.getOutcome());
-//        } catch (Exception e) {
-//            log.error("Get data on task [{}] failed: ", taskId, e);
-//            return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
-//        }
-//    }
+    public EntityModel<EventOutcomeWithMessage> getData(String taskId, Locale locale, Authentication auth) {
+        try {
+            GetDataEventOutcome outcome = dataService.getData(taskId, ((LoggedUser) auth.getPrincipal()).transformToUser());
+            return EventOutcomeWithMessageResource.successMessage("Get data groups successful", outcome);
+        } catch (IllegalArgumentWithChangedFieldsException e) {
+            log.error("Get data on task [{}] failed: ", taskId, e);
+            return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), e.getOutcome());
+        } catch (Exception e) {
+            log.error("Get data on task [{}] failed: ", taskId, e);
+            return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
+        }
+    }
 
     public EntityModel<EventOutcomeWithMessage> setData(String taskId, TaskDataSets dataBody, Authentication auth) {
         try {

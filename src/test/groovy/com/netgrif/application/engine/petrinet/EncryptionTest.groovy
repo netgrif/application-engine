@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.insurance
+package com.netgrif.application.engine.petrinet
 
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.LoggedUser

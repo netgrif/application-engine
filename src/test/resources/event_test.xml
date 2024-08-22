@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>test</id>
-    <initials>TST</initials>
+    <version>1.0.0</version>
     <title>Test</title>
     <data type="text">
         <id>task_assign_pre</id>
@@ -44,7 +43,7 @@
         <id>task</id>
         <x>0</x>
         <y>0</y>
-        <label>task</label>
+        <title>task</title>
         <event type="assign">
             <id>task_assign</id>
             <title>Prirad</title>
@@ -121,4 +120,4 @@
             </actions>
         </event>
     </transition>
-</document>
+</process>
