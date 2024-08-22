@@ -21,6 +21,7 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.netgrif.application.engine.search.SearchUtils.*;
@@ -34,6 +35,10 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     private QueryType type;
     @Getter
     private Boolean multiple;
+    @Getter
+    private Predicate fullMongoQuery;
+    @Getter
+    private String fullElasticQuery;
 
     public void setElasticQuery(ParseTree node, String query) {
         elasticQuery.put(node, query);
@@ -57,31 +62,39 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     }
 
     private void processOrExpression(List<ParseTree> children, ParseTree current) {
-        List<Predicate> predicates = children.stream().map(this::getMongoQuery).collect(Collectors.toList());
-        String elasticQuery = children.stream().map(this::getElasticQuery).collect(Collectors.joining(" OR "));
+        List<Predicate> predicates = children.stream()
+                .map(this::getMongoQuery)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        String elasticQuery = children.stream()
+                .map(this::getElasticQuery)
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining(" OR "));
 
-        if (predicates.contains(null)) {
-            setMongoQuery(current, null);
-        } else {
+        if (!predicates.isEmpty()) {
             BooleanBuilder predicate = new BooleanBuilder();
             predicates.forEach(predicate::or);
             setMongoQuery(current, predicate);
         }
-        setElasticQuery(current, elasticQuery);
+        setElasticQuery(current, elasticQuery.isBlank() ? null : elasticQuery);
     }
 
     private void processAndExpression(List<ParseTree> children, ParseTree current) {
-        List<Predicate> predicates = children.stream().map(this::getMongoQuery).collect(Collectors.toList());
-        String elasticQuery = children.stream().map(this::getElasticQuery).collect(Collectors.joining(" AND "));
+        List<Predicate> predicates = children.stream()
+                .map(this::getMongoQuery)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        String elasticQuery = children.stream()
+                .map(this::getElasticQuery)
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining(" AND "));
 
-        if (predicates.contains(null)) {
-            setMongoQuery(current, null);
-        } else {
+        if (!predicates.isEmpty()) {
             BooleanBuilder predicate = new BooleanBuilder();
             predicates.forEach(predicate::and);
             setMongoQuery(current, predicate);
         }
-        setElasticQuery(current, elasticQuery);
+        setElasticQuery(current, elasticQuery.isBlank() ? null : elasticQuery);
     }
 
     private void processConditionGroup(ParseTree child, ParseTree current) {
@@ -89,7 +102,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String elasticQuery = getElasticQuery(child);
 
         setMongoQuery(current, (predicate));
-        setElasticQuery(current, "(" + elasticQuery + ")");
+        setElasticQuery(current, elasticQuery != null ? "(" + elasticQuery + ")" : null);
     }
 
     private void processCondition(ParseTree child, ParseTree current, Boolean not) {
@@ -98,7 +111,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
         if (not) {
             predicate = predicate != null ? predicate.not() : null;
-            elasticQuery = "NOT " + elasticQuery;
+            elasticQuery = elasticQuery != null ? "NOT " + elasticQuery : null;
         }
 
         setMongoQuery(current, predicate);
@@ -114,6 +127,8 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     @Override
     public void exitProcessQuery(QueryLangParser.ProcessQueryContext ctx) {
         processBasicExpression(ctx.processConditions(), ctx);
+        fullMongoQuery = getMongoQuery(ctx);
+        fullElasticQuery = getElasticQuery(ctx);
     }
 
     @Override
@@ -125,6 +140,8 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     @Override
     public void exitCaseQuery(QueryLangParser.CaseQueryContext ctx) {
         processBasicExpression(ctx.caseConditions(), ctx);
+        fullMongoQuery = getMongoQuery(ctx);
+        fullElasticQuery = getElasticQuery(ctx);
     }
 
     @Override
@@ -136,6 +153,8 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     @Override
     public void exitTaskQuery(QueryLangParser.TaskQueryContext ctx) {
         processBasicExpression(ctx.taskConditions(), ctx);
+        fullMongoQuery = getMongoQuery(ctx);
+        fullElasticQuery = getElasticQuery(ctx);
     }
 
     @Override
@@ -147,6 +166,8 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     @Override
     public void exitUserQuery(QueryLangParser.UserQueryContext ctx) {
         processBasicExpression(ctx.userConditions(), ctx);
+        fullMongoQuery = getMongoQuery(ctx);
+        fullElasticQuery = getElasticQuery(ctx);
     }
 
     @Override
@@ -433,6 +454,16 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     }
 
     @Override
+    public void exitProcessIdentifierComparison(QueryLangParser.ProcessIdentifierComparisonContext ctx) {
+        StringPath stringPath = QCase.case$.processIdentifier;
+        Token op = ctx.stringComparison().op;
+        String string = getStringValue(ctx.stringComparison().STRING().getText());
+
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string));
+        setElasticQuery(ctx, buildElasticQuery("processIdentifier", op, string));
+    }
+
+    @Override
     public void exitAuthorComparison(QueryLangParser.AuthorComparisonContext ctx) {
         StringPath stringPath = QCase.case$.author.id;
         Token op = ctx.stringComparison().op;
@@ -543,8 +574,8 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     }
 
     @Override
-    public void exitDataString(QueryLangParser.DataStringContext ctx) { // todo NAE-1997: options comparison grammar update??
-        String fieldId = ctx.data().fieldId.getText();
+    public void exitDataString(QueryLangParser.DataStringContext ctx) {
+        String fieldId = ctx.dataValue().fieldId.getText();
         Token op = ctx.stringComparison().op;
         checkOp(ComparisonType.STRING, op);
         String string = getStringValue(ctx.stringComparison().STRING().getText());
@@ -555,11 +586,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitDataNumber(QueryLangParser.DataNumberContext ctx) {
-        if (ctx.data().property.getType() == QueryLangParser.OPTIONS) {
-            throw new IllegalArgumentException("Search by number value is not applicable for options.");
-        }
-
-        String fieldId = ctx.data().fieldId.getText();
+        String fieldId = ctx.dataValue().fieldId.getText();
         Token op = ctx.numberComparison().op;
         checkOp(ComparisonType.NUMBER, op);
         String number = ctx.numberComparison().NUMBER().getText();
@@ -570,11 +597,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitDataDate(QueryLangParser.DataDateContext ctx) {
-        if (ctx.data().property.getType() == QueryLangParser.OPTIONS) {
-            throw new IllegalArgumentException("Search by date value is not applicable for options.");
-        }
-
-        String fieldId = ctx.data().fieldId.getText();
+        String fieldId = ctx.dataValue().fieldId.getText();
         Token op = ctx.dateComparison().op;
         checkOp(ComparisonType.DATE, op);
         LocalDateTime localDateTime = toDateTime(ctx.dateComparison().DATE().getText());
@@ -585,11 +608,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitDataDatetime(QueryLangParser.DataDatetimeContext ctx) {
-        if (ctx.data().property.getType() == QueryLangParser.OPTIONS) {
-            throw new IllegalArgumentException("Search by date time value is not applicable for options.");
-        }
-
-        String fieldId = ctx.data().fieldId.getText();
+        String fieldId = ctx.dataValue().fieldId.getText();
         Token op = ctx.dateTimeComparison().op;
         checkOp(ComparisonType.DATETIME, op);
         LocalDateTime localDateTime = toDateTime(ctx.dateTimeComparison().DATETIME().getText());
@@ -600,17 +619,24 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitDataBoolean(QueryLangParser.DataBooleanContext ctx) {
-        if (ctx.data().property.getType() == QueryLangParser.OPTIONS) {
-            throw new IllegalArgumentException("Search by boolean value is not applicable for options.");
-        }
-
-        String fieldId = ctx.data().fieldId.getText();
+        String fieldId = ctx.dataValue().fieldId.getText();
         Token op = ctx.booleanComparison().op;
         checkOp(ComparisonType.BOOLEAN, op);
         String booleanValue = ctx.booleanComparison().BOOLEAN().getText();
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".booleanValue", op, Timestamp.valueOf(booleanValue).toString()));
+        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".booleanValue", op, booleanValue));
+    }
+
+    @Override
+    public void enterDataOptionsComparison(QueryLangParser.DataOptionsComparisonContext ctx) {
+        String fieldId = ctx.dataOptions().fieldId.getText();
+        Token op = ctx.stringComparison().op;
+        checkOp(ComparisonType.BOOLEAN, op);
+        String string = getStringValue(ctx.stringComparison().STRING().getText());
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".options", op, string));
     }
 
     @Override
@@ -621,18 +647,28 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String numberValue = ctx.numberComparison().NUMBER().getText();
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("places." + placeId + ".marking", op, numberValue)); // todo NAE-1997: update places structure in elastic/another approach?
+        setElasticQuery(ctx, buildElasticQuery("places." + placeId + ".marking", op, numberValue));
     }
 
     @Override
-    public void exitTasksComparison(QueryLangParser.TasksComparisonContext ctx) {
-        String taskId = ctx.tasks().taskId.getText();
-        String property = ctx.tasks().property.getType() == QueryLangParser.STATE ? ".state" : "userId";
+    public void exitTasksStateComparison(QueryLangParser.TasksStateComparisonContext ctx) {
+        String taskId = ctx.tasksState().taskId.getText();
+        Token op = ctx.op;
+        checkOp(ComparisonType.STRING, op);
+        State state = ctx.state.getType() == QueryLangParser.ENABLED ? State.ENABLED : State.DISABLED;
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, buildElasticQuery("tasks." + taskId + ".state", op, state.toString()));
+    }
+
+    @Override
+    public void exitTasksUserIdComparison(QueryLangParser.TasksUserIdComparisonContext ctx) {
+        String taskId = ctx.tasksUserId().taskId.getText();
         Token op = ctx.stringComparison().op;
         checkOp(ComparisonType.STRING, op);
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("tasks." + taskId + property, op, string)); // todo NAE-1997: update tasks structure in elastic/another approach?
+        setElasticQuery(ctx, buildElasticQuery("tasks." + taskId + ".userId", op, string));
     }
 }

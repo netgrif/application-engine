@@ -45,12 +45,15 @@ processComparisons: idComparison
 
 caseComparisons: idComparison
                | processIdComparison
+               | processIdentifierComparison
                | titleComparison
                | creationDateComparison
                | authorComparison
                | placesComparison
-               | tasksComparison
-               | dataComparison
+               | tasksStateComparison
+               | tasksUserIdComparison
+               | dataValueComparison
+               | dataOptionsComparison
                ;
 
 taskComparisons: idComparison
@@ -79,9 +82,10 @@ creationDateComparison: CREATION_DATE SPACE dateComparison # cdDate
                       | CREATION_DATE SPACE dateTimeComparison # cdDateTime
                       ; // todo NAE-1997: date/datetime?
 processIdComparison: PROCESS_ID SPACE stringComparison ;
+processIdentifierComparison: PROCESS_IDENTIFIER SPACE stringComparison ;
 authorComparison: AUTHOR SPACE stringComparison ;
 transitionIdComparison: TRANSITION_ID SPACE stringComparison ;
-stateComparison: STATE SPACE EQ state=(ENABLED | DISABLED) ;
+stateComparison: STATE SPACE EQ SPACE state=(ENABLED | DISABLED) ;
 userIdComparison: USER_ID SPACE stringComparison ;
 caseIdComparison: CASE_ID SPACE stringComparison ;
 lastAssignComparison: LAST_ASSIGN SPACE dateComparison # laDate
@@ -93,14 +97,16 @@ lastFinishComparison: LAST_FINISH SPACE dateComparison # lfDate
 nameComparison: NAME SPACE stringComparison ;
 surnameComparison: SURNAME SPACE stringComparison ;
 emailComparison: EMAIL SPACE stringComparison ;
-dataComparison: data SPACE stringComparison # dataString
-              | data SPACE numberComparison # dataNumber
-              | data SPACE dateComparison # dataDate
-              | data SPACE dateTimeComparison # dataDatetime
-              | data SPACE booleanComparison # dataBoolean
+dataValueComparison: dataValue SPACE stringComparison # dataString
+              | dataValue SPACE numberComparison # dataNumber
+              | dataValue SPACE dateComparison # dataDate
+              | dataValue SPACE dateTimeComparison # dataDatetime
+              | dataValue SPACE booleanComparison # dataBoolean
               ;
+dataOptionsComparison: dataOptions stringComparison ;
 placesComparison: places SPACE numberComparison ;
-tasksComparison: tasks SPACE stringComparison ;
+tasksStateComparison: tasksState SPACE op=EQ SPACE state=(ENABLED | DISABLED) ;
+tasksUserIdComparison: tasksUserId SPACE stringComparison ;
 
 // basic comparisons
 stringComparison: op=(EQ | CONTAINS) SPACE STRING ;
@@ -110,9 +116,11 @@ dateTimeComparison: op=(EQ | LT | GT | LTE | GTE) SPACE DATETIME ;
 booleanComparison: op=EQ SPACE BOOLEAN ;
 
 // special attribute rules
-data: DATA '.' fieldId=JAVA_ID '.' property=(VALUE | OPTIONS) ;
-places: PLACES '.' placeId=JAVA_ID '.' MARKING ; // todo NAE-1997: places structure in elastic
-tasks: TASKS '.' taskId=JAVA_ID '.' property=(STATE | USER_ID) ; // todo NAE-1997: tasks structure in elastic, state comparison?
+dataValue: DATA '.' fieldId=JAVA_ID '.'VALUE ;
+dataOptions: DATA '.' fieldId=JAVA_ID '.' OPTIONS ;
+places: PLACES '.' placeId=JAVA_ID '.' MARKING ;
+tasksState: TASKS '.' taskId=JAVA_ID '.' STATE ;
+tasksUserId: TASKS '.' taskId=JAVA_ID '.' USER_ID ;
 
 // operators
 AND: A N D | '&' ;
@@ -142,6 +150,7 @@ IDENTIFIER: I D E N T I F I E R ;
 VERSION: V E R S I O N ;
 CREATION_DATE: C R E A T I O N D A T E ;
 PROCESS_ID: P R O C E S S I D ;
+PROCESS_IDENTIFIER: P R O C E S S I D E N T I F I E R ;
 AUTHOR: A U T H O R ;
 PLACES: P L A C E S ;
 TRANSITION_ID: T R A N S I T I O N I D ;
@@ -165,8 +174,8 @@ DISABLED: D I S A B L E D ;
 LIST: '[' SPACE? ((STRING | NUMBER) SPACE? (',' SPACE? (STRING | NUMBER) SPACE? )* )? SPACE? ']' ;
 STRING: '\'' (~('\'' | '\r' | '\n'))* '\'' ;
 NUMBER: DIGIT+ ('.' DIGIT+)? ;
-DATETIME: DATE 'T' DIGIT DIGIT ':' DIGIT DIGIT ':' DIGIT DIGIT ('.' DIGIT+)? ; // 2020-03-03T20:00:00 todo NAE-1997 better recognition
-DATE: DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT ; // 2020-03-03, todo NAE-1997 better recognition
+DATETIME: DATE 'T' ([01] DIGIT | '2' [0-3]) ':' [0-5] DIGIT ':' [0-5] DIGIT ('.' DIGIT+)? ; // 2020-03-03T20:00:00
+DATE: DIGIT DIGIT DIGIT DIGIT '-' ('0' [1-9] | '1' [0-2]) '-' ('0' [1-9] | [12] DIGIT | '3' [01]) ; // 2020-03-03
 BOOLEAN: T R U E | F A L S E ;
 VERSION_NUMBER: DIGIT+ '.' DIGIT+ '.' DIGIT+ ;
 JAVA_ID: [a-zA-Z$_] [a-zA-Z0-9$_]* ;

@@ -795,7 +795,6 @@
                 <configuration>
                     <sourceDirectory>src/main/java</sourceDirectory>
                     <outputDirectory>${project.build.directory}/generated-sources/java/</outputDirectory>
-                    <visitor>true</visitor>
                 </configuration>
                 <executions>
                     <execution>

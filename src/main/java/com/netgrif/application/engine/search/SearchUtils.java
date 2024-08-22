@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.search;
 
+import com.netgrif.application.engine.antlr4.QueryLangLexer;
 import com.netgrif.application.engine.antlr4.QueryLangParser;
 import com.netgrif.application.engine.petrinet.domain.QPetriNet;
 import com.netgrif.application.engine.petrinet.domain.version.QVersion;
@@ -8,13 +9,15 @@ import com.netgrif.application.engine.search.enums.ComparisonType;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.StringPath;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +45,7 @@ public class SearchUtils {
     }
 
     public static String toDateTimeString(LocalDateTime localDateTime) {
-        return localDateTime.truncatedTo(ChronoUnit.SECONDS).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        return localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
     public static LocalDateTime toDateTime(String dateTimeString) {
@@ -67,6 +70,25 @@ public class SearchUtils {
                 throw new IllegalArgumentException("Invalid date/datetime format");
             }
         }
+    }
+
+    public static QueryLangEvaluator evaluateQuery(String input) {
+        if (input == null || input.isEmpty()) {
+            throw new IllegalArgumentException("Query cannot be empty.");
+        }
+
+        QueryLangLexer lexer = new QueryLangLexer(CharStreams.fromString(input));
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        QueryLangParser parser = new QueryLangParser(tokens);
+        parser.removeErrorListeners();
+        parser.addErrorListener(new QueryLangErrorListener());
+
+        ParseTreeWalker walker = new ParseTreeWalker();
+        QueryLangEvaluator evaluator = new QueryLangEvaluator();
+
+        walker.walk(evaluator, parser.query());
+
+        return evaluator;
     }
 
     public static String getStringValue(String queryLangString) {
