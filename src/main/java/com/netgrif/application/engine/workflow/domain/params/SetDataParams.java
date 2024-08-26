@@ -22,6 +22,8 @@ public class SetDataParams {
     private DataSet dataSet;
     private IUser user;
     @Builder.Default
+    private boolean isTransactional = false;
+    @Builder.Default
     private Map<String, String> params = new HashMap<>();
 
     public SetDataParams(Task task, DataSet dataSet, IUser user) {

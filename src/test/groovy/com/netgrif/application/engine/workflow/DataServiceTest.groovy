@@ -6,13 +6,18 @@ import com.netgrif.application.engine.petrinet.domain.DataGroup
 import com.netgrif.application.engine.petrinet.domain.DataRef
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.ButtonField
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -23,6 +28,8 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
+
+import static org.junit.jupiter.api.Assertions.assertThrows
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -123,6 +130,74 @@ class DataServiceTest {
         assert dataGroups.get(1).getParentTaskRefId() == "taskRef_result"
         assert dataGroups.get(2).getParentTaskRefId() == "taskRef_1"
         assert dataGroups.get(3).getParentTaskRefId() == "taskRef_0"
+    }
+
+    @Test
+    void testTransactionalSetDataOutcomes() {
+        def aCase = importHelper.createCase("Case", this.setDataNet)
+        ButtonField buttonWithValueOne = new ButtonField()
+        buttonWithValueOne.setRawValue(1)
+
+        assert aCase != null
+
+        SetDataParams setDataParams = SetDataParams.with()
+                .useCase(aCase)
+                .user(superCreator.superUser)
+                .isTransactional(true)
+                .dataSet(new DataSet(Map.of(
+                        "button_1", (Field<Integer>) buttonWithValueOne,
+                        "button_0", (Field<Integer>) buttonWithValueOne
+                )))
+                .build()
+        SetDataEventOutcome outcome = dataService.setData(setDataParams)
+        assert outcome
+        assert outcome.getOutcomes().size() == 2
+    }
+
+    @Test
+    void testTransactionalSetDataFailure() {
+        def aCase = importHelper.createCase("Case", this.setDataNet)
+        ButtonField buttonWithValueOne = new ButtonField()
+        buttonWithValueOne.setRawValue(1)
+
+        assert aCase != null
+
+        SetDataParams setDataParams = SetDataParams.with()
+                .useCase(aCase)
+                .user(superCreator.superUser)
+                .isTransactional(true)
+                .dataSet(new DataSet(Map.of(
+                        "button_1", (Field<Integer>) buttonWithValueOne,
+                        "non_existing_button", (Field<Integer>) buttonWithValueOne
+                )))
+                .build()
+        assertThrows(IllegalArgumentException.class, { dataService.setData(setDataParams) })
+
+        aCase = workflowService.findOne(aCase.stringId)
+        assert aCase.getDataSet().get("button_1").getRawValue() != 1
+    }
+
+    @Test
+    void testTransactionalSetDataSuccess() {
+        def aCase = importHelper.createCase("Case", this.setDataNet)
+        ButtonField buttonWithValueOne = new ButtonField()
+        buttonWithValueOne.setRawValue(1)
+
+        assert aCase != null
+
+        SetDataParams setDataParams = SetDataParams.with()
+                .useCase(aCase)
+                .user(superCreator.superUser)
+                .isTransactional(false)
+                .dataSet(new DataSet(Map.of(
+                        "button_1", (Field<Integer>) buttonWithValueOne,
+                        "non_existing_button", (Field<Integer>) buttonWithValueOne
+                )))
+                .build()
+        assertThrows(IllegalArgumentException.class, { dataService.setData(setDataParams) })
+
+        aCase = workflowService.findOne(aCase.stringId)
+        assert aCase.getDataSet().get("button_1").getRawValue() == 1
     }
 
 //    @Test

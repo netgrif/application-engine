@@ -16,6 +16,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavio
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
+import com.netgrif.application.engine.transaction.NaeTransaction;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
@@ -33,6 +34,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
+import groovy.lang.Closure;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -42,7 +44,10 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
@@ -75,6 +80,9 @@ public class DataService implements IDataService {
 
     @Autowired
     private IHistoryService historyService;
+
+    @Autowired
+    private MongoTransactionManager transactionManager;
 
     @Autowired
     private IValidationService validation;
@@ -158,6 +166,9 @@ public class DataService implements IDataService {
         }
     }
 
+    /**
+     * todo javadoc
+     * */
     @Override
     public SetDataEventOutcome setData(SetDataParams setDataParams) {
         fillMissingAttributes(setDataParams);
@@ -168,11 +179,34 @@ public class DataService implements IDataService {
         if (task.getUserId() != null) {
             task.setUser(userService.findById(task.getUserId()));
         }
+
+        if (setDataParams.isTransactional()) {
+            NaeTransaction transaction = NaeTransaction.builder()
+                    .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
+                    .forceCreation(false)
+                    .transactionManager(transactionManager)
+                    .event(new Closure<SetDataEventOutcome>(null) {
+                        @Override
+                        public SetDataEventOutcome call() {
+                            return doSetData(setDataParams);
+                        }
+                    })
+                    .build();
+            transaction.begin();
+            return (SetDataEventOutcome) transaction.getResultOfEvent();
+        } else {
+            return doSetData(setDataParams);
+        }
+    }
+
+    private SetDataEventOutcome doSetData(SetDataParams setDataParams) {
+        Task task = setDataParams.getTask();
         List<EventOutcome> outcomes = new ArrayList<>();
         for (Map.Entry<String, Field<?>> stringFieldEntry : setDataParams.getDataSet().getFields().entrySet()) {
             String fieldId = stringFieldEntry.getKey();
             Field<?> newDataField = stringFieldEntry.getValue();
-            outcomes.add(setDataField(task, fieldId, newDataField, setDataParams.getUser()));
+            SetDataEventOutcome setDataEventOutcome = setDataField(task, fieldId, newDataField, setDataParams.getUser());
+            outcomes.add(setDataEventOutcome);
         }
         Case useCase = workflowService.findOne(task.getCaseId());
         return new SetDataEventOutcome(useCase, task, outcomes);

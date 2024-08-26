@@ -107,8 +107,8 @@ class TransactionTest {
 
     @Test
     void testBasicTransactionWithFailure() {
-        Case useCase = createTestCaseAndSetButton("test", "testBasicTransactionWithFailure")
         importHelper.createCase("toBeRemoved", testNet)
+        Case useCase = createTestCaseAndSetButton("test", "testBasicTransactionWithFailure")
 
         assert findAllByIdentifier("transaction_test").size() == 4
 

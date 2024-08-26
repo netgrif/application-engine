@@ -37,6 +37,10 @@ public class NaeTransaction {
      * */
     private Closure<?> event;
     /**
+     * Return value of the {@link #event}
+     * */
+    private Object resultOfEvent;
+    /**
      * Callback, that is called when {@link NaeTransaction#event} is successful.
      * */
     private Closure<?> onCommit;
@@ -72,7 +76,7 @@ public class NaeTransaction {
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 try {
                     registerTransactionCallBacks();
-                    event.call();
+                    resultOfEvent = event.call();
                     throwIfDeadlineReached(); // Transaction API does not check the timeout declared in transaction template
                 } catch (Exception rethrow) {
                     onEventException = rethrow;
