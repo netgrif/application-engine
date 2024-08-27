@@ -52,7 +52,6 @@ import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -376,6 +375,26 @@ public class WorkflowService implements IWorkflowService {
     public DeleteCaseEventOutcome deleteCase(DeleteCaseParams deleteCaseParams) {
         fillMissingAttributes(deleteCaseParams);
 
+        if (deleteCaseParams.isTransactional()) {
+            NaeTransaction transaction = NaeTransaction.builder()
+                    .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
+                    .forceCreation(false)
+                    .transactionManager(transactionManager)
+                    .event(new Closure<DeleteCaseEventOutcome>(null) {
+                        @Override
+                        public DeleteCaseEventOutcome call() {
+                            return doDeleteCase(deleteCaseParams);
+                        }
+                    })
+                    .build();
+            transaction.begin();
+            return (DeleteCaseEventOutcome) transaction.getResultOfEvent();
+        } else {
+            return doDeleteCase(deleteCaseParams);
+        }
+    }
+
+    private DeleteCaseEventOutcome doDeleteCase(DeleteCaseParams deleteCaseParams) {
         Case useCase = deleteCaseParams.getUseCase();
 
         List<EventOutcome> preEventOutcomes = eventService.runActions(useCase.getPetriNet().getPreDeleteActions(),
