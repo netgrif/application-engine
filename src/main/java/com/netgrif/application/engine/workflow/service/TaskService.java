@@ -27,6 +27,7 @@ import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExe
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.rules.domain.facts.TransitionEventFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
+import com.netgrif.application.engine.transaction.NaeTransaction;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.*;
@@ -49,6 +50,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
+import groovy.lang.Closure;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -56,10 +58,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -105,6 +110,9 @@ public class TaskService implements ITaskService {
 
     @Autowired
     private IRuleEngine ruleEngine;
+
+    @Autowired
+    private MongoTransactionManager transactionManager;
 
     /**
      * Executes provided {@link Task} in provided {@link Case}
@@ -175,6 +183,30 @@ public class TaskService implements ITaskService {
     public AssignTaskEventOutcome assignTask(TaskParams taskParams) throws TransitionNotExecutableException {
         fillMissingAttributes(taskParams);
 
+        if (taskParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
+            NaeTransaction transaction = NaeTransaction.builder()
+                    .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
+                    .forceCreation(false)
+                    .transactionManager(transactionManager)
+                    .event(new Closure<AssignTaskEventOutcome>(null) {
+                        @Override
+                        public AssignTaskEventOutcome call() {
+                            try {
+                                return doAssignTask(taskParams);
+                            } catch (TransitionNotExecutableException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    })
+                    .build();
+            transaction.begin();
+            return (AssignTaskEventOutcome) transaction.getResultOfEvent();
+        } else {
+            return doAssignTask(taskParams);
+        }
+    }
+
+    private AssignTaskEventOutcome doAssignTask(TaskParams taskParams) throws TransitionNotExecutableException {
         Task task = taskParams.getTask();
         Case useCase = taskParams.getUseCase();
         IUser user = taskParams.getUser();
@@ -281,6 +313,30 @@ public class TaskService implements ITaskService {
     public FinishTaskEventOutcome finishTask(TaskParams taskParams) throws TransitionNotExecutableException {
         fillMissingAttributes(taskParams);
 
+        if (taskParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
+            NaeTransaction transaction = NaeTransaction.builder()
+                    .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
+                    .forceCreation(false)
+                    .transactionManager(transactionManager)
+                    .event(new Closure<FinishTaskEventOutcome>(null) {
+                        @Override
+                        public FinishTaskEventOutcome call() {
+                            try {
+                                return doFinishTask(taskParams);
+                            } catch (TransitionNotExecutableException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    })
+                    .build();
+            transaction.begin();
+            return (FinishTaskEventOutcome) transaction.getResultOfEvent();
+        } else {
+            return doFinishTask(taskParams);
+        }
+    }
+
+    private FinishTaskEventOutcome doFinishTask(TaskParams taskParams) throws TransitionNotExecutableException {
         Task task = taskParams.getTask();
         Case useCase = taskParams.getUseCase();
         IUser user = taskParams.getUser();
@@ -388,6 +444,26 @@ public class TaskService implements ITaskService {
     public CancelTaskEventOutcome cancelTask(TaskParams taskParams) {
         fillMissingAttributes(taskParams);
 
+        if (taskParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
+            NaeTransaction transaction = NaeTransaction.builder()
+                    .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
+                    .forceCreation(false)
+                    .transactionManager(transactionManager)
+                    .event(new Closure<CancelTaskEventOutcome>(null) {
+                        @Override
+                        public CancelTaskEventOutcome call() {
+                            return doCancelTask(taskParams);
+                        }
+                    })
+                    .build();
+            transaction.begin();
+            return (CancelTaskEventOutcome) transaction.getResultOfEvent();
+        } else {
+            return doCancelTask(taskParams);
+        }
+    }
+
+    private CancelTaskEventOutcome doCancelTask(TaskParams taskParams) {
         Task task = taskParams.getTask();
         IUser user = taskParams.getUser();
         Case useCase = taskParams.getUseCase();

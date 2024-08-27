@@ -19,6 +19,7 @@ import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.startup.SystemUserRunner;
 import com.netgrif.application.engine.startup.UriRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
@@ -40,6 +41,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -84,6 +88,8 @@ public class TaskServiceTest {
 
     @Autowired
     private SuperAdminConfiguration configuration;
+    @Autowired
+    private TaskService taskService;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -150,5 +156,147 @@ public class TaskServiceTest {
     public LoggedUser mockLoggedUser() {
         Authority authorityUser = authorityService.getOrCreate(Authority.user);
         return new LoggedUser(new ObjectId().toString(), configuration.getEmail(), configuration.getPassword(), Collections.singleton(authorityUser));
+    }
+
+    @Test
+    public void testTransactionalAssignTaskFailure() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        String taskId = createCaseAndReturnTaskId("src/test/resources/transactional_task_event_test.xml",
+                "assignTest");
+
+        TaskParams taskParams = TaskParams.with()
+                .isTransactional(true)
+                .taskId(taskId)
+                .user(superCreator.getSuperUser())
+                .build();
+
+        assertThrows(RuntimeException.class, () -> taskService.assignTask(taskParams));
+
+        Task aTask = taskService.findOne(taskId);
+        assert aTask.getUserId() == null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePre")) == null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePost")) == null;
+    }
+
+    @Test
+    public void testNonTransactionalAssignTaskFailure() throws IOException, MissingPetriNetMetaDataException {
+        String taskId = createCaseAndReturnTaskId("src/test/resources/transactional_task_event_test.xml",
+                "assignTest");
+
+        TaskParams taskParams = TaskParams.with()
+                .isTransactional(false)
+                .taskId(taskId)
+                .user(superCreator.getSuperUser())
+                .build();
+
+        assertThrows(RuntimeException.class, () -> taskService.assignTask(taskParams));
+
+        Task aTask = taskService.findOne(taskId);
+        assert aTask.getUserId() != null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePre")) != null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePost")) != null;
+    }
+
+    @Test
+    public void testTransactionalCancelTaskFailure() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        String taskId = createCaseAndReturnTaskId("src/test/resources/transactional_task_event_test.xml",
+                "cancelTest");
+
+        TaskParams taskParams = TaskParams.with()
+                .isTransactional(false)
+                .taskId(taskId)
+                .user(superCreator.getSuperUser())
+                .build();
+
+        Task aTask = taskService.assignTask(taskParams).getTask();
+        assert Objects.equals(aTask.getUserId(), superCreator.getSuperUser().getStringId());
+
+        taskParams.setTransactional(true);
+        assertThrows(RuntimeException.class, () -> taskService.cancelTask(taskParams));
+
+        aTask = taskService.findOne(taskId);
+        assert Objects.equals(aTask.getUserId(), superCreator.getSuperUser().getStringId());
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePre")) == null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePost")) == null;
+    }
+
+    @Test
+    public void testNonTransactionalCancelTaskFailure() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        String taskId = createCaseAndReturnTaskId("src/test/resources/transactional_task_event_test.xml",
+                "cancelTest");
+
+        TaskParams taskParams = TaskParams.with()
+                .isTransactional(false)
+                .taskId(taskId)
+                .user(superCreator.getSuperUser())
+                .build();
+
+        Task aTask = taskService.assignTask(taskParams).getTask();
+        assert Objects.equals(aTask.getUserId(), superCreator.getSuperUser().getStringId());
+
+        assertThrows(RuntimeException.class, () -> taskService.cancelTask(taskParams));
+
+        aTask = taskService.findOne(taskId);
+        assert aTask.getUserId() == null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePre")) != null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePost")) != null;
+    }
+
+    @Test
+    public void testTransactionalFinishTaskFailure() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        String taskId = createCaseAndReturnTaskId("src/test/resources/transactional_task_event_test.xml",
+                "finishTest");
+
+        TaskParams taskParams = TaskParams.with()
+                .isTransactional(false)
+                .taskId(taskId)
+                .user(superCreator.getSuperUser())
+                .build();
+
+        Task aTask = taskService.assignTask(taskParams).getTask();
+        assert Objects.equals(aTask.getUserId(), superCreator.getSuperUser().getStringId());
+
+        taskParams.setTransactional(true);
+        assertThrows(RuntimeException.class, () -> taskService.finishTask(taskParams));
+
+        aTask = taskService.findOne(taskId);
+        assert Objects.equals(aTask.getUserId(), superCreator.getSuperUser().getStringId());
+        assert aTask.getFinishedBy() == null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePre")) == null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePost")) == null;
+    }
+
+    @Test
+    public void testNonTransactionalFinishTaskFailure() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        String taskId = createCaseAndReturnTaskId("src/test/resources/transactional_task_event_test.xml",
+                "finishTest");
+
+        TaskParams taskParams = TaskParams.with()
+                .isTransactional(false)
+                .taskId(taskId)
+                .user(superCreator.getSuperUser())
+                .build();
+
+        Task aTask = taskService.assignTask(taskParams).getTask();
+        assert Objects.equals(aTask.getUserId(), superCreator.getSuperUser().getStringId());
+
+        assertThrows(RuntimeException.class, () -> taskService.finishTask(taskParams));
+
+        aTask = taskService.findOne(taskId);
+        assert aTask.getUserId() == null;
+        assert aTask.getFinishedBy().equals(superCreator.getSuperUser().getStringId());
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePre")) != null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePost")) != null;
+    }
+
+    private String createCaseAndReturnTaskId(String filePath, String transId) throws IOException, MissingPetriNetMetaDataException {
+        PetriNet net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream(filePath), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet();
+
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNet(net)
+                .loggedUser(superCreator.getLoggedSuper())
+                .build();
+        Case useCase = workflowService.createCase(createCaseParams).getCase();
+        return useCase.getTaskStringId(transId);
     }
 }

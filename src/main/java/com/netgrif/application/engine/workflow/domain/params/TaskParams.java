@@ -20,6 +20,8 @@ public class TaskParams {
     private Case useCase;
     private IUser user;
     @Builder.Default
+    private boolean isTransactional = false;
+    @Builder.Default
     private Map<String, String> params = new HashMap<>();
 
     public TaskParams(Task task) {

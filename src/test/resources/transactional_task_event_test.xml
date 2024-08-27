@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>transactional_task_event_test</id>
+    <initials>TST</initials>
+    <title>Test</title>
+    <defaultRole>true</defaultRole>
+    <transition>
+        <id>assignTest</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Task</label>
+        <event type="assign">
+            <id>1</id>
+            <actions phase="pre">
+                <action>
+                    createCase("transactional_task_event_test", "CasePre")
+                </action>
+            </actions>
+            <actions phase="post">
+                <action>
+                    createCase("transactional_task_event_test", "CasePost")
+                    throw new RuntimeException("error on purpose")
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>cancelTest</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Task</label>
+        <event type="cancel">
+            <id>2</id>
+            <actions phase="pre">
+                <action>
+                    createCase("transactional_task_event_test", "CasePre")
+                </action>
+            </actions>
+            <actions phase="post">
+                <action>
+                    createCase("transactional_task_event_test", "CasePost")
+                    throw new RuntimeException("error on purpose")
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>finishTest</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Task</label>
+        <event type="finish">
+            <id>3</id>
+            <actions phase="pre">
+                <action>
+                    createCase("transactional_task_event_test", "CasePre")
+                </action>
+            </actions>
+            <actions phase="post">
+                <action>
+                    createCase("transactional_task_event_test", "CasePost")
+                    throw new RuntimeException("error on purpose")
+                </action>
+            </actions>
+        </event>
+    </transition>
+</document>
