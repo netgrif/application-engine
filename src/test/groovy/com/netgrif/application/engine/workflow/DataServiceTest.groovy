@@ -175,6 +175,7 @@ class DataServiceTest {
 
         aCase = workflowService.findOne(aCase.stringId)
         assert aCase.getDataSet().get("button_1").getRawValue() != 1
+        assert aCase.getDataSet().get("button_0").getRawValue() != 1337 // forbidden result of set action of button_1
     }
 
     @Test
@@ -198,6 +199,7 @@ class DataServiceTest {
 
         aCase = workflowService.findOne(aCase.stringId)
         assert aCase.getDataSet().get("button_1").getRawValue() == 1
+        assert aCase.getDataSet().get("button_0").getRawValue() == 1337 // allowed result of set action of button_1
     }
 
 //    @Test
