@@ -2,19 +2,18 @@ package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ipc.TaskApiTest
+import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
-import groovy.time.TimeCategory
-import groovy.time.TimeDuration
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,7 +21,8 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-import static com.netgrif.application.engine.workflow.domain.params.CreateCaseParams.*
+import static com.netgrif.application.engine.workflow.domain.params.CreateCaseParams.with
+import static org.junit.jupiter.api.Assertions.assertThrows
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -32,6 +32,7 @@ class WorkflowServiceTest {
 
     public static final String NET_FILE = "case_search_test.xml"
     public static final String CASE_LOCALE_NET_FILE = "create_case_locale.xml"
+    public static final String CASE_FAILURE_NET_FILE = "create_case_failure.xml"
     public static final String FIRST_AUTO_NET_FILE = "petriNets/NAE_1382_first_trans_auto.xml"
     public static final String SECOND_AUTO_NET_FILE = "petriNets/NAE_1382_first_trans_auto_2.xml"
 
@@ -146,5 +147,49 @@ class WorkflowServiceTest {
         Case enCase = workflowService.createCase(createCaseParams).getCase()
 
         assert enCase.title == "English translation"
+    }
+
+    @Test
+    void testTransactionalCreateCaseFailure() {
+        petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(CASE_LOCALE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()))
+        PetriNet net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(CASE_FAILURE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
+
+        CreateCaseParams createCaseParams = with()
+                .isTransactional(true)
+                .petriNet(net)
+                .title("FailedCase")
+                .color(null)
+                .loggedUser(superCreator.getLoggedSuper())
+                .build()
+
+        assertThrows(RuntimeException.class, { workflowService.createCase(createCaseParams) })
+
+        assert workflowService.searchOne(QCase.case$.title.eq("FailedCase")) == null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPre")) == null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPost")) == null
+    }
+
+    @Test
+    void testNonTransactionalCreateCaseFailure() {
+        petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(CASE_LOCALE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()))
+        PetriNet net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(CASE_FAILURE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
+
+        CreateCaseParams createCaseParams = with()
+                .isTransactional(false)
+                .petriNet(net)
+                .title("FailedCase")
+                .color(null)
+                .loggedUser(superCreator.getLoggedSuper())
+                .build()
+
+        assertThrows(RuntimeException.class, { workflowService.createCase(createCaseParams) })
+
+        assert workflowService.searchOne(QCase.case$.title.eq("FailedCase")) != null // failure in post action
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPre")) != null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPost")) != null
     }
 }

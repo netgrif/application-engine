@@ -19,6 +19,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.security.service.EncryptionService;
+import com.netgrif.application.engine.transaction.NaeTransaction;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataFieldValue;
@@ -36,6 +37,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
 import com.querydsl.core.types.Predicate;
+import groovy.lang.Closure;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +46,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -94,6 +99,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     private DataSetInitializer dataSetInitializer;
+
+    @Autowired
+    private MongoTransactionManager transactionManager;
 
     @Autowired
     public void setElasticCaseService(IElasticCaseService elasticCaseService) {
@@ -217,6 +225,26 @@ public class WorkflowService implements IWorkflowService {
     public CreateCaseEventOutcome createCase(CreateCaseParams createCaseParams) {
         fillMissingAttributes(createCaseParams);
 
+        if (createCaseParams.isTransactional()) {
+            NaeTransaction transaction = NaeTransaction.builder()
+                    .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
+                    .forceCreation(false)
+                    .transactionManager(transactionManager)
+                    .event(new Closure<CreateCaseEventOutcome>(null) {
+                        @Override
+                        public CreateCaseEventOutcome call() {
+                            return doCreateCase(createCaseParams);
+                        }
+                    })
+                    .build();
+            transaction.begin();
+            return (CreateCaseEventOutcome) transaction.getResultOfEvent();
+        } else {
+            return doCreateCase(createCaseParams);
+        }
+    }
+
+    private CreateCaseEventOutcome doCreateCase(CreateCaseParams createCaseParams) {
         Case useCase = createCaseObject(createCaseParams);
         CreateTasksOutcome createTasksOutcome = taskService.createAndSetTasksInCase(useCase);
         save(useCase); // must be after tasks creation for effectivity reasons
