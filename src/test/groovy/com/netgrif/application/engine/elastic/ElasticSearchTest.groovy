@@ -17,7 +17,6 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -120,7 +119,7 @@ class ElasticSearchTest {
         CASE_NUMBER.times {
             def _case = importHelper.createCaseAsSuper("$it" as String, it % 2 == 0 ? net : net2)
             _case.dataSet.get("number").rawValue = it * 100.0 as Double
-            _case.dataSet.get("enumeration").rawValue = (_case.petriNet.dataSet.get("enumeration") as EnumerationField).choices[it % 3]
+            _case.dataSet.get("enumeration").rawValue = (_case.process.dataSet.get("enumeration") as EnumerationField).choices[it % 3]
             workflowService.save(_case)
         }
 

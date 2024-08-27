@@ -14,11 +14,16 @@ import com.netgrif.application.engine.importer.model.EventType;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
+import com.netgrif.application.engine.petrinet.domain.arcs.ArcOrderComparator;
+import com.netgrif.application.engine.petrinet.domain.arcs.PTArc;
+import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.petrinet.domain.throwable.IllegalMarkingException;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.application.engine.petrinet.service.MultiplicityEvaluator;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.rules.domain.facts.TransitionEventFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
@@ -57,7 +62,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -107,6 +111,8 @@ public class TaskService implements ITaskService {
 
     @Autowired
     protected IValidationService validation;
+    @Autowired
+    private MultiplicityEvaluator multiplicityEvaluator;
 
     @Autowired
     public void setElasticTaskService(IElasticTaskService elasticTaskService) {
@@ -164,7 +170,7 @@ public class TaskService implements ITaskService {
     @Override
     public AssignTaskEventOutcome assignTask(Task task, IUser user, Map<String, String> params) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(task.getCaseId());
-        Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+        Transition transition = useCase.getProcess().getTransition(task.getTransitionId());
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreAssignActions(), workflowService.findOne(task.getCaseId()), task, transition, params));
         useCase = workflowService.findOne(task.getCaseId());
         task = findOne(task.getStringId());
@@ -188,8 +194,8 @@ public class TaskService implements ITaskService {
 
     protected Case assignTaskToUser(IUser user, Task task, String useCaseId) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(useCaseId);
-        useCase.getPetriNet().initializeArcs();
-        Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+        useCase.getProcess().initializeArcs();
+        Transition transition = useCase.getProcess().getTransition(task.getTransitionId());
 
         log.info("[{}]: Assigning task [{}] to user [{}]", useCaseId, task.getTitle(), user.getSelfOrImpersonated().getEmail());
 
@@ -261,7 +267,7 @@ public class TaskService implements ITaskService {
     @Override
     public FinishTaskEventOutcome finishTask(Task task, IUser user, Map<String, String> params) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(task.getCaseId());
-        Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+        Transition transition = useCase.getProcess().getTransition(task.getTransitionId());
 
         log.info("[{}]: Finishing task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), user.getSelfOrImpersonated().getEmail());
 
@@ -330,7 +336,7 @@ public class TaskService implements ITaskService {
     @Override
     public CancelTaskEventOutcome cancelTask(Task task, IUser user, Map<String, String> params) {
         Case useCase = workflowService.findOne(task.getCaseId());
-        Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+        Transition transition = useCase.getProcess().getTransition(task.getTransitionId());
 
         log.info("[{}]: Canceling task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), user.getSelfOrImpersonated().getEmail());
 
@@ -358,7 +364,7 @@ public class TaskService implements ITaskService {
 
     private Task returnTokens(Task task, String useCaseId) {
         Case useCase = workflowService.findOne(useCaseId);
-        Process net = useCase.getPetriNet();
+        Process net = useCase.getProcess();
 //        TODO: release/8.0.0
 //        net.getArcsOfTransition(task.getTransitionId()).stream()
 //                .filter(arc -> arc.getSource() instanceof Place)
@@ -394,7 +400,7 @@ public class TaskService implements ITaskService {
         Task task = taskOptional.get();
 
         Case useCase = workflowService.findOne(task.getCaseId());
-        Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+        Transition transition = useCase.getProcess().getTransition(task.getTransitionId());
 
         log.info("[{}]: Delegating task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), delegatedUser.getEmail());
 
@@ -456,7 +462,7 @@ public class TaskService implements ITaskService {
     @Override
     public void reloadTasks(Case useCase) {
         log.info("[{}]: Reloading tasks in [{}]", useCase.getStringId(), useCase.getTitle());
-        Process net = useCase.getPetriNet();
+        Process net = useCase.getProcess();
         List<Task> tasks;
         // create tasks on first reload (create case)
         if (useCase.getTasks().isEmpty()) {
@@ -470,7 +476,7 @@ public class TaskService implements ITaskService {
         Task autoTriggered = null;
         for (Task task : tasks) {
             Transition transition = net.getTransition(task.getTransitionId());
-            if (isExecutable(transition, net)) {
+            if (isExecutable(transition, useCase)) {
                 task.setState(State.ENABLED);
                 if (task.isAutoTriggered()) {
                     autoTriggered = task;
@@ -485,52 +491,51 @@ public class TaskService implements ITaskService {
         }
     }
 
-    boolean isExecutable(Transition transition, Process net) {
-        Collection<Arc> arcsOfTransition = net.getArcsOfTransition(transition);
-
+    boolean isExecutable(Transition transition, Case useCase) {
+        List<PTArc> arcsOfTransition = useCase.getProcess().getInputArcsOf(transition.getImportId());
         if (arcsOfTransition == null) {
             return true;
         }
+        Map<String, Integer> markingBefore = useCase.getActivePlaces();
         // TODO: NAE-1858 is this valid check? what about multiple input arcs from same place?
-//        return arcsOfTransition.stream()
-//                .filter(arc -> arc.getDestination().equals(transition)) // todo: from same source error
-//                .allMatch(Arc::isExecutable);
-//        TODO: release/8.0.0
+        // todo: from same source error
+        //        TODO: release/8.0.0
+        try {
+            arcsOfTransition.forEach(Arc::execute);
+        } catch (IllegalArgumentException e) {
+            useCase.getProcess().setActivePlaces(markingBefore);
+            return false;
+        }
         return true;
     }
 
-    void finishExecution(Transition transition, String useCaseId) throws TransitionNotExecutableException {
+    void finishExecution(Transition transition, String useCaseId) {
         Case useCase = workflowService.findOne(useCaseId);
         log.info("[{}]: Finish execution of task [{}] in case [{}]", useCaseId, transition.getTitle(), useCase.getTitle());
-        execute(transition, useCase, arc -> arc.getSource().equals(transition));
-        Supplier<Stream<Arc>> arcStreamSupplier = () -> useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream();
-        arcStreamSupplier.get().filter(arc -> useCase.getConsumedTokens().containsKey(arc.getStringId())).forEach(arc -> useCase.getConsumedTokens().remove(arc.getStringId()));
-        workflowService.save(useCase);
+        // TODO: release/8.0.0 set multiplicity
+        useCase.getProcess().getOutputArcsOf(transition.getImportId()).forEach(Arc::execute);
+        workflowService.updateMarking(useCase);
+        // TODO: release/8.0.0 save?
+//        workflowService.save(useCase);
     }
 
     public void startExecution(Transition transition, Case useCase) throws TransitionNotExecutableException {
         log.info("[{}]: Start execution of {} in case {}", useCase.getStringId(), transition.getTitle(), useCase.getTitle());
-        execute(transition, useCase, arc -> arc.getDestination().equals(transition));
-    }
 
-    protected void execute(Transition transition, Case useCase, Predicate<Arc> predicate) throws TransitionNotExecutableException {
-        Supplier<Stream<Arc>> filteredSupplier = () -> useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream().filter(predicate);
-
-        // TODO: NAE-1969 fix
-//        if (!filteredSupplier.get().allMatch(Arc::isExecutable)) {
-//            throw new TransitionNotExecutableException("Not all arcs can be executed task [" + transition.getStringId() + "] in case [" + useCase.getTitle() + "]");
-//        }
-//
-//        filteredSupplier.get().sorted((o1, o2) -> ArcOrderComparator.getInstance().compare(o1, o2)).forEach(arc -> {
-//            if (arc instanceof ResetArc) {
-//                useCase.getConsumedTokens().put(arc.getStringId(), ((Place) arc.getSource()).getTokens());
-//            }
-//            if (arc.getReference() != null && arc.getSource() instanceof Place) {
-//                useCase.getConsumedTokens().put(arc.getStringId(), arc.getReference().getMultiplicity());
-//            }
-//            arc.execute();
-//        });
-
+        try {
+            useCase.getProcess().getInputArcsOf(transition.getImportId()).stream()
+                    .sorted((a1, a2) -> ArcOrderComparator.getInstance().compare(a1, a2))
+                    .forEach(arc -> {
+                        int consumed = arc.getMultiplicity();
+                        if (arc instanceof ResetArc) {
+                            consumed = arc.getSource().getTokens();
+                        }
+                        useCase.getConsumedTokens().put(arc.getStringId(), consumed);
+                        arc.execute();
+                    });
+        } catch (IllegalMarkingException e) {
+            throw new TransitionNotExecutableException("Not all arcs can be executed task [" + transition.getStringId() + "] in case [" + useCase.getTitle() + "]");
+        }
         workflowService.updateMarking(useCase);
     }
 

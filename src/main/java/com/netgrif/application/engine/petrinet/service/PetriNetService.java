@@ -62,7 +62,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -357,11 +356,12 @@ public class PetriNetService implements IPetriNetService {
     public PetriNetImportReference getNetFromCase(String caseId) {
         Case useCase = workflowService.findOne(caseId);
         PetriNetImportReference pn = new PetriNetImportReference();
-        useCase.getPetriNet().getTransitions().forEach((key, value) -> pn.getTransitions().add(new TransitionImportReference(value)));
-        useCase.getPetriNet().getPlaces().forEach((key, value) -> pn.getPlaces().add(new PlaceImportReference(value)));
-        useCase.getPetriNet().getArcs().forEach((key, arcs) -> {
-            arcs.forEach(arc -> pn.getArcs().add(new ArcImportReference(arc)));
-        });
+        useCase.getProcess().getTransitions().forEach((key, value) -> pn.getTransitions().add(new TransitionImportReference(value)));
+        useCase.getProcess().getPlaces().forEach((key, value) -> pn.getPlaces().add(new PlaceImportReference(value)));
+        // TODO: release/8.0.0 needed?
+//        useCase.getProcess().getArcs().forEach((key, arcs) -> {
+//            arcs.forEach(arc -> pn.getArcs().add(new ArcImportReference(arc)));
+//        });
         pn.getAssignedTasks().addAll(historyService.findAllAssignTaskEventLogsByCaseId(caseId)
                 .stream().map(TaskEventLog::getTransitionId).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
         pn.getFinishedTasks().addAll(historyService.findAllFinishTaskEventLogsByCaseId(caseId)

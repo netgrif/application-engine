@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.arcs;
 
 import com.netgrif.application.engine.petrinet.domain.*;
+import com.netgrif.application.engine.utils.UniqueKeyMap;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Transient;
@@ -11,37 +12,39 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class Arc extends ProcessObject {
+public abstract class Arc<S extends Node, D extends Node> extends ProcessObject {
 
     @Transient
-    protected Node source;
+    protected S source;
     protected String sourceId;
     @Transient
-    protected Node destination;
+    protected D destination;
     protected String destinationId;
-    protected Multiplicity multiplicity;
+    protected Multiplicity multiplicityExpression;
     protected List<Position> breakpoints;
-    protected Map<String, String> properties;
+    protected UniqueKeyMap<String, String> properties;
 
     public Arc() {
         this.setObjectId(new ObjectId());
         this.breakpoints = new ArrayList<>();
-        this.properties = new HashMap<>();
+        this.properties = new UniqueKeyMap<>();
     }
 
-    public Arc(Node source, Node destination, int multiplicity) {
+    public Arc(S source, D destination, int multiplicity) {
         this();
         this.setSource(source);
         this.setDestination(destination);
-        this.multiplicity = new Multiplicity(multiplicity);
+        this.multiplicityExpression = new Multiplicity(multiplicity);
     }
 
-    public Arc(Node source, Node destination, String multiplicity) {
+    public Arc(S source, D destination, String multiplicity) {
         this();
         this.setSource(source);
         this.setDestination(destination);
-        this.multiplicity = new Multiplicity(multiplicity);
+        this.multiplicityExpression = new Multiplicity(multiplicity);
     }
+
+    public abstract void execute();
 
     public Place getPlace() {
         return (source instanceof Place) ? ((Place) source) : ((Place) destination);
@@ -51,30 +54,22 @@ public class Arc extends ProcessObject {
         return (source instanceof Transition) ? ((Transition) source) : ((Transition) destination);
     }
 
-    public void setSource(Node source) {
+    public void setSource(S source) {
         this.source = source;
         this.sourceId = source.getImportId();
     }
 
-    public void setDestination(Node destination) {
+    public void setDestination(D destination) {
         this.destination = destination;
         this.destinationId = destination.getImportId();
     }
 
-    @Override
-    public String toString() {
-        return source.getTitle() + " -(" + multiplicity + ")> " + destination.getTitle();
+    public int getMultiplicity() {
+        return this.multiplicityExpression.getMultiplicity();
     }
 
-    @SuppressWarnings("Duplicates")
-    public Arc clone() {
-        Arc clone = new Arc();
-        clone.setSourceId(this.sourceId);
-        clone.setDestinationId(this.destinationId);
-        clone.setBreakpoints(this.breakpoints);
-        clone.setObjectId(this.getObjectId());
-        clone.setImportId(this.importId);
-        clone.setMultiplicity(this.multiplicity.clone());
-        return clone;
+    @Override
+    public String toString() {
+        return source.getTitle() + " -(" + multiplicityExpression + ")> " + destination.getTitle();
     }
 }

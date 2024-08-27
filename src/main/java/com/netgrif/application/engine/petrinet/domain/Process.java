@@ -3,6 +3,9 @@ package com.netgrif.application.engine.petrinet.domain;
 import com.netgrif.application.engine.importer.model.CaseEventType;
 import com.netgrif.application.engine.importer.model.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
+import com.netgrif.application.engine.petrinet.domain.arcs.ArcCollection;
+import com.netgrif.application.engine.petrinet.domain.arcs.PTArc;
+import com.netgrif.application.engine.petrinet.domain.arcs.TPArc;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
@@ -44,8 +47,7 @@ public class Process extends ProcessObject {
     private UniqueKeyMap<String, Field<?>> dataSet;
     private UniqueKeyMap<String, Transition> transitions;
     private UniqueKeyMap<String, Place> places;
-    // TODO: release/8.0.0 save sorted by execution priority
-    private UniqueKeyMap<String, List<Arc>> arcs;//todo: import id
+    private UniqueKeyMap<String, ArcCollection> arcs;//todo: import id
     private UniqueKeyMap<String, String> properties;
 
     // TODO: 18. 3. 2017 replace with Spring auditing
@@ -111,29 +113,36 @@ public class Process extends ProcessObject {
         caseEvents.put(caseEvent.getType(), caseEvent);
     }
 
-    public List<Arc> getArcsOfTransition(Transition transition) {
-        return getArcsOfTransition(transition.getStringId());
-    }
-
-    public List<Arc> getArcsOfTransition(String transitionId) {
+    public List<PTArc> getInputArcsOf(String transitionId) {
         if (arcs.containsKey(transitionId)) {
-            return arcs.get(transitionId);
+            return arcs.get(transitionId).getInput();
         }
         return new LinkedList<>();
     }
+
+    public List<TPArc> getOutputArcsOf(String transitionId) {
+        if (arcs.containsKey(transitionId)) {
+            return arcs.get(transitionId).getOutput();
+        }
+        return new LinkedList<>();
+    }
+
 
     public void addDataSetField(Field<?> field) {
         this.dataSet.put(field.getStringId(), field);
     }
 
-    public void addArc(Arc arc) {
+    public void addArc(Arc<?, ?> arc) {
         String transitionId = arc.getTransition().getStringId();
-        if (arcs.containsKey(transitionId)) {
-            arcs.get(transitionId).add(arc);
+        ArcCollection arcCollection = arcs.get(transitionId);
+        if (arcCollection == null) {
+            arcCollection = new ArcCollection();
+            arcs.put(transitionId, arcCollection);
+        }
+        if (arc instanceof PTArc) {
+            arcCollection.addInput((PTArc) arc);
         } else {
-            List<Arc> arcList = new LinkedList<>();
-            arcList.add(arc);
-            arcs.put(transitionId, arcList);
+            arcCollection.addOutput((TPArc) arc);
         }
     }
 
@@ -164,10 +173,12 @@ public class Process extends ProcessObject {
     }
 
     public void initializeArcs() {
-        arcs.values().forEach(list -> list.forEach(arc -> {
-            arc.setSource(getNode(arc.getSourceId()));
-            arc.setDestination(getNode(arc.getDestinationId()));
-        }));
+        arcs.values().forEach(list -> {
+            list.getOutput().forEach(arc -> {
+                arc.setSource(getTransition(arc.getSourceId()));
+                arc.setDestination(getPlace(arc.getDestinationId()));
+            });
+        });
     }
 
     public void initializeTokens(Map<String, Integer> activePlaces) {
@@ -178,6 +189,13 @@ public class Process extends ProcessObject {
         return places.values().stream()
                 .filter(Place::hasAnyTokens)
                 .collect(Collectors.toMap(ProcessObject::getStringId, Place::getTokens));
+    }
+
+    public void setActivePlaces(Map<String, Integer> activePlaces) {
+        places.forEach((id, place) -> {
+            Integer marking = activePlaces.getOrDefault(id, 0);
+            place.setTokens(marking);
+        });
     }
 
     public List<Field<?>> getImmediateFields() {
@@ -282,17 +300,15 @@ public class Process extends ProcessObject {
         clone.setImportId(this.importId);
         clone.setDataSet(this.dataSet.entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x,y)->y, UniqueKeyMap::new))
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x, y) -> y, UniqueKeyMap::new))
         );
         clone.setPlaces(this.places.entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x,y)->y, UniqueKeyMap::new))
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x, y) -> y, UniqueKeyMap::new))
         );
         clone.setArcs(this.arcs.entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
-                        .map(Arc::clone)
-                        .collect(Collectors.toList()), (x,y)->y, UniqueKeyMap::new))
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x, y) -> y, UniqueKeyMap::new))
         );
         clone.initializeArcs();
         clone.setCaseEvents(this.caseEvents == null ? null : this.caseEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));

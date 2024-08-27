@@ -106,7 +106,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case save(Case useCase) {
-        if (useCase.getPetriNet() == null) {
+        if (useCase.getProcess() == null) {
             setPetriNet(useCase);
         }
         encryptDataSet(useCase);
@@ -353,15 +353,15 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public DeleteCaseEventOutcome deleteCase(Case useCase, Map<String, String> params) {
-        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty(), params));
+        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getProcess().getPreDeleteActions(), useCase, Optional.empty(), params));
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
         log.info("[{}]: User [{}] is deleting case {}", useCase.getStringId(), userService.getLoggedOrSystem().getStringId(), useCase.getTitle());
 
         taskService.deleteTasksByCase(useCase.getStringId());
         repository.delete(useCase);
 
-        outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty(), params));
-        addMessageToOutcome(useCase.getPetriNet(), CaseEventType.DELETE, outcome);
+        outcome.addOutcomes(eventService.runActions(useCase.getProcess().getPostDeleteActions(), null, Optional.empty(), params));
+        addMessageToOutcome(useCase.getProcess(), CaseEventType.DELETE, outcome);
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.POST));
         return outcome;
     }
@@ -405,7 +405,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public void updateMarking(Case useCase) {
-        Process net = useCase.getPetriNet();
+        Process net = useCase.getProcess();
         useCase.setActivePlaces(net.getActivePlaces());
     }
 
@@ -486,7 +486,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private Map<Field<?>, String> getEncryptedDataSet(Case useCase) {
-        Process net = useCase.getPetriNet();
+        Process net = useCase.getProcess();
         Map<Field<?>, String> encryptedDataSet = new HashMap<>();
 
         for (Map.Entry<String, Field<?>> entry : net.getDataSet().entrySet()) {
@@ -500,10 +500,10 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private void setPetriNet(Case useCase) {
-        Process model = useCase.getPetriNet();
+        Process model = useCase.getProcess();
         if (model == null) {
             model = petriNetService.clone(useCase.getPetriNetObjectId());
-            useCase.setPetriNet(model);
+            useCase.setProcess(model);
         }
         model.initializeTokens(useCase.getActivePlaces());
 //        TODO: release/8.0.0

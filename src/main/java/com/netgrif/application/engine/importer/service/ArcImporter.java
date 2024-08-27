@@ -2,6 +2,7 @@ package com.netgrif.application.engine.importer.service;
 
 import com.netgrif.application.engine.importer.model.ArcType;
 import com.netgrif.application.engine.importer.model.Expression;
+import com.netgrif.application.engine.petrinet.domain.Node;
 import com.netgrif.application.engine.petrinet.domain.arcs.*;
 import org.springframework.stereotype.Component;
 
@@ -12,23 +13,43 @@ import java.util.function.Supplier;
 @Component
 public final class ArcImporter {
 
-    private final Map<ArcType, Supplier<Arc>> arcFactory;
+    private final Map<ArcType, Supplier<PTArc>> ptArcFactory;
+    private final Map<ArcType, Supplier<TPArc>> tpArcFactory;
 
     public ArcImporter() {
-        arcFactory = new HashMap<>();
-        arcFactory.put(ArcType.REGULAR, Arc::new);
-        arcFactory.put(ArcType.RESET, ResetArc::new);
-        arcFactory.put(ArcType.INHIBITOR, InhibitorArc::new);
-        arcFactory.put(ArcType.READ, ReadArc::new);
+        ptArcFactory = new HashMap<>();
+        ptArcFactory.put(ArcType.REGULAR, RegularPTArc::new);
+        ptArcFactory.put(ArcType.RESET, ResetArc::new);
+        ptArcFactory.put(ArcType.INHIBITOR, InhibitorArc::new);
+        ptArcFactory.put(ArcType.READ, ReadArc::new);
+        tpArcFactory = new HashMap<>();
+        tpArcFactory.put(ArcType.REGULAR, RegularTPArc::new);
     }
 
-    public Arc getArc(com.netgrif.application.engine.importer.model.Arc importArc, Importer importer) throws IllegalArgumentException {
-        Arc arc = arcFactory.get(importArc.getType()).get();
+    public Arc<? extends Node, ? extends Node> getArc(com.netgrif.application.engine.importer.model.Arc importArc, Importer importer) {
+        Arc<? extends Node, ? extends Node> arc;
+        if (importer.isInputArc(importArc)) {
+            arc = getInputArc(importArc, importer);
+        } else {
+            arc = getOutputArc(importArc, importer);
+        }
         arc.setImportId(importArc.getId());
-        arc.setSource(importer.getNode(importArc.getSourceId()));
-        arc.setDestination(importer.getNode(importArc.getDestinationId()));
-        arc.setMultiplicity(createMultiplicity(importArc.getMultiplicity()));
+        arc.setMultiplicityExpression(createMultiplicity(importArc.getMultiplicity()));
         importer.createProperties(importArc.getProperties(), arc.getProperties());
+        return arc;
+    }
+
+    public TPArc getOutputArc(com.netgrif.application.engine.importer.model.Arc importArc, Importer importer) throws IllegalArgumentException {
+        TPArc arc = tpArcFactory.get(importArc.getType()).get();
+        arc.setSource(importer.getTransition(importArc.getSourceId()));
+        arc.setDestination(importer.getPlace(importArc.getDestinationId()));
+        return arc;
+    }
+
+    public PTArc getInputArc(com.netgrif.application.engine.importer.model.Arc importArc, Importer importer) throws IllegalArgumentException {
+        PTArc arc = ptArcFactory.get(importArc.getType()).get();
+        arc.setSource(importer.getPlace(importArc.getSourceId()));
+        arc.setDestination(importer.getTransition(importArc.getDestinationId()));
         return arc;
     }
 

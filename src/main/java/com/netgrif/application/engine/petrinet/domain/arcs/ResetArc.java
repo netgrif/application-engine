@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.petrinet.domain.arcs;
 
-import com.netgrif.application.engine.petrinet.domain.Place;
-
 /**
  * Reset arc does not alter the enabling condition, but involve a change of the marking on <i>p</i> by firing of <i>t</i>:
  * <ul>
@@ -17,11 +15,10 @@ public class ResetArc extends PTArc {
      *
      * @return true
      */
-//    TODO: release/8.0.0
-//    @Override
-//    public boolean isExecutable() {
-//        return true;
-//    }
+    @Override
+    public boolean isExecutable() {
+        return true;
+    }
 
     /**
      * Changes the marking on <i>p</i> by firing of <i>t</i>:
@@ -30,24 +27,22 @@ public class ResetArc extends PTArc {
      *     <li><i>m'(p)</i> = <i>W(t,p)</i>, if <i>p</i> is also a postplace of <i>t</i></li>
      * </ul>
      */
-//    @Override
-//    public void execute() {
-//        Place place = ((Place) source);
-//        place.removeAllTokens();
-//    }
-//
-//    @Override
-//    public void rollbackExecution(Integer tokensConsumed) {
-//        ((Place) source).addTokens(tokensConsumed);
-//    }
+    @Override
+    public void execute() {
+        source.removeAllTokens();
+    }
 
-    @SuppressWarnings("Duplicates")
+    @Override
+    public void rollbackExecution(Integer tokensConsumed) {
+        source.addTokens(tokensConsumed);
+    }
+
     @Override
     public ResetArc clone() {
         ResetArc clone = new ResetArc();
-        clone.setSourceId(this.sourceId);
-        clone.setDestinationId(this.destinationId);
-        clone.setMultiplicity(this.multiplicity);
+        clone.setSource(this.source);
+        clone.setDestination(this.destination);
+        clone.setMultiplicityExpression(this.multiplicityExpression.clone());
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);
         return clone;

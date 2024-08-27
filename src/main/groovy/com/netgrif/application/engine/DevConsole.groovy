@@ -30,7 +30,7 @@ class DevConsole {
     @GetMapping(value = "/dataset/{title}", produces = APPLICATION_JSON_VALUE)
     String dataset(@PathVariable String title) {
         def useCase = caseRepository.findAll().find { it.title == title }
-        return "{ ${useCase?.dataSet?.collect { "\"${useCase?.petriNet?.dataSet?.get(it?.key)?.importId}:${useCase?.petriNet?.dataSet?.get(it?.key)?.title?.toString()?.replaceAll("\n[ ]{2}", "")}\":\"${it?.value?.value as String}\"" }?.join(", ")} }"
+        return "{ ${useCase?.dataSet?.collect { "\"${useCase?.process?.dataSet?.get(it?.key)?.importId}:${useCase?.process?.dataSet?.get(it?.key)?.title?.toString()?.replaceAll("\n[ ]{2}", "")}\":\"${it?.value?.value as String}\"" }?.join(", ")} }"
     }
 
     @GetMapping(value = "/net/{title}", produces = APPLICATION_XML_VALUE)

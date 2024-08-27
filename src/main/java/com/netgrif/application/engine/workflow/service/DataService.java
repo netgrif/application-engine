@@ -7,12 +7,10 @@ import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
 import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.model.DataEventType;
-import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
@@ -114,7 +112,7 @@ public class DataService implements IDataService {
     @Override
     public GetDataEventOutcome getData(Task task, Case useCase, IUser user, Map<String, String> params) {
         log.info("[{}]: Getting data of task {} [{}]", useCase.getStringId(), task.getTransitionId(), task.getStringId());
-        Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+        Transition transition = useCase.getProcess().getTransition(task.getTransitionId());
         Map<String, DataRef> dataRefs = transition.getDataSet();
         List<DataRef> dataSetFields = new ArrayList<>();
         GetDataEventOutcome outcome = new GetDataEventOutcome(useCase, task);
@@ -212,9 +210,9 @@ public class DataService implements IDataService {
         // TODO: NAE-1859 permissions?
         Case useCase = workflowService.findOne(task.getCaseId());
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
-        Optional<Field<?>> fieldOptional = useCase.getPetriNet().getField(fieldId);
+        Optional<Field<?>> fieldOptional = useCase.getProcess().getField(fieldId);
         if (fieldOptional.isEmpty()) {
-            throw new IllegalArgumentException("[" + useCase.getStringId() + "] Field " + fieldId + " does not exist in case " + useCase.getTitle() + " of process " + useCase.getPetriNet().getStringId());
+            throw new IllegalArgumentException("[" + useCase.getStringId() + "] Field " + fieldId + " does not exist in case " + useCase.getTitle() + " of process " + useCase.getProcess().getStringId());
         }
         Field<?> field = fieldOptional.get();
         // PRE
@@ -243,7 +241,7 @@ public class DataService implements IDataService {
     }
 
     private void setOutcomeMessage(Task task, Case useCase, TaskEventOutcome outcome, String fieldId, Field<?> field, DataEventType type) {
-        Map<String, DataRef> caseDataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
+        Map<String, DataRef> caseDataSet = useCase.getProcess().getTransition(task.getTransitionId()).getDataSet();
         I18nString message = null;
         if (field.getEvents().containsKey(type)) {
             message = field.getEvents().get(type).getMessage();
@@ -399,7 +397,7 @@ public class DataService implements IDataService {
     @Override
     public FileFieldInputStream getFileByCase(String caseId, Task task, String fieldId, boolean forPreview) {
         Case useCase = workflowService.findOne(caseId);
-        FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
+        FileField field = (FileField) useCase.getProcess().getDataSet().get(fieldId);
         return getFile(useCase, task, field, forPreview);
     }
 
@@ -411,7 +409,7 @@ public class DataService implements IDataService {
     @Override
     public FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name, Map<String, String> params) {
         Case useCase = workflowService.findOne(caseId);
-        FileListField field = (FileListField) useCase.getPetriNet().getDataSet().get(fieldId);
+        FileListField field = (FileListField) useCase.getProcess().getDataSet().get(fieldId);
         return getFileByName(useCase, field, name, params);
     }
 
@@ -596,8 +594,8 @@ public class DataService implements IDataService {
     private List<EventOutcome> getChangedFieldByFileFieldContainer(String fieldId, Task referencingTask, Case useCase, Map<String, String> params) {
         List<EventOutcome> outcomes = new ArrayList<>();
         // TODO: release/8.0.0 changed value, use set data
-        outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET, EventPhase.PRE, useCase, referencingTask, null, params));
-        outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET, EventPhase.POST, useCase, referencingTask, null, params));
+        outcomes.addAll(resolveDataEvents(useCase.getProcess().getField(fieldId).get(), DataEventType.SET, EventPhase.PRE, useCase, referencingTask, null, params));
+        outcomes.addAll(resolveDataEvents(useCase.getProcess().getField(fieldId).get(), DataEventType.SET, EventPhase.POST, useCase, referencingTask, null, params));
         updateDataset(useCase);
         workflowService.save(useCase);
         return outcomes;
@@ -730,7 +728,7 @@ public class DataService implements IDataService {
     private ImmutablePair<Case, FileListField> getCaseAndFileListField(String taskId, String fieldId) {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
-        FileListField field = (FileListField) useCase.getPetriNet().getDataSet().get(fieldId);
+        FileListField field = (FileListField) useCase.getProcess().getDataSet().get(fieldId);
         field.setRawValue(((FileListFieldValue) useCase.getDataSet().get(field.getStringId()).getRawValue()));
         return new ImmutablePair<>(useCase, field);
     }

@@ -216,7 +216,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     def initTransitionsMap(Map<String, String> transitionIds) {
         transitionIds.each { name, id ->
-            set(name, useCase.petriNet.transitions[id])
+            set(name, useCase.process.transitions[id])
         }
     }
 
@@ -270,7 +270,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     def initial = { Field field, Transition trans ->
         copyBehavior(field, trans)
         DataFieldBehavior fieldBehavior = getOrCreateBehavior(field.stringId, trans.stringId)
-        DataFieldBehavior initialBehavior = useCase?.petriNet?.dataSet?.get(field.importId)?.behaviors?.get(trans?.importId)
+        DataFieldBehavior initialBehavior = useCase?.process?.dataSet?.get(field.importId)?.behaviors?.get(trans?.importId)
         if (initialBehavior == null) {
             initialBehavior = new DataFieldBehavior()
         }
@@ -420,7 +420,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
                 changeBehaviourAndSave(field, behavior, trans)
             }
         } else if (transitionObject instanceof Closure && transitionObject == transitions) {
-            useCase.petriNet.transitions.each { transitionEntry ->
+            useCase.process.transitions.each { transitionEntry ->
                 changeBehaviourAndSave(field, behavior, transitionEntry.value)
             }
         } else {
@@ -448,7 +448,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     // TODO: release/8.0.0 check if needed after merge
     protected void saveFieldBehaviorWithTask(Field<?> field, Task task, Closure behavior, def behaviorClosureResult) {
         Case aCase = workflowService.findOne(task.caseId)
-        Transition transition = aCase.getPetriNet().getTransition(task.getTransitionId())
+        Transition transition = aCase.getProcess().getTransition(task.getTransitionId())
         behaviorClosureResult = behavior(field, transition, aCase)
         saveFieldBehavior(field, transition, (behavior == initial) ? behaviorClosureResult as Set : null, aCase, Optional.of(task))
     }
@@ -532,7 +532,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         if (taskId != null) {
             targetTask = taskService.findOne(taskId)
         }
-        Field field = targetCase.getPetriNet().getDataSet().get(fieldId)
+        Field field = targetCase.getProcess().getDataSet().get(fieldId)
         // TODO: release/8.0.0 missing
         change(field, targetCase, Optional.of(targetTask))
     }
@@ -2317,6 +2317,6 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     Field<?> getFieldOfTask(String taskId, String fieldId) {
         Task task = taskService.findOne(taskId)
         Case taskCase = workflowService.findOne(task.caseId)
-        return taskCase.getPetriNet().getDataSet().get(fieldId)
+        return taskCase.getProcess().getDataSet().get(fieldId)
     }
 }

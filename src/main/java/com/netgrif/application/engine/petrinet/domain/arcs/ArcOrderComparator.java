@@ -2,7 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.arcs;
 
 public class ArcOrderComparator {
 
-    private static ArcOrderComparator ourInstance = new ArcOrderComparator();
+    private static final ArcOrderComparator ourInstance = new ArcOrderComparator();
 
     private ArcOrderComparator() {
     }

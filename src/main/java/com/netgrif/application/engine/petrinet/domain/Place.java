@@ -1,30 +1,27 @@
 package com.netgrif.application.engine.petrinet.domain;
 
+import com.netgrif.application.engine.petrinet.domain.throwable.IllegalMarkingException;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Map;
-
+@EqualsAndHashCode(callSuper = true)
 @Data
+@NoArgsConstructor
 @Document
 public class Place extends Node {
 
-    private Integer tokens;
-    // TODO: release/8.0.0 unique key map
-    // TODO: release/8.0.0 move to node?
-    private Map<String, String> properties;
+    private int tokens;
 
-    public Place() {
-        super();
-    }
 
     public void addTokens(int tokens) {
         this.tokens += tokens;
     }
 
-    public void removeTokens(Integer tokens) throws IllegalArgumentException {
+    public void removeTokens(int tokens) throws IllegalArgumentException {
         if (this.tokens - tokens < 0) {
-            throw new IllegalArgumentException("Place can not have negative number of tokens.");
+            throw new IllegalMarkingException(this);
         }
         this.tokens -= tokens;
     }

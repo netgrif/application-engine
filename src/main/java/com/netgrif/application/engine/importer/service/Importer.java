@@ -382,13 +382,24 @@ public class Importer {
         process.addArc(arcImporter.getArc(importArc, this));
     }
 
-    protected Node getNode(String id) {
-        if (process.getPlace(id) != null) {
-            return process.getPlace(id);
-        } else if (process.getTransition(id) != null) {
-            return process.getTransition(id);
+    protected boolean isInputArc(com.netgrif.application.engine.importer.model.Arc importArc) {
+        return this.process.getPlace(importArc.getSourceId()) != null;
+    }
+
+    protected Place getPlace(String id) {
+        Place place = process.getPlace(id);
+        if (place == null) {
+            throw new IllegalArgumentException("Place with id [" + id + "] not found.");
         }
-        throw new IllegalArgumentException("Node with id [" + id + "] not found.");
+        return place;
+    }
+
+    protected Transition getTransition(String id) {
+        Transition transition = process.getTransition(id);
+        if (transition == null) {
+            throw new IllegalArgumentException("Transition with id [" + id + "] not found.");
+        }
+        return transition;
     }
 
     protected void createDataSet(com.netgrif.application.engine.importer.model.Data importData) throws MissingIconKeyException {
@@ -770,7 +781,7 @@ public class Importer {
         return com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy.valueOf(policy.value().toUpperCase());
     }
 
-    protected void createProperties(com.netgrif.application.engine.importer.model.Properties propertiesXml, Map<String, String> properties) {
+    protected void createProperties(com.netgrif.application.engine.importer.model.Properties propertiesXml, UniqueKeyMap<String, String> properties) {
         if (propertiesXml == null) {
             return;
         }

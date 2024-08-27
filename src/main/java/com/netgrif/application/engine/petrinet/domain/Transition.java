@@ -9,6 +9,7 @@ import com.netgrif.application.engine.petrinet.domain.events.Event;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
+import com.netgrif.application.engine.utils.UniqueKeyMap;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import com.netgrif.application.engine.workflow.domain.triggers.AutoTrigger;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
@@ -37,7 +38,6 @@ public class Transition extends Node {
     private Map<EventType, Event> events;
     @Transient
     private Boolean hasAutoTrigger;
-    private Map<String, String> properties;
 
     public Transition() {
         super();
@@ -46,7 +46,6 @@ public class Transition extends Node {
         assignPolicy = AssignPolicy.MANUAL;
         finishPolicy = FinishPolicy.MANUAL;
         events = new HashMap<>();
-        properties = new HashMap<>();
     }
 
     public void setDataRefBehavior(Field<?> field, DataFieldBehavior behavior) {
@@ -205,7 +204,7 @@ public class Transition extends Node {
         clone.setIcon(icon);
         clone.setFinishPolicy(finishPolicy);
         clone.setEvents(this.events == null ? null : events.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
-        clone.setProperties(new HashMap<>(this.properties));
+        clone.setProperties(new UniqueKeyMap<>(this.getProperties()));
         return clone;
     }
 }

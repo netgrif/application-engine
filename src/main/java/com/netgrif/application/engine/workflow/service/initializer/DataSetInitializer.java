@@ -9,7 +9,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpr
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 @Component
@@ -25,7 +24,7 @@ public class DataSetInitializer {
         ArrayList<Field<?>> dynamicValueFields = new ArrayList<>();
         ArrayList<ChoiceField<?>> dynamicChoiceFields = new ArrayList<>();
         ArrayList<MapOptionsField<I18nString, ?>> dynamicOptionFields = new ArrayList<>();
-        useCase.getPetriNet().getDataSet().forEach((fieldId, field) -> {
+        useCase.getProcess().getDataSet().forEach((fieldId, field) -> {
             Field<?> useCaseField = field.clone();
             useCase.getDataSet().put(fieldId, useCaseField);
             if (field.isImmediate()) {

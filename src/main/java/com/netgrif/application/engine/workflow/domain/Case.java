@@ -41,7 +41,7 @@ public class Case implements Serializable {
     @JsonIgnore
     @Transient
     @QueryType(PropertyType.NONE)
-    private Process petriNet;
+    private Process process;
     @NotNull
     @Indexed
     private String processIdentifier;
@@ -85,7 +85,7 @@ public class Case implements Serializable {
 
     public Case(Process petriNet) {
         this();
-        this.petriNet = petriNet;
+        this.process = petriNet;
         petriNetObjectId = petriNet.getObjectId();
         processIdentifier = petriNet.getIdentifier();
         parentPetriNetIdentifiers = new ArrayList<>(petriNet.getParentIdentifiers());

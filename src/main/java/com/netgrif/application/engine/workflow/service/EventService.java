@@ -44,7 +44,7 @@ public class EventService implements IEventService {
     public List<EventOutcome> runActions(List<Action> actions, Case useCase, Optional<Task> task, Map<String, String> params) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
         actions.forEach(action -> {
-            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, null, params, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
+            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, null, params, useCase == null ? Collections.emptyList() : useCase.getProcess().getFunctions());
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
                         if (((SetDataEventOutcome) outcome).getChangedFields().getFields().isEmpty()) {
@@ -63,7 +63,7 @@ public class EventService implements IEventService {
         actions.stream()
                 .filter(a -> a.getSetDataType().isTriggered(newDataField))
                 .forEach(action -> {
-                    List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), newDataField, params, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
+                    List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), newDataField, params, useCase == null ? Collections.emptyList() : useCase.getProcess().getFunctions());
                     outcomes.stream()
                             .filter(SetDataEventOutcome.class::isInstance)
                             .filter(outcome -> !((SetDataEventOutcome) outcome).getChangedFields().getFields().isEmpty())
@@ -80,7 +80,7 @@ public class EventService implements IEventService {
             fieldActions.addAll(DataRef.getEventAction(field.getEvents().get(actionTrigger), phase));
         }
         if (task != null) {
-            Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+            Transition transition = useCase.getProcess().getTransition(task.getTransitionId());
             if (transition.getDataSet().containsKey(field.getStringId()) && !transition.getDataSet().get(field.getStringId()).getEvents().isEmpty()) {
                 fieldActions.addAll(DataRef.getEventAction(transition.getDataSet().get(field.getStringId()).getEvents().get(actionTrigger), phase));
             }

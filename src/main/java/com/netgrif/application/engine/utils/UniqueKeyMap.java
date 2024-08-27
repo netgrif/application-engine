@@ -13,7 +13,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class UniqueKeyMap<K extends String, V> extends LinkedHashMap<K, V> {
 
-    public UniqueKeyMap(Map<? extends K, ? extends V> m) {
+    public UniqueKeyMap(UniqueKeyMap<K,V> m) {
         super(m);
     }
 

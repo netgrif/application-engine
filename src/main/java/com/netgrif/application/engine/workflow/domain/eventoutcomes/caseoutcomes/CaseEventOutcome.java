@@ -16,7 +16,7 @@ public abstract class CaseEventOutcome extends PetriNetEventOutcome {
     }
 
     protected CaseEventOutcome(Case aCase) {
-        super(aCase.getPetriNet());
+        super(aCase.getProcess());
         this.aCase = aCase;
     }
 
@@ -26,12 +26,12 @@ public abstract class CaseEventOutcome extends PetriNetEventOutcome {
     }
 
     protected CaseEventOutcome(I18nString message, Case aCase) {
-        super(message, aCase.getPetriNet());
+        super(message, aCase.getProcess());
         this.aCase = aCase;
     }
 
     protected CaseEventOutcome(I18nString message, List<EventOutcome> outcomes, Case aCase) {
-        super(message, outcomes, aCase.getPetriNet());
+        super(message, outcomes, aCase.getProcess());
         this.aCase = aCase;
     }
 
@@ -41,6 +41,6 @@ public abstract class CaseEventOutcome extends PetriNetEventOutcome {
 
     public void setCase(Case aCase) {
         this.aCase = aCase;
-        setNet(aCase.getPetriNet());
+        setNet(aCase.getProcess());
     }
 }

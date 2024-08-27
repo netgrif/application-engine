@@ -129,8 +129,8 @@ class DataSearchRequestTest {
         _case.dataSet.get("user").rawValue = new UserFieldValue(testUser1.stringId, testUser1.name, testUser1.surname, testUser1.email)
         _case.dataSet.get("date").rawValue = date
         _case.dataSet.get("datetime").rawValue = date.atTime(13, 37)
-        _case.dataSet.get("enumeration").rawValue = (_case.petriNet.dataSet.get("enumeration") as ChoiceField).choices.find({ it.defaultValue == "Alice" })
-        _case.dataSet.get("multichoice").rawValue = (_case.petriNet.dataSet.get("multichoice") as ChoiceField).choices.findAll({ it.defaultValue == "Alice" || it.defaultValue == "Bob" }).toSet()
+        _case.dataSet.get("enumeration").rawValue = (_case.process.dataSet.get("enumeration") as ChoiceField).choices.find({ it.defaultValue == "Alice" })
+        _case.dataSet.get("multichoice").rawValue = (_case.process.dataSet.get("multichoice") as ChoiceField).choices.findAll({ it.defaultValue == "Alice" || it.defaultValue == "Bob" }).toSet()
         _case.dataSet.get("enumeration_map").rawValue = "alice"
         _case.dataSet.get("multichoice_map").rawValue = ["alice", "bob"].toSet()
         _case.dataSet.get("file").rawValue = FileFieldValue.fromString("singlefile.txt")
