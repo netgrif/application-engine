@@ -112,10 +112,32 @@ public class DataService implements IDataService {
 
         Case useCase = getDataParams.getUseCase();
         Task task = getDataParams.getTask();
-        IUser user = getDataParams.getUser();
 
         log.info("[{}]: Getting data of task {} [{}]", useCase.getStringId(), task.getTransitionId(), task.getStringId());
 
+        if (getDataParams.isTransactional()) {
+            NaeTransaction transaction = NaeTransaction.builder()
+                    .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
+                    .forceCreation(false)
+                    .transactionManager(transactionManager)
+                    .event(new Closure<GetDataEventOutcome>(null) {
+                        @Override
+                        public GetDataEventOutcome call() {
+                            return doGetData(getDataParams);
+                        }
+                    })
+                    .build();
+            transaction.begin();
+            return (GetDataEventOutcome) transaction.getResultOfEvent();
+        } else {
+            return doGetData(getDataParams);
+        }
+    }
+
+    private GetDataEventOutcome doGetData(GetDataParams getDataParams) {
+        Case useCase = getDataParams.getUseCase();
+        Task task = getDataParams.getTask();
+        IUser user = getDataParams.getUser();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         Map<String, DataRef> dataRefs = transition.getDataSet();
         List<DataRef> dataSetFields = new ArrayList<>();
@@ -167,7 +189,17 @@ public class DataService implements IDataService {
     }
 
     /**
-     * todo javadoc
+     * Sets the provided data by {@link SetDataParams}
+     *
+     * @param setDataParams parameters containing the data to be set within the {@link Case} or {@link Task} object
+     * <br>
+     * <b>Required parameters</b>
+     * <ul>
+     *      <li>taskId or task or useCase</li>
+     *      <li>user</li>
+     * </ul>
+     *
+     * @return outcome containing changed fields, updated Task and Case
      * */
     @Override
     public SetDataEventOutcome setData(SetDataParams setDataParams) {
@@ -213,6 +245,9 @@ public class DataService implements IDataService {
     }
 
     private void fillMissingAttributes(SetDataParams setDataParams) {
+        if (setDataParams.getUser() == null) {
+            throw new IllegalArgumentException("User must be provided on set data.");
+        }
         if (setDataParams.getTask() == null) {
             if (setDataParams.getTaskId() != null) {
                 Task task = taskService.findOne(setDataParams.getTaskId());
@@ -228,9 +263,6 @@ public class DataService implements IDataService {
             } else {
                 throw new IllegalArgumentException("Cannot set data without provided task.");
             }
-        }
-        if (setDataParams.getUser() == null) {
-            throw new IllegalArgumentException("User must be provided on set data.");
         }
     }
 

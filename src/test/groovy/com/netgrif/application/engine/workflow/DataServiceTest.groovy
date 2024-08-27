@@ -12,6 +12,7 @@ import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParam
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.params.SetDataParams
@@ -134,11 +135,9 @@ class DataServiceTest {
 
     @Test
     void testTransactionalSetDataOutcomes() {
-        def aCase = importHelper.createCase("Case", this.setDataNet)
+        Case aCase = importHelper.createCase("Case", this.setDataNet)
         ButtonField buttonWithValueOne = new ButtonField()
         buttonWithValueOne.setRawValue(1)
-
-        assert aCase != null
 
         SetDataParams setDataParams = SetDataParams.with()
                 .useCase(aCase)
@@ -156,11 +155,9 @@ class DataServiceTest {
 
     @Test
     void testTransactionalSetDataFailure() {
-        def aCase = importHelper.createCase("Case", this.setDataNet)
+        Case aCase = importHelper.createCase("Case", this.setDataNet)
         ButtonField buttonWithValueOne = new ButtonField()
         buttonWithValueOne.setRawValue(1)
-
-        assert aCase != null
 
         SetDataParams setDataParams = SetDataParams.with()
                 .useCase(aCase)
@@ -179,12 +176,10 @@ class DataServiceTest {
     }
 
     @Test
-    void testTransactionalSetDataSuccess() {
-        def aCase = importHelper.createCase("Case", this.setDataNet)
+    void testNonTransactionalSetDataFailure() {
+        Case aCase = importHelper.createCase("Case", this.setDataNet)
         ButtonField buttonWithValueOne = new ButtonField()
         buttonWithValueOne.setRawValue(1)
-
-        assert aCase != null
 
         SetDataParams setDataParams = SetDataParams.with()
                 .useCase(aCase)
