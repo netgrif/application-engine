@@ -47,6 +47,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
@@ -114,7 +115,7 @@ public class DataService implements IDataService {
 
         log.info("[{}]: Getting data of task {} [{}]", useCase.getStringId(), task.getTransitionId(), task.getStringId());
 
-        if (getDataParams.isTransactional()) {
+        if (getDataParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
                     .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
                     .forceCreation(false)
@@ -211,7 +212,7 @@ public class DataService implements IDataService {
             task.setUser(userService.findById(task.getUserId()));
         }
 
-        if (setDataParams.isTransactional()) {
+        if (setDataParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
                     .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
                     .forceCreation(false)

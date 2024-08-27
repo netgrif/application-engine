@@ -52,6 +52,7 @@ import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -224,7 +225,7 @@ public class WorkflowService implements IWorkflowService {
     public CreateCaseEventOutcome createCase(CreateCaseParams createCaseParams) {
         fillMissingAttributes(createCaseParams);
 
-        if (createCaseParams.isTransactional()) {
+        if (createCaseParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
                     .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
                     .forceCreation(false)
@@ -375,7 +376,7 @@ public class WorkflowService implements IWorkflowService {
     public DeleteCaseEventOutcome deleteCase(DeleteCaseParams deleteCaseParams) {
         fillMissingAttributes(deleteCaseParams);
 
-        if (deleteCaseParams.isTransactional()) {
+        if (deleteCaseParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
                     .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
                     .forceCreation(false)
