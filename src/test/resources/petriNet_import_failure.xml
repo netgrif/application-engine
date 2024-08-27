@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>petriNet_import_failure</id>
+    <initials>TST</initials>
+    <title>Test</title>
+    <processEvents>
+        <event type="upload">
+            <id>123</id>
+            <actions phase="pre">
+                <action>
+                    createCase("new_model", "CaseFromPre")
+                </action>
+            </actions>
+            <actions phase="post">
+                <action>
+                    createCase("new_model", "CaseFromPost")
+                    throw new RuntimeException("error on purpose")
+                </action>
+            </actions>
+        </event>
+    </processEvents>
+</document>

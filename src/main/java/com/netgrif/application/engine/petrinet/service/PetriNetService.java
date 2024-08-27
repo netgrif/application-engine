@@ -31,12 +31,14 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.application.engine.rules.domain.facts.NetImportedFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
+import com.netgrif.application.engine.transaction.NaeTransaction;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import groovy.lang.Closure;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
@@ -46,6 +48,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -53,6 +56,8 @@ import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.annotation.Resource;
 import javax.inject.Provider;
@@ -123,6 +128,9 @@ public class PetriNetService implements IPetriNetService {
 
     @Autowired
     private IUriService uriService;
+
+    @Autowired
+    private MongoTransactionManager transactionManager;
 
     private IElasticPetriNetService elasticPetriNetService;
 
@@ -197,6 +205,30 @@ public class PetriNetService implements IPetriNetService {
             MissingPetriNetMetaDataException, MissingIconKeyException {
         fillMissingAttributes(importPetriNetParams);
 
+        if (importPetriNetParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
+            NaeTransaction transaction = NaeTransaction.builder()
+                    .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
+                    .forceCreation(false)
+                    .transactionManager(transactionManager)
+                    .event(new Closure<ImportPetriNetEventOutcome>(null) {
+                        @Override
+                        public ImportPetriNetEventOutcome call() {
+                            try {
+                                return doImportPetriNet(importPetriNetParams);
+                            } catch (MissingPetriNetMetaDataException | IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    })
+                    .build();
+            transaction.begin();
+            return (ImportPetriNetEventOutcome) transaction.getResultOfEvent();
+        } else {
+            return doImportPetriNet(importPetriNetParams);
+        }
+    }
+
+    private ImportPetriNetEventOutcome doImportPetriNet(ImportPetriNetParams importPetriNetParams) throws MissingPetriNetMetaDataException, IOException {
         ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
         ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
         IOUtils.copy(importPetriNetParams.getXmlFile(), xmlCopy);
@@ -471,7 +503,8 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public Optional<PetriNet> findByImportId(String id) {
-        return Optional.of(repository.findByImportId(id));
+        PetriNet net = repository.findByImportId(id);
+        return net == null ? Optional.empty() : Optional.of(net);
     }
 
     @Override

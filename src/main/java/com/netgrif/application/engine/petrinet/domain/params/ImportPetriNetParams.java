@@ -20,6 +20,8 @@ public class ImportPetriNetParams {
     private VersionType releaseType;
     private LoggedUser author;
     @Builder.Default
+    private boolean isTransactional = false;
+    @Builder.Default
     private Map<String, String> params = new HashMap<>();
 
     public ImportPetriNetParams(InputStream xmlFile, VersionType releaseType, LoggedUser author, String uriNodeId) {

@@ -19,6 +19,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
@@ -34,6 +35,8 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+import static org.junit.jupiter.api.Assertions.assertThrows
+
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
@@ -41,6 +44,9 @@ class PetriNetServiceTest {
 
     public static final String NET_FILE = "process_delete_test.xml"
     public static final String NET_SEARCH_FILE = "process_search_test.xml"
+    public static final String NET_IMPORT_FILE = "net_import_1.xml"
+    public static final String PETRINET_IMPORT_FAILURE_FILE = "petriNet_import_failure.xml"
+    public static final String PETRINET_IMPORT_FAILURE_IDENTIFIER = "petriNet_import_failure"
     public static final String CUSTOMER_USER_MAIL = "customer@netgrif.com"
 
     @Autowired
@@ -223,5 +229,40 @@ class PetriNetServiceTest {
         search8.setInitials("PST")
         search8.setAuthor(author)
         assert petriNetService.search(search8, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
+    }
+
+    @Test
+    void testTransactionalImportFailure() {
+        ImportPetriNetParams importPetriNetParams = ImportPetriNetParams.with()
+                .isTransactional(true)
+                .xmlFile(stream(PETRINET_IMPORT_FAILURE_FILE))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build()
+
+        assertThrows(RuntimeException.class, { petriNetService.importPetriNet(importPetriNetParams) })
+
+        assert petriNetService.findByImportId(PETRINET_IMPORT_FAILURE_IDENTIFIER).isEmpty()
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPre")) == null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPost")) == null
+    }
+
+    @Test
+    void testNonTransactionalImportFailure() {
+        petriNetService.importPetriNet(new ImportPetriNetParams(stream(NET_IMPORT_FILE), VersionType.MAJOR,
+                superCreator.getLoggedSuper()))
+
+        ImportPetriNetParams importPetriNetParams = ImportPetriNetParams.with()
+                .isTransactional(false)
+                .xmlFile(stream(PETRINET_IMPORT_FAILURE_FILE))
+                .releaseType(VersionType.MAJOR)
+                .author(superCreator.getLoggedSuper())
+                .build()
+
+        assertThrows(RuntimeException.class, { petriNetService.importPetriNet(importPetriNetParams) })
+
+        assert petriNetService.findByImportId(PETRINET_IMPORT_FAILURE_IDENTIFIER).isPresent()
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPre")) != null
+        assert workflowService.searchOne(QCase.case$.title.eq("CaseFromPost")) != null
     }
 }
