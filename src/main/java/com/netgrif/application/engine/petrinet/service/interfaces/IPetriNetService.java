@@ -7,6 +7,7 @@ import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.application.engine.petrinet.domain.params.DeletePetriNetParams;
 import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
@@ -91,7 +92,7 @@ public interface IPetriNetService {
 
     List<PetriNet> get(List<String> petriNetIds);
 
-    void deletePetriNet(String id, LoggedUser loggedUser);
+    void deletePetriNet(DeletePetriNetParams deletePetriNetParams);
 
     void runActions(List<Action> actions, PetriNet petriNet);
 

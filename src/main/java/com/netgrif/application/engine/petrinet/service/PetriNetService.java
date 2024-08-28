@@ -21,6 +21,7 @@ import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
+import com.netgrif.application.engine.petrinet.domain.params.DeletePetriNetParams;
 import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
@@ -207,8 +208,6 @@ public class PetriNetService implements IPetriNetService {
 
         if (importPetriNetParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
-                    .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
-                    .forceCreation(false)
                     .transactionManager(transactionManager)
                     .event(new Closure<ImportPetriNetEventOutcome>(null) {
                         @Override
@@ -565,8 +564,38 @@ public class PetriNetService implements IPetriNetService {
         queryTotal.addCriteria(criteria);
     }
 
+    /**
+     * Removes {@link PetriNet} along with its Cases and roles
+     *
+     * @param deletePetriNetParams parameters for PetriNet removal
+     * <br>
+     * <b>Required parameters</b>
+     * <ul>
+     *      <li>petriNetId</li>
+     * </ul>
+     * */
     @Override
-    public void deletePetriNet(String processId, LoggedUser loggedUser) {
+    public void deletePetriNet(DeletePetriNetParams deletePetriNetParams) {
+        if (deletePetriNetParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
+            NaeTransaction transaction = NaeTransaction.builder()
+                    .transactionManager(transactionManager)
+                    .event(new Closure<>(null) {
+                        @Override
+                        public Object call() {
+                            doDeletePetriNet(deletePetriNetParams);
+                            return null;
+                        }
+                    })
+                    .build();
+            transaction.begin();
+        } else {
+            doDeletePetriNet(deletePetriNetParams);
+        }
+    }
+
+    private void doDeletePetriNet(DeletePetriNetParams deletePetriNetParams) {
+        String processId = deletePetriNetParams.getPetriNetId();
+
         Optional<PetriNet> petriNetOptional = repository.findById(processId);
         if (petriNetOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find process with id [" + processId + "]");
@@ -577,7 +606,7 @@ public class PetriNetService implements IPetriNetService {
 
         this.userService.removeRoleOfDeletedPetriNet(petriNet);
         this.workflowService.deleteInstancesOfPetriNet(petriNet);
-        this.processRoleService.deleteRolesOfNet(petriNet, loggedUser);
+        this.processRoleService.deleteRolesOfNet(petriNet, deletePetriNetParams.getLoggedUser());
         try {
             ldapGroupService.deleteProcessRoleByPetrinet(petriNet.getStringId());
         } catch (NullPointerException e) {
@@ -585,7 +614,6 @@ public class PetriNetService implements IPetriNetService {
         } catch (Exception ex) {
             log.error("LdapGroup", ex);
         }
-
 
         log.info("[{}]: User [{}] is deleting Petri net {} version {}", processId, userService.getLoggedOrSystem().getStringId(),
                 petriNet.getIdentifier(), petriNet.getVersion().toString());

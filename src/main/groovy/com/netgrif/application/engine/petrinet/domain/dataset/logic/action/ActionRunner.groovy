@@ -45,8 +45,6 @@ abstract class ActionRunner {
             code.init(action, useCase, task, changes, this, params)
             if (TransactionSynchronizationManager.isSynchronizationActive()) {
                 def transaction = NaeTransaction.builder()
-                        .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
-                        .forceCreation(false)
                         .transactionManager(transactionManager)
                         .event(code)
                         .build()

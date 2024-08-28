@@ -10,6 +10,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.*
+import com.netgrif.application.engine.petrinet.domain.params.DeletePetriNetParams
 import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
@@ -134,7 +135,7 @@ class PetriNetServiceTest {
         assert user.processRoles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
 
-        petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
+        petriNetService.deletePetriNet(new DeletePetriNetParams(testNet.stringId, superCreator.getLoggedSuper()))
         assert petriNetRepository.count() == processCount
         Thread.sleep(5000)
         assert elasticPetriNetRepository.findByStringId(testNet.stringId) == null

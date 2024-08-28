@@ -26,12 +26,14 @@ public class NaeTransaction {
     /**
      * Timeout for the transaction in milliseconds. When the timeout is reached, transaction fails on commit.
      * */
-    private int timeout;
+    @Builder.Default
+    private int timeout = TransactionDefinition.TIMEOUT_DEFAULT;
     /**
      * If set to true, new transaction is created in any situation (uses {@link Propagation#REQUIRES_NEW}). If set to
      * false, transaction is created only if none exists (uses {@link Propagation#REQUIRED}).
      * */
-    private boolean forceCreation;
+    @Builder.Default
+    private boolean forceCreation = false;
     /**
      * Transaction code to be executed under transaction.
      * */
@@ -52,7 +54,8 @@ public class NaeTransaction {
 
     private Exception onCallBackException;
     private Exception onEventException;
-    private Propagation propagation;
+    @Builder.Default
+    private Propagation propagation = Propagation.REQUIRED;
     private Date deadline;
     private boolean wasRolledBack;
 
@@ -166,8 +169,8 @@ public class NaeTransaction {
      * */
     public static class NaeTransactionBuilder {
         public NaeTransactionBuilder forceCreation(boolean forceCreation) {
-            propagation = forceCreation ? Propagation.REQUIRES_NEW : Propagation.REQUIRED;
-            this.forceCreation = forceCreation;
+            this.propagation$value = forceCreation ? Propagation.REQUIRES_NEW : Propagation.REQUIRED;
+            this.forceCreation$value = forceCreation;
             return this;
         }
     }

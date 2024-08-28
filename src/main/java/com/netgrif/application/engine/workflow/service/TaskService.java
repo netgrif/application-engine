@@ -185,8 +185,6 @@ public class TaskService implements ITaskService {
 
         if (taskParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
-                    .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
-                    .forceCreation(false)
                     .transactionManager(transactionManager)
                     .event(new Closure<AssignTaskEventOutcome>(null) {
                         @Override
@@ -315,8 +313,6 @@ public class TaskService implements ITaskService {
 
         if (taskParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
-                    .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
-                    .forceCreation(false)
                     .transactionManager(transactionManager)
                     .event(new Closure<FinishTaskEventOutcome>(null) {
                         @Override
@@ -446,8 +442,6 @@ public class TaskService implements ITaskService {
 
         if (taskParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
-                    .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
-                    .forceCreation(false)
                     .transactionManager(transactionManager)
                     .event(new Closure<CancelTaskEventOutcome>(null) {
                         @Override

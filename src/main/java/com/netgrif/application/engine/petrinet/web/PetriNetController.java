@@ -7,6 +7,7 @@ import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyE
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.application.engine.petrinet.domain.params.DeletePetriNetParams;
 import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
@@ -201,7 +202,7 @@ public class PetriNetController {
             return MessageResource.errorMessage("Deleting Petri net " + processId + " failed!");
         }
         LoggedUser user = (LoggedUser) auth.getPrincipal();
-        asyncRunner.execute(() -> this.service.deletePetriNet(decodedProcessId, user));
+        asyncRunner.execute(() -> this.service.deletePetriNet(new DeletePetriNetParams(decodedProcessId, user)));
         return MessageResource.successMessage("Petri net " + decodedProcessId + " is being deleted");
     }
 

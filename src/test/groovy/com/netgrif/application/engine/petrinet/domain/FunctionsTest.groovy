@@ -4,6 +4,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.dataset.*
+import com.netgrif.application.engine.petrinet.domain.params.DeletePetriNetParams
 import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
@@ -114,8 +115,10 @@ class FunctionsTest {
         assert user
 
         userService.deleteUser(user)
-        petriNetService.deletePetriNet(functionResNet.stringId, userService.getLoggedOrSystem().transformToLoggedUser())
-        petriNetService.deletePetriNet(functionTestNet.stringId, userService.getLoggedOrSystem().transformToLoggedUser())
+        petriNetService.deletePetriNet(new DeletePetriNetParams(functionResNet.stringId,
+                userService.getLoggedOrSystem().transformToLoggedUser()))
+        petriNetService.deletePetriNet(new DeletePetriNetParams(functionTestNet.stringId,
+                userService.getLoggedOrSystem().transformToLoggedUser()))
     }
 
     @Test
@@ -144,7 +147,8 @@ class FunctionsTest {
         def fieldBehavior = field.behaviors
         assert fieldBehavior.get("1").behavior == EDITABLE
 
-        petriNetService.deletePetriNet(functionTestNet.stringId, userService.getLoggedOrSystem().transformToLoggedUser())
+        petriNetService.deletePetriNet(new DeletePetriNetParams(functionTestNet.stringId,
+                userService.getLoggedOrSystem().transformToLoggedUser()))
     }
 
     @Test
@@ -157,7 +161,8 @@ class FunctionsTest {
             def nets = petriNetService.getByIdentifier(FUNCTION_RES_IDENTIFIER)
             if (nets) {
                 nets.each {
-                    petriNetService.deletePetriNet(it.getStringId(), userService.getLoggedOrSystem().transformToLoggedUser())
+                    petriNetService.deletePetriNet(new DeletePetriNetParams(it.getStringId(),
+                            userService.getLoggedOrSystem().transformToLoggedUser()))
                 }
             }
 
@@ -183,7 +188,8 @@ class FunctionsTest {
             def nets = petriNetService.getByIdentifier(FUNCTION_TEST_IDENTIFIER)
             if (nets) {
                 nets.each {
-                    petriNetService.deletePetriNet(it.getStringId(), userService.getLoggedOrSystem().transformToLoggedUser())
+                    petriNetService.deletePetriNet(new DeletePetriNetParams(it.getStringId(),
+                            userService.getLoggedOrSystem().transformToLoggedUser()))
                 }
             }
 

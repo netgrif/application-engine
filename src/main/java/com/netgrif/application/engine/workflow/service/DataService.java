@@ -117,8 +117,6 @@ public class DataService implements IDataService {
 
         if (getDataParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
-                    .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
-                    .forceCreation(false)
                     .transactionManager(transactionManager)
                     .event(new Closure<GetDataEventOutcome>(null) {
                         @Override
@@ -214,8 +212,6 @@ public class DataService implements IDataService {
 
         if (setDataParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
-                    .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
-                    .forceCreation(false)
                     .transactionManager(transactionManager)
                     .event(new Closure<SetDataEventOutcome>(null) {
                         @Override

@@ -227,8 +227,6 @@ public class WorkflowService implements IWorkflowService {
 
         if (createCaseParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
-                    .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
-                    .forceCreation(false)
                     .transactionManager(transactionManager)
                     .event(new Closure<CreateCaseEventOutcome>(null) {
                         @Override
@@ -378,8 +376,6 @@ public class WorkflowService implements IWorkflowService {
 
         if (deleteCaseParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
-                    .timeout(TransactionDefinition.TIMEOUT_DEFAULT)
-                    .forceCreation(false)
                     .transactionManager(transactionManager)
                     .event(new Closure<DeleteCaseEventOutcome>(null) {
                         @Override
