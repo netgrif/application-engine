@@ -26,8 +26,7 @@ public class CreateCaseParams {
     private LoggedUser loggedUser;
     @Builder.Default
     private Locale locale = LocaleContextHolder.getLocale();
-    @Builder.Default
-    private boolean isTransactional = false;
+    private Boolean isTransactional;
     @Builder.Default
     private Map<String, String> params = new HashMap<>();
 

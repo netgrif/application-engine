@@ -38,7 +38,7 @@ import org.springframework.test.context.ActiveProfiles
 import static org.junit.jupiter.api.Assertions.assertThrows
 
 @SpringBootTest
-@ActiveProfiles(["test"])
+@ActiveProfiles(["test", "test-transaction"])
 class TransactionTest {
 
     @Autowired

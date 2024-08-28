@@ -15,8 +15,7 @@ public class DeleteCaseParams {
 
     private String useCaseId;
     private Case useCase;
-    @Builder.Default
-    private boolean isTransactional = false;
+    private Boolean isTransactional;
     @Builder.Default
     private Map<String, String> params = new HashMap<>();
 

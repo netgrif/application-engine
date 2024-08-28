@@ -20,6 +20,7 @@ import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.security.service.EncryptionService;
 import com.netgrif.application.engine.transaction.NaeTransaction;
+import com.netgrif.application.engine.transaction.configuration.NaeTransactionProperties;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataFieldValue;
@@ -51,7 +52,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
@@ -102,6 +102,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     private MongoTransactionManager transactionManager;
+
+    @Autowired
+    private NaeTransactionProperties transactionProperties;
 
     @Autowired
     public void setElasticCaseService(IElasticCaseService elasticCaseService) {
@@ -225,7 +228,7 @@ public class WorkflowService implements IWorkflowService {
     public CreateCaseEventOutcome createCase(CreateCaseParams createCaseParams) {
         fillMissingAttributes(createCaseParams);
 
-        if (createCaseParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
+        if (createCaseParams.getIsTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
                     .transactionManager(transactionManager)
                     .event(new Closure<CreateCaseEventOutcome>(null) {
@@ -316,6 +319,9 @@ public class WorkflowService implements IWorkflowService {
         if (createCaseParams.getLoggedUser() == null) {
             throw new IllegalArgumentException("Logged user cannot be null on Case creation.");
         }
+        if (createCaseParams.getIsTransactional() == null) {
+            createCaseParams.setIsTransactional(transactionProperties.isCreateCaseTransactional());
+        }
         if (createCaseParams.getPetriNet() == null) {
             PetriNet petriNet;
             if (createCaseParams.getPetriNetId() != null) {
@@ -374,7 +380,7 @@ public class WorkflowService implements IWorkflowService {
     public DeleteCaseEventOutcome deleteCase(DeleteCaseParams deleteCaseParams) {
         fillMissingAttributes(deleteCaseParams);
 
-        if (deleteCaseParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
+        if (deleteCaseParams.getIsTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
                     .transactionManager(transactionManager)
                     .event(new Closure<DeleteCaseEventOutcome>(null) {
@@ -422,6 +428,9 @@ public class WorkflowService implements IWorkflowService {
             } else {
                 throw new IllegalArgumentException("At least case id must be provided on case removal.");
             }
+        }
+        if (deleteCaseParams.getIsTransactional() == null) {
+            deleteCaseParams.setIsTransactional(transactionProperties.isDeleteCaseTransactional());
         }
     }
 

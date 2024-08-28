@@ -17,6 +17,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.transaction.NaeTransaction;
+import com.netgrif.application.engine.transaction.configuration.NaeTransactionProperties;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
@@ -87,6 +88,9 @@ public class DataService implements IDataService {
     @Autowired
     private IValidationService validation;
 
+    @Autowired
+    private NaeTransactionProperties transactionProperties;
+
     @Value("${nae.image.preview.scaling.px:400}")
     private int imageScale;
 
@@ -115,7 +119,7 @@ public class DataService implements IDataService {
 
         log.info("[{}]: Getting data of task {} [{}]", useCase.getStringId(), task.getTransitionId(), task.getStringId());
 
-        if (getDataParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
+        if (getDataParams.getIsTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
                     .transactionManager(transactionManager)
                     .event(new Closure<GetDataEventOutcome>(null) {
@@ -184,6 +188,9 @@ public class DataService implements IDataService {
             Case useCase = workflowService.findOne(getDataParams.getTask().getCaseId());
             getDataParams.setUseCase(useCase);
         }
+        if (getDataParams.getIsTransactional() == null) {
+            getDataParams.setIsTransactional(transactionProperties.isGetDataTransactional());
+        }
     }
 
     /**
@@ -210,7 +217,7 @@ public class DataService implements IDataService {
             task.setUser(userService.findById(task.getUserId()));
         }
 
-        if (setDataParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
+        if (setDataParams.getIsTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
                     .transactionManager(transactionManager)
                     .event(new Closure<SetDataEventOutcome>(null) {
@@ -259,6 +266,9 @@ public class DataService implements IDataService {
             } else {
                 throw new IllegalArgumentException("Cannot set data without provided task.");
             }
+        }
+        if (setDataParams.getIsTransactional() == null) {
+            setDataParams.setIsTransactional(transactionProperties.isSetDataTransactional());
         }
     }
 

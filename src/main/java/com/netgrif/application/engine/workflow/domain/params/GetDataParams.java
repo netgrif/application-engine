@@ -19,8 +19,7 @@ public class GetDataParams {
     private Task task;
     private IUser user;
     private Case useCase;
-    @Builder.Default
-    private boolean isTransactional = false;
+    private Boolean isTransactional;
     @Builder.Default
     private Map<String, String> params = new HashMap<>();
 

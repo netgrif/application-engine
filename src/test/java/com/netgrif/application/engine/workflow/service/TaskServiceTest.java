@@ -159,7 +159,7 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void testTransactionalAssignTaskFailure() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+    public void testTransactionalAssignTaskFailure() throws IOException, MissingPetriNetMetaDataException {
         String taskId = createCaseAndReturnTaskId("src/test/resources/transactional_task_event_test.xml",
                 "assignTest");
 
@@ -210,7 +210,7 @@ public class TaskServiceTest {
         Task aTask = taskService.assignTask(taskParams).getTask();
         assert Objects.equals(aTask.getUserId(), superCreator.getSuperUser().getStringId());
 
-        taskParams.setTransactional(true);
+        taskParams.setIsTransactional(true);
         assertThrows(RuntimeException.class, () -> taskService.cancelTask(taskParams));
 
         aTask = taskService.findOne(taskId);
@@ -255,7 +255,7 @@ public class TaskServiceTest {
         Task aTask = taskService.assignTask(taskParams).getTask();
         assert Objects.equals(aTask.getUserId(), superCreator.getSuperUser().getStringId());
 
-        taskParams.setTransactional(true);
+        taskParams.setIsTransactional(true);
         assertThrows(RuntimeException.class, () -> taskService.finishTask(taskParams));
 
         aTask = taskService.findOne(taskId);

@@ -169,8 +169,12 @@ public class NaeTransaction {
      * */
     public static class NaeTransactionBuilder {
         public NaeTransactionBuilder forceCreation(boolean forceCreation) {
+            this.propagation$set = true;
             this.propagation$value = forceCreation ? Propagation.REQUIRES_NEW : Propagation.REQUIRED;
+
+            this.forceCreation$set = true;
             this.forceCreation$value = forceCreation;
+
             return this;
         }
     }

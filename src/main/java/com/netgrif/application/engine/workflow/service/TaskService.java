@@ -28,6 +28,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleSe
 import com.netgrif.application.engine.rules.domain.facts.TransitionEventFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.transaction.NaeTransaction;
+import com.netgrif.application.engine.transaction.configuration.NaeTransactionProperties;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.*;
@@ -114,6 +115,9 @@ public class TaskService implements ITaskService {
     @Autowired
     private MongoTransactionManager transactionManager;
 
+    @Autowired
+    private NaeTransactionProperties transactionProperties;
+
     /**
      * Executes provided {@link Task} in provided {@link Case}
      *
@@ -183,7 +187,7 @@ public class TaskService implements ITaskService {
     public AssignTaskEventOutcome assignTask(TaskParams taskParams) throws TransitionNotExecutableException {
         fillMissingAttributes(taskParams);
 
-        if (taskParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
+        if (taskParams.getIsTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
                     .transactionManager(transactionManager)
                     .event(new Closure<AssignTaskEventOutcome>(null) {
@@ -311,7 +315,7 @@ public class TaskService implements ITaskService {
     public FinishTaskEventOutcome finishTask(TaskParams taskParams) throws TransitionNotExecutableException {
         fillMissingAttributes(taskParams);
 
-        if (taskParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
+        if (taskParams.getIsTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
                     .transactionManager(transactionManager)
                     .event(new Closure<FinishTaskEventOutcome>(null) {
@@ -440,7 +444,7 @@ public class TaskService implements ITaskService {
     public CancelTaskEventOutcome cancelTask(TaskParams taskParams) {
         fillMissingAttributes(taskParams);
 
-        if (taskParams.isTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
+        if (taskParams.getIsTransactional() && !TransactionSynchronizationManager.isSynchronizationActive()) {
             NaeTransaction transaction = NaeTransaction.builder()
                     .transactionManager(transactionManager)
                     .event(new Closure<CancelTaskEventOutcome>(null) {
@@ -587,6 +591,9 @@ public class TaskService implements ITaskService {
         if (taskParams.getUser() == null) {
             IUser user = userService.getLoggedOrSystem();
             taskParams.setUser(user);
+        }
+        if (taskParams.getIsTransactional() == null) {
+            taskParams.setIsTransactional(transactionProperties.isTaskEventTransactional());
         }
     }
 
