@@ -10,8 +10,8 @@ public class RegularTPArc extends TPArc {
     @Override
     public RegularTPArc clone() {
         RegularTPArc clone = new RegularTPArc();
-        clone.setSource(this.source);
-        clone.setDestination(this.destination);
+        clone.setSourceId(this.sourceId);
+        clone.setDestinationId(this.destinationId);
         clone.setMultiplicityExpression(this.multiplicityExpression.clone());
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);

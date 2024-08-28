@@ -40,8 +40,8 @@ public class ResetArc extends PTArc {
     @Override
     public ResetArc clone() {
         ResetArc clone = new ResetArc();
-        clone.setSource(this.source);
-        clone.setDestination(this.destination);
+        clone.setSourceId(this.sourceId);
+        clone.setDestinationId(this.destinationId);
         clone.setMultiplicityExpression(this.multiplicityExpression.clone());
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);

@@ -20,8 +20,8 @@ public class RegularPTArc extends PTArc {
     @Override
     public RegularPTArc clone() {
         RegularPTArc clone = new RegularPTArc();
-        clone.setSource(this.source);
-        clone.setDestination(this.destination);
+        clone.setSourceId(this.sourceId);
+        clone.setDestinationId(this.destinationId);
         clone.setMultiplicityExpression(this.multiplicityExpression.clone());
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);

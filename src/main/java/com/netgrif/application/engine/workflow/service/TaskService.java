@@ -502,7 +502,7 @@ public class TaskService implements ITaskService {
         //        TODO: release/8.0.0
         try {
             arcsOfTransition.forEach(Arc::execute);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalMarkingException e) {
             useCase.getProcess().setActivePlaces(markingBefore);
             return false;
         }
@@ -515,8 +515,7 @@ public class TaskService implements ITaskService {
         // TODO: release/8.0.0 set multiplicity
         useCase.getProcess().getOutputArcsOf(transition.getImportId()).forEach(Arc::execute);
         workflowService.updateMarking(useCase);
-        // TODO: release/8.0.0 save?
-//        workflowService.save(useCase);
+        workflowService.save(useCase);
     }
 
     public void startExecution(Transition transition, Case useCase) throws TransitionNotExecutableException {

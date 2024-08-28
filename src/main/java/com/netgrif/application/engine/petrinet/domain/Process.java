@@ -178,6 +178,10 @@ public class Process extends ProcessObject {
                 arc.setSource(getTransition(arc.getSourceId()));
                 arc.setDestination(getPlace(arc.getDestinationId()));
             });
+            list.getInput().forEach(arc -> {
+                arc.setSource(getPlace(arc.getSourceId()));
+                arc.setDestination(getTransition(arc.getDestinationId()));
+            });
         });
     }
 

@@ -37,8 +37,8 @@ public class InhibitorArc extends PTArc {
     @Override
     public InhibitorArc clone() {
         InhibitorArc clone = new InhibitorArc();
-        clone.setSource(this.source);
-        clone.setDestination(this.destination);
+        clone.setSourceId(this.sourceId);
+        clone.setDestinationId(this.destinationId);
         clone.setMultiplicityExpression(this.multiplicityExpression.clone());
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);
