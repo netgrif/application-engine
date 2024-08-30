@@ -10,6 +10,7 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.ButtonField
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -24,6 +25,9 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
+import com.netgrif.application.engine.workflow.web.responsebodies.TaskDataSets
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import org.junit.jupiter.api.BeforeEach
@@ -33,9 +37,26 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.util.Pair
+import org.springframework.hateoas.MediaTypes
+import org.springframework.mock.web.MockHttpServletRequest
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
+import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.MvcResult
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.web.context.WebApplicationContext
+
+import java.nio.charset.StandardCharsets
 
 import static org.junit.jupiter.api.Assertions.assertThrows
+import static org.springframework.http.MediaType.APPLICATION_JSON
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 
 @SpringBootTest
 @ActiveProfiles(["test", "test-transaction"])
@@ -71,7 +92,17 @@ class TransactionTest {
     @Autowired
     private SuperCreator superCreator
 
+    @Autowired
+    private WebApplicationContext wac
+
     private PetriNet testNet
+    private Authentication auth
+    private MockMvc mvc
+    private static final String USER_EMAIL = "super@netgrif.com"
+    private static final String CASE_CREATE_URL = "/api/workflow/case"
+    private static final String ASSIGN_TASK_URL = "/api/task/assign/"
+    private static final String SET_GET_DATA_URL_TEMPLATE = "/api/task/%s/data"
+    private static final String FINISH_TASK_URL = "/api/task/finish/"
 
     @BeforeEach
     void before() throws IOException, MissingPetriNetMetaDataException {
@@ -348,31 +379,38 @@ class TransactionTest {
     @Test
     @Disabled
     void testPerformance() {
-        int iterations = 1000
-        Case useCase = importHelper.createCase("performance test case", testNet)
+        beforeMvcTest()
 
-        long totalTransactionalDuration = 0
-        (0..iterations).each {
-            Date startTime = new Date()
-            dataService.setData(new SetDataParams(useCase, new DataSet(["testCreateCaseInTransactionPerformance": new ButtonField(rawValue: 1)]
-                    as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
-            Date endTime = new Date()
-            TimeDuration elapsedTimeTransactional = TimeCategory.minus( endTime, startTime )
-            totalTransactionalDuration += elapsedTimeTransactional.toMilliseconds()
+        PetriNet net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/petriNets/mortgage.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
+
+        int iterations = 500
+        long totalCreateCaseDuration = 0
+        long totalAssignTaskDuration = 0
+        long totalGetDataDuration = 0
+        long totalSetDataDuration = 0
+        long totalFinishTaskDuration = 0
+        (0..iterations).each {idx ->
+            Pair<TimeDuration, Case> createCasePair = createCase(net.stringId, "Case" + idx)
+            totalCreateCaseDuration += createCasePair.first.toMilliseconds()
+            String taskId = createCasePair.second["tasks"]["t2"]["taskStringId"]
+            Pair<TimeDuration, Task> assignTaskPair = assignTask(taskId)
+            totalAssignTaskDuration += assignTaskPair.first.toMilliseconds()
+            TimeDuration getDataDuration = getData(taskId)
+            totalGetDataDuration += getDataDuration.toMilliseconds()
+            TimeDuration setDataDuration = setData(taskId, "surname", "xxxx")
+            totalSetDataDuration += setDataDuration.toMilliseconds()
+            // todo mvc.finishTask requires some additional changed due to problem with user.getLoggedUser() (password is not initialized)
+            Pair<TimeDuration, Task> finishTaskPair = finishTask(taskId)
+            totalFinishTaskDuration += finishTaskPair.first.toMilliseconds()
         }
 
-        long totalNonTransactionalDuration = 0
-        (0..iterations).each {
-            Date startTime = new Date()
-            dataService.setData(new SetDataParams(useCase, new DataSet(["testCreateCasePerformance": new ButtonField(rawValue: 1)]
-                    as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
-            Date endTime = new Date()
-            TimeDuration elapsedTimeTransactional = TimeCategory.minus( endTime, startTime )
-            totalNonTransactionalDuration += elapsedTimeTransactional.toMilliseconds()
-        }
-
-        println("AVG transactional for 1 create case: " + totalTransactionalDuration / iterations + "ms")
-        println("AVG non-transactional for 1 create case: " + totalNonTransactionalDuration / iterations + "ms")
+        println("AVG for " + iterations + " iterations createCase is " + totalCreateCaseDuration / iterations + " ms")
+        println("AVG for " + iterations + " iterations assignTask is " + totalAssignTaskDuration / iterations + " ms")
+        println("AVG for " + iterations + " iterations getData is " + totalGetDataDuration / iterations + " ms")
+        println("AVG for " + iterations + " iterations setData is " + totalSetDataDuration / iterations + " ms")
+        println("AVG for " + iterations + " iterations finishTask is " + totalFinishTaskDuration / iterations + " ms")
     }
 
     private Case createTestCaseAndSetButton(String title, String buttonFieldId) {
@@ -428,6 +466,85 @@ class TransactionTest {
                 Locale.getDefault(),
                 false
         ) >= 1
+    }
+
+    private void beforeMvcTest() {
+        mvc = MockMvcBuilders
+                .webAppContextSetup(wac)
+                .apply(springSecurity())
+                .build()
+        auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
+        auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
+    }
+
+    private Pair<TimeDuration, Case> createCase(String petriNetStringId, String caseTitle) {
+        String content = JsonOutput.toJson([
+                title: caseTitle,
+                netId: petriNetStringId,
+                color: "color"
+        ])
+        Date startTime = new Date()
+        MvcResult result = mvc.perform(post(CASE_CREATE_URL)
+                .accept(MediaTypes.HAL_JSON_VALUE)
+                .content(content)
+                .contentType(APPLICATION_JSON)
+                .with(authentication(auth)))
+                .andReturn()
+        Date endTime = new Date()
+        return Pair.of(TimeCategory.minus( endTime, startTime ), parseResult(result).outcome.case)
+    }
+
+    private Pair<TimeDuration, Task> assignTask(String taskId) {
+        Date startTime = new Date()
+        MvcResult result = mvc.perform(get(ASSIGN_TASK_URL+taskId)
+                .accept(MediaTypes.HAL_JSON_VALUE)
+                .contentType(APPLICATION_JSON)
+                .with(authentication(auth)))
+                .andReturn()
+        Date endTime = new Date()
+        return Pair.of(TimeCategory.minus( endTime, startTime ), parseResult(result).outcome.task)
+    }
+
+    private Pair<TimeDuration, Task> finishTask(String taskId) {
+        Date startTime = new Date()
+        MvcResult result = mvc.perform(get(FINISH_TASK_URL+taskId)
+                .accept(MediaTypes.HAL_JSON_VALUE)
+                .contentType(APPLICATION_JSON)
+                .with(authentication(auth)))
+                .andReturn()
+        Date endTime = new Date()
+        return Pair.of(TimeCategory.minus( endTime, startTime ), parseResult(result).outcome.task)
+    }
+
+    private TimeDuration getData(String taskId) {
+        Date startTime = new Date()
+        mvc.perform(get(String.format(SET_GET_DATA_URL_TEMPLATE, taskId))
+                .contentType(APPLICATION_JSON)
+                .with(authentication(auth)))
+        Date endTime = new Date()
+        return TimeCategory.minus( endTime, startTime )
+    }
+
+    private TimeDuration setData(String taskId, String fieldId, String newValue) {
+        Field<String> surnameField = new TextField()
+        surnameField.setRawValue(newValue)
+
+        def body = [(taskId): new DataSet([(fieldId): (Field<String>) surnameField])]
+
+        String content = JsonOutput.toJson(new TaskDataSets(body))
+
+        Date startTime = new Date()
+        mvc.perform(post(String.format(SET_GET_DATA_URL_TEMPLATE, taskId))
+                .content(content)
+                .contentType(APPLICATION_JSON)
+                .with(authentication(auth)))
+        Date endTime = new Date()
+        return TimeCategory.minus( endTime, startTime )
+    }
+
+    @SuppressWarnings("GrMethodMayBeStatic")
+    private def parseResult(MvcResult result) {
+        return (new JsonSlurper()).parseText(result.response.getContentAsString(StandardCharsets.UTF_8))
     }
 
 }
