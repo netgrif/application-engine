@@ -31,7 +31,7 @@ public class EventService implements IEventService {
 
     @Override
     public List<EventOutcome> runActions(List<Action> actions, Case useCase, Task task, Transition transition, Map<String, String> params) {
-        log.info("[" + useCase.getStringId() + "]: Running actions of transition " + transition.getStringId());
+        log.info("[{}]: Running actions of transition {}", useCase.getStringId(), transition.getStringId());
         return runActions(actions, useCase, Optional.of(task), params);
     }
 

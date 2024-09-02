@@ -136,6 +136,12 @@ public class Case implements Serializable {
         );
     }
 
+    public void updateTask(Task task) {
+        TaskPair taskPair = tasks.get(task.getTransitionId());
+        taskPair.setState(task.getState());
+        taskPair.setUserId(task.getAssigneeId());
+    }
+
     public String getPetriNetId() {
         return petriNetObjectId.toString();
     }

@@ -35,6 +35,7 @@ import static com.netgrif.application.engine.petrinet.domain.dataset.logic.Field
 @Document
 @Data
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
+// TODO: release/8.0.0 check with new schema
 @JsonSubTypes({
         @JsonSubTypes.Type(value = BooleanField.class, name = "BOOLEAN"),
         @JsonSubTypes.Type(value = ButtonField.class, name = "BUTTON"),
@@ -42,7 +43,7 @@ import static com.netgrif.application.engine.petrinet.domain.dataset.logic.Field
         @JsonSubTypes.Type(value = DateField.class, name = "DATE"),
         @JsonSubTypes.Type(value = DateTimeField.class, name = "DATE_TIME"),
         @JsonSubTypes.Type(value = EnumerationField.class, name = "ENUMERATION"),
-        @JsonSubTypes.Type(value = EnumerationMapField.class, name = "ENUMERATION_MAP_FIELD"),
+        @JsonSubTypes.Type(value = EnumerationMapField.class, name = "ENUMERATION_MAP"),
         @JsonSubTypes.Type(value = FileField.class, name = "FILE"),
         @JsonSubTypes.Type(value = FileListField.class, name = "FILE_LIST"),
         @JsonSubTypes.Type(value = FilterField.class, name = "FILTER"),

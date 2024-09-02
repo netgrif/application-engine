@@ -436,8 +436,7 @@ public class Importer {
 //        addPredefinedRolesWithDefaultPermissions(importTransition, transition);
 //
         if (importTransition.getEvent() != null) {
-            importTransition.getEvent().forEach(event -> transition.addEvent(createEvent(event))
-            );
+            importTransition.getEvent().forEach(event -> transition.addEvent(createEvent(event)));
         }
         process.addTransition(transition);
     }
@@ -453,8 +452,8 @@ public class Importer {
     protected void addBaseEventProperties(com.netgrif.application.engine.petrinet.domain.events.BaseEvent event, com.netgrif.application.engine.importer.model.BaseEvent imported) {
         event.setImportId(imported.getId());
         event.setMessage(toI18NString(imported.getMessage()));
-        event.setPostActions(parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType.POST, imported));
         event.setPreActions(parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType.PRE, imported));
+        event.setPostActions(parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType.POST, imported));
     }
 
     protected List<Action> parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType phase, com.netgrif.application.engine.importer.model.BaseEvent imported) {
@@ -467,6 +466,7 @@ public class Importer {
     protected Action createAction(com.netgrif.application.engine.importer.model.Action importedAction) {
         Action action = new Action();
         action.setImportId(buildActionId(importedAction.getId()));
+        action.setDefinition(importedAction.getValue());
         if (importedAction.getType() != null) {
             // TODO: release/8.0.0 add atribute "type" to data set actions
         }

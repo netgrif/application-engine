@@ -27,16 +27,16 @@
         <id>user</id>
         <title>User</title>
     </role>
-    <data type="enumeration">
-        <id>enumeration_0</id>
+    <data type="enumeration_map">
+        <id>request_origin</id>
         <title>Origin of the request</title>
         <options>
-            <option key="Online">Online</option>
-            <option key="Call">Call</option>
+            <option key="online">Online</option>
+            <option key="call">Call</option>
         </options>
     </data>
     <data type="number">
-        <id>number_0</id>
+        <id>customer_id</id>
         <title>Customer ID</title>
         <validations>
             <validation>
@@ -49,37 +49,37 @@
         </validations>
     </data>
     <data type="taskRef">
-        <id>taskRef_0</id>
+        <id>form_ref</id>
         <title/>
         <init>t9</init>
     </data>
     <data type="text">
-        <id>text_0</id>
+        <id>name</id>
         <title>Name</title>
     </data>
     <data type="text">
-        <id>text_1</id>
+        <id>surname</id>
         <title>Surname</title>
         <placeholder>`</placeholder>
     </data>
     <data type="text">
-        <id>text_2</id>
+        <id>email</id>
         <title>Email</title>
     </data>
     <data type="text">
-        <id>text_3</id>
+        <id>request_text</id>
         <title>Request</title>
     </data>
     <data type="text">
-        <id>text_4</id>
+        <id>answer_department</id>
         <title>Answer of the department</title>
     </data>
     <data type="text">
-        <id>text_5</id>
+        <id>answer_registration</id>
         <title>Answer of the registration</title>
     </data>
     <data type="text">
-        <id>text_6</id>
+        <id>status</id>
         <title>Status</title>
     </data>
     <transition>
@@ -97,7 +97,7 @@
             <id>t1_0</id>
             <item>
                 <dataRef>
-                    <id>taskRef_0</id>
+                    <id>form_ref</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>
@@ -109,7 +109,7 @@
             <actions phase="pre">
                 <action id="1">
 					<![CDATA[
-                    change text_6 value { "Request submitted." }
+                    change status value { "Request submitted." }
                     ]]>
 				</action>
             </actions>
@@ -130,7 +130,7 @@
             <id>t2_0</id>
             <item>
                 <dataRef>
-                    <id>enumeration_0</id>
+                    <id>request_origin</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>
@@ -141,7 +141,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>taskRef_0</id>
+                    <id>form_ref</id>
                     <logic>
                         <behavior>visible</behavior>
                     </logic>
@@ -153,14 +153,14 @@
             <actions phase="pre">
                 <action id="2">
 					<![CDATA[
-                    change text_6 value { "Request registered." }
+                    change status value { "Request registered." }
                     ]]>
 				</action>
             </actions>
             <actions phase="post">
                 <action id="4">
 					<![CDATA[
-                    if (number_0.value < 2000) {
+                    if (customer_id.rawValue < 2000) {
                         assignTask("t3")
                         finishTask("t3")
                     } else {
@@ -199,7 +199,7 @@
             <id>t4_0</id>
             <item>
                 <dataRef>
-                    <id>text_4</id>
+                    <id>answer_department</id>
                     <logic>
                         <behavior>editable</behavior>
                         <required>true</required>
@@ -211,7 +211,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>taskRef_0</id>
+                    <id>form_ref</id>
                     <logic>
                         <behavior>visible</behavior>
                     </logic>
@@ -234,7 +234,7 @@
             <id>t5_0</id>
             <item>
                 <dataRef>
-                    <id>text_5</id>
+                    <id>answer_registration</id>
                     <logic>
                         <behavior>editable</behavior>
                         <required>true</required>
@@ -246,7 +246,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>text_4</id>
+                    <id>answer_department</id>
                     <logic>
                         <behavior>visible</behavior>
                     </logic>
@@ -254,7 +254,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>taskRef_0</id>
+                    <id>form_ref</id>
                     <logic>
                         <behavior>visible</behavior>
                     </logic>
@@ -266,8 +266,8 @@
             <actions phase="pre">
                 <action id="3">
 					<![CDATA[
-                    change text_6 value { "Request finished." }
-                    make text_5, visible on t8 when { true }
+                    change status value { "Request finished." }
+                    make answer_registration, visible on t8 when { true }
                     ]]>
 				</action>
             </actions>
@@ -300,7 +300,7 @@
             <id>t7_0</id>
             <item>
                 <dataRef>
-                    <id>text_4</id>
+                    <id>answer_department</id>
                     <logic>
                         <behavior>editable</behavior>
                         <required>true</required>
@@ -309,7 +309,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>taskRef_0</id>
+                    <id>form_ref</id>
                     <logic>
                         <behavior>visible</behavior>
                     </logic>
@@ -332,7 +332,7 @@
             <id>t8_0</id>
             <item>
                 <dataRef>
-                    <id>text_6</id>
+                    <id>status</id>
                     <logic>
                         <behavior>visible</behavior>
                     </logic>
@@ -340,7 +340,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>text_5</id>
+                    <id>answer_registration</id>
                     <logic>
                         <behavior>hidden</behavior>
                     </logic>
@@ -348,7 +348,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>taskRef_0</id>
+                    <id>form_ref</id>
                     <logic>
                         <behavior>visible</behavior>
                     </logic>
@@ -371,7 +371,7 @@
             <id>t9_0</id>
             <item>
                 <dataRef>
-                    <id>text_0</id>
+                    <id>name</id>
                     <logic>
                         <behavior>editable</behavior>
                         <required>true</required>
@@ -380,7 +380,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>text_1</id>
+                    <id>surname</id>
                     <logic>
                         <behavior>editable</behavior>
                         <required>true</required>
@@ -389,7 +389,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>text_2</id>
+                    <id>email</id>
                     <logic>
                         <behavior>editable</behavior>
                         <required>true</required>
@@ -398,7 +398,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>number_0</id>
+                    <id>customer_id</id>
                     <logic>
                         <behavior>editable</behavior>
                         <required>true</required>
@@ -407,7 +407,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>text_3</id>
+                    <id>request_text</id>
                     <logic>
                         <behavior>editable</behavior>
                         <required>true</required>

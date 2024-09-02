@@ -9,11 +9,19 @@ import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
+import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.State
+import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskDataSets
 import groovy.json.JsonOutput
@@ -41,6 +49,8 @@ import org.springframework.web.context.WebApplicationContext
 
 import java.nio.charset.StandardCharsets
 
+import static com.netgrif.application.engine.workflow.domain.State.DISABLED
+import static com.netgrif.application.engine.workflow.domain.State.ENABLED
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
@@ -64,34 +74,94 @@ class RequestTest {
     @Test
     void firstDepartmentTest() {
         createCase("My request")
-        submitRequest()
+        submitRequest(1_234d)
         register()
         firstDepartment()
         answer()
+        assertRequest([
+                "t1": DISABLED,
+                "t2": DISABLED,
+                "t3": DISABLED,
+                "t4": DISABLED,
+                "t5": DISABLED,
+                "t6": DISABLED,
+                "t7": DISABLED,
+                "t8": ENABLED,
+                "t9": ENABLED
+        ])
     }
 
-    void submitRequest() {
+    @Test
+    void secondDepartmentTest() {
+        createCase("My request")
+        submitRequest(2_345d)
+        register()
+        secondDepartment()
+        answer()
+        assertRequest([
+                "t1": DISABLED,
+                "t2": DISABLED,
+                "t3": DISABLED,
+                "t4": DISABLED,
+                "t5": DISABLED,
+                "t6": DISABLED,
+                "t7": DISABLED,
+                "t8": ENABLED,
+                "t9": ENABLED
+        ])
+    }
+
+    void submitRequest(double customerId) {
         searchTasks("t1")
         assignTask()
+        setData(new DataSet([
+                "name"        : new TextField(rawValue: "John"),
+                "surname"     : new TextField(rawValue: "Doe"),
+                "email"       : new TextField(rawValue: "johndoe@email.com"),
+                "customer_id" : new NumberField(rawValue: customerId),
+                "request_text": new TextField(rawValue: "Please change my address")
+        ]))
         finishTask()
     }
 
     void register() {
         searchTasks("t2")
         assignTask()
+        setData(new DataSet([
+                "request_origin": new EnumerationMapField(rawValue: "online")
+        ]))
         finishTask()
     }
 
     void firstDepartment() {
         searchTasks("t4")
         assignTask()
+        setData(DataSet.of("answer_department", new TextField(rawValue: "Address changed. 1st dpt")))
+        finishTask()
+    }
+
+    void secondDepartment() {
+        searchTasks("t7")
+        assignTask()
+        setData(DataSet.of("answer_department", new TextField(rawValue: "Address changed. 2nd dpt")))
         finishTask()
     }
 
     void answer() {
         searchTasks("t5")
         assignTask()
+        setData(DataSet.of("answer_registration", new TextField(rawValue: "Your address was changed")))
         finishTask()
+    }
+
+    void assertRequest(Map<String, State> taskStates) {
+        Case requestCase = workflowService.findOne(caseId)
+        List<Task> requestTasks = taskService.findAllByCase(caseId)
+
+        taskStates.each { String t, State state ->
+            assert requestCase.tasks[t].state == state
+            assert requestTasks.find { it.transitionId == t }.state == state
+        }
     }
 
     void createCase(String title) {
@@ -203,9 +273,11 @@ class RequestTest {
     private IPetriNetService petriNetService
     private IProcessRoleService processRoleService
     private IUserService userService
+    private IWorkflowService workflowService
+    private ITaskService taskService
 
     @Autowired
-    RequestTest(WebApplicationContext wac, TestHelper testHelper, SuperCreator superCreator, ImportHelper importHelper, ObjectMapper objectMapper, IPetriNetService petriNetService, IProcessRoleService processRoleService, IUserService userService) {
+    RequestTest(WebApplicationContext wac, TestHelper testHelper, SuperCreator superCreator, ImportHelper importHelper, ObjectMapper objectMapper, IPetriNetService petriNetService, IProcessRoleService processRoleService, IUserService userService, IWorkflowService workflowService, ITaskService taskService) {
         this.wac = wac
         this.testHelper = testHelper
         this.superCreator = superCreator
@@ -214,6 +286,8 @@ class RequestTest {
         this.petriNetService = petriNetService
         this.processRoleService = processRoleService
         this.userService = userService
+        this.workflowService = workflowService
+        this.taskService = taskService
     }
 
     private String caseId

@@ -22,7 +22,7 @@ public class ActionEvaluator implements IActionEvaluator {
     public void evaluate(List<Action> actions, List<Function> functions) {
         actions.forEach(action -> {
             try {
-                actionRunner.getActionCode(action, functions, true);
+                actionRunner.getActionCode(action, functions, null, true);
             } catch (Exception e) {
                 throw new IllegalArgumentException("Could not evaluate action[" + action.getImportId() + "]: \n " + action.getDefinition(), e);
             }

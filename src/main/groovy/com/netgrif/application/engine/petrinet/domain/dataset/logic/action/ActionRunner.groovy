@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 
 import com.netgrif.application.engine.petrinet.domain.Function
+import com.netgrif.application.engine.petrinet.domain.Transition
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
@@ -25,7 +26,7 @@ abstract class ActionRunner {
 
     private Map<String, Object> actionsCache = new HashMap<>()
 
-    List<EventOutcome> run(Action action, Case useCase,  Map<String, String> params, List<Function> functions = []) {
+    List<EventOutcome> run(Action action, Case useCase, Map<String, String> params, List<Function> functions = []) {
         return run(action, useCase, Optional.empty(), null, params, functions)
     }
 
@@ -34,7 +35,7 @@ abstract class ActionRunner {
             actionsCache = new HashMap<>()
         }
         log.debug("Action: $action")
-        def code = getActionCode(action, functions)
+        def code = getActionCode(action, functions, useCase)
         try {
             code.init(action, useCase, task, changes, this, params)
             code()
@@ -45,11 +46,11 @@ abstract class ActionRunner {
         return ((ActionDelegate) code.delegate).outcomes
     }
 
-    Closure getActionCode(Action action, List<Function> functions, boolean shouldRewriteCachedActions = false) {
-        return getActionCode(actionsCacheService.getCompiledAction(action, shouldRewriteCachedActions), functions)
+    Closure getActionCode(Action action, List<Function> functions, Case useCase, boolean shouldRewriteCachedActions = false) {
+        return getActionCode(actionsCacheService.getCompiledAction(action, shouldRewriteCachedActions), functions, useCase)
     }
 
-    Closure getActionCode(Closure code, List<Function> functions) {
+    Closure getActionCode(Closure code, List<Function> functions, Case useCase) {
         def actionDelegate = getActionDelegate()
 
         actionsCacheService.getCachedFunctions(functions).each {
@@ -61,6 +62,12 @@ abstract class ActionRunner {
                 namespace["${it.function.name}"] = it.code.rehydrate(actionDelegate, it.code.owner, it.code.thisObject)
             }
             actionDelegate.metaClass."${entry.key}" = namespace
+        }
+        useCase.dataSet.fields.forEach { String id, Field<?> field ->
+            actionDelegate.metaClass."$id" = field
+        }
+        useCase.process.transitions.forEach { String id, Transition t ->
+            actionDelegate.metaClass."$id" = t
         }
         return code.rehydrate(actionDelegate, code.owner, code.thisObject)
     }
