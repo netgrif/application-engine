@@ -5,6 +5,7 @@ import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -12,6 +13,8 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
@@ -85,11 +88,11 @@ class ImporterTest {
     @Test
     void importTest() {
         long beforeImportNet = processRoleRepository.count()
-        def netOptional = petriNetService.importPetriNet(
+        def netOptional = petriNetService.importPetriNet(new ImportPetriNetParams(
                 firstVersionResource.inputStream,
                 VersionType.MAJOR,
                 superCreator.loggedSuper
-        )
+        ))
         assert netOptional.getNet() != null
         assert processRoleRepository.count() == beforeImportNet + 2
         long statusImportRole = processRoleRepository.count()
@@ -171,11 +174,11 @@ class ImporterTest {
         }
         assert net.places.size() == 0
 
-        def netOptional2 = petriNetService.importPetriNet(
+        def netOptional2 = petriNetService.importPetriNet(new ImportPetriNetParams(
                 secondVersionResource.inputStream,
                 VersionType.MAJOR,
                 superCreator.loggedSuper
-        )
+        ))
 
         assert processRoleRepository.count() == statusImportRole + 1
         assert netOptional2.getNet() != null
@@ -289,11 +292,18 @@ class ImporterTest {
 
     @Test
     void thisKeywordInDataEventsTest() {
-        PetriNet net = petriNetService.importPetriNet(new ClassPathResource("/this_kw_test.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        PetriNet net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new ClassPathResource("/this_kw_test.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
 
         assert net != null
-        Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper).getCase()
-        taskService.assignTask(testCase.getTaskStringId("t1"))
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNet(net)
+                .title("Test case")
+                .color("")
+                .loggedUser(superCreator.loggedSuper)
+                .build()
+        Case testCase = workflowService.createCase(createCaseParams).getCase()
+        taskService.assignTask(new TaskParams(testCase.getTaskStringId("t1")))
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.getDataSet().get("text_field").getRawValue() == "Hello world!"
         assert testCase.getDataSet().get("tester_text_field").getRawValue() == "Hello world!"
@@ -301,10 +311,17 @@ class ImporterTest {
 
     @Test
     void initialBehaviorTest() {
-        PetriNet net = petriNetService.importPetriNet(new ClassPathResource("/initial_behavior.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        PetriNet net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new ClassPathResource("/initial_behavior.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
 
         assert net
-        Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNet(net)
+                .title("Test case")
+                .color("")
+                .loggedUser(superCreator.loggedSuper)
+                .build()
+        Case testCase = workflowService.createCase(createCaseParams).getCase()
 
         assertBehaviors(testCase.dataSet.get(NUMBER_FIELD).behaviors.get("1"), FORBIDDEN)
         assertBehaviors(testCase.dataSet.get(TEXT_FIELD).behaviors.get("1"), HIDDEN)
@@ -331,7 +348,8 @@ class ImporterTest {
 
     @Test
     void enumerationMultichoiceOptionsTest() throws IOException, MissingPetriNetMetaDataException {
-        PetriNet net = petriNetService.importPetriNet(new ClassPathResource("/enumeration_multichoice_options.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        PetriNet net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new ClassPathResource("/enumeration_multichoice_options.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
 
         assert net != null
 
@@ -352,10 +370,10 @@ class ImporterTest {
 
     @Test
     void testDataGroupImportWithoutId() {
-        def netOutcome = petriNetService.importPetriNet(
+        def netOutcome = petriNetService.importPetriNet(new ImportPetriNetParams(
                 new FileInputStream("src/test/resources/datagroup_no_id_test.xml"),
                 VersionType.MAJOR,
-                superCreator.loggedSuper)
+                superCreator.loggedSuper))
 
         assert netOutcome.getNet() != null
 
@@ -367,7 +385,8 @@ class ImporterTest {
 
     @Test
     void createTransitionNoLabel() {
-        PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/NoLabel.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        PetriNet net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/importTest/NoLabel.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet()
         assert net
         PetriNet importNet = petriNetService.findByImportId(net.getImportId()).get()
         assert importNet
@@ -376,7 +395,7 @@ class ImporterTest {
         assert importNet.getTransition("layout").getTitle().defaultValue == ""
     }
 
-    private boolean equalSet(Set<I18nString> first, Set<I18nString> second) {
+    private static boolean equalSet(Set<I18nString> first, Set<I18nString> second) {
         return first.every {
             second.any { that -> it.defaultValue == that.defaultValue }
         }

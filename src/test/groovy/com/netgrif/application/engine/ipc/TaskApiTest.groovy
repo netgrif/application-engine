@@ -10,6 +10,7 @@ import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -57,7 +58,7 @@ class TaskApiTest {
     private TestHelper testHelper
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreator superCreator
 
     private def stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
@@ -77,7 +78,8 @@ class TaskApiTest {
     @Test
     @Disabled("GroovyRuntime Could not find matching constructor")
     void testTaskSearch() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_SEARCH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(TASK_SEARCH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()))
 
         assert netOptional.getNet() != null
 
@@ -108,7 +110,8 @@ class TaskApiTest {
     @Test
     @Disabled()
     void testTaskEventActions() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_EVENTS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(TASK_EVENTS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()))
 
         assert netOptional.getNet() != null
 
@@ -141,8 +144,10 @@ class TaskApiTest {
     @Test
     @Disabled("spusta 2 krat")
     void testTaskExecution() {
-        def limitsNetOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        def leasingNetOptional = petriNetService.importPetriNet(stream(LEASING_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def limitsNetOptional = petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()))
+        def leasingNetOptional = petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(LEASING_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()))
 
         assert limitsNetOptional.getNet() != null
         assert leasingNetOptional.getNet() != null
@@ -216,7 +221,8 @@ class TaskApiTest {
 
     @Test
     void testTaskBulkActions() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_BULK_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(TASK_BULK_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()))
 
         assert netOptional.getNet() != null
         PetriNet net = netOptional.getNet()
@@ -241,7 +247,8 @@ class TaskApiTest {
 
     @Test
     void testGetData() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_GETTER_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(TASK_GETTER_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()))
 
         assert netOptional.getNet() != null
         PetriNet net = netOptional.getNet()
@@ -270,7 +277,8 @@ class TaskApiTest {
 
     @Test
     void testSetData() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_SETTER_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(TASK_SETTER_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()))
 
         assert netOptional.getNet() != null
         PetriNet net = netOptional.getNet()

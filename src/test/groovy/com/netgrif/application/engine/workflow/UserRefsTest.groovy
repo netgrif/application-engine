@@ -8,11 +8,12 @@ import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.TaskPair
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
@@ -69,7 +70,8 @@ class UserRefsTest {
     @BeforeEach
     void before() {
         helper.truncateDbs()
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/userrefs_test.xml"), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).getNet()
+        def net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/userrefs_test.xml"), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser())).getNet()
         assert net
         netId = net.getStringId()
         def userEmails = [configuration.email, "engine@netgrif.com"]
@@ -79,9 +81,9 @@ class UserRefsTest {
             def _case = importHelper.createCase("$it" as String, net)
             String id = userService.findByEmail(userEmails[it % 2]).getStringId()
             String taskId = _case.getTaskStringId("t1")
-            dataService.setData(taskId, new DataSet([
+            dataService.setData(new SetDataParams(taskId, new DataSet([
                     "user_list_1": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(id)]))
-            ] as Map<String, Field<?>>), superCreator.getLoggedSuper()).getCase()
+            ] as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
             userIds.add(id)
         }
     }

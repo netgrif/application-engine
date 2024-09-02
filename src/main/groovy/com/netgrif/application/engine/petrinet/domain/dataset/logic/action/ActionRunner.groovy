@@ -1,16 +1,19 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
-
 import com.netgrif.application.engine.petrinet.domain.Function
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
+import com.netgrif.application.engine.transaction.NaeTransaction
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Lookup
+import org.springframework.data.mongodb.MongoTransactionManager
 import org.springframework.stereotype.Component
+import org.springframework.transaction.TransactionDefinition
+import org.springframework.transaction.support.TransactionSynchronizationManager
 
 @Slf4j
 @Component
@@ -22,6 +25,9 @@ abstract class ActionRunner {
 
     @Autowired
     private IFieldActionsCacheService actionsCacheService
+
+    @Autowired
+    private MongoTransactionManager transactionManager
 
     private Map<String, Object> actionsCache = new HashMap<>()
 
@@ -37,7 +43,16 @@ abstract class ActionRunner {
         def code = getActionCode(action, functions)
         try {
             code.init(action, useCase, task, changes, this, params)
-            code()
+            if (TransactionSynchronizationManager.isSynchronizationActive()) {
+                def transaction = NaeTransaction.builder()
+                        .transactionManager(transactionManager)
+                        .event(code)
+                        .build()
+                transaction.setForceCreation(false)
+                transaction.begin()
+            } else {
+                code()
+            }
         } catch (Exception e) {
             log.error("Action: $action.definition")
             throw e

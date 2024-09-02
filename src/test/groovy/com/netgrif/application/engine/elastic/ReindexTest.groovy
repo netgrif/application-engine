@@ -5,10 +5,12 @@ import com.netgrif.application.engine.elastic.service.ReindexingTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -50,14 +52,21 @@ class ReindexTest {
 
     @Test
     void reindexTest() {
-        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert net.getNet() != null
         int countTread = Thread.activeCount()
         List<Thread> threads = []
         List<Case> savedCase = []
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNet(net.getNet())
+                .title("Test")
+                .color("color")
+                .loggedUser(superCreator.getLoggedSuper())
+                .build()
         for (int i in 1..2000) {
             threads << Thread.start {
-                def useCase = workflowService.createCase(net.getNet().stringId, "Test", "color", superCreator.getLoggedSuper()).getCase()
+                def useCase = workflowService.createCase(createCaseParams).getCase()
                 savedCase.add(useCase)
             }
         }
@@ -69,7 +78,7 @@ class ReindexTest {
         threads = []
         for (int i in 1..4000) {
             threads << Thread.start {
-                def useCase = workflowService.createCase(net.getNet().stringId, "Test", "color", superCreator.getLoggedSuper()).getCase()
+                def useCase = workflowService.createCase(createCaseParams).getCase()
                 savedCase.add(useCase)
             }
         }

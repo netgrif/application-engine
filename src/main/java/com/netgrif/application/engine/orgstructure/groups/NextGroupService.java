@@ -11,7 +11,6 @@ import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -20,12 +19,14 @@ import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
+import com.netgrif.application.engine.workflow.domain.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
-import com.netgrif.application.engine.workflow.web.responsebodies.TaskDataSets;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
@@ -106,16 +107,21 @@ public class NextGroupService implements INextGroupService {
         if (userDefaultGroup != null && userDefaultGroup.getTitle().equals(title)) {
             return null;
         }
-        PetriNet orgGroupNet = petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER);
-        CreateCaseEventOutcome outcome = workflowService.createCase(orgGroupNet.getStringId(), title, "", author.transformToLoggedUser());
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNet(petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER))
+                .title(title)
+                .color("")
+                .loggedUser(author.transformToLoggedUser())
+                .build();
+        CreateCaseEventOutcome outcome = workflowService.createCase(createCaseParams);
 
         DataSet taskData = getInitialGroupData(author, title, outcome.getCase());
         Task initTask = getGroupInitTask(outcome.getCase());
-        dataService.setData(initTask.getStringId(), taskData, author);
+        dataService.setData(new SetDataParams(initTask, taskData, author));
 
         try {
-            taskService.assignTask(author.transformToLoggedUser(), initTask.getStringId());
-            taskService.finishTask(author.transformToLoggedUser(), initTask.getStringId());
+            taskService.assignTask(new TaskParams(initTask, author));
+            taskService.finishTask(new TaskParams(initTask, author));
         } catch (TransitionNotExecutableException e) {
             log.error(e.getMessage());
         }

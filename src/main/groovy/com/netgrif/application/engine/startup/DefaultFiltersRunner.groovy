@@ -3,25 +3,23 @@ package com.netgrif.application.engine.startup
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
-import com.netgrif.application.engine.petrinet.domain.dataset.Field
-import com.netgrif.application.engine.petrinet.domain.dataset.FilterField
-import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
-import com.netgrif.application.engine.petrinet.domain.dataset.TextField
+import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
-import groovy.transform.CompileStatic
 import lombok.extern.slf4j.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
 
 @Slf4j
 @Component
@@ -271,11 +269,17 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
             }
         }
 
-        Case filterCase = this.workflowService.createCase(filterNet.getStringId(), title, null, loggedUser.transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNet(filterNet)
+                .title(title)
+                .color(null)
+                .loggedUser(loggedUser.transformToLoggedUser())
+                .build()
+        Case filterCase = this.workflowService.createCase(createCaseParams).getCase()
         filterCase.setIcon(icon)
         filterCase = this.workflowService.save(filterCase)
         Task newFilterTask = this.taskService.searchOne(QTask.task.transitionId.eq(AUTO_CREATE_TRANSITION).and(QTask.task.caseId.eq(filterCase.getStringId())))
-        this.taskService.assignTask(newFilterTask, this.userService.getLoggedOrSystem())
+        this.taskService.assignTask(new TaskParams(newFilterTask, this.userService.getLoggedOrSystem()))
 
         DataSet dataSet = new DataSet([
                 (FILTER_TYPE_FIELD_ID): new EnumerationMapField(rawValue: filterType),
@@ -288,11 +292,11 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
         }
 
         // TODO: release/8.0.0 join setData to one call
-        this.dataService.setData(newFilterTask, dataSet, superCreator.getSuperUser())
+        this.dataService.setData(new SetDataParams(newFilterTask, dataSet, superCreator.getSuperUser()))
         if (isImported) {
-            this.dataService.setData(newFilterTask, new DataSet([
+            this.dataService.setData(new SetDataParams(newFilterTask, new DataSet([
                     (IS_IMPORTED): new NumberField(rawValue: 1)
-            ] as Map<String, Field<?>>), superCreator.getSuperUser())
+            ] as Map<String, Field<?>>), superCreator.getSuperUser()))
         }
 
         I18nString translatedTitle = new I18nString(title)
@@ -302,7 +306,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
         filterCase.dataSet.get(FILTER_I18N_TITLE_FIELD_ID).rawValue = translatedTitle
         workflowService.save(filterCase)
 
-        this.taskService.finishTask(newFilterTask, this.userService.getLoggedOrSystem())
+        this.taskService.finishTask(new TaskParams(newFilterTask, this.userService.getLoggedOrSystem()))
         return Optional.of(this.workflowService.findOne(filterCase.getStringId()))
     }
 }

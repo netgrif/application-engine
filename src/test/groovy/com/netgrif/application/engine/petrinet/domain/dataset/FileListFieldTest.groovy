@@ -8,10 +8,12 @@ import com.netgrif.application.engine.configuration.properties.SuperAdminConfigu
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,7 +27,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.util.MultiValueMap
 import org.springframework.web.context.WebApplicationContext
 
 import static org.hamcrest.core.StringContains.containsString
@@ -86,7 +87,8 @@ class FileListFieldTest {
     }
 
     PetriNet getNet() {
-        def netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/remoteFileListField.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/remoteFileListField.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert netOptional.getNet() != null
         return netOptional.getNet()
     }
@@ -102,11 +104,17 @@ class FileListFieldTest {
     void downloadFileByCaseAndName() {
         PetriNet net = getNet()
 
-        IUser user = userService.findByEmail(configuration.email, true)
+        IUser user = userService.findByEmail(configuration.email)
         assert user != null
 
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getCase()
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNet(net)
+                .title("Test file from file list download")
+                .color("black")
+                .loggedUser(user.transformToLoggedUser())
+                .build()
+        Case useCase = workflowService.createCase(createCaseParams).getCase()
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user)
 
         mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/named")
                 .param("fieldId", FIELD_ID)
@@ -123,11 +131,17 @@ class FileListFieldTest {
     void downloadFileByTask() {
         PetriNet net = getNet()
 
-        IUser user = userService.findByEmail(configuration.email, true)
+        IUser user = userService.findByEmail(configuration.email)
         assert user != null
 
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getCase()
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNet(net)
+                .title("Test file from file list download")
+                .color("black")
+                .loggedUser(user.transformToLoggedUser())
+                .build()
+        Case useCase = workflowService.createCase(createCaseParams).getCase()
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user)
 
         // TODO: release/8.0.0 '/test-file-list.txt' or  "test-file.txt" ?
         mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file/named")

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.domain;
 
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.EventOutcome;
 import lombok.Getter;
 import lombok.Setter;
 

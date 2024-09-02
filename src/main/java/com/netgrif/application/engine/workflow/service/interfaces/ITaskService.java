@@ -5,27 +5,29 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.DelegateTaskEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.EventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.AssignTaskEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.CancelTaskEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.DelegateTaskEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.FinishTaskEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.CreateTasksOutcome;
+import com.netgrif.application.engine.workflow.domain.params.TaskParams;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 // TODO: release/8.0.0 remove LoggedUser, create TaskEventContext class to merge all params
 public interface ITaskService {
 
-    void reloadTasks(Case useCase);
+    boolean reloadTasks(Case useCase);
+
+    CreateTasksOutcome createAndSetTasksInCase(Case useCase);
 
     Task findOne(String taskId);
 
@@ -51,49 +53,19 @@ public interface ITaskService {
 
     Task searchOne(com.querydsl.core.types.Predicate predicate);
 
-    List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException;
+    List<EventOutcome> executeTask(Task task, Case useCase);
 
     List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, IUser user, Map<String, String> params) throws TransitionNotExecutableException;
 
-    FinishTaskEventOutcome finishTask(Task task, IUser user) throws TransitionNotExecutableException;
-
-    FinishTaskEventOutcome finishTask(Task task, IUser user, Map<String, String> params) throws TransitionNotExecutableException;
-
-    FinishTaskEventOutcome finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
-
-    FinishTaskEventOutcome finishTask(LoggedUser loggedUser, String taskId, Map<String, String> params) throws IllegalArgumentException, TransitionNotExecutableException;
-
-    FinishTaskEventOutcome finishTask(String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
-
-    FinishTaskEventOutcome finishTask(String taskId, Map<String, String> params) throws IllegalArgumentException, TransitionNotExecutableException;
-
-    List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException;
+    FinishTaskEventOutcome finishTask(TaskParams taskParams) throws TransitionNotExecutableException;
 
     List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, IUser user, Map<String, String> params) throws TransitionNotExecutableException;
 
-    AssignTaskEventOutcome assignTask(Task task, IUser user) throws TransitionNotExecutableException;
-
-    AssignTaskEventOutcome assignTask(Task task, IUser user, Map<String, String> params) throws TransitionNotExecutableException;
-
-    AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException, TaskNotFoundException;
-
-    AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId, Map<String, String> params) throws TransitionNotExecutableException, TaskNotFoundException;
-
-    AssignTaskEventOutcome assignTask(String taskId) throws TransitionNotExecutableException;
-
-    AssignTaskEventOutcome assignTask(String taskId, Map<String, String> params) throws TransitionNotExecutableException;
-
-    List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, IUser user);
+    AssignTaskEventOutcome assignTask(TaskParams taskParams) throws TransitionNotExecutableException;
 
     List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, IUser user, Map<String, String> params);
 
-    CancelTaskEventOutcome cancelTask(Task task, IUser user);
-
-    CancelTaskEventOutcome cancelTask(Task task, IUser user, Map<String, String> params);
-
-    CancelTaskEventOutcome cancelTask(LoggedUser loggedUser, String taskId);
-
-    CancelTaskEventOutcome cancelTask(LoggedUser loggedUser, String taskId, Map<String, String> params);
+    CancelTaskEventOutcome cancelTask(TaskParams taskParams);
 
     // TODO: release/8.0.0 delegate is deprecated
     DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId) throws TransitionNotExecutableException;

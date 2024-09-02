@@ -6,12 +6,19 @@ import com.netgrif.application.engine.petrinet.domain.DataGroup
 import com.netgrif.application.engine.petrinet.domain.DataRef
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.ButtonField
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -23,15 +30,17 @@ import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+import static org.junit.jupiter.api.Assertions.assertThrows
+
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 @CompileStatic
 class DataServiceTest {
 
-    private static final String TASK_TITLE = "Transition";
-    private static final String FILE_FIELD_TITLE = "File";
-    private static final String TEXT_FIELD_TITLE = "Result";
+    private static final String TASK_TITLE = "Transition"
+    private static final String FILE_FIELD_TITLE = "File"
+    private static final String TEXT_FIELD_TITLE = "Result"
 
     @Autowired
     private ImportHelper importHelper
@@ -58,20 +67,24 @@ class DataServiceTest {
     @BeforeEach
     void beforeAll() {
         testHelper.truncateDbs()
-        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_referenced.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/data_service_referenced.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert net.getNet() != null
 
-        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_taskref.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/data_service_taskref.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert net.getNet() != null
         this.net = net.getNet()
 
-        ImportPetriNetEventOutcome agreementNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/agreement.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome agreementNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/agreement.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert agreementNet.getNet() != null
         this.agreementNet = agreementNet.getNet()
 
-        ImportPetriNetEventOutcome netoutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/test_setData.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
-        assert netoutcome.getNet() != null;
-        this.setDataNet = netoutcome.getNet();
+        ImportPetriNetEventOutcome netoutcome = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/test_setData.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
+        assert netoutcome.getNet() != null
+        this.setDataNet = netoutcome.getNet()
     }
 
     @Test
@@ -118,6 +131,70 @@ class DataServiceTest {
         assert dataGroups.get(1).getParentTaskRefId() == "taskRef_result"
         assert dataGroups.get(2).getParentTaskRefId() == "taskRef_1"
         assert dataGroups.get(3).getParentTaskRefId() == "taskRef_0"
+    }
+
+    @Test
+    void testTransactionalSetDataOutcomes() {
+        Case aCase = importHelper.createCase("Case", this.setDataNet)
+        ButtonField buttonWithValueOne = new ButtonField()
+        buttonWithValueOne.setRawValue(1)
+
+        SetDataParams setDataParams = SetDataParams.with()
+                .useCase(aCase)
+                .user(superCreator.superUser)
+                .isTransactional(true)
+                .dataSet(new DataSet(Map.of(
+                        "button_1", (Field<Integer>) buttonWithValueOne,
+                        "button_0", (Field<Integer>) buttonWithValueOne
+                )))
+                .build()
+        SetDataEventOutcome outcome = dataService.setData(setDataParams)
+        assert outcome
+        assert outcome.getOutcomes().size() == 2
+    }
+
+    @Test
+    void testTransactionalSetDataFailure() {
+        Case aCase = importHelper.createCase("Case", this.setDataNet)
+        ButtonField buttonWithValueOne = new ButtonField()
+        buttonWithValueOne.setRawValue(1)
+
+        SetDataParams setDataParams = SetDataParams.with()
+                .useCase(aCase)
+                .user(superCreator.superUser)
+                .isTransactional(true)
+                .dataSet(new DataSet(Map.of(
+                        "button_1", (Field<Integer>) buttonWithValueOne,
+                        "non_existing_button", (Field<Integer>) buttonWithValueOne
+                )))
+                .build()
+        assertThrows(IllegalArgumentException.class, { dataService.setData(setDataParams) })
+
+        aCase = workflowService.findOne(aCase.stringId)
+        assert aCase.getDataSet().get("button_1").getRawValue() != 1
+        assert aCase.getDataSet().get("button_0").getRawValue() != 1337 // forbidden result of set action of button_1
+    }
+
+    @Test
+    void testNonTransactionalSetDataFailure() {
+        Case aCase = importHelper.createCase("Case", this.setDataNet)
+        ButtonField buttonWithValueOne = new ButtonField()
+        buttonWithValueOne.setRawValue(1)
+
+        SetDataParams setDataParams = SetDataParams.with()
+                .useCase(aCase)
+                .user(superCreator.superUser)
+                .isTransactional(false)
+                .dataSet(new DataSet(Map.of(
+                        "button_1", (Field<Integer>) buttonWithValueOne,
+                        "non_existing_button", (Field<Integer>) buttonWithValueOne
+                )))
+                .build()
+        assertThrows(IllegalArgumentException.class, { dataService.setData(setDataParams) })
+
+        aCase = workflowService.findOne(aCase.stringId)
+        assert aCase.getDataSet().get("button_1").getRawValue() == 1
+        assert aCase.getDataSet().get("button_0").getRawValue() == 1337 // allowed result of set action of button_1
     }
 
 //    @Test

@@ -7,10 +7,12 @@ import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExe
 import com.netgrif.application.engine.workflow.domain.IllegalArgumentWithChangedFieldsException;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessage;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.response.EventOutcomeWithMessageResource;
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams;
+import com.netgrif.application.engine.workflow.domain.params.TaskParams;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -89,7 +91,11 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> assign(LoggedUser loggedUser, String taskId) {
         try {
-            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName(), taskService.assignTask(loggedUser, taskId));
+            TaskParams taskParams = TaskParams.with()
+                    .taskId(taskId)
+                    .user(loggedUser.transformToUser())
+                    .build();
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName(), taskService.assignTask(taskParams));
         } catch (TransitionNotExecutableException e) {
             log.error("Assigning task [{}] failed: ", taskId, e);
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
@@ -107,7 +113,11 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> finish(LoggedUser loggedUser, String taskId) {
         try {
-            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " finished", taskService.finishTask(loggedUser, taskId));
+            TaskParams taskParams = TaskParams.with()
+                    .taskId(taskId)
+                    .user(loggedUser.transformToUser())
+                    .build();
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " finished", taskService.finishTask(taskParams));
         } catch (Exception e) {
             log.error("Finishing task [{}] failed: ", taskId, e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
@@ -120,7 +130,11 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> cancel(LoggedUser loggedUser, String taskId) {
         try {
-            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " canceled", taskService.cancelTask(loggedUser, taskId));
+            TaskParams taskParams = TaskParams.with()
+                    .taskId(taskId)
+                    .user(loggedUser.transformToUser())
+                    .build();
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " canceled", taskService.cancelTask(taskParams));
         } catch (Exception e) {
             log.error("Canceling task [{}] failed: ", taskId, e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
@@ -200,7 +214,8 @@ public abstract class AbstractTaskController {
     public EntityModel<EventOutcomeWithMessage> setData(String taskId, TaskDataSets dataBody, Authentication auth) {
         try {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
-            dataBody.getBody().forEach((task, dataSet) -> outcomes.put(task, dataService.setData(task, dataSet, (LoggedUser) auth.getPrincipal())));
+            dataBody.getBody().forEach((task, dataSet) -> outcomes.put(task, dataService.setData(new SetDataParams(task,
+                    dataSet, ((LoggedUser) auth.getPrincipal()).transformToUser()))));
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set", mainOutcome);
         } catch (IllegalArgumentWithChangedFieldsException e) {

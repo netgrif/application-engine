@@ -61,7 +61,7 @@
 			def childCases = workflowService.findAllById(childCaseIds)
 			async.run {
 				childCases.each {
-					workflowService.deleteCase(it)
+					deleteCase(it)
 				}
 			}
 		}

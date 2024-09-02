@@ -390,6 +390,10 @@ public class PetriNet extends PetriNetObject {
         return defaultCaseNameExpression != null;
     }
 
+    public boolean hasDefaultCaseName() {
+        return defaultCaseName != null;
+    }
+
     @Override
     public String getStringId() {
         return id.toString();

@@ -7,12 +7,15 @@ import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.ButtonField
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -76,7 +79,8 @@ class SetDataOnButtonTest {
     @BeforeEach
     void initNet() {
         testHelper.truncateDbs()
-        net = petriNetService.importPetriNet(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).getNet()
+        net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream(RESOURCE_PATH), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser())).getNet()
         assert net != null
     }
 
@@ -91,8 +95,8 @@ class SetDataOnButtonTest {
         Task parentTask = taskService.searchOne(QTask.task.caseTitle.eq(PARENT_CASE) & QTask.task.transitionId.eq(TEST_TRANSITION))
         assert parentTask != null
 
-        taskService.assignTask(parentTask.getStringId())
-        taskService.finishTask(parentTask.getStringId())
+        taskService.assignTask(new TaskParams(parentTask))
+        taskService.finishTask(new TaskParams(parentTask))
 
         childCase = workflowService.findOne(childCase.getStringId())
         assert childCase.dataSet.get(TEXT_0_FIELD_ID).rawValue.toString() == OUTPUT_TEXT_0
@@ -106,11 +110,11 @@ class SetDataOnButtonTest {
 
         Task testCaseTask = taskService.searchOne(QTask.task.caseTitle.eq(PARENT_CASE) & QTask.task.transitionId.eq(TEST_TRANSITION))
         assert testCaseTask != null
-        dataService.setData(testCaseTask.stringId, new DataSet([
+        dataService.setData(new SetDataParams(testCaseTask.stringId, new DataSet([
                 "button_0": new ButtonField(rawValue: 42),
                 "button_1": new ButtonField(rawValue: 42),
                 "button_2": new ButtonField(rawValue: 42)
-        ] as Map<String, Field<?>>), superCreator.getLoggedSuper())
+        ] as Map<String, Field<?>>), superCreator.getSuperUser()))
 
         testCase = workflowService.findOne(testCase.getStringId())
 

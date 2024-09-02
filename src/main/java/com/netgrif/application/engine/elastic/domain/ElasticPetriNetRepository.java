@@ -13,4 +13,6 @@ public interface ElasticPetriNetRepository extends ElasticsearchRepository<Elast
     List<ElasticPetriNet> findAllByUriNodeId(String uriNodeId);
 
     void deleteAllByStringId(String id);
+
+    List<ElasticPetriNet> findAllByIdentifier(String identifier);
 }

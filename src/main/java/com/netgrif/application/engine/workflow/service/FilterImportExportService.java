@@ -18,6 +18,7 @@ import com.netgrif.application.engine.utils.InputStreamToString;
 import com.netgrif.application.engine.workflow.domain.*;
 import com.netgrif.application.engine.workflow.domain.filter.FilterImportExport;
 import com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -86,12 +87,24 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Override
     public void createFilterImport(IUser author) {
-        workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER, "Import filters " + author.getFullName(), "", author.transformToLoggedUser());
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNetIdentifier(IMPORT_NET_IDENTIFIER)
+                .title("Import filters " + author.getFullName())
+                .color("")
+                .loggedUser(author.transformToLoggedUser())
+                .build();
+        workflowService.createCase(createCaseParams);
     }
 
     @Override
     public void createFilterExport(IUser author) {
-        workflowService.createCaseByIdentifier(EXPORT_NET_IDENTIFIER, "Export filters " + author.getFullName(), "", author.transformToLoggedUser());
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNetIdentifier(EXPORT_NET_IDENTIFIER)
+                .title("Export filters " + author.getFullName())
+                .color("")
+                .loggedUser(author.transformToLoggedUser())
+                .build();
+        workflowService.createCase(createCaseParams);
     }
 
     /**
@@ -236,7 +249,8 @@ public class FilterImportExportService implements IFilterImportExportService {
 //            filterCase.get().getDataSet().get(FIELD_FILTER).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.VISIBLE));
             workflowService.save(filterCase.get());
         });
-        taskService.assignTasks(taskService.findAllById(new ArrayList<>(importedFilterTaskIds.values())), userService.getLoggedUser());
+        taskService.assignTasks(taskService.findAllById(new ArrayList<>(importedFilterTaskIds.values())),
+                userService.getLoggedUser(), new HashMap<>());
         changeFilterField(importedFilterTaskIds.values());
         return importedFilterTaskIds;
     }

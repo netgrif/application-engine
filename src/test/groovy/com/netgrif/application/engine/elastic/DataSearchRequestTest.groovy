@@ -18,12 +18,14 @@ import com.netgrif.application.engine.petrinet.domain.dataset.I18nField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -108,10 +110,11 @@ class DataSearchRequestTest {
 
         repository.deleteAll()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert net.getNet() != null
 
-        def users = userService.findAll(true)
+        def users = userService.findAll()
         assert users.size() >= 2
         def testUser1 = users[0]
         def testUser2 = users[1]
@@ -121,7 +124,7 @@ class DataSearchRequestTest {
         testUser2.processRoles = []
         testUser2.authorities = []
 
-        LocalDate date = LocalDate.of(2020, 7, 25);
+        LocalDate date = LocalDate.of(2020, 7, 25)
         Case _case = importHelper.createCase("correct", net.getNet())
         _case.dataSet.get("number").rawValue = 7.0 as Double
         _case.dataSet.get("boolean").rawValue = true
@@ -140,11 +143,11 @@ class DataSearchRequestTest {
         (_case.dataSet.get("i18n_divider") as I18nField).rawValue.defaultValue = "Modified i18n divider value"
         workflowService.save(_case)
 
-        Task actionTrigger = taskService.searchOne(QTask.task.caseId.eq(_case.stringId).and(QTask.task.transitionId.eq("2")));
+        Task actionTrigger = taskService.searchOne(QTask.task.caseId.eq(_case.stringId).and(QTask.task.transitionId.eq("2")))
         assert actionTrigger != null
-        dataService.setData(actionTrigger, new DataSet([
+        dataService.setData(new SetDataParams(actionTrigger, new DataSet([
                 "testActionTrigger": new TextField(rawValue: "random value")
-        ] as Map<String, Field<?>>), superCreator.getSuperUser())
+        ] as Map<String, Field<?>>), superCreator.getSuperUser()))
 
         10.times {
             _case = importHelper.createCase("wrong${it}", net.getNet())

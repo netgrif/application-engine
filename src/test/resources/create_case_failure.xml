@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>create_case_failure</id>
+    <initials>TST</initials>
+    <title>Test</title>
+    <caseEvents>
+        <event type="create">
+            <id>123</id>
+            <actions phase="pre">
+                <action>
+                    createCase("create_case_locale", "CaseFromPre")
+                </action>
+            </actions>
+            <actions phase="post">
+                <action>
+                    createCase("create_case_locale", "CaseFromPost")
+                    throw new RuntimeException("error on purpose")
+                </action>
+            </actions>
+        </event>
+    </caseEvents>
+</document>

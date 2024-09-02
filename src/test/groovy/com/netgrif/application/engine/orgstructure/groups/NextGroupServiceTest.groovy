@@ -80,7 +80,7 @@ class NextGroupServiceTest {
     }
 
     Case createGroup() {
-        return nextGroupService.createGroup("CUSTOM_GROUP_1", userService.findByEmail(DUMMY_USER_MAIL, false)).getCase()
+        return nextGroupService.createGroup("CUSTOM_GROUP_1", userService.findByEmail(DUMMY_USER_MAIL)).getCase()
     }
 
     List<Case> findGroup() {
@@ -95,15 +95,15 @@ class NextGroupServiceTest {
     Case addUser() {
         QCase qCase = new QCase("case")
         Case group = nextGroupService.findByPredicate(qCase.title.eq("CUSTOM_GROUP_1")).get(0)
-        nextGroupService.addUser(userService.findByEmail(CUSTOMER_USER_MAIL, false), group)
-        nextGroupService.addUser(userService.findByEmail("engine@netgrif.com", false), group)
+        nextGroupService.addUser(userService.findByEmail(CUSTOMER_USER_MAIL), group)
+        nextGroupService.addUser(userService.findByEmail("engine@netgrif.com"), group)
         return group
     }
 
     Case removeUser() {
         QCase qCase = new QCase("case")
         Case group = nextGroupService.findByPredicate(qCase.title.eq("CUSTOM_GROUP_1")).get(0)
-        nextGroupService.removeUser(userService.findByEmail(CUSTOMER_USER_MAIL, false), group)
+        nextGroupService.removeUser(userService.findByEmail(CUSTOMER_USER_MAIL), group)
         return group
     }
 }

@@ -11,4 +11,8 @@ public enum ProcessRolePermission {
     public String value() {
         return super.name().toLowerCase();
     }
+
+    public static ProcessRolePermission fromValue(String v) {
+        return valueOf(v);
+    }
 }

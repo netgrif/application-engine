@@ -3,12 +3,15 @@ package com.netgrif.application.engine.action
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.DeleteCaseParams
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
@@ -65,18 +68,28 @@ class AssignRemoveTest {
     @Test
     @Disabled("Create functions or update test")
     void testAssignAndRemoveRole() throws MissingPetriNetMetaDataException, IOException {
-        ImportPetriNetEventOutcome netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/role_assign_remove_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome netOptional = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/petriNets/role_assign_remove_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
 
         assert netOptional.getNet() != null
         def net = netOptional.getNet()
         def roleCount = userService.system.processRoles.size()
 
         // create
-        Case caze = workflowService.createCase(net.stringId, 'TEST', '', userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNet(net)
+                .title("TEST")
+                .color("")
+                .loggedUser(userService.getLoggedOrSystem().transformToLoggedUser())
+                .build()
+        Case caze = workflowService.createCase(createCaseParams).getCase()
         assert userService.system.processRoles.size() == roleCount + 4
 
         // delete
-        workflowService.deleteCase(caze.stringId)
+        DeleteCaseParams deleteCaseParams = DeleteCaseParams.with()
+                .useCase(caze)
+                .build()
+        workflowService.deleteCase(deleteCaseParams)
         assert userService.system.processRoles.size() == roleCount
     }
 }

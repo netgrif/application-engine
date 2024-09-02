@@ -2,12 +2,14 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.GetDataParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -61,8 +63,10 @@ class DynamicValidationPerformanceTest {
     @Test
     void testValidations() {
         // TODO: release/8.0.0 Object f.text_valid_switch  does not exists
-        ImportPetriNetEventOutcome optNet1 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_validations_performance_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        ImportPetriNetEventOutcome optNet2 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_validations_performance_test_comparison.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome optNet1 = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/petriNets/dynamic_validations_performance_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
+        ImportPetriNetEventOutcome optNet2 = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/petriNets/dynamic_validations_performance_test_comparison.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
 
         def aCase1 = importHelper.createCase("Case 1", optNet1.getNet())
         def aCase2 = importHelper.createCase("Case 2", optNet2.getNet())
@@ -77,7 +81,7 @@ class DynamicValidationPerformanceTest {
 
     Map<String, Field> getData(Case useCase) {
         Task task = task(useCase)
-        return dataService.getData(task, useCase, superCreator.getSuperUser()).getData().collectEntries { [(it.fieldId): (it)] }
+        return dataService.getData(new GetDataParams(task, useCase, superCreator.getSuperUser())).getData().collectEntries { [(it.fieldId): (it)] }
     }
 
     Task task(Case useCase) {

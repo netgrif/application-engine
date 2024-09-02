@@ -10,6 +10,7 @@ import com.netgrif.application.engine.configuration.properties.SuperAdminConfigu
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -18,8 +19,11 @@ import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.startup.SystemUserRunner;
 import com.netgrif.application.engine.startup.UriRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams;
+import com.netgrif.application.engine.workflow.domain.params.TaskParams;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -37,6 +41,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -81,6 +88,8 @@ public class TaskServiceTest {
 
     @Autowired
     private SuperAdminConfiguration configuration;
+    @Autowired
+    private TaskService taskService;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -89,16 +98,30 @@ public class TaskServiceTest {
         userRunner.run("");
         uriRunner.run();
 
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()));
         PetriNet net = petriNetRepository.findAll().get(0);
-        workflowService.createCase(net.getStringId(), "Storage Unit", "color", mockLoggedUser());
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNet(net)
+                .title("Storage Unit")
+                .color("color")
+                .loggedUser(mockLoggedUser())
+                .build();
+        workflowService.createCase(createCaseParams);
     }
 
     @Test
     public void resetArcTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet();
+        PetriNet net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet();
         LoggedUser loggedUser = mockLoggedUser();
-        CreateCaseEventOutcome outcome = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNet(net)
+                .title("Reset test")
+                .color("color")
+                .loggedUser(loggedUser)
+                .build();
+        CreateCaseEventOutcome outcome = workflowService.createCase(createCaseParams);
         User user = new User();
         user.setName("name");
         user.setPassword("password");
@@ -107,31 +130,173 @@ public class TaskServiceTest {
         user.setState(UserState.ACTIVE);
         user = userRepository.save(user);
 
-        assert outcome.getCase().getConsumedTokens().size() == 0;
+        assert outcome.getCase().getConsumedTokens().isEmpty();
         assert outcome.getCase().getActivePlaces().size() == 1;
-        assert outcome.getCase().getActivePlaces().values().contains(5);
+        assert outcome.getCase().getActivePlaces().containsValue(5);
 
         Task task = taskRepository.findAll().stream().filter(t -> t.getTitle().getDefaultValue().equalsIgnoreCase("reset")).findFirst().orElse(null);
 
         assert task != null;
 
-        service.assignTask(user.transformToLoggedUser(), task.getStringId());
+        service.assignTask(new TaskParams(task, user));
         Case useCase = caseRepository.findById(outcome.getCase().getStringId()).get();
 
         assert useCase.getConsumedTokens().size() == 1;
-        assert useCase.getConsumedTokens().values().contains(5);
-        assert useCase.getActivePlaces().size() == 0;
+        assert useCase.getConsumedTokens().containsValue(5);
+        assert useCase.getActivePlaces().isEmpty();
 
-        service.cancelTask(user.transformToLoggedUser(), task.getStringId());
+        service.cancelTask(new TaskParams(task, user));
         useCase = caseRepository.findById(useCase.getStringId()).get();
 
-        assert useCase.getConsumedTokens().size() == 0;
+        assert useCase.getConsumedTokens().isEmpty();
         assert useCase.getActivePlaces().size() == 1;
-        assert useCase.getActivePlaces().values().contains(5);
+        assert useCase.getActivePlaces().containsValue(5);
     }
 
     public LoggedUser mockLoggedUser() {
         Authority authorityUser = authorityService.getOrCreate(Authority.user);
         return new LoggedUser(new ObjectId().toString(), configuration.getEmail(), configuration.getPassword(), Collections.singleton(authorityUser));
+    }
+
+    @Test
+    public void testTransactionalAssignTaskFailure() throws IOException, MissingPetriNetMetaDataException {
+        String taskId = createCaseAndReturnTaskId("src/test/resources/transactional_task_event_test.xml",
+                "assignTest");
+
+        TaskParams taskParams = TaskParams.with()
+                .isTransactional(true)
+                .taskId(taskId)
+                .user(superCreator.getSuperUser())
+                .build();
+
+        assertThrows(RuntimeException.class, () -> taskService.assignTask(taskParams));
+
+        Task aTask = taskService.findOne(taskId);
+        assert aTask.getUserId() == null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePre")) == null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePost")) == null;
+    }
+
+    @Test
+    public void testNonTransactionalAssignTaskFailure() throws IOException, MissingPetriNetMetaDataException {
+        String taskId = createCaseAndReturnTaskId("src/test/resources/transactional_task_event_test.xml",
+                "assignTest");
+
+        TaskParams taskParams = TaskParams.with()
+                .isTransactional(false)
+                .taskId(taskId)
+                .user(superCreator.getSuperUser())
+                .build();
+
+        assertThrows(RuntimeException.class, () -> taskService.assignTask(taskParams));
+
+        Task aTask = taskService.findOne(taskId);
+        assert aTask.getUserId() != null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePre")) != null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePost")) != null;
+    }
+
+    @Test
+    public void testTransactionalCancelTaskFailure() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        String taskId = createCaseAndReturnTaskId("src/test/resources/transactional_task_event_test.xml",
+                "cancelTest");
+
+        TaskParams taskParams = TaskParams.with()
+                .isTransactional(false)
+                .taskId(taskId)
+                .user(superCreator.getSuperUser())
+                .build();
+
+        Task aTask = taskService.assignTask(taskParams).getTask();
+        assert Objects.equals(aTask.getUserId(), superCreator.getSuperUser().getStringId());
+
+        taskParams.setIsTransactional(true);
+        assertThrows(RuntimeException.class, () -> taskService.cancelTask(taskParams));
+
+        aTask = taskService.findOne(taskId);
+        assert Objects.equals(aTask.getUserId(), superCreator.getSuperUser().getStringId());
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePre")) == null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePost")) == null;
+    }
+
+    @Test
+    public void testNonTransactionalCancelTaskFailure() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        String taskId = createCaseAndReturnTaskId("src/test/resources/transactional_task_event_test.xml",
+                "cancelTest");
+
+        TaskParams taskParams = TaskParams.with()
+                .isTransactional(false)
+                .taskId(taskId)
+                .user(superCreator.getSuperUser())
+                .build();
+
+        Task aTask = taskService.assignTask(taskParams).getTask();
+        assert Objects.equals(aTask.getUserId(), superCreator.getSuperUser().getStringId());
+
+        assertThrows(RuntimeException.class, () -> taskService.cancelTask(taskParams));
+
+        aTask = taskService.findOne(taskId);
+        assert aTask.getUserId() == null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePre")) != null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePost")) != null;
+    }
+
+    @Test
+    public void testTransactionalFinishTaskFailure() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        String taskId = createCaseAndReturnTaskId("src/test/resources/transactional_task_event_test.xml",
+                "finishTest");
+
+        TaskParams taskParams = TaskParams.with()
+                .isTransactional(false)
+                .taskId(taskId)
+                .user(superCreator.getSuperUser())
+                .build();
+
+        Task aTask = taskService.assignTask(taskParams).getTask();
+        assert Objects.equals(aTask.getUserId(), superCreator.getSuperUser().getStringId());
+
+        taskParams.setIsTransactional(true);
+        assertThrows(RuntimeException.class, () -> taskService.finishTask(taskParams));
+
+        aTask = taskService.findOne(taskId);
+        assert Objects.equals(aTask.getUserId(), superCreator.getSuperUser().getStringId());
+        assert aTask.getFinishedBy() == null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePre")) == null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePost")) == null;
+    }
+
+    @Test
+    public void testNonTransactionalFinishTaskFailure() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        String taskId = createCaseAndReturnTaskId("src/test/resources/transactional_task_event_test.xml",
+                "finishTest");
+
+        TaskParams taskParams = TaskParams.with()
+                .isTransactional(false)
+                .taskId(taskId)
+                .user(superCreator.getSuperUser())
+                .build();
+
+        Task aTask = taskService.assignTask(taskParams).getTask();
+        assert Objects.equals(aTask.getUserId(), superCreator.getSuperUser().getStringId());
+
+        assertThrows(RuntimeException.class, () -> taskService.finishTask(taskParams));
+
+        aTask = taskService.findOne(taskId);
+        assert aTask.getUserId() == null;
+        assert aTask.getFinishedBy().equals(superCreator.getSuperUser().getStringId());
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePre")) != null;
+        assert workflowService.searchOne(QCase.case$.title.eq("CasePost")) != null;
+    }
+
+    private String createCaseAndReturnTaskId(String filePath, String transId) throws IOException, MissingPetriNetMetaDataException {
+        PetriNet net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream(filePath), VersionType.MAJOR, superCreator.getLoggedSuper())).getNet();
+
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNet(net)
+                .loggedUser(superCreator.getLoggedSuper())
+                .build();
+        Case useCase = workflowService.createCase(createCaseParams).getCase();
+        return useCase.getTaskStringId(transId);
     }
 }

@@ -34,10 +34,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 200
     services:
-      mongo:
-        image: mongo:4.4
-        ports:
-          - 27017:27017
 
       redis:
         image: redis
@@ -52,12 +48,45 @@ jobs:
         options: -e="discovery.type=single-node" -e="xpack.security.enabled=false" --health-cmd="curl http://localhost:9200/_cluster/health" --health-interval=10s --health-timeout=5s --health-retries=10
 
     steps:
+      - name: Start MongoDB
+        uses: MongoCamp/mongodb-github-action@1.2.0
+        with:
+          mongodb-version: 4.4
+          mongodb-replica-set: rs0
+
+      - name: Wait for Elasticsearch to be ready
+        run: |
+          echo "Waiting for Elasticsearch to be ready..."
+          for i in {1..30}; do
+            if curl -fsSL http://localhost:9200/_cluster/health | grep '"status":"green"' &>/dev/null; then
+              echo "Elasticsearch is up"
+              break
+            fi
+            echo "Waiting for Elasticsearch..."
+            sleep 2
+          done
+
+      - name: Wait for MongoDB to be ready
+        run: |
+          echo "Waiting for MongoDB to be ready..."
+          for i in {1..30}; do
+            if mongo --eval "printjson(db.serverStatus())" &>/dev/null; then
+              echo "MongoDB is up"
+              break
+            fi
+            echo "Waiting for MongoDB..."
+            sleep 2
+          done
+
       - name: Test Database
         env:
           ELASTIC_SEARCH_URL: http://localhost:${{ job.services.elasticsearch.ports[9200] }}
+          MONGO_URL: http://localhost:27017
         run: |
           echo $ELASTIC_SEARCH_URL
+          echo $MONGO_URL
           curl -fsSL "$ELASTIC_SEARCH_URL/_cat/health?h=status"
+          curl -fsSL "$MONGO_URL"
 
       - uses: actions/checkout@v3
         with:
@@ -85,7 +114,6 @@ jobs:
 
       - name: Generate certificates
         run: cd src/main/resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl rsa -in keypair.pem -pubout -out public.crt && openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der && cd ../../../..
-
 
       - name: Build
         run: mvn clean package install -DskipTests=true

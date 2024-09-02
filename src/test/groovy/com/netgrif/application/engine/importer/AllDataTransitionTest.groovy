@@ -5,10 +5,11 @@ import com.netgrif.application.engine.importer.service.AllDataConfiguration
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.Transition
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -48,8 +49,9 @@ class AllDataTransitionTest {
 
     @Test
     void testAllData() throws MissingPetriNetMetaDataException, IOException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(resourceFile.inputStream, VersionType.MAJOR, superCreator.getLoggedSuper());
-        assert outcome.getNet() != null;
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new ImportPetriNetParams(
+                resourceFile.inputStream, VersionType.MAJOR, superCreator.getLoggedSuper()))
+        assert outcome.getNet() != null
         PetriNet net = outcome.getNet()
 
         assert net.transitions.size() == 3

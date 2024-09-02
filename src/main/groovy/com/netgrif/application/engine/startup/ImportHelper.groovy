@@ -7,16 +7,21 @@ import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupS
 import com.netgrif.application.engine.petrinet.domain.DataRef
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.CancelTaskEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.GetDataParams
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
+import com.netgrif.application.engine.workflow.domain.params.TaskParams
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -24,8 +29,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import groovy.util.logging.Slf4j
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.ResourceLoader
@@ -96,7 +99,7 @@ class ImportHelper {
 
     Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().stringId) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        PetriNet petriNet = petriNetService.importPetriNet(netStream, release, author, uriNodeId).getNet()
+        PetriNet petriNet = petriNetService.importPetriNet(new ImportPetriNetParams(netStream, release, author, uriNodeId)).getNet()
         log.info("Imported '${petriNet?.title?.defaultValue}' ['${petriNet?.identifier}', ${petriNet?.stringId}]")
         return Optional.of(petriNet)
     }
@@ -109,12 +112,12 @@ class ImportHelper {
         return Optional.of(petriNet)
     }
 
-    ProcessRole getProcessRoleByImportId(PetriNet net, String roleId) {
+    static ProcessRole getProcessRoleByImportId(PetriNet net, String roleId) {
         ProcessRole role = net.roles.values().find { it -> it.importId == roleId }
         return role
     }
 
-    Map<String, ProcessRole> getProcessRolesByImportId(PetriNet net, Map<String, String> importId) {
+    static Map<String, ProcessRole> getProcessRolesByImportId(PetriNet net, Map<String, String> importId) {
         HashMap<String, ProcessRole> roles = new HashMap<>()
         importId.each { it ->
             roles.put(it.getKey(), getProcessRoleByImportId(net, it.getValue()))
@@ -131,7 +134,7 @@ class ImportHelper {
         return map
     }
 
-    IUser createUser(User user, Authority[] authorities, ProcessRole[] roles) {
+    IUser createUser(IUser user, Authority[] authorities, ProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
         roles.each { user.addProcessRole(it) }
         user.state = UserState.ACTIVE
@@ -141,7 +144,13 @@ class ImportHelper {
     }
 
     Case createCase(String title, PetriNet net, LoggedUser user) {
-        return workflowService.createCase(net.getStringId(), title, "", user).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNet(net)
+                .title(title)
+                .color("")
+                .loggedUser(user)
+                .build()
+        return workflowService.createCase(createCaseParams).getCase()
     }
 
     Case createCase(String title, PetriNet net) {
@@ -152,28 +161,28 @@ class ImportHelper {
         return createCase(title, net, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
-    AssignTaskEventOutcome assignTask(String taskTitle, String caseId, LoggedUser author) {
-        return taskService.assignTask(author, getTaskId(taskTitle, caseId))
+    AssignTaskEventOutcome assignTask(String taskTitle, String caseId, IUser author) {
+        return taskService.assignTask(new TaskParams(getTaskId(taskTitle, caseId), author))
     }
 
     AssignTaskEventOutcome assignTaskToSuper(String taskTitle, String caseId) {
-        return assignTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
+        return assignTask(taskTitle, caseId, superCreator.superUser ?: userService.getSystem())
     }
 
-    FinishTaskEventOutcome finishTask(String taskTitle, String caseId, LoggedUser author) {
-        return taskService.finishTask(author, getTaskId(taskTitle, caseId))
+    FinishTaskEventOutcome finishTask(String taskTitle, String caseId, IUser author) {
+        return taskService.finishTask(new TaskParams(getTaskId(taskTitle, caseId), author))
     }
 
     FinishTaskEventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
-        return finishTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
+        return finishTask(taskTitle, caseId, superCreator.superUser ?: userService.getSystem())
     }
 
-    CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, LoggedUser user) {
-        return taskService.cancelTask(user, getTaskId(taskTitle, caseId))
+    CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, IUser user) {
+        return taskService.cancelTask(new TaskParams(getTaskId(taskTitle, caseId), user))
     }
 
     CancelTaskEventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {
-        return cancelTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
+        return cancelTask(taskTitle, caseId, superCreator.superUser ?: userService.getSystem())
     }
 
     String getTaskId(String taskTitle, String caseId) {
@@ -182,7 +191,7 @@ class ImportHelper {
     }
 
     SetDataEventOutcome setTaskData(String taskId, DataSet dataSet) {
-        dataService.setData(taskId, dataSet, superCreator.getSuperUser())
+        dataService.setData(new SetDataParams(taskId, dataSet, superCreator.getSuperUser()))
     }
 
     SetDataEventOutcome setTaskData(String taskTitle, String caseId, DataSet data) {
@@ -190,10 +199,10 @@ class ImportHelper {
     }
 
     List<DataRef> getTaskData(String taskTitle, String caseId) {
-        return dataService.getData(getTaskId(taskTitle, caseId), superCreator.getSuperUser()).getData()
+        return dataService.getData(new GetDataParams(getTaskId(taskTitle, caseId), superCreator.getSuperUser())).getData()
     }
 
     void updateSuperUser() {
-        superCreator.setAllToSuperUser();
+        superCreator.setAllToSuperUser()
     }
 }

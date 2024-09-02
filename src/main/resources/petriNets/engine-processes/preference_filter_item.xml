@@ -116,7 +116,7 @@
 		])
 		setDataWithPropagation(parentTask, dataSet)
 		async.run {
-			workflowService.deleteCase(useCase.stringId)
+			deleteCase(useCase)
 		}
 			<!--@formatter:on-->
 		</action>

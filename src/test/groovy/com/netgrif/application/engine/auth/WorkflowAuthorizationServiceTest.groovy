@@ -12,13 +12,16 @@ import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.params.CreateCaseParams
+import com.netgrif.application.engine.workflow.domain.params.SetDataParams
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowAuthorizationService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -113,11 +116,13 @@ class WorkflowAuthorizationServiceTest {
                 .apply(springSecurity())
                 .build()
 
-        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/workflow_authorization_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/workflow_authorization_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert net.getNet() != null
         this.net = net.getNet()
 
-        ImportPetriNetEventOutcome netWithUserRefs = petriNetService.importPetriNet(new FileInputStream("src/test/resources/workflow_authorization_service_test_with_userRefs.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome netWithUserRefs = petriNetService.importPetriNet(new ImportPetriNetParams(
+                new FileInputStream("src/test/resources/workflow_authorization_service_test_with_userRefs.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()))
         assert netWithUserRefs.getNet() != null
         this.netWithUserRefs = netWithUserRefs.getNet()
 
@@ -209,7 +214,13 @@ class WorkflowAuthorizationServiceTest {
     void testCanCallDelete() {
         ProcessRole positiveDeleteRole = this.net.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
         userService.addRole(testUser, positiveDeleteRole.getStringId())
-        Case case_ = workflowService.createCase(net.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNet(net)
+                .title("Test delete")
+                .color("")
+                .loggedUser(testUser.transformToLoggedUser())
+                .build()
+        Case case_ = workflowService.createCase(createCaseParams).getCase()
         assert workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
         userService.removeRole(testUser, positiveDeleteRole.getStringId())
     }
@@ -226,7 +237,13 @@ class WorkflowAuthorizationServiceTest {
     void testCanCallDeleteFalse() {
         ProcessRole deleteRole = this.net.getRoles().values().find(v -> v.getImportId() == "delete_neg_role")
         userService.addRole(testUser, deleteRole.getStringId())
-        Case case_ = workflowService.createCase(net.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNet(net)
+                .title("Test delete")
+                .color("")
+                .loggedUser(testUser.transformToLoggedUser())
+                .build()
+        Case case_ = workflowService.createCase(createCaseParams).getCase()
         assert !workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
         userService.removeRole(testUser, deleteRole.getStringId())
     }
@@ -240,11 +257,17 @@ class WorkflowAuthorizationServiceTest {
         userService.addRole(testUser, posDeleteRole.getStringId())
         userService.addRole(testUser, negDeleteRole.getStringId())
 
-        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNet(netWithUserRefs)
+                .title("Test delete")
+                .color("")
+                .loggedUser(testUser.transformToLoggedUser())
+                .build()
+        Case case_ = workflowService.createCase(createCaseParams).getCase()
         String taskId = case_.getTaskStringId("1")
-        case_ = dataService.setData(taskId, new DataSet([
+        case_ = dataService.setData(new SetDataParams(taskId, new DataSet([
                 "pos_user_list": new UserListField(rawValue: new UserListFieldValue(userValues: [dataService.makeUserFieldValue(testUser.stringId)])),
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+        ] as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
         workflowService.save(case_)
 
         assert workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
@@ -261,12 +284,18 @@ class WorkflowAuthorizationServiceTest {
         userService.addRole(testUser, posDeleteRole.getStringId())
         userService.addRole(testUser, negDeleteRole.getStringId())
 
-        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
+        CreateCaseParams createCaseParams = CreateCaseParams.with()
+                .petriNet(netWithUserRefs)
+                .title("Test delete")
+                .color("")
+                .loggedUser(testUser.transformToLoggedUser())
+                .build()
+        Case case_ = workflowService.createCase(createCaseParams).getCase()
         String taskId = case_.getTaskStringId("1")
-        case_ = dataService.setData(taskId, new DataSet([
+        case_ = dataService.setData(new SetDataParams(taskId, new DataSet([
                 "pos_user_list": new UserListField(rawValue: new UserListFieldValue(userValues: [dataService.makeUserFieldValue(testUser.stringId)])),
                 "neg_user_list": new UserListField(rawValue: new UserListFieldValue(userValues: [dataService.makeUserFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+        ] as Map<String, Field<?>>), superCreator.getSuperUser())).getCase()
 
         assert !workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
 

@@ -3,8 +3,6 @@ package com.netgrif.application.engine.workflow
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach

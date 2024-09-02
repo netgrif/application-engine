@@ -75,8 +75,4 @@ public class ElasticsearchConfiguration {
         return new ElasticsearchRestTemplate(client());
     }
 
-    @Bean
-    public CaseEventHandler caseEventHandler() {
-        return new CaseEventHandler();
-    }
 }

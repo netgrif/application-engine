@@ -3,11 +3,12 @@ package com.netgrif.application.engine.ipc
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.params.ImportPetriNetParams
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.outcomes.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -55,7 +56,8 @@ class CaseApiTest {
 
     @Test
     void testCreate() {
-        testNet = petriNetService.importPetriNet(stream(CREATE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        testNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(CREATE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()))
 
         assert testNet.getNet() != null
 
@@ -72,7 +74,8 @@ class CaseApiTest {
     void testSearch() {
         testHelper.truncateDbs()
 
-        testNet = petriNetService.importPetriNet(stream(SEARCH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        testNet = petriNetService.importPetriNet(new ImportPetriNetParams(
+                stream(SEARCH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()))
 
         assert testNet.getNet() != null
 
