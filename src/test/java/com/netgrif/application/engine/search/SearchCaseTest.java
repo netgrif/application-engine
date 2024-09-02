@@ -1,0 +1,525 @@
+package com.netgrif.application.engine.search;
+
+import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.auth.domain.Authority;
+import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.auth.domain.User;
+import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.application.engine.petrinet.domain.dataset.*;
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.search.interfaces.ISearchService;
+import com.netgrif.application.engine.startup.ImportHelper;
+import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static com.netgrif.application.engine.search.SearchUtils.toDateTimeString;
+
+@Slf4j
+@SpringBootTest
+@ActiveProfiles({"test"})
+@ExtendWith(SpringExtension.class)
+public class SearchCaseTest {
+
+    @Autowired
+    private ImportHelper importHelper;
+
+    @Autowired
+    private TestHelper testHelper;
+
+    @Autowired
+    private ISearchService searchService;
+
+    private Map<String, Authority> auths;
+
+    @BeforeEach
+    void setup() {
+        testHelper.truncateDbs();
+        auths = importHelper.createAuthorities(Map.of("user", Authority.user, "admin", Authority.admin));
+    }
+
+    private PetriNet importPetriNet(String fileName) {
+        PetriNet testNet = importHelper.createNet(fileName).orElse(null);
+        assert testNet != null;
+        return testNet;
+    }
+
+    private IUser createUser(String name, String surname, String email, String authority) {
+        User user = new User(email, "password", name, surname);
+        Authority[] authorities = new Authority[]{auths.get(authority)};
+        ProcessRole[] processRoles = new ProcessRole[]{};
+        return importHelper.createUser(user, authorities, processRoles);
+    }
+
+    @Test
+    public void testSearchById() {
+        PetriNet net = importPetriNet("search/search_test.xml");
+
+        Case caze = importHelper.createCase("Search Test", net);
+
+        String query = String.format("case: id eq '%s'", caze.getStringId());
+
+        long count = searchService.count(query);
+        assert count == 1;
+
+        Object foundCase = searchService.search(query);
+
+        assert foundCase instanceof Case;
+        assert foundCase.equals(caze);
+    }
+
+    @Test
+    public void testSearchByProcessId() {
+        PetriNet net = importPetriNet("search/search_test.xml");
+        PetriNet net2 = importPetriNet("search/search_test2.xml");
+
+        Case case1 = importHelper.createCase("Search Test", net);
+        Case case2 = importHelper.createCase("Search Test", net);
+        Case case3 = importHelper.createCase("Search Test2", net2);
+
+        String query = String.format("case: processId eq '%s'", net.getStringId());
+        String queryOther = String.format("case: processId eq '%s'", net2.getStringId());
+        String queryMore = String.format("cases: processId eq '%s'", net.getStringId());
+
+        long count = searchService.count(query);
+        assert count == 2;
+
+        count = searchService.count(queryOther);
+        assert count == 1;
+
+        Object foundCase = searchService.search(query);
+        assert foundCase instanceof Case;
+        assert foundCase.equals(case1) || foundCase.equals(case2);
+
+        foundCase = searchService.search(queryOther);
+        assert foundCase instanceof Case;
+        assert foundCase.equals(case3);
+
+        Object cases = searchService.search(queryMore);
+        assert cases instanceof List;
+        assert ((List<Case>) cases).containsAll(List.of(case1, case2));
+    }
+
+    @Test
+    public void testSearchByProcessIdentifier() {
+        PetriNet net = importPetriNet("search/search_test.xml");
+        PetriNet net2 = importPetriNet("search/search_test2.xml");
+
+        Case case1 = importHelper.createCase("Search Test", net);
+        Case case2 = importHelper.createCase("Search Test", net);
+        Case case3 = importHelper.createCase("Search Test2", net2);
+
+        String query = String.format("case: processIdentifier eq '%s'", net.getIdentifier());
+        String queryOther = String.format("case: processIdentifier eq '%s'", net2.getIdentifier());
+        String queryMore = String.format("cases: processIdentifier eq '%s'", net.getIdentifier());
+
+        long count = searchService.count(query);
+        assert count == 2;
+
+        count = searchService.count(queryOther);
+        assert count == 1;
+
+        Object foundCase = searchService.search(query);
+        assert foundCase instanceof Case;
+        assert foundCase.equals(case1) || foundCase.equals(case2);
+
+        foundCase = searchService.search(queryOther);
+        assert foundCase instanceof Case;
+        assert foundCase.equals(case3);
+
+        Object processes = searchService.search(queryMore);
+        assert processes instanceof List;
+        assert ((List<Case>) processes).containsAll(List.of(case1, case2));
+    }
+
+    @Test
+    public void testSearchByTitle() {
+        PetriNet net = importPetriNet("search/search_test.xml");
+        Case case1 = importHelper.createCase("Search Test", net);
+        Case case2 = importHelper.createCase("Search Test", net);
+        Case case3 = importHelper.createCase("Search Test2", net);
+
+        String query = String.format("case: title eq '%s'", case1.getTitle());
+        String queryOther = String.format("case: title eq '%s'", case3.getTitle());
+        String queryMore = String.format("cases: title eq '%s'", case1.getTitle());
+
+        long count = searchService.count(query);
+        assert count == 2;
+
+        count = searchService.count(queryOther);
+        assert count == 1;
+
+        Object foundCase = searchService.search(query);
+        assert foundCase instanceof Case;
+        assert foundCase.equals(case1) || foundCase.equals(case2);
+
+        foundCase = searchService.search(queryOther);
+        assert foundCase instanceof Case;
+        assert foundCase.equals(case3);
+
+        Object cases = searchService.search(queryMore);
+        assert cases instanceof List;
+        assert ((List<Case>) cases).containsAll(List.of(case1, case2));
+    }
+
+    @Test
+    public void testSearchByCreationDate() {
+        PetriNet net = importPetriNet("search/search_test.xml");
+
+        Case case1 = importHelper.createCase("Search Test", net);
+        Case case2 = importHelper.createCase("Search Test", net);
+        Case case3 = importHelper.createCase("Search Test", net);
+
+        String queryEq = String.format("process: creationDate eq '%s'", toDateTimeString(case1.getCreationDate()));
+        String queryLt = String.format("processes: creationDate lt '%s'", toDateTimeString(case3.getCreationDate()));
+        String queryLte = String.format("processes: creationDate lte '%s'", toDateTimeString(case3.getCreationDate()));
+        String queryGt = String.format("processes: creationDate gt '%s'", toDateTimeString(case1.getCreationDate()));
+        String queryGte = String.format("processes: creationDate gte '%s'", toDateTimeString(case1.getCreationDate()));
+
+        long count = searchService.count(queryEq);
+        assert count == 1;
+
+        Object foundCase = searchService.search(queryEq);
+        assert foundCase instanceof Case;
+        assert foundCase.equals(case1);
+
+        count = searchService.count(queryLt);
+        assert count == 2;
+
+        Object cases = searchService.search(queryLt);
+        assert cases instanceof List;
+        assert ((List<Case>) cases).containsAll(List.of(case1, case2));
+
+        count = searchService.count(queryLte);
+        assert count == 2;
+
+        cases = searchService.search(queryLte);
+        assert cases instanceof List;
+        assert ((List<Case>) cases).containsAll(List.of(case1, case2, case3));
+
+        count = searchService.count(queryGt);
+        assert count == 2;
+
+        cases = searchService.search(queryGt);
+        assert cases instanceof List;
+        assert ((List<Case>) cases).containsAll(List.of(case2, case3));
+
+        count = searchService.count(queryGte);
+        assert count == 2;
+
+        cases = searchService.search(queryGte);
+        assert cases instanceof List;
+        assert ((List<Case>) cases).containsAll(List.of(case1, case2, case3));
+    }
+
+    @Test
+    public void testSearchByAuthor() {
+        PetriNet net = importPetriNet("search/search_test.xml");
+
+        IUser user1 = createUser("Name1", "Surname1", "Email1", "user");
+        IUser user2 = createUser("Name2", "Surname2", "Email2", "user");
+
+        Case case1 = importHelper.createCase("Search Test", net, user1.transformToLoggedUser());
+        Case case2 = importHelper.createCase("Search Test", net, user1.transformToLoggedUser());
+        Case case3 = importHelper.createCase("Search Test2", net, user2.transformToLoggedUser());
+
+        String query = String.format("case: author eq '%s'", user1.getStringId());
+        String queryOther = String.format("case: author eq '%s'", user2.getStringId());
+        String queryMore = String.format("cases: author eq '%s'", user1.getStringId());
+
+        long count = searchService.count(query);
+        assert count == 2;
+
+        count = searchService.count(queryOther);
+        assert count == 1;
+
+        Object foundCase = searchService.search(query);
+        assert foundCase instanceof Case;
+        assert foundCase.equals(case1) || foundCase.equals(case2);
+
+        foundCase = searchService.search(queryOther);
+        assert foundCase instanceof Case;
+        assert foundCase.equals(case3);
+
+        Object cases = searchService.search(queryMore);
+        assert cases instanceof List;
+        assert ((List<Case>) cases).containsAll(List.of(case1, case2));
+    }
+
+    @Test
+    public void testSearchByPlaces() {
+        PetriNet net = importPetriNet("search/search_test.xml");
+
+        IUser user1 = createUser("Name1", "Surname1", "Email1", "user");
+
+        Case case1 = importHelper.createCase("Search Test", net);
+        Case case2 = importHelper.createCase("Search Test", net);
+        Case case3 = importHelper.createCase("Search Test2", net);
+
+        importHelper.assignTask("Test", case1.getStringId(), user1.transformToLoggedUser());
+        importHelper.finishTask("Test", case1.getStringId(), user1.transformToLoggedUser());
+        importHelper.assignTask("Test", case2.getStringId(), user1.transformToLoggedUser());
+        importHelper.finishTask("Test", case2.getStringId(), user1.transformToLoggedUser());
+
+        String query = String.format("case: places.p2.marking eq %s", 1);
+        String queryOther = String.format("case: places.p1.marking eq %s", 1);
+        String queryMore = String.format("cases: places.p2.marking eq %s", 1);
+
+        long count = searchService.count(query);
+        assert count == 2;
+
+        count = searchService.count(queryOther);
+        assert count == 1;
+
+        Object foundCase = searchService.search(query);
+        assert foundCase instanceof Case;
+        assert foundCase.equals(case1) || foundCase.equals(case2);
+
+        foundCase = searchService.search(queryOther);
+        assert foundCase instanceof Case;
+        assert foundCase.equals(case3);
+
+        Object cases = searchService.search(queryMore);
+        assert cases instanceof List;
+        assert ((List<Case>) cases).containsAll(List.of(case1, case2));
+    }
+
+    @Test
+    public void testSearchByTaskState() {
+        PetriNet net = importPetriNet("search/search_test.xml");
+
+        IUser user1 = createUser("Name1", "Surname1", "Email1", "user");
+
+        Case case1 = importHelper.createCase("Search Test", net);
+        Case case2 = importHelper.createCase("Search Test", net);
+        Case case3 = importHelper.createCase("Search Test2", net);
+
+        importHelper.assignTask("Test", case1.getStringId(), user1.transformToLoggedUser());
+        importHelper.finishTask("Test", case1.getStringId(), user1.transformToLoggedUser());
+        importHelper.assignTask("Test", case2.getStringId(), user1.transformToLoggedUser());
+        importHelper.finishTask("Test", case2.getStringId(), user1.transformToLoggedUser());
+
+        String query = String.format("case: tasks.t1.state eq %s", "disabled");
+        String queryOther = String.format("case: tasks.t1.state eq %s", "enabled");
+        String queryMore = String.format("cases: tasks.t1.state eq %s", "disabled");
+
+        long count = searchService.count(query);
+        assert count == 2;
+
+        count = searchService.count(queryOther);
+        assert count == 1;
+
+        Object foundCase = searchService.search(query);
+        assert foundCase instanceof Case;
+        assert foundCase.equals(case1) || foundCase.equals(case2);
+
+        foundCase = searchService.search(queryOther);
+        assert foundCase instanceof Case;
+        assert foundCase.equals(case3);
+
+        Object cases = searchService.search(queryMore);
+        assert cases instanceof List;
+        assert ((List<Case>) cases).containsAll(List.of(case1, case2));
+    }
+
+    @Test
+    public void testSearchByTaskUserId() {
+        PetriNet net = importPetriNet("search/search_test.xml");
+
+        IUser user1 = createUser("Name1", "Surname1", "Email1", "user");
+        IUser user2 = createUser("Name2", "Surname2", "Email2", "user");
+
+        Case case1 = importHelper.createCase("Search Test", net);
+        Case case2 = importHelper.createCase("Search Test", net);
+        Case case3 = importHelper.createCase("Search Test2", net);
+
+        importHelper.assignTask("Test", case1.getStringId(), user1.transformToLoggedUser());
+        importHelper.assignTask("Test", case2.getStringId(), user1.transformToLoggedUser());
+        importHelper.assignTask("Test", case3.getStringId(), user2.transformToLoggedUser());
+
+        String query = String.format("case: tasks.t1.userId eq '%s'", user1.getStringId());
+        String queryOther = String.format("case: tasks.t1.userId eq '%s'", user2.getStringId());
+        String queryMore = String.format("cases: tasks.t1.userId eq '%s'", user1.getStringId());
+
+        long count = searchService.count(query);
+        assert count == 2;
+
+        count = searchService.count(queryOther);
+        assert count == 1;
+
+        Object foundCase = searchService.search(query);
+        assert foundCase instanceof Case;
+        assert foundCase.equals(case1) || foundCase.equals(case2);
+
+        foundCase = searchService.search(queryOther);
+        assert foundCase instanceof Case;
+        assert foundCase.equals(case3);
+
+        Object cases = searchService.search(queryMore);
+        assert cases instanceof List;
+        assert ((List<Case>) cases).containsAll(List.of(case1, case2));
+    }
+
+    // todo: change values
+
+//        BooleanField booleanTrue = new BooleanField();
+//        booleanTrue.setRawValue(true);
+//        BooleanField booleanFalse = new BooleanField();
+//        booleanFalse.setRawValue(false);
+//        TextField textField = new TextField();
+//        textField.setRawValue("test");
+//        Map<String, I18nString> options = Map.of("test1", new I18nString("Test1"), "test2", new I18nString("Test2"), "test3", new I18nString("Test3"));
+//        EnumerationMapField enumerationMapField = new EnumerationMapField();
+//        enumerationMapField.setOptions(options);
+//        enumerationMapField.setRawValue("test1");
+//        MultichoiceMapField multichoiceMapField = new MultichoiceMapField();
+//        multichoiceMapField.setOptions(options);
+//        multichoiceMapField.setRawValue(Set.of("test1", "test2"));
+//        NumberField numberField = new NumberField();
+//        numberField.setRawValue(2.0);
+//        DateField dateField = new DateField();
+//        dateField.setRawValue(LocalDate.now());
+//        DateTimeField dateTimeField = new DateTimeField();
+//        dateTimeField.setRawValue(LocalDateTime.now());
+
+//        importHelper.assignTask("Test", case1.getStringId(), user1.transformToLoggedUser());
+//        importHelper.setTaskData("Test", case1.getStringId(), new DataSet(Map.of(
+//                "boolean_immediate", booleanTrue,
+//                "text_immediate", textField,
+//                "number_immediate", numberField,
+//                "multichoice_immediate", multichoiceMapField,
+//                "enumeration_immediate", enumerationMapField,
+//                "date_immediate", dateField,
+//                "date_time_immediate", dateTimeField
+//        )));
+//        importHelper.finishTask("Test", case1.getStringId(), user1.transformToLoggedUser());
+//        importHelper.assignTask("Test", case2.getStringId(), user1.transformToLoggedUser());
+//        importHelper.finishTask("Test", case2.getStringId(), user1.transformToLoggedUser());
+
+    @Test
+    public void testSearchByDataValue() {
+        PetriNet net = importPetriNet("search/search_test.xml");
+
+        IUser user1 = createUser("Name1", "Surname1", "Email1", "user");
+
+        Case case1 = importHelper.createCase("Search Test", net);
+
+
+
+        String queryTextEq = String.format("case: data.text_immediate.value eq %s", "'test'");
+        String queryTextContains = String.format("case: data.text_immediate.value contains %s", "'es'");
+        String queryBoolean = String.format("case: data.boolean_immediate.value eq %s", "true");
+        String queryEnumerationEq = String.format("case: data.enumeration_map_immediate.value eq %s", "'key2'");
+        String queryEnumerationContains = String.format("case: data.enumeration_map_immediate.value contains %s", "'ey2'");
+        String queryMultichoiceEq = String.format("case: data.multichoice_map_immediate.value eq %s", "'key2'");
+        String queryMultichoiceContains = String.format("case: data.multichoice_map_immediate.value contains %s", "'ey2'");
+        String queryNumberEq = String.format("case: data.number_immediate.value eq %s", 54);
+        String queryNumberLt = String.format("case: data.number_immediate.value lt %s", 55);
+        String queryNumberLte = String.format("case: data.number_immediate.value lte %s", 55);
+        String queryNumberGt = String.format("case: data.number_immediate.value gt %s", 53);
+        String queryNumberGte = String.format("case: data.number_immediate.value gte %s", 53);
+        String queryDateEq = String.format("case: data.date_immediate.value eq %s", SearchUtils.toDateString(LocalDate.now()));
+        String queryDateLt = String.format("case: data.date_immediate.value lt %s", SearchUtils.toDateString(LocalDate.now().plusDays(1)));
+        String queryDateLte = String.format("case: data.date_immediate.value lte %s", SearchUtils.toDateString(LocalDate.now().plusDays(1)));
+        String queryDateGt = String.format("case: data.date_immediate.value gt %s", SearchUtils.toDateString(LocalDate.now().minusDays(1)));
+        String queryDateGte = String.format("case: data.date_immediate.value gte %s", SearchUtils.toDateString(LocalDate.now().minusDays(1)));
+        String queryDateTimeEq = String.format("case: data.date_immediate.value eq %s", SearchUtils.toDateString((LocalDateTime) case1.getDataSet().get("date_immediate").getRawValue()));
+        String queryDateTimeLt = String.format("case: data.date_immediate.value lt %s", SearchUtils.toDateString(LocalDateTime.now().plusMinutes(1)));
+        String queryDateTimeLte = String.format("case: data.date_immediate.value lte %s", SearchUtils.toDateString(LocalDateTime.now().plusMinutes(1)));
+        String queryDateTimeGt = String.format("case: data.date_immediate.value gt %s", SearchUtils.toDateString(LocalDateTime.now().minusMinutes(1)));
+        String queryDateTimeGte = String.format("case: data.date_immediate.value gte %s", SearchUtils.toDateString(LocalDateTime.now().minusMinutes(1)));
+
+
+        long count = searchService.count(queryTextEq);
+        assert count == 1;
+
+        count = searchService.count(queryTextContains);
+        assert count == 1;
+
+        count = searchService.count(queryBoolean);
+        assert count == 1;
+
+        count = searchService.count(queryEnumerationEq);
+        assert count == 1;
+
+        count = searchService.count(queryEnumerationContains);
+        assert count == 1;
+
+        count = searchService.count(queryMultichoiceEq);
+        assert count == 1;
+
+        count = searchService.count(queryMultichoiceContains);
+        assert count == 1;
+
+        count = searchService.count(queryNumberEq);
+        assert count == 1;
+
+        count = searchService.count(queryNumberLt);
+        assert count == 1;
+
+        count = searchService.count(queryNumberLte);
+        assert count == 1;
+
+        count = searchService.count(queryNumberGt);
+        assert count == 1;
+
+        count = searchService.count(queryNumberGte);
+        assert count == 1;
+
+        count = searchService.count(queryDateEq);
+        assert count == 1;
+
+        count = searchService.count(queryDateLt);
+        assert count == 1;
+
+        count = searchService.count(queryDateLte);
+        assert count == 1;
+
+        count = searchService.count(queryDateGt);
+        assert count == 1;
+
+        count = searchService.count(queryDateGte);
+        assert count == 1;
+
+        count = searchService.count(queryDateTimeEq);
+        assert count == 1;
+
+        count = searchService.count(queryDateTimeLt);
+        assert count == 1;
+
+        count = searchService.count(queryDateTimeLte);
+        assert count == 1;
+
+        count = searchService.count(queryDateTimeGt);
+        assert count == 1;
+
+        count = searchService.count(queryDateTimeGte);
+        assert count == 1;
+
+        Object foundCase = searchService.search(queryTextEq);
+        assert foundCase instanceof Case;
+        assert foundCase.equals(case1);
+
+        foundCase = searchService.search(queryTextContains);
+        assert foundCase instanceof Case;
+        assert foundCase.equals(case1);
+
+        // todo: other assertions
+    }
+
+}
