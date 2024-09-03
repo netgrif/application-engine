@@ -2,16 +2,19 @@ package com.netgrif.application.engine.event.dispatchers.common;
 
 import com.netgrif.application.engine.event.events.Event;
 import com.netgrif.application.engine.event.events.EventAction;
+import com.netgrif.application.engine.event.events.task.TaskEvent;
+import com.netgrif.application.engine.event.listeners.ContextEditingListener;
 import com.netgrif.application.engine.event.listeners.Listener;
+import com.netgrif.application.engine.workflow.domain.Task;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Slf4j
 public abstract class AbstractDispatcher {
@@ -107,7 +110,9 @@ public abstract class AbstractDispatcher {
      */
     protected void dispatch(Event event, AbstractDispatcher dispatcher, Function<RegisteredListener, Boolean> foo) {
         List<CompletableFuture<Void>> futures = new ArrayList<>();
-        for (RegisteredListener registeredListener : registeredListeners) {
+        List<RegisteredListener> simpleListeners = registeredListeners.stream().filter(l -> !(l.listener() instanceof ContextEditingListener<?>)).toList();
+        List<RegisteredListener> contextEditingListeners = registeredListeners.stream().filter(l -> l.listener() instanceof ContextEditingListener<?>).toList();
+        for (RegisteredListener registeredListener : simpleListeners) {
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 if (foo.apply(registeredListener)) {
                     log.trace("Sending event with message {} synchronously", event.getMessage());
@@ -117,6 +122,12 @@ public abstract class AbstractDispatcher {
             futures.add(future);
         }
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        Event updatedEvent = event;
+        for (RegisteredListener registeredListener : contextEditingListeners) {
+            if (foo.apply(registeredListener)) {
+                updatedEvent = ((ContextEditingListener<Event>) registeredListener.listener()).onContextEditingEvent(updatedEvent, dispatcher);
+            }
+        }
     }
 
     /***

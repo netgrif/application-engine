@@ -1,16 +1,16 @@
 package com.netgrif.application.engine.event.events.petrinet;
 
-import com.netgrif.application.engine.event.events.Event;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import lombok.Getter;
 
 @Getter
-public class ProcessDeleteEvent extends Event {
+public class ProcessDeleteEvent extends ProcessEvent {
 
     protected PetriNet petriNet;
 
-    public ProcessDeleteEvent(PetriNet petriNet) {
-        super(petriNet);
+    public ProcessDeleteEvent(PetriNet petriNet, EventPhase phase) {
+        super(petriNet, phase);
         this.petriNet = petriNet;
     }
 

@@ -7,6 +7,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.properties.CacheProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
+import com.netgrif.application.engine.event.events.Event;
 import com.netgrif.application.engine.event.events.petrinet.ProcessDeleteEvent;
 import com.netgrif.application.engine.event.events.petrinet.ProcessDeployEvent;
 import com.netgrif.application.engine.history.domain.petrinetevents.DeletePetriNetEventLog;
@@ -32,8 +33,8 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
-import com.netgrif.application.engine.rules.domain.facts.NetImportedFact;
-import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
+//import com.netgrif.application.engine.rules.domain.facts.NetImportedFact;
+//import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
@@ -88,8 +89,8 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     protected FileStorageConfiguration fileStorageConfiguration;
 
-    @Autowired
-    protected IRuleEngine ruleEngine;
+//    @Autowired
+//    protected IRuleEngine ruleEngine;
 
     @Autowired
     protected IWorkflowService workflowService;
@@ -243,15 +244,17 @@ public class PetriNetService implements IPetriNetService {
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully and saved in a folder: " + savedPath.toString());
 
         outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params));
-        evaluateRules(net, EventPhase.PRE);
+//        evaluateRules(net, EventPhase.PRE);
+        publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.PRE));
         historyService.save(new ImportPetriNetEventLog(null, EventPhase.PRE, net.getObjectId()));
         save(net);
         outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), params));
-        evaluateRules(net, EventPhase.POST);
+//        evaluateRules(net, EventPhase.POST);
+        publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.POST));
         historyService.save(new ImportPetriNetEventLog(null, EventPhase.POST, net.getObjectId()));
         addMessageToOutcome(net, ProcessEventType.UPLOAD, outcome);
         outcome.setNet(imported.get());
-        publisher.publishEvent(new ProcessDeployEvent(outcome));
+//        publisher.publishEvent(new ProcessDeployEvent(outcome));
         return outcome;
     }
 
@@ -262,11 +265,9 @@ public class PetriNetService implements IPetriNetService {
         return outcome;
     }
 
-    protected void evaluateRules(PetriNet net, EventPhase phase) {
-        int rulesExecuted = ruleEngine.evaluateRules(net, new NetImportedFact(net.getStringId(), phase));
-        if (rulesExecuted > 0) {
-            save(net);
-        }
+    protected void evaluateRules(Event event) {
+        publisher.publishEvent(event);
+
     }
 
     @Override
@@ -563,7 +564,7 @@ public class PetriNetService implements IPetriNetService {
         // net functions must be removed from cache after it was deleted from repository
         this.functionCacheService.reloadCachedFunctions(petriNet);
         historyService.save(new DeletePetriNetEventLog(null, EventPhase.PRE, petriNet.getObjectId()));
-        publisher.publishEvent(new ProcessDeleteEvent(petriNet));
+        publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.POST));
     }
 
     private Criteria getProcessRolesCriteria(LoggedUser user) {

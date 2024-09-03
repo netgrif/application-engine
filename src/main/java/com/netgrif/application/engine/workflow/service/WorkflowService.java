@@ -6,6 +6,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.application.engine.event.events.workflow.CaseEvent;
 import com.netgrif.application.engine.event.events.workflow.CreateCaseEvent;
 import com.netgrif.application.engine.event.events.workflow.DeleteCaseEvent;
 import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventLog;
@@ -23,8 +24,8 @@ import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
-import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
+//import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
+//import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.security.service.EncryptionService;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -94,8 +95,8 @@ public class WorkflowService implements IWorkflowService {
     @Autowired
     protected FieldFactory fieldFactory;
 
-    @Autowired
-    protected IRuleEngine ruleEngine;
+//    @Autowired
+//    protected IRuleEngine ruleEngine;
 
     @Autowired
     protected FieldActionsRunner actionsRunner;
@@ -333,7 +334,7 @@ public class WorkflowService implements IWorkflowService {
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user, Map<String, String> params) {
         LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
-        int rulesExecuted;
+//        int rulesExecuted;
         Case useCase = new Case(petriNet);
         useCase.populateDataSet(initValueExpressionEvaluator, params);
         useCase.setColor(color);
@@ -344,10 +345,7 @@ public class WorkflowService implements IWorkflowService {
 
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
         outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty(), params));
-        rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
-        if (rulesExecuted > 0) {
-            useCase = save(useCase);
-        }
+        useCase = evaluateRules(new CreateCaseEvent(new CreateCaseEventOutcome(useCase, outcome.getOutcomes()), EventPhase.PRE));
 
         historyService.save(new CreateCaseEventLog(useCase, EventPhase.PRE));
         log.info("[" + useCase.getStringId() + "]: Case " + useCase.getTitle() + " created");
@@ -360,15 +358,16 @@ public class WorkflowService implements IWorkflowService {
         useCase = findOne(useCase.getStringId());
         outcome.addOutcomes(eventService.runActions(petriNet.getPostCreateActions(), useCase, Optional.empty(), params));
         useCase = findOne(useCase.getStringId());
-        rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
-        if (rulesExecuted > 0) {
-            useCase = save(useCase);
-        }
+        useCase = evaluateRules(new CreateCaseEvent(new CreateCaseEventOutcome(useCase, outcome.getOutcomes()), EventPhase.POST));
+//        rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
+//        if (rulesExecuted > 0) {
+//            useCase = save(useCase);
+//        }
 
         historyService.save(new CreateCaseEventLog(useCase, EventPhase.POST));
         outcome.setCase(setImmediateDataFields(useCase));
         addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
-        publisher.publishEvent(new CreateCaseEvent(outcome));
+//        publisher.publishEvent(new CreateCaseEvent(outcome));
         return outcome;
     }
 
@@ -409,6 +408,7 @@ public class WorkflowService implements IWorkflowService {
 
         DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty(), params));
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
+        useCase = evaluateRules(new DeleteCaseEvent(outcome, EventPhase.PRE));
         log.info("[" + useCase.getStringId() + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting case " + useCase.getTitle());
 
         taskService.deleteTasksByCase(useCase.getStringId());
@@ -416,8 +416,9 @@ public class WorkflowService implements IWorkflowService {
 
         outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty(), params));
         addMessageToOutcome(useCase.getPetriNet(), CaseEventType.DELETE, outcome);
+        useCase = evaluateRules(new DeleteCaseEvent(outcome, EventPhase.POST));
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.POST));
-        publisher.publishEvent(new DeleteCaseEvent(outcome));
+//        publisher.publishEvent(new DeleteCaseEvent(outcome));
         return outcome;
     }
 
@@ -648,5 +649,10 @@ public class WorkflowService implements IWorkflowService {
         String objectIdPart = parts[1];
 
         return new ObjectId(objectIdPart);
+    }
+
+    private Case evaluateRules(CaseEvent event) {
+        publisher.publishEvent(event);
+        return findOne(event.getCaseEventOutcome().getCase().getStringId());
     }
 }
