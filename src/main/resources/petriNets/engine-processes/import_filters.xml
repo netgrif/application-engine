@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../petriflow_schema_layout.xsd">
     <id>import_filters</id>
     <initials>FTI</initials>
     <title name="import_filters">Import of filters</title>
@@ -29,7 +30,7 @@
     </data>
     <data type="button">
         <id>import_file</id>
-        <title></title>
+        <title/>
         <placeholder name="import_file_placeholder">Import filters</placeholder>
         <desc name="import_file_desc">Import filters from uploaded xml file</desc>
         <component>
@@ -38,13 +39,23 @@
     </data>
     <data type="taskRef">
         <id>imported_filters</id>
-        <title></title>
+        <title/>
         <action trigger="get">
             importedFilters: f.imported_filters;
 
             filterImportExportService.changeFilterField(importedFilters.value)
         </action>
     </data>
+
+
+    <data type="i18n">
+        <id>divider_1</id>
+        <title/>
+        <component>
+            <name>divider</name>
+        </component>
+    </data>
+
     <!-- I18NS -->
     <i18n locale="sk">
         <i18nString name="import_filters">Import filtrov</i18nString>
@@ -62,76 +73,81 @@
         <i18nString name="import_file_placeholder">Filter importieren</i18nString>
         <i18nString name="import_file_desc">Filter aus hochgeladener xml-Datei importieren</i18nString>
     </i18n>
+
     <!-- TRANSITIONS -->
     <transition>
         <id>importFilter</id>
         <x>200</x>
         <y>100</y>
         <label name="import_file_placeholder">Import filters</label>
-        <layout>
-            <offset>0</offset>
-        </layout>
         <assignPolicy>auto</assignPolicy>
-        <dataGroup>
-            <id>DataGroup_0</id>
-            <layout>grid</layout>
-            <dataRef>
-                <id>upload_file</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>import_file</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <action trigger="set">
-                        importedFiltersRef: f.imported_filters;
+        <grid>
+            <id>select_user_grid</id>
+            <item>
+                <dataRef>
+                    <id>upload_file</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>import_file</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                    <event type="set">
+                        <id>import_file_importFilter_set</id>
+                        <actions phase="post">
+                            <action>
+                                importedFiltersRef: f.imported_filters;
 
-                        change importedFiltersRef value { importFilters() }
-                    </action>
-                </logic>
-                <layout>
-                    <x>2</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>DataGroup_1</id>
-            <layout>grid</layout>
-            <dataRef>
-                <id>imported_filters</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>1</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-        </dataGroup>
+                                change importedFiltersRef value { importFilters() }
+                            </action>
+                        </actions>
+                    </event>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / 3</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>divider_1</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / span 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>imported_filters</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / span 2</grid-column>
+                </properties>
+            </item>
+            <properties>
+                <display>grid</display>
+                <grid-template-columns>repeat(2, 1fr)</grid-template-columns>
+                <justify-items>stretch</justify-items>
+                <align-items>stretch</align-items>
+                <justify-content>stretch</justify-content>
+                <align-content>stretch</align-content>
+            </properties>
+        </grid>
         <event type="finish">
-            <id></id>
+            <id>importFilter_finish</id>
             <actions phase="pre">
                 <action>
                     importedFilters: f.imported_filters;
@@ -142,7 +158,7 @@
             </actions>
         </event>
         <event type="cancel">
-            <id></id>
+            <id>importFilter_cancel</id>
             <actions phase="pre">
                 <action>
                     importedFilters: f.imported_filters;
@@ -160,7 +176,7 @@
         <id>p1</id>
         <x>100</x>
         <y>100</y>
-        <label></label>
+        <label/>
         <tokens>1</tokens>
         <static>false</static>
     </place>

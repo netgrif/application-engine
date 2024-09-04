@@ -3,7 +3,6 @@ package com.netgrif.application.engine.petrinet.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
@@ -13,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Transient;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +29,6 @@ public class DataRef {
     @Transient
     private DataFieldBehavior behavior;
     private Map<DataEventType, DataEvent> events;
-    private FieldLayout layout;
     private Component component;
     @Transient
     protected String parentTaskId;
@@ -38,6 +37,7 @@ public class DataRef {
 
     public DataRef(Field<?> field, DataFieldBehavior behavior) {
         this.field = field;
+        this.fieldId = field.getImportId();
         this.setBehavior(behavior);
     }
 
@@ -72,14 +72,17 @@ public class DataRef {
     public boolean isForbidden() {
         return isBehaviorSet(FORBIDDEN);
     }
+
     @JsonIgnore
     public boolean isEditable() {
         return isBehaviorSet(EDITABLE);
     }
+
     @JsonIgnore
     public boolean isHidden() {
         return isBehaviorSet(HIDDEN);
     }
+
     @JsonIgnore
     public boolean isVisible() {
         return isBehaviorSet(VISIBLE);
@@ -91,7 +94,13 @@ public class DataRef {
 
     public DataRef clone() {
         DataRef cloned = new DataRef();
-        // TODO: release/8.0.0 implement
+        cloned.setFieldId(this.fieldId);
+        cloned.setField(this.field == null ? null : this.field.clone());
+        cloned.setBehavior(this.behavior == null ? null : this.behavior.clone());
+        cloned.setEvents(this.events == null || this.events.isEmpty() ? new HashMap<>() : new HashMap<>(this.events));
+        cloned.setComponent(this.component == null ? null : this.component.clone());
+        cloned.setParentTaskId(this.parentTaskId);
+        cloned.setParentCaseId(this.parentCaseId);
         return cloned;
     }
 }

@@ -642,7 +642,8 @@
                             <packageName>com.netgrif.application.engine.importer.model</packageName>
                             <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
                             <sources>
-                                <source>src/main/resources/petriNets/petriflow_schema.xsd</source>
+                                <!-- TODO: remove - temporary for purposes of layout implementation -->
+                                <source>src/main/resources/petriNets/petriflow_schema_layout.xsd</source>
                             </sources>
                             <generateEpisode>false</generateEpisode>
                             <clearOutputDir>false</clearOutputDir>

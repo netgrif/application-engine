@@ -7,16 +7,19 @@ import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
 import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.importer.model.LayoutType;
 import com.netgrif.application.engine.importer.service.FieldFactory;
-import com.netgrif.application.engine.petrinet.domain.Component;
-import com.netgrif.application.engine.petrinet.domain.*;
+import com.netgrif.application.engine.petrinet.domain.DataRef;
+import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
+import com.netgrif.application.engine.petrinet.domain.layout.LayoutContainer;
+import com.netgrif.application.engine.petrinet.domain.layout.LayoutItem;
+import com.netgrif.application.engine.petrinet.domain.layout.LayoutObjectType;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -25,8 +28,8 @@ import com.netgrif.application.engine.workflow.domain.EventNotExecutableExceptio
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.layoutoutcomes.GetLayoutsEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
@@ -255,123 +258,110 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, LoggedUser loggedUser) {
+    public GetLayoutsEventOutcome getLayouts(String taskId, Locale locale, LoggedUser loggedUser) {
         IUser user = userService.getUserFromLoggedUser(loggedUser);
-        return getDataGroups(taskId, locale, user);
+        return getLayouts(taskId, locale, user);
     }
 
     @Override
-    public GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, IUser user) {
-        return getDataGroups(taskId, locale, new HashSet<>(), 0, null, user);
-    }
-
-    private GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, Set<String> collectedTaskIds, int level, String parentTaskRefId, IUser user) {
+    public GetLayoutsEventOutcome getLayouts(String taskId, Locale locale, IUser user) {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
-        PetriNet net = useCase.getPetriNet();
-        Transition transition = net.getTransition(task.getTransitionId());
-        GetDataGroupsEventOutcome outcome = new GetDataGroupsEventOutcome(useCase, task);
-        log.info("Getting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level);
-        List<DataGroup> resultDataGroups = new ArrayList<>();
-        List<DataRef> data = getData(task, useCase, user).getData();
-        Map<String, DataRef> dataFieldMap = data.stream().collect(Collectors.toMap(DataRef::getFieldId, field -> field));
-        List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::clone).collect(Collectors.toList());
-        for (DataGroup dataGroup : dataGroups) {
-            resolveTaskRefOrderOnGrid(dataGroup, dataFieldMap);
-            resultDataGroups.add(dataGroup);
-            log.debug("Setting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level + " " + dataGroup.getImportId());
 
-            LinkedHashMap<String, DataRef> resources = new LinkedHashMap<>();
-            for (String dataFieldId : dataGroup.getData()) {
-                Field<?> field = net.getDataSet().get(dataFieldId);
-                if (!dataFieldMap.containsKey(dataFieldId)) {
-                    continue;
-                }
-                DataRef resource = dataFieldMap.get(dataFieldId);
-                if (level != 0) {
-                    dataGroup.setParentCaseId(useCase.getStringId());
-                    resource.setParentCaseId(useCase.getStringId());
-                    dataGroup.setParentTaskId(taskId);
-                    dataGroup.setParentTransitionId(task.getTransitionId());
-                    dataGroup.setParentTaskRefId(parentTaskRefId);
-                    dataGroup.setNestingLevel(level);
-                    resource.setParentTaskId(taskId);
-                }
-                resources.put(dataFieldId, resource);
-                // TODO: release/8.0.0
-                // if (field.getType() == FieldType.TASK_REF && shouldResolveTaskRefData(field, transition.getDataSet().get(field.getStringId()))) {
-                if (field.getType() == DataType.TASK_REF) {
-                    resultDataGroups.addAll(collectTaskRefDataGroups(dataFieldMap.get(dataFieldId), locale, collectedTaskIds, level, user));
-                }
-            }
-            dataGroup.setDataRefs(resources);
-        }
-        outcome.setData(resultDataGroups);
+        GetLayoutsEventOutcome outcome = new GetLayoutsEventOutcome(useCase, task);
+        outcome.setLayout(
+                this.processLayoutContainer(useCase.getPetriNet().getTransition(task.getTransitionId()).getLayoutContainer().clone(), task, useCase, user,
+                        outcome, locale, false, new LinkedHashSet<>())
+        );
         return outcome;
     }
 
-    // TODO: release/8.0.0 needed?
-//    private boolean shouldResolveTaskRefData(Field<?> field, DataFieldLogic dataRef) {
-//        if (dataRef.getComponent() != null) {
-//            return hasRequiredComponentProperty(dataRef.getComponent(), "resolve_data", "true");
-//        } else if (field.getComponent() != null) {
-//            return hasRequiredComponentProperty(field.getComponent(), "resolve_data", "true");
-//        }
-//        return true;
-//    }
+    private LayoutContainer processLayoutContainer(LayoutContainer container, Task task, Case useCase, IUser user,
+                                                   GetLayoutsEventOutcome outcome, Locale locale, Boolean forceVisible, Set<String> collectedTaskIds) {
+        Map<String, DataRef> dataRefs = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
 
-    // TODO: release/8.0.0 refactor?
-    private boolean hasRequiredComponentProperty(Component component, String propertyName, String propertyValue) {
-        return component != null
-                && component.getProperties() != null
-                && component.getProperties().containsKey(propertyName)
-                && component.getProperties().get(propertyName).equals(propertyValue);
+        container.setParentCaseId(useCase.getStringId());
+        container.setParentTaskId(task.getStringId());
+        container.setParentTransitionId(task.getTransitionId());
+
+        for (LayoutItem item : container.getItems()) {
+            if (item.getDataRefId() != null) {
+                if (!dataRefs.containsKey(item.getDataRefId())) {       // This should never happen
+                    item.setDataRefId(null);
+                    continue;
+                }
+                item.setDataRef(dataRefs.get(item.getDataRefId()));
+
+                Field<?> field = useCase.getDataSet().get(item.getDataRefId());
+                DataFieldBehavior behavior = field.getBehaviors().get(task.getTransitionId());
+
+                if (behavior.isForbidden()) {
+                    continue;
+                }
+                outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, null, new HashMap<>()));
+                historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE, user));
+
+                if (outcome.getMessage() == null) {
+                    setOutcomeMessage(task, useCase, outcome, item.getDataRefId(), field, DataEventType.GET);
+                }
+                item.getDataRef().setField(field);
+                item.getDataRef().setFieldId(item.getDataRefId());
+                item.getDataRef().setBehavior(behavior);
+
+                outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task, null, new HashMap<>()));
+                historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST, user));
+
+                item.getDataRef().setParentCaseId(useCase.getStringId());
+                item.getDataRef().setParentTaskId(task.getStringId());
+                if (forceVisible && item.getDataRef().getBehavior().getBehavior() == FieldBehavior.EDITABLE) {
+                    item.getDataRef().getBehavior().setBehavior(FieldBehavior.VISIBLE);
+                }
+                if (useCase.getPetriNet().getDataSet().get(item.getDataRefId()).getType() == DataType.TASK_REF) {
+                    item.setContainer(this.processTaskRefLayoutContainer(item.getDataRef(), user, locale, collectedTaskIds, outcome));
+                }
+            } else if (item.getContainer() != null) {
+                item.setContainer(
+                        this.processLayoutContainer(
+                                item.getContainer(), task, useCase, user,
+                                outcome, locale, forceVisible, collectedTaskIds
+                        )
+                );
+            }
+        }
+        return container;
     }
 
-    private List<DataGroup> collectTaskRefDataGroups(DataRef taskRefField, Locale locale, Set<String> collectedTaskIds, int level, IUser user) {
+    private LayoutContainer processTaskRefLayoutContainer(DataRef taskRefField, IUser user, Locale locale, Set<String> collectedTaskIds, GetLayoutsEventOutcome outcome) {
         List<String> taskIds = ((TaskField) taskRefField.getField()).getRawValue();
         if (taskIds == null) {
-            return new ArrayList<>();
+            return null;
         }
-
-        List<DataGroup> groups = new ArrayList<>();
+        LayoutContainer taskRefWrapper = new LayoutContainer(LayoutObjectType.FLEX);
+        taskRefWrapper.setProperties(getDefaultFlexProperties());
         taskIds.stream()
-                .filter(id -> !collectedTaskIds.contains(id))
-                .forEach(id -> {
-                    collectedTaskIds.add(id);
-                    List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1, taskRefField.getFieldId(), user).getData();
-                    resolveTaskRefBehavior(taskRefField, taskRefDataGroups);
-                    groups.addAll(taskRefDataGroups);
+                .filter(taskId -> !collectedTaskIds.contains(taskId))
+                .forEach(taskId -> {
+                    collectedTaskIds.add(taskId);
+                    LayoutItem wrapperItem = new LayoutItem(LayoutObjectType.FLEX, null, null, null, Map.of("flex-grow", "1", "flex-basis", "0"));
+                    Task task = taskService.findOne(taskId);
+                    Case useCase = workflowService.findOne(task.getCaseId());
+                    LayoutContainer container = this.processLayoutContainer(
+                            useCase.getPetriNet().getTransition(task.getTransitionId()).getLayoutContainer().clone(), task, useCase, user,
+                            outcome, locale, taskRefField.getBehavior().getBehavior() == FieldBehavior.VISIBLE, collectedTaskIds
+                    );
+                    wrapperItem.setContainer(container);
+                    taskRefWrapper.addLayoutItem(wrapperItem);
                 });
-
-        return groups;
+        return taskRefWrapper;
     }
 
-    private void resolveTaskRefOrderOnGrid(DataGroup dataGroup, Map<String, DataRef> dataFieldMap) {
-        if (dataGroup.getLayout() == null || dataGroup.getLayout().getType() != LayoutType.GRID) {
-            return;
-        }
-        dataGroup.setData(dataGroup.getData().stream().filter(dataFieldMap::containsKey).map(dataFieldMap::get).sorted(Comparator.comparingInt(a -> a.getLayout().getY())).map(DataRef::getFieldId).collect(Collectors.toCollection(LinkedHashSet::new)));
-    }
-
-    private void resolveTaskRefBehavior(DataRef taskRefField, List<DataGroup> taskRefDataGroups) {
-        if (taskRefField.getBehavior().getBehavior() == FieldBehavior.VISIBLE) {
-            taskRefDataGroups.forEach(dataGroup -> {
-                dataGroup.getDataRefs().values().forEach(field -> {
-                    if (field.getBehavior().getBehavior() == FieldBehavior.EDITABLE) {
-                        field.getBehavior().setBehavior(FieldBehavior.VISIBLE);
-                    }
-                });
-            });
-        } else if (taskRefField.getBehavior().getBehavior() == FieldBehavior.HIDDEN) {
-            taskRefDataGroups.forEach(dataGroup -> {
-                dataGroup.getDataRefs().values().forEach(field -> {
-                    if (field.getBehavior().getBehavior() != FieldBehavior.FORBIDDEN) {
-                        field.getBehavior().setBehavior(FieldBehavior.HIDDEN);
-                    }
-                });
-            });
-        }
+    private Map<String, String> getDefaultFlexProperties() {
+        Map<String, String> defaultFlexProeperties = new HashMap<>();
+        defaultFlexProeperties.put("display", "flex");
+        defaultFlexProeperties.put("flex-direction", "column");
+        defaultFlexProeperties.put("justify-content", "flex-start");
+        defaultFlexProeperties.put("align-items", "stretch");
+        return defaultFlexProeperties;
     }
 
     @Override

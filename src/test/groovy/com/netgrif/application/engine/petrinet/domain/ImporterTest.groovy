@@ -349,20 +349,20 @@ class ImporterTest {
     }
 
 
-    @Test
-    void testDataGroupImportWithoutId() {
-        def netOutcome = petriNetService.importPetriNet(
-                new FileInputStream("src/test/resources/datagroup_no_id_test.xml"),
-                VersionType.MAJOR,
-                superCreator.loggedSuper)
-
-        assert netOutcome.getNet() != null
-
-        def net = netOutcome.getNet()
-        net.getTransition("test").getDataGroups().forEach((k, v) -> {
-            assert v.getStringId() != null && v.getStringId().length() > 0
-        })
-    }
+//    @Test
+//    void testDataGroupImportWithoutId() {
+//        def netOutcome = petriNetService.importPetriNet(
+//                new FileInputStream("src/test/resources/datagroup_no_id_test.xml"),
+//                VersionType.MAJOR,
+//                superCreator.loggedSuper)
+//
+//        assert netOutcome.getNet() != null
+//
+//        def net = netOutcome.getNet()
+//        net.getTransition("test").getDataGroups().forEach((k, v) -> {
+//            assert v.getStringId() != null && v.getStringId().length() > 0
+//        })
+//    }
 
     @Test
     void createTransitionNoLabel() {

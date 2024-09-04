@@ -7,8 +7,8 @@ import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExe
 import com.netgrif.application.engine.workflow.domain.IllegalArgumentWithChangedFieldsException;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.layoutoutcomes.GetLayoutsEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
@@ -186,7 +186,7 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> getData(String taskId, Locale locale, Authentication auth) {
         try {
-            GetDataGroupsEventOutcome outcome = dataService.getDataGroups(taskId, locale, (LoggedUser) auth.getPrincipal());
+            GetLayoutsEventOutcome outcome = dataService.getLayouts(taskId, locale, (LoggedUser) auth.getPrincipal());
             return EventOutcomeWithMessageResource.successMessage("Get data groups successful", outcome);
         } catch (IllegalArgumentWithChangedFieldsException e) {
             log.error("Get data on task [{}] failed: ", taskId, e);

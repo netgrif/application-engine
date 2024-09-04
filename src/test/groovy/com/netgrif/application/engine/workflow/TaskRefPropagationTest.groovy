@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow
 
-import com.netgrif.application.engine.petrinet.domain.DataGroup
+
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -107,7 +107,7 @@ class TaskRefPropagationTest {
         workflowService.save(child)
 
         /* validate getDataGroups object and taskRef field ids */
-        List<DataGroup> parentData = dataService.getDataGroups(parentTaskId, Locale.forLanguageTag("SK"), superCreator.getLoggedSuper()).data
+//        List<DataGroup> parentData = dataService.getDataGroups(parentTaskId, Locale.forLanguageTag("SK"), superCreator.getLoggedSuper()).data
         // TODO: release/8.0.0 fix
 //        LocalisedField parentText = findField(parentData, PARENT_FIELD_TEXT_TITLE)
 //        LocalisedField parentMultichoice = findField(parentData, PARENT_FIELD_MULTICHOICE_TITLE)

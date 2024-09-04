@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-	<id>data/all_data</id>
-	<title>All Data</title>
-	<initials>ALL</initials>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="petriflow_schema_layout.xsd">
+    <id>data/all_data</id>
+    <initials>ALL</initials>
+    <title>All Data</title>
+    <defaultRole>true</defaultRole>
     <caseName>All data test default case name</caseName>
     <!-- ROLES -->
-    <defaultRole>true</defaultRole>
     <role>
         <id>process_role</id>
         <title>Process role</title>
@@ -17,22 +18,46 @@
         <init>10000</init>
     </data>
     <data type="number" immediate="true">
+        <id>number_decimal</id>
+        <title>Number</title>
+        <init>10000.1</init>
+        <component>
+            <name>decimal</name>
+        </component>
+    </data>
+    <data type="number" immediate="true">
         <id>number_currency</id>
         <title>Number currency</title>
         <init>10000</init>
-        <format>
-            <currency>
-                <code>EUR</code>
-                <fractionSize>2</fractionSize>
-                <locale>sk_SK</locale>
-            </currency>
-        </format>
+        <component>
+            <name>currency</name>
+            <properties>
+                <property key="code">EUR</property>
+                <property key="fractionSize">2</property>
+                <property key="locale">sk_SK</property>
+            </properties>
+        </component>
     </data>
 
     <data type="text" immediate="true">
         <id>text</id>
         <title>Text</title>
         <init>Lorem ipsum</init>
+        <event type="set">
+            <id>test_set</id>
+            <actions phase="post">
+                <action>
+                    // example of how to set field behavior on selected transition
+                    setData(
+                            task.get(),
+                            new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
+                                    "taskRef_3"    : new com.netgrif.application.engine.petrinet.domain.dataset.TaskField(behaviors: createBehavior("taskRef_3", com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.EDITABLE, "6")),
+                                    "password_data": new com.netgrif.application.engine.petrinet.domain.dataset.TaskField(behaviors: createBehavior("password_data", com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.EDITABLE, task.get().transitionId))
+                            ])
+                    )
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="text" immediate="true">
         <id>password_data</id>
@@ -55,6 +80,22 @@
             <name>textarea</name>
             <property key="color">red</property>
             <property key="fontSize">12</property>
+        </component>
+    </data>
+    <data type="text" immediate="true">
+        <id>text_html</id>
+        <title>Text</title>
+        <init>Lorem ipsum</init>
+        <component>
+            <name>htmltextarea</name>
+        </component>
+    </data>
+    <data type="text" immediate="true">
+        <id>text_rich</id>
+        <title>Text</title>
+        <init>Lorem ipsum</init>
+        <component>
+            <name>richtextarea</name>
         </component>
     </data>
 
@@ -88,6 +129,22 @@
             <name>list</name>
         </component>
     </data>
+    <data type="enumeration" immediate="true">
+        <id>enumeration_stepper</id>
+        <title>Enumeration list</title>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
+        <init>Bob</init>
+        <component>
+            <name>stepper</name>
+        </component>
+    </data>
+
+    <!--    <data type="stringCollection" immediate="true">-->
+    <!--        <id>string_collection</id>-->
+    <!--        <title>String collection</title>-->
+    <!--    </data>-->
 
     <data type="enumeration_map" immediate="true">
         <id>enumeration_map</id>
@@ -139,36 +196,60 @@
     </data>
 
     <data type="boolean" immediate="true">
-        <id>boolean</id>
+        <id>boolean_f</id>
         <title>Boolean</title>
         <placeholder>True</placeholder>
+        <init>true</init>
     </data>
 
     <data type="date" immediate="true">
-        <id>date</id>
+        <id>date_f</id>
         <title>Date</title>
         <init>01.01.2019</init>
     </data>
 
     <data type="taskRef">
-        <id>taskRef</id>
+        <id>taskRef_1</id>
         <title>Task Ref</title>
         <inits>
-            <init>4</init>
+            <init>5</init>
+        </inits>
+    </data>
+    <data type="taskRef">
+        <id>taskRef_2</id>
+        <title>Task Ref</title>
+        <inits>
+            <init>6</init>
+        </inits>
+    </data>
+    <data type="taskRef" immediate="true">
+        <id>taskRef_3</id>
+        <title>Task Ref</title>
+        <inits>
+            <init>7</init>
         </inits>
     </data>
 
     <data type="file" immediate="true">
         <id>file</id>
         <title>File</title>
-        <action trigger="set">
-            <!-- @formatter:off -->
-            textfield: f.text;
-            change textfield value {
-                "funguje to"
-            }
-            <!-- @formatter:on -->
-        </action>
+        <component>
+            <name>preview</name>
+        </component>
+        <event type="set">
+            <id>file_set</id>
+            <actions phase="post">
+                <action>
+                    // example of how to set field value on task
+                    setData(
+                            task.get(),
+                            new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
+                                    "text": new com.netgrif.application.engine.petrinet.domain.dataset.TextField(rawValue: "TEST")
+                            ])
+                    )
+                </action>
+            </actions>
+        </event>
     </data>
 
     <data type="fileList" immediate="true">
@@ -192,7 +273,7 @@
     </data>
 
     <data type="dateTime" immediate="true">
-        <id>datetime</id>
+        <id>datetime_f</id>
         <title>Datetime</title>
         <init>01.01.2019 20:00</init>
     </data>
@@ -207,479 +288,1791 @@
     </data>
 
     <data type="text">
-        <id>taskref_test_field</id>
-        <title>Text datafield z iného transitionu</title>
-        <init>Field načítaný pomocou taskrefu</init>
+        <id>taskref_test_field_1</id>
+        <title>Text ref 1</title>
+        <init>Text ref 1</init>
+    </data>
+    <data type="text">
+        <id>taskref_test_field_2</id>
+        <title>Text ref 2</title>
+        <init>Text ref 2</init>
+    </data>
+    <data type="text">
+        <id>taskref_test_field_3</id>
+        <title>Text ref 3</title>
+        <init>Text ref 3</init>
     </data>
     <!-- TRANSITIONS -->
+    <!--
+        This is transition without defining properties for flex containers and items (with one root container and 1st lvl indented child flex containers).
+        Default Petriflow configuration (which can be changed in project properties) will be applied in this scenario.
+        Default configuration is:
+            root flex container is configured to be column
+            child flex containers are configured to be row
+            items in child flex containers are stretched evenly in their space
+        For default configuration in project check application.properties section: nae.layout.flex
+
+        This transition layout will be as follows: for each row there will be equally sized fields:
+            if you put 1 field in child flex container, it will be stretched on whole line
+            if you put 2 fields in child flex container, they will be split evenly on halves
+            if you put 3 fields in child flex container, they will be split evenly on thirds
+            ...
+    -->
     <transition>
-        <id>1</id>
+        <id>t1</id>
         <x>379</x>
         <y>273</y>
-        <label>Task - editable</label>
+        <label>Task - editable - flex - one container indentation</label>
         <assignPolicy>auto</assignPolicy>
-        <dataGroup>
-            <id>number</id>
-            <title>Number fields</title>
-            <stretch>false</stretch>
-            <rows>2</rows>
-            <dataRef>
-                <id>number</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>number_currency</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>text</id>
-            <title>Text fields</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>text</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>text_area</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>password_data</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>password_dataref</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <component>
-                    <name>password</name>
-                </component>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>enumeration</id>
-            <title>Enumeration fields</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>enumeration</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>enumeration_autocomplete</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>enumeration_list</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>enumeration_map</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>multichoice</id>
-            <title>Multichoice fields</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>multichoice</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>multichoice_list</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>multichoice_map</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>boolean</id>
-            <title>Boolean fields</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>boolean</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>date</id>
-            <title>Date fields</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>date</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>datetime</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>file</id>
-            <title>File fields</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>file</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>fileList</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>user</id>
-            <title>User fields</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>user</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>button</id>
-            <title>Button fields</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>button</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <action trigger="set">
-                        generatePdf("1","file")
-                    </action>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>taskRef</id>
-            <title>Task refs</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>taskRef</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
+        <flex>
+            <id>t1_flex</id>
+            <item>
+                <flex>
+                    <id>number_flex_1</id>
+                    <item>
+                        <dataRef>
+                            <id>number</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>number_currency</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>number_flex_2</id>
+                    <item>
+                        <dataRef>
+                            <id>number_decimal</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>text_flex_1</id>
+                    <item>
+                        <dataRef>
+                            <id>text</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+
+                        </dataRef>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>text_area</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                            <event type="set">
+                                <id>text_area_set_t1</id>
+                                <actions phase="post">
+                                    <action>
+                                        // example of how to set new task field value
+
+                                        def newTaskValue = useCase.tasks.get("7").taskId
+
+                                        setData(
+                                                "t1",
+                                                useCase,
+                                                com.netgrif.application.engine.workflow.web.responsebodies.DataSet.of(
+                                                        "taskRef_1", new com.netgrif.application.engine.petrinet.domain.dataset.TaskField(rawValue: [newTaskValue.toString()])
+                                                )
+                                        )
+                                    </action>
+                                </actions>
+                            </event>
+                        </dataRef>
+                    </item>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>text_flex_2</id>
+                    <item>
+                        <dataRef>
+                            <id>password_data</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>password_dataref</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                            <component>
+                                <name>password</name>
+                            </component>
+                        </dataRef>
+                    </item>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>text_flex_3</id>
+                    <item>
+                        <dataRef>
+                            <id>text_html</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>text_rich</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>enum_flex_1</id>
+                    <item>
+                        <dataRef>
+                            <id>enumeration</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>enumeration_autocomplete</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>enum_flex_2</id>
+                    <item>
+                        <dataRef>
+                            <id>enumeration_list</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>enumeration_map</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>enum_flex_3</id>
+                    <item>
+                        <dataRef>
+                            <id>enumeration_stepper</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                </flex>
+            </item>
+            <!--            <item>-->
+            <!--                <flex>-->
+            <!--                    <id>string_collection_flex</id>-->
+            <!--                    <item>-->
+            <!--                        <dataRef>-->
+            <!--                            <id>string_collection</id>-->
+            <!--                            <logic>-->
+            <!--                                <behavior>editable</behavior>-->
+            <!--                            </logic>-->
+            <!--                        </dataRef>-->
+            <!--                    </item>-->
+            <!--                </flex>-->
+            <!--            </item>-->
+            <item>
+                <flex>
+                    <id>multi_flex_1</id>
+                    <item>
+                        <dataRef>
+                            <id>multichoice</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>multichoice_list</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>multi_flex_2</id>
+                    <item>
+                        <dataRef>
+                            <id>multichoice_map</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>bool_flex</id>
+                    <item>
+                        <dataRef>
+                            <id>boolean_f</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>date_flex</id>
+                    <item>
+                        <dataRef>
+                            <id>date_f</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>datetime_f</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>file_flex</id>
+                    <item>
+                        <dataRef>
+                            <id>file</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>fileList</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>user_flex</id>
+                    <item>
+                        <dataRef>
+                            <id>user</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>button_flex</id>
+                    <item>
+                        <dataRef>
+                            <id>button</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>task_flex</id>
+                    <item>
+                        <dataRef>
+                            <id>taskRef_1</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                    <item>
+                        <!-- you can include empty item to eg. split flex layout to multiple columns -->
+                    </item>
+                </flex>
+            </item>
+        </flex>
+    </transition>
+
+
+    <!--
+        This is transition without defining properties for flex containers and items (with one root container without child containers indented).
+        Default Petriflow configuration (which can be changed in project properties) will be applied in this scenario.
+        Default configuration is:
+            root flex container is configured to be column
+            items in child flex containers are stretched on whole line
+        For default configuration in project check application.properties section: nae.layout.flex
+    -->
+    <transition>
+        <id>t2</id>
+        <x>379</x>
+        <y>273</y>
+        <label>Task - editable - flex - without child container indentation</label>
+        <assignPolicy>auto</assignPolicy>
+        <flex>
+            <id>t2_flex</id>
+            <item>
+                <dataRef>
+                    <id>number</id>
+                    <logic>
+                        <behavior>hidden</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>number_currency</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>number_decimal</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>text</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>text_area</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>password_data</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>password_dataref</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                    <component>
+                        <name>password</name>
+                    </component>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>text_html</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>text_rich</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration_autocomplete</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration_list</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration_map</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration_stepper</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <!--                    <item>-->
+            <!--                        <dataRef>-->
+            <!--                            <id>string_collection</id>-->
+            <!--                            <logic>-->
+            <!--                                <behavior>editable</behavior>-->
+            <!--                            </logic>-->
+            <!--                        </dataRef>-->
+            <!--                    </item>-->
+            <item>
+                <dataRef>
+                    <id>multichoice</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>multichoice_list</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>multichoice_map</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>boolean_f</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>date_f</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>datetime_f</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>file</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>fileList</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>user</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>button</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>taskRef_1</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+        </flex>
+    </transition>
+
+    <!--
+        This is transition where we define properties for flex containers and items (with one root container and 1st lvl indented child flex containers).
+        All elements behave as visible (so they are not able to be edited).
+        In case you define properties for each element, default project properties will be overridden as follows:
+            - default project properties are firstly applied on each element
+            - each property from element is then applied (if property of element overlaps with project default properties, element property is applied
+        For default configuration in project check application.properties section: nae.layout.flex
+
+        This layout is same as t1 which is default Petriflow layout for flex configuration
+        This transition layout will be as follows, for each row there will be equally sized fields:
+            if you put 1 field in child flex container, it will be stretched on whole line
+            if you put 2 fields in child flex container, they will be split evenly on halves
+            if you put 3 fields in child flex container, they will be split evenly on thirds
+            ...
+    -->
+    <transition>
+        <id>t3</id>
+        <x>379</x>
+        <y>273</y>
+        <label>Task - visible - flex</label>
+        <assignPolicy>auto</assignPolicy>
+        <flex>
+            <id>t3_flex</id>
+            <item>
+                <flex>
+                    <id>number_flex_1</id>
+                    <item>
+                        <dataRef>
+                            <id>number</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>number_currency</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <properties>
+                        <display>flex</display>
+                        <flex-direction>row</flex-direction>
+                        <justify-content>space-between</justify-content>
+                        <align-items>stretch</align-items>
+                    </properties>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>number_flex_2</id>
+                    <item>
+                        <dataRef>
+                            <id>number_decimal</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <properties>
+                        <display>flex</display>
+                        <flex-direction>row</flex-direction>
+                        <justify-content>space-between</justify-content>
+                        <align-items>stretch</align-items>
+                    </properties>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>text_flex_1</id>
+                    <item>
+                        <dataRef>
+                            <id>text</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>text_area</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <properties>
+                        <display>flex</display>
+                        <flex-direction>row</flex-direction>
+                        <justify-content>space-between</justify-content>
+                        <align-items>stretch</align-items>
+                    </properties>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>text_flex_2</id>
+                    <item>
+                        <dataRef>
+                            <id>password_data</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>password_dataref</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                            <component>
+                                <name>password</name>
+                            </component>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <properties>
+                        <display>flex</display>
+                        <flex-direction>row</flex-direction>
+                        <justify-content>space-between</justify-content>
+                        <align-items>stretch</align-items>
+                    </properties>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>text_flex_3</id>
+                    <item>
+                        <dataRef>
+                            <id>text_html</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>text_rich</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <properties>
+                        <display>flex</display>
+                        <flex-direction>row</flex-direction>
+                        <justify-content>space-between</justify-content>
+                        <align-items>stretch</align-items>
+                    </properties>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>enum_flex_1</id>
+                    <item>
+                        <dataRef>
+                            <id>enumeration</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>enumeration_autocomplete</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <properties>
+                        <display>flex</display>
+                        <flex-direction>row</flex-direction>
+                        <justify-content>space-between</justify-content>
+                        <align-items>stretch</align-items>
+                    </properties>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>enum_flex_2</id>
+                    <item>
+                        <dataRef>
+                            <id>enumeration_list</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>enumeration_map</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <properties>
+                        <display>flex</display>
+                        <flex-direction>row</flex-direction>
+                        <justify-content>space-between</justify-content>
+                        <align-items>stretch</align-items>
+                    </properties>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>enum_flex_3</id>
+                    <item>
+                        <dataRef>
+                            <id>enumeration_stepper</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <properties>
+                        <display>flex</display>
+                        <flex-direction>row</flex-direction>
+                        <justify-content>space-between</justify-content>
+                        <align-items>stretch</align-items>
+                    </properties>
+                </flex>
+            </item>
+            <!--            <item>-->
+            <!--                <flex>-->
+            <!--                    <id>string_collection_flex</id>-->
+            <!--                    <item>-->
+            <!--                        <dataRef>-->
+            <!--                            <id>string_collection</id>-->
+            <!--                            <logic>-->
+            <!--                                <behavior>visible</behavior>-->
+            <!--                            </logic>-->
+            <!--                        </dataRef>-->
+            <!--                        <properties>-->
+            <!--                            <flex-grow>1</flex-grow>-->
+            <!--                            <flex-basis>0</flex-basis>-->
+            <!--                        </properties>-->
+            <!--                    </item>-->
+            <!--                    <properties>-->
+            <!--                        <display>flex</display>-->
+            <!--                        <flex-direction>row</flex-direction>-->
+            <!--                        <justify-content>space-between</justify-content>-->
+            <!--                        <align-items>stretch</align-items>-->
+            <!--                    </properties>-->
+            <!--                </flex>-->
+            <!--            </item>-->
+            <item>
+                <flex>
+                    <id>multi_flex_1</id>
+                    <item>
+                        <dataRef>
+                            <id>multichoice</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>multichoice_list</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <properties>
+                        <display>flex</display>
+                        <flex-direction>row</flex-direction>
+                        <justify-content>space-between</justify-content>
+                        <align-items>stretch</align-items>
+                    </properties>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>multi_flex_2</id>
+                    <item>
+                        <dataRef>
+                            <id>multichoice_map</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <properties>
+                        <display>flex</display>
+                        <flex-direction>row</flex-direction>
+                        <justify-content>space-between</justify-content>
+                        <align-items>stretch</align-items>
+                    </properties>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>bool_flex</id>
+                    <item>
+                        <dataRef>
+                            <id>boolean_f</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <properties>
+                        <display>flex</display>
+                        <flex-direction>row</flex-direction>
+                        <justify-content>space-between</justify-content>
+                        <align-items>stretch</align-items>
+                    </properties>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>date_flex</id>
+                    <item>
+                        <dataRef>
+                            <id>date_f</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>datetime_f</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <properties>
+                        <display>flex</display>
+                        <flex-direction>row</flex-direction>
+                        <justify-content>space-between</justify-content>
+                        <align-items>stretch</align-items>
+                    </properties>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>file_flex</id>
+                    <item>
+                        <dataRef>
+                            <id>file</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>fileList</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <properties>
+                        <display>flex</display>
+                        <flex-direction>row</flex-direction>
+                        <justify-content>space-between</justify-content>
+                        <align-items>stretch</align-items>
+                    </properties>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>user_flex</id>
+                    <item>
+                        <dataRef>
+                            <id>user</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <properties>
+                        <display>flex</display>
+                        <flex-direction>row</flex-direction>
+                        <justify-content>space-between</justify-content>
+                        <align-items>stretch</align-items>
+                    </properties>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>button_flex</id>
+                    <item>
+                        <dataRef>
+                            <id>button</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <properties>
+                        <display>flex</display>
+                        <flex-direction>row</flex-direction>
+                        <justify-content>space-between</justify-content>
+                        <align-items>stretch</align-items>
+                    </properties>
+                </flex>
+            </item>
+            <item>
+                <flex>
+                    <id>task_flex</id>
+                    <item>
+                        <dataRef>
+                            <id>taskRef_1</id>
+                            <logic>
+                                <behavior>visible</behavior>
+                            </logic>
+                        </dataRef>
+                        <properties>
+                            <flex-grow>1</flex-grow>
+                            <flex-basis>0</flex-basis>
+                        </properties>
+                    </item>
+                    <properties>
+                        <display>flex</display>
+                        <flex-direction>row</flex-direction>
+                        <justify-content>space-between</justify-content>
+                        <align-items>stretch</align-items>
+                    </properties>
+                </flex>
+            </item>
+            <properties>
+                <display>flex</display>
+                <flex-direction>column</flex-direction>
+                <justify-content>flex-start</justify-content>
+                <align-items>stretch</align-items>
+            </properties>
+        </flex>
+    </transition>
+
+
+    <!--
+        This is transition without defining properties for grid containers and items (with one root container).
+        Default Petriflow configuration (which can be changed in project properties) will be applied in this scenario.
+        Default configuration is:
+            root grid container is configured to position two fields in one row
+            items in grid container are same width stretched and takes half of space
+        For default configuration in project check application.properties section: nae.layout.grid
+
+        This transition layout will be as follows, for each row there will be equally sized 2 fields each taking half of screen.
+        If one of fields is hidden, fields will move up and left to fill it space.
+    -->
+    <transition>
+        <id>t4</id>
+        <x>379</x>
+        <y>273</y>
+        <label>Task - editable - grid</label>
+        <assignPolicy>auto</assignPolicy>
+        <grid>
+            <id>t4_grid</id>
+            <item>
+                <dataRef>
+                    <id>number</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>number_currency</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>number_decimal</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>text</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>text_area</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>password_data</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>password_dataref</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                    <component>
+                        <name>password</name>
+                    </component>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>text_html</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>text_rich</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration_autocomplete</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration_list</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration_map</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration_stepper</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <!--            <item>-->
+            <!--                <dataRef>-->
+            <!--                    <id>string_collection</id>-->
+            <!--                    <logic>-->
+            <!--                        <behavior>editable</behavior>-->
+            <!--                    </logic>-->
+            <!--                </dataRef>-->
+            <!--            </item>-->
+            <item>
+                <dataRef>
+                    <id>multichoice</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>multichoice_list</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>multichoice_map</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>boolean_f</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>date_f</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>datetime_f</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>file</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>fileList</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>user</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>button</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+            <item>
+                <dataRef>
+                    <id>taskRef_1</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+        </grid>
+    </transition>
+
+
+    <!--
+        This is transition with defining properties for grid containers and items (with one root container).
+        Default Petriflow configuration (which can be changed in project properties) will be applied in this scenario,
+        but will be overridden by container/item properties.
+        For default configuration in project check application.properties section: nae.layout.grid
+
+        This transition layout will be as follows, for each row there will be equally sized 2 fields each taking half of screen.
+        This configuration is similar to default Petriflow configuration, but fields have their position fixed,
+        which means if one field is hidden, other fields will not shift up and left to fill its space.
+    -->
+    <transition>
+        <id>t5</id>
+        <x>379</x>
+        <y>273</y>
+        <label>Task - visible - grid</label>
+        <assignPolicy>auto</assignPolicy>
+        <grid>
+            <id>t5_grid</id>
+            <item>
+                <dataRef>
+                    <id>number</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                    <grid-row>1 / 2</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>number_currency</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / 3</grid-column>
+                    <grid-row>1 / 2</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>number_decimal</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                    <grid-row>2 / 3</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>text</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / 3</grid-column>
+                    <grid-row>2 / 3</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>text_area</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                    <grid-row>3 / 4</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>password_data</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / 3</grid-column>
+                    <grid-row>3 / 4</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>password_dataref</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                    <component>
+                        <name>password</name>
+                    </component>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                    <grid-row>4 / 5</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>text_html</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / 3</grid-column>
+                    <grid-row>4 / 5</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>text_rich</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                    <grid-row>5 / 6</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / 3</grid-column>
+                    <grid-row>5 / 6</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration_autocomplete</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                    <grid-row>6 / 7</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration_list</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / 3</grid-column>
+                    <grid-row>6 / 7</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration_map</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                    <grid-row>7 / 8</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration_stepper</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / 3</grid-column>
+                    <grid-row>7 / 8</grid-row>
+                </properties>
+            </item>
+            <!--            <item>-->
+            <!--                <dataRef>-->
+            <!--                    <id>string_collection</id>-->
+            <!--                    <logic>-->
+            <!--                        <behavior>visible</behavior>-->
+            <!--                    </logic>-->
+            <!--                </dataRef>-->
+            <!--                <properties>-->
+            <!--                    <grid-column>1 / 2</grid-column>-->
+            <!--                    <grid-row>1 / 2</grid-row>-->
+            <!--                </properties>-->
+            <!--            </item>-->
+            <item>
+                <dataRef>
+                    <id>multichoice</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                    <grid-row>8 / 9</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>multichoice_list</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / 3</grid-column>
+                    <grid-row>8 / 9</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>multichoice_map</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                    <grid-row>9 / 10</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>boolean_f</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / 3</grid-column>
+                    <grid-row>9 / 10</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>date_f</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                    <grid-row>10 / 11</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>datetime_f</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / 3</grid-column>
+                    <grid-row>10 / 11</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>file</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                    <grid-row>11 / 12</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>fileList</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / 3</grid-column>
+                    <grid-row>11 / 12</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>user</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                    <grid-row>12 / 13</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>button</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / 3</grid-column>
+                    <grid-row>12 / 13</grid-row>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>taskRef_1</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                    <grid-row>13 / 14</grid-row>
+                </properties>
+            </item>
+            <properties>
+                <display>grid</display>
+                <grid-template-columns>repeat(2, 1fr)</grid-template-columns>
+                <justify-items>stretch</justify-items>
+                <align-items>stretch</align-items>
+                <justify-content>stretch</justify-content>
+                <align-content>stretch</align-content>
+            </properties>
+        </grid>
     </transition>
     <transition>
-        <id>2</id>
+        <id>5</id>
         <x>379</x>
         <y>273</y>
-        <label>Task - visible</label>
+        <label>Task ref test transition 1</label>
         <assignPolicy>auto</assignPolicy>
-        <dataGroup>
-            <id>number</id>
-            <title>Number fields</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>number</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>number_currency</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>text</id>
-            <title>Text fields</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>text</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>text_area</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>enumeration</id>
-            <title>Enumeration fields</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>enumeration</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>enumeration_autocomplete</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>enumeration_list</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>enumeration_map</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>multichoice</id>
-            <title>Multichoice fields</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>multichoice</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>multichoice_list</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>multichoice_map</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>boolean</id>
-            <title>Boolean fields</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>boolean</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>date</id>
-            <title>Date fields</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>date</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>datetime</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>file</id>
-            <title>File fields</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>file</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>fileList</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>user</id>
-            <title>User fields</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>user</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>button</id>
-            <title>Button fields</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>button</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
+        <flex>
+            <id>flex_t5</id>
+            <item>
+                <flex>
+                    <id>flex_row_t5</id>
+                    <item>
+                        <dataRef>
+                            <id>taskRef_2</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>taskref_test_field_1</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                </flex>
+            </item>
+        </flex>
     </transition>
     <transition>
-        <id>3</id>
+        <id>6</id>
         <x>379</x>
         <y>273</y>
-        <label>Datagroups</label>
+        <label>Task ref test transition 2</label>
         <assignPolicy>auto</assignPolicy>
-        <dataGroup>
-            <id>stretch</id>
-            <title>Stretch</title>
-            <alignment>start</alignment>
-            <stretch>true</stretch>
-            <dataRef>
-                <id>text</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>number</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>enumeration</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>right</id>
-            <title>Alignment - Right</title>
-            <alignment>end</alignment>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>text</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>number</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>enumeration</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>left</id>
-            <title>Alignment - Left</title>
-            <alignment>start</alignment>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>text</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>number</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>enumeration</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-		<dataGroup>
-			<id>center</id>
-            <title>Alignment - Center</title>
-			<alignment>center</alignment>
-			<stretch>false</stretch>
-			<dataRef>
-				<id>text</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-			</dataRef>
-            <dataRef>
-                <id>number</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>enumeration</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-		</dataGroup>
+        <flex>
+            <id>flex_t6</id>
+            <item>
+                <flex>
+                    <id>flex_row_t6</id>
+                    <item>
+                        <dataRef>
+                            <id>taskRef_3</id>
+                            <logic>
+                                <behavior>hidden</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                    <item>
+                        <dataRef>
+                            <id>taskref_test_field_2</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                </flex>
+            </item>
+        </flex>
     </transition>
     <transition>
-        <id>4</id>
+        <id>7</id>
         <x>379</x>
         <y>273</y>
-        <label>Task ref test transition</label>
+        <label>Task ref test transition 3</label>
         <assignPolicy>auto</assignPolicy>
-        <dataGroup>
-            <id>taskref</id>
-            <title>Task ref test group</title>
-            <dataRef>
-                <id>taskref_test_field</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
+        <flex>
+            <id>flex_t7</id>
+            <item>
+                <flex>
+                    <id>flex_row_t7</id>
+                    <item>
+                        <dataRef>
+                            <id>taskref_test_field_3</id>
+                            <logic>
+                                <behavior>editable</behavior>
+                            </logic>
+                        </dataRef>
+                    </item>
+                </flex>
+            </item>
+        </flex>
     </transition>
 </document>

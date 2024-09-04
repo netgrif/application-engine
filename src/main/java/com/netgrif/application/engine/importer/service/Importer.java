@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.importer.service;
 
+import com.netgrif.application.engine.configuration.LayoutFlexConfiguration;
+import com.netgrif.application.engine.configuration.LayoutGridConfiguration;
 import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.model.DataRef;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
@@ -9,8 +11,6 @@ import com.netgrif.application.engine.importer.service.validation.ILogicValidato
 import com.netgrif.application.engine.importer.service.validation.ITransitionValidator;
 import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.Component;
-import com.netgrif.application.engine.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.petrinet.domain.Function;
 import com.netgrif.application.engine.petrinet.domain.Place;
 import com.netgrif.application.engine.petrinet.domain.Transaction;
 import com.netgrif.application.engine.petrinet.domain.Transition;
@@ -19,21 +19,17 @@ import com.netgrif.application.engine.petrinet.domain.arcs.reference.Reference;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Type;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
-import com.netgrif.application.engine.petrinet.domain.events.*;
-import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
-import com.netgrif.application.engine.petrinet.domain.events.Event;
 import com.netgrif.application.engine.petrinet.domain.events.EventType;
-import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.events.ProcessEventType;
-import com.netgrif.application.engine.petrinet.domain.layout.DataGroupLayout;
-import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
+import com.netgrif.application.engine.petrinet.domain.layout.LayoutContainer;
+import com.netgrif.application.engine.petrinet.domain.layout.LayoutItem;
+import com.netgrif.application.engine.petrinet.domain.layout.LayoutObjectType;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
@@ -49,13 +45,17 @@ import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.BooleanUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlElement;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -136,6 +136,12 @@ public class Importer {
     @Autowired
     private ILogicValidator logicValidator;
 
+    @Autowired
+    private LayoutFlexConfiguration flexConfiguration;
+
+    @Autowired
+    private LayoutGridConfiguration gridConfiguration;
+
     public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
             initialize();
@@ -206,7 +212,6 @@ public class Importer {
         document.getPlace().forEach(this::createPlace);
         document.getTransition().forEach(this::createTransition);
         document.getArc().forEach(this::createArc);
-        document.getMapping().forEach(this::applyMapping);
         document.getData().forEach(this::resolveDataActions);
         document.getTransition().forEach(this::resolveTransitionActions);
         document.getData().forEach(this::addActionRefs);
@@ -236,42 +241,10 @@ public class Importer {
     }
 
     protected void addAllDataTransition() {
-        com.netgrif.application.engine.importer.model.Transition allDataConfig = allDataConfiguration.getAllData();
-        if (document.getTransition().stream().anyMatch(transition -> allDataConfig.getId().equals(transition.getId()))) {
+        com.netgrif.application.engine.importer.model.Transition allDataTransition = allDataConfiguration.createAllDataTransition(document);
+        if (allDataTransition == null) {
             return;
         }
-        com.netgrif.application.engine.importer.model.DataGroup configDataGroup = allDataConfig.getDataGroup().get(0);
-        int y = 0;
-        com.netgrif.application.engine.importer.model.Transition allDataTransition = new com.netgrif.application.engine.importer.model.Transition();
-        allDataTransition.setId(allDataConfig.getId());
-        allDataTransition.setX(allDataConfig.getX());
-        allDataTransition.setY(allDataConfig.getY());
-        allDataTransition.setLabel(allDataConfig.getLabel());
-        allDataTransition.setIcon(allDataConfig.getIcon());
-        allDataTransition.setPriority(allDataConfig.getPriority());
-        allDataTransition.setAssignPolicy(allDataConfig.getAssignPolicy());
-        allDataTransition.setFinishPolicy(allDataConfig.getFinishPolicy());
-        // TODO: NAE-1858: all properties
-        com.netgrif.application.engine.importer.model.DataGroup allDataGroup = new com.netgrif.application.engine.importer.model.DataGroup();
-        for (Data field : document.getData()) {
-            DataRef dataRef = new DataRef();
-            dataRef.setId(field.getId());
-            Layout layout = new Layout();
-            layout.setCols(configDataGroup.getCols());
-            layout.setRows(1);
-            layout.setX(0);
-            layout.setY(y);
-            layout.setOffset(0);
-            layout.setTemplate(Template.MATERIAL);
-            layout.setAppearance(Appearance.OUTLINE);
-            dataRef.setLayout(layout);
-            Logic logic = new Logic();
-            logic.getBehavior().add(Behavior.EDITABLE);
-            dataRef.setLogic(logic);
-            allDataGroup.getDataRef().add(dataRef);
-            y++;
-        }
-        allDataTransition.getDataGroup().add(allDataGroup);
         document.getTransition().add(allDataTransition);
     }
 
@@ -359,16 +332,6 @@ public class Importer {
         translation.addTranslation(locale, i18NStringType.getValue());
     }
 
-    protected void applyMapping(Mapping mapping) throws MissingIconKeyException {
-        Transition transition = getTransition(mapping.getTransitionRef());
-        mapping.getRoleRef().forEach(roleRef -> addRoleLogic(transition, roleRef));
-        mapping.getDataRef().forEach(dataRef -> addDataLogic(transition, dataRef));
-        for (com.netgrif.application.engine.importer.model.DataGroup dataGroup : mapping.getDataGroup()) {
-            addDataGroup(transition, dataGroup, mapping.getDataGroup().indexOf(dataGroup));
-        }
-        mapping.getTrigger().forEach(trigger -> addTrigger(transition, trigger));
-    }
-
     protected void resolveDataActions(Data data) {
         String fieldId = data.getId();
         if (data.getEvent() != null && !data.getEvent().isEmpty()) {
@@ -426,15 +389,35 @@ public class Importer {
     }
 
     protected void resolveTransitionActions(com.netgrif.application.engine.importer.model.Transition trans) {
-        if (trans.getDataRef() != null) {
-            resolveDataRefActions(trans.getDataRef(), trans);
+        List<DataRef> dataRefs = new ArrayList<>();
+        
+        if (trans.getGrid() != null) {
+            resolveDataRefsGridLayoutContainer(trans.getGrid(), dataRefs);
+        } else if (trans.getFlex() != null) {
+            resolveDataRefsFlexLayoutContainer(trans.getFlex(), dataRefs);
         }
-        if (trans.getDataGroup() != null) {
-            trans.getDataGroup().forEach(ref -> {
-                if (ref.getDataRef() != null) {
-                    resolveDataRefActions(ref.getDataRef(), trans);
-                }
-            });
+        resolveDataRefActions(dataRefs, trans);
+    }
+    
+    protected void resolveDataRefsGridLayoutContainer(GridContainer gridContainer, List<DataRef> dataRefs) {
+        gridContainer.getItem().forEach(gridItem -> {
+            resolveDataRefsLayoutItem(dataRefs, gridItem);
+        });
+    }
+
+    protected void resolveDataRefsFlexLayoutContainer(FlexContainer flexContainer, List<DataRef> dataRefs) {
+        flexContainer.getItem().forEach(flexItem -> {
+            resolveDataRefsLayoutItem(dataRefs, flexItem);
+        });
+    }
+
+    private void resolveDataRefsLayoutItem(List<DataRef> dataRefs, com.netgrif.application.engine.importer.model.LayoutItem gridItem) {
+        if (gridItem.getDataRef() != null) {
+            dataRefs.add(gridItem.getDataRef());
+        } else if (gridItem.getGrid() != null) {
+            resolveDataRefsGridLayoutContainer(gridItem.getGrid(), dataRefs);
+        } else if (gridItem.getFlex() != null) {
+            resolveDataRefsFlexLayoutContainer(gridItem.getFlex(), dataRefs);
         }
     }
 
@@ -530,10 +513,6 @@ public class Importer {
             transition.setTags(this.buildTagsMap(importTransition.getTags().getTag()));
         }
 
-        if (importTransition.getLayout() != null) {
-            transition.setLayout(new TaskLayout(importTransition));
-        }
-
         transition.setPriority(importTransition.getPriority());
         transition.setIcon(importTransition.getIcon());
         transition.setAssignPolicy(toAssignPolicy(importTransition.getAssignPolicy()));
@@ -556,11 +535,8 @@ public class Importer {
                     addUserLogic(transition, userRef));
         }
 
-        if (importTransition.getDataRef() != null) {
-            for (com.netgrif.application.engine.importer.model.DataRef dataRef : importTransition.getDataRef()) {
-                addDataWithDefaultGroup(transition, dataRef);
-            }
-        }
+        resolveLayoutContainer(importTransition, transition);
+
         if (importTransition.getTrigger() != null) {
             importTransition.getTrigger().forEach(trigger ->
                     addTrigger(transition, trigger)
@@ -568,11 +544,6 @@ public class Importer {
         }
         if (importTransition.getTransactionRef() != null) {
             addToTransaction(transition, importTransition.getTransactionRef());
-        }
-        if (importTransition.getDataGroup() != null) {
-            for (com.netgrif.application.engine.importer.model.DataGroup dataGroup : importTransition.getDataGroup()) {
-                addDataGroup(transition, dataGroup, importTransition.getDataGroup().indexOf(dataGroup));
-            }
         }
 
         addPredefinedRolesWithDefaultPermissions(importTransition, transition);
@@ -632,6 +603,132 @@ public class Importer {
         event.setPreActions(parsePreActions(null, imported));
 
         return event;
+    }
+
+    protected void resolveLayoutContainer(com.netgrif.application.engine.importer.model.Transition importTransition, Transition transition) {
+        if (importTransition.getFlex() != null && importTransition.getGrid() != null) {
+            throw new IllegalArgumentException("Found Flex and Grid container together in Transition {" + importTransition.getId() + "}");
+        }
+
+        if (importTransition.getFlex() != null) {
+            transition.setLayoutContainer(getFlexLayoutContainer(importTransition.getFlex(), transition, 0));
+        }
+
+        if (importTransition.getGrid() != null) {
+            transition.setLayoutContainer(getGridLayoutContainer(importTransition.getGrid(), transition, 0));
+        }
+    }
+
+    protected LayoutContainer getFlexLayoutContainer(FlexContainer importedFlexContainer, Transition transition, int depth) {
+
+        LayoutContainer layoutContainer = new LayoutContainer();
+        layoutContainer.setImportId(importedFlexContainer.getId());
+        layoutContainer.setLayoutType(LayoutObjectType.FLEX);
+
+        Map<String, String> layoutContainerProperties = new HashMap<>(depth == 0 ? flexConfiguration.getRoot() : flexConfiguration.getContainer());
+        if (importedFlexContainer.getProperties() != null) {
+            for (java.lang.reflect.Field containerPropertyField : importedFlexContainer.getProperties().getClass().getDeclaredFields()) {
+                try {
+                    resolveFieldProperty(containerPropertyField, layoutContainerProperties, importedFlexContainer.getProperties());
+                } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                    throw new IllegalArgumentException("Unexpected property in Flex Container {" + importedFlexContainer.getId() + "}");
+                }
+            }
+        }
+        layoutContainer.setProperties(layoutContainerProperties);
+
+        for (FlexItem flexItem : importedFlexContainer.getItem()) {
+            layoutContainer.addLayoutItem(getLayoutItem(importedFlexContainer.getId(), flexItem, transition, depth));
+        }
+
+        return layoutContainer;
+    }
+
+    protected LayoutContainer getGridLayoutContainer(GridContainer importedGridContainer, Transition transition, int depth) {
+        LayoutContainer layoutContainer = new LayoutContainer();
+        layoutContainer.setImportId(importedGridContainer.getId());
+        layoutContainer.setLayoutType(LayoutObjectType.GRID);
+
+        Map<String, String> layoutProperties = new HashMap<>(depth == 0 ? gridConfiguration.getRoot() : gridConfiguration.getContainer());
+        if (importedGridContainer.getProperties() != null) {
+            for (java.lang.reflect.Field field: importedGridContainer.getProperties().getClass().getDeclaredFields()) {
+                try {
+                    resolveFieldProperty(field, layoutProperties, importedGridContainer.getProperties());
+                } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                    throw new IllegalArgumentException("Unexpected property in Grid Container {" + importedGridContainer.getId() + "}");
+                }
+            }
+        }
+        layoutContainer.setProperties(layoutProperties);
+
+        for (GridItem gridItem : importedGridContainer.getItem()) {
+            layoutContainer.addLayoutItem(getLayoutItem(importedGridContainer.getId(), gridItem, transition, depth));
+        }
+
+        return layoutContainer;
+    }
+
+    private LayoutItem getLayoutItem(String containerId, com.netgrif.application.engine.importer.model.LayoutItem importedLayoutItem, Transition transition, int depth) {
+        if (BooleanUtils.toInteger(importedLayoutItem.getFlex() != null) + BooleanUtils.toInteger(importedLayoutItem.getGrid() != null) + BooleanUtils.toInteger(importedLayoutItem.getDataRef() != null) > 1) {
+            throw new IllegalArgumentException("Found Flex/Grid/DataRef together in Layout Container {" + containerId + "}");
+        }
+        LayoutItem layoutItem = new LayoutItem();
+        layoutItem.setLayoutType(importedLayoutItem instanceof GridItem ? LayoutObjectType.GRID : LayoutObjectType.FLEX);
+
+        boolean isFlex = importedLayoutItem instanceof FlexItem;
+        Map<String, String> layoutItemProperties = isFlex ? new HashMap<>(flexConfiguration.getChildren()) : new HashMap<>(gridConfiguration.getChildren());
+        Object itemProperties = !isFlex ? ((GridItem) importedLayoutItem).getProperties() : ((FlexItem) importedLayoutItem).getProperties();
+        if (itemProperties != null) {
+            for (java.lang.reflect.Field itemPropertyField : itemProperties.getClass().getDeclaredFields()) {
+                try {
+                    resolveFieldProperty(itemPropertyField, layoutItemProperties, itemProperties);
+                } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                    throw new IllegalArgumentException("Unexpected property in Grid Item of Grid Container {" + containerId + "}");
+                }
+            }
+        }
+        layoutItem.setProperties(layoutItemProperties);
+
+        if (importedLayoutItem.getFlex() != null) {
+            layoutItem.setContainer(getFlexLayoutContainer(importedLayoutItem.getFlex(), transition, depth + 1));
+        } else if (importedLayoutItem.getGrid() != null) {
+            layoutItem.setContainer(getGridLayoutContainer(importedLayoutItem.getGrid(), transition, depth + 1));
+        } else if (importedLayoutItem.getDataRef() != null) {
+            layoutItem.setDataRefId(resolveDataRef(importedLayoutItem.getDataRef(), transition).getFieldId());
+        }
+        return layoutItem;
+    }
+
+    protected void resolveFieldProperty(java.lang.reflect.Field field, Map<String, String> layoutProperties, Object containerProperties)
+            throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        String propertyName = field.getAnnotation(XmlElement.class) == null || field.getAnnotation(XmlElement.class).name().equals("##default")
+                ? field.getName()
+                : field.getAnnotation(XmlElement.class).name();
+        field.setAccessible(true);
+        if (field.get(containerProperties) == null) {
+            return;
+        }
+        if (field.getType().equals(String.class) || field.getType().equals(Integer.class)) {
+            layoutProperties.put(propertyName, field.get(containerProperties).toString());
+        } else {
+            Method valueMethod = field.get(containerProperties).getClass().getMethod("value");
+            layoutProperties.put(propertyName, valueMethod.invoke(field.get(containerProperties)).toString());
+        }
+    }
+
+    protected com.netgrif.application.engine.petrinet.domain.DataRef resolveDataRef(DataRef importedDataRef, Transition transition) {
+        String fieldId = importedDataRef.getId();
+        Field<?> field = getField(fieldId);
+        com.netgrif.application.engine.petrinet.domain.DataRef dataRef = new com.netgrif.application.engine.petrinet.domain.DataRef(field);
+        if (!transition.getDataSet().containsKey(fieldId)) {
+            transition.getDataSet().put(fieldId, dataRef);
+        } else {
+            throw new IllegalArgumentException("Field with id [" + fieldId + "] occurs multiple times in transition [" + transition.getStringId() + "]");
+        }
+
+        addDataLogic(transition, importedDataRef, dataRef);
+        addDataComponent(importedDataRef, dataRef);
+        return dataRef;
     }
 
     protected List<Action> parsePostActions(String transitionId, com.netgrif.application.engine.importer.model.BaseEvent imported) {
@@ -715,50 +812,6 @@ public class Importer {
         net.addPermission(anonymousRole.getStringId(), roleFactory.getProcessPermissions(logic));
     }
 
-    protected void addDataWithDefaultGroup(Transition transition, DataRef dataRef) throws MissingIconKeyException {
-        DataGroup dataGroup = new DataGroup();
-        dataGroup.setImportId(transition.getImportId() + "_" + dataRef.getId() + "_" + System.currentTimeMillis());
-        if (transition.getLayout() != null && transition.getLayout().getCols() != null) {
-            dataGroup.setLayout(new DataGroupLayout(null, transition.getLayout().getCols(), null, null, null));
-        }
-        dataGroup.setAlignment(DataGroupAlignment.START);
-        dataGroup.setStretch(true);
-        dataGroup.addData(getField(dataRef.getId()).getStringId());
-        transition.addDataGroup(dataGroup);
-
-        addDataLogic(transition, dataRef);
-        addDataLayout(transition, dataRef);
-        addDataComponent(transition, dataRef);
-    }
-
-    protected void addDataGroup(Transition transition, com.netgrif.application.engine.importer.model.DataGroup importDataGroup, int index) throws MissingIconKeyException {
-        DataGroup dataGroup = new DataGroup();
-
-        if (importDataGroup.getId() != null && importDataGroup.getId().length() > 0) {
-            dataGroup.setImportId(importDataGroup.getId());
-        } else {
-            dataGroup.setImportId(transition.getImportId() + "_dg_" + index);
-        }
-
-        dataGroup.setLayout(new DataGroupLayout(importDataGroup));
-
-        dataGroup.setTitle(toI18NString(importDataGroup.getTitle()));
-        dataGroup.setAlignment(importDataGroup.getAlignment() != null ? importDataGroup.getAlignment() : null);
-        dataGroup.setStretch(importDataGroup.isStretch());
-        importDataGroup.getDataRef().forEach(dataRef -> dataGroup.addData(getField(dataRef.getId()).getStringId()));
-        transition.addDataGroup(dataGroup);
-        DataGroupLayout dataGroupLayout = dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null ? dataGroup.getLayout() : null;
-
-        for (DataRef dataRef : importDataGroup.getDataRef()) {
-            if (dataGroupLayout != null && dataGroupLayout.getType().equals(LayoutType.GRID) && dataRef.getLayout() == null) {
-                throw new IllegalArgumentException("Data ref [" + dataRef.getId() + "] of data group [" + dataGroup.getStringId() + "] in transition [" + transition.getStringId() + "] doesn't have a layout.");
-            }
-            addDataLogic(transition, dataRef);
-            addDataLayout(transition, dataRef);
-            addDataComponent(transition, dataRef);
-        }
-    }
-
     protected void addToTransaction(Transition transition, TransactionRef transactionRef) {
         Transaction transaction = getTransaction(transactionRef.getId());
         if (transaction == null) {
@@ -798,10 +851,10 @@ public class Importer {
         transition.addUserRef(userRefId, roleFactory.getPermissions(logic));
     }
 
-    protected void addDataLogic(Transition transition, DataRef dataRef) {
-        Logic logic = dataRef.getLogic();
+    protected void addDataLogic(Transition transition, DataRef importedDataRef, com.netgrif.application.engine.petrinet.domain.DataRef dataRef) {
+        Logic logic = importedDataRef.getLogic();
         try {
-            Field<?> field = getField(dataRef.getId());
+            Field<?> field = getField(importedDataRef.getId());
             String fieldId = field.getStringId();
             if (logic == null || fieldId == null) {
                 return;
@@ -814,46 +867,16 @@ public class Importer {
                 behavior.setRequired(logic.getBehavior().stream().anyMatch(Behavior.REQUIRED::equals));
                 behavior.setImmediate(logic.getBehavior().stream().anyMatch(Behavior.IMMEDIATE::equals));
             }
-            transition.setDataRefBehavior(field, behavior);
+            dataRef.setBehavior(behavior);
+            field.setBehavior(transition.getImportId(), behavior);
         } catch (NullPointerException e) {
-            throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
+            throw new IllegalArgumentException("Wrong dataRef id [" + importedDataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
         }
     }
 
     // TODO: release/8.0.0 Behavior REQ,IMM,OPT deprecated
     private boolean isNotDeprecated(Behavior behavior) {
         return !Behavior.REQUIRED.equals(behavior) && !Behavior.IMMEDIATE.equals(behavior) && !Behavior.OPTIONAL.equals(behavior);
-    }
-
-    protected void addDataLayout(Transition transition, DataRef dataRef) {
-        Layout layout = dataRef.getLayout();
-        try {
-            Field<?> field = getField(dataRef.getId());
-            String fieldId = field.getStringId();
-            if (layout == null || fieldId == null) {
-                return;
-            }
-
-            String template = DEFAULT_FIELD_TEMPLATE;
-            if (layout.getTemplate() != null) {
-                template = layout.getTemplate().toString();
-            }
-
-            String appearance = DEFAULT_FIELD_APPEARANCE;
-            if (layout.getAppearance() != null) {
-                appearance = layout.getAppearance().toString();
-            }
-
-            String alignment = DEFAULT_FIELD_ALIGNMENT;
-            if (layout.getAlignment() != null) {
-                alignment = layout.getAlignment().value();
-            }
-
-            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getOffset(), template, appearance, alignment);
-            transition.setDataRefLayout(field, fieldLayout);
-        } catch (NullPointerException e) {
-            throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
-        }
     }
 
     // TODO: release/8.0.0 check merge
@@ -865,15 +888,16 @@ public class Importer {
         }
         transition.addDataSet(fieldId, null, null, null, component);
     }*/
-    protected void addDataComponent(Transition transition, DataRef dataRef) throws MissingIconKeyException {
-        Field<?> field = getField(dataRef.getId());
+
+    protected void addDataComponent(DataRef importedDataRef, com.netgrif.application.engine.petrinet.domain.DataRef dataRef) throws MissingIconKeyException {
+        Field<?> field = getField(importedDataRef.getId());
         Component component;
-        if ((dataRef.getComponent()) == null) {
+        if ((importedDataRef.getComponent()) == null) {
             component = field.getComponent();
         } else {
-            component = componentFactory.buildComponent(dataRef.getComponent(), this, field);
+            component = componentFactory.buildComponent(importedDataRef.getComponent(), this, field);
         }
-        transition.setDataRefComponent(field, component);
+        dataRef.setComponent(component);
     }
 
     protected Map<DataEventType, DataEvent> buildEvents(String fieldId, List<com.netgrif.application.engine.importer.model.DataEvent> events, String transitionId) {

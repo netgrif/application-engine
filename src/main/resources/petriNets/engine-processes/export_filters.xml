@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../petriflow_schema_layout.xsd">
     <id>export_filters</id>
     <initials>FTE</initials>
     <title name="export_filters">Export of filters</title>
@@ -18,32 +19,43 @@
         <title name="exportable_filters">Exportable filters</title>
         <placeholder name="exportable_filters_placeholder">List of all exportable filters</placeholder>
         <desc name="exportable_filters_desc">Select one or more filters to export</desc>
-        <action trigger="get">
-            exportable_filters: f.exportable_filters;
+        <event type="get">
+            <id>exportable_filters_get</id>
+            <actions phase="pre">
+                <action>
+                    exportable_filters: f.exportable_filters;
 
-            change exportable_filters options {
-                return findAllFilters()
-                    .collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
-            }
-        </action>
+                    change exportable_filters options {
+                        return findAllFilters()
+                                .collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
+                    }
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="button">
         <id>export_btn</id>
+        <title/>
         <placeholder name="export_btn_placeholder">Export filters</placeholder>
         <desc name="export_btn_desc">Export selected filters into xml file</desc>
-        <action trigger="set" phase="post">
-            exportable_filters: f.exportable_filters,
-            export_file: f.export_file,
-            trans: t.exportFilter;
-
-            change export_file value { exportFilters(exportable_filters.value) }
-            change exportable_filters value { [] }
-            make export_file, visible on trans when {exportable_filters.value.length != 0}
-            make export_file, hidden on trans when {exportable_filters.value.length == 0}
-        </action>
         <component>
             <name>raised</name>
         </component>
+        <event type="set">
+            <id>export_btn_set</id>
+            <actions phase="post">
+                <action>
+                    exportable_filters: f.exportable_filters,
+                    export_file: f.export_file,
+                    trans: t.exportFilter;
+
+                    change export_file value { exportFilters(exportable_filters.value) }
+                    change exportable_filters value { [] }
+                    make export_file, visible on trans when {exportable_filters.value.length != 0}
+                    make export_file, hidden on trans when {exportable_filters.value.length == 0}
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="file">
         <id>export_file</id>
@@ -79,61 +91,54 @@
         <id>exportFilter</id>
         <x>200</x>
         <y>100</y>
-        <layout>
-            <offset>0</offset>
-        </layout>
-        <assignPolicy>auto</assignPolicy>
         <label name="export_btn_placeholder">Export filters</label>
-        <dataGroup>
-            <id>DataGroup_0</id>
-            <layout>grid</layout>
-            <dataRef>
-                <id>exportable_filters</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>export_btn</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>2</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>export_file</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>1</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-        </dataGroup>
+        <assignPolicy>auto</assignPolicy>
+        <grid>
+            <id>exportFilter_grid</id>
+            <item>
+                <dataRef>
+                    <id>exportable_filters</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>export_btn</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / 3</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>export_file</id>
+                    <logic>
+                        <behavior>hidden</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <properties>
+                <display>grid</display>
+                <grid-template-columns>repeat(2, 1fr)</grid-template-columns>
+                <justify-items>stretch</justify-items>
+                <align-items>stretch</align-items>
+                <justify-content>stretch</justify-content>
+                <align-content>stretch</align-content>
+            </properties>
+        </grid>
         <event type="assign">
+            <id>exportFilter_assign</id>
             <actions phase="post">
                 <action>
                     export_file: f.export_file,
@@ -149,7 +154,7 @@
         <id>p1</id>
         <x>100</x>
         <y>100</y>
-        <label></label>
+        <label/>
         <tokens>1</tokens>
         <static>false</static>
     </place>

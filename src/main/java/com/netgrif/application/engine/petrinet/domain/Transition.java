@@ -1,32 +1,24 @@
 package com.netgrif.application.engine.petrinet.domain;
 
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.Event;
 import com.netgrif.application.engine.petrinet.domain.events.EventType;
-import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
+import com.netgrif.application.engine.petrinet.domain.layout.LayoutContainer;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.application.engine.petrinet.domain.roles.AssignedUserPermission;
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
-import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import com.netgrif.application.engine.workflow.domain.triggers.AutoTrigger;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
-import com.querydsl.core.annotations.PropertyType;
-import com.querydsl.core.annotations.QueryType;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Transient;
-import org.apache.lucene.analysis.CharArrayMap;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Document
@@ -34,8 +26,6 @@ import java.util.stream.Collectors;
 @Setter
 public class Transition extends Node {
 
-    @org.springframework.data.mongodb.core.mapping.Field("dataGroups")
-    private Map<String, DataGroup> dataGroups;
     @org.springframework.data.mongodb.core.mapping.Field("dataSet")
     private LinkedHashMap<String, DataRef> dataSet;
     @org.springframework.data.mongodb.core.mapping.Field("roles")
@@ -45,8 +35,6 @@ public class Transition extends Node {
     private Map<String, Map<RolePermission, Boolean>> userRefs;
     @org.springframework.data.mongodb.core.mapping.Field("triggers")
     private List<Trigger> triggers;
-    @QueryType(PropertyType.NONE)
-    private TaskLayout layout;
     private Integer priority;
     private AssignPolicy assignPolicy;
     private String icon;
@@ -58,6 +46,7 @@ public class Transition extends Node {
     @Transient
     private Boolean hasAutoTrigger;
     private Map<String, String> tags;
+    private LayoutContainer layoutContainer;
 
     public Transition() {
         super();
@@ -66,38 +55,12 @@ public class Transition extends Node {
         userRefs = new HashMap<>();
         triggers = new LinkedList<>();
         negativeViewRoles = new LinkedList<>();
-        dataGroups = new LinkedHashMap<>();
         assignPolicy = AssignPolicy.MANUAL;
         dataFocusPolicy = DataFocusPolicy.MANUAL;
         finishPolicy = FinishPolicy.MANUAL;
         events = new HashMap<>();
         assignedUserPolicy = new HashMap<>();
         tags = new HashMap<>();
-    }
-
-    public void setDataRefBehavior(Field<?> field, DataFieldBehavior behavior) {
-        // TODO: release/8.0.0
-        setDataRefAttribute(field, dataRef ->  {
-            field.setBehavior(this.importId, behavior);
-            dataRef.setBehavior(behavior);
-        });
-    }
-
-    public void setDataRefComponent(Field<?> field, Component component) {
-        setDataRefAttribute(field, dataRef -> dataRef.setComponent(component));
-    }
-
-    public void setDataRefLayout(Field<?> field, FieldLayout fieldLayout) {
-        setDataRefAttribute(field, dataRef -> dataRef.setLayout(fieldLayout));
-    }
-
-    private void setDataRefAttribute(Field<?> field, Consumer<DataRef> attributeChange) {
-        String fieldId = field.getStringId();
-        if (!dataSet.containsKey(fieldId)) {
-            dataSet.put(fieldId, new DataRef(field));
-        }
-        DataRef dataRef = dataSet.get(fieldId);
-        attributeChange.accept(dataRef);
     }
 
     public void setDataEvents(String field, Map<DataEventType, DataEvent> events) {
@@ -124,10 +87,6 @@ public class Transition extends Node {
         } else {
             userRefs.put(userRefId, permissions);
         }
-    }
-
-    public void addDataGroup(DataGroup dataGroup) {
-        dataGroups.put(dataGroup.getStringId(), dataGroup);
     }
 
     public void addTrigger(Trigger trigger) {
@@ -242,13 +201,11 @@ public class Transition extends Node {
         clone.setTitle(this.getTitle() == null ? null : this.getTitle().clone());
         clone.setPosition(this.getPosition().getX(), this.getPosition().getY());
         clone.setImportId(this.importId);
-        clone.setDataGroups(this.dataGroups == null ? null : dataGroups.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y.clone(), LinkedHashMap::new)));
         clone.setDataSet(this.dataSet == null ? null : dataSet.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y.clone(), LinkedHashMap::new)));
         clone.setRoles(this.roles == null ? null : roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
         clone.setNegativeViewRoles(new ArrayList<>(negativeViewRoles));
         clone.setUserRefs(this.userRefs == null ? null : userRefs.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
         clone.setTriggers(this.triggers == null ? null : triggers.stream().map(Trigger::clone).collect(Collectors.toList()));
-        clone.setLayout(this.layout == null ? null : layout.clone());
         clone.setPriority(priority);
         clone.setAssignPolicy(assignPolicy);
         clone.setIcon(icon);
@@ -258,6 +215,7 @@ public class Transition extends Node {
         clone.setAssignedUserPolicy(new HashMap<>(assignedUserPolicy));
         clone.setTags(new HashMap<>(this.tags));
         clone.setDefaultRoleId(defaultRoleId);
+        clone.setLayoutContainer(this.layoutContainer == null ? null : this.layoutContainer.clone());
         return clone;
     }
 }

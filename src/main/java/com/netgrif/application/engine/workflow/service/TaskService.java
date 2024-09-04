@@ -775,7 +775,6 @@ public class TaskService implements ITaskService {
                 .processId(useCase.getPetriNetId())
                 .caseId(useCase.getId().toString())
                 .transitionId(transition.getImportId())
-                .layout(transition.getLayout())
                 .tags(transition.getTags())
                 .caseColor(useCase.getColor())
                 .caseTitle(useCase.getTitle())

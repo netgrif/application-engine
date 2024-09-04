@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:noNamespaceSchemaLocation="../petriflow_schema_layout.xsd">
 	<id>preference_filter_item</id>
 	<initials>PFI</initials>
 	<title>Preference filter item</title>
@@ -18,7 +19,7 @@
 	</data>
 	<data type="enumeration" immediate="true">
 		<id>entry_name</id>
-		<title></title>
+		<title/>
 	</data>
 	<data type="text" >
 		<id>entry_default_name</id>
@@ -26,115 +27,129 @@
 	</data>
 	<data type="text">
 		<id>entry_marker</id>
-		<title></title>
+		<title/>
 	</data>
 	<data type="button">
 		<id>move_option_up</id>
-		<title></title>
+		<title/>
 		<placeholder name="move_up">Up</placeholder>
-		<action trigger="set">
-			parentId: f.parentId;
+		<event type="set">
+			<id>move_option_up_set</id>
+			<actions phase="post">
+				<action>
+					parentId: f.parentId;
 
-			if (!task.isPresent()) {
-				return
-			}
+					if (!task.isPresent()) {
+						return
+					}
 
-			def parentCase = findCase({it.id.eq(new org.bson.types.ObjectId(parentId.value.value))});
+					def parentCase = findCase({it.id.eq(new org.bson.types.ObjectId(parentId.value.value))});
 
-			def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value.value
+					def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value.value
 
-			def currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
+					def currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
 
-			if (currentIndex != 0) {
-				previousTaskRefValue.remove(currentIndex)
-				previousTaskRefValue.add(currentIndex - 1, task.get().stringId)
+					if (currentIndex != 0) {
+						previousTaskRefValue.remove(currentIndex)
+						previousTaskRefValue.add(currentIndex - 1, task.get().stringId)
 
-				def parentTask = findTask({it.caseId.eq(parentId.value.value).and(it.transitionId.eq("navigationMenuConfig"))})
-				def dataSet = new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
-						"filter_tasks"      : new com.netgrif.application.engine.petrinet.domain.dataset.TaskField(rawValue: previousTaskRefValue),
-				])
-				setDataWithPropagation(parentTask, dataSet)
-			}
-		</action>
+						def parentTask = findTask({it.caseId.eq(parentId.value.value).and(it.transitionId.eq("navigationMenuConfig"))})
+						def dataSet = new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
+								"filter_tasks"      : new com.netgrif.application.engine.petrinet.domain.dataset.TaskField(rawValue: previousTaskRefValue),
+						])
+						setDataWithPropagation(parentTask, dataSet)
+					}
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="button">
 		<id>move_option_down</id>
-		<title></title>
+		<title/>
 		<placeholder name="move_down">Down</placeholder>
-		<action trigger="set">
-			parentId: f.parentId;
+		<event type="set">
+			<id>move_option_down_set</id>
+			<actions phase="post">
+				<action>
+					parentId: f.parentId;
 
-			if (!task.isPresent()) {
-				return;
-			}
+					if (!task.isPresent()) {
+						return
+					}
 
-			def parentCase = findCase({it.id.eq(new org.bson.types.ObjectId(parentId.value.value))});
+					def parentCase = findCase({it.id.eq(new org.bson.types.ObjectId(parentId.value.value))});
 
-			def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value.value
+					def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value.value
 
-			def currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
+					def currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
 
-			if (currentIndex != previousTaskRefValue.size() - 1) {
-				previousTaskRefValue.remove(currentIndex)
-				previousTaskRefValue.add(currentIndex + 1, task.get().stringId)
+					if (currentIndex != previousTaskRefValue.size() - 1) {
+						previousTaskRefValue.remove(currentIndex)
+						previousTaskRefValue.add(currentIndex + 1, task.get().stringId)
 
-				def parentTask = findTask({it.caseId.eq(parentId.value.value).and(it.transitionId.eq("navigationMenuConfig"))})
-				def dataSet = new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
-						"filter_tasks"      : new com.netgrif.application.engine.petrinet.domain.dataset.TaskField(rawValue: previousTaskRefValue),
-				])
-				setDataWithPropagation(parentTask, dataSet)
-			}
-		</action>
+						def parentTask = findTask({it.caseId.eq(parentId.value.value).and(it.transitionId.eq("navigationMenuConfig"))})
+						def dataSet = new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
+								"filter_tasks"      : new com.netgrif.application.engine.petrinet.domain.dataset.TaskField(rawValue: previousTaskRefValue),
+						])
+						setDataWithPropagation(parentTask, dataSet)
+					}
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="button">
 		<id>remove_option</id>
-		<title></title>
+		<title/>
 		<placeholder name="remove">Remove</placeholder>
+		<event type="set">
+			<id>remove_option_set</id>
+			<actions phase="post">
+				<action>
+					<!--@formatter:off-->
+					parentId: f.parentId,
+					filterCase: f.filter_case;
 
-		<action trigger="set">
-			<!--@formatter:off-->
-		parentId: f.parentId,
-		filterCase: f.filter_case;
+					if (!task.isPresent()) {
+						return;
+					}
+					def parentCase = findCase({ it.id.eq(new org.bson.types.ObjectId(parentId.value.value)) });
+					def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value.value
+					def currentIndex = previousTaskRefValue.findIndexOf({ id -> id == task.get().stringId })
 
-		if (!task.isPresent()) {
-			return;
-		}
-		def parentCase = findCase({ it.id.eq(new org.bson.types.ObjectId(parentId.value.value)) });
-		def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value.value
-		def currentIndex = previousTaskRefValue.findIndexOf({ id -> id == task.get().stringId })
+					previousTaskRefValue.remove(currentIndex)
 
-		previousTaskRefValue.remove(currentIndex)
+					def previousCaseRefValue = parentCase.dataSet.get("referenced_filters").value.value
+					currentIndex = previousCaseRefValue.findIndexOf({ id -> id == filterCase.value.value[0] })
+					previousCaseRefValue.remove(currentIndex)
 
-		def previousCaseRefValue = parentCase.dataSet.get("referenced_filters").value.value
-		currentIndex = previousCaseRefValue.findIndexOf({ id -> id == filterCase.value.value[0] })
-		previousCaseRefValue.remove(currentIndex)
-
-		def parentTask = findTask({ it.caseId.eq(parentId.value.value).and(it.transitionId.eq("navigationMenuConfig")) })
-		def dataSet = new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
-				"filter_tasks"      : new com.netgrif.application.engine.petrinet.domain.dataset.TaskField(rawValue: previousTaskRefValue),
-				"referenced_filters": new com.netgrif.application.engine.petrinet.domain.dataset.CaseField(rawValue: previousCaseRefValue),
-		])
-		setDataWithPropagation(parentTask, dataSet)
-		async.run {
-			workflowService.deleteCase(useCase.stringId)
-		}
-			<!--@formatter:on-->
-		</action>
+					def parentTask = findTask({ it.caseId.eq(parentId.value.value).and(it.transitionId.eq("navigationMenuConfig")) })
+					def dataSet = new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
+						"filter_tasks"      : new com.netgrif.application.engine.petrinet.domain.dataset.TaskField(rawValue: previousTaskRefValue),
+						"referenced_filters": new com.netgrif.application.engine.petrinet.domain.dataset.CaseField(rawValue: previousCaseRefValue),
+					])
+					setDataWithPropagation(parentTask, dataSet)
+					async.run {
+						workflowService.deleteCase(useCase.stringId)
+					}
+					<!--@formatter:on-->
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="taskRef">
 		<id>filter_preview</id>
-		<title></title>
+		<title/>
 	</data>
 	<data type="caseRef">
 		<id>filter_case</id>
-		<title></title>
+		<title/>
 		<allowedNets>
 			<allowedNet>filter</allowedNet>
 		</allowedNets>
 	</data>
 	<data type="text" immediate="true">
 		<id>parentId</id>
-		<title></title>
+		<title/>
 	</data>
 	<data type="boolean" immediate="true">
 		<id>use_icon</id>
@@ -147,110 +162,144 @@
 		<component>
 			<name>htmltextarea</name>
 		</component>
-		<init></init>
 	</data>
 	<data type="text" immediate="true">
 		<id>icon_name</id>
 		<title name="icon_identifier">Menu icon identifier</title>
 		<desc name="icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
-		<action trigger="set">
-			iconIdentifier: f.this,
-			iconPreview: f.icon_preview;
+		<event type="set">
+			<id>icon_name_set</id>
+			<actions phase="post">
+				<action>
+					iconIdentifier: f.this,
+					iconPreview: f.icon_preview;
 
-			if (iconIdentifier.value.value == "") {
-				change iconPreview value {<![CDATA["""<span></span>"""]]>}
-				return;
-			}
+					if (iconIdentifier.value.value == "") {
+						change iconPreview value {<![CDATA["""<span></span>"""]]>}
+						return;
+					}
 
-			change iconPreview value {
-				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + iconIdentifier.value.value + <![CDATA["""</span>"""]]>
-			}
-		</action>
+					change iconPreview value {
+						<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + iconIdentifier.value.value + <![CDATA["""</span>"""]]>
+					}
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="button">
 		<id>add_allowed_roles</id>
-		<title></title>
+		<title/>
 		<placeholder name="allow_roles">Allow view for roles</placeholder>
-		<action trigger="set">
-			allowedRoles: f.allowed_roles,
-			processesAvailable: f.processes_available,
-			rolesAvailable: f.roles_available;
+		<event type="set">
+			<id>add_allowed_roles_set</id>
+			<actions phase="post">
+				<action>
+					allowedRoles: f.allowed_roles,
+					processesAvailable: f.processes_available,
+					rolesAvailable: f.roles_available;
 
-			change allowedRoles options {return configurableMenuService.addSelectedRoles(allowedRoles, processesAvailable, rolesAvailable)}
+					change allowedRoles options {return configurableMenuService.addSelectedRoles(allowedRoles, processesAvailable, rolesAvailable)}
 
-			change rolesAvailable value {[]}
-			change rolesAvailable options {[:]}
-			change processesAvailable value {null}
-		</action>
+					change rolesAvailable value {[]}
+					change rolesAvailable options {[:]}
+					change processesAvailable value {null}
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="button">
 		<id>remove_allowed_roles</id>
-		<title></title>
+		<title/>
 		<placeholder name="remove_from_allowed_roles">Remove from allowed roles</placeholder>
-		<action trigger="set">
-			allowedRoles: f.allowed_roles,
-			processesAvailable: f.processes_available,
-			rolesAvailable: f.roles_available;
+		<event type="set">
+			<id>remove_allowed_roles_set</id>
+			<actions phase="post">
+				<action>
+					allowedRoles: f.allowed_roles,
+					processesAvailable: f.processes_available,
+					rolesAvailable: f.roles_available;
 
-			change allowedRoles options {return configurableMenuService.removeSelectedRoles(allowedRoles)}
+					change allowedRoles options {return configurableMenuService.removeSelectedRoles(allowedRoles)}
 
-			change allowedRoles value {[]}
-			change rolesAvailable value {[]}
-			change rolesAvailable options {[:]}
-			change processesAvailable value {null}
-		</action>
+					change allowedRoles value {[]}
+					change rolesAvailable value {[]}
+					change rolesAvailable options {[:]}
+					change processesAvailable value {null}
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="button">
 		<id>add_banned_roles</id>
-		<title></title>
+		<title/>
 		<placeholder name="ban_roles">Ban view for roles</placeholder>
-		<action trigger="set">
-			bannedRoles: f.banned_roles,
-			processesAvailable: f.processes_available,
-			rolesAvailable: f.roles_available;
+		<event type="set">
+			<id>add_banned_roles_set</id>
+			<actions phase="post">
+				<action>
+					bannedRoles: f.banned_roles,
+					processesAvailable: f.processes_available,
+					rolesAvailable: f.roles_available;
 
-			change bannedRoles options {return configurableMenuService.addSelectedRoles(bannedRoles, processesAvailable, rolesAvailable)}
+					change bannedRoles options {return configurableMenuService.addSelectedRoles(bannedRoles, processesAvailable, rolesAvailable)}
 
-			change rolesAvailable value {[]}
-			change rolesAvailable options {[:]}
-			change processesAvailable value {null}
-		</action>
+					change rolesAvailable value {[]}
+					change rolesAvailable options {[:]}
+					change processesAvailable value {null}
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="button">
 		<id>remove_banned_roles</id>
-		<title></title>
+		<title/>
 		<placeholder name="remove_from_banned_roles">Remove from banned roles</placeholder>
-		<action trigger="set">
-			bannedRoles: f.banned_roles,
-			processesAvailable: f.processes_available,
-			rolesAvailable: f.roles_available;
+		<event type="set">
+			<id>remove_banned_roles_set</id>
+			<actions phase="post">
+				<action>
+					bannedRoles: f.banned_roles,
+					processesAvailable: f.processes_available,
+					rolesAvailable: f.roles_available;
 
-			change bannedRoles options {return configurableMenuService.removeSelectedRoles(bannedRoles)}
+					change bannedRoles options {return configurableMenuService.removeSelectedRoles(bannedRoles)}
 
-			change bannedRoles value {[]}
-			change rolesAvailable value {[]}
-			change rolesAvailable options {[:]}
-			change processesAvailable value {null}
-		</action>
+					change bannedRoles value {[]}
+					change rolesAvailable value {[]}
+					change rolesAvailable options {[:]}
+					change processesAvailable value {null}
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="enumeration_map" immediate="true">
 		<id>processes_available</id>
 		<title name="available_processes">Your processes</title>
 		<desc name="available_processes_desc">Select a process containing roles you wish to add to allowed or banned roles lists.</desc>
-		<action trigger="get">
-			processes: f.this;
+		<event type="get">
+			<id>processes_available_get</id>
+			<actions phase="pre">
+				<action>
+					processes: f.this;
 
-			change processes options {return configurableMenuService.getNetsByAuthorAsMapOptions(loggedUser(), org.springframework.context.i18n.LocaleContextHolder.locale)}
-		</action>
-		<action trigger="set">
-			processes: f.this,
-			allowedRoles: f.allowed_roles,
-			bannedRoles: f.banned_roles,
-			rolesAvailable: f.roles_available;
+					change processes options {return configurableMenuService.getNetsByAuthorAsMapOptions(loggedUser(), org.springframework.context.i18n.LocaleContextHolder.locale)}
+				</action>
+			</actions>
+		</event>
+		<event type="set">
+			<id>processes_available_set</id>
+			<actions phase="post">
+				<action>
+					processes: f.this,
+					allowedRoles: f.allowed_roles,
+					bannedRoles: f.banned_roles,
+					rolesAvailable: f.roles_available;
 
-			change rolesAvailable options {return configurableMenuService.getAvailableRolesFromNet(processes, allowedRoles, bannedRoles)}
-			change rolesAvailable value {[]}
-		</action>
+					change rolesAvailable options {return configurableMenuService.getAvailableRolesFromNet(processes, allowedRoles, bannedRoles)}
+					change rolesAvailable value {[]}
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="multichoice_map" immediate="true">
 		<id>roles_available</id>
@@ -288,49 +337,37 @@
 	<data type="text" immediate="true">
 		<id>create_case_button_icon</id>
 		<title name="create_case_button_icon">"New case" button icon identifier</title>
-		<action trigger="set">
-			create_case_button_icon_preview: f.create_case_button_icon_preview,
-			create_case_button_icon: f.create_case_button_icon;
+		<event type="set">
+			<id>create_case_button_icon_set</id>
+			<actions phase="post">
+				<action>
+					create_case_button_icon_preview: f.create_case_button_icon_preview,
+					create_case_button_icon: f.create_case_button_icon;
 
 
-			if (create_case_button_icon.value.value == "") {
-				change create_case_button_icon_preview value {<![CDATA["""<span></span>"""]]>}
-				return;
-			}
+					if (create_case_button_icon.value.value == "") {
+						change create_case_button_icon_preview value {<![CDATA["""<span></span>"""]]>}
+						return;
+					}
 
-			change create_case_button_icon_preview value {
-				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + create_case_button_icon.value.value + <![CDATA["""</span>"""]]>
-			}
-		</action>
+					change create_case_button_icon_preview value {
+						<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + create_case_button_icon.value.value + <![CDATA["""</span>"""]]>
+					}
+				</action>
+			</actions>
+		</event>
  	</data>
 
-<data type="text" immediate="true">
+	<data type="text" immediate="true">
 		<id>default_headers</id>
 		<title name="default_headers">Set default headers</title>
 	</data>
-  
-<data type="multichoice_map">
+
+	<data type="multichoice_map">
 		<id>allowed_nets</id>
 		<title name="allowed_nets">Allowed nets</title>
 	</data>
 
-<!--	<data type="boolean">-->
-<!--		<id>use_i18n</id>-->
-<!--		<title>Translate menu item title?</title>-->
-<!--		<init>false</init>-->
-<!--	</data>-->
-<!--	<data type="multichoice_map">-->
-<!--		<id>enabled_locales</id>-->
-<!--		<title>Supported locales</title>-->
-<!--	</data>-->
-<!--	<data type="enumeration_map">-->
-<!--		<id>edited_locale</id>-->
-<!--		<title>Edit locale translation</title>-->
-<!--	</data>-->
-<!--	<data type="text">-->
-<!--		<id>new_translation_value</id>-->
-<!--		<title>Menu item translation in selected locale</title>-->
-<!--	</data>-->
 	<!-- I18NS -->
 	<i18n locale="sk">
 		<i18nString name="menu_item_title">Názov položky menu</i18nString>
@@ -387,508 +424,385 @@
 		<id>init</id>
 		<x>420</x>
 		<y>260</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label></label>
-		<dataRef>
-			<id>filter_case</id>
-			<logic>
-				<behavior>forbidden</behavior>
-			</logic>
-			<layout>
-				<x>1</x>
-				<y>0</y>
-				<rows>1</rows>
-				<cols>2</cols>
-				<template>netgrif</template>
-			</layout>
-			<logic>
-				<action trigger="set">
-					filterTaskRef: f.filter_preview,
-					filterCaseRef: f.filter_case,
-					entryDefaultName: f.entry_default_name,
-					entryName: f.entry_name,
-					icon: f.icon_name;
+		<label/>
+		<grid>
+			<id>init_grid</id>
+			<item>
+				<dataRef>
+					<id>filter_case</id>
+					<logic>
+						<behavior>forbidden</behavior>
+					</logic>
+					<event type="set">
+						<id>filter_case_init_set</id>
+						<actions phase="post">
+							<action>
+								filterTaskRef: f.filter_preview,
+								filterCaseRef: f.filter_case,
+								entryDefaultName: f.entry_default_name,
+								entryName: f.entry_name,
+								icon: f.icon_name;
 
-					def filterCase = findCase({it.id.eq(filterCaseRef.value.value[0])})
+								def filterCase = findCase({it.id.eq(filterCaseRef.value.value[0])})
 
-					change entryDefaultName value {return filterCase.title}
+								change entryDefaultName value {return filterCase.title}
 
-					change entryName value {return filterCase.dataSet["i18n_filter_name"].value.value}
+								change entryName value {return filterCase.dataSet["i18n_filter_name"].value.value}
 
-					change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+								change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
 
-					change icon value {filterCase.icon}
-				</action>
-			</logic>
-		</dataRef>
-		<dataRef>
-			<id>parentId</id>
-			<logic>
-				<behavior>editable</behavior>
-			</logic>
-		</dataRef>
-		<dataRef>
-			<id>icon_name</id>
-			<logic>
-				<behavior>editable</behavior>
-			</logic>
-		</dataRef>
+								change icon value {filterCase.icon}
+							</action>
+						</actions>
+					</event>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>parentId</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>icon_name</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<properties>
+				<display>grid</display>
+				<grid-template-columns>1fr</grid-template-columns>
+				<justify-items>stretch</justify-items>
+				<align-items>stretch</align-items>
+				<justify-content>stretch</justify-content>
+				<align-content>stretch</align-content>
+			</properties>
+		</grid>
 	</transition>
 	<transition>
 		<id>view</id>
 		<x>660</x>
 		<y>260</y>
-		<layout>
-			<cols>5</cols>
-			<offset>0</offset>
-		</layout>
-		<label></label>
-		<dataGroup>
-			<id>DataGroup_0</id>
-			<title></title>
-			<layout>grid</layout>
-			<dataRef>
-				<id>entry_default_name</id>
-				<logic>
-					<behavior>editable</behavior>
-					<action trigger="set">
-						entryName: f.entry_name,
-						filterTask: f.filter_preview,
-						filterCaseRef: f.filter_case,
-						entryDefaultName: f.entry_default_name;
+		<label/>
+		<grid>
+			<id>view_grid</id>
+			<item>
+				<dataRef>
+					<id>entry_default_name</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+					<event type="set">
+						<id>entry_default_name_view_set</id>
+						<actions phase="post">
+							<action>
+								entryName: f.entry_name,
+								filterTask: f.filter_preview,
+								filterCaseRef: f.filter_case,
+								entryDefaultName: f.entry_default_name;
 
-						def filterCase = findCase({it.id.eq(new org.bson.types.ObjectId(filterCaseRef.value.value[0]))})
-						filterCase.setTitle(entryDefaultName.value.value)
-						workflowService.save(filterCase)
-						def filterTask = findTask({ it.id.eq(filterTask.value.value[0])})
-						setData(filterTask, [
-							"new_title": ["type":"text", "value": entryDefaultName.value.value]
-						])
+								def filterCase = findCase({it.id.eq(new org.bson.types.ObjectId(filterCaseRef.value.value[0]))})
+								filterCase.setTitle(entryDefaultName.value.value)
+								workflowService.save(filterCase)
+								def filterTask = findTask({ it.id.eq(filterTask.value.value[0])})
+								setData(filterTask, [
+										"new_title": ["type":"text", "value": entryDefaultName.value.value]
+								])
 
-						change entryName value {return new com.netgrif.application.engine.petrinet.domain.I18nString(entryDefaultName.value.value)}
-					</action>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>move_option_up</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>fill</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>move_option_down</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>3</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>remove_option</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>4</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>processes_available</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>2</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>roles_available</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>1</x>
-					<y>1</y>
-					<rows>2</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>add_allowed_roles</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>allowed_roles</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>3</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>remove_allowed_roles</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>4</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>add_banned_roles</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>banned_roles</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>3</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>remove_banned_roles</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>4</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>use_icon</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>3</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-				</layout>
-				<event type="set">
-					<id>0</id>
-					<actions phase="post">
-						<action>
-							trans: t.this,
-							iconPreview: f.icon_preview,
-							iconName: f.icon_name,
-							useIcon: f.use_icon;
+								change entryName value {return new com.netgrif.application.engine.petrinet.domain.I18nString(entryDefaultName.value.value)}
+							</action>
+						</actions>
+					</event>
+				</dataRef>
+				<properties>
+					<grid-column>1 / span 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>move_option_up</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>3 / 4</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>move_option_down</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>4 / 5</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>remove_option</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>5 / 6</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>processes_available</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+					<grid-row>2 / span 2</grid-row>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>roles_available</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>2 / 3</grid-column>
+					<grid-row>2 / span 2</grid-row>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>add_allowed_roles</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>3 / 4</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>allowed_roles</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>4 / 5</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>remove_allowed_roles</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>5 / 6</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>add_banned_roles</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>3 / 4</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>banned_roles</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>4 / 5</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>remove_banned_roles</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>5 / 6</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>use_icon</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+					<event type="set">
+						<id>use_icon_view_set</id>
+						<actions phase="post">
+							<action>
+								trans: t.this,
+								iconPreview: f.icon_preview,
+								iconName: f.icon_name,
+								useIcon: f.use_icon;
 
-							make iconPreview,visible on trans when {useIcon.value.value}
-							make iconName,editable on trans when {useIcon.value.value}
+								make iconPreview,visible on trans when {useIcon.value.value}
+								make iconName,editable on trans when {useIcon.value.value}
 
-							make iconPreview,hidden on trans when {!useIcon.value.value}
-							make iconName,hidden on trans when {!useIcon.value.value}
-						</action>
-					</actions>
-				</event>
-			</dataRef>
-			<dataRef>
-				<id>icon_preview</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>1</x>
-					<y>3</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>icon_name</id>
-				<logic>
-					<behavior>editable</behavior>
-					<action trigger="set">
-						iconIdentifier: f.icon_name,
-						filterCaseId: f.filter_case;
+								make iconPreview,hidden on trans when {!useIcon.value.value}
+								make iconName,hidden on trans when {!useIcon.value.value}
+							</action>
+						</actions>
+					</event>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>icon_preview</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>2 / 3</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>icon_name</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+					<event type="set">
+						<id>icon_name_view_set</id>
+						<actions phase="post">
+							<action>
+								iconIdentifier: f.icon_name,
+								filterCaseId: f.filter_case;
 
-						def filterCase = findCase({it.id.eq(new org.bson.types.ObjectId(filterCaseId.value.value[0]))})
-						filterCase.setIcon(iconIdentifier.value.value)
-						workflowService.save(filterCase)
-					</action>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>3</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<offset>0</offset>
-				</layout>
-			</dataRef>
-<!--			<dataRef>-->
-<!--				<id>use_i18n</id>-->
-<!--				<logic>-->
-<!--					<behavior>editable</behavior>-->
-<!--				</logic>-->
-<!--				<layout>-->
-<!--					<x>0</x>-->
-<!--					<y>2</y>-->
-<!--					<rows>1</rows>-->
-<!--					<cols>1</cols>-->
-<!--					<offset>0</offset>-->
-<!--					<template>material</template>-->
-<!--				</layout>-->
-<!--				<event type="set">-->
-<!--					<id>0</id>-->
-<!--					<actions phase="post">-->
-<!--						<action>-->
-<!--							trans: t.this,-->
-<!--							i18nMultichoice: f.enabled_locales,-->
-<!--							i18nEnumeration: f.edited_locale,-->
-<!--							i18nTextfield: f.new_translation_value,-->
-<!--							useI18n: f.use_i18n;-->
-
-<!--							make i18nMultichoice,editable on trans when {useI18n.value}-->
-<!--							make i18nEnumeration,editable on trans when {useI18n.value}-->
-<!--							make i18nTextfield,editable on trans when {useI18n.value}-->
-
-<!--							make i18nMultichoice,hidden on trans when {!useI18n.value}-->
-<!--							make i18nEnumeration,hidden on trans when {!useI18n.value}-->
-<!--							make i18nTextfield,hidden on trans when {!useI18n.value}-->
-<!--						</action>-->
-<!--					</actions>-->
-<!--				</event>-->
-<!--			</dataRef>-->
-<!--			<dataRef>-->
-<!--				<id>enabled_locales</id>-->
-<!--				<logic>-->
-<!--					<behavior>hidden</behavior>-->
-<!--				</logic>-->
-<!--				<layout>-->
-<!--					<x>1</x>-->
-<!--					<y>2</y>-->
-<!--					<rows>1</rows>-->
-<!--					<cols>1</cols>-->
-<!--					<offset>0</offset>-->
-<!--					<template>material</template>-->
-<!--					<appearance>outline</appearance>-->
-<!--				</layout>-->
-<!--			</dataRef>-->
-<!--			<dataRef>-->
-<!--				<id>edited_locale</id>-->
-<!--				<logic>-->
-<!--					<behavior>hidden</behavior>-->
-<!--				</logic>-->
-<!--				<layout>-->
-<!--					<x>2</x>-->
-<!--					<y>2</y>-->
-<!--					<rows>1</rows>-->
-<!--					<cols>1</cols>-->
-<!--					<offset>0</offset>-->
-<!--					<template>material</template>-->
-<!--					<appearance>outline</appearance>-->
-<!--				</layout>-->
-<!--			</dataRef>-->
-<!--			<dataRef>-->
-<!--				<id>new_translation_value</id>-->
-<!--				<logic>-->
-<!--					<behavior>hidden</behavior>-->
-<!--				</logic>-->
-<!--				<layout>-->
-<!--					<x>3</x>-->
-<!--					<y>2</y>-->
-<!--					<rows>1</rows>-->
-<!--					<cols>2</cols>-->
-<!--					<offset>0</offset>-->
-<!--					<template>material</template>-->
-<!--					<appearance>outline</appearance>-->
-<!--				</layout>-->
-<!--			</dataRef>-->
-			<dataRef>
-				<id>filter_preview</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>3</y>
-					<rows>1</rows>
-					<cols>5</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>entry_marker</id>
-				<logic>
-					<behavior>hidden</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>4</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance></appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>entry_name</id>
-				<logic>
-					<behavior>hidden</behavior>
-				</logic>
-				<layout>
-					<x>1</x>
-					<y>4</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance></appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>create_case_button_title</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>5</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>create_case_button_icon_preview</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>5</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>create_case_button_icon</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>3</x>
-					<y>5</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>default_headers</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>6</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
+								def filterCase = findCase({it.id.eq(new org.bson.types.ObjectId(filterCaseId.value.value[0]))})
+								filterCase.setIcon(iconIdentifier.value.value)
+								workflowService.save(filterCase)
+							</action>
+						</actions>
+					</event>
+				</dataRef>
+				<properties>
+					<grid-column>3 / span 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>filter_preview</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / span 5</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>entry_marker</id>
+					<logic>
+						<behavior>hidden</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>entry_name</id>
+					<logic>
+						<behavior>hidden</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>2 / 3</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>create_case_button_title</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / span 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>create_case_button_icon_preview</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>3 / 4</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>create_case_button_icon</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>4 / span 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>default_headers</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / span 4</grid-column>
+				</properties>
+			</item>
+			<properties>
+				<display>grid</display>
+				<grid-template-columns>repeat(5, 1fr)</grid-template-columns>
+				<justify-items>stretch</justify-items>
+				<align-items>stretch</align-items>
+				<justify-content>stretch</justify-content>
+				<align-content>stretch</align-content>
+			</properties>
+		</grid>
 	</transition>
 
 	<transition>
@@ -896,45 +810,60 @@
 		<x>420</x>
 		<y>350</y>
 		<label>[Change filter]</label>
+		<grid>
+			<id>change_filter_grid</id>
+			<item>
+				<dataRef>
+					<id>new_filter_id</id>
+					<logic>
+						<behavior>editable</behavior>
+						<behavior>required</behavior>
+					</logic>
+					<event type="set">
+						<id>new_filter_id_change_filter_set</id>
+						<actions phase="post">
+							<action>
+								new_filter_id: f.new_filter_id,
+								filterTaskRef: f.filter_preview,
+								filterCaseRef: f.filter_case,
+								entryDefaultName: f.entry_default_name,
+								entryName: f.entry_name,
+								icon: f.icon_name;
 
-		<dataRef>
-			<id>new_filter_id</id>
-			<logic>
-				<behavior>editable</behavior>
-				<behavior>required</behavior>
-			</logic>
-			<event type="set">
-				<id>set_event_0</id>
-				<actions phase="post">
-					<action>
-						new_filter_id: f.new_filter_id,
-						filterTaskRef: f.filter_preview,
-						filterCaseRef: f.filter_case,
-						entryDefaultName: f.entry_default_name,
-						entryName: f.entry_name,
-						icon: f.icon_name;
+								change filterCaseRef value { [new_filter_id.value.value] }
+								def filterCase = findCase({it.id.eq(filterCaseRef.value.value[0])})
 
-						change filterCaseRef value { [new_filter_id.value.value] }
-						def filterCase = findCase({it.id.eq(filterCaseRef.value.value[0])})
+								change entryDefaultName value {return filterCase.title}
 
-						change entryDefaultName value {return filterCase.title}
+								change entryName value {return filterCase.dataSet["i18n_filter_name"].value.value}
 
-						change entryName value {return filterCase.dataSet["i18n_filter_name"].value.value}
+								change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
 
-						change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
-
-						change icon value {filterCase.icon}
-					</action>
-				</actions>
-			</event>
-		</dataRef>
+								change icon value {filterCase.icon}
+							</action>
+						</actions>
+					</event>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<properties>
+				<display>grid</display>
+				<grid-template-columns>1fr</grid-template-columns>
+				<justify-items>stretch</justify-items>
+				<align-items>stretch</align-items>
+				<justify-content>stretch</justify-content>
+				<align-content>stretch</align-content>
+			</properties>
+		</grid>
 	</transition>
 	<!-- PLACES -->
 	<place>
 		<id>p1</id>
 		<x>300</x>
 		<y>260</y>
-		<label></label>
+		<label/>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>
@@ -942,7 +871,7 @@
 		<id>p2</id>
 		<x>540</x>
 		<y>260</y>
-		<label></label>
+		<label/>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>

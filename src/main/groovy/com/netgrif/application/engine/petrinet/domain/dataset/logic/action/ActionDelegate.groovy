@@ -8,7 +8,6 @@ import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
-import com.netgrif.application.engine.configuration.ApplicationContextProvider
 import com.netgrif.application.engine.configuration.PublicViewProperties
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
@@ -17,8 +16,8 @@ import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearc
 import com.netgrif.application.engine.export.configuration.ExportConfiguration
 import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
-import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.history.service.IHistoryService
+import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
@@ -60,13 +59,10 @@ import org.quartz.Scheduler
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.core.io.ClassPathResource
-import org.springframework.core.io.FileSystemResource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 
-import java.time.ZoneId
 import java.util.stream.Collectors
 
 /**
@@ -240,6 +236,20 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
             useCase.dataSet.get(fieldId).behaviors.put(transitionId, dataFieldBehavior)
         }
         return dataFieldBehavior
+    }
+
+    // TODO: docasna metoda na priradenie behavior fieldu (make na 8.0.0 nefunguje)
+    DataFieldBehaviors createBehavior(String fieldId, FieldBehavior fieldBehavior, String transitionId = task.get().transitionId, Case caze = useCase) {
+        Field<?> caseField = useCase.dataSet.get(fieldId)
+        if (caseField.behaviors == null) {
+            caseField.behaviors = new DataFieldBehaviors()
+            caze.dataSet.get(fieldId).behaviors.put(transitionId, new DataFieldBehavior())
+        }
+        if (caseField.behaviors.get(transitionId) == null && caze.getPetriNet().getTransition(transitionId) != null && caze.getPetriNet().getTransition(transitionId).dataSet.get(fieldId) != null) {
+            caseField.behaviors.put(transitionId, caze.getPetriNet().getTransition(transitionId).dataSet.get(fieldId).behavior)
+        }
+        caseField.behaviors.behaviors.get(transitionId).behavior = fieldBehavior
+        return caseField.behaviors
     }
 
     def visible = { Field field, Transition trans ->
