@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.event.events.task;
 
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
+import com.netgrif.application.engine.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome;
 
 public class FinishTaskEvent extends TaskEvent {
@@ -12,5 +13,10 @@ public class FinishTaskEvent extends TaskEvent {
     @Override
     public String getMessage() {
         return "FinishTaskEvent: Task [" + taskEventOutcome.getTask().getStringId() + "] finished";
+    }
+
+    @Override
+    public EventType getEventType() {
+        return EventType.FINISH;
     }
 }

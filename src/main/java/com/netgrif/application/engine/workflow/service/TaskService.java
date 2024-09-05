@@ -863,7 +863,7 @@ public class TaskService implements ITaskService {
 
         useCase.addTask(task);
         CreateTaskEventOutcome outcome = new CreateTaskEventOutcome(useCase, task);
-        //publisher.publishEvent(new CreateTaskEvent(outcome));
+        publisher.publishEvent(new CreateTaskEvent(outcome, EventPhase.POST));
 
         return task;
     }

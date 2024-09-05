@@ -423,12 +423,12 @@
 <!--            <artifactId>kie-spring</artifactId>-->
 <!--            <version>${kie-spring.version}</version>-->
 <!--        </dependency>-->
-        <dependency>
-            <groupId>com.netgrif</groupId>
-            <artifactId>netgrif-drools</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.netgrif</groupId>-->
+<!--            <artifactId>netgrif-drools</artifactId>-->
+<!--            <version>0.0.1-SNAPSHOT</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>

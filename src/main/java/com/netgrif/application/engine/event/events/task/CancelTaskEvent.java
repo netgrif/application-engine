@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.event.events.task;
 
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
+import com.netgrif.application.engine.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome;
 
 public class CancelTaskEvent extends TaskEvent {
@@ -12,5 +13,9 @@ public class CancelTaskEvent extends TaskEvent {
     @Override
     public String getMessage() {
         return "CancelTaskEvent: Task [" + taskEventOutcome.getTask().getStringId() + "] cancelled";
+    }
+    @Override
+    public EventType getEventType() {
+        return EventType.CANCEL;
     }
 }

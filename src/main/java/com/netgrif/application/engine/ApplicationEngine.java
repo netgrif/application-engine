@@ -4,13 +4,11 @@ import com.netgrif.application.engine.configuration.ApplicationContextProvider;
 import com.netgrif.application.engine.configuration.JsonRootRelProvider;
 import com.netgrif.application.engine.configuration.groovy.converter.GStringToStringConverter;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
-import com.netgrif.netgrifdrools.NetgrifDroolsApplication;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +16,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.hateoas.server.LinkRelationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -32,7 +29,7 @@ import java.util.List;
 @EnableAspectJAutoProxy
 @SpringBootApplication(
         exclude = {DataSourceAutoConfiguration.class},
-        scanBasePackages = {"com.netgrif.application.engine", "com.netgrif.netgrifdrools"})
+        scanBasePackages = {"com.netgrif.application.engine"})
 @EnableMongoAuditing
 @ConfigurationPropertiesScan
 @Aspect
