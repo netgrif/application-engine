@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
-class FileListField extends Field<FileListFieldValue> {
-    private String storageType
+class FileListField extends StorageField<FileListFieldValue> {
 
     FileListField() {
         super()
@@ -48,21 +47,12 @@ class FileListField extends Field<FileListFieldValue> {
         this.getValue().getNamesPaths().add(new FileFieldValue(fileName, path))
     }
 
-    String getStorageType() {
-        return storageType
-    }
-
-    void setStorageType(String storageType) {
-        this.storageType = storageType
-    }
-
-
     @Override
     Field clone() {
         FileListField clone = new FileListField()
         super.clone(clone)
         clone.storageType = this.storageType
-
+        clone.remote = this.remote
         return clone
     }
 }

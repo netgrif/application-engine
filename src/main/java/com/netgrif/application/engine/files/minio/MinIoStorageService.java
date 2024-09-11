@@ -4,6 +4,7 @@ import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.files.throwable.BadRequestException;
 import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import com.netgrif.application.engine.files.throwable.StorageException;
+import com.netgrif.application.engine.petrinet.domain.dataset.StorageField;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
@@ -27,19 +28,11 @@ import java.security.NoSuchAlgorithmException;
         value = "nae.storage.minio.enabled",
         havingValue = "true"
 )
-public class MinioStorageService implements IStorageService {
-
-    MinioClient minioClient;
-
-    MinioProperties properties;
+public class MinIoStorageService implements IStorageService {
+    private MinIoProperties properties;
 
     @Autowired
-    public void setMinioClient(MinioClient minioClient) {
-        this.minioClient = minioClient;
-    }
-
-    @Autowired
-    public void setProperties(MinioProperties properties) {
+    public void setProperties(MinIoProperties properties) {
         this.properties = properties;
     }
 
@@ -49,11 +42,11 @@ public class MinioStorageService implements IStorageService {
     }
 
     @Override
-    public InputStream get(String path) throws BadRequestException, ServiceErrorException, FileNotFoundException {
+    public InputStream get(StorageField<?> field, String path) throws BadRequestException, ServiceErrorException, FileNotFoundException {
         try {
-            return minioClient.getObject(
+            return client(field.getRemote().getHost(), field.getRemote().getCredentials()).getObject(
                     GetObjectArgs.builder()
-                            .bucket(properties.getBucketName())
+                            .bucket(field.getRemote().getBucket() )
                             .object(path)
                             .build()
             );
@@ -77,20 +70,20 @@ public class MinioStorageService implements IStorageService {
     }
 
     @Override
-    public boolean save(String path, MultipartFile file) throws StorageException {
+    public boolean save(StorageField<?> field, String path, MultipartFile file) throws StorageException {
         try (InputStream stream = file.getInputStream()) {
-            return this.save(path, stream);
+            return this.save(field, path, stream);
         } catch (StorageException | IOException e) {
             throw new StorageException("File cannot be saved", e);
         }
     }
 
     @Override
-    public boolean save(String path, InputStream stream) throws StorageException {
+    public boolean save(StorageField<?> field, String path, InputStream stream) throws StorageException {
         try {
-            return minioClient.putObject(PutObjectArgs
+            return client(field.getRemote().getHost(), field.getRemote().getCredentials()).putObject(PutObjectArgs
                     .builder()
-                    .bucket(properties.getBucketName()).object(path)
+                    .bucket(field.getRemote().getBucket()).object(path)
                     .stream(stream, -1, properties.getPartSize())
                     .build()).etag() != null;
         } catch (ErrorResponseException e) {
@@ -104,11 +97,13 @@ public class MinioStorageService implements IStorageService {
     }
 
     @Override
-    public void delete(String path) throws StorageException {
+    public void delete(StorageField<?> field, String path) throws StorageException {
         try {
-            minioClient.removeObject(RemoveObjectArgs
+            client(field.getRemote().getHost(), field.getRemote().getCredentials()).removeObject(RemoveObjectArgs
                     .builder()
-                    .bucket(properties.getBucketName()).object(path).build());
+                    .bucket(field.getRemote().getBucket())
+                    .object(path)
+                    .build());
         } catch (InsufficientDataException | InternalException | InvalidResponseException |
                  IOException | NoSuchAlgorithmException | ServerException | XmlParserException e) {
             throw new ServiceErrorException(e.getMessage(), e);
@@ -129,5 +124,16 @@ public class MinioStorageService implements IStorageService {
     @Override
     public String getPath(String caseId, String fieldId, String name) {
         return caseId + "-" + fieldId + "-" + name;
+    }
+
+    public static String getBucketOrDefault(String bucket) {
+        return bucket != null ? bucket : MinIoProperties.DEFAULT_BUCKET;
+    }
+
+    protected MinioClient client(String host, String credentials) {
+        return MinioClient.builder()
+                .endpoint(properties.getHosts(host).getHost())
+                .credentials(properties.getHosts(host).getCredentials(credentials).getUser(), properties.getHosts(host).getCredentials(credentials).getPassword())
+                .build();
     }
 }

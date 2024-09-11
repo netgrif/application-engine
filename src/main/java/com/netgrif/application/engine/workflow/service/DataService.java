@@ -485,7 +485,7 @@ public class DataService implements IDataService {
             log.error("File " + name + " not found!");
             throw new FileNotFoundException("File " + name + " not found!");
         }
-        return new FileFieldInputStream(storageResolverService.resolve(field.getStorageType()).get(fileFieldValue.get().getPath()), name);
+        return new FileFieldInputStream(storageResolverService.resolve(field.getStorageType()).get(field, fileFieldValue.get().getPath()), name);
     }
 
     @Override
@@ -506,7 +506,7 @@ public class DataService implements IDataService {
             if (forPreview) {
                 return getFilePreview(field, useCase);
             } else {
-                return new FileFieldInputStream(field, storageResolverService.resolve(field.getStorageType()).get(field.getValue().getPath()));
+                return new FileFieldInputStream(field, storageResolverService.resolve(field.getStorageType()).get(field, field.getValue().getPath()));
             }
         } catch (IOException | StorageException e) {
             log.error("Getting file failed: ", e);
@@ -525,9 +525,9 @@ public class DataService implements IDataService {
     private FileFieldInputStream getFilePreview(FileField field, Case useCase) throws IOException, StorageException {
         IStorageService storageService = storageResolverService.resolve(field.getStorageType());
         if (field.getValue().getPreviewPath() != null) {
-            return new FileFieldInputStream(field, storageService.get(field.getValue().getPreviewPath()));
+            return new FileFieldInputStream(field, storageService.get(field, field.getValue().getPreviewPath()));
         }
-        InputStream stream = storageService.get(field.getValue().getPath());
+        InputStream stream = storageService.get(field, field.getValue().getPath());
         File file = File.createTempFile(field.getStringId(), ".pdf");
         file.deleteOnExit();
         FileOutputStream fos = new FileOutputStream(file);
@@ -537,7 +537,7 @@ public class DataService implements IDataService {
         byte[] bytes = generateFilePreviewToStream(file).toByteArray();
         try (InputStream inputStream = new ByteArrayInputStream(bytes)) {
             String previewPath = storageService.getPreviewPath(useCase.getStringId(), field.getImportId(), field.getValue().getName());
-            storageService.save(previewPath, inputStream);
+            storageService.save(field, previewPath, inputStream);
             field.getValue().setPreviewPath(previewPath);
             useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
             workflowService.save(useCase);
@@ -587,7 +587,7 @@ public class DataService implements IDataService {
 
     @Override
     public InputStream download(FileListField field, FileFieldValue fieldValue) throws StorageException, FileNotFoundException {
-        return storageResolverService.resolve(field.getStorageType()).get(fieldValue.getPath());
+        return storageResolverService.resolve(field.getStorageType()).get(field, fieldValue.getPath());
     }
 
     @Override
@@ -604,9 +604,9 @@ public class DataService implements IDataService {
         IStorageService storageService = storageResolverService.resolve(field.getStorageType());
         try {
             if (useCase.getDataSet().get(field.getStringId()).getValue() != null && field.getValue().getPath() != null) {
-                storageService.delete(field.getValue().getPath());
+                storageService.delete(field, field.getValue().getPath());
                 if (field.getValue().getPreviewPath() != null) {
-                    storageService.delete(field.getValue().getPreviewPath());
+                    storageService.delete(field, field.getValue().getPreviewPath());
                 }
                 useCase.getDataSet().get(field.getStringId()).setValue(null);
             }
@@ -614,7 +614,7 @@ public class DataService implements IDataService {
             field.setValue(multipartFile.getOriginalFilename());
             String path = storageService.getPath(useCase.getStringId(), field.getStringId(), multipartFile.getOriginalFilename());
             field.getValue().setPath(path);
-            storageService.save(path, multipartFile);
+            storageService.save(field, path, multipartFile);
         } catch (StorageException e) {
             log.error("File " + multipartFile.getOriginalFilename() + " in case " + useCase.getStringId() + " could not be saved to file field " + field.getStringId(), e);
             throw new EventNotExecutableException("File " + multipartFile.getOriginalFilename() + " in case " + useCase.getStringId() + " could not be saved to file field " + field.getStringId(), e);
@@ -641,13 +641,13 @@ public class DataService implements IDataService {
                 if (field.getValue() != null && field.getValue().getNamesPaths() != null) {
                     Optional<FileFieldValue> fileFieldValue = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(multipartFile.getOriginalFilename())).findFirst();
                     if (fileFieldValue.isPresent()) {
-                        storageService.delete(fileFieldValue.get().getPath());
+                        storageService.delete(field, fileFieldValue.get().getPath());
                         field.getValue().getNamesPaths().remove(fileFieldValue.get());
                     }
                 }
                 String path = storageService.getPath(useCase.getStringId(), field.getStringId(), multipartFile.getOriginalFilename());
                 field.addValue(multipartFile.getOriginalFilename(), path);
-                storageService.save(path, multipartFile);
+                storageService.save(field, path, multipartFile);
             } catch (StorageException e) {
                 log.error(e.getMessage());
                 throw new EventNotExecutableException("File " + multipartFile.getOriginalFilename() + " in case " + useCase.getStringId() + " could not be saved to file list field " + field.getStringId(), e);
@@ -682,9 +682,9 @@ public class DataService implements IDataService {
         IStorageService storageService = storageResolverService.resolve(field.getStorageType());
         if (useCase.getDataSet().get(field.getStringId()).getValue() != null) {
             try {
-                storageService.delete(field.getValue().getPath());
+                storageService.delete(field, field.getValue().getPath());
                 if (field.getValue().getPreviewPath() != null) {
-                    storageService.delete(field.getValue().getPreviewPath());
+                    storageService.delete(field, field.getValue().getPreviewPath());
                 }
             } catch (StorageException e) {
                 log.error(e.getMessage());
@@ -719,7 +719,7 @@ public class DataService implements IDataService {
         Optional<FileFieldValue> fileFieldValue = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
         if (fileFieldValue.isPresent()) {
             try {
-                storageService.delete(fileFieldValue.get().getPath());
+                storageService.delete(field, fileFieldValue.get().getPath());
                 field.getValue().getNamesPaths().remove(fileFieldValue.get());
                 useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
             } catch (StorageException e) {

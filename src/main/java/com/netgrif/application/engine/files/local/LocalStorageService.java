@@ -4,6 +4,7 @@ import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.files.throwable.BadRequestException;
 import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import com.netgrif.application.engine.files.throwable.StorageException;
+import com.netgrif.application.engine.petrinet.domain.dataset.StorageField;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,21 +29,21 @@ public class LocalStorageService implements IStorageService {
     }
 
     @Override
-    public InputStream get(String path) throws BadRequestException, ServiceErrorException, FileNotFoundException {
+    public InputStream get(StorageField<?> field, String path) throws BadRequestException, ServiceErrorException, FileNotFoundException {
         return new FileInputStream(path);
     }
 
     @Override
-    public boolean save(String path, MultipartFile file) throws StorageException {
+    public boolean save(StorageField<?> field, String path, MultipartFile file) throws StorageException {
         try (InputStream stream = file.getInputStream()) {
-            return this.save(path, stream);
+            return this.save(field, path, stream);
         } catch (StorageException | IOException e) {
             throw new StorageException("File cannot be saved", e);
         }
     }
 
     @Override
-    public boolean save(String path, InputStream stream) throws StorageException {
+    public boolean save(StorageField<?> field, String path, InputStream stream) throws StorageException {
         File savedFile = createNewFile(path);
         try (FileOutputStream fout = new FileOutputStream(savedFile)) {
             stream.transferTo(fout);
@@ -68,7 +69,7 @@ public class LocalStorageService implements IStorageService {
     }
 
     @Override
-    public void delete(String path) throws StorageException {
+    public void delete(StorageField<?> field, String path) throws StorageException {
         new File(path).delete();
     }
 

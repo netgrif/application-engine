@@ -4,9 +4,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class FileField extends Field<FileFieldValue> {
-
-    private String storageType
+class FileField extends StorageField<FileFieldValue> {
 
     FileField() {
         super()
@@ -42,19 +40,12 @@ class FileField extends Field<FileFieldValue> {
         this.setDefaultValue(FileFieldValue.fromString(defaultValue))
     }
 
-    String getStorageType() {
-        return this.storageType
-    }
-
-    void setStorageType(String storageType) {
-        this.storageType = storageType
-    }
-
     @Override
     Field clone() {
         FileField clone = new FileField()
         super.clone(clone)
         clone.storageType = this.storageType
+        clone.remote = this.remote
         return clone
     }
 }

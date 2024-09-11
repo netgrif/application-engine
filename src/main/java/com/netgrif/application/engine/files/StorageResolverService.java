@@ -27,8 +27,8 @@ public class StorageResolverService {
             log.error("Storage services with interface IStorageService not found.");
             throw new StorageNotFoundException("Remote Storage not available.");
         }
-        if (storageServices.containsKey(type)) {
-            return storageServices.get(type);
+        if (storageServices.containsKey(type.toUpperCase())) {
+            return storageServices.get(type.toUpperCase());
         }
         throw new StorageNotFoundException("Storage Service with type: " + type + " not available.");
 
