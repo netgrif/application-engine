@@ -1054,8 +1054,8 @@ public class Importer {
             throw new IllegalArgumentException("Role ID '" + ProcessRole.ANONYMOUS_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
         }
 
-        ProcessRole role = null;
-        if (importRole.isGlobal() == null || !importRole.isGlobal() || (importRole.isGlobal() && processRoleService.findAllByImportId(ProcessRole.GLOBAL + importRole.getId()).isEmpty())) {
+        ProcessRole role;
+        if (shouldInitializeRole(importRole)) {
             role = initRole(importRole);
         } else {
             role = new ArrayList<>(processRoleService.findAllByImportId(ProcessRole.GLOBAL + importRole.getId())).get(0);
@@ -1063,6 +1063,11 @@ public class Importer {
 
         net.addRole(role);
         roles.put(importRole.getId(), role);
+    }
+
+    protected boolean shouldInitializeRole(Role importRole) {
+        return importRole.isGlobal() == null || !importRole.isGlobal() ||
+                (importRole.isGlobal() && processRoleService.findAllByImportId(ProcessRole.GLOBAL + importRole.getId()).isEmpty());
     }
 
     protected ProcessRole initRole(Role importRole) {
