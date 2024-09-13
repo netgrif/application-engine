@@ -525,7 +525,7 @@ public final class FieldFactory {
 
     private FileField buildFileField(Data data) {
         FileField fileField = new FileField();
-        fileField.setStorageType(data.getRemote() == null ? defaultStorageType : data.getRemote().getType());
+        fileField.setStorageType((data.getRemote() == null || data.getRemote().getType() == null) ? defaultStorageType : data.getRemote().getType());
         resolveIfRemote(data, fileField);
         setDefaultValue(fileField, data, defaultValue -> {
             if (defaultValue != null) {
@@ -537,7 +537,7 @@ public final class FieldFactory {
 
     private FileListField buildFileListField(Data data) {
         FileListField fileListField = new FileListField();
-        fileListField.setStorageType(data.getRemote() == null ? defaultStorageType : data.getRemote().getType());
+        fileListField.setStorageType((data.getRemote() == null || data.getRemote().getType() == null) ? defaultStorageType : data.getRemote().getType());
         resolveIfRemote(data, fileListField);
         setDefaultValues(fileListField, data, defaultValues -> {
             if (defaultValues != null && !defaultValues.isEmpty()) {
@@ -864,10 +864,10 @@ public final class FieldFactory {
             if (data.getRemote().getHost() != null) {
                 field.getRemote().setHost(data.getRemote().getHost());
             }
-            if (data.getRemote().getType().equals(MinIoProperties.MINIO_TYPE) && data.getRemote().getBucket() != null) {
+            if (field.getStorageType().equals(MinIoProperties.MINIO_TYPE) && data.getRemote().getBucket() != null) {
                 field.getRemote().setBucket(getBucketOrDefault(data.getRemote().getBucket()));
             }
-            if (data.getRemote().getType().equals(MinIoProperties.MINIO_TYPE) && data.getRemote().getBucket() != null) {
+            if (field.getStorageType().equals(MinIoProperties.MINIO_TYPE) && data.getRemote().getBucket() != null) {
                 field.getRemote().setCredentials(data.getRemote().getCredentials());
             }
         }
