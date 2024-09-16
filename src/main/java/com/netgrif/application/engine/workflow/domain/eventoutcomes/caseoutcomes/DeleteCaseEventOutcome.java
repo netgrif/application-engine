@@ -18,8 +18,8 @@ public class DeleteCaseEventOutcome extends CaseEventOutcome {
         super(aCase, outcomes);
     }
 
-    public DeleteCaseEventOutcome(I18nString message,Case aCase) {
-        super(message,aCase);
+    public DeleteCaseEventOutcome(I18nString message, Case aCase) {
+        super(message, aCase);
     }
 
     public DeleteCaseEventOutcome(I18nString message, List<EventOutcome> outcomes, Case aCase) {

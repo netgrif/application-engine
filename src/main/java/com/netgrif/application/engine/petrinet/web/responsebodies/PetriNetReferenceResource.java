@@ -13,23 +13,23 @@ public class PetriNetReferenceResource extends EntityModel<PetriNetReference> {
 
     private void buildLinks() {
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
-                .methodOn(PetriNetController.class).getOne(getContent().getStringId(), null, null))
+                        .methodOn(PetriNetController.class).getOne(getContent().getStringId(), null, null))
                 .withSelfRel());
 
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
-                .methodOn(PetriNetController.class).getOne(getContent().getIdentifier(), getContent().getVersion(), null, null))
+                        .methodOn(PetriNetController.class).getOne(getContent().getIdentifier(), getContent().getVersion(), null, null))
                 .withRel("identifier"));
 
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
-                .methodOn(PetriNetController.class).getRoles(getContent().getStringId(), null))
+                        .methodOn(PetriNetController.class).getRoles(getContent().getStringId(), null))
                 .withRel("roles"));
 
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
-                .methodOn(PetriNetController.class).getTransactions(getContent().getStringId(), null))
+                        .methodOn(PetriNetController.class).getTransactions(getContent().getStringId(), null))
                 .withRel("transaction"));
 
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
-                .methodOn(PetriNetController.class).getNetFile(getContent().getStringId(), getContent().getTitle(), null, null))
+                        .methodOn(PetriNetController.class).getNetFile(getContent().getStringId(), getContent().getTitle(), null, null))
                 .withRel("file"));
     }
 }

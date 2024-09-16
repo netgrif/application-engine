@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import static com.netgrif.application.engine.petrinet.web.PetriNetController.decodeUrl;
 

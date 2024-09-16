@@ -224,7 +224,7 @@ public class Case implements Serializable {
         return this.dataSet.get(field).hasDefinedBehavior(transition);
     }
 
-    public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
+    public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator, Map<String, String> params) {
         List<Field<?>> dynamicInitFields = new LinkedList<>();
         List<MapOptionsField<I18nString, ?>> dynamicOptionsFields = new LinkedList<>();
         List<ChoiceField<?>> dynamicChoicesFields = new LinkedList<>();
@@ -234,6 +234,9 @@ public class Case implements Serializable {
                 this.dataSet.put(key, new DataField());
             } else {
                 this.dataSet.put(key, new DataField(field.getDefaultValue()));
+            }
+            if (field.getComponent() != null) {
+                this.dataSet.get(key).setComponent(field.getComponent());
             }
             if (field instanceof UserField) {
                 this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
@@ -254,16 +257,19 @@ public class Case implements Serializable {
                 dynamicChoicesFields.add((ChoiceField<?>) field);
             }
         });
-        dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field)));
-        dynamicChoicesFields.forEach(field -> this.dataSet.get(field.getImportId()).setChoices(initValueExpressionEvaluator.evaluateChoices(this, field)));
-        dynamicOptionsFields.forEach(field -> this.dataSet.get(field.getImportId()).setOptions(initValueExpressionEvaluator.evaluateOptions(this, field)));
-        populateDataSetBehavior();
+        dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field, params)));
+        dynamicChoicesFields.forEach(field -> this.dataSet.get(field.getImportId()).setChoices(initValueExpressionEvaluator.evaluateChoices(this, field, params)));
+        dynamicOptionsFields.forEach(field -> this.dataSet.get(field.getImportId()).setOptions(initValueExpressionEvaluator.evaluateOptions(this, field, params)));
+        populateDataSetBehaviorAndComponents();
     }
 
-    private void populateDataSetBehavior() {
+    private void populateDataSetBehaviorAndComponents() {
         petriNet.getTransitions().forEach((transitionKey, transitionValue) -> {
             transitionValue.getDataSet().forEach((dataKey, dataValue) -> {
                 getDataSet().get(dataKey).addBehavior(transitionKey, new HashSet<>(dataValue.getBehavior()));
+                if (dataValue.getComponent() != null) {
+                    getDataSet().get(dataKey).addDataRefComponent(transitionKey, dataValue.getComponent());
+                }
             });
         });
     }

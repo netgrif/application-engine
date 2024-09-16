@@ -344,7 +344,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     private static BooleanExpression caseIdString(String caseId) {
-        return caseId.equals("") ? QCase.case$._id.isNull() :  QCase.case$._id.eq(new ObjectId(caseId));
+        return caseId.equals("") ? QCase.case$._id.isNull() : QCase.case$._id.eq(new ObjectId(caseId));
     }
 
     public Predicate group(Object query, LoggedUser user, Locale locale) {
@@ -352,7 +352,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (query instanceof List) {
             processQuery.setGroup((List<String>) query);
         } else if (query instanceof String) {
-            processQuery.setGroup(new ArrayList<String>( Arrays.asList((String) query)) );
+            processQuery.setGroup(new ArrayList<String>(Arrays.asList((String) query)));
         }
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
         if (groupProcesses.size() == 0)

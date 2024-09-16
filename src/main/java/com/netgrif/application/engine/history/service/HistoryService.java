@@ -26,6 +26,8 @@ import java.util.List;
 
 @Service
 public class HistoryService implements IHistoryService {
+    protected String clazz = "', _class: '";
+
     @Autowired
     private EventLogRepository eventLogRepository;
 
@@ -38,8 +40,6 @@ public class HistoryService implements IHistoryService {
         eventLogRepository.save(eventLog);
     }
 
-    protected String clazz = "', _class: '";
-    
     @Override
     public List<EventLog> findAllByIds(List<ObjectId> eventIds) {
         return eventLogRepository.findAllById(eventIds);

@@ -12,17 +12,18 @@ public class EventOutcomeWithMessage extends ResponseMessage {
     public EventOutcomeWithMessage(LocalisedEventOutcome outcome) {
         this.outcome = outcome;
     }
+
     public EventOutcomeWithMessage(String errorMsg) {
         setError(errorMsg);
     }
 
-    public static EventOutcomeWithMessage withSuccessMessage(String successMessage, LocalisedEventOutcome outcome){
+    public static EventOutcomeWithMessage withSuccessMessage(String successMessage, LocalisedEventOutcome outcome) {
         EventOutcomeWithMessage outcomeWithMessage = new EventOutcomeWithMessage(outcome);
         outcomeWithMessage.setSuccess(successMessage);
         return outcomeWithMessage;
     }
 
-    public static EventOutcomeWithMessage withErrorMessage(String errorMessage, LocalisedEventOutcome outcome){
+    public static EventOutcomeWithMessage withErrorMessage(String errorMessage, LocalisedEventOutcome outcome) {
         EventOutcomeWithMessage outcomeWithMessage = new EventOutcomeWithMessage(outcome);
         outcomeWithMessage.setError(errorMessage);
         return outcomeWithMessage;

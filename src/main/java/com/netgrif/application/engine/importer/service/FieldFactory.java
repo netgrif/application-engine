@@ -11,6 +11,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runne
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Argument;
 import com.netgrif.application.engine.validation.converter.LegacyValidationConverter;
 import com.netgrif.application.engine.petrinet.domain.views.View;
+import com.netgrif.application.engine.validation.converter.LegacyValidationConverter;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataValidationExpressionEvaluator;
@@ -55,6 +56,139 @@ public final class FieldFactory {
     @Autowired
     public void setLegacyValidationConverter(LegacyValidationConverter legacyValidationConverter) {
         this.legacyValidationConverter = legacyValidationConverter;
+    }
+
+    public static Set<I18nString> parseMultichoiceValue(Case useCase, String fieldId) {
+        Object values = useCase.getFieldValue(fieldId);
+        if (values instanceof ArrayList) {
+            return (Set<I18nString>) ((ArrayList) values).stream().map(val -> new I18nString(val.toString())).collect(Collectors.toCollection(LinkedHashSet::new));
+        } else {
+            return (Set<I18nString>) values;
+        }
+    }
+
+    public static Set<String> parseMultichoiceMapValue(Case useCase, String fieldId) {
+        Object values = useCase.getFieldValue(fieldId);
+        if (values instanceof ArrayList) {
+            return (Set<String>) ((ArrayList) values).stream().map(val -> val.toString()).collect(Collectors.toCollection(LinkedHashSet::new));
+        } else {
+            return (Set<String>) values;
+        }
+    }
+
+    public static Double parseDouble(Object value) {
+        if (value instanceof String) {
+            return Double.parseDouble((String) value);
+        } else if (value instanceof Integer) {
+            return ((Integer) value) * 1D;
+        } else if (value instanceof Double) {
+            return (Double) value;
+        }
+        return null;
+    }
+
+    public static LocalDate parseDate(Object value) {
+        if (value instanceof Date) {
+            return ((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        } else if (value instanceof String) {
+            return parseDateFromString((String) value);
+        } else if (value instanceof LocalDate) {
+            return (LocalDate) value;
+        }
+        return null;
+    }
+
+    /**
+     * Available formats - YYYYMMDD; YYYY-MM-DD; DD.MM.YYYY
+     *
+     * @param value - Date as string
+     * @return Parsed date as LocalDate object or null if date cannot be parsed
+     */
+    public static LocalDate parseDateFromString(String value) {
+        if (value == null)
+            return null;
+
+        List<String> patterns = Arrays.asList("dd.MM.yyyy");
+        try {
+            return LocalDate.parse(value, DateTimeFormatter.BASIC_ISO_DATE);
+        } catch (DateTimeParseException e) {
+            try {
+                return LocalDate.parse(value, DateTimeFormatter.ISO_DATE);
+            } catch (DateTimeParseException ex) {
+                for (String pattern : patterns) {
+                    try {
+                        return LocalDate.parse(value, DateTimeFormatter.ofPattern(pattern));
+                    } catch (DateTimeParseException | IllegalArgumentException exc) {
+                        continue;
+                    }
+                }
+            }
+        }
+        LocalDateTime dateTime = parseDateTimeFromString(value);
+        if (dateTime != null) {
+            return dateTime.toLocalDate();
+        }
+        return null;
+    }
+
+    public static LocalDateTime parseDateTime(Object value) {
+        if (value == null)
+            return null;
+
+        if (value instanceof LocalDate)
+            return LocalDateTime.of((LocalDate) value, LocalTime.NOON);
+        else if (value instanceof String)
+            return parseDateTimeFromString((String) value);
+        else if (value instanceof Date)
+            return LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault());
+        return (LocalDateTime) value;
+    }
+
+    public static LocalDateTime parseDateTimeFromString(String value) {
+        if (value == null)
+            return null;
+
+        List<String> patterns = Arrays.asList("dd.MM.yyyy HH:mm", "dd.MM.yyyy HH:mm:ss");
+        try {
+            return LocalDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME);
+        } catch (DateTimeParseException e) {
+            try {
+                return LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            } catch (DateTimeParseException ex) {
+                try {
+                    return LocalDateTime.parse(value, DateTimeFormatter.ISO_INSTANT);
+                } catch (DateTimeParseException exc) {
+                    for (String pattern : patterns) {
+                        try {
+                            return LocalDateTime.parse(value, DateTimeFormatter.ofPattern(pattern));
+                        } catch (DateTimeParseException | IllegalArgumentException excp) {
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public static I18nString parseEnumValue(Case useCase, String fieldId, EnumerationField field) {
+        Object value = useCase.getFieldValue(fieldId);
+        if (value instanceof String) {
+            for (I18nString i18nString : field.getChoices()) {
+                if (i18nString.contains((String) value)) {
+                    return i18nString;
+                }
+            }
+            return new I18nString((String) value);
+//            throw new IllegalArgumentException("Value " + value + " is not a valid value.");
+        } else {
+            return (I18nString) value;
+        }
+    }
+
+    public static String parseEnumerationMapValue(Case useCase, String fieldId) {
+        Object value = useCase.getFieldValue(fieldId);
+        return value != null ? value.toString() : null;
     }
 
     // TODO: refactor this shit
@@ -147,7 +281,7 @@ public final class FieldFactory {
             field.setFormat(format);
         }
         if (data.getView() != null) {
-            log.warn("Data attribute [view] in field [" + field.getImportId()  + "] is deprecated.");
+            log.warn("Data attribute [view] in field [" + field.getImportId() + "] is deprecated.");
             View view = viewFactory.buildView(data);
             field.setComponent(new Component(view.getValue()));
         }
@@ -523,13 +657,10 @@ public final class FieldFactory {
     }
 
     private void resolveComponent(Field field, Case useCase, String transitionId) {
-        if (transitionId == null) {
-            return;
-        }
-        com.netgrif.application.engine.petrinet.domain.Transition transition = useCase.getPetriNet().getTransition(transitionId);
-        Component transitionComponent = transition.getDataSet().get(field.getImportId()).getComponent();
-        if (transitionComponent != null) {
-            field.setComponent(transitionComponent);
+        if (useCase.getDataField(field.getStringId()).hasComponent(transitionId)) {
+            field.setComponent(useCase.getDataField(field.getStringId()).getDataRefComponents().get(transitionId));
+        } else if (useCase.getDataField(field.getStringId()).hasComponent()) {
+            field.setComponent(useCase.getDataField(field.getStringId()).getComponent());
         }
     }
 
@@ -625,38 +756,9 @@ public final class FieldFactory {
         field.setValue((UserListFieldValue) useCase.getFieldValue(fieldId));
     }
 
-    public static Set<I18nString> parseMultichoiceValue(Case useCase, String fieldId) {
-        Object values = useCase.getFieldValue(fieldId);
-        if (values instanceof ArrayList) {
-            return (Set<I18nString>) ((ArrayList) values).stream().map(val -> new I18nString(val.toString())).collect(Collectors.toCollection(LinkedHashSet::new));
-        } else {
-            return (Set<I18nString>) values;
-        }
-    }
-
-    public static Set<String> parseMultichoiceMapValue(Case useCase, String fieldId) {
-        Object values = useCase.getFieldValue(fieldId);
-        if (values instanceof ArrayList) {
-            return (Set<String>) ((ArrayList) values).stream().map(val -> val.toString()).collect(Collectors.toCollection( LinkedHashSet::new ));
-        } else {
-            return (Set<String>) values;
-        }
-    }
-
     private Double parseNumberValue(Case useCase, String fieldId) {
         Object value = useCase.getFieldValue(fieldId);
         return parseDouble(value);
-    }
-
-    public static Double parseDouble(Object value) {
-        if (value instanceof String) {
-            return Double.parseDouble((String) value);
-        } else if (value instanceof Integer) {
-            return ((Integer) value) * 1D;
-        } else if (value instanceof Double) {
-            return (Double) value;
-        }
-        return null;
     }
 
     private void parseDateValue(DateField field, String fieldId, Case useCase) {
@@ -669,109 +771,9 @@ public final class FieldFactory {
         field.setDefaultValue(parseDate(value));
     }
 
-    public static LocalDate parseDate(Object value) {
-        if (value instanceof Date) {
-            return ((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        } else if (value instanceof String) {
-            return parseDateFromString((String) value);
-        } else if (value instanceof LocalDate) {
-            return (LocalDate) value;
-        }
-        return null;
-    }
-
-    /**
-     * Available formats - YYYYMMDD; YYYY-MM-DD; DD.MM.YYYY
-     *
-     * @param value - Date as string
-     * @return Parsed date as LocalDate object or null if date cannot be parsed
-     */
-    public static LocalDate parseDateFromString(String value) {
-        if (value == null)
-            return null;
-
-        List<String> patterns = Arrays.asList("dd.MM.yyyy");
-        try {
-            return LocalDate.parse(value, DateTimeFormatter.BASIC_ISO_DATE);
-        } catch (DateTimeParseException e) {
-            try {
-                return LocalDate.parse(value, DateTimeFormatter.ISO_DATE);
-            } catch (DateTimeParseException ex) {
-                for (String pattern : patterns) {
-                    try {
-                        return LocalDate.parse(value, DateTimeFormatter.ofPattern(pattern));
-                    } catch (DateTimeParseException | IllegalArgumentException exc) {
-                        continue;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
     private void parseDateTimeValue(DateTimeField field, String fieldId, Case useCase) {
         Object value = useCase.getFieldValue(fieldId);
         field.setValue(parseDateTime(value));
-    }
-
-    public static LocalDateTime parseDateTime(Object value) {
-        if (value == null)
-            return null;
-
-        if (value instanceof LocalDate)
-            return LocalDateTime.of((LocalDate) value, LocalTime.NOON);
-        else if (value instanceof String)
-            return parseDateTimeFromString((String) value);
-        else if (value instanceof Date)
-            return LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault());
-        return (LocalDateTime) value;
-    }
-
-    public static LocalDateTime parseDateTimeFromString(String value) {
-        if (value == null)
-            return null;
-
-        List<String> patterns = Arrays.asList("dd.MM.yyyy HH:mm", "dd.MM.yyyy HH:mm:ss");
-        try {
-            return LocalDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME);
-        } catch (DateTimeParseException e) {
-            try {
-                return LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            } catch (DateTimeParseException ex) {
-                try {
-                    return LocalDateTime.parse(value, DateTimeFormatter.ISO_INSTANT);
-                } catch (DateTimeParseException exc) {
-                    for (String pattern : patterns) {
-                        try {
-                            return LocalDateTime.parse(value, DateTimeFormatter.ofPattern(pattern));
-                        } catch (DateTimeParseException | IllegalArgumentException excp) {
-                            continue;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    public static I18nString parseEnumValue(Case useCase, String fieldId, EnumerationField field) {
-        Object value = useCase.getFieldValue(fieldId);
-        if (value instanceof String) {
-            for (I18nString i18nString : field.getChoices()) {
-                if (i18nString.contains((String) value)) {
-                    return i18nString;
-                }
-            }
-            return new I18nString((String) value);
-//            throw new IllegalArgumentException("Value " + value + " is not a valid value.");
-        } else {
-            return (I18nString) value;
-        }
-    }
-
-    public static String parseEnumerationMapValue(Case useCase, String fieldId) {
-        Object value = useCase.getFieldValue(fieldId);
-        return value != null ? value.toString() : null;
     }
 
     private void parseFileValue(FileField field, Case useCase, String fieldId) {

@@ -16,6 +16,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.Eve
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
+import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.web.responsebodies.*;
 import org.slf4j.Logger;
@@ -37,7 +38,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public abstract class AbstractTaskController {
 
@@ -221,10 +225,10 @@ public abstract class AbstractTaskController {
         }
     }
 
-    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> dataBody, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, MultipartFile multipartFile, FileFieldRequest dataBody, Locale locale) {
         try {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
-            dataBody.entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.saveFile(it.getKey(), fieldId, multipartFile)));
+            outcomes.put(dataBody.getParentTaskId(), dataService.saveFile(dataBody.getParentTaskId(), dataBody.getFieldId(), multipartFile));
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set",
                     LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
@@ -259,11 +263,12 @@ public abstract class AbstractTaskController {
         outcomes.put(taskId, dataService.deleteFile(taskId, fieldId));
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
-                LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));    }
+                LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
+    }
 
-    public EntityModel<EventOutcomeWithMessage> saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles, Map<String, String> dataBody) {
+    public EntityModel<EventOutcomeWithMessage> saveFiles(String taskId, MultipartFile[] multipartFiles, FileFieldRequest requestBody) {
         Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
-        dataBody.entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.saveFiles(it.getKey(), fieldId, multipartFiles)));
+        outcomes.put(requestBody.getParentTaskId(), dataService.saveFiles(requestBody.getParentTaskId(), requestBody.getFieldId(), multipartFiles));
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
                 LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));

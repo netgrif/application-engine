@@ -94,7 +94,7 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Override
     public void createFilterImport(IUser author) {
-        workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER,"Import filters " + author.getFullName(), "", author.transformToLoggedUser());
+        workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER, "Import filters " + author.getFullName(), "", author.transformToLoggedUser());
     }
 
     @Override
@@ -106,6 +106,7 @@ public class FilterImportExportService implements IFilterImportExportService {
      * Method which performs export of selected filters into xml file.
      * Method finds all cases by provided ids, transform them into FilterImportExportList object
      * and serialize them into xml file on path: storage/filterExport/<userId>/filters.xml
+     *
      * @param filtersToExport - set of ids of filter cases, which should be exported
      * @return FileFieldValue - file field value with path to xml file of exported filters
      * @throws IOException - if file which contains exported filters cannot be created
@@ -119,6 +120,7 @@ public class FilterImportExportService implements IFilterImportExportService {
     /**
      * Method which performs export of selected filters into xml file.
      * Method finds all cases by provided ids, transform them into FilterImportExportList object
+     *
      * @param filtersToExport - set of ids of filter cases, which should be exported
      * @return a serializable wrapper of a list of filter objects in serializable form
      */
@@ -157,8 +159,9 @@ public class FilterImportExportService implements IFilterImportExportService {
      * export located on path: filter_export_schema.xml
      * If the file is correct, method calls performImport method which
      * creates filter cases
+     *
      * @return List<String> - list of task ids of imported filter cases in - import_filter transition
-     * @throws IOException - if imported file is not found
+     * @throws IOException                - if imported file is not found
      * @throws IllegalFilterFileException - if uploaded xml is not in correct xml format and invalidate against schema
      */
     @Override
@@ -171,17 +174,18 @@ public class FilterImportExportService implements IFilterImportExportService {
     /**
      * Method which performs import of filters from already created filter import class instances
      * passed in as parameter.
+     *
      * @param filterList - instance of class FilterImportExportList
      * @return a mapping of original filter case ids to task ids of imported filter cases in - import_filter transition
      * @throws IOException - if imported file is not found
      */
     @Override
-    public Map<String, String> importFilters (FilterImportExportList filterList) throws IOException, TransitionNotExecutableException {
+    public Map<String, String> importFilters(FilterImportExportList filterList) throws IOException, TransitionNotExecutableException {
         log.info("Importing filters from imported menu");
         return performImport(filterList);
     }
 
-    protected Map<String, String> performImport (FilterImportExportList filterList) throws IOException, TransitionNotExecutableException {
+    protected Map<String, String> performImport(FilterImportExportList filterList) throws IOException, TransitionNotExecutableException {
         Map<String, String> oldToNewFilterId = new HashMap<>();
         Map<String, String> importedFilterTaskIds = new HashMap<>();
 
@@ -248,6 +252,7 @@ public class FilterImportExportService implements IFilterImportExportService {
     /**
      * Method which provides reloading of imported filters fields, so if allowed nets are missing,
      * htmlTextArea is shown with list of missing allowed nets, otherwise filter preview is shown.
+     *
      * @param filterFields - list of task ids of filters which value should be reloaded
      */
     @Override

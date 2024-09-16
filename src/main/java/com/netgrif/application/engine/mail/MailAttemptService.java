@@ -25,10 +25,10 @@ public class MailAttemptService implements IMailAttemptService {
         this.securityLimitsProperties = securityLimitsProperties;
         attemptsCache = CacheBuilder.newBuilder().
                 expireAfterWrite(securityLimitsProperties.getEmailBlockDuration(), securityLimitsProperties.getEmailBlockTimeType()).build(new CacheLoader<String, Integer>() {
-            public Integer load(String key) {
-                return 0;
-            }
-        });
+                    public Integer load(String key) {
+                        return 0;
+                    }
+                });
     }
 
     public void mailAttempt(String key) {

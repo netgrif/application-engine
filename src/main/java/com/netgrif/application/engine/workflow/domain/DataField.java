@@ -4,6 +4,7 @@ package com.netgrif.application.engine.workflow.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Referencable;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
@@ -57,8 +58,16 @@ public class DataField implements Referencable, Serializable {
     @Setter
     private Long version = 0l;
 
+    @Getter
+    private Map<String, Component> dataRefComponents;
+
+    @Getter
+    @Setter
+    private Component component;
+
     public DataField() {
         behavior = new HashMap<>();
+        dataRefComponents = new HashMap<>();
     }
 
     public DataField(Object value) {
@@ -115,6 +124,18 @@ public class DataField implements Referencable, Serializable {
             this.behavior.get(transition).addAll(behavior);
         else
             this.behavior.put(transition, new HashSet<>(behavior));
+    }
+
+    public void addDataRefComponent(String transition, Component component) {
+        this.dataRefComponents.put(transition, component);
+    }
+
+    public boolean hasComponent(String transition) {
+        return this.dataRefComponents.containsKey(transition);
+    }
+
+    public boolean hasComponent() {
+        return this.component != null;
     }
 
     public ObjectNode applyOnlyVisibleBehavior() {
@@ -210,7 +231,7 @@ public class DataField implements Referencable, Serializable {
     @Override
     public int getMultiplicity() {
         double parsedValue = Double.parseDouble(String.valueOf(value));
-        if(parsedValue == Math.floor(parsedValue) && !Double.isInfinite(parsedValue)){
+        if (parsedValue == Math.floor(parsedValue) && !Double.isInfinite(parsedValue)) {
             return (int) Double.parseDouble(String.valueOf(value));
         } else {
             throw new IllegalArgumentException("Variable arc must be an non negative integer");

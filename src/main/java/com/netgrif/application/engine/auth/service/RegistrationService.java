@@ -32,6 +32,9 @@ import java.util.Objects;
 public class RegistrationService implements IRegistrationService {
 
     @Autowired
+    protected BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -45,9 +48,6 @@ public class RegistrationService implements IRegistrationService {
 
     @Autowired
     private ServerAuthProperties serverAuthProperties;
-
-    @Autowired
-    protected BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     @Transactional
