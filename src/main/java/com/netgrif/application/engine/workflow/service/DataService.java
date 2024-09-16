@@ -957,7 +957,6 @@ public class DataService implements IDataService {
                 List<String> listTask = parseListStringValues(node);
                 validateTaskRefValue(listTask, taskId);
                 value = listTask;
-                // TODO 29.9.2020: validate task ref value? is such feature desired?
                 break;
             case "stringCollection":
                 value = parseListStringValues(node);
@@ -1167,11 +1166,9 @@ public class DataService implements IDataService {
         });
     }
 
-    public void validateTaskRefValue(List<String> value, String restrictedTaskId) throws IllegalArgumentException {
-        value.forEach(taskId -> {
-            if (taskId.equals(restrictedTaskId)) {
-                throw new IllegalArgumentException(String.format("Task with id '%s' cannot be added to task ref, since it is an task which displaying task ref", restrictedTaskId));
-            }
-        });
+    public void validateTaskRefValue(List<String> taskIds, String restrictedTaskId) throws IllegalArgumentException {
+        if (taskIds != null && taskIds.contains(restrictedTaskId)) {
+            throw new IllegalArgumentException(String.format("Task with id '%s' cannot be added to task ref, since it is a task which is displaying task ref", restrictedTaskId));
+        }
     }
 }
