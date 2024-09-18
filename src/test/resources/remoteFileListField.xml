@@ -9,7 +9,11 @@
         <id>fileList</id>
         <title>Remote File List</title>
         <placeholder>Remote file list</placeholder>
-        <remote>MINIO</remote>
+        <storage>
+            <type>minio</type>
+            <host>host_1</host>
+            <bucket>default</bucket>
+        </storage>
     </data>
     <transition>
         <id>task</id>
