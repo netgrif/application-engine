@@ -434,8 +434,6 @@ public class Importer {
         transition.setImportId(importTransition.getId());
         transition.setTitle(toI18NString(importTransition.getTitle()));
         createProperties(importTransition.getProperties(), transition.getProperties());
-        // TODO: release/8.0.0 layout, dataref actions
-//            transition.setLayout(new TaskLayout(importTransition));
         transition.setIcon(importTransition.getIcon());
         transition.setAssignPolicy(toAssignPolicy(importTransition.getAssignPolicy()));
         transition.setFinishPolicy(toFinishPolicy(importTransition.getFinishPolicy()));
@@ -703,8 +701,9 @@ public class Importer {
         ProcessRole role = new ProcessRole();
         role.setImportId(importRole.getId());
         role.setName(toI18NString(importRole.getTitle()));
-        // TODO: release/8.0.0
-//        role.setEvents(createEventsMap(importRole.getEvent()));
+        if (importRole.getEvent() != null) {
+            importRole.getEvent().forEach(event -> role.addEvent(createEvent(event)));
+        }
 
         role.setNetId(process.getStringId());
         process.addRole(role);
@@ -809,26 +808,19 @@ public class Importer {
         propertiesXml.getProperty().forEach(property -> properties.put(property.getKey(), property.getValue()));
     }
 
-
-
-
-
     protected void resolveLayoutContainer(com.netgrif.application.engine.importer.model.Transition importTransition, Transition transition) {
         if (importTransition.getFlex() != null && importTransition.getGrid() != null) {
             throw new IllegalArgumentException("Found Flex and Grid container together in Transition {" + importTransition.getId() + "}");
         }
-
         if (importTransition.getFlex() != null) {
             transition.setLayoutContainer(getFlexLayoutContainer(importTransition.getFlex(), transition, 0));
         }
-
         if (importTransition.getGrid() != null) {
             transition.setLayoutContainer(getGridLayoutContainer(importTransition.getGrid(), transition, 0));
         }
     }
 
     protected LayoutContainer getFlexLayoutContainer(FlexContainer importedFlexContainer, Transition transition, int depth) {
-
         LayoutContainer layoutContainer = new LayoutContainer();
         layoutContainer.setImportId(importedFlexContainer.getId());
         layoutContainer.setLayoutType(LayoutObjectType.FLEX);
@@ -933,7 +925,9 @@ public class Importer {
         } else {
             throw new IllegalArgumentException("Field with id [" + fieldId + "] occurs multiple times in transition [" + transition.getStringId() + "]");
         }
-
+        if (importedDataRef.getEvent() != null) {
+            importedDataRef.getEvent().forEach(event -> dataRef.addEvent(createDataEvent(event)));
+        }
         addDataLogic(field, transition, importedDataRef, dataRef);
         addDataComponent(field, importedDataRef, dataRef);
         return dataRef;

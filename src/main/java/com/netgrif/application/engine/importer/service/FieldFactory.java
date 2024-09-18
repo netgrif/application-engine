@@ -35,18 +35,15 @@ public final class FieldFactory {
         Field<?> field = builder.build(data, importer);
         field.setImportId(data.getId());
         field.setTitle(importer.toI18NString(data.getTitle()));
-//        if (data.isImmediate() != null) {
-//            field.setImmediate(data.isImmediate());
-//        }
-//        if (data.getLength() != null) {
-//            field.setLength(data.getLength());
-//        }
-//        if (data.getDesc() != null)
-//            field.setDescription(importer.toI18NString(data.getDesc()));
-//
-//        if (data.getPlaceholder() != null)
-//            field.setPlaceholder(importer.toI18NString(data.getPlaceholder()));
-//
+        if (data.isImmediate() != null) {
+            field.setImmediate(data.isImmediate());
+        }
+        if (data.getDesc() != null) {
+            field.setDescription(importer.toI18NString(data.getDesc()));
+        }
+        if (data.getPlaceholder() != null) {
+            field.setPlaceholder(importer.toI18NString(data.getPlaceholder()));
+        }
 //        // TODO: release/8.0.0 validation register
 //        // TODO: release/8.0.0 valid deprecated
 //        if (data.getValid() != null) {
@@ -66,15 +63,8 @@ public final class FieldFactory {
 //            Component component = componentFactory.buildComponent(data.getComponent(), importer, data);
 //            field.setComponent(component);
 //        }
-//        if (data.getView() != null) {
-//            log.warn("Data attribute [view] in field [{}] is deprecated.", field.getImportId());
-//        }
-//        if (data.getFormat() != null) {
-//            log.warn("Data attribute [format] in field [{}] is deprecated.", field.getImportId());
-//        }
 //
-//        setEncryption(field, data);
-//
+        setEncryption(field, data);
 //        dataValidator.checkDeprecatedAttributes(data);
         return field;
     }
@@ -98,12 +88,12 @@ public final class FieldFactory {
     }*/
 
     private void setEncryption(Field<?> field, Data data) {
-//        if (data.getEncryption() != null && data.getEncryption().isValue()) {
-//            String encryption = data.getEncryption().getAlgorithm();
-//            if (encryption == null) {
-//                encryption = properties.getAlgorithm();
-//            }
-//            field.setEncryption(encryption);
-//        }
+        if (data.getEncryption() != null && data.getEncryption().isValue()) {
+            String encryption = data.getEncryption().getAlgorithm();
+            if (encryption == null) {
+                encryption = properties.getAlgorithm();
+            }
+            field.setEncryption(encryption);
+        }
     }
 }

@@ -11,10 +11,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Data
 @Document
@@ -31,12 +28,17 @@ public class ProcessRole extends Imported {
     private String description;
     private Map<EventType, Event> events;
 
+    public ProcessRole(ObjectId id) {
+        this.id = id;
+        this.events = new HashMap<>();
+    }
+
     public ProcessRole() {
-        id = new ObjectId();
+        this(new ObjectId());
     }
 
     public ProcessRole(String id) {
-        this.id = new ObjectId(id);
+        this(new ObjectId(id));
     }
 
     @EqualsAndHashCode.Include
@@ -81,6 +83,10 @@ public class ProcessRole extends Imported {
         if (events != null && events.containsKey(type))
             return events.get(type).getPostActions();
         return new LinkedList<>();
+    }
+
+    public void addEvent(Event event) {
+        this.events.put(event.getType(), event);
     }
 
     @Override

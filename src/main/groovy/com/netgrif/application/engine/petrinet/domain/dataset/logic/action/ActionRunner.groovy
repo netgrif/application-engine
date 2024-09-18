@@ -63,11 +63,13 @@ abstract class ActionRunner {
             }
             actionDelegate.metaClass."${entry.key}" = namespace
         }
-        useCase.dataSet.fields.forEach { String id, Field<?> field ->
-            actionDelegate.metaClass."$id" = field
-        }
-        useCase.process.transitions.forEach { String id, Transition t ->
-            actionDelegate.metaClass."$id" = t
+        if (useCase != null) {
+            useCase.dataSet.fields.forEach { String id, Field<?> field ->
+                actionDelegate.metaClass."$id" = field
+            }
+            useCase.process.transitions.forEach { String id, Transition t ->
+                actionDelegate.metaClass."$id" = t
+            }
         }
         return code.rehydrate(actionDelegate, code.owner, code.thisObject)
     }

@@ -20,7 +20,6 @@ import static com.netgrif.application.engine.petrinet.domain.dataset.logic.Field
 
 
 @Data
-@NoArgsConstructor
 public class DataRef {
 
     private String fieldId;
@@ -34,7 +33,13 @@ public class DataRef {
     // TODO: release/8.0.0 uniqeue key map
     private Map<String, String> properties;
 
+    public DataRef() {
+        this.events = new HashMap<>();
+        this.properties = new HashMap<>();
+    }
+
     public DataRef(Field<?> field, DataFieldBehavior behavior) {
+        this();
         this.field = field;
         this.fieldId = field.getImportId();
         this.setBehavior(behavior);
@@ -60,6 +65,10 @@ public class DataRef {
         } else {
             return event.getPostActions();
         }
+    }
+
+    public void addEvent(DataEvent event) {
+        events.put(event.getType(), event);
     }
 
     @Override

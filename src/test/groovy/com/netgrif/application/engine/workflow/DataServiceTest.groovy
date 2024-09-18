@@ -3,19 +3,12 @@ package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.Process
-import com.netgrif.application.engine.petrinet.domain.DataRef
-import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
