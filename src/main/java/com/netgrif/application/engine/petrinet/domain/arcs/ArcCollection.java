@@ -25,6 +25,10 @@ public class ArcCollection {
         this.output.add(arc);
     }
 
+    public int size() {
+        return input.size() + output.size();
+    }
+
     public ArcCollection clone() {
         ArcCollection cloned = new ArcCollection();
         cloned.input = this.input.stream().map(PTArc::clone).collect(Collectors.toList());

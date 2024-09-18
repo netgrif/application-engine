@@ -7,7 +7,7 @@
     <xs:element name="process">
         <xs:complexType>
             <xs:sequence>
-                <xs:element type="xs:string" name="id"/>
+                <xs:element type="identifier" name="id"/>
                 <xs:element type="xs:string" name="version"/>
                 <xs:element type="extension" name="extends" minOccurs="0"/>
                 <xs:element type="i18nStringType" name="title"/>
@@ -44,13 +44,13 @@
     </xs:element>
     <xs:complexType name="extension">
         <xs:sequence>
-            <xs:element type="xs:string" name="id"/>
+            <xs:element type="identifier" name="id"/>
             <xs:element type="xs:string" name="version"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="data">
         <xs:sequence>
-            <xs:element type="xs:string" name="id"/>
+            <xs:element type="identifier" name="id"/>
             <xs:element type="i18nStringType" name="title"/>
             <xs:element type="i18nStringType" name="placeholder" minOccurs="0"/>
             <xs:element type="i18nStringType" name="desc" minOccurs="0"/>
@@ -67,10 +67,7 @@
             <xs:element type="init" name="init" minOccurs="0"/>
             <xs:element type="component" name="component" minOccurs="0"/>
             <xs:element type="encryption" name="encryption" minOccurs="0"/>
-            <xs:choice>
-                <xs:element type="action" name="action" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element type="dataEvent" name="event" maxOccurs="unbounded" minOccurs="0"/>
-            </xs:choice>
+            <xs:element type="dataEvent" name="event" maxOccurs="unbounded" minOccurs="0"/>
             <xs:element type="allowedNets" name="allowedNets" minOccurs="0"/>
             <xs:element type="properties" name="properties" minOccurs="0">
                 <xs:unique name="dataPropertyUniqueKey">
@@ -93,7 +90,7 @@
     </xs:complexType>
     <xs:complexType name="role">
         <xs:sequence>
-            <xs:element type="xs:string" name="id"/>
+            <xs:element type="identifier" name="id"/>
             <xs:element type="i18nStringType" name="title"/>
             <xs:element type="event" name="event" maxOccurs="unbounded" minOccurs="0"/>
             <xs:element type="properties" name="properties" minOccurs="0">
@@ -107,7 +104,7 @@
     </xs:complexType>
     <xs:complexType name="transition">
         <xs:sequence>
-            <xs:element type="xs:string" name="id"/>
+            <xs:element type="identifier" name="id"/>
             <xs:element type="nonNegativeInteger" name="x"/>
             <xs:element type="nonNegativeInteger" name="y"/>
             <xs:element type="i18nStringType" name="title"/>
@@ -128,10 +125,11 @@
                 </xs:unique>
             </xs:element>
         </xs:sequence>
+        <xs:attribute type="scope" name="scope"/>
     </xs:complexType>
     <xs:complexType name="place">
         <xs:sequence>
-            <xs:element type="xs:string" name="id"/>
+            <xs:element type="identifier" name="id"/>
             <xs:element type="nonNegativeInteger" name="x"/>
             <xs:element type="nonNegativeInteger" name="y"/>
             <xs:element type="i18nStringType" name="title" minOccurs="0"/>
@@ -147,7 +145,7 @@
     </xs:complexType>
     <xs:complexType name="arc">
         <xs:sequence>
-            <xs:element type="xs:string" name="id"/>
+            <xs:element type="identifier" name="id"/>
             <xs:element name="type" type="arc_type" default="regular"/>
             <xs:element type="xs:string" name="sourceId"/>
             <xs:element type="xs:string" name="destinationId"/>
@@ -160,6 +158,7 @@
                 </xs:unique>
             </xs:element>
         </xs:sequence>
+        <xs:attribute type="scope" name="scope"/>
     </xs:complexType>
     <xs:complexType name="i18n">
         <xs:sequence>
@@ -339,7 +338,6 @@
             <xs:element type="xs:boolean" name="create" minOccurs="0"/>
             <xs:element type="xs:boolean" name="delete" minOccurs="0"/>
             <xs:element type="xs:boolean" name="view" minOccurs="0"/>
-            <xs:element type="action" name="action" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="roleRef">
@@ -349,7 +347,7 @@
     </xs:complexType>
     <xs:complexType name="permissionRef">
         <xs:sequence>
-            <xs:element type="xs:string" name="id"/>
+            <xs:element type="identifier" name="id"/>
             <xs:element type="roleRefLogic" name="logic"/>
             <xs:element type="properties" name="properties" minOccurs="0">
                 <xs:unique name="permissionRefPropertyUniqueKey">
@@ -371,7 +369,7 @@
     </xs:complexType>
     <xs:complexType name="casePermissionRef">
         <xs:sequence>
-            <xs:element type="xs:string" name="id"/>
+            <xs:element type="identifier" name="id"/>
             <xs:element type="caseLogic" name="caseLogic"/>
         </xs:sequence>
     </xs:complexType>
@@ -385,7 +383,7 @@
     </xs:simpleType>
     <xs:complexType name="dataRef">
         <xs:sequence>
-            <xs:element type="xs:string" name="id"/>
+            <xs:element type="identifier" name="id"/>
             <xs:element type="dataRefLogic" name="logic"/>
             <xs:element type="component" name="component" minOccurs="0"/>
             <xs:element type="dataEvent" name="event" minOccurs="0" maxOccurs="unbounded"/>
@@ -414,7 +412,8 @@
     <xs:complexType name="validation">
         <xs:sequence>
             <xs:element type="xs:string" name="name"/>
-            <xs:element name="arguments" type="arguments" minOccurs="0"/>
+            <xs:element name="clientArguments" type="arguments" minOccurs="0"/>
+            <xs:element name="serverArguments" type="arguments" minOccurs="0"/>
             <xs:element name="message" type="i18nStringType" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
@@ -464,7 +463,7 @@
     </xs:complexType>
     <xs:complexType name="baseEvent">
         <xs:sequence>
-            <xs:element type="xs:string" name="id"/>
+            <xs:element type="identifier" name="id"/>
             <xs:element type="actions" name="actions" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element type="i18nStringType" name="message" minOccurs="0"/>
             <xs:element type="properties" name="properties" minOccurs="0">
@@ -550,6 +549,7 @@
             <xs:enumeration value="options"/>
             <xs:enumeration value="optionsExpression"/>
             <xs:enumeration value="roles"/>
+            <xs:enumeration value="any"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:complexType name="actions">
@@ -572,16 +572,16 @@
     </xs:complexType>
     <xs:complexType name="arguments">
         <xs:sequence>
-            <xs:element type="xs:string" name="argument" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="argument" name="argument" maxOccurs="unbounded" minOccurs="0"/>
         </xs:sequence>
-        <xs:attribute type="argumentType" name="type" use="required"/>
     </xs:complexType>
-    <xs:simpleType name="argumentType">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="client"/>
-            <xs:enumeration value="server"/>
-        </xs:restriction>
-    </xs:simpleType>
+    <xs:complexType name="argument">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="dynamic" type="xs:boolean"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
     <!-- UTILS -->
     <xs:simpleType name="empty">
         <xs:restriction base="xs:string">
@@ -598,7 +598,7 @@
     </xs:complexType>
     <xs:complexType name="flexContainer">
         <xs:sequence>
-            <xs:element type="xs:string" name="id"/>
+            <xs:element type="identifier" name="id"/>
             <xs:element type="flexItem" name="item" maxOccurs="unbounded" minOccurs="0"/>
             <xs:element type="flexContainerProperties" name="properties" minOccurs="0"/>
         </xs:sequence>
@@ -614,7 +614,7 @@
     </xs:complexType>
     <xs:complexType name="gridContainer">
         <xs:sequence>
-            <xs:element type="xs:string" name="id"/>
+            <xs:element type="identifier" name="id"/>
             <xs:element type="gridItem" name="item" maxOccurs="unbounded" minOccurs="0"/>
             <xs:element type="gridContainerProperties" name="properties" minOccurs="0"/>
         </xs:sequence>
@@ -833,6 +833,11 @@
             <xs:enumeration value="row"/>
             <xs:enumeration value="column"/>
             <xs:enumeration value="dense"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="identifier">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[$_a-zA-Z][_a-zA-Z0-9]*"/>
         </xs:restriction>
     </xs:simpleType>
 </xs:schema>

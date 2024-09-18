@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Transient;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,8 +29,6 @@ public class DataRef {
     @Transient
     private DataFieldBehavior behavior;
     private Map<DataEventType, DataEvent> events;
-    // TODO: NAE-1969 fix
-//    private Object layout;
     private Component component;
     // TODO: release/8.0.0 parentCaseId
     // TODO: release/8.0.0 uniqeue key map
@@ -37,6 +36,7 @@ public class DataRef {
 
     public DataRef(Field<?> field, DataFieldBehavior behavior) {
         this.field = field;
+        this.fieldId = field.getImportId();
         this.setBehavior(behavior);
     }
 
@@ -93,7 +93,11 @@ public class DataRef {
 
     public DataRef clone() {
         DataRef cloned = new DataRef();
-        // TODO: release/8.0.0 implement
+        cloned.setFieldId(this.fieldId);
+        cloned.setField(this.field == null ? null : this.field.clone());
+        cloned.setBehavior(this.behavior == null ? null : this.behavior.clone());
+        cloned.setEvents(this.events == null || this.events.isEmpty() ? new HashMap<>() : new HashMap<>(this.events));
+        cloned.setComponent(this.component == null ? null : this.component.clone());
         return cloned;
     }
 }

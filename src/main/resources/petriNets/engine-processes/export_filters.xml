@@ -17,14 +17,19 @@
         <title id="exportable_filters">Exportable filters</title>
         <placeholder id="exportable_filters_placeholder">List of all exportable filters</placeholder>
         <desc id="exportable_filters_desc">Select one or more filters to export</desc>
-        <action trigger="get">
-            exportable_filters: f.exportable_filters;
+        <event type="get">
+            <id>exportable_filters_get</id>
+            <actions phase="pre">
+                <action>
+                    exportable_filters: f.exportable_filters;
 
-            change exportable_filters options {
-                return findAllFilters()
-                    .collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
-            }
-        </action>
+                    change exportable_filters options {
+                        return findAllFilters()
+                            .collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
+                    }
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="button">
         <id>export_btn</id>
@@ -83,65 +88,57 @@
         <id>exportFilter</id>
         <x>200</x>
         <y>100</y>
-        <assignPolicy>auto</assignPolicy>
         <title id="export_btn_placeholder">Export filters</title>
-        <!--TODO: release/8.0.0-->
-        <!--<dataGroup>-->
-        <!--    <id>DataGroup_0</id>-->
-        <!--    <layout>grid</layout>-->
-        <!--    <dataRef>-->
-        <!--        <id>exportable_filters</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>editable</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>2</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>export_btn</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>editable</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>2</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>2</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>export_file</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>hidden</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>1</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>2</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--</dataGroup>-->
+        <assignPolicy>auto</assignPolicy>
+        <grid>
+            <id>exportFilter_grid</id>
+            <item>
+                <dataRef>
+                    <id>exportable_filters</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>export_btn</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / 3</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>export_file</id>
+                    <logic>
+                        <behavior>hidden</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <properties>
+                <display>grid</display>
+                <grid-template-columns>repeat(2, 1fr)</grid-template-columns>
+                <justify-items>stretch</justify-items>
+                <align-items>stretch</align-items>
+                <justify-content>stretch</justify-content>
+                <align-content>stretch</align-content>
+            </properties>
+        </grid>
         <event type="assign">
+            <id>exportFilter_assign</id>
             <actions phase="post">
                 <action>
-                    export_file: f.export_file,
-                    trans: t.exportFilter;
-
-                    make export_file, hidden on trans when {true}
+                    make export_file, hidden on exportFilter when {true}
                 </action>
             </actions>
         </event>
@@ -152,7 +149,6 @@
         <x>100</x>
         <y>100</y>
         <tokens>1</tokens>
-        <static>false</static>
     </place>
     <!-- ARCS -->
     <arc>

@@ -237,6 +237,20 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return dataFieldBehavior
     }
 
+    // TODO: docasna metoda na priradenie behavior fieldu (make na 8.0.0 nefunguje)
+    DataFieldBehaviors createBehavior(String fieldId, FieldBehavior fieldBehavior, String transitionId = task.get().transitionId, Case caze = useCase) {
+        Field<?> caseField = useCase.dataSet.get(fieldId)
+        if (caseField.behaviors == null) {
+            caseField.behaviors = new DataFieldBehaviors()
+            caze.dataSet.get(fieldId).behaviors.put(transitionId, new DataFieldBehavior())
+        }
+        if (caseField.behaviors.get(transitionId) == null && caze.getPetriNet().getTransition(transitionId) != null && caze.getPetriNet().getTransition(transitionId).dataSet.get(fieldId) != null) {
+            caseField.behaviors.put(transitionId, caze.getPetriNet().getTransition(transitionId).dataSet.get(fieldId).behavior)
+        }
+        caseField.behaviors.behaviors.get(transitionId).behavior = fieldBehavior
+        return caseField.behaviors
+    }
+
     def visible = { Field field, Transition trans ->
         copyBehavior(field, trans)
         getOrCreateBehavior(field.stringId, trans.stringId).behavior = FieldBehavior.VISIBLE

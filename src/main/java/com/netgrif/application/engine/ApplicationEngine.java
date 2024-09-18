@@ -41,9 +41,6 @@ public class ApplicationEngine {
     public MongoCustomConversions customConversions() {
         List<Converter<?, ?>> converters = new ArrayList<>();
         converters.add(new StringToVersionConverter());
-        // TODO: NAE-1969 check
-//        converters.add(new LayoutTypeConverter());
-//        converters.add(new DataGroupAlignmentConverter());
         return new MongoCustomConversions(converters);
     }
 

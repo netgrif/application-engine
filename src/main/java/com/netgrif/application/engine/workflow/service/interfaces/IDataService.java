@@ -2,20 +2,17 @@ package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.layoutoutcomes.GetLayoutsEventOutcome;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
-import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -94,6 +91,11 @@ public interface IDataService {
     SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name);
 
     SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name, Map<String, String> params);
+
+    // TODO: release/8.0.0 deprecated by forms
+    GetLayoutsEventOutcome getLayouts(String taskId, Locale locale, IUser user);
+
+    GetLayoutsEventOutcome getLayouts(String taskId, Locale locale, LoggedUser loggedUser);
 
     // TODO: release/8.0.0 revision
     Page<Task> setImmediateFields(Page<Task> tasks);

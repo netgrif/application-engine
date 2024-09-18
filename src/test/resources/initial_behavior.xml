@@ -1,31 +1,46 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>initial_behavior</id>
+    <version>1.0.0</version>
     <title>Initial behavior</title>
-    <initials>IBH</initials>
     <defaultRole>true</defaultRole>
-    <!-- DATA -->
-    <data type="number" immediate="true">
-        <id>number</id>
-        <title>Number</title>
-        <init>10000</init>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">IBH</property>
+    </properties>
+    <data type="boolean" immediate="true">
+        <id>boolean</id>
+        <title>Boolean</title>
+        <placeholder>True</placeholder>
     </data>
-
-    <data type="text" immediate="true">
-        <id>text</id>
-        <title>Text</title>
-        <init>Lorem ipsum</init>
+    <data type="button" immediate="true">
+        <id>button</id>
+        <title>Button</title>
+        <placeholder>Push</placeholder>
+        <component>
+            <id>fab</id>
+        </component>
     </data>
-
+    <data type="date" immediate="true">
+        <id>date</id>
+        <title>Date</title>
+        <init>01.01.2019</init>
+    </data>
+    <data type="dateTime" immediate="true">
+        <id>datetime</id>
+        <title>Datetime</title>
+        <init>01.01.2019 20:00</init>
+    </data>
     <data type="enumeration" immediate="true">
         <id>enumeration</id>
         <title>Enumeration</title>
-        <values>Alice</values>
-        <values>Bob</values>
-        <values>Carol</values>
+        <options>
+            <option key="Alice">Alice</option>
+            <option key="Bob">Bob</option>
+            <option key="Carol">Carol</option>
+        </options>
         <init>Bob</init>
     </data>
-
     <data type="enumeration_map" immediate="true">
         <id>enumeration_map</id>
         <title>Enumeration Map</title>
@@ -36,19 +51,29 @@
         </options>
         <init>bo</init>
     </data>
-
+    <data type="file" immediate="true">
+        <id>file</id>
+        <title>File</title>
+    </data>
+    <data type="fileList" immediate="true">
+        <id>fileList</id>
+        <title>File List</title>
+    </data>
+    <data type="i18n">
+        <id>i18n</id>
+        <title>Init I18n</title>
+        <placeholder>Init I18n field</placeholder>
+        <init>Default i18n test value</init>
+    </data>
     <data type="multichoice" immediate="true">
         <id>multichoice</id>
         <title>Multichoice</title>
-        <values>Alice</values>
-        <values>Bob</values>
-        <values>Carol</values>
-        <inits>
-            <init>Alice</init>
-            <init>Bob</init>
-        </inits>
+        <options>
+            <option key="Alice">Alice</option>
+            <option key="Bob">Bob</option>
+            <option key="Carol">Carol</option>
+        </options>
     </data>
-
     <data type="multichoice_map" immediate="true">
         <id>multichoice_map</id>
         <title>Multichoice Map</title>
@@ -57,290 +82,221 @@
             <option key="bo">Bob</option>
             <option key="ca">Carol</option>
         </options>
-        <inits>
-            <init>al</init>
-            <init>ca</init>
-        </inits>
     </data>
-
-    <data type="boolean" immediate="true">
-        <id>boolean</id>
-        <title>Boolean</title>
-        <placeholder>True</placeholder>
+    <data type="number" immediate="true">
+        <id>number</id>
+        <title>Number</title>
+        <init>10000</init>
     </data>
-
-    <data type="date" immediate="true">
-        <id>date</id>
-        <title>Date</title>
-        <init>01.01.2019</init>
+    <data type="text" immediate="true">
+        <id>text</id>
+        <title>Text</title>
+        <init>Lorem ipsum</init>
     </data>
-
-    <data type="file" immediate="true">
-        <id>file</id>
-        <title>File</title>
-    </data>
-
-    <data type="fileList" immediate="true">
-        <id>fileList</id>
-        <title>File List</title>
-    </data>
-
     <data type="user" immediate="true">
         <id>user</id>
         <title>User</title>
     </data>
-
-    <data type="dateTime" immediate="true">
-        <id>datetime</id>
-        <title>Datetime</title>
-        <init>01.01.2019 20:00</init>
-    </data>
-
-    <data type="button" immediate="true">
-        <id>button</id>
-        <title>Button</title>
-        <placeholder>Push</placeholder>
-        <component>
-            <name>fab</name>
-        </component>
-    </data>
-
-    <data type="i18n">
-        <id>i18n</id>
-        <title>Init I18n</title>
-        <placeholder>Init I18n field</placeholder>
-        <init>Default i18n test value</init>
-    </data>
-
-    <!-- TRANSITIONS -->
     <transition>
-        <id>1</id>
+        <id>t1</id>
         <x>379</x>
         <y>273</y>
-        <label>Task - editable</label>
+        <title>Task - editable</title>
         <assignPolicy>auto</assignPolicy>
-        <dataGroup>
-            <id>DataGroup_0</id>
-            <layout>grid</layout>
-            <dataRef>
-                <id>number</id>
-                <logic>
-                    <behavior>forbidden</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>text</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                </logic>
-                <layout>
-                    <x>2</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>enumeration</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>1</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>enumeration_map</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>2</x>
-                    <y>1</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>multichoice</id>
-                <logic>
-                    <behavior>required</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>2</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>multichoice_map</id>
-                <logic>
-                    <behavior>immediate</behavior>
-                </logic>
-                <layout>
-                    <x>2</x>
-                    <y>2</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>boolean</id>
-                <logic>
-                    <behavior>optional</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>3</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>date</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <behavior>required</behavior>
-                </logic>
-                <layout>
-                    <x>2</x>
-                    <y>3</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>datetime</id>
-                <logic>
-                    <behavior>immediate</behavior>
-                    <behavior>required</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>4</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>file</id>
-                <logic>
-                    <behavior>forbidden</behavior>
-                    <behavior>immediate</behavior>
-                </logic>
-                <layout>
-                    <x>2</x>
-                    <y>4</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>fileList</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                    <behavior>optional</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>5</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>user</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                    <behavior>immediate</behavior>
-                </logic>
-                <layout>
-                    <x>2</x>
-                    <y>5</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>button</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <behavior>required</behavior>
-                    <behavior>immediate</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>6</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>i18n</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                    <behavior>optional</behavior>
-                    <behavior>immediate</behavior>
-                </logic>
-                <layout>
-                    <x>2</x>
-                    <y>6</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-        </dataGroup>
+        <flex>
+            <id>t1_flex</id>
+            <item>
+                <dataRef>
+                    <id>number</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>text</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration_map</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>multichoice</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                        <required>true</required>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>multichoice_map</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                        <immediate>true</immediate>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>boolean</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>date</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                        <required>true</required>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>datetime</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                        <required>true</required>
+                        <immediate>true</immediate>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>file</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                        <immediate>true</immediate>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>fileList</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>user</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                        <immediate>true</immediate>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>button</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                        <required>true</required>
+                        <immediate>true</immediate>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>i18n</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                        <immediate>true</immediate>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
-</document>
+</process>

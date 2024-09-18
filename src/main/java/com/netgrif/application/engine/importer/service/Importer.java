@@ -1,28 +1,38 @@
 package com.netgrif.application.engine.importer.service;
 
+import com.netgrif.application.engine.configuration.LayoutFlexConfiguration;
+import com.netgrif.application.engine.configuration.LayoutGridConfiguration;
 import com.netgrif.application.engine.importer.model.*;
+import com.netgrif.application.engine.importer.model.DataRef;
 import com.netgrif.application.engine.importer.service.evaluation.IActionEvaluator;
 import com.netgrif.application.engine.importer.service.evaluation.IFunctionEvaluator;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.importer.service.validation.IProcessValidator;
+import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.Function;
 import com.netgrif.application.engine.petrinet.domain.Place;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.Event;
 import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
+import com.netgrif.application.engine.petrinet.domain.layout.LayoutContainer;
+import com.netgrif.application.engine.petrinet.domain.layout.LayoutItem;
+import com.netgrif.application.engine.petrinet.domain.layout.LayoutObjectType;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
+import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.BooleanUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,6 +41,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import javax.xml.bind.annotation.XmlElement;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -83,6 +96,12 @@ public class Importer {
 
     @Autowired
     protected IProcessValidator processValidator;
+
+    @Autowired
+    private LayoutFlexConfiguration flexConfiguration;
+
+    @Autowired
+    private LayoutGridConfiguration gridConfiguration;
 
     public Importer() {
         this.i18n = new HashMap<>();
@@ -438,6 +457,8 @@ public class Importer {
         if (importTransition.getEvent() != null) {
             importTransition.getEvent().forEach(event -> transition.addEvent(createEvent(event)));
         }
+        resolveLayoutContainer(importTransition, transition);
+
         process.addTransition(transition);
     }
 
@@ -786,5 +807,167 @@ public class Importer {
             return;
         }
         propertiesXml.getProperty().forEach(property -> properties.put(property.getKey(), property.getValue()));
+    }
+
+
+
+
+
+    protected void resolveLayoutContainer(com.netgrif.application.engine.importer.model.Transition importTransition, Transition transition) {
+        if (importTransition.getFlex() != null && importTransition.getGrid() != null) {
+            throw new IllegalArgumentException("Found Flex and Grid container together in Transition {" + importTransition.getId() + "}");
+        }
+
+        if (importTransition.getFlex() != null) {
+            transition.setLayoutContainer(getFlexLayoutContainer(importTransition.getFlex(), transition, 0));
+        }
+
+        if (importTransition.getGrid() != null) {
+            transition.setLayoutContainer(getGridLayoutContainer(importTransition.getGrid(), transition, 0));
+        }
+    }
+
+    protected LayoutContainer getFlexLayoutContainer(FlexContainer importedFlexContainer, Transition transition, int depth) {
+
+        LayoutContainer layoutContainer = new LayoutContainer();
+        layoutContainer.setImportId(importedFlexContainer.getId());
+        layoutContainer.setLayoutType(LayoutObjectType.FLEX);
+
+        Map<String, String> layoutContainerProperties = new HashMap<>(depth == 0 ? flexConfiguration.getRoot() : flexConfiguration.getContainer());
+        if (importedFlexContainer.getProperties() != null) {
+            for (java.lang.reflect.Field containerPropertyField : importedFlexContainer.getProperties().getClass().getDeclaredFields()) {
+                try {
+                    resolveFieldProperty(containerPropertyField, layoutContainerProperties, importedFlexContainer.getProperties());
+                } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                    throw new IllegalArgumentException("Unexpected property in Flex Container {" + importedFlexContainer.getId() + "}");
+                }
+            }
+        }
+        layoutContainer.setProperties(layoutContainerProperties);
+
+        for (FlexItem flexItem : importedFlexContainer.getItem()) {
+            layoutContainer.addLayoutItem(getLayoutItem(importedFlexContainer.getId(), flexItem, transition, depth));
+        }
+
+        return layoutContainer;
+    }
+
+    protected LayoutContainer getGridLayoutContainer(GridContainer importedGridContainer, Transition transition, int depth) {
+        LayoutContainer layoutContainer = new LayoutContainer();
+        layoutContainer.setImportId(importedGridContainer.getId());
+        layoutContainer.setLayoutType(LayoutObjectType.GRID);
+
+        Map<String, String> layoutProperties = new HashMap<>(depth == 0 ? gridConfiguration.getRoot() : gridConfiguration.getContainer());
+        if (importedGridContainer.getProperties() != null) {
+            for (java.lang.reflect.Field field: importedGridContainer.getProperties().getClass().getDeclaredFields()) {
+                try {
+                    resolveFieldProperty(field, layoutProperties, importedGridContainer.getProperties());
+                } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                    throw new IllegalArgumentException("Unexpected property in Grid Container {" + importedGridContainer.getId() + "}");
+                }
+            }
+        }
+        layoutContainer.setProperties(layoutProperties);
+
+        for (GridItem gridItem : importedGridContainer.getItem()) {
+            layoutContainer.addLayoutItem(getLayoutItem(importedGridContainer.getId(), gridItem, transition, depth));
+        }
+
+        return layoutContainer;
+    }
+
+    private LayoutItem getLayoutItem(String containerId, com.netgrif.application.engine.importer.model.LayoutItem importedLayoutItem, Transition transition, int depth) {
+        if (BooleanUtils.toInteger(importedLayoutItem.getFlex() != null) + BooleanUtils.toInteger(importedLayoutItem.getGrid() != null) + BooleanUtils.toInteger(importedLayoutItem.getDataRef() != null) > 1) {
+            throw new IllegalArgumentException("Found Flex/Grid/DataRef together in Layout Container {" + containerId + "}");
+        }
+        LayoutItem layoutItem = new LayoutItem();
+        layoutItem.setLayoutType(importedLayoutItem instanceof GridItem ? LayoutObjectType.GRID : LayoutObjectType.FLEX);
+
+        boolean isFlex = importedLayoutItem instanceof FlexItem;
+        Map<String, String> layoutItemProperties = isFlex ? new HashMap<>(flexConfiguration.getChildren()) : new HashMap<>(gridConfiguration.getChildren());
+        Object itemProperties = !isFlex ? ((GridItem) importedLayoutItem).getProperties() : ((FlexItem) importedLayoutItem).getProperties();
+        if (itemProperties != null) {
+            for (java.lang.reflect.Field itemPropertyField : itemProperties.getClass().getDeclaredFields()) {
+                try {
+                    resolveFieldProperty(itemPropertyField, layoutItemProperties, itemProperties);
+                } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                    throw new IllegalArgumentException("Unexpected property in Grid Item of Grid Container {" + containerId + "}");
+                }
+            }
+        }
+        layoutItem.setProperties(layoutItemProperties);
+
+        if (importedLayoutItem.getFlex() != null) {
+            layoutItem.setContainer(getFlexLayoutContainer(importedLayoutItem.getFlex(), transition, depth + 1));
+        } else if (importedLayoutItem.getGrid() != null) {
+            layoutItem.setContainer(getGridLayoutContainer(importedLayoutItem.getGrid(), transition, depth + 1));
+        } else if (importedLayoutItem.getDataRef() != null) {
+            layoutItem.setDataRefId(resolveDataRef(importedLayoutItem.getDataRef(), transition).getFieldId());
+        }
+        return layoutItem;
+    }
+
+    protected void resolveFieldProperty(java.lang.reflect.Field field, Map<String, String> layoutProperties, Object containerProperties)
+            throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        String propertyName = field.getAnnotation(XmlElement.class) == null || field.getAnnotation(XmlElement.class).name().equals("##default")
+                ? field.getName()
+                : field.getAnnotation(XmlElement.class).name();
+        field.setAccessible(true);
+        if (field.get(containerProperties) == null) {
+            return;
+        }
+        if (field.getType().equals(String.class) || field.getType().equals(Integer.class)) {
+            layoutProperties.put(propertyName, field.get(containerProperties).toString());
+        } else {
+            Method valueMethod = field.get(containerProperties).getClass().getMethod("value");
+            layoutProperties.put(propertyName, valueMethod.invoke(field.get(containerProperties)).toString());
+        }
+    }
+
+    protected com.netgrif.application.engine.petrinet.domain.DataRef resolveDataRef(com.netgrif.application.engine.importer.model.DataRef importedDataRef, Transition transition) {
+        String fieldId = importedDataRef.getId();
+        Field<?> field = process.getField(fieldId).get();
+        com.netgrif.application.engine.petrinet.domain.DataRef dataRef = new com.netgrif.application.engine.petrinet.domain.DataRef(field);
+        if (!transition.getDataSet().containsKey(fieldId)) {
+            transition.getDataSet().put(fieldId, dataRef);
+        } else {
+            throw new IllegalArgumentException("Field with id [" + fieldId + "] occurs multiple times in transition [" + transition.getStringId() + "]");
+        }
+
+        addDataLogic(field, transition, importedDataRef, dataRef);
+        addDataComponent(field, importedDataRef, dataRef);
+        return dataRef;
+    }
+
+    protected void addDataLogic(Field<?> field, Transition transition, DataRef importedDataRef, com.netgrif.application.engine.petrinet.domain.DataRef dataRef) {
+        DataRefLogic logic = importedDataRef.getLogic();
+        try {
+            String fieldId = field.getStringId();
+            if (logic == null || fieldId == null) {
+                return;
+            }
+
+            DataFieldBehavior behavior = new DataFieldBehavior();
+            if (logic.getBehavior() != null) {
+                behavior.setBehavior(FieldBehavior.fromXml(logic.getBehavior()));
+                behavior.setRequired(logic.isRequired() != null ? logic.isRequired() : false);
+                behavior.setImmediate(logic.isImmediate() != null ? logic.isImmediate() : false);
+            }
+            dataRef.setBehavior(behavior);
+            field.setBehavior(transition.getImportId(), behavior);
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException("Wrong dataRef id [" + importedDataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
+        }
+    }
+
+    protected void addDataComponent(Field<?> field, DataRef importedDataRef, com.netgrif.application.engine.petrinet.domain.DataRef dataRef) throws MissingIconKeyException {
+        Component component;
+//            TODO: release/8.0.0
+//        if ((importedDataRef.getComponent()) == null) {
+            component = field.getComponent();
+//        } else {
+//            component = componentFactory.buildComponent(importedDataRef.getComponent(), this, field);
+//        }
+        dataRef.setComponent(component);
     }
 }

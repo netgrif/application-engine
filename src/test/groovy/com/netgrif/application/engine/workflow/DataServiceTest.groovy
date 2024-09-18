@@ -3,6 +3,8 @@ package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.Process
+import com.netgrif.application.engine.petrinet.domain.DataRef
+import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -52,37 +54,36 @@ class DataServiceTest {
     private Process setDataNet
     private Process net
 
-    @BeforeEach
-    void beforeAll() {
-        testHelper.truncateDbs()
-        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_referenced.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert net.getNet() != null
+//    @BeforeEach
+//    void beforeAll() {
+//        testHelper.truncateDbs()
+//        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_referenced.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+//        assert net.getNet() != null
+//
+//        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_taskref.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+//        assert net.getNet() != null
+//        this.net = net.getNet()
+//
+//        ImportPetriNetEventOutcome agreementNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/agreement.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+//        assert agreementNet.getNet() != null
+//        this.agreementNet = agreementNet.getNet()
+//
+//        ImportPetriNetEventOutcome netoutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/test_setData.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+//        assert netoutcome.getNet() != null;
+//        this.setDataNet = netoutcome.getNet();
+//    }
 
-        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_taskref.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert net.getNet() != null
-        this.net = net.getNet()
-
-        ImportPetriNetEventOutcome agreementNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/agreement.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert agreementNet.getNet() != null
-        this.agreementNet = agreementNet.getNet()
-
-        ImportPetriNetEventOutcome netoutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/test_setData.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
-        assert netoutcome.getNet() != null;
-        this.setDataNet = netoutcome.getNet();
-    }
-
-    @Test
-    @Disabled
-    void testTaskrefedFileFieldAction() {
-        def aCase = importHelper.createCase("Case", this.net)
-        assert aCase != null
-
-        def taskId = importHelper.getTaskId(TASK_TITLE, aCase.stringId)
-        assert taskId != null
-
-        importHelper.assignTaskToSuper(TASK_TITLE, aCase.stringId)
-        // TODO: NAE-1969 fix
-//        List<DataGroup> datagroups = dataService.getDataGroups(taskId, Locale.ENGLISH, superCreator.getLoggedSuper()).getData()
+//    @Test
+//    @Disabled
+//    void testTaskrefedFileFieldAction() {
+//        def aCase = importHelper.createCase("Case", this.net)
+//        assert aCase != null
+//
+//        def taskId = importHelper.getTaskId(TASK_TITLE, aCase.stringId)
+//        assert taskId != null
+//
+//        importHelper.assignTaskToSuper(TASK_TITLE, aCase.stringId)
+//        List<DataGroup> datagroups = dataService.getLayouts(taskId, Locale.ENGLISH, superCreator.getLoggedSuper()).getData()
 //
 //        assert datagroups.stream().filter({ it -> it.dataRefs.size() > 0 }).count() == 3
 //        DataRef fileField = findField(datagroups, FILE_FIELD_TITLE)
@@ -92,9 +93,8 @@ class DataServiceTest {
 //        DataRef textField = findField(datagroups, TEXT_FIELD_TITLE)
 //        assert changes.changedFields.fields.containsKey(textField.fieldId)
 //        assert changes.changedFields.fields.get(textField.fieldId).rawValue == "OK"
-    }
-
-    // TODO: NAE-1969 fix
+//    }
+//
 //    DataRef findField(List<DataGroup> datagroups, String fieldTitle) {
 //        def fieldDataGroup = datagroups.find { it -> it.dataRefs.values().find({ DataRef field -> (field.field.name.defaultValue == fieldTitle) }) != null }
 //        assert fieldDataGroup != null
@@ -113,7 +113,7 @@ class DataServiceTest {
 //
 //        importHelper.assignTaskToSuper("summary A", aCase.stringId)
 //
-//        List<DataGroup> dataGroups = dataService.getDataGroups(taskId, Locale.ENGLISH, superCreator.getLoggedSuper()).getData()
+//        List<DataGroup> dataGroups = dataService.getLayouts(taskId, Locale.ENGLISH, superCreator.getLoggedSuper()).getData()
 //        assert dataGroups.get(1).getParentTaskRefId() == "taskRef_result"
 //        assert dataGroups.get(2).getParentTaskRefId() == "taskRef_1"
 //        assert dataGroups.get(3).getParentTaskRefId() == "taskRef_0"

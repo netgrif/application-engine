@@ -28,10 +28,16 @@
 		<title>Group ID</title>
 		<placeholder>Enter group ID</placeholder>
 		<desc>ID of organization group</desc>
-		<action trigger="get">
-			id: f.group_id;
-			change id value { useCase.stringId }
-		</action>
+		<event type="get">
+			<id>group_id_get</id>
+			<actions phase="pre">
+				<action>
+					id: f.group_id;
+
+					change id value { useCase.stringId }
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="user">
 		<id>author</id>
@@ -42,26 +48,46 @@
 		<title>Group name</title>
 		<placeholder>Enter group name</placeholder>
 		<desc>Name of organization group</desc>
-		<action trigger="set">
-			name: f.group_name;
-			useCase.setTitle(name.value.value)
-			workflowService.save(useCase)
-		</action>
+		<event type="set">
+			<id>group_name_set</id>
+			<actions phase="post">
+				<action>
+					name: f.group_name;
+
+					useCase.setTitle(name.value.value)
+					workflowService.save(useCase)
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="user">
 		<id>user_selection</id>
 		<title>Select user</title>
 		<placeholder>No user selected</placeholder>
 		<desc>Select user to be added as a group member</desc>
-		<action trigger="get">
-			userField: f.user_selection;
-			change userField value { null }
-		</action>
-		<action trigger="set">
-			selection: f.members,
-			userField: f.user_selection;
-			change selection options {  nextGroupService.addUser(userField.value.value, selection.options) }
-		</action>
+		<event type="get">
+			<id>user_selection_get</id>
+			<actions phase="pre">
+				<action>
+					userField: f.user_selection;
+
+					change userField value { null }
+				</action>
+			</actions>
+		</event>
+		<event type="set">
+			<id>user_selection_set</id>
+			<actions phase="post">
+				<action>
+					selection: f.members,
+					userField: f.user_selection;
+
+					if (userField.value != null) {
+						change selection options {  nextGroupService.addUser(userField.value.value, selection.options) }
+					}
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="multichoice_map">
 		<id>members</id>
@@ -79,18 +105,23 @@
 			<option key="invite" id="user_action_selection_invite">Invite new user</option>
 		</options>
 		<init>add</init>
-		<action trigger="set">
-			action_selection: f.user_action_selection,
-			user_selection: f.user_selection,
-			invite_by_mail: f.invite_by_mail,
-			trans: t.8;
+		<event type="set">
+			<id>user_action_selection_set</id>
+			<actions phase="post">
+				<action>
+					action_selection: f.user_action_selection,
+					user_selection: f.user_selection,
+					invite_by_mail: f.invite_by_mail,
+					trans: t.8;
 
-			make user_selection, editable on trans when { action_selection.value.value == "add" }
-			make invite_by_mail, hidden on trans when { action_selection.value.value == "add" }
+					make user_selection, editable on trans when { action_selection.value.value == "add" }
+					make invite_by_mail, hidden on trans when { action_selection.value.value == "add" }
 
-			make user_selection, hidden on trans when { action_selection.value.value == "invite" }
-			make invite_by_mail, editable on trans when { action_selection.value.value == "invite" }
-		</action>
+					make user_selection, hidden on trans when { action_selection.value.value == "invite" }
+					make invite_by_mail, editable on trans when { action_selection.value.value == "invite" }
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="text">
 		<id>invite_by_mail</id>
@@ -152,7 +183,7 @@
 			menuIdentifier: f.export_menu_name,
 			menusForExport: f.menus_for_export;
 
-			change menusForExport options { return menuImportExportService.addSelectedEntriesToExport(selectedEntries, menusForExport, menuIdentifier.value.value) }
+					change menusForExport options { return menuImportExportService.addSelectedEntriesToExport(selectedEntries, menusForExport, menuIdentifier.value.value) }
 
 			change selectedEntries value {[]}
 		</action>
@@ -248,6 +279,17 @@
 			updateAvailableEntries(useCase)
 		</action>
 	</data>
+
+
+	<data type="i18n">
+		<id>grid_header</id>
+		<title/>
+		<init id="import_export_dg">Import &amp; export of menu entries</init>
+		<component>
+			<id>divider</id>
+		</component>
+	</data>
+
 	<!-- I18NS -->
 	<i18n locale="sk">
 		<i18nString id="author">Autor grupy</i18nString>
@@ -311,58 +353,52 @@
 		<y>220</y>
 		<title>Initialize group</title>
 		<assignPolicy>auto</assignPolicy>
-		<!--// TODO: release/8.0.0-->
-		<!--<dataGroup>-->
-		<!--	<id>DataGroup_0</id>-->
-		<!--	<layout>grid</layout>-->
-		<!--	<dataRef>-->
-		<!--		<id>group_id</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>visible</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>0</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>4</cols>-->
-		<!--			<offset>6</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>author</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>visible</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>1</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>4</cols>-->
-		<!--			<offset>6</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>group_name</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>editable</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>2</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>4</cols>-->
-		<!--			<offset>6</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--</dataGroup>-->
+		<grid>
+			<id>2_grid</id>
+			<item>
+				<dataRef>
+					<id>group_id</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>author</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>group_name</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<properties>
+				<display>grid</display>
+				<grid-template-columns>1fr</grid-template-columns>
+				<justify-items>stretch</justify-items>
+				<align-items>stretch</align-items>
+				<justify-content>stretch</justify-content>
+				<align-content>stretch</align-content>
+			</properties>
+		</grid>
 		<event type="finish">
-			<id>1</id>
+			<id>2_finish</id>
 			<actions phase="pre">
 				<action>
                     <!--@formatter:off-->
@@ -394,71 +430,61 @@
 		<y>100</y>
 		<title>Group info</title>
 		<assignPolicy>auto</assignPolicy>
-		<!--// TODO: release/8.0.0-->
-		<!--<dataGroup>-->
-		<!--	<id>DataGroup_0</id>-->
-		<!--	<layout>grid</layout>-->
-		<!--	<dataRef>-->
-		<!--		<id>group_id</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>visible</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>0</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>4</cols>-->
-		<!--			<offset>0</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>author</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>visible</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>1</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>4</cols>-->
-		<!--			<offset>0</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>group_name</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>visible</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>2</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>4</cols>-->
-		<!--			<offset>0</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>members</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>visible</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>3</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>4</cols>-->
-		<!--			<offset>0</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--</dataGroup>-->
+		<grid>
+			<id>6_grid</id>
+			<item>
+				<dataRef>
+					<id>group_id</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>author</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>group_name</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>members</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<properties>
+				<display>grid</display>
+				<grid-template-columns>1fr</grid-template-columns>
+				<justify-items>stretch</justify-items>
+				<align-items>stretch</align-items>
+				<justify-content>stretch</justify-content>
+				<align-content>stretch</align-content>
+			</properties>
+		</grid>
 	</transition>
 	<transition>
 		<id>8</id>
@@ -466,73 +492,63 @@
 		<y>340</y>
 		<title>Add user</title>
 		<assignPolicy>auto</assignPolicy>
-		<!--// TODO: release/8.0.0-->
-		<!--<dataGroup>-->
-		<!--	<id>DataGroup_0</id>-->
-		<!--	<layout>grid</layout>-->
-		<!--	<dataRef>-->
-		<!--		<id>user_action_selection</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>editable</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>0</y>-->
-		<!--			<rows>2</rows>-->
-		<!--			<cols>4</cols>-->
-		<!--			<offset>6</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>user_selection</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>editable</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>2</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>4</cols>-->
-		<!--			<offset>6</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>invite_by_mail</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>hidden</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>3</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>4</cols>-->
-		<!--			<offset>6</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>members</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>visible</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>4</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>4</cols>-->
-		<!--			<offset>6</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--</dataGroup>-->
+		<grid>
+			<id>8_grid</id>
+			<item>
+				<dataRef>
+					<id>user_action_selection</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>user_selection</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>invite_by_mail</id>
+					<logic>
+						<behavior>hidden</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>members</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<properties>
+				<display>grid</display>
+				<grid-template-columns>1fr</grid-template-columns>
+				<justify-items>stretch</justify-items>
+				<align-items>stretch</align-items>
+				<justify-content>stretch</justify-content>
+				<align-content>stretch</align-content>
+			</properties>
+		</grid>
 		<event type="finish">
-			<id>invite_new_user</id>
+			<id>8_finish</id>
 			<actions phase="pre">
 				<action>
 					action_selection: f.user_action_selection,
@@ -552,56 +568,50 @@
 		<y>340</y>
 		<title>Edit group info</title>
 		<assignPolicy>auto</assignPolicy>
-		<!--// TODO: release/8.0.0-->
-		<!--<dataGroup>-->
-		<!--	<id>DataGroup_0</id>-->
-		<!--	<layout>grid</layout>-->
-		<!--	<dataRef>-->
-		<!--		<id>group_id</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>visible</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>0</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>4</cols>-->
-		<!--			<offset>6</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>author</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>visible</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>1</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>4</cols>-->
-		<!--			<offset>6</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>group_name</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>editable</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>2</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>4</cols>-->
-		<!--			<offset>6</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--</dataGroup>-->
+		<grid>
+			<id>25_grid</id>
+			<item>
+				<dataRef>
+					<id>group_id</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>author</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>group_name</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<properties>
+				<display>grid</display>
+				<grid-template-columns>1fr</grid-template-columns>
+				<justify-items>stretch</justify-items>
+				<align-items>stretch</align-items>
+				<justify-content>stretch</justify-content>
+				<align-content>stretch</align-content>
+			</properties>
+		</grid>
 	</transition>
 	<transition>
 		<id>28</id>
@@ -609,31 +619,34 @@
 		<y>100</y>
 		<title>Remove user</title>
 		<assignPolicy>auto</assignPolicy>
-		<!--// TODO: release/8.0.0-->
-		<!--<dataGroup>-->
-		<!--	<id>DataGroup_0</id>-->
-		<!--	<layout>grid</layout>-->
-		<!--	<dataRef>-->
-		<!--		<id>members</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>editable</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>0</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>4</cols>-->
-		<!--			<offset>6</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--</dataGroup>-->
+		<grid>
+			<id>28_grid</id>
+			<item>
+				<dataRef>
+					<id>members</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<properties>
+				<display>grid</display>
+				<grid-template-columns>1fr</grid-template-columns>
+				<justify-items>stretch</justify-items>
+				<align-items>stretch</align-items>
+				<justify-content>stretch</justify-content>
+				<align-content>stretch</align-content>
+			</properties>
+		</grid>
 		<event type="finish">
-			<id>remove_user</id>
+			<id>28_finish</id>
 			<actions phase="pre">
 				<action>
 					members: f.members;
+
 					change members options { nextGroupService.removeUser(members.value.value, members.options, useCase) }
 					change members value { [] }
 				</action>
@@ -646,177 +659,149 @@
 		<y>100</y>
 		<title id="menu_configuration">Configure menu</title>
 		<assignPolicy>auto</assignPolicy>
-		<!--// TODO: release/8.0.0-->
-		<!--<dataGroup>-->
-		<!--	<id>dg2</id>-->
-		<!--	<layout>grid</layout>-->
-		<!--	<title id="import_export_dg">Import &amp; export of menu entries</title>-->
-		<!--	<dataRef>-->
-		<!--		<id>available_export_entries</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>editable</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>0</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>1</cols>-->
-		<!--			<offset>0</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>export_menu_name</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>editable</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>1</x>-->
-		<!--			<y>0</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>2</cols>-->
-		<!--			<offset>0</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>update_available_entries_btn</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>editable</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>3</x>-->
-		<!--			<y>0</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>1</cols>-->
-		<!--			<offset>0</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>add_to_export_btn</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>visible</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>4</x>-->
-		<!--			<y>0</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>1</cols>-->
-		<!--			<offset>0</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>menus_for_export</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>editable</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>1</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>3</cols>-->
-		<!--			<offset>0</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>clear_menu_selection_btn</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>editable</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>3</x>-->
-		<!--			<y>1</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>1</cols>-->
-		<!--			<offset>0</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>export_menu_btn</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>editable</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>4</x>-->
-		<!--			<y>1</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>1</cols>-->
-		<!--			<offset>0</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>export_menu_file</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>visible</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>2</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>3</cols>-->
-		<!--			<offset>0</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>import_menu_file</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>editable</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>3</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>3</cols>-->
-		<!--			<offset>0</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>import_menu_btn</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>editable</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>4</x>-->
-		<!--			<y>3</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>1</cols>-->
-		<!--			<offset>0</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--	<dataRef>-->
-		<!--		<id>import_results</id>-->
-		<!--		<logic>-->
-		<!--			<behavior>visible</behavior>-->
-		<!--		</logic>-->
-		<!--		<layout>-->
-		<!--			<x>0</x>-->
-		<!--			<y>4</y>-->
-		<!--			<rows>1</rows>-->
-		<!--			<cols>5</cols>-->
-		<!--			<offset>0</offset>-->
-		<!--			<template>material</template>-->
-		<!--			<appearance>outline</appearance>-->
-		<!--		</layout>-->
-		<!--	</dataRef>-->
-		<!--</dataGroup>-->
+		<grid>
+			<id>navigationMenuConfig_grid</id>
+			<item>
+				<dataRef>
+					<id>grid_header</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / span 5</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>available_export_entries</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>export_menu_name</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>2 / span 2</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>update_available_entries_btn</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>4 / 5</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>add_to_export_btn</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>5 / 6</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>menus_for_export</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / span 3</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>clear_menu_selection_btn</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>4 / 5</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>export_menu_btn</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>5 / 6</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>export_menu_file</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / span 3</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>import_menu_file</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / span 3</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>import_menu_btn</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>4 / 5</grid-column>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>import_results</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<grid-column>1 / span 5</grid-column>
+				</properties>
+			</item>
+			<properties>
+				<display>grid</display>
+				<grid-template-columns>repeat(5, 1fr)</grid-template-columns>
+				<justify-items>stretch</justify-items>
+				<align-items>stretch</align-items>
+				<justify-content>stretch</justify-content>
+				<align-content>stretch</align-content>
+			</properties>
+		</grid>
 	</transition>
 
 	<!-- PLACES -->
@@ -826,7 +811,6 @@
 		<y>220</y>
 		<title>#init</title>
 		<tokens>1</tokens>
-		<static>false</static>
 	</place>
 	<place>
 		<id>4</id>
@@ -834,14 +818,12 @@
 		<y>220</y>
 		<title>Group created</title>
 		<tokens>0</tokens>
-		<static>false</static>
 	</place>
 	<place>
 		<id>p1</id>
 		<x>300</x>
 		<y>100</y>
 		<tokens>0</tokens>
-		<static>false</static>
 	</place>
 	<!-- ARCS -->
 	<arc>

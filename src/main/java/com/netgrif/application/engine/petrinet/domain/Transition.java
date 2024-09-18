@@ -6,6 +6,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.Event;
+import com.netgrif.application.engine.petrinet.domain.layout.LayoutContainer;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
@@ -19,7 +20,6 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Document
@@ -31,8 +31,7 @@ public class Transition extends Node {
     private LinkedHashMap<String, DataRef> dataSet;
     private Map<String, Map<RolePermission, Boolean>> permissions;
     private List<Trigger> triggers;
-    //    TODO: release/8.0.0 layouts
-//    private TaskLayout layout;
+    private LayoutContainer layoutContainer;
     private AssignPolicy assignPolicy;
     private FinishPolicy finishPolicy;
     private Map<EventType, Event> events;
@@ -50,23 +49,15 @@ public class Transition extends Node {
 
     public void setDataRefBehavior(Field<?> field, DataFieldBehavior behavior) {
         // TODO: release/8.0.0
-        setDataRefAttribute(field, dataRef -> {
-            field.setBehavior(this.importId, behavior);
-            dataRef.setBehavior(behavior);
-        });
+//        setDataRefAttribute(field, dataRef -> {
+//            field.setBehavior(this.importId, behavior);
+//            dataRef.setBehavior(behavior);
+//        });
     }
 
     public void setDataRefComponent(Field<?> field, Component component) {
-        setDataRefAttribute(field, dataRef -> dataRef.setComponent(component));
-    }
-
-    private void setDataRefAttribute(Field<?> field, Consumer<DataRef> attributeChange) {
-        String fieldId = field.getStringId();
-        if (!dataSet.containsKey(fieldId)) {
-            dataSet.put(fieldId, new DataRef(field));
-        }
-        DataRef dataRef = dataSet.get(fieldId);
-        attributeChange.accept(dataRef);
+        // TODO: release/8.0.0
+//        setDataRefAttribute(field, dataRef -> dataRef.setComponent(component));
     }
 
     public void setDataEvents(String field, Map<DataEventType, DataEvent> events) {
@@ -205,6 +196,7 @@ public class Transition extends Node {
         clone.setFinishPolicy(finishPolicy);
         clone.setEvents(this.events == null ? null : events.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
         clone.setProperties(new UniqueKeyMap<>(this.getProperties()));
+        clone.setLayoutContainer(this.layoutContainer == null ? null : this.layoutContainer.clone());
         return clone;
     }
 }

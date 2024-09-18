@@ -9,7 +9,7 @@
     <!-- CASE EVENTS -->
     <caseEvents>
         <event type="create">
-            <id>create</id>
+            <id>case_create</id>
             <actions phase="post">
                 <action>
                     caseId: f.filter_case_id;
@@ -61,7 +61,7 @@
         <id>origin_view_id</id>
         <title id="origin_view_id">Origin ViewId</title>
         <event type="set">
-            <id>set</id>
+            <id>origin_view_id_set</id>
             <actions phase="post">
                 <action>
                     origin_view_id: f.origin_view_id,
@@ -101,7 +101,7 @@
         <id>parent_filter_id</id>
         <title id="parent_filter_id">parent filter ID</title>
         <event type="set">
-            <id>set</id>
+            <id>parent_filter_id_set</id>
             <actions phase="post">
                 <action>
                     parent_filter_id: f.parent_filter_id,
@@ -120,15 +120,15 @@
     </data>
     <data type="i18n" immediate="true">
         <id>i18n_filter_name</id>
-        <title></title>
+        <title/>
     </data>
     <data type="text">
         <id>filter_case_id</id>
-        <title></title>
+        <title/>
     </data>
     <data type="text">
         <id>menu_identifier</id>
-        <title></title>
+        <title/>
     </data>
     <data type="button">
         <id>and_me</id>
@@ -140,7 +140,7 @@
     </data>
     <data type="taskRef">
         <id>taskref_and_parent</id>
-        <title></title>
+        <title/>
     </data>
     <data type="text">
         <id>trimmed_origin_view_id</id>
@@ -150,11 +150,14 @@
         <id>is_imported</id>
         <title>imported</title>
         <init>0</init>
-        <action trigger="set">
-            isNotImported: f.is_not_imported;
-
-            change isNotImported value { return 0 }
-        </action>
+        <event type="set">
+            <id>is_imported_set</id>
+            <actions phase="post">
+                <action>
+                    change is_not_imported value { return 0 }
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="number">
         <id>is_not_imported</id>
@@ -171,7 +174,7 @@
     </data>
     <data type="enumeration_map">
         <id>missing_nets_translation</id>
-        <title></title>
+        <title/>
         <options>
             <option key="sk">Zoznam chýbajúcich procesov pre aktuálny filter:</option>
             <option key="en">List of missing processes for current filter:</option>
@@ -180,11 +183,18 @@
     </data>
     <data type="taskRef">
         <id>my_full_filter</id>
-        <title></title>
+        <title/>
     </data>
     <data type="multichoice_map">
         <id>allowed_nets</id>
         <title id="allowed_nets">Allowed nets</title>
+    </data>
+    <data type="i18n">
+        <id>divider_1</id>
+        <title/>
+        <component>
+            <id>divider</id>
+        </component>
     </data>
     <!-- I18NS -->
     <i18n locale="sk">
@@ -242,91 +252,92 @@
         <y>260</y>
         <title id="create_new_filter">Create new filter</title>
         <assignPolicy>auto</assignPolicy>
-        <!--TODO: release/8.0.0-->
-        <!--<dataGroup>-->
-        <!--    <id>myFilter</id>-->
-        <!--    <layout>grid</layout>-->
-        <!--    <dataRef>-->
-        <!--        <id>my_full_filter</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>visible</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>4</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--</dataGroup>-->
-        <!--<dataGroup>-->
-        <!--    <id>DataGroup_0</id>-->
-        <!--    <layout>grid</layout>-->
-        <!--    <dataRef>-->
-        <!--        <id>visibility</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>editable</behavior>-->
-        <!--            <behavior>required</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>1</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>4</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>new_title</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>editable</behavior>-->
-        <!--            <behavior>required</behavior>-->
-        <!--            <action trigger="set">-->
-        <!--                userTitle: f.new_title,-->
-        <!--                i18nName: f.i18n_filter_name;-->
-
-        <!--                change i18nName value { new com.netgrif.application.engine.petrinet.domain.I18nString(userTitle.rawValue) }-->
-        <!--            </action>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>2</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>4</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>allowed_nets</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>editable</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>3</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>4</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--</dataGroup>-->
+        <grid>
+            <id>newFilter_grid</id>
+            <item>
+                <dataRef>
+                    <id>my_full_filter</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>divider_1</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>visibility</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                        <behavior>required</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>new_title</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                        <behavior>required</behavior>
+                    </logic>
+                    <event type="set">
+                        <id>new_title_newFilter_set</id>
+                        <actions phase="post">
+                            <action>
+                                change i18n_filter_name value { new com.netgrif.application.engine.petrinet.domain.I18nString(new_title.rawValue) }
+                            </action>
+                        </actions>
+                    </event>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>allowed_nets</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <properties>
+                <display>grid</display>
+                <grid-template-columns>1fr</grid-template-columns>
+                <justify-items>stretch</justify-items>
+                <align-items>stretch</align-items>
+                <justify-content>stretch</justify-content>
+                <align-content>stretch</align-content>
+            </properties>
+        </grid>
         <event type="finish">
-            <id></id>
-            <title id="save">Save</title>
+            <id>newFilter_finish</id>
             <actions phase="post">
                 <action>
-                    name: f.new_title;
-                    useCase.setTitle(name.rawValue)
+                    // TODO: release/8.0.0
+                    useCase.setTitle(new_title.rawValue)
                     workflowService.save(useCase)
                 </action>
             </actions>
+            <title name="save">Save</title>
         </event>
     </transition>
     <transition>
@@ -334,146 +345,135 @@
         <x>740</x>
         <y>380</y>
         <title id="details">Details</title>
-        <!--TODO: release/8.0.0-->
-        <!--<dataGroup>-->
-        <!--    <id>DataGroup_0</id>-->
-        <!--    <layout>grid</layout>-->
-        <!--    <dataRef>-->
-        <!--        <id>filter_type</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>visible</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>1</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>visibility</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>visible</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>1</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>1</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--</dataGroup>-->
-        <!--<dataGroup>-->
-        <!--    <id>myFilter</id>-->
-        <!--    <layout>grid</layout>-->
-        <!--    <dataRef>-->
-        <!--        <id>my_full_filter</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>visible</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>4</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--</dataGroup>-->
+        <grid>
+            <id>t2_grid</id>
+            <item>
+                <dataRef>
+                    <id>filter_type</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>visibility</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / 3</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>divider_1</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / span 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>my_full_filter</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / span 2</grid-column>
+                </properties>
+            </item>
+            <properties>
+                <display>grid</display>
+                <grid-template-columns>repeat(2, 1fr)</grid-template-columns>
+                <justify-items>stretch</justify-items>
+                <align-items>stretch</align-items>
+                <justify-content>stretch</justify-content>
+                <align-content>stretch</align-content>
+            </properties>
+        </grid>
     </transition>
     <transition>
         <id>frontend_create</id>
         <x>380</x>
         <y>260</y>
         <title>Set filter metadata</title>
-        <!--TODO: release/8.0.0-->
-        <!--<dataGroup>-->
-        <!--    <id>DataGroup_0</id>-->
-        <!--    <layout>grid</layout>-->
-        <!--    <dataRef>-->
-        <!--        <id>filter</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>editable</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>4</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>filter_type</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>editable</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>1</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>4</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>origin_view_id</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>editable</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>2</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>4</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>parent_filter_id</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>editable</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>3</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>4</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>allowed_nets</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>editable</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>4</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>4</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--</dataGroup>-->
+        <grid>
+            <id>frontend_create_grid</id>
+            <item>
+                <dataRef>
+                    <id>filter</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>filter_type</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>origin_view_id</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>parent_filter_id</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>allowed_nets</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <properties>
+                <display>grid</display>
+                <grid-template-columns>1fr</grid-template-columns>
+                <justify-items>stretch</justify-items>
+                <align-items>stretch</align-items>
+                <justify-content>stretch</justify-content>
+                <align-content>stretch</align-content>
+            </properties>
+        </grid>
         <event type="finish">
-            <id>finish</id>
+            <id>frontend_create_finish</id>
             <actions phase="post">
                 <action>
                     taskRef: f.my_full_filter;
@@ -488,88 +488,74 @@
         <x>500</x>
         <y>180</y>
         <title>Automated new filter</title>
-        <!--TODO: release/8.0.0-->
-        <!--<dataGroup>-->
-        <!--    <id>DataGroup_0</id>-->
-        <!--    <layout>grid</layout>-->
-        <!--    <dataRef>-->
-        <!--        <id>filter</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>editable</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>1</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>filter_type</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>editable</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>1</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>1</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>visibility</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>editable</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>2</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>1</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>origin_view_id</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>editable</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>3</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>1</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>parent_filter_id</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>editable</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>1</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>1</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--</dataGroup>-->
+        <grid>
+            <id>auto_create_grid</id>
+            <item>
+                <dataRef>
+                    <id>filter</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>filter_type</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / 3</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>visibility</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>3 / 4</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>origin_view_id</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>4 / 5</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>parent_filter_id</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <properties>
+                <display>grid</display>
+                <grid-template-columns>repeat(4, 1fr)</grid-template-columns>
+                <justify-items>stretch</justify-items>
+                <align-items>stretch</align-items>
+                <justify-content>stretch</justify-content>
+                <align-content>stretch</align-content>
+            </properties>
+        </grid>
         <event type="finish">
-            <id>finish</id>
+            <id>auto_create_finish</id>
             <actions phase="post">
                 <action>
                     taskRef: f.my_full_filter;
@@ -590,126 +576,116 @@
                 <view>true</view>
             </logic>
         </roleRef>
-        <!--TODO: release/8.0.0-->
-        <!--<dataGroup>-->
-        <!--    <id>DataGroup_0</id>-->
-        <!--    <layout>grid</layout>-->
-        <!--    <dataRef>-->
-        <!--        <id>filter</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>visible</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>4</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>filter_case_id</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>hidden</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>1</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>4</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>origin_view_id</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>forbidden</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>2</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>4</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>taskref_and_parent</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>visible</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>3</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>4</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>new_title</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>hidden</behavior>-->
-        <!--            <action trigger="set">-->
-        <!--                name: f.new_title,-->
-        <!--                i18nName: f.i18n_filter_name;-->
+        <grid>
+            <id>view_filter_grid</id>
+            <item>
+                <dataRef>
+                    <id>filter</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / span 4</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>filter_case_id</id>
+                    <logic>
+                        <behavior>hidden</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / span 4</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>origin_view_id</id>
+                    <logic>
+                        <behavior>forbidden</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / span 4</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>taskref_and_parent</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / span 4</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>new_title</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                    <event type="set">
+                        <id>new_title_view_filter_set</id>
+                        <actions phase="post">
+                            <action>
+                                name: f.new_title,
+                                i18nName: f.i18n_filter_name;
 
-        <!--                change i18nName value { new com.netgrif.application.engine.petrinet.domain.I18nString(name.rawValue) }-->
-        <!--            </action>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>4</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>4</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--</dataGroup>-->
-        <!--<dataGroup>-->
-        <!--    <id>DataGroup_1</id>-->
-        <!--    <layout>grid</layout>-->
-        <!--    <dataRef>-->
-        <!--        <id>and_view</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>forbidden</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>1</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>trimmed_origin_view_id</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>forbidden</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>1</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>3</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--</dataGroup>-->
+                                change i18nName value { new com.netgrif.application.engine.petrinet.domain.I18nString(name.rawValue) }
+                            </action>
+                        </actions>
+                    </event>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / span 4</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>divider_1</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / span 4</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>and_view</id>
+                    <logic>
+                        <behavior>forbidden</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>trimmed_origin_view_id</id>
+                    <logic>
+                        <behavior>forbidden</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / span 3</grid-column>
+                </properties>
+            </item>
+            <properties>
+                <display>grid</display>
+                <grid-template-columns>repeat(4, 1fr)</grid-template-columns>
+                <justify-items>stretch</justify-items>
+                <align-items>stretch</align-items>
+                <justify-content>stretch</justify-content>
+                <align-content>stretch</align-content>
+            </properties>
+        </grid>
     </transition>
     <transition>
         <id>view_as_ancestor</id>
@@ -721,214 +697,203 @@
                 <view>true</view>
             </logic>
         </roleRef>
-        <!--TODO: release/8.0.0-->
-        <!--<dataGroup>-->
-        <!--    <id>DataGroup_0</id>-->
-        <!--    <layout>grid</layout>-->
-        <!--    <dataRef>-->
-        <!--        <id>and_me</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>visible</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>1</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>filter</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>visible</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>1</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>3</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>taskref_and_parent</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>visible</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>3</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>4</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--</dataGroup>-->
-        <!--<dataGroup>-->
-        <!--    <id>DataGroup_1</id>-->
-        <!--    <layout>grid</layout>-->
-        <!--    <dataRef>-->
-        <!--        <id>and_view</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>forbidden</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>1</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>trimmed_origin_view_id</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>forbidden</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>1</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>3</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>origin_view_id</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>forbidden</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>3</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>3</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--</dataGroup>-->
+        <grid>
+            <id>view_as_ancestor_grid</id>
+            <item>
+                <dataRef>
+                    <id>and_me</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>filter</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / span 3</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>taskref_and_parent</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / span 4</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>divider_1</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / span 4</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>and_view</id>
+                    <logic>
+                        <behavior>forbidden</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>trimmed_origin_view_id</id>
+                    <logic>
+                        <behavior>forbidden</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / span 3</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>origin_view_id</id>
+                    <logic>
+                        <behavior>forbidden</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / span 3</grid-column>
+                </properties>
+            </item>
+            <properties>
+                <display>grid</display>
+                <grid-template-columns>repeat(4, 1fr)</grid-template-columns>
+                <justify-items>stretch</justify-items>
+                <align-items>stretch</align-items>
+                <justify-content>stretch</justify-content>
+                <align-content>stretch</align-content>
+            </properties>
+        </grid>
     </transition>
     <transition>
         <id>import_filter</id>
         <x>740</x>
         <y>180</y>
         <title id="import_filter">Import filter</title>
-        <!--TODO: release/8.0.0-->
-        <!--<dataGroup>-->
-        <!--    <id>DataGroup_0</id>-->
-        <!--    <layout>grid</layout>-->
-        <!--    <title></title>-->
-        <!--    <dataRef>-->
-        <!--        <id>new_title</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>editable</behavior>-->
-        <!--            <action trigger="get">-->
-        <!--                name: f.new_title;-->
+        <grid>
+            <id>import_filter_grid</id>
+            <item>
+                <dataRef>
+                    <id>new_title</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                    <event type="get">
+                        <id>new_title_import_filter_get</id>
+                        <actions phase="pre">
+                            <action>
+                                name: f.new_title;
 
-        <!--                change name value { useCase.getTitle() }-->
-        <!--            </action>-->
-        <!--            <action trigger="set">-->
-        <!--                name: f.new_title,-->
-        <!--                i18nName: f.i18n_filter_name;-->
+                                change name value { useCase.getTitle() }
+                            </action>
+                        </actions>
+                    </event>
+                    <event type="set">
+                        <id>new_title_import_filter_set</id>
+                        <actions phase="post">
+                            <action>
+                                name: f.new_title,
+                                i18nName: f.i18n_filter_name;
 
-        <!--                change i18nName value { new com.netgrif.application.engine.petrinet.domain.I18nString(name.rawValue) }-->
-        <!--            </action>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>1</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>filter_type</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>visible</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>1</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>1</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>visibility</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>editable</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>2</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>1</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--    <dataRef>-->
-        <!--        <id>missing_allowed_nets</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>hidden</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>2</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>2</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--</dataGroup>-->
-        <!--<dataGroup>-->
-        <!--    <id>DataGroup_1</id>-->
-        <!--    <layout>grid</layout>-->
-        <!--    <dataRef>-->
-        <!--        <id>my_full_filter</id>-->
-        <!--        <logic>-->
-        <!--            <behavior>visible</behavior>-->
-        <!--        </logic>-->
-        <!--        <layout>-->
-        <!--            <x>0</x>-->
-        <!--            <y>0</y>-->
-        <!--            <rows>1</rows>-->
-        <!--            <cols>4</cols>-->
-        <!--            <offset>0</offset>-->
-        <!--            <template>material</template>-->
-        <!--            <appearance>outline</appearance>-->
-        <!--        </layout>-->
-        <!--    </dataRef>-->
-        <!--</dataGroup>-->
+                                change i18nName value { new com.netgrif.application.engine.petrinet.domain.I18nString(name.rawValue) }
+                            </action>
+                        </actions>
+                    </event>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>filter_type</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>2 / 3</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>visibility</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>3 / 4</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>missing_allowed_nets</id>
+                    <logic>
+                        <behavior>hidden</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / span 2</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>divider_1</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / span 4</grid-column>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>my_full_filter</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <grid-column>1 / span 4</grid-column>
+                </properties>
+            </item>
+            <properties>
+                <display>grid</display>
+                <grid-template-columns>repeat(4, 1fr)</grid-template-columns>
+                <justify-items>stretch</justify-items>
+                <align-items>stretch</align-items>
+                <justify-content>stretch</justify-content>
+                <align-content>stretch</align-content>
+            </properties>
+        </grid>
         <event type="finish">
-            <id></id>
+            <id>import_filter_finish</id>
             <actions phase="post">
                 <action>
-                    name: f.new_title;
-                    changeCaseProperty "title" about { name.rawValue }
-
+                    changeCaseProperty "title" about { new_title.rawValue }
                 </action>
             </actions>
         </event>
@@ -939,35 +904,30 @@
         <x>260</x>
         <y>260</y>
         <tokens>1</tokens>
-        <static>false</static>
     </place>
     <place>
         <id>p2</id>
         <x>740</x>
         <y>260</y>
         <tokens>0</tokens>
-        <static>false</static>
     </place>
     <place>
         <id>p3</id>
         <x>540</x>
         <y>260</y>
         <tokens>0</tokens>
-        <static>false</static>
     </place>
     <place>
         <id>p4</id>
         <x>660</x>
         <y>140</y>
         <tokens>0</tokens>
-        <static>false</static>
     </place>
     <place>
         <id>p5</id>
         <x>500</x>
         <y>340</y>
         <tokens>0</tokens>
-        <static>false</static>
     </place>
     <!-- ARCS -->
     <arc>
