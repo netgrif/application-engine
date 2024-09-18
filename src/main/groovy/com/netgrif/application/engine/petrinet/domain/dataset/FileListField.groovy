@@ -51,8 +51,7 @@ class FileListField extends StorageField<FileListFieldValue> {
     Field clone() {
         FileListField clone = new FileListField()
         super.clone(clone)
-        clone.storageType = this.storageType
-        clone.remote = this.remote
+        clone.storage = this.storage
         return clone
     }
 }

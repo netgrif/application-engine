@@ -44,8 +44,7 @@ class FileField extends StorageField<FileFieldValue> {
     Field clone() {
         FileField clone = new FileField()
         super.clone(clone)
-        clone.storageType = this.storageType
-        clone.remote = this.remote
+        clone.storage = this.storage
         return clone
     }
 }

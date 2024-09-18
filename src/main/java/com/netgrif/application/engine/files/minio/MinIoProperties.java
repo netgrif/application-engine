@@ -10,7 +10,7 @@ import java.util.Map;
 @Component
 @ConfigurationProperties(prefix = "nae.storage.minio")
 public class MinIoProperties {
-    public static final String MINIO_TYPE = "minio";
+    public static final String HOST = "host";
     public static final String DEFAULT_BUCKET = "default";
     private boolean enabled = false;
     private Map<String, MinIoHostInfo> hosts;

@@ -4,6 +4,7 @@ import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.files.throwable.BadRequestException;
 import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import com.netgrif.application.engine.files.throwable.StorageException;
+import com.netgrif.application.engine.petrinet.domain.dataset.MinIoStorage;
 import com.netgrif.application.engine.petrinet.domain.dataset.StorageField;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
@@ -43,10 +44,11 @@ public class MinIoStorageService implements IStorageService {
 
     @Override
     public InputStream get(StorageField<?> field, String path) throws BadRequestException, ServiceErrorException, FileNotFoundException {
-        try {
-            return client(field.getRemote().getHost(), field.getRemote().getCredentials()).getObject(
+        MinIoStorage storage = (MinIoStorage) field.getStorage();
+        try (MinioClient minioClient = client(storage.getHost())) {
+            return minioClient.getObject(
                     GetObjectArgs.builder()
-                            .bucket(field.getRemote().getBucket() )
+                            .bucket(storage.getBucket() )
                             .object(path)
                             .build()
             );
@@ -62,8 +64,7 @@ public class MinIoStorageService implements IStorageService {
         } catch (InvalidKeyException e) {
             log.error("Key " + path + " is corrupted.", e);
             throw new BadRequestException("Key " + path + " is corrupted.", e);
-        } catch (ServerException | InsufficientDataException | IOException | NoSuchAlgorithmException |
-                 InvalidResponseException | XmlParserException | InternalException e) {
+        } catch (Exception e) {
             log.error("Some internal error from minio", e);
             throw new ServiceErrorException("The file cannot be retrieved", e);
         }
@@ -80,17 +81,17 @@ public class MinIoStorageService implements IStorageService {
 
     @Override
     public boolean save(StorageField<?> field, String path, InputStream stream) throws StorageException {
-        try {
-            return client(field.getRemote().getHost(), field.getRemote().getCredentials()).putObject(PutObjectArgs
+        MinIoStorage storage = (MinIoStorage) field.getStorage();
+        try (MinioClient minioClient = client(storage.getHost())) {
+            return minioClient.putObject(PutObjectArgs
                     .builder()
-                    .bucket(field.getRemote().getBucket()).object(path)
+                    .bucket(storage.getBucket()).object(path)
                     .stream(stream, -1, properties.getPartSize())
                     .build()).etag() != null;
         } catch (ErrorResponseException e) {
             log.error(e.getMessage(), e);
             throw new StorageException(e.getMessage(), e);
-        } catch (InsufficientDataException | XmlParserException | InvalidKeyException | InternalException |
-                 InvalidResponseException | IOException | NoSuchAlgorithmException | ServerException e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new ServiceErrorException(e.getMessage());
         }
@@ -98,10 +99,11 @@ public class MinIoStorageService implements IStorageService {
 
     @Override
     public void delete(StorageField<?> field, String path) throws StorageException {
-        try {
-            client(field.getRemote().getHost(), field.getRemote().getCredentials()).removeObject(RemoveObjectArgs
+        MinIoStorage storage = (MinIoStorage) field.getStorage();
+        try (MinioClient minioClient = client(storage.getHost())) {
+            minioClient.removeObject(RemoveObjectArgs
                     .builder()
-                    .bucket(field.getRemote().getBucket())
+                    .bucket(storage.getBucket())
                     .object(path)
                     .build());
         } catch (InsufficientDataException | InternalException | InvalidResponseException |
@@ -109,7 +111,7 @@ public class MinIoStorageService implements IStorageService {
             throw new ServiceErrorException(e.getMessage(), e);
         } catch (InvalidKeyException e) {
             throw new BadRequestException(e.getMessage());
-        } catch (ErrorResponseException e) {
+        } catch (Exception e) {
             log.error("File cannot be deleted", e);
             throw new StorageException("File cannot be deleted", e);
         }
@@ -123,17 +125,17 @@ public class MinIoStorageService implements IStorageService {
 
     @Override
     public String getPath(String caseId, String fieldId, String name) {
-        return caseId + "-" + fieldId + "-" + name;
+        return caseId + "/" + fieldId + "-" + name;
     }
 
     public static String getBucketOrDefault(String bucket) {
         return bucket != null ? bucket : MinIoProperties.DEFAULT_BUCKET;
     }
 
-    protected MinioClient client(String host, String credentials) {
+    protected MinioClient client(String host) {
         return MinioClient.builder()
                 .endpoint(properties.getHosts(host).getHost())
-                .credentials(properties.getHosts(host).getCredentials(credentials).getUser(), properties.getHosts(host).getCredentials(credentials).getPassword())
+                .credentials(properties.getHosts(host).getUser(), properties.getHosts(host).getPassword())
                 .build();
     }
 }

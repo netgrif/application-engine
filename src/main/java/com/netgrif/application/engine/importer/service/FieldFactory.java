@@ -8,7 +8,7 @@ import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.Format;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
-import com.netgrif.application.engine.petrinet.domain.dataset.Remote;
+import com.netgrif.application.engine.petrinet.domain.dataset.factory.StorageFactory;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation;
 import com.netgrif.application.engine.petrinet.domain.views.View;
@@ -525,8 +525,7 @@ public final class FieldFactory {
 
     private FileField buildFileField(Data data) {
         FileField fileField = new FileField();
-        fileField.setStorageType((data.getRemote() == null || data.getRemote().getType() == null) ? defaultStorageType : data.getRemote().getType());
-        resolveIfRemote(data, fileField);
+        resolveStorage(data, fileField);
         setDefaultValue(fileField, data, defaultValue -> {
             if (defaultValue != null) {
                 fileField.setDefaultValue(defaultValue);
@@ -537,8 +536,7 @@ public final class FieldFactory {
 
     private FileListField buildFileListField(Data data) {
         FileListField fileListField = new FileListField();
-        fileListField.setStorageType((data.getRemote() == null || data.getRemote().getType() == null) ? defaultStorageType : data.getRemote().getType());
-        resolveIfRemote(data, fileListField);
+        resolveStorage(data, fileListField);
         setDefaultValues(fileListField, data, defaultValues -> {
             if (defaultValues != null && !defaultValues.isEmpty()) {
                 fileListField.setDefaultValue(defaultValues);
@@ -855,21 +853,7 @@ public final class FieldFactory {
         }
     }
 
-    private void resolveIfRemote(Data data, StorageField<?> field) {
-        if (data.getRemote() != null) {
-            if (data.getRemote().getType() != null && data.getRemote().getType().equals(MinIoProperties.MINIO_TYPE) && !minIoProperties.isEnabled()) {
-                throw new StorageNotEnabledException("Storage of type [" + MinIoProperties.MINIO_TYPE + "] is not enabled.");
-            }
-            field.setRemote(new Remote());
-            if (data.getRemote().getHost() != null) {
-                field.getRemote().setHost(data.getRemote().getHost());
-            }
-            if (field.getStorageType().equals(MinIoProperties.MINIO_TYPE) && data.getRemote().getBucket() != null) {
-                field.getRemote().setBucket(getBucketOrDefault(data.getRemote().getBucket()));
-            }
-            if (field.getStorageType().equals(MinIoProperties.MINIO_TYPE) && data.getRemote().getBucket() != null) {
-                field.getRemote().setCredentials(data.getRemote().getCredentials());
-            }
-        }
+    private void resolveStorage(Data data, StorageField<?> field) {
+        field.setStorage(StorageFactory.createStorage(data, defaultStorageType, minIoProperties));
     }
 }

@@ -7,9 +7,6 @@ import java.util.Map;
 @Data
 public class MinIoHostInfo {
     private String host;
-    private Map<String, MinIoCredentials> credentials;
-
-    public MinIoCredentials getCredentials(String credentialsKey) {
-        return credentials.get(credentialsKey);
-    }
+    private String user;
+    private String password;
 }

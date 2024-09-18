@@ -75,12 +75,12 @@ public class LocalStorageService implements IStorageService {
 
     @Override
     public String getPreviewPath(String caseId, String fieldId, String name) {
-        return fileStorageConfiguration.getStoragePath() + "/file_preview/" + caseId + "-" + fieldId + "-" + name;
+        return fileStorageConfiguration.getStoragePath() + "/file_preview/" + caseId + "/" + fieldId + "-" + name;
     }
 
     @Override
     public String getPath(String caseId, String fieldId, String name) {
-        return fileStorageConfiguration.getStoragePath() + "/" + caseId + "-" + fieldId + "-" + name;
+        return fileStorageConfiguration.getStoragePath() + "/" + caseId + "/" + fieldId + "-" + name;
     }
 
 }
