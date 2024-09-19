@@ -8,11 +8,11 @@ abstract class StorageField<T> extends Field<T> {
         super()
     }
 
-    String getStorageType() {
+    StorageType getStorageType() {
         if (storage == null) {
             return StorageType.LOCAL
         }
-        return storage.getType().name()
+        return storage.getType()
     }
 
     void setStorageType(StorageType storageType) {

@@ -524,11 +524,8 @@ public class DataService implements IDataService {
 
     private FileFieldInputStream getFilePreview(FileField field, Case useCase) throws IOException, StorageException {
         IStorageService storageService = storageResolverService.resolve(field.getStorageType());
-        if (field.getValue().getPreviewPath() != null) {
-            return new FileFieldInputStream(field, storageService.get(field, field.getValue().getPreviewPath()));
-        }
         InputStream stream = storageService.get(field, field.getValue().getPath());
-        File file = File.createTempFile(field.getStringId(), ".pdf");
+        File file = File.createTempFile(field.getStringId(), "." + FileFieldDataType.resolveTypeFromName(field.getValue().getName()).extension);
         file.deleteOnExit();
         FileOutputStream fos = new FileOutputStream(file);
         IOUtils.copy(stream, fos);
@@ -539,8 +536,6 @@ public class DataService implements IDataService {
             String previewPath = storageService.getPreviewPath(useCase.getStringId(), field.getImportId(), field.getValue().getName());
             storageService.save(field, previewPath, inputStream);
             field.getValue().setPreviewPath(previewPath);
-            useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
-            workflowService.save(useCase);
             inputStream.reset();
             return new FileFieldInputStream(field, inputStream);
         } catch (StorageException e) {
@@ -550,8 +545,7 @@ public class DataService implements IDataService {
     }
 
     private ByteArrayOutputStream generateFilePreviewToStream(File file) throws IOException {
-        int dot = file.getName().lastIndexOf(".");
-        FileFieldDataType fileType = FileFieldDataType.resolveType((dot == -1) ? "" : file.getName().substring(dot + 1));
+        FileFieldDataType fileType = FileFieldDataType.resolveTypeFromName(file.getName());
         BufferedImage image = getBufferedImageFromFile(file, fileType);
         if (image.getWidth() > imageScale || image.getHeight() > imageScale) {
             image = scaleImagePreview(image);

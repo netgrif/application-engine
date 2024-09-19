@@ -6,6 +6,7 @@ import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import com.netgrif.application.engine.files.throwable.StorageException;
 import com.netgrif.application.engine.petrinet.domain.dataset.MinIoStorage;
 import com.netgrif.application.engine.petrinet.domain.dataset.StorageField;
+import com.netgrif.application.engine.petrinet.domain.dataset.StorageType;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
@@ -38,8 +39,8 @@ public class MinIoStorageService implements IStorageService {
     }
 
     @Override
-    public String getType() {
-        return "MINIO";
+    public StorageType getType() {
+        return StorageType.MINIO;
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.netgrif.application.engine.files.throwable.BadRequestException;
 import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import com.netgrif.application.engine.files.throwable.StorageException;
 import com.netgrif.application.engine.petrinet.domain.dataset.StorageField;
+import com.netgrif.application.engine.petrinet.domain.dataset.StorageType;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,8 @@ public class LocalStorageService implements IStorageService {
     }
 
     @Override
-    public String getType() {
-        return "LOCAL";
+    public StorageType getType() {
+        return StorageType.LOCAL;
     }
 
     @Override

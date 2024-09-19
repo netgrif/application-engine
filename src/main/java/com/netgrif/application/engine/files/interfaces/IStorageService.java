@@ -4,13 +4,14 @@ import com.netgrif.application.engine.files.throwable.BadRequestException;
 import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import com.netgrif.application.engine.files.throwable.StorageException;
 import com.netgrif.application.engine.petrinet.domain.dataset.StorageField;
+import com.netgrif.application.engine.petrinet.domain.dataset.StorageType;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 public interface IStorageService {
-    String getType();
+    StorageType getType();
 
     InputStream get(StorageField<?> field, String path) throws BadRequestException, ServiceErrorException, FileNotFoundException;
 
