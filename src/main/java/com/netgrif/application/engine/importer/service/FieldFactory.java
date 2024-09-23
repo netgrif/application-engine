@@ -86,17 +86,6 @@ public final class FieldFactory {
         return Expression.ofStatic(value);
     }
 
-//TODO: release/8.0.0 merge check
-    /* private StringCollectionField buildStringCollectionField(Data data, Importer importer) {
-        StringCollectionField field = new StringCollectionField();
-        setDefaultValues(field, data, defaultValues -> {
-            if (defaultValues != null) {
-                field.setDefaultValue(defaultValues);
-            }
-        });
-        return field;
-    }*/
-
     private void setEncryption(Field<?> field, Data data) {
         if (data.getEncryption() != null && data.getEncryption().isValue()) {
             String encryption = data.getEncryption().getAlgorithm();

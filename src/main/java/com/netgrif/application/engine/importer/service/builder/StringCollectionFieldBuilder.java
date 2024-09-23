@@ -1,0 +1,28 @@
+package com.netgrif.application.engine.importer.service.builder;
+
+import com.netgrif.application.engine.importer.model.Data;
+import com.netgrif.application.engine.importer.model.DataType;
+import com.netgrif.application.engine.importer.service.Importer;
+import com.netgrif.application.engine.petrinet.domain.dataset.StringCollectionField;
+import org.springframework.stereotype.Component;
+
+@Component
+public class StringCollectionFieldBuilder extends FieldBuilder<StringCollectionField> {
+
+    @Override
+    public StringCollectionField build(Data data, Importer importer) {
+        StringCollectionField field = new StringCollectionField();
+        // TODO: release/8.0.0 fix
+//        setDefaultValues(field, data, defaultValues -> {
+//            if (defaultValues != null) {
+//                field.setDefaultValue(defaultValues);
+//            }
+//        });
+        return field;
+    }
+
+    @Override
+    public DataType getType() {
+        return DataType.STRING_COLLECTION;
+    }
+}
