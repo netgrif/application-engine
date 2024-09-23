@@ -7,6 +7,7 @@ import com.netgrif.application.engine.importer.model.DataRef;
 import com.netgrif.application.engine.importer.service.evaluation.IActionEvaluator;
 import com.netgrif.application.engine.importer.service.evaluation.IFunctionEvaluator;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
+import com.netgrif.application.engine.importer.service.trigger.TriggerFactory;
 import com.netgrif.application.engine.importer.service.validation.IProcessValidator;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.Function;
@@ -444,11 +445,11 @@ public class Importer {
 //            );
 //        }
 //
-//        if (importTransition.getTrigger() != null) {
-//            importTransition.getTrigger().forEach(trigger ->
-//                    createTrigger(transition, trigger)
-//            );
-//        }
+        if (importTransition.getTrigger() != null) {
+            importTransition.getTrigger().forEach(trigger ->
+                    createTrigger(transition, trigger)
+            );
+        }
 //
 //        addPredefinedRolesWithDefaultPermissions(importTransition, transition);
 //
@@ -673,13 +674,10 @@ public class Importer {
         return this.process.getIdentifier() + "-" + actionId;
     }
 
-//
-//    protected void createTrigger(Transition transition, com.netgrif.application.engine.importer.model.Trigger importTrigger) {
-//        com.netgrif.application.engine.workflow.domain.triggers.Trigger trigger = triggerFactory.buildTrigger(importTrigger);
-//
-//        transition.addTrigger(trigger);
-//    }
-//
+    protected void createTrigger(Transition transition, com.netgrif.application.engine.importer.model.Trigger importTrigger) {
+        transition.addTrigger(triggerFactory.buildTrigger(importTrigger));
+    }
+
     protected void createPlace(com.netgrif.application.engine.importer.model.Place importPlace) {
         Place place = new Place();
         place.setImportId(importPlace.getId());
@@ -708,36 +706,6 @@ public class Importer {
         role.setNetId(process.getStringId());
         process.addRole(role);
     }
-//
-//    protected Map<EventType, com.netgrif.application.engine.petrinet.domain.events.Event> createEventsMap(List<com.netgrif.application.engine.importer.model.Event> events) {
-//        Map<EventType, com.netgrif.application.engine.petrinet.domain.events.Event> finalEvents = new HashMap<>();
-//        events.forEach(event ->
-//                finalEvents.put(com.netgrif.application.engine.importer.model.EventType.valueOf(event.getType().value().toUpperCase()), createEvent(null, event))
-//        );
-//
-//        return finalEvents;
-//    }
-
-//    protected Map<com.netgrif.application.engine.importer.model.ProcessEventType, com.netgrif.application.engine.petrinet.domain.events.ProcessEvent> createProcessEventsMap(List<com.netgrif.application.engine.importer.model.ProcessEvent> events) {
-//        Map<com.netgrif.application.engine.importer.model.ProcessEventType, com.netgrif.application.engine.petrinet.domain.events.ProcessEvent> finalEvents = new HashMap<>();
-//        events.forEach(event ->
-//                finalEvents.put(com.netgrif.application.engine.importer.model.ProcessEventType.valueOf(event.getType().value().toUpperCase()), addProcessEvent(event))
-//        );
-//
-//        return finalEvents;
-//    }
-//
-//    protected Map<com.netgrif.application.engine.importer.model.CaseEventType, com.netgrif.application.engine.petrinet.domain.events.CaseEvent> createCaseEventsMap(List<com.netgrif.application.engine.importer.model.CaseEvent> events) {
-//        Map<com.netgrif.application.engine.importer.model.CaseEventType, com.netgrif.application.engine.petrinet.domain.events.CaseEvent> finalEvents = new HashMap<>();
-//        events.forEach(event ->
-//                finalEvents.put(com.netgrif.application.engine.importer.model.CaseEventType.valueOf(event.getType().value().toUpperCase()), addCaseEvent(event))
-//        );
-//
-//        return finalEvents;
-//    }
-//
-
-//
 //    protected void addPredefinedRolesWithDefaultPermissions(com.netgrif.application.engine.importer.model.Transition importTransition, Transition transition) {
 //        // Don't add if positive roles or triggers or positive user refs
 //        if ((importTransition.getRoleRef() != null && importTransition.getRoleRef().stream().anyMatch(this::hasPositivePermission))

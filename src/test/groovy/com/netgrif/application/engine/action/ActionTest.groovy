@@ -65,7 +65,6 @@ class ActionTest {
         def netOptional = importHelper.createNet("NAE-1616_duplicate_action_id.xml")
         assert netOptional.isPresent()
         def net = netOptional.get()
-        // TODO: NAE-1969 fix
         assert net.processEvents.get(ProcessEventType.UPLOAD).preActions.size() == 1
         assert net.processEvents.get(ProcessEventType.UPLOAD).preActions.first().definition.contains("process_upload_pre")
         assert net.processEvents.get(ProcessEventType.UPLOAD).postActions.size() == 1

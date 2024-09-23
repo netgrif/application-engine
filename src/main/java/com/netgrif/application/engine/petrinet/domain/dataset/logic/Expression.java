@@ -30,6 +30,10 @@ public class Expression<T> implements Serializable {
         return new Expression<>(null, definition);
     }
 
+    public boolean isDynamic() {
+        return defaultValue == null && definition != null;
+    }
+
     @Override
     public String toString() {
         return definition;

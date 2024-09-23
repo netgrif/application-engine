@@ -31,11 +31,11 @@ public abstract class FieldBuilder<T extends Field<?>> {
     }
 
     public String getInitExpression(Data data) {
-//        if (data.getInit() != null) {
-//            if (data.getInit().isDynamic()) {
-//                return data.getInit().getValue();
-//            }
-//        }
+        if (data.getInit() != null) {
+            if (data.getInit().isDynamic()) {
+                return data.getInit().getValue();
+            }
+        }
         return null;
     }
 

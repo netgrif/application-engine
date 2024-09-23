@@ -32,11 +32,12 @@ public class DataSetInitializer {
                 useCase.getImmediateData().add(useCaseField);
             }
             // TODO: release/8.0.0
-//            if (useCaseField.isDynamicDefaultValue()) {
-//                dynamicValueFields.add(useCaseField);
-//            } else {
+            if (useCaseField.getDefaultValue() != null && useCaseField.getDefaultValue().isDynamic()) {
+                dynamicValueFields.add(useCaseField);
+            } else {
+                // TODO: release/8.0.0
 //                useCaseField.applyDefaultValue();
-//            }
+            }
             if (useCaseField instanceof ChoiceField) {
                 ChoiceField<?> choiceField = (ChoiceField<?>) useCaseField;
                 if (choiceField.isDynamic()) {

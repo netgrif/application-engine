@@ -1,67 +1,87 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>vpt</id>
-    <initials>VPT</initials>
+    <version>1.0.0</version>
     <title>ViewPermissionTest test</title>
     <defaultRole>true</defaultRole>
-    <roleRef>
-        <id>view_pos_role</id>
-        <caseLogic>
-            <view>true</view>
-        </caseLogic>
-    </roleRef>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">VPT</property>
+    </properties>
     <roleRef>
         <id>view_neg_role</id>
         <caseLogic>
             <view>false</view>
         </caseLogic>
     </roleRef>
-    <role>
+    <roleRef>
         <id>view_pos_role</id>
-        <name>view pos role</name>
-    </role>
+        <caseLogic>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
     <role>
         <id>view_neg_role</id>
-        <name>view neg role</name>
+        <title>view neg role</title>
     </role>
+    <role>
+        <id>view_pos_role</id>
+        <title>view pos role</title>
+    </role>
+    <data type="file">
+        <id>file</id>
+        <title>File</title>
+    </data>
     <data type="text">
         <id>text</id>
         <title>Text</title>
         <init>text</init>
     </data>
-    <data type="file">
-        <id>file</id>
-        <title>File</title>
-    </data>
     <transition>
-        <id>1</id>
+        <id>t1</id>
         <x>1</x>
         <y>1</y>
-        <label>Transition</label>
-        <roleRef>
-            <id>view_pos_role</id>
-            <logic>
-                <view>true</view>
-            </logic>
-        </roleRef>
+        <title>Transition</title>
         <roleRef>
             <id>view_neg_role</id>
             <logic>
                 <view>false</view>
             </logic>
         </roleRef>
-        <dataRef>
-            <id>text</id>
+        <roleRef>
+            <id>view_pos_role</id>
             <logic>
-                <behavior>editable</behavior>
+                <view>true</view>
             </logic>
-        </dataRef>
-        <dataRef>
-            <id>file</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
+        </roleRef>
+        <flex>
+            <id>t1_flex</id>
+            <item>
+                <dataRef>
+                    <id>text</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>file</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
-</document>
+</process>

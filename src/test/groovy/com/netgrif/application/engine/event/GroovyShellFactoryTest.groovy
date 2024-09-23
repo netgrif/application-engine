@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.event
 
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.LoggedUser
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
@@ -21,33 +22,11 @@ import org.springframework.web.context.WebApplicationContext
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class GroovyShellFactoryTest {
-
-    private static final String USER_EMAIL = "test@test.com"
-    private static final String USER_PASSW = "password"
+class GroovyShellFactoryTest extends EngineTest {
 
     public static final String FILE_NAME = "groovy_shell_test.xml"
 
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private WebApplicationContext wac
-
-    @Autowired
-    private TestHelper testHelper
-
-    @Autowired
-    private ITaskService taskService
-
-    @Autowired
-    private IProcessRoleService roleService
-
-    @Autowired
-    private IUserService userService
-
     private Process net
-
 
     @BeforeEach
     void before() {
@@ -57,7 +36,6 @@ class GroovyShellFactoryTest {
         assert testNet.isPresent()
         net = testNet.get()
     }
-
 
     @Test
     void caseFieldsExpressionTest() {
@@ -69,16 +47,18 @@ class GroovyShellFactoryTest {
     void roleActionsTest() {
         userService.metaClass.groovyShellTestMethod = { String string, I18nString i18nString -> println("groovyShellTestMethod") }
 
-        def user = userService.findByEmail(userService.getSystem().getEmail(), false)
+        def user = userService.findByEmail(userService.getSystem().getEmail())
         def processRoleCount = user.processRoles.size()
         def roles = roleService.findAll(net.getStringId())
-        assert roles.size() == 1
+        def roleIds = ["anonymous", "default", "newRole_1"]
+        assert roles.size() == roleIds.size()
+        roles.each { assert it.importId in roleIds }
         roleService.assignRolesToUser(
                 user.getStringId(),
                 new HashSet<String>(roles.collect { it.stringId } + user.processRoles.collect { it.stringId }),
                 new LoggedUser("", "a", "", [])
         )
-        user = userService.findByEmail(userService.getSystem().getEmail(), false)
+        user = userService.findByEmail(userService.getSystem().getEmail())
         assert user.processRoles.size() == processRoleCount + 1
     }
 
@@ -88,6 +68,11 @@ class GroovyShellFactoryTest {
         importHelper.assignTaskToSuper("task", _case.getStringId())
         def task = taskService.searchOne(QTask.task.transitionId.eq("t1"))
         assert task != null
-        assert task.getUserId() != null
+        assert task.assigneeId != null
+    }
+
+    @Autowired
+    GroovyShellFactoryTest(ImportHelper importHelper, WebApplicationContext wac, TestHelper testHelper, ITaskService taskService, IProcessRoleService roleService, IUserService userService) {
+        super(importHelper, wac, testHelper, taskService, roleService, userService)
     }
 }
