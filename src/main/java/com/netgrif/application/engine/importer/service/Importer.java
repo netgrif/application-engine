@@ -40,11 +40,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.InputStream;
-import java.time.LocalDateTime;
 import javax.xml.bind.annotation.XmlElement;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -85,9 +85,6 @@ public class Importer {
 
     @Autowired
     protected TriggerFactory triggerFactory;
-
-    @Autowired
-    protected ComponentFactory componentFactory;
 
     @Autowired
     protected IActionEvaluator actionEvaluator;
@@ -339,7 +336,7 @@ public class Importer {
         importedProcess.getTransition().add(allDataTransition);
     }
 
-//    private List<com.netgrif.application.engine.importer.model.Action> filterActionsByTrigger(List<com.netgrif.application.engine.importer.model.Action> actions, com.netgrif.application.engine.importer.model.DataEventType trigger) {
+    //    private List<com.netgrif.application.engine.importer.model.Action> filterActionsByTrigger(List<com.netgrif.application.engine.importer.model.Action> actions, com.netgrif.application.engine.importer.model.DataEventType trigger) {
 //        return actions.stream()
 //                .filter(action -> action.getTrigger().equalsIgnoreCase(trigger.toString()))
 //                .collect(Collectors.toList());
@@ -639,27 +636,6 @@ public class Importer {
 //        return !Behavior.REQUIRED.equals(behavior) && !Behavior.IMMEDIATE.equals(behavior) && !Behavior.OPTIONAL.equals(behavior);
 //    }
 //
-//    // TODO: release/8.0.0 check merge
-//    /*protected void addDataComponent(Transition transition, DataRef dataRef) throws MissingIconKeyException {
-//        String fieldId = getField(dataRef.getId()).getStringId();
-//        Component component = null;
-//        if ((dataRef.getComponent()) != null) {
-//            component = componentFactory.buildComponent(dataRef.getComponent(), this, getField(dataRef.getId()));
-//        }
-//        transition.addDataSet(fieldId, null, null, null, component);
-//    }*/
-//    protected void addDataComponent(Transition transition, DataRef dataRef) throws MissingIconKeyException {
-//        Field<?> field = getField(dataRef.getId());
-//        Component component;
-//        if ((dataRef.getComponent()) == null) {
-//            component = field.getComponent();
-//        } else {
-//            component = componentFactory.buildComponent(dataRef.getComponent(), this, field);
-//        }
-//        transition.setDataRefComponent(field, component);
-//    }
-//
-//
 //    protected List<Action> buildActions(List<com.netgrif.application.engine.importer.model.Action> imported, String fieldId, String transitionId) {
 //        return imported.stream()
 //                .map(action -> parseAction(fieldId, transitionId, action))
@@ -819,7 +795,7 @@ public class Importer {
 
         Map<String, String> layoutProperties = new HashMap<>(depth == 0 ? gridConfiguration.getRoot() : gridConfiguration.getContainer());
         if (importedGridContainer.getProperties() != null) {
-            for (java.lang.reflect.Field field: importedGridContainer.getProperties().getClass().getDeclaredFields()) {
+            for (java.lang.reflect.Field field : importedGridContainer.getProperties().getClass().getDeclaredFields()) {
                 try {
                     resolveFieldProperty(field, layoutProperties, importedGridContainer.getProperties());
                 } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
@@ -923,13 +899,16 @@ public class Importer {
     }
 
     protected void addDataComponent(Field<?> field, DataRef importedDataRef, com.netgrif.application.engine.petrinet.domain.DataRef dataRef) throws MissingIconKeyException {
-        Component component;
-//            TODO: release/8.0.0
-//        if ((importedDataRef.getComponent()) == null) {
-            component = field.getComponent();
-//        } else {
-//            component = componentFactory.buildComponent(importedDataRef.getComponent(), this, field);
-//        }
+        Component component = field.getComponent();
+        if (importedDataRef.getComponent() != null) {
+            component = createComponent(importedDataRef.getComponent());
+        }
         dataRef.setComponent(component);
+    }
+
+    public Component createComponent(com.netgrif.application.engine.importer.model.Component importedComponent) {
+        Component component = new Component(importedComponent.getId());
+        createProperties(importedComponent.getProperties(), component.getProperties());
+        return component;
     }
 }

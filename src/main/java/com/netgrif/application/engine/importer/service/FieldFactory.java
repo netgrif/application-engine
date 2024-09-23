@@ -1,11 +1,15 @@
 package com.netgrif.application.engine.importer.service;
 
 import com.netgrif.application.engine.configuration.properties.DatabaseProperties;
+import com.netgrif.application.engine.importer.model.Argument;
 import com.netgrif.application.engine.importer.model.Data;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.service.builder.FieldBuilder;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
+import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.petrinet.domain.dataset.Validation;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -18,13 +22,11 @@ import java.util.stream.Collectors;
 public final class FieldFactory {
 
     private final DatabaseProperties properties;
-    private final ComponentFactory componentFactory;
     private final Map<DataType, FieldBuilder<?>> builders;
 
-    public FieldFactory(DatabaseProperties properties, List<FieldBuilder<?>> builders, ComponentFactory componentFactory) {
+    public FieldFactory(DatabaseProperties properties, List<FieldBuilder<?>> builders) {
         this.properties = properties;
         this.builders = builders.stream().collect(Collectors.toMap(FieldBuilder::getType, Function.identity()));
-        this.componentFactory = componentFactory;
     }
 
     Field<?> getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {
@@ -44,39 +46,47 @@ public final class FieldFactory {
         if (data.getPlaceholder() != null) {
             field.setPlaceholder(importer.toI18NString(data.getPlaceholder()));
         }
-//        // TODO: release/8.0.0 validation register
-//        // TODO: release/8.0.0 valid deprecated
-//        if (data.getValid() != null) {
-//            List<Valid> list = data.getValid();
-//            for (Valid item : list) {
-//                // TODO: release/8.0.0 new I18nString?
-//                field.addValidation(new Validation(item.getValue(), new I18nString()));
-//            }
-//        }
-//        if (data.getValidations() != null) {
-//            List<com.netgrif.application.engine.importer.model.Validation> list = data.getValidations().getValidation();
-//            for (com.netgrif.application.engine.importer.model.Validation item : list) {
-//                field.addValidation(new Validation(item.getExpression().getValue(), importer.toI18NString(item.getMessage())));
-//            }
-//        }
-//        if (data.getComponent() != null) {
-//            Component component = componentFactory.buildComponent(data.getComponent(), importer, data);
-//            field.setComponent(component);
-//        }
+        if (data.getValidations() != null) {
+            List<com.netgrif.application.engine.importer.model.Validation> list = data.getValidations().getValidation();
+            for (com.netgrif.application.engine.importer.model.Validation item : list) {
+                field.addValidation(createValidation(item, importer));
+            }
+        }
+        if (data.getComponent() != null) {
+            Component component = importer.createComponent(data.getComponent());
+            field.setComponent(component);
+        }
 //
         setEncryption(field, data);
 //        dataValidator.checkDeprecatedAttributes(data);
         return field;
     }
 
-//TODO: release/8.0.0 merge check
-    /*private void resolveComponent(Field field, Case useCase, String transitionId) {
-        if (useCase.getDataField(field.getStringId()).hasComponent(transitionId)) {
-            field.setComponent(useCase.getDataField(field.getStringId()).getDataRefComponents().get(transitionId));
-        } else if (useCase.getDataField(field.getStringId()).hasComponent()) {
-            field.setComponent(useCase.getDataField(field.getStringId()).getComponent());
+    private Validation createValidation(com.netgrif.application.engine.importer.model.Validation item, Importer importer) {
+        Validation validation = new Validation();
+        validation.setName(item.getName());
+        validation.setMessage(importer.toI18NString(item.getMessage()));
+        if (item.getClientArguments() != null) {
+            for (Argument argument : item.getClientArguments().getArgument()) {
+                validation.getClientArguments().add(createArgument(argument.getValue(), argument.isDynamic()));
+            }
         }
-    }*/
+        if (item.getServerArguments() != null) {
+            for (Argument argument : item.getServerArguments().getArgument()) {
+                validation.getServerArguments().add(createArgument(argument.getValue(), argument.isDynamic()));
+            }
+        }
+        return validation;
+    }
+
+    private Expression<String> createArgument(String value, Boolean dynamic) {
+        if (dynamic != null && dynamic) {
+            return Expression.ofDynamic(value);
+        }
+        return Expression.ofStatic(value);
+    }
+
+//TODO: release/8.0.0 merge check
     /* private StringCollectionField buildStringCollectionField(Data data, Importer importer) {
         StringCollectionField field = new StringCollectionField();
         setDefaultValues(field, data, defaultValues -> {
