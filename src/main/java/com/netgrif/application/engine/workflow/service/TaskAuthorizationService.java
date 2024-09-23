@@ -1,10 +1,8 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.auth.domain.AnonymousUser;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.petrinet.domain.roles.AssignedUserPermission;
-import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
+import com.netgrif.application.engine.petrinet.domain.roles.TaskPermission;
 import com.netgrif.application.engine.petrinet.domain.throwable.IllegalTaskStateException;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskAuthorizationService;
@@ -22,19 +20,19 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     ITaskService taskService;
 
     @Override
-    public Boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, RolePermission... permissions) {
+    public Boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, TaskPermission... permissions) {
         return userHasAtLeastOneRolePermission(loggedUser.transformToUser(), taskService.findById(taskId), permissions);
     }
 
     @Override
-    public Boolean userHasAtLeastOneRolePermission(IUser user, Task task, RolePermission... permissions) {
+    public Boolean userHasAtLeastOneRolePermission(IUser user, Task task, TaskPermission... permissions) {
         if (task.getPermissions() == null || task.getPermissions().isEmpty()) {
             return null;
         }
 
-        Map<RolePermission, Boolean> aggregatePermissions = getAggregateRolePermissions(user, task.getPermissions());
+        Map<TaskPermission, Boolean> aggregatePermissions = getAggregateRolePermissions(user, task.getPermissions());
 
-        for (RolePermission permission : permissions) {
+        for (TaskPermission permission : permissions) {
             if (hasRestrictedPermission(aggregatePermissions.get(permission))) {
                 return false;
             }
@@ -44,12 +42,12 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     }
 
     @Override
-    public Boolean userHasUserListPermission(LoggedUser loggedUser, String taskId, RolePermission... permissions) {
+    public Boolean userHasUserListPermission(LoggedUser loggedUser, String taskId, TaskPermission... permissions) {
         return userHasUserListPermission(loggedUser.transformToUser(), taskService.findById(taskId), permissions);
     }
 
     @Override
-    public Boolean userHasUserListPermission(IUser user, Task task, RolePermission... permissions) {
+    public Boolean userHasUserListPermission(IUser user, Task task, TaskPermission... permissions) {
 //        TODO: release/8.0.0
 //        if (task.getUserRefs() == null || task.getUserRefs().isEmpty()) {
 //            return null;
@@ -111,10 +109,11 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 //        return loggedUser.getSelfOrImpersonated().isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
     }
 
+    // TODO: release/8.0.0 delegate doesnt exist anymore
     @Override
     public boolean canCallDelegate(LoggedUser loggedUser, String taskId) {
-        Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.DELEGATE);
-        Boolean userPerm = userHasUserListPermission(loggedUser, taskId, RolePermission.DELEGATE);
+        Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, taskId, TaskPermission.REASSIGN);
+        Boolean userPerm = userHasUserListPermission(loggedUser, taskId, TaskPermission.REASSIGN);
         return loggedUser.getSelfOrImpersonated().isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
     }
 
@@ -146,8 +145,8 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 //        if (!isAssigned(taskId)) {
 //            throw new IllegalTaskStateException("Task with ID '" + taskId + "' cannot be canceled, because it is not assigned!");
 //        }
-        Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.CANCEL);
-        Boolean userPerm = userHasUserListPermission(loggedUser, taskId, RolePermission.CANCEL);
+        Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, taskId, TaskPermission.CANCEL);
+        Boolean userPerm = userHasUserListPermission(loggedUser, taskId, TaskPermission.CANCEL);
         return loggedUser.getSelfOrImpersonated().isAdmin() || ((userPerm == null ? (rolePerm != null && rolePerm) : userPerm) && isAssignee(loggedUser, taskId)) && canAssignedCancel(loggedUser.transformToUser(), taskId);
     }
 

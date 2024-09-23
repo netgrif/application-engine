@@ -2,7 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.roles;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum ProcessRolePermission {
+public enum CasePermission {
     CREATE,
     DELETE,
     VIEW;

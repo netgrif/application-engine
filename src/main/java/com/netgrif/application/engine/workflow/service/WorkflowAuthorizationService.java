@@ -3,7 +3,7 @@ package com.netgrif.application.engine.workflow.service;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.petrinet.domain.Process;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
+import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowAuthorizationService;
@@ -26,22 +26,22 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
     @Override
     public boolean canCallDelete(LoggedUser user, String caseId) {
         Case requestedCase = workflowService.findOne(caseId);
-        Boolean rolePerm = userHasAtLeastOneRolePermission(user.getSelfOrImpersonated().transformToUser(), requestedCase.getProcess(), ProcessRolePermission.DELETE);
-        Boolean userPerm = userHasUserListPermission(user.transformToUser(), requestedCase, ProcessRolePermission.DELETE);
+        Boolean rolePerm = userHasAtLeastOneRolePermission(user.getSelfOrImpersonated().transformToUser(), requestedCase.getProcess(), CasePermission.DELETE);
+        Boolean userPerm = userHasUserListPermission(user.transformToUser(), requestedCase, CasePermission.DELETE);
         return user.getSelfOrImpersonated().isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
     }
 
     @Override
     public boolean canCallCreate(LoggedUser user, String netId) {
         Process net = petriNetService.getPetriNet(netId);
-        return user.getSelfOrImpersonated().isAdmin() || userHasAtLeastOneRolePermission(user.transformToUser(), net, ProcessRolePermission.CREATE);
+        return user.getSelfOrImpersonated().isAdmin() || userHasAtLeastOneRolePermission(user.transformToUser(), net, CasePermission.CREATE);
     }
 
     @Override
-    public Boolean userHasAtLeastOneRolePermission(IUser user, Process net, ProcessRolePermission... permissions) {
-        Map<ProcessRolePermission, Boolean> aggregatePermissions = getAggregateProcessRolePermissions(user, net.getPermissions());
+    public Boolean userHasAtLeastOneRolePermission(IUser user, Process net, CasePermission... permissions) {
+        Map<CasePermission, Boolean> aggregatePermissions = getAggregateProcessRolePermissions(user, net.getPermissions());
 
-        for (ProcessRolePermission permission : permissions) {
+        for (CasePermission permission : permissions) {
             if (hasRestrictedPermission(aggregatePermissions.get(permission))) {
                 return false;
             }
@@ -51,7 +51,7 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
     }
 
     @Override
-    public Boolean userHasUserListPermission(IUser user, Case useCase, ProcessRolePermission... permissions) {
+    public Boolean userHasUserListPermission(IUser user, Case useCase, CasePermission... permissions) {
 //        TODO: release/8.0.0
 //        if (useCase.getUserRefs() == null || useCase.getUserRefs().isEmpty()) {
 //            return null;

@@ -16,7 +16,7 @@ import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
+import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
@@ -188,10 +188,10 @@ public class WorkflowService implements IWorkflowService {
         return save(useCase);
     }
 
-    private void resolveUserRefPermissions(Case useCase, String userListId, Map<ProcessRolePermission, Boolean> permission) {
+    private void resolveUserRefPermissions(Case useCase, String userListId, Map<CasePermission, Boolean> permission) {
         List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(userListId).getRawValue());
         if (userIds != null && !userIds.isEmpty()) {
-            if (permission.containsKey(ProcessRolePermission.VIEW) && !permission.get(ProcessRolePermission.VIEW)) {
+            if (permission.containsKey(CasePermission.VIEW) && !permission.get(CasePermission.VIEW)) {
 //                TODO: release/8.0.0
 //                useCase.getNegativeViewUsers().addAll(userIds);
             } else {

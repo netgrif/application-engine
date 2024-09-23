@@ -2,11 +2,11 @@ package com.netgrif.application.engine.importer
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.AllDataConfiguration
-import com.netgrif.application.engine.importer.service.RoleFactory
+import com.netgrif.application.engine.importer.service.PermissionFactory
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission
-import com.netgrif.application.engine.petrinet.domain.roles.RolePermission
+import com.netgrif.application.engine.petrinet.domain.roles.CasePermission
+import com.netgrif.application.engine.petrinet.domain.roles.TaskPermission
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.SuperCreator
@@ -55,7 +55,7 @@ class PredefinedRolesPermissionsTest {
     private IProcessRoleService processRoleService
 
     @Autowired
-    private RoleFactory roleFactory
+    private PermissionFactory roleFactory
 
     @Autowired
     private AllDataConfiguration configuration
@@ -129,99 +129,99 @@ class PredefinedRolesPermissionsTest {
     void definedDefaultRole() {
         testPermissions(definedDefaultRoleNet, [
                 (DEFAULT_ROLE_ID): [
-                        (ProcessRolePermission.VIEW)  : true,
-                        (ProcessRolePermission.DELETE): true,
-                        (ProcessRolePermission.CREATE): true,
+                        (CasePermission.VIEW)  : true,
+                        (CasePermission.DELETE): true,
+                        (CasePermission.CREATE): true,
                 ]
-        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+        ] as Map<String, Map<CasePermission, Boolean>>, [
                 (DEFAULT_ROLE_ID): [
-                        (RolePermission.ASSIGN)  : true,
-                        (RolePermission.CANCEL)  : true,
-                        (RolePermission.FINISH)  : true,
-                        (RolePermission.VIEW)    : true,
+                        (TaskPermission.ASSIGN)  : true,
+                        (TaskPermission.CANCEL)  : true,
+                        (TaskPermission.FINISH)  : true,
+                        (TaskPermission.VIEW)    : true,
 //                        TODO: release/8.0.0
 //                        (RolePermission.SET)     : true,
-                        (RolePermission.DELEGATE): true
+                        (TaskPermission.DELEGATE): true
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
+        ] as Map<String, Map<TaskPermission, Boolean>>, true, false)
     }
 
     @Test
     void shadowDefaultRole() {
         testPermissions(shadowedDefaultRoleNet, [
                 (NET_ROLE_ID): [
-                        (ProcessRolePermission.VIEW)  : true,
-                        (ProcessRolePermission.DELETE): true,
+                        (CasePermission.VIEW)  : true,
+                        (CasePermission.DELETE): true,
                 ]
-        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+        ] as Map<String, Map<CasePermission, Boolean>>, [
                 (NET_ROLE_ID): [
-                        (RolePermission.VIEW)    : true,
-                        (RolePermission.DELEGATE): true,
+                        (TaskPermission.VIEW)    : true,
+                        (TaskPermission.DELEGATE): true,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
+        ] as Map<String, Map<TaskPermission, Boolean>>, true, false)
     }
 
     @Test
     void customDefaultRole() {
         testPermissions(customDefaultRoleNet, [
                 (DEFAULT_ROLE_ID): [
-                        (ProcessRolePermission.VIEW)  : true,
-                        (ProcessRolePermission.DELETE): true,
+                        (CasePermission.VIEW)  : true,
+                        (CasePermission.DELETE): true,
                 ]
-        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+        ] as Map<String, Map<CasePermission, Boolean>>, [
                 (DEFAULT_ROLE_ID): [
-                        (RolePermission.VIEW)    : true,
-                        (RolePermission.DELEGATE): true,
+                        (TaskPermission.VIEW)    : true,
+                        (TaskPermission.DELEGATE): true,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
+        ] as Map<String, Map<TaskPermission, Boolean>>, true, false)
     }
 
     @Test
     void negativeDefaultRole() {
         testPermissions(negativeDefaultRoleNet, [
                 (DEFAULT_ROLE_ID): [
-                        (ProcessRolePermission.VIEW)  : false,
-                        (ProcessRolePermission.DELETE): false,
+                        (CasePermission.VIEW)  : false,
+                        (CasePermission.DELETE): false,
                 ]
-        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+        ] as Map<String, Map<CasePermission, Boolean>>, [
                 (DEFAULT_ROLE_ID): [
-                        (RolePermission.VIEW)    : false,
-                        (RolePermission.DELEGATE): false,
+                        (TaskPermission.VIEW)    : false,
+                        (TaskPermission.DELEGATE): false,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
+        ] as Map<String, Map<TaskPermission, Boolean>>, true, false)
     }
 
     @Test
     void combinedDefaultRole() {
         testPermissions(combinedDefaultRoleNet, [
                 (DEFAULT_ROLE_ID): [
-                        (ProcessRolePermission.VIEW)  : true,
-                        (ProcessRolePermission.DELETE): true,
+                        (CasePermission.VIEW)  : true,
+                        (CasePermission.DELETE): true,
                 ],
                 (NET_ROLE_ID)    : [
-                        (ProcessRolePermission.VIEW)  : false,
-                        (ProcessRolePermission.DELETE): false,
+                        (CasePermission.VIEW)  : false,
+                        (CasePermission.DELETE): false,
                 ]
-        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+        ] as Map<String, Map<CasePermission, Boolean>>, [
                 (DEFAULT_ROLE_ID): [
-                        (RolePermission.VIEW)    : true,
-                        (RolePermission.DELEGATE): true,
+                        (TaskPermission.VIEW)    : true,
+                        (TaskPermission.DELEGATE): true,
                 ],
                 (NET_ROLE_ID)    : [
-                        (RolePermission.VIEW)    : false,
-                        (RolePermission.DELEGATE): false,
+                        (TaskPermission.VIEW)    : false,
+                        (TaskPermission.DELEGATE): false,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
+        ] as Map<String, Map<TaskPermission, Boolean>>, true, false)
     }
 
     @Test()
     void missingDefaultRole() {
-        testPermissions(missingDefaultRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+        testPermissions(missingDefaultRoleNet, [:] as Map<String, Map<CasePermission, Boolean>>, [
                 (DEFAULT_ROLE_ID): [
-                        (RolePermission.VIEW)    : true,
-                        (RolePermission.DELEGATE): true,
+                        (TaskPermission.VIEW)    : true,
+                        (TaskPermission.DELEGATE): true,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, false, false)
+        ] as Map<String, Map<TaskPermission, Boolean>>, false, false)
     }
 
     @Test()
@@ -233,27 +233,27 @@ class PredefinedRolesPermissionsTest {
 
     @Test()
     void defaultShadowedByUserRef() {
-        testPermissions(shadowedUserRefDefaultRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [:] as Map<String, Map<RolePermission, Boolean>>, true, false)
+        testPermissions(shadowedUserRefDefaultRoleNet, [:] as Map<String, Map<CasePermission, Boolean>>, [:] as Map<String, Map<TaskPermission, Boolean>>, true, false)
     }
 
     @Test
     void disabledReferencedDefaultRole() {
         testPermissions(disabledReferencedDefaultRoleNet, [
                 (DEFAULT_ROLE_ID): [
-                        (ProcessRolePermission.VIEW)  : true,
-                        (ProcessRolePermission.DELETE): true,
+                        (CasePermission.VIEW)  : true,
+                        (CasePermission.DELETE): true,
                 ]
-        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+        ] as Map<String, Map<CasePermission, Boolean>>, [
                 (DEFAULT_ROLE_ID): [
-                        (RolePermission.VIEW)    : true,
-                        (RolePermission.DELEGATE): true,
+                        (TaskPermission.VIEW)    : true,
+                        (TaskPermission.DELEGATE): true,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, false, false)
+        ] as Map<String, Map<TaskPermission, Boolean>>, false, false)
     }
 
     @Test()
     void defaultShadowedByUsersRef() {
-        testPermissions(shadowedUsersRefDefaultRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [:] as Map<String, Map<RolePermission, Boolean>>, true, false)
+        testPermissions(shadowedUsersRefDefaultRoleNet, [:] as Map<String, Map<CasePermission, Boolean>>, [:] as Map<String, Map<TaskPermission, Boolean>>, true, false)
     }
 
     //    ANONYMOUS ROLE =================================
@@ -261,97 +261,97 @@ class PredefinedRolesPermissionsTest {
     void definedAnonymousRole() {
         testPermissions(definedAnonymousRoleNet, [
                 (ANONYMOUS_ROLE_ID): [
-                        (ProcessRolePermission.VIEW)  : true,
-                        (ProcessRolePermission.CREATE): true,
+                        (CasePermission.VIEW)  : true,
+                        (CasePermission.CREATE): true,
                 ]
-        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+        ] as Map<String, Map<CasePermission, Boolean>>, [
                 (ANONYMOUS_ROLE_ID): [
-                        (RolePermission.ASSIGN): true,
-                        (RolePermission.CANCEL): true,
-                        (RolePermission.FINISH): true,
-                        (RolePermission.VIEW)  : true,
+                        (TaskPermission.ASSIGN): true,
+                        (TaskPermission.CANCEL): true,
+                        (TaskPermission.FINISH): true,
+                        (TaskPermission.VIEW)  : true,
 //                        TODO: release/8.0.0
 //                        (RolePermission.SET)   : true,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, false, true)
+        ] as Map<String, Map<TaskPermission, Boolean>>, false, true)
     }
 
     @Test
     void shadowAnonymousRole() {
         testPermissions(shadowedAnonymousRoleNet, [
                 (NET_ROLE_ID): [
-                        (ProcessRolePermission.VIEW)  : true,
-                        (ProcessRolePermission.DELETE): true,
+                        (CasePermission.VIEW)  : true,
+                        (CasePermission.DELETE): true,
                 ]
-        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+        ] as Map<String, Map<CasePermission, Boolean>>, [
                 (NET_ROLE_ID): [
-                        (RolePermission.VIEW)    : true,
-                        (RolePermission.DELEGATE): true,
+                        (TaskPermission.VIEW)    : true,
+                        (TaskPermission.DELEGATE): true,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, false, true)
+        ] as Map<String, Map<TaskPermission, Boolean>>, false, true)
     }
 
     @Test
     void customAnonymousRole() {
         testPermissions(customAnonymousRoleNet, [
                 (ANONYMOUS_ROLE_ID): [
-                        (ProcessRolePermission.VIEW)  : true,
-                        (ProcessRolePermission.DELETE): true,
+                        (CasePermission.VIEW)  : true,
+                        (CasePermission.DELETE): true,
                 ]
-        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+        ] as Map<String, Map<CasePermission, Boolean>>, [
                 (ANONYMOUS_ROLE_ID): [
-                        (RolePermission.VIEW)    : true,
-                        (RolePermission.DELEGATE): true,
+                        (TaskPermission.VIEW)    : true,
+                        (TaskPermission.DELEGATE): true,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, false, true)
+        ] as Map<String, Map<TaskPermission, Boolean>>, false, true)
     }
 
     @Test
     void negativeAnonymousRole() {
         testPermissions(negativeAnonymousRoleNet, [
                 (ANONYMOUS_ROLE_ID): [
-                        (ProcessRolePermission.VIEW)  : false,
-                        (ProcessRolePermission.DELETE): false,
+                        (CasePermission.VIEW)  : false,
+                        (CasePermission.DELETE): false,
                 ]
-        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+        ] as Map<String, Map<CasePermission, Boolean>>, [
                 (ANONYMOUS_ROLE_ID): [
-                        (RolePermission.VIEW)    : false,
-                        (RolePermission.DELEGATE): false,
+                        (TaskPermission.VIEW)    : false,
+                        (TaskPermission.DELEGATE): false,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, false, true)
+        ] as Map<String, Map<TaskPermission, Boolean>>, false, true)
     }
 
     @Test
     void combinedAnonymousRole() {
         testPermissions(combinedAnonymousRoleNet, [
                 (ANONYMOUS_ROLE_ID): [
-                        (ProcessRolePermission.VIEW)  : true,
-                        (ProcessRolePermission.DELETE): true,
+                        (CasePermission.VIEW)  : true,
+                        (CasePermission.DELETE): true,
                 ],
                 (NET_ROLE_ID)      : [
-                        (ProcessRolePermission.VIEW)  : false,
-                        (ProcessRolePermission.DELETE): false,
+                        (CasePermission.VIEW)  : false,
+                        (CasePermission.DELETE): false,
                 ]
-        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+        ] as Map<String, Map<CasePermission, Boolean>>, [
                 (ANONYMOUS_ROLE_ID): [
-                        (RolePermission.VIEW)    : true,
-                        (RolePermission.DELEGATE): true,
+                        (TaskPermission.VIEW)    : true,
+                        (TaskPermission.DELEGATE): true,
                 ],
                 (NET_ROLE_ID)      : [
-                        (RolePermission.VIEW)    : false,
-                        (RolePermission.DELEGATE): false,
+                        (TaskPermission.VIEW)    : false,
+                        (TaskPermission.DELEGATE): false,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, false, true)
+        ] as Map<String, Map<TaskPermission, Boolean>>, false, true)
     }
 
     @Test()
     void missingAnonymousRole() {
-        testPermissions(missingAnonymousRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+        testPermissions(missingAnonymousRoleNet, [:] as Map<String, Map<CasePermission, Boolean>>, [
                 (ANONYMOUS_ROLE_ID): [
-                        (RolePermission.VIEW)    : true,
-                        (RolePermission.DELEGATE): true,
+                        (TaskPermission.VIEW)    : true,
+                        (TaskPermission.DELEGATE): true,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, false, false)
+        ] as Map<String, Map<TaskPermission, Boolean>>, false, false)
     }
 
     @Test()
@@ -363,27 +363,27 @@ class PredefinedRolesPermissionsTest {
 
     @Test()
     void anonymousShadowedByUserRef() {
-        testPermissions(shadowedUserRefAnonymousRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [:] as Map<String, Map<RolePermission, Boolean>>, false, true)
+        testPermissions(shadowedUserRefAnonymousRoleNet, [:] as Map<String, Map<CasePermission, Boolean>>, [:] as Map<String, Map<TaskPermission, Boolean>>, false, true)
     }
 
     @Test
     void disabledReferencedAnonymousRole() {
         testPermissions(disabledReferencedAnonymousRoleNet, [
                 (ANONYMOUS_ROLE_ID): [
-                        (ProcessRolePermission.VIEW)  : true,
-                        (ProcessRolePermission.DELETE): true,
+                        (CasePermission.VIEW)  : true,
+                        (CasePermission.DELETE): true,
                 ]
-        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+        ] as Map<String, Map<CasePermission, Boolean>>, [
                 (ANONYMOUS_ROLE_ID): [
-                        (RolePermission.VIEW)    : true,
-                        (RolePermission.DELEGATE): true,
+                        (TaskPermission.VIEW)    : true,
+                        (TaskPermission.DELEGATE): true,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, false, false)
+        ] as Map<String, Map<TaskPermission, Boolean>>, false, false)
     }
 
     @Test()
     void anonymousShadowedByUsersRef() {
-        testPermissions(shadowedUsersRefAnonymousRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [:] as Map<String, Map<RolePermission, Boolean>>, false, true)
+        testPermissions(shadowedUsersRefAnonymousRoleNet, [:] as Map<String, Map<CasePermission, Boolean>>, [:] as Map<String, Map<TaskPermission, Boolean>>, false, true)
     }
 
     // COMBINED ROLES ======================================
@@ -396,45 +396,45 @@ class PredefinedRolesPermissionsTest {
     void definedCombinedRole() {
         testPermissions(definedCombinedRoleNet, [
                 (DEFAULT_ROLE_ID)  : [
-                        (ProcessRolePermission.VIEW)  : true,
-                        (ProcessRolePermission.DELETE): true,
-                        (ProcessRolePermission.CREATE): true,
+                        (CasePermission.VIEW)  : true,
+                        (CasePermission.DELETE): true,
+                        (CasePermission.CREATE): true,
                 ],
                 (ANONYMOUS_ROLE_ID): [
-                        (ProcessRolePermission.VIEW)  : true,
-                        (ProcessRolePermission.CREATE): true,
+                        (CasePermission.VIEW)  : true,
+                        (CasePermission.CREATE): true,
                 ]
-        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+        ] as Map<String, Map<CasePermission, Boolean>>, [
                 (DEFAULT_ROLE_ID)  : [
-                        (RolePermission.ASSIGN)  : true,
-                        (RolePermission.CANCEL)  : true,
-                        (RolePermission.FINISH)  : true,
-                        (RolePermission.VIEW)    : true,
+                        (TaskPermission.ASSIGN)  : true,
+                        (TaskPermission.CANCEL)  : true,
+                        (TaskPermission.FINISH)  : true,
+                        (TaskPermission.VIEW)    : true,
 //                        TODO: release/8.0.0
 //                        (RolePermission.SET)     : true,
-                        (RolePermission.DELEGATE): true
+                        (TaskPermission.DELEGATE): true
                 ],
                 (ANONYMOUS_ROLE_ID): [
-                        (RolePermission.ASSIGN): true,
-                        (RolePermission.CANCEL): true,
-                        (RolePermission.FINISH): true,
-                        (RolePermission.VIEW)  : true,
+                        (TaskPermission.ASSIGN): true,
+                        (TaskPermission.CANCEL): true,
+                        (TaskPermission.FINISH): true,
+                        (TaskPermission.VIEW)  : true,
 //                        TODO: release/8.0.0
 //                        (RolePermission.SET)   : true,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, true, true)
+        ] as Map<String, Map<TaskPermission, Boolean>>, true, true)
     }
 
 
-    private void testPermissions(Resource model, Map<String, Map<ProcessRolePermission, Boolean>> processPermissions, Map<String, Map<RolePermission, Boolean>> taskPermissions, boolean defaultRoleEnabled, boolean anonymousRoleEnabled) {
+    private void testPermissions(Resource model, Map<String, Map<CasePermission, Boolean>> processPermissions, Map<String, Map<TaskPermission, Boolean>> taskPermissions, boolean defaultRoleEnabled, boolean anonymousRoleEnabled) {
         NetCaseTask instances = importAndCreate(model)
         String netRoleId = instances.net.getRoles().keySet().find({ it -> it != DEFAULT_ROLE_ID && it != ANONYMOUS_ROLE_ID })
 
-        Map<String, Map<ProcessRolePermission, Boolean>> processPerms = transformProcessRolePermissionMap(processPermissions, netRoleId);
-        Map<String, Map<RolePermission, Boolean>> taskPerms = transformRolePermissionMap(taskPermissions, netRoleId);
+        Map<String, Map<CasePermission, Boolean>> processPerms = transformProcessRolePermissionMap(processPermissions, netRoleId);
+        Map<String, Map<TaskPermission, Boolean>> taskPerms = transformRolePermissionMap(taskPermissions, netRoleId);
 
-        def negativeProcessView = processPerms.findAll { it -> it.value.containsKey(ProcessRolePermission.VIEW) && !it.value.get(ProcessRolePermission.VIEW) }.collect { it -> it.key }
-        def negativeTaskView = taskPerms.findAll { it -> it.value.containsKey(RolePermission.VIEW) && !it.value.get(RolePermission.VIEW) }.collect { it -> it.key }
+        def negativeProcessView = processPerms.findAll { it -> it.value.containsKey(CasePermission.VIEW) && !it.value.get(CasePermission.VIEW) }.collect { it -> it.key }
+        def negativeTaskView = taskPerms.findAll { it -> it.value.containsKey(TaskPermission.VIEW) && !it.value.get(TaskPermission.VIEW) }.collect { it -> it.key }
 
 //        TODO: release/8.0.0
 //        assert instances.net.isDefaultRoleEnabled() == defaultRoleEnabled
@@ -476,16 +476,16 @@ class PredefinedRolesPermissionsTest {
         return new NetCaseTask(net, aCase, task)
     }
 
-    private Map<String, Map<ProcessRolePermission, Boolean>> transformProcessRolePermissionMap(Map<String, Map<ProcessRolePermission, Boolean>> input, String netRoleId) {
+    private Map<String, Map<CasePermission, Boolean>> transformProcessRolePermissionMap(Map<String, Map<CasePermission, Boolean>> input, String netRoleId) {
         return input.collectEntries { it ->
             [it.key == DEFAULT_ROLE_ID || it.key == ANONYMOUS_ROLE_ID ? it.key : netRoleId, it.value.collectEntries { ti -> [ti.key, ti.value] }]
-        } as Map<String, Map<ProcessRolePermission, Boolean>>
+        } as Map<String, Map<CasePermission, Boolean>>
     }
 
-    private Map<String, Map<RolePermission, Boolean>> transformRolePermissionMap(Map<String, Map<RolePermission, Boolean>> input, String netRoleId) {
+    private Map<String, Map<TaskPermission, Boolean>> transformRolePermissionMap(Map<String, Map<TaskPermission, Boolean>> input, String netRoleId) {
         return input.collectEntries { it ->
             [it.key == DEFAULT_ROLE_ID || it.key == ANONYMOUS_ROLE_ID ? it.key : netRoleId, it.value.collectEntries { ti -> [ti.key, ti.value] }]
-        } as Map<String, Map<RolePermission, Boolean>>
+        } as Map<String, Map<TaskPermission, Boolean>>
     }
 
     private class NetCaseTask {

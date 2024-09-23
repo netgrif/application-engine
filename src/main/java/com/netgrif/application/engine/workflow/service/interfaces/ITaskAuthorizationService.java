@@ -2,18 +2,18 @@ package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
+import com.netgrif.application.engine.petrinet.domain.roles.TaskPermission;
 import com.netgrif.application.engine.petrinet.domain.throwable.IllegalTaskStateException;
 import com.netgrif.application.engine.workflow.domain.Task;
 
 public interface ITaskAuthorizationService {
-    Boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, RolePermission... permissions);
+    Boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, TaskPermission... permissions);
 
-    Boolean userHasAtLeastOneRolePermission(IUser user, Task task, RolePermission... permissions);
+    Boolean userHasAtLeastOneRolePermission(IUser user, Task task, TaskPermission... permissions);
 
-    Boolean userHasUserListPermission(LoggedUser loggedUser, String taskId, RolePermission... permissions);
+    Boolean userHasUserListPermission(LoggedUser loggedUser, String taskId, TaskPermission... permissions);
 
-    Boolean userHasUserListPermission(IUser user, Task task, RolePermission... permissions);
+    Boolean userHasUserListPermission(IUser user, Task task, TaskPermission... permissions);
 
     boolean isAssignee(LoggedUser loggedUser, String taskId);
 

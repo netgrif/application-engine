@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
+import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -13,9 +13,9 @@ public class ProcessRolesAndPermissions {
 
     private List<ProcessRole> processRoles;
 
-    private Map<String, Map<ProcessRolePermission, Boolean>> permissions;
+    private Map<String, Map<CasePermission, Boolean>> permissions;
 
-    public ProcessRolesAndPermissions(List<ProcessRole> processRoles, Map<String, Map<ProcessRolePermission, Boolean>> permissions) {
+    public ProcessRolesAndPermissions(List<ProcessRole> processRoles, Map<String, Map<CasePermission, Boolean>> permissions) {
         this();
         this.processRoles = processRoles;
         this.permissions.putAll(permissions);

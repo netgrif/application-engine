@@ -9,7 +9,7 @@ import com.netgrif.application.engine.petrinet.domain.events.Event;
 import com.netgrif.application.engine.petrinet.domain.layout.LayoutContainer;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
-import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
+import com.netgrif.application.engine.petrinet.domain.roles.TaskPermission;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import com.netgrif.application.engine.workflow.domain.triggers.AutoTrigger;
@@ -29,7 +29,7 @@ public class Transition extends Node {
 
     private String icon;
     private LinkedHashMap<String, DataRef> dataSet;
-    private Map<String, Map<RolePermission, Boolean>> permissions;
+    private Map<String, Map<TaskPermission, Boolean>> permissions;
     private List<Trigger> triggers;
     private LayoutContainer layoutContainer;
     private AssignPolicy assignPolicy;
@@ -66,7 +66,7 @@ public class Transition extends Node {
         }
     }
 
-    public void addRole(String roleId, Map<RolePermission, Boolean> permissions) {
+    public void addRole(String roleId, Map<TaskPermission, Boolean> permissions) {
 //        if (roles.containsKey(roleId) && roles.get(roleId) != null) {
 //            roles.get(roleId).putAll(permissions);
 //        } else {
@@ -78,7 +78,7 @@ public class Transition extends Node {
 //        negativeViewRoles.add(roleId);
     }
 
-    public void addUserRef(String userRefId, Map<RolePermission, Boolean> permissions) {
+    public void addUserRef(String userRefId, Map<TaskPermission, Boolean> permissions) {
 //        if (userRefs.containsKey(userRefId) && userRefs.get(userRefId) != null) {
 //            userRefs.get(userRefId).putAll(permissions);
 //        } else {

@@ -11,7 +11,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
 import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
+import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
 import lombok.Data;
@@ -38,7 +38,7 @@ public class Process extends ProcessObject {
     private String icon;
     private I18nExpression defaultCaseName;
     // TODO: release/8.0.0 - default + anonymous role, roleref
-    private UniqueKeyMap<String, Map<ProcessRolePermission, Boolean>> permissions;
+    private UniqueKeyMap<String, Map<CasePermission, Boolean>> permissions;
     private Map<ProcessEventType, ProcessEvent> processEvents;
     private Map<CaseEventType, CaseEvent> caseEvents;
     @DBRef
@@ -93,7 +93,7 @@ public class Process extends ProcessObject {
         this.roles.put(role.getStringId(), role);
     }
 
-    public void addPermission(String actorId, Map<ProcessRolePermission, Boolean> permissions) {
+    public void addPermission(String actorId, Map<CasePermission, Boolean> permissions) {
         if (this.permissions.containsKey(actorId) && this.permissions.get(actorId) != null) {
             this.permissions.get(actorId).putAll(permissions);
         } else {

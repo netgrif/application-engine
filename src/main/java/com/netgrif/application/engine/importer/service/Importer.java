@@ -81,7 +81,7 @@ public class Importer {
     protected ArcImporter arcImporter;
 
     @Autowired
-    protected RoleFactory roleFactory;
+    protected PermissionFactory permissionFactory;
 
     @Autowired
     protected TriggerFactory triggerFactory;
@@ -147,7 +147,7 @@ public class Importer {
         importedProcess.getTransition().forEach(this::createTransition);
         importedProcess.getArc().forEach(this::createArc);
         importedProcess.getFunction().forEach(this::createFunction);
-        importedProcess.getRoleRef().forEach(this::createRoleRef);
+        importedProcess.getRoleRef().forEach(this::createProcessPermissions);
 
 //        addPredefinedRolesWithDefaultPermissions();
 
@@ -162,6 +162,7 @@ public class Importer {
         actionEvaluator.evaluate(actions, process.getFunctions());
         processValidator.validate(process);
 
+        // TODO: release/8.0.0 import result as in builder
         return Optional.of(process);
     }
 
@@ -205,7 +206,8 @@ public class Importer {
         return extension.getId() == null || extension.getId().isBlank()
                 || extension.getVersion() == null || extension.getVersion().isBlank();
     }
-//
+
+    //
 //    protected void resolveUserRef(com.netgrif.application.engine.importer.model.CaseUserRef userRef) {
 //        com.netgrif.application.engine.importer.model.CaseLogic logic = userRef.getCaseLogic();
 //        String usersId = userRef.getId();
@@ -217,27 +219,6 @@ public class Importer {
 //        net.addUserPermission(usersId, roleFactory.getProcessPermissions(logic));
 //    }
 //
-//    protected void resolveProcessEvents(com.netgrif.application.engine.importer.model.ProcessEvents processEvents) {
-//        if (processEvents != null && processEvents.getEvent() != null) {
-//            net.setProcessEvents(createProcessEventsMap(processEvents.getEvent()));
-//        }
-//    }
-//
-//    protected void resolveCaseEvents(com.netgrif.application.engine.importer.model.CaseEvents caseEvents) {
-//        if (caseEvents != null && caseEvents.getEvent() != null) {
-//            net.setCaseEvents(createCaseEventsMap(caseEvents.getEvent()));
-//        }
-//    }
-//
-//    protected void resolveActionRefs(String actionId, Action action) {
-//        Action referenced = actions.get(actionId);
-//        if (referenced == null) {
-//            throw new IllegalArgumentException("Invalid action reference with id [" + actionId + "]");
-//        }
-//        action.setDefinition(referenced.getDefinition());
-//        action.setTrigger(referenced.getTrigger());
-//    }
-
     protected void addI18N(com.netgrif.application.engine.importer.model.I18N importI18N) {
         String locale = importI18N.getLocale();
         importI18N.getI18NString().forEach(translation -> addTranslation(translation, locale));
@@ -435,13 +416,11 @@ public class Importer {
         transition.setIcon(importTransition.getIcon());
         transition.setAssignPolicy(toAssignPolicy(importTransition.getAssignPolicy()));
         transition.setFinishPolicy(toFinishPolicy(importTransition.getFinishPolicy()));
-//
-//        if (importTransition.getRoleRef() != null) {
-//            importTransition.getRoleRef().forEach(roleRef ->
-//                    addRoleLogic(transition, roleRef)
-//            );
-//        }
-//
+        if (importTransition.getRoleRef() != null) {
+            importTransition.getRoleRef().forEach(roleRef ->
+                    createTaskPermissions(transition, roleRef)
+            );
+        }
         if (importTransition.getTrigger() != null) {
             importTransition.getTrigger().forEach(trigger ->
                     createTrigger(transition, trigger)
@@ -526,19 +505,24 @@ public class Importer {
         process.addFunction(function);
     }
 
-    protected void createRoleRef(com.netgrif.application.engine.importer.model.CaseRoleRef roleRef) {
-        // TODO: release/8.0.0
-//        com.netgrif.application.engine.importer.model.CaseLogic logic = roleRef.getCaseLogic();
-//        String roleId = net.getRoles().get(roleRef.getId()).getStringId();
-//
-//        if (logic == null || roleId == null) {
-//            return;
-//        }
-//        if (logic.isView() != null && !logic.isView()) {
-//            net.addNegativeViewRole(roleId);
-//        }
-//
-//        net.addPermission(roleId, roleFactory.getProcessPermissions(logic));
+    protected void createProcessPermissions(com.netgrif.application.engine.importer.model.CaseRoleRef roleRef) {
+        com.netgrif.application.engine.importer.model.CaseLogic logic = roleRef.getCaseLogic();
+        ProcessRole role = process.getRole(roleRef.getId());
+        if (logic == null || role == null) {
+            // TODO: release/8.0.0 warn
+            return;
+        }
+        process.addPermission(role.getStringId(), permissionFactory.buildProcessPermissions(logic));
+    }
+
+    protected void createTaskPermissions(Transition transition, com.netgrif.application.engine.importer.model.RoleRef roleRef) {
+        com.netgrif.application.engine.importer.model.RoleRefLogic logic = roleRef.getLogic();
+        ProcessRole role = process.getRole(roleRef.getId());
+        if (logic == null || role == null) {
+            // TODO: release/8.0.0 warn
+            return;
+        }
+        transition.addRole(role.getStringId(), permissionFactory.buildTaskPermissions(logic));
     }
 
 //    protected void addDefaultRole(Transition transition) {
@@ -586,19 +570,6 @@ public class Importer {
 //        net.addPermission(anonymousRole.getStringId(), roleFactory.getProcessPermissions(logic));
 //    }
 //
-//    protected void addRoleLogic(Transition transition, com.netgrif.application.engine.importer.model.RoleRef roleRef) {
-//        com.netgrif.application.engine.importer.model.RoleRefLogic logic = roleRef.getLogic();
-//        String roleId = getRole(roleRef.getId()).getStringId();
-//
-//        if (logic == null || roleId == null) {
-//            return;
-//        }
-//        if (logic.isView() != null && !logic.isView()) {
-//            transition.addNegativeViewRole(roleId);
-//        }
-//        transition.addRole(roleId, roleFactory.getPermissions(logic));
-//    }
-
 //    protected void addUserLogic(Transition transition, UserRef userRef) {
 //        Logic logic = userRef.getLogic();
 //        String userRefId = userRef.getId();

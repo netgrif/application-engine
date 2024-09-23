@@ -6,7 +6,7 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
-import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
+import com.netgrif.application.engine.petrinet.domain.roles.TaskPermission;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -65,7 +65,7 @@ public class Task implements Serializable {
      * Role ObjectId : [ RolePermission, true/false ]
      */
     @Builder.Default
-    private Map<String, Map<RolePermission, Boolean>> permissions = new HashMap<>();
+    private Map<String, Map<TaskPermission, Boolean>> permissions = new HashMap<>();
 
     private LocalDateTime lastAssigned;
     private LocalDateTime lastFinished;
@@ -95,7 +95,7 @@ public class Task implements Serializable {
         return id.toString();
     }
 
-    public void addRole(String roleId, Map<RolePermission, Boolean> permissions) {
+    public void addRole(String roleId, Map<TaskPermission, Boolean> permissions) {
         if (this.permissions.containsKey(roleId) && this.permissions.get(roleId) != null) {
             this.permissions.get(roleId).putAll(permissions);
         } else {
@@ -126,7 +126,7 @@ public class Task implements Serializable {
         return triggers.stream().anyMatch(trigger -> trigger != null && TriggerType.AUTO.equals(trigger.getType()));
     }
 
-    private void compareExistingUserPermissions(String userId, Map<RolePermission, Boolean> permissions) {
+    private void compareExistingUserPermissions(String userId, Map<TaskPermission, Boolean> permissions) {
         // TODO: release/8.0.0 check if possible to reduce duplicated code, possible solution is to have abstraction on permissions map
 //        permissions.forEach((id, perm) -> {
 //            if ((users.containsKey(userId) && !users.get(userId).containsKey(id)) || (users.containsKey(userId) && users.get(userId).containsKey(id) && users.get(userId).get(id))) {

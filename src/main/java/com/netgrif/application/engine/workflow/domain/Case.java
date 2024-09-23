@@ -5,7 +5,7 @@ import com.netgrif.application.engine.auth.domain.Author;
 import com.netgrif.application.engine.petrinet.domain.PetriNetIdentifier;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
+import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
@@ -74,7 +74,7 @@ public class Case implements Serializable {
     @Indexed
     private Map<String, TaskPair> tasks = new HashMap<>();
     @JsonIgnore
-    private Map<String, Map<ProcessRolePermission, Boolean>> permissions = new HashMap<>();
+    private Map<String, Map<CasePermission, Boolean>> permissions = new HashMap<>();
     private Map<String, String> properties = new HashMap<>();
 
     private String uriNodeId;
@@ -93,13 +93,13 @@ public class Case implements Serializable {
         icon = petriNet.getIcon();
 
         permissions = petriNet.getPermissions().entrySet().stream()
-                .filter(role -> role.getValue().containsKey(ProcessRolePermission.DELETE) || role.getValue().containsKey(ProcessRolePermission.VIEW))
+                .filter(role -> role.getValue().containsKey(CasePermission.DELETE) || role.getValue().containsKey(CasePermission.VIEW))
                 .map(role -> {
-                    Map<ProcessRolePermission, Boolean> permissionMap = new HashMap<>();
-                    if (role.getValue().containsKey(ProcessRolePermission.DELETE))
-                        permissionMap.put(ProcessRolePermission.DELETE, role.getValue().get(ProcessRolePermission.DELETE));
-                    if (role.getValue().containsKey(ProcessRolePermission.VIEW)) {
-                        permissionMap.put(ProcessRolePermission.VIEW, role.getValue().get(ProcessRolePermission.VIEW));
+                    Map<CasePermission, Boolean> permissionMap = new HashMap<>();
+                    if (role.getValue().containsKey(CasePermission.DELETE))
+                        permissionMap.put(CasePermission.DELETE, role.getValue().get(CasePermission.DELETE));
+                    if (role.getValue().containsKey(CasePermission.VIEW)) {
+                        permissionMap.put(CasePermission.VIEW, role.getValue().get(CasePermission.VIEW));
                     }
                     return new AbstractMap.SimpleEntry<>(role.getKey(), permissionMap);
                 })

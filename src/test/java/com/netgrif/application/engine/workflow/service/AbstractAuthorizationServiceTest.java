@@ -3,7 +3,7 @@ package com.netgrif.application.engine.workflow.service;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.User;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
+import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission.*;
+import static com.netgrif.application.engine.petrinet.domain.roles.CasePermission.*;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -55,13 +55,13 @@ class AbstractAuthorizationServiceTest {
         user.addProcessRole(roles.get(0));
         user.addProcessRole(roles.get(1));
 
-        Map<String, Map<ProcessRolePermission, Boolean>> netPermissions = new HashMap<>();
+        Map<String, Map<CasePermission, Boolean>> netPermissions = new HashMap<>();
         netPermissions.put(roles.get(0).getStringId(), getInitEntryValue());
         netPermissions.put(roles.get(1).getStringId(), getInitEntryValue());
         netPermissions.put(roles.get(2).getStringId(), getInitEntryValue());
 
         // situation 1
-        Map<ProcessRolePermission, Boolean> aggregatePermission = mockInstance.getAggregateProcessRolePermissions(user, netPermissions);
+        Map<CasePermission, Boolean> aggregatePermission = mockInstance.getAggregateProcessRolePermissions(user, netPermissions);
 
         assert aggregatePermission.get(CREATE);
         assert aggregatePermission.get(VIEW);
@@ -78,8 +78,8 @@ class AbstractAuthorizationServiceTest {
         assert !aggregatePermission.get(DELETE);
     }
 
-    private Map<ProcessRolePermission, Boolean> getInitEntryValue() {
-        Map<ProcessRolePermission, Boolean> result = new HashMap<>();
+    private Map<CasePermission, Boolean> getInitEntryValue() {
+        Map<CasePermission, Boolean> result = new HashMap<>();
         result.put(CREATE, true);
         result.put(VIEW, true);
         result.put(DELETE, true);
