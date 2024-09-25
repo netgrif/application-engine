@@ -571,13 +571,20 @@ public class Importer {
     }
 
     protected boolean hasPositivePermission(com.netgrif.application.engine.importer.model.PermissionRef permissionRef) {
-        return (permissionRef.getLogic().isPerform() != null && permissionRef.getLogic().isPerform())
-                || (permissionRef.getLogic().isView() != null && permissionRef.getLogic().isView())
-                || (permissionRef.getLogic().isAssign() != null && permissionRef.getLogic().isAssign())
-                || (permissionRef.getLogic().isCancel() != null && permissionRef.getLogic().isCancel())
-                || (permissionRef.getLogic().isFinish() != null && permissionRef.getLogic().isFinish())
-                || (permissionRef.getLogic().isReassign() != null && permissionRef.getLogic().isReassign())
-                || (permissionRef.getLogic().isViewDisabled() != null && permissionRef.getLogic().isViewDisabled());
+        RoleRefLogic logic = permissionRef.getLogic();
+        return isAnyTrue(
+                logic.isPerform(),
+                logic.isView(),
+                logic.isAssign(),
+                logic.isCancel(),
+                logic.isFinish(),
+                logic.isReassign(),
+                logic.isViewDisabled()
+        );
+    }
+
+    protected boolean isAnyTrue(Boolean... permissions) {
+        return Arrays.stream(permissions).anyMatch(this::isTrue);
     }
 
     protected String buildActionId(String actionId) {
@@ -802,5 +809,9 @@ public class Importer {
         Component component = new Component(importedComponent.getId());
         createProperties(importedComponent.getProperties(), component.getProperties());
         return component;
+    }
+
+    protected boolean isTrue(Boolean permission) {
+        return (permission != null && permission);
     }
 }
