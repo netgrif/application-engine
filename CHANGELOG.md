@@ -38,6 +38,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.2](h
 
 ### Changed
 - [NAE-1947] HistoryService findAllSetDataEventLogs is not working
+- [NAE-1979] Optimize Maven Resources Plugin Configuration for Correct File Filtering and Copying
 
 
 ## [6.3.3](https://github.com/netgrif/application-engine/releases/tag/v6.3.3) (2024-01-19)
