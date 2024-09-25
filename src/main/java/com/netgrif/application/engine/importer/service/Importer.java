@@ -57,6 +57,8 @@ public class Importer {
     protected Process process;
     protected ProcessRole defaultRole;
     protected ProcessRole anonymousRole;
+    protected boolean isDefaultRoleEnabled = false;
+    protected boolean isAnonymousRoleEnabled = false;
 
     protected Map<String, I18nString> i18n;
     protected List<String> missingMetaData;
@@ -149,7 +151,7 @@ public class Importer {
         importedProcess.getFunction().forEach(this::createFunction);
         importedProcess.getRoleRef().forEach(this::createProcessPermissions);
 
-//        addPredefinedRolesWithDefaultPermissions();
+        addPredefinedRolesWithDefaultPermissions();
 
         if (importedProcess.getProcessEvents() != null) {
             importedProcess.getProcessEvents().getEvent().forEach(this::createProcessEvent);
@@ -184,8 +186,8 @@ public class Importer {
             throw new IllegalArgumentException("Parent petri net not found.");
         }
         process = parentNet.clone();
-        // transition must be removed since it's going to be added later with proper data
         process.setCreationDate(LocalDateTime.now());
+        // transition must be removed since it's going to be added later with proper data
         process.getTransitions().remove(allDataConfiguration.getAllData().getId());
         process.setObjectId(new ObjectId());
         process.addParentIdentifier(new PetriNetIdentifier(
@@ -207,18 +209,6 @@ public class Importer {
                 || extension.getVersion() == null || extension.getVersion().isBlank();
     }
 
-    //
-//    protected void resolveUserRef(com.netgrif.application.engine.importer.model.CaseUserRef userRef) {
-//        com.netgrif.application.engine.importer.model.CaseLogic logic = userRef.getCaseLogic();
-//        String usersId = userRef.getId();
-//
-//        if (logic == null || usersId == null) {
-//            return;
-//        }
-//
-//        net.addUserPermission(usersId, roleFactory.getProcessPermissions(logic));
-//    }
-//
     protected void addI18N(com.netgrif.application.engine.importer.model.I18N importI18N) {
         String locale = importI18N.getLocale();
         importI18N.getI18NString().forEach(translation -> addTranslation(translation, locale));
@@ -271,6 +261,10 @@ public class Importer {
         }
         createProperties(importedProcess.getProperties(), process.getProperties());
 
+        // TODO: release/8.0.0 rework
+        this.isDefaultRoleEnabled = (importedProcess.isDefaultRole() != null && importedProcess.isDefaultRole());
+        this.isAnonymousRoleEnabled = (importedProcess.isAnonymousRole() != null && importedProcess.isAnonymousRole());
+
         if (!missingMetaData.isEmpty()) {
             throw new MissingPetriNetMetaDataException(missingMetaData);
         }
@@ -317,12 +311,6 @@ public class Importer {
         importedProcess.getTransition().add(allDataTransition);
     }
 
-    //    private List<com.netgrif.application.engine.importer.model.Action> filterActionsByTrigger(List<com.netgrif.application.engine.importer.model.Action> actions, com.netgrif.application.engine.importer.model.DataEventType trigger) {
-//        return actions.stream()
-//                .filter(action -> action.getTrigger().equalsIgnoreCase(trigger.toString()))
-//                .collect(Collectors.toList());
-//    }
-//
 //    private void addActionsToEvent(List<Action> actions, com.netgrif.application.engine.importer.model.DataEventType type, Map<com.netgrif.application.engine.importer.model.DataEventType, DataEvent> events) {
 //        if (actions.isEmpty()) return;
 //        if (events.get(type) != null) {
@@ -426,9 +414,9 @@ public class Importer {
                     createTrigger(transition, trigger)
             );
         }
-//
-//        addPredefinedRolesWithDefaultPermissions(importTransition, transition);
-//
+
+        addPredefinedRolesWithDefaultPermissions(importTransition, transition);
+
         if (importTransition.getEvent() != null) {
             importTransition.getEvent().forEach(event -> transition.addEvent(createEvent(event)));
         }
@@ -505,6 +493,63 @@ public class Importer {
         process.addFunction(function);
     }
 
+    protected void addPredefinedRolesWithDefaultPermissions() {
+        // only if no positive role associations and no positive user ref associations
+        if (process.getPermissions().values().stream().anyMatch(perms -> perms.containsValue(true))) {
+            return;
+        }
+        addDefaultRole();
+        addAnonymousRole();
+    }
+
+    protected void addPredefinedRolesWithDefaultPermissions(com.netgrif.application.engine.importer.model.Transition importTransition, Transition transition) {
+        // Don't add if positive roles or triggers or positive user refs
+        if ((importTransition.getRoleRef() != null && importTransition.getRoleRef().stream().anyMatch(this::hasPositivePermission))
+                || (importTransition.getTrigger() != null && !importTransition.getTrigger().isEmpty())) {
+            return;
+        }
+        addDefaultRole(transition);
+        addAnonymousRole(transition);
+    }
+
+    protected void addDefaultRole() {
+        addSystemRole(isDefaultRoleEnabled, defaultRole);
+    }
+
+    protected void addDefaultRole(Transition transition) {
+        addSystemRole(transition, isDefaultRoleEnabled, defaultRole);
+    }
+
+    protected void addAnonymousRole() {
+        addSystemRole(isAnonymousRoleEnabled, anonymousRole);
+    }
+
+    protected void addAnonymousRole(Transition transition) {
+        addSystemRole(transition, isAnonymousRoleEnabled, anonymousRole);
+    }
+
+    protected void addSystemRole(boolean isEnabled, ProcessRole role) {
+        if (!isEnabled || process.getPermissions().containsKey(role.getStringId())) {
+            return;
+        }
+
+        com.netgrif.application.engine.importer.model.CaseLogic logic = new com.netgrif.application.engine.importer.model.CaseLogic();
+        logic.setCreate(true);
+        logic.setDelete(true); // TODO: release/8.0.0 anonymous can delete
+        logic.setView(true);
+        process.addPermission(role.getStringId(), permissionFactory.buildProcessPermissions(logic));
+    }
+
+    protected void addSystemRole(Transition transition, boolean isEnabled, ProcessRole role) {
+        if (!isEnabled || transition.getPermissions().containsKey(role.getStringId())) {
+            return;
+        }
+
+        com.netgrif.application.engine.importer.model.RoleRefLogic logic = new com.netgrif.application.engine.importer.model.RoleRefLogic();
+        logic.setPerform(true);
+        transition.addPermission(role.getStringId(), permissionFactory.buildTaskPermissions(logic));
+    }
+
     protected void createProcessPermissions(com.netgrif.application.engine.importer.model.CaseRoleRef roleRef) {
         com.netgrif.application.engine.importer.model.CaseLogic logic = roleRef.getCaseLogic();
         ProcessRole role = process.getRole(roleRef.getId());
@@ -522,96 +567,18 @@ public class Importer {
             // TODO: release/8.0.0 warn
             return;
         }
-        transition.addRole(role.getStringId(), permissionFactory.buildTaskPermissions(logic));
+        transition.addPermission(role.getStringId(), permissionFactory.buildTaskPermissions(logic));
     }
 
-//    protected void addDefaultRole(Transition transition) {
-//        if (!net.isDefaultRoleEnabled() || isDefaultRoleReferenced(transition)) {
-//            return;
-//        }
-//
-//        com.netgrif.application.engine.importer.model.RoleRefLogic logic = new com.netgrif.application.engine.importer.model.RoleRefLogic();
-//        logic.setPerform(true);
-//        transition.addRole(defaultRole.getStringId(), roleFactory.getPermissions(logic));
-//    }
-//
-//    protected void addAnonymousRole(Transition transition) {
-//        // TODO: NAE-1969 refactor
-//        if (!net.isAnonymousRoleEnabled() || isAnonymousRoleReferenced(transition)) {
-//            return;
-//        }
-//
-//        com.netgrif.application.engine.importer.model.RoleRefLogic logic = new com.netgrif.application.engine.importer.model.RoleRefLogic();
-//        logic.setPerform(true);
-//        transition.addRole(anonymousRole.getStringId(), roleFactory.getPermissions(logic));
-//    }
-
-//
-//    protected void addDefaultPermissions() {
-//        if (!net.isDefaultRoleEnabled() || isDefaultRoleReferencedOnNet()) {
-//            return;
-//        }
-//
-//        com.netgrif.application.engine.importer.model.CaseLogic logic = new com.netgrif.application.engine.importer.model.CaseLogic();
-//        logic.setCreate(true);
-//        logic.setDelete(true);
-//        logic.setView(true);
-//        net.addPermission(defaultRole.getStringId(), roleFactory.getProcessPermissions(logic));
-//    }
-//
-//    protected void addAnonymousPermissions() {
-//        if (!net.isAnonymousRoleEnabled() || isAnonymousRoleReferencedOnNet()) {
-//            return;
-//        }
-//
-//        com.netgrif.application.engine.importer.model.CaseLogic logic = new com.netgrif.application.engine.importer.model.CaseLogic();
-//        logic.setCreate(true);
-//        logic.setView(true);
-//        net.addPermission(anonymousRole.getStringId(), roleFactory.getProcessPermissions(logic));
-//    }
-//
-//    protected void addUserLogic(Transition transition, UserRef userRef) {
-//        Logic logic = userRef.getLogic();
-//        String userRefId = userRef.getId();
-//
-//        if (logic == null || userRefId == null) {
-//            return;
-//        }
-//        transition.addUserRef(userRefId, roleFactory.getPermissions(logic));
-//    }
-//
-//    protected void addDataLogic(Transition transition, DataRef dataRef) {
-//        Logic logic = dataRef.getLogic();
-//        try {
-//            Field<?> field = getField(dataRef.getId());
-//            String fieldId = field.getStringId();
-//            if (logic == null || fieldId == null) {
-//                return;
-//            }
-//
-//            DataFieldBehavior behavior = new DataFieldBehavior();
-//            if (logic.getBehavior() != null) {
-//                Optional<Behavior> first = logic.getBehavior().stream().filter(this::isNotDeprecated).findFirst();
-//                behavior.setBehavior(FieldBehavior.fromString(first.orElse(com.netgrif.application.engine.importer.model.Behavior.EDITABLE)));
-//                behavior.setRequired(logic.getBehavior().stream().anyMatch(Behavior.REQUIRED::equals));
-//                behavior.setImmediate(logic.getBehavior().stream().anyMatch(Behavior.IMMEDIATE::equals));
-//            }
-//            transition.setDataRefBehavior(field, behavior);
-//        } catch (NullPointerException e) {
-//            throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
-//        }
-//    }
-//
-//    // TODO: release/8.0.0 Behavior REQ,IMM,OPT deprecated
-//    private boolean isNotDeprecated(Behavior behavior) {
-//        return !Behavior.REQUIRED.equals(behavior) && !Behavior.IMMEDIATE.equals(behavior) && !Behavior.OPTIONAL.equals(behavior);
-//    }
-//
-//    protected List<Action> buildActions(List<com.netgrif.application.engine.importer.model.Action> imported, String fieldId, String transitionId) {
-//        return imported.stream()
-//                .map(action -> parseAction(fieldId, transitionId, action))
-//                .collect(Collectors.toList());
-//    }
+    protected boolean hasPositivePermission(com.netgrif.application.engine.importer.model.PermissionRef permissionRef) {
+        return (permissionRef.getLogic().isPerform() != null && permissionRef.getLogic().isPerform())
+                || (permissionRef.getLogic().isView() != null && permissionRef.getLogic().isView())
+                || (permissionRef.getLogic().isAssign() != null && permissionRef.getLogic().isAssign())
+                || (permissionRef.getLogic().isCancel() != null && permissionRef.getLogic().isCancel())
+                || (permissionRef.getLogic().isFinish() != null && permissionRef.getLogic().isFinish())
+                || (permissionRef.getLogic().isReassign() != null && permissionRef.getLogic().isReassign())
+                || (permissionRef.getLogic().isViewDisabled() != null && permissionRef.getLogic().isViewDisabled());
+    }
 
     protected String buildActionId(String actionId) {
         if (actionId == null) {
@@ -653,53 +620,7 @@ public class Importer {
         role.setNetId(process.getStringId());
         process.addRole(role);
     }
-//    protected void addPredefinedRolesWithDefaultPermissions(com.netgrif.application.engine.importer.model.Transition importTransition, Transition transition) {
-//        // Don't add if positive roles or triggers or positive user refs
-//        if ((importTransition.getRoleRef() != null && importTransition.getRoleRef().stream().anyMatch(this::hasPositivePermission))
-//                || (importTransition.getTrigger() != null && !importTransition.getTrigger().isEmpty())) {
-//            return;
-//        }
-//        addDefaultRole(transition);
-//        addAnonymousRole(transition);
-//    }
-//
-//    protected boolean hasPositivePermission(com.netgrif.application.engine.importer.model.PermissionRef permissionRef) {
-//        return (permissionRef.getLogic().isPerform() != null && permissionRef.getLogic().isPerform())
-//                || (permissionRef.getLogic().isView() != null && permissionRef.getLogic().isView())
-//                || (permissionRef.getLogic().isAssign() != null && permissionRef.getLogic().isAssign())
-//                || (permissionRef.getLogic().isCancel() != null && permissionRef.getLogic().isCancel())
-//                || (permissionRef.getLogic().isFinish() != null && permissionRef.getLogic().isFinish())
-//                || (permissionRef.getLogic().isReassign() != null && permissionRef.getLogic().isReassign())
-//                || (permissionRef.getLogic().isViewDisabled() != null && permissionRef.getLogic().isViewDisabled());
-//    }
 
-    //    protected void addPredefinedRolesWithDefaultPermissions() {
-//        // only if no positive role associations and no positive user ref associations
-//        if (net.getPermissions().values().stream().anyMatch(perms -> perms.containsValue(true))
-//                || net.getUserRefs().values().stream().anyMatch(perms -> perms.containsValue(true))) {
-//            return;
-//        }
-//
-//        addDefaultPermissions();
-//        addAnonymousPermissions();
-//    }
-//
-//    protected boolean isDefaultRoleReferenced(Transition transition) {
-//        return transition.getRoles().containsKey(defaultRole.getStringId());
-//    }
-//
-//    protected boolean isDefaultRoleReferencedOnNet() {
-//        return net.getPermissions().containsKey(defaultRole.getStringId());
-//    }
-//
-//    protected boolean isAnonymousRoleReferenced(Transition transition) {
-//        return transition.getRoles().containsKey(anonymousRole.getStringId());
-//    }
-//
-//    protected boolean isAnonymousRoleReferencedOnNet() {
-//        return net.getPermissions().containsKey(anonymousRole.getStringId());
-//    }
-//
     protected com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy toAssignPolicy(com.netgrif.application.engine.importer.model.AssignPolicy policy) {
         if (policy == null || policy.value() == null) {
             return com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy.MANUAL;

@@ -37,12 +37,9 @@ public class PermissionFactory {
         if (roleLogic.isPerform() == null) {
             return;
         }
-        permissions.put(TaskPermission.VIEW, roleLogic.isPerform());
-        permissions.put(TaskPermission.ASSIGN, roleLogic.isPerform());
-        permissions.put(TaskPermission.CANCEL, roleLogic.isPerform());
-        permissions.put(TaskPermission.FINISH, roleLogic.isPerform());
-        permissions.put(TaskPermission.REASSIGN, roleLogic.isPerform());
-        permissions.put(TaskPermission.VIEW_DISABLED, roleLogic.isPerform());
+        for (TaskPermission permission : TaskPermission.values()) {
+            permissions.put(permission, roleLogic.isPerform());
+        }
     }
 
     private <T> void addPermission(Map<T, Boolean> permissions, Boolean permission, T rolePermission) {

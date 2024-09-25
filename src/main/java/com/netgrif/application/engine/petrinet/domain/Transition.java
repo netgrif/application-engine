@@ -66,14 +66,16 @@ public class Transition extends Node {
         }
     }
 
-    public void addRole(String roleId, Map<TaskPermission, Boolean> permissions) {
-//        if (roles.containsKey(roleId) && roles.get(roleId) != null) {
-//            roles.get(roleId).putAll(permissions);
-//        } else {
-//            roles.put(roleId, permissions);
-//        }
+    public void addPermission(String actorId, Map<TaskPermission, Boolean> permissions) {
+        // TODO: release/8.0.0 refactor pemission into class, addPermission as class function
+        if (this.permissions.containsKey(actorId) && this.permissions.get(actorId) != null) {
+            this.permissions.get(actorId).putAll(permissions);
+        } else {
+            this.permissions.put(actorId, permissions);
+        }
     }
 
+    // TODO: release/8.0.0
     public void addNegativeViewRole(String roleId) {
 //        negativeViewRoles.add(roleId);
     }
