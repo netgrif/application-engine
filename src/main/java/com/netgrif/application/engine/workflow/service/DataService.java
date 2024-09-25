@@ -248,7 +248,7 @@ public class DataService implements IDataService {
                 boolean modified = false;
                 ChangedField changedField = new ChangedField();
                 changedField.setId(fieldId);
-                Object newValue = parseFieldsValues(entry.getValue(), dataField);
+                Object newValue = parseFieldsValues(entry.getValue(), dataField, task.getStringId());
                 if (entry.getValue().has("value") || getFieldTypeFromNode((ObjectNode) entry.getValue()).equals("button")) {
                     dataField.setValue(newValue);
                     changedField.addAttribute("value", newValue);
@@ -830,7 +830,7 @@ public class DataService implements IDataService {
         return eventService.processDataEvents(field, trigger, phase, useCase, task, params);
     }
 
-    private Object parseFieldsValues(JsonNode jsonNode, DataField dataField) {
+    private Object parseFieldsValues(JsonNode jsonNode, DataField dataField, String taskId) {
         ObjectNode node = (ObjectNode) jsonNode;
         Object value;
         switch (getFieldTypeFromNode(node)) {
@@ -900,8 +900,9 @@ public class DataService implements IDataService {
                 value = list;
                 break;
             case "taskRef":
-                value = parseListStringValues(node);
-                // TODO 29.9.2020: validate task ref value? is such feature desired?
+                List<String> listTask = parseListStringValues(node);
+                validateTaskRefValue(listTask, taskId);
+                value = listTask;
                 break;
             case "stringCollection":
                 value = parseListStringValues(node);
@@ -1111,5 +1112,11 @@ public class DataService implements IDataService {
                 throw new IllegalArgumentException(String.format("Case '%s' with id '%s' cannot be added to case ref, since it is an instance of process with identifier '%s', which is not one of the allowed nets", _case.getTitle(), _case.getStringId(), _case.getProcessIdentifier()));
             }
         });
+    }
+
+    public void validateTaskRefValue(List<String> taskIds, String restrictedTaskId) throws IllegalArgumentException {
+        if (taskIds != null && taskIds.contains(restrictedTaskId)) {
+            throw new IllegalArgumentException(String.format("Task with id '%s' cannot be added to task ref, since it is a task which is displaying task ref", restrictedTaskId));
+        }
     }
 }

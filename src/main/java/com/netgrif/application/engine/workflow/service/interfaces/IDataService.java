@@ -88,6 +88,8 @@ public interface IDataService {
 
     void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException;
 
+    void validateTaskRefValue(List<String> value, String restrictedTaskId) throws IllegalArgumentException;
+
     SetDataEventOutcome changeComponentProperties(Case useCase, String transitionId, String fieldId, Map<String, String> properties);
 
     SetDataEventOutcome changeComponentProperties(Case useCase, Task task, String fieldId, Map<String, String> properties);
