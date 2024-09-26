@@ -17,6 +17,10 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.2](h
 - [NAE-1959] Indexing enumerationMap field fails when no options exist
 - [NAE-1960] Enumeration Map does not propagate changes when selecting
 - [NAE-1967] Elasticsearch disable dynamic field mapping
+- [NAE-2006] WorkflowService.deleteInstancesOfPetriNet does not remove all cases
+- [NAE-1983] Public view file handling
+- [NAE-2007] Vulnerabilities fix
+- [NAE-1952] Fix Loading Issue for Duplicate TaskRef Entries
 
 ### Added
 - [NAE-1901] Taskref list rendering update
@@ -35,6 +39,9 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.2](h
 - [NAE-1955] Update setData to handle options / choices
 - [NAE-1958] Make component properties changeable
 - [NAE-1962] Event properties
+- [NAE-1946] Remote file connector to S3
+- [NAE-1927] Shared Roles
+- [NAE-1945] External resource loader
 
 ### Changed
 - [NAE-1947] HistoryService findAllSetDataEventLogs is not working
