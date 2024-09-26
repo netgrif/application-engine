@@ -365,15 +365,12 @@ public class TaskService implements ITaskService {
     private Task returnTokens(Task task, String useCaseId) {
         Case useCase = workflowService.findOne(useCaseId);
         Process net = useCase.getProcess();
-//        TODO: release/8.0.0
-//        net.getArcsOfTransition(task.getTransitionId()).stream()
-//                .filter(arc -> arc.getSource() instanceof Place)
-//                .forEach(arc -> {
-//                    arc.rollbackExecution(useCase.getConsumedTokens().get(arc.getStringId()));
-//                    useCase.getConsumedTokens().remove(arc.getStringId());
-//                });
+        net.getArcs().get(task.getTransitionId()).getInput()
+                .forEach(arc -> {
+                    arc.rollbackExecution(useCase.getConsumedTokens().get(arc.getStringId()));
+                    useCase.getConsumedTokens().remove(arc.getStringId());
+                });
         workflowService.updateMarking(useCase);
-
         task.setAssigneeId(null);
         // TODO: NAE-1848 should this be null?
         task.setLastAssigned(null);

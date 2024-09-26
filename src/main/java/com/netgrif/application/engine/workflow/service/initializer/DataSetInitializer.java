@@ -32,11 +32,12 @@ public class DataSetInitializer {
                 useCase.getImmediateData().add(useCaseField);
             }
             // TODO: release/8.0.0
-            if (useCaseField.getDefaultValue() != null && useCaseField.getDefaultValue().isDynamic()) {
-                dynamicValueFields.add(useCaseField);
-            } else {
-                // TODO: release/8.0.0
-//                useCaseField.applyDefaultValue();
+            if (useCaseField.getDefaultValue() != null) {
+                if (useCaseField.getDefaultValue().isDynamic()) {
+                    dynamicValueFields.add(useCaseField);
+                } else {
+                    useCaseField.applyDefaultValue();
+                }
             }
             if (useCaseField instanceof ChoiceField) {
                 ChoiceField<?> choiceField = (ChoiceField<?>) useCaseField;
@@ -45,7 +46,7 @@ public class DataSetInitializer {
                 }
             }
             if (useCaseField instanceof MapOptionsField) {
-                MapOptionsField<I18nString,?> optionsField = (MapOptionsField<I18nString, ?>) useCaseField;
+                MapOptionsField<I18nString, ?> optionsField = (MapOptionsField<I18nString, ?>) useCaseField;
                 if (optionsField.isDynamic()) {
                     dynamicOptionFields.add(optionsField);
                 }

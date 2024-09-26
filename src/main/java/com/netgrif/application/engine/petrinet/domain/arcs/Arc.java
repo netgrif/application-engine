@@ -68,6 +68,10 @@ public abstract class Arc<S extends Node, D extends Node> extends ProcessObject 
         return this.multiplicityExpression.getMultiplicity();
     }
 
+    public void setMultiplicity(int weight) {
+        this.multiplicityExpression.setMultiplicity(weight);
+    }
+
     @Override
     public String toString() {
         return source.getTitle() + " -(" + multiplicityExpression + ")> " + destination.getTitle();

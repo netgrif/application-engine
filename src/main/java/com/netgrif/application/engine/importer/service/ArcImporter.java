@@ -3,6 +3,7 @@ package com.netgrif.application.engine.importer.service;
 import com.netgrif.application.engine.importer.model.ArcType;
 import com.netgrif.application.engine.importer.model.Expression;
 import com.netgrif.application.engine.petrinet.domain.Node;
+import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.arcs.*;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +35,7 @@ public final class ArcImporter {
             arc = getOutputArc(importArc, importer);
         }
         arc.setImportId(importArc.getId());
-        arc.setMultiplicityExpression(createMultiplicity(importArc.getMultiplicity()));
+        arc.setMultiplicityExpression(createMultiplicity(importArc.getMultiplicity(), importer));
         importer.createProperties(importArc.getProperties(), arc.getProperties());
         return arc;
     }
@@ -53,10 +54,18 @@ public final class ArcImporter {
         return arc;
     }
 
-    private Multiplicity createMultiplicity(Expression multiplicity) {
-        if (multiplicity.isDynamic()) {
-            return new Multiplicity(multiplicity.getValue());
+    private Multiplicity createMultiplicity(Expression multiplicity, Importer importer) {
+        if (!multiplicity.isDynamic()) {
+            return new Multiplicity(Integer.parseInt(multiplicity.getValue()));
         }
-        return new Multiplicity(Integer.parseInt(multiplicity.getValue()));
+        Process process = importer.getProcess();
+        String definition = multiplicity.getValue();
+        if (process.getPlace(definition) != null) {
+            return new Multiplicity(definition, ReferenceType.PLACE);
+        } else if (process.getField(definition).isPresent()) {
+            return new Multiplicity(definition, ReferenceType.DATA_VARIABLE);
+        } else {
+            return new Multiplicity(definition);
+        }
     }
 }

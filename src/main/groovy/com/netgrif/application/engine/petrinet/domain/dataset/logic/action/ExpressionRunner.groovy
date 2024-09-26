@@ -21,7 +21,6 @@ abstract class ExpressionRunner {
     @Lookup("actionDelegate")
     abstract ActionDelegate getExpressionDelegate()
 
-
     @Autowired
     private IGroovyShellFactory shellFactory
 

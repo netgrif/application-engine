@@ -2,8 +2,6 @@ package com.netgrif.application.engine.importer.service.builder;
 
 import com.netgrif.application.engine.importer.model.Data;
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.importer.model.Init;
-import com.netgrif.application.engine.importer.model.Option;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField;
@@ -13,9 +11,11 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehaviors;
 import org.bson.types.ObjectId;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public abstract class FieldBuilder<T extends Field<?>> {
 
@@ -40,11 +40,10 @@ public abstract class FieldBuilder<T extends Field<?>> {
     }
 
     public String resolveInit(Data data) {
-//        if (data.getInits() != null && data.getInits().getInit() != null) {
-//            return data.getInits().getInit().get(0).getValue();
-//        }
-//        if (data.getInit() != null) return data.getInit().getValue();
-        return null;
+        if (data.getInit() == null) {
+            return null;
+        }
+        return data.getInit().getValue();
     }
 
     public List<String> resolveInits(Data data) {

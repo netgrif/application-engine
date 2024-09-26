@@ -141,7 +141,7 @@ class PredefinedRolesPermissionsTest {
                         (TaskPermission.VIEW)    : true,
 //                        TODO: release/8.0.0
 //                        (RolePermission.SET)     : true,
-                        (TaskPermission.DELEGATE): true
+//                        (TaskPermission.DELEGATE): true
                 ]
         ] as Map<String, Map<TaskPermission, Boolean>>, true, false)
     }
@@ -156,7 +156,7 @@ class PredefinedRolesPermissionsTest {
         ] as Map<String, Map<CasePermission, Boolean>>, [
                 (NET_ROLE_ID): [
                         (TaskPermission.VIEW)    : true,
-                        (TaskPermission.DELEGATE): true,
+//                        (TaskPermission.DELEGATE): true,
                 ]
         ] as Map<String, Map<TaskPermission, Boolean>>, true, false)
     }
@@ -171,7 +171,7 @@ class PredefinedRolesPermissionsTest {
         ] as Map<String, Map<CasePermission, Boolean>>, [
                 (DEFAULT_ROLE_ID): [
                         (TaskPermission.VIEW)    : true,
-                        (TaskPermission.DELEGATE): true,
+//                        (TaskPermission.DELEGATE): true,
                 ]
         ] as Map<String, Map<TaskPermission, Boolean>>, true, false)
     }
@@ -186,7 +186,7 @@ class PredefinedRolesPermissionsTest {
         ] as Map<String, Map<CasePermission, Boolean>>, [
                 (DEFAULT_ROLE_ID): [
                         (TaskPermission.VIEW)    : false,
-                        (TaskPermission.DELEGATE): false,
+//                        (TaskPermission.DELEGATE): false,
                 ]
         ] as Map<String, Map<TaskPermission, Boolean>>, true, false)
     }
@@ -205,11 +205,11 @@ class PredefinedRolesPermissionsTest {
         ] as Map<String, Map<CasePermission, Boolean>>, [
                 (DEFAULT_ROLE_ID): [
                         (TaskPermission.VIEW)    : true,
-                        (TaskPermission.DELEGATE): true,
+//                        (TaskPermission.DELEGATE): true,
                 ],
                 (NET_ROLE_ID)    : [
                         (TaskPermission.VIEW)    : false,
-                        (TaskPermission.DELEGATE): false,
+//                        (TaskPermission.DELEGATE): false,
                 ]
         ] as Map<String, Map<TaskPermission, Boolean>>, true, false)
     }
@@ -219,7 +219,7 @@ class PredefinedRolesPermissionsTest {
         testPermissions(missingDefaultRoleNet, [:] as Map<String, Map<CasePermission, Boolean>>, [
                 (DEFAULT_ROLE_ID): [
                         (TaskPermission.VIEW)    : true,
-                        (TaskPermission.DELEGATE): true,
+//                        (TaskPermission.DELEGATE): true,
                 ]
         ] as Map<String, Map<TaskPermission, Boolean>>, false, false)
     }
@@ -246,7 +246,7 @@ class PredefinedRolesPermissionsTest {
         ] as Map<String, Map<CasePermission, Boolean>>, [
                 (DEFAULT_ROLE_ID): [
                         (TaskPermission.VIEW)    : true,
-                        (TaskPermission.DELEGATE): true,
+//                        (TaskPermission.DELEGATE): true,
                 ]
         ] as Map<String, Map<TaskPermission, Boolean>>, false, false)
     }
@@ -286,7 +286,7 @@ class PredefinedRolesPermissionsTest {
         ] as Map<String, Map<CasePermission, Boolean>>, [
                 (NET_ROLE_ID): [
                         (TaskPermission.VIEW)    : true,
-                        (TaskPermission.DELEGATE): true,
+//                        (TaskPermission.DELEGATE): true,
                 ]
         ] as Map<String, Map<TaskPermission, Boolean>>, false, true)
     }
@@ -301,7 +301,7 @@ class PredefinedRolesPermissionsTest {
         ] as Map<String, Map<CasePermission, Boolean>>, [
                 (ANONYMOUS_ROLE_ID): [
                         (TaskPermission.VIEW)    : true,
-                        (TaskPermission.DELEGATE): true,
+//                        (TaskPermission.DELEGATE): true,
                 ]
         ] as Map<String, Map<TaskPermission, Boolean>>, false, true)
     }
@@ -316,7 +316,7 @@ class PredefinedRolesPermissionsTest {
         ] as Map<String, Map<CasePermission, Boolean>>, [
                 (ANONYMOUS_ROLE_ID): [
                         (TaskPermission.VIEW)    : false,
-                        (TaskPermission.DELEGATE): false,
+//                        (TaskPermission.DELEGATE): false,
                 ]
         ] as Map<String, Map<TaskPermission, Boolean>>, false, true)
     }
@@ -335,11 +335,11 @@ class PredefinedRolesPermissionsTest {
         ] as Map<String, Map<CasePermission, Boolean>>, [
                 (ANONYMOUS_ROLE_ID): [
                         (TaskPermission.VIEW)    : true,
-                        (TaskPermission.DELEGATE): true,
+//                        (TaskPermission.DELEGATE): true,
                 ],
                 (NET_ROLE_ID)      : [
                         (TaskPermission.VIEW)    : false,
-                        (TaskPermission.DELEGATE): false,
+//                        (TaskPermission.DELEGATE): false,
                 ]
         ] as Map<String, Map<TaskPermission, Boolean>>, false, true)
     }
@@ -349,7 +349,7 @@ class PredefinedRolesPermissionsTest {
         testPermissions(missingAnonymousRoleNet, [:] as Map<String, Map<CasePermission, Boolean>>, [
                 (ANONYMOUS_ROLE_ID): [
                         (TaskPermission.VIEW)    : true,
-                        (TaskPermission.DELEGATE): true,
+//                        (TaskPermission.DELEGATE): true,
                 ]
         ] as Map<String, Map<TaskPermission, Boolean>>, false, false)
     }
@@ -376,7 +376,7 @@ class PredefinedRolesPermissionsTest {
         ] as Map<String, Map<CasePermission, Boolean>>, [
                 (ANONYMOUS_ROLE_ID): [
                         (TaskPermission.VIEW)    : true,
-                        (TaskPermission.DELEGATE): true,
+//                        (TaskPermission.DELEGATE): true,
                 ]
         ] as Map<String, Map<TaskPermission, Boolean>>, false, false)
     }
@@ -412,7 +412,7 @@ class PredefinedRolesPermissionsTest {
                         (TaskPermission.VIEW)    : true,
 //                        TODO: release/8.0.0
 //                        (RolePermission.SET)     : true,
-                        (TaskPermission.DELEGATE): true
+//                        (TaskPermission.DELEGATE): true
                 ],
                 (ANONYMOUS_ROLE_ID): [
                         (TaskPermission.ASSIGN): true,

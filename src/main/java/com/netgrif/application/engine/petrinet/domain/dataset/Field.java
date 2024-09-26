@@ -111,6 +111,10 @@ public abstract class Field<T> extends Imported {
         return this.value.getValue();
     }
 
+    public void applyDefaultValue() {
+        this.setRawValue(this.getDefaultValue().getDefaultValue());
+    }
+
     public void addActions(Collection<Action> dataEvents, DataEventType type) {
         dataEvents.forEach(action -> addAction(action, type));
     }

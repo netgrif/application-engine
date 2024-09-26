@@ -10,7 +10,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
-import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
+import com.netgrif.application.engine.petrinet.domain.arcs.ArcCollection;
 import com.netgrif.application.engine.petrinet.domain.dataset.NumberField;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
@@ -41,6 +41,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.io.FileInputStream;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -121,16 +122,15 @@ public class VariableArcsTest {
 
     @Test
     public void importTest() throws MissingIconKeyException {
-//        TODO: release/8.0.0
-//        List<Arc> arcs = this.loaded.getArcs().values().stream().flatMap(List::stream).collect(Collectors.toList());
-//        assert arcs.size() > 0;
-//        CreateCaseEventOutcome caseOutcome = workflowService.createCase(this.loaded.getStringId(), "VARTEST", "red", mock.mockLoggedUser());
-//        assert caseOutcome.getCase().getPetriNet().getArcs()
-//                .values()
-//                .stream()
-//                .flatMap(List::stream)
-//                .filter(arc -> arc.getReference() != null)
-//                .allMatch(arc -> arc.getReference().getReferencable() != null);
+        int count = this.loaded.getArcs().values().stream().map(ArcCollection::size).reduce(Integer::sum).orElse(0);
+        assert count > 0;
+        CreateCaseEventOutcome caseOutcome = workflowService.createCase(this.loaded.getStringId(), "VARTEST", "red", mock.mockLoggedUser());
+        assert caseOutcome.getCase().getProcess().getArcs()
+                .values()
+                .stream()
+                .flatMap(arcCollection -> Stream.concat(arcCollection.getInput().stream(), arcCollection.getOutput().stream()))
+                .filter(arc -> arc.getMultiplicityExpression() != null)
+                .allMatch(arc -> arc.getMultiplicityExpression().getMultiplicity() != null);
     }
 
     @Test
@@ -248,8 +248,8 @@ public class VariableArcsTest {
                 assert !cancelCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_start");
             }
             if (task.getTitle().getDefaultValue().contains("var")) {
-                dataRefMultiplicityBeforeChange = Double.parseDouble(cancelCase.getDataSet().get(arcType + "_var").getValue().toString());
-                NumberField varArcReference = (NumberField) cancelCase.getDataSet().get(arcType + "_var");
+                dataRefMultiplicityBeforeChange = Double.parseDouble(cancelCase.getDataSet().get(arcType + "_var_field").getValue().toString());
+                NumberField varArcReference = (NumberField) cancelCase.getDataSet().get(arcType + "_var_field");
                 varArcReference.setRawValue(800d);
                 workflowService.save(cancelCase);
             }
@@ -274,7 +274,7 @@ public class VariableArcsTest {
             }
 
             if (task.getTitle().getDefaultValue().contains("var")) {
-                NumberField varArcReference = (NumberField) cancelCase.getDataSet().get(arcType + "_var");
+                NumberField varArcReference = (NumberField) cancelCase.getDataSet().get(arcType + "_var_field");
                 varArcReference.setRawValue(dataRefMultiplicityBeforeChange);
                 workflowService.save(cancelCase);
             }

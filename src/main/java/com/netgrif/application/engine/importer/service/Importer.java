@@ -32,6 +32,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.BooleanUtils;
 import org.bson.types.ObjectId;
@@ -53,7 +54,9 @@ public class Importer {
 
     public static final String FILE_EXTENSION = ".xml";
 
+    @Getter
     protected com.netgrif.application.engine.importer.model.Process importedProcess;
+    @Getter
     protected Process process;
     protected ProcessRole defaultRole;
     protected ProcessRole anonymousRole;

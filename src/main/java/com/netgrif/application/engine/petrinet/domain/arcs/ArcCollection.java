@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.petrinet.domain.arcs;
 
+import com.netgrif.application.engine.petrinet.domain.Node;
 import lombok.Data;
+import org.apache.commons.collections.ListUtils;
 
 import java.util.ArrayList;
 import java.util.List;

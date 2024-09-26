@@ -13,7 +13,12 @@ import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.I18nExpression;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Process;
-import com.netgrif.application.engine.petrinet.domain.dataset.*;
+import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
+import com.netgrif.application.engine.petrinet.domain.arcs.ReferenceType;
+import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
@@ -299,7 +304,7 @@ public class WorkflowService implements IWorkflowService {
         historyService.save(new CreateCaseEventLog(useCase, EventPhase.PRE));
         log.info("[{}]: Case {} created", useCase.getStringId(), useCase.getTitle());
 //TODO: release/8.0.0
-//        useCase.getPetriNet().initializeArcs(useCase.getDataSet());
+        resolveArcsWeight(useCase);
         taskService.reloadTasks(useCase);
         //TODO: release/8.0.0
 //        useCase = findOne(useCase.getStringId());
@@ -327,7 +332,7 @@ public class WorkflowService implements IWorkflowService {
 //        if (caseTitle.isDynamic()) {
 //            makeTitle = (u) -> initValueExpressionEvaluator.evaluateCaseName(u, petriNet.getDefaultCaseName(), params).getTranslation(locale);
 //        } else {
-            makeTitle = (u) -> petriNet.getDefaultCaseName().getTranslation(locale);
+        makeTitle = (u) -> petriNet.getDefaultCaseName().getTranslation(locale);
 //        }
         return makeTitle;
     }
@@ -506,8 +511,33 @@ public class WorkflowService implements IWorkflowService {
             useCase.setProcess(model);
         }
         model.initializeTokens(useCase.getActivePlaces());
-//        TODO: release/8.0.0
-//        model.initializeArcs(useCase.getDataSet());
+        resolveArcsWeight(useCase);
+    }
+
+    private void resolveArcsWeight(Case useCase) {
+        useCase.getProcess().getArcs().values().forEach(arcCollection -> {
+            arcCollection.getInput().forEach(arc -> this.resolveWeight(arc, useCase));
+            arcCollection.getOutput().forEach(arc -> this.resolveWeight(arc, useCase));
+        });
+    }
+
+    private void resolveWeight(Arc<?, ?> arc, Case useCase) {
+        int weight;
+        if (arc.getMultiplicityExpression().isDynamic()) {
+            String definition = arc.getMultiplicityExpression().getDefinition();
+            ReferenceType referenceType = arc.getMultiplicityExpression().getReferenceType();
+            if (referenceType == ReferenceType.PLACE) {
+                weight = useCase.getProcess().getPlace(definition).getTokens();
+            } else if (referenceType == ReferenceType.DATA_VARIABLE) {
+                weight = (int) useCase.getDataSet().get(definition).getRawValue();
+            } else {
+                // TODO: release/8.0.0 evaluate expression
+                weight = 2;
+            }
+        } else {
+            weight = arc.getMultiplicityExpression().getDefaultValue();
+        }
+        arc.setMultiplicity(weight);
     }
 
     private EventOutcome addMessageToOutcome(Process net, CaseEventType type, EventOutcome outcome) {

@@ -29,7 +29,7 @@ public class Transition extends Node {
 
     private String icon;
     private LinkedHashMap<String, DataRef> dataSet;
-    private Map<String, Map<TaskPermission, Boolean>> permissions;
+    private UniqueKeyMap<String, Map<TaskPermission, Boolean>> permissions;
     private List<Trigger> triggers;
     private LayoutContainer layoutContainer;
     private AssignPolicy assignPolicy;
@@ -45,6 +45,7 @@ public class Transition extends Node {
         assignPolicy = AssignPolicy.MANUAL;
         finishPolicy = FinishPolicy.MANUAL;
         events = new HashMap<>();
+        permissions = new UniqueKeyMap<>();
     }
 
     public void setDataRefBehavior(Field<?> field, DataFieldBehavior behavior) {
