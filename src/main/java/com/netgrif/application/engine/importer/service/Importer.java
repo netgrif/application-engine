@@ -138,8 +138,6 @@ public class Importer {
     protected Optional<Process> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
         initializePetriNet();
 
-        process.addRole(defaultRole);
-        process.addRole(anonymousRole);
         importedProcess.getI18N().forEach(this::addI18N);
 
         setMetaData();

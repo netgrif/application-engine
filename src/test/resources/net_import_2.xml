@@ -1,36 +1,33 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>new_model</id>
     <version>1.0.0</version>
-    <initials>NEW</initials>
     <title>New Model2</title>
     <icon>home2</icon>
-    <defaultRole>true</defaultRole>
-    <transitionRole>false</transitionRole>
-    <!-- TRANSACTIONS -->
-    <!-- ROLES -->
+    <defaultRole>false</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">NEW</property>
+    </properties>
     <role>
         <id>newRole_3</id>
         <title>newRole_3</title>
     </role>
-    <!-- DATA -->
-    <data type="text">
-        <id>newVariable_7</id>
-        <title>newVariable_7</title>
-    </data>
     <data type="text">
         <id>newVariable_6</id>
         <title>newVariable_6</title>
     </data>
-    <!-- I18NS -->
-    <!-- TRANSITIONS -->
+    <data type="text">
+        <id>newVariable_7</id>
+        <title>newVariable_7</title>
+    </data>
     <transition>
-        <id>3</id>
+        <id>t3</id>
         <x>481</x>
         <y>186</y>
-        <label>task3</label>
+        <title>task3</title>
+        <flex>
+            <id>t3_flex</id>
+        </flex>
     </transition>
-    <!-- PLACES -->
-    <!-- ARCS -->
-</document>
+</process>

@@ -109,7 +109,7 @@
                 <dataRef>
                     <id>number</id>
                     <logic>
-                        <behavior>editable</behavior>
+                        <behavior>forbidden</behavior>
                     </logic>
                 </dataRef>
                 <properties>
@@ -122,7 +122,7 @@
                 <dataRef>
                     <id>text</id>
                     <logic>
-                        <behavior>editable</behavior>
+                        <behavior>hidden</behavior>
                     </logic>
                 </dataRef>
                 <properties>
@@ -135,7 +135,7 @@
                 <dataRef>
                     <id>enumeration</id>
                     <logic>
-                        <behavior>editable</behavior>
+                        <behavior>visible</behavior>
                     </logic>
                 </dataRef>
                 <properties>
@@ -231,7 +231,7 @@
                 <dataRef>
                     <id>file</id>
                     <logic>
-                        <behavior>editable</behavior>
+                        <behavior>forbidden</behavior>
                         <immediate>true</immediate>
                     </logic>
                 </dataRef>
@@ -245,7 +245,7 @@
                 <dataRef>
                     <id>fileList</id>
                     <logic>
-                        <behavior>editable</behavior>
+                        <behavior>hidden</behavior>
                     </logic>
                 </dataRef>
                 <properties>
@@ -258,7 +258,7 @@
                 <dataRef>
                     <id>user</id>
                     <logic>
-                        <behavior>editable</behavior>
+                        <behavior>hidden</behavior>
                         <immediate>true</immediate>
                     </logic>
                 </dataRef>
@@ -287,7 +287,7 @@
                 <dataRef>
                     <id>i18n</id>
                     <logic>
-                        <behavior>editable</behavior>
+                        <behavior>hidden</behavior>
                         <immediate>true</immediate>
                     </logic>
                 </dataRef>

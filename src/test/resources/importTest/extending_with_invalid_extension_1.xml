@@ -1,15 +1,15 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<document>
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
     <id>extending_with_invalid_extension_1</id>
     <version>1.0.0</version>
-    <initials>EIE</initials>
-    <title>Extending with invalid extension - empty id</title>
-    <defaultRole>true</defaultRole>
-    <anonymousRole>false</anonymousRole>
-
     <extends>
         <id></id>
         <version>1.0.0</version>
     </extends>
-
-</document>
+    <title>Extending with invalid extension - empty id</title>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">EIE</property>
+    </properties>
+</process>

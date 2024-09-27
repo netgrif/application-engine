@@ -40,7 +40,7 @@ public class ExpressionEvaluator implements IInitValueExpressionEvaluator {
     }
 
     @Override
-    public Set<I18nString> evaluateChoices(Case useCase, ChoiceField field, Map<String, String> params) {
+    public LinkedHashSet<I18nString> evaluateChoices(Case useCase, ChoiceField field, Map<String, String> params) {
         Object result = evaluate(useCase, field.getExpression(), params);
         if (!(result instanceof Collection)) {
             throw new IllegalArgumentException("[" + useCase.getStringId() + "] Dynamic choices not an instance of Collection: " + field.getImportId());

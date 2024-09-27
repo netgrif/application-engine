@@ -7,6 +7,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 import com.netgrif.application.engine.workflow.domain.Case;
 
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,7 +17,7 @@ public interface IInitValueExpressionEvaluator {
 
     Map<String, I18nString> evaluateOptions(Case useCase, MapOptionsField<I18nString, ?> field, Map<String, String> params);
 
-    Set<I18nString> evaluateChoices(Case useCase, ChoiceField field, Map<String, String> params);
+    LinkedHashSet<I18nString> evaluateChoices(Case useCase, ChoiceField field, Map<String, String> params);
 
     I18nString evaluateCaseName(Case useCase, Expression<?> expression, Map<String, String> params);
 

@@ -1,15 +1,15 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<document>
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
     <id>extending_non_existing_parent</id>
     <version>1.0.0</version>
-    <initials>ENP</initials>
-    <title>Extending non existing parent test net</title>
-    <defaultRole>true</defaultRole>
-    <anonymousRole>false</anonymousRole>
-
     <extends>
         <id>something</id>
         <version>0.0.0</version>
     </extends>
-
-</document>
+    <title>Extending non existing parent test net</title>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">ENP</property>
+    </properties>
+</process>

@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
     <id>importer_upsert</id>
+    <version>1.0.0</version>
     <title>importer_upsert</title>
-    <initials>IMP</initials>
+    <properties>
+        <property key="initials">IMP</property>
+    </properties>
     <!-- ROLES -->
     <transition>
-        <id>3</id>
+        <id>t3</id>
         <x>379</x>
         <y>273</y>
-        <label>Datagroups</label>
+        <title>Datagroups</title>
     </transition>
-</document>
+</process>

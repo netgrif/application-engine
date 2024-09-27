@@ -7,15 +7,16 @@ import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 @Data
-public class MultichoiceField extends ChoiceField<Set<I18nString>> {
+public class MultichoiceField extends ChoiceField<LinkedHashSet<I18nString>> {
 
     public MultichoiceField() {
         super();
-        super.setRawValue(new HashSet<>());
+        super.setRawValue(new LinkedHashSet<>());
     }
 
     public MultichoiceField(List<I18nString> values) {
