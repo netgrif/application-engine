@@ -1,0 +1,38 @@
+package com.netgrif.application.engine.validation.validator.text;
+
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation;
+import com.netgrif.application.engine.validation.exception.ValidationException;
+import com.netgrif.application.engine.validation.validator.IValidator;
+import com.netgrif.application.engine.workflow.domain.DataField;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.stereotype.Component;
+
+import java.util.Optional;
+
+@Component
+public class EmailValidation implements IValidator<TextField> {
+
+    public static String emailRegex = "^[a-zA-Z0-9\\._\\%\\+\\-]+@[a-zA-Z0-9\\.\\-]+\\.[a-zA-Z]{2,}$";
+
+    @Override
+    public void validate(TextField field, DataField dataField) throws ValidationException {
+        Optional<Validation> possibleValidation = getPossibleValidation(field);
+        if (possibleValidation.isEmpty()) {
+            return;
+        }
+        Validation validation = possibleValidation.get();
+        String value = (String) dataField.getValue();
+        if (value == null || value.length() == 0) {
+            return;
+        }
+        if (!value.matches(emailRegex)) {
+            throwValidationException(validation, "Invalid value of field [" + field.getImportId() + "], value [" + value + "] is not a valid e-mail");
+        }
+
+    }
+
+    public String getName() {
+        return "email";
+    }
+}

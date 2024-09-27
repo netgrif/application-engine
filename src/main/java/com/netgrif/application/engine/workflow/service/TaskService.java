@@ -27,7 +27,7 @@ import com.netgrif.application.engine.rules.domain.facts.TransitionEventFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
+import com.netgrif.application.engine.validation.service.IValidationRegistryService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
@@ -109,7 +109,7 @@ public class TaskService implements ITaskService {
     protected IHistoryService historyService;
 
     @Autowired
-    protected IValidationService validation;
+    protected IValidationRegistryService validationRegistryService;
 
     @Autowired
     public void setElasticTaskService(IElasticTaskService elasticTaskService) {
@@ -598,7 +598,7 @@ public class TaskService implements ITaskService {
         for (Map.Entry<String, DataFieldLogic> entry : transition.getDataSet().entrySet()) {
             if (useCase.getPetriNet().getDataSet().get(entry.getKey()) != null
                     && useCase.getPetriNet().getDataSet().get(entry.getKey()).getValidations() != null) {
-                validation.valid(useCase.getPetriNet().getDataSet().get(entry.getKey()), useCase.getDataField(entry.getKey()));
+                validationRegistryService.validate(useCase.getPetriNet().getDataSet().get(entry.getKey()), useCase.getDataField(entry.getKey()));
             }
             if (!useCase.getDataField(entry.getKey()).isRequired(transition.getImportId()))
                 continue;

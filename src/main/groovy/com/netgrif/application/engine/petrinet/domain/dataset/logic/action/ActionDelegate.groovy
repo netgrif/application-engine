@@ -30,6 +30,7 @@ import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
@@ -41,6 +42,7 @@ import com.netgrif.application.engine.startup.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
+import com.netgrif.application.engine.validation.converter.LegacyValidationConverter
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.QTask
@@ -186,6 +188,9 @@ class ActionDelegate {
     PublicViewProperties publicViewProperties
 
     FrontendActionOutcome Frontend
+
+    @Autowired
+    LegacyValidationConverter legacyValidationConverter
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -537,8 +542,10 @@ class ActionDelegate {
         targetCase.dataSet.get(field.stringId).validations = field.validations
         saveTargetCase(targetCase)
         List<Validation> compiled = field.validations.collect { it.clone() }
-        compiled.findAll { it instanceof DynamicValidation }.collect { (DynamicValidation) it }.each {
-            it.compiledRule = dataValidationExpressionEvaluator.compile(targetCase, it.expression)
+        compiled.findAll { it.getArguments().any {arg -> arg.value.dynamic}}.each {
+            it.getArguments().findAll {arg -> arg.value.dynamic}.each {
+                arg -> arg.value.value = dataValidationExpressionEvaluator.compile(targetCase, new Expression(arg.value.dynamicValue))
+            }
         }
         ChangedField changedField = new ChangedField(field.stringId)
         changedField.addAttribute("validations", compiled.collect { it.getLocalizedValidation(LocaleContextHolder.locale) })
@@ -793,14 +800,14 @@ class ActionDelegate {
         List<Validation> newValidations = []
         if (valid != null) {
             if (valid instanceof String) {
-                newValidations = [new Validation(valid as String)]
+                newValidations = [legacyValidationConverter.convert(new Validation(valid as String))]
             } else if (valid instanceof Validation) {
-                newValidations = [valid]
+                newValidations = [legacyValidationConverter.convert(valid)]
             } else if (valid instanceof Collection) {
                 if (valid.every { it instanceof Validation }) {
-                    newValidations = valid
+                    newValidations = valid.collect { it -> legacyValidationConverter.convert(it as Validation)}
                 } else {
-                    newValidations = valid.collect { new Validation(it as String) }
+                    newValidations = valid.collect { legacyValidationConverter.convert(new Validation(it as String)) }
                 }
             }
         }
