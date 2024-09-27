@@ -1,44 +1,53 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
     <id>function_res</id>
-    <initials>SFR</initials>
+    <version>1.0.0</version>
     <title>Test</title>
-    <!-- FUNCTIONS -->
-    <function name="createUser" scope="namespace">
-        {  com.netgrif.application.engine.auth.domain.User user ->
-            if (user != null) {
-                registrationService.encodeUserPassword(user)
-                userService.save(user)
-            }
-        }
-    </function>
+    <defaultRole>false</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">SFR</property>
+    </properties>
     <function scope="namespace" name="calculate">
-        { def x, def y ->
-            return x + y
-        }
+        <![CDATA[
+		{ def x, def y ->
+		    return x + y
+		}
+		]]>
     </function>
-    <!-- ROLE -->
-    <!-- DATA -->
+    <function scope="namespace" name="createUser">
+        <![CDATA[
+		{  com.netgrif.application.engine.auth.domain.User user ->
+		    if (user != null) {
+		        registrationService.encodeUserPassword(user)
+		        userService.save(user)
+		    }
+		}
+		]]>
+    </function>
     <data type="number">
         <id>number</id>
         <title>Number</title>
     </data>
-    <!-- TRANSITIONS -->
     <transition>
         <id>1</id>
         <x>0</x>
         <y>0</y>
-        <label>Test</label>
-        <dataGroup>
-            <id>0</id>
-            <layout>flow</layout>
-            <dataRef>
-                <id>number</id>
-                <logic><behavior>editable</behavior></logic>
-            </dataRef>
-        </dataGroup>
+        <title>Test</title>
+        <flex>
+            <id>1_flex</id>
+            <item>
+                <dataRef>
+                    <id>number</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
-    <!-- PLACES -->
-    <!-- ARCS -->
-</document>
+</process>

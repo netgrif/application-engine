@@ -1,41 +1,50 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
     <id>function_res</id>
-    <initials>SFR</initials>
+    <version>1.0.0</version>
     <title>Test</title>
-    <!-- FUNCTIONS -->
-    <function name="calculate" scope="namespace">
-        { def x, def y ->
-            return x * y
-        }
+    <defaultRole>false</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">SFR</property>
+    </properties>
+    <function scope="namespace" name="calculate">
+        <![CDATA[
+		{ def x, def y ->
+		    return x * y
+		}
+		]]>
     </function>
-    <function name="updateUseCaseFieldValue" scope="namespace">
-        { def fieldId, def newValue ->
-            change useCase.dataSet.get(fieldId) value { newValue }
-        }
+    <function scope="namespace" name="updateUseCaseFieldValue">
+        <![CDATA[
+		{ def fieldId, def newValue ->
+		    change useCase.dataSet.get(fieldId) value { newValue }
+		}
+		]]>
     </function>
-    <!-- ROLE -->
-    <!-- DATA -->
     <data type="number">
         <id>number</id>
         <title>Number</title>
     </data>
-    <!-- TRANSITIONS -->
     <transition>
         <id>1</id>
         <x>0</x>
         <y>0</y>
-        <label>Test</label>
-        <dataGroup>
-            <id>0</id>
-            <layout>flow</layout>
-            <dataRef>
-                <id>number</id>
-                <logic><behavior>editable</behavior></logic>
-            </dataRef>
-        </dataGroup>
+        <title>Test</title>
+        <flex>
+            <id>1_flex</id>
+            <item>
+                <dataRef>
+                    <id>number</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
-    <!-- PLACES -->
-    <!-- ARCS -->
-</document>
+</process>
