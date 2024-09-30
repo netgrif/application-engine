@@ -11,12 +11,14 @@ import com.netgrif.application.engine.history.domain.taskevents.CancelTaskEventL
 import com.netgrif.application.engine.history.domain.taskevents.FinishTaskEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.model.EventType;
+import com.netgrif.application.engine.petrinet.domain.DataRef;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.ArcOrderComparator;
 import com.netgrif.application.engine.petrinet.domain.arcs.PTArc;
 import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc;
+import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
@@ -30,10 +32,7 @@ import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.State;
-import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
+import com.netgrif.application.engine.workflow.domain.*;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.*;
@@ -62,9 +61,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -271,7 +268,7 @@ public class TaskService implements ITaskService {
 
         log.info("[{}]: Finishing task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), user.getSelfOrImpersonated().getEmail());
 
-        validateData(transition, useCase);
+        validateData(useCase, task);
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreFinishActions(), workflowService.findOne(task.getCaseId()), task, transition, params));
         useCase = workflowService.findOne(task.getCaseId());
         task = findOne(task.getStringId());
@@ -554,28 +551,27 @@ public class TaskService implements ITaskService {
         return outcomes;
     }
 
-    void validateData(Transition transition, Case useCase) {
-//        TODO: release/8.0.0 fix validation
-//        for (Map.Entry<String, DataFieldLogic> entry : transition.getDataSet().entrySet()) {
-//            if (useCase.getPetriNet().getDataSet().get(entry.getKey()) != null
-//                    && useCase.getPetriNet().getDataSet().get(entry.getKey()).getValidations() != null) {
-//                validation.valid(useCase.getPetriNet().getDataSet().get(entry.getKey()), useCase.getDataField(entry.getKey()));
-//            }
-//            if (!useCase.getDataField(entry.getKey()).isRequired(transition.getImportId()))
+    void validateData(Case useCase, Task task) {
+        useCase.getDataSet().getFields().values().stream().filter(field -> field.getBehaviors().get(task.getTransitionId()) != null).forEach(field -> {
+            DataFieldBehavior behavior = field.getBehaviors().get(task.getTransitionId());
+            if (!field.getValidations().isEmpty()) {
+                validation.valid(field);
+            }
+            if (!behavior.isRequired()) {
+                return;
+            }
+            // TODO: release/8.0.0 check if needed
+//            if (useCase.getDataField(entry.getKey()).isUndefined(transition.getImportId()) && !entry.getValue().isRequired()) {
 //                continue;
-//            if (useCase.getDataField(entry.getKey()).isUndefined(transition.getImportId()) && !entry.getValue().isRequired())
-//                continue;
-//
-//            Object value = useCase.getDataSet().get(entry.getKey()).getValue();
-//            if (value == null) {
-//                Field field = useCase.getField(entry.getKey());
-//                throw new IllegalArgumentException("Field \"" + field.getName() + "\" has null value");
 //            }
-//            if (value instanceof String && ((String) value).isEmpty()) {
-//                Field field = useCase.getField(entry.getKey());
-//                throw new IllegalArgumentException("Field \"" + field.getName() + "\" has empty value");
-//            }
-//        }
+            Object value = field.getRawValue();
+            if (value == null) {
+                throw new IllegalArgumentException("Field \"" + field.getTitle() + "\" has null value");
+            }
+            if (value instanceof String && ((String) value).isEmpty()) {
+                throw new IllegalArgumentException("Field \"" + field.getTitle() + "\" has empty value");
+            }
+        });
     }
 
     protected void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase) {

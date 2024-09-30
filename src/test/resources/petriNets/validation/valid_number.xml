@@ -1,18 +1,20 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../../../main/resources/petriNets/petriflow_schema.xsd">
     <id>valid_number</id>
-    <initials>VN1</initials>
+    <version>1.0.0</version>
     <title>Validacia NumberFieldu</title>
     <icon>check_circle</icon>
     <defaultRole>true</defaultRole>
     <anonymousRole>true</anonymousRole>
-    <transitionRole>false</transitionRole>
+    <properties>
+        <property key="initials">VN1</property>
+    </properties>
     <data type="number">
         <id>number01</id>
         <title/>
         <validations>
             <validation>
-                <expression>odd</expression>
+                <name>odd</name>
                 <message>error-number01</message>
             </validation>
         </validations>
@@ -22,7 +24,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>even</expression>
+                <name>even</name>
                 <message>error-number02</message>
             </validation>
         </validations>
@@ -32,7 +34,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>positive</expression>
+                <name>positive</name>
                 <message>error-number03</message>
             </validation>
         </validations>
@@ -42,7 +44,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>negative</expression>
+                <name>negative</name>
                 <message>error-number04</message>
             </validation>
         </validations>
@@ -52,7 +54,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>decimal</expression>
+                <name>decimal</name>
                 <message>error-number05</message>
             </validation>
         </validations>
@@ -62,7 +64,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>inrange 10,20</expression>
+                <name>inrange 10,20</name>
                 <message>error-number06</message>
             </validation>
         </validations>
@@ -73,11 +75,11 @@
         <title/>
         <validations>
             <validation>
-                <expression>odd</expression>
+                <name>odd</name>
                 <message>error-number07-1</message>
             </validation>
             <validation>
-                <expression>inrange 1,5</expression>
+                <name>inrange 1,5</name>
                 <message>error-number07-2</message>
             </validation>
         </validations>
@@ -87,136 +89,113 @@
         <id>t1</id>
         <x>260</x>
         <y>100</y>
-        <label>Test</label>
-        <dataGroup>
-            <id>t1_0</id>
-            <cols>4</cols>
-            <layout>grid</layout>
-            <dataRef>
-                <id>number01</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>number02</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>1</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>number03</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>2</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>number04</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>3</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>number05</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>4</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>number06</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>5</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>number07</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>6</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-        </dataGroup>
-        <event type="assign">
-            <id>t1_assign</id>
-        </event>
-        <event type="finish">
-            <id>t1_finish</id>
-        </event>
-        <event type="cancel">
-            <id>t1_cancel</id>
-        </event>
-        <event type="delegate">
-            <id>t1_delegate</id>
-        </event>
+        <title>Test</title>
+        <flex>
+            <id>t1_flex</id>
+            <item>
+                <dataRef>
+                    <id>number01</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>number02</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>number03</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>number04</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>number05</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>number06</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>number07</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
     <place>
         <id>p1</id>
         <x>180</x>
         <y>100</y>
         <tokens>1</tokens>
-        <static>false</static>
     </place>
     <place>
         <id>p2</id>
         <x>340</x>
         <y>100</y>
         <tokens>0</tokens>
-        <static>false</static>
     </place>
     <arc>
         <id>a1</id>
@@ -232,4 +211,4 @@
         <destinationId>p2</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
-</document>
+</process>

@@ -10,6 +10,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleSe
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -29,8 +30,9 @@ class GroovyShellFactoryTest extends EngineTest {
     private Process net
 
     @BeforeEach
+    @Override
     void before() {
-        testHelper.truncateDbs()
+        super.before()
 
         def testNet = importHelper.createNet(FILE_NAME)
         assert testNet.isPresent()

@@ -1,54 +1,35 @@
 package com.netgrif.application.engine.validation
 
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.BooleanField
 import com.netgrif.application.engine.petrinet.domain.dataset.DateField
 import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.web.context.WebApplicationContext
 
 import java.time.LocalDate
 
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
-class ValidationTest {
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private CaseRepository caseRepository
-
-    @Autowired
-    private TestHelper testHelper
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private SuperCreator superCreator
-
-    @BeforeEach
-    void setup() {
-        testHelper.truncateDbs()
-    }
+class ValidationTest extends EngineTest {
 
     private Process importTextNet() {
         Process testNet = importHelper.createNet("validation/valid_text.xml", VersionType.MAJOR).get()
@@ -568,7 +549,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), new DataSet(["boolean_0": new BooleanField(rawValue:true)]))
+        importHelper.setTaskData(task.getStringId(), new DataSet(["boolean_0": new BooleanField(rawValue: true)]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -582,7 +563,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), new DataSet(["boolean_0": new BooleanField(rawValue:false)]))
+            importHelper.setTaskData(task.getStringId(), new DataSet(["boolean_0": new BooleanField(rawValue: false)]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -782,7 +763,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), new DataSet(["date05": new DateField(rawValue: LocalDate.of(2022,3,3))]))
+        importHelper.setTaskData(task.getStringId(), new DataSet(["date05": new DateField(rawValue: LocalDate.of(2022, 3, 3))]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -794,7 +775,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), new DataSet(["date06": new DateField(rawValue: LocalDate.of(1994,7,4))]))
+        importHelper.setTaskData(task.getStringId(), new DataSet(["date06": new DateField(rawValue: LocalDate.of(1994, 7, 4))]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -807,7 +788,7 @@ class ValidationTest {
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), new DataSet(["date06": new DateField(rawValue: LocalDate.of(1994,7,3))]))
+            importHelper.setTaskData(task.getStringId(), new DataSet(["date06": new DateField(rawValue: LocalDate.of(1994, 7, 3))]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -821,7 +802,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), new DataSet(["date07": new DateField(rawValue: LocalDate.of(1994,7,3))]))
+        importHelper.setTaskData(task.getStringId(), new DataSet(["date07": new DateField(rawValue: LocalDate.of(1994, 7, 3))]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -834,7 +815,7 @@ class ValidationTest {
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), new DataSet(["date07": new DateField(rawValue: LocalDate.of(1994,7,4))]))
+            importHelper.setTaskData(task.getStringId(), new DataSet(["date07": new DateField(rawValue: LocalDate.of(1994, 7, 4))]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -1053,5 +1034,10 @@ class ValidationTest {
             assert taskFinish != null
         })
         Assertions.assertEquals("error-number07-2", thrown.getMessage());
+    }
+
+    @Autowired
+    ValidationTest(ImportHelper importHelper, WebApplicationContext wac, TestHelper testHelper, ITaskService taskService, IProcessRoleService roleService, IUserService userService) {
+        super(importHelper, wac, testHelper, taskService, roleService, userService)
     }
 }

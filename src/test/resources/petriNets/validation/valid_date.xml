@@ -1,18 +1,20 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../../../main/resources/petriNets/petriflow_schema.xsd">
     <id>valid_date</id>
-    <initials>VD1</initials>
+    <version>1.0.0</version>
     <title>Validacia DateFieldu</title>
     <icon>check_circle</icon>
     <defaultRole>true</defaultRole>
     <anonymousRole>true</anonymousRole>
-    <transitionRole>false</transitionRole>
+    <properties>
+        <property key="initials">VD1</property>
+    </properties>
     <data type="date">
         <id>date01</id>
         <title/>
         <validations>
             <validation>
-                <expression>between today,future</expression> <!-- od dnes do buducnosti-->
+                <name>between today,future</name>
                 <message>error-date01</message>
             </validation>
         </validations>
@@ -22,7 +24,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>between past,today</expression> <!-- od  minulosti do dnešného dňa -->
+                <name>between past,today</name>
                 <message>error-date02</message>
             </validation>
         </validations>
@@ -32,7 +34,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>between 2020-03-03,today</expression> <!-- od datumu do dnešného dňa -->
+                <name>between 2020-03-03,today</name>
                 <message>error-date03</message>
             </validation>
         </validations>
@@ -42,7 +44,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>between past,2020-03-03</expression> <!-- od minulosti do datumu -->
+                <name>between past,2020-03-03</name>
                 <message>error-date04</message>
             </validation>
         </validations>
@@ -52,7 +54,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>between 2020-01-01,2022-03-03</expression> <!-- od datumu do datumu -->
+                <name>between 2020-01-01,2022-03-03</name>
                 <message>error-date05</message>
             </validation>
         </validations>
@@ -62,7 +64,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>workday</expression> <!-- pracovny den -->
+                <name>workday</name>
                 <message>error-date06</message>
             </validation>
         </validations>
@@ -72,7 +74,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>weekend</expression> <!-- vikend -->
+                <name>weekend</name>
                 <message>error-date07</message>
             </validation>
         </validations>
@@ -81,136 +83,113 @@
         <id>t1</id>
         <x>260</x>
         <y>100</y>
-        <label>Test</label>
-        <dataGroup>
-            <id>t1_0</id>
-            <cols>4</cols>
-            <layout>grid</layout>
-            <dataRef>
-                <id>date01</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>date02</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>1</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>date03</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>2</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>date04</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>3</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>date05</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>4</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>date06</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>5</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>date07</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>6</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-        </dataGroup>
-        <event type="assign">
-            <id>t1_assign</id>
-        </event>
-        <event type="finish">
-            <id>t1_finish</id>
-        </event>
-        <event type="cancel">
-            <id>t1_cancel</id>
-        </event>
-        <event type="delegate">
-            <id>t1_delegate</id>
-        </event>
+        <title>Test</title>
+        <flex>
+            <id>t1_flex</id>
+            <item>
+                <dataRef>
+                    <id>date01</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>date02</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>date03</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>date04</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>date05</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>date06</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>date07</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
     <place>
         <id>p1</id>
         <x>180</x>
         <y>100</y>
         <tokens>1</tokens>
-        <static>false</static>
     </place>
     <place>
         <id>p2</id>
         <x>340</x>
         <y>100</y>
         <tokens>0</tokens>
-        <static>false</static>
     </place>
     <arc>
         <id>a1</id>
@@ -226,4 +205,4 @@
         <destinationId>p2</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
-</document>
+</process>

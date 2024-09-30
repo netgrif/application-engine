@@ -57,7 +57,6 @@ public class Task implements Serializable {
     @Builder.Default
     private FinishPolicy finishPolicy = FinishPolicy.MANUAL;
 
-
     @Builder.Default
     private List<Trigger> triggers = new LinkedList<>();
 

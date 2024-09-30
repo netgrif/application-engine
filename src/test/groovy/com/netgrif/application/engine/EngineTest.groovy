@@ -4,6 +4,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
+import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.web.context.WebApplicationContext
@@ -25,5 +26,10 @@ abstract class EngineTest {
         this.taskService = taskService
         this.roleService = roleService
         this.userService = userService
+    }
+
+    @BeforeEach
+    void before() {
+        testHelper.truncateDbs()
     }
 }

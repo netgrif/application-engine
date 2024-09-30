@@ -1,17 +1,20 @@
- 	<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:noNamespaceSchemaLocation="../../../../main/resources/petriNets/petriflow_schema.xsd">
 	<id>valid_regex</id>
-	<initials>VR1</initials>
+	<version>1.0.0</version>
 	<title>Validacia regexov</title>
 	<icon>check_circle</icon>
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
-	<transitionRole>false</transitionRole>
+	<properties>
+		<property key="initials">VR1</property>
+	</properties>
 	<data type="text">
 		<id>regex01</id>
 		<title/>
 		<validations>
 			<validation>
-				<expression>regex ^([0-9]{1,6})$</expression>  <!-- Cislo pocet znakov 1-6 -->
+				<name>regex ^([0-9]{1,6})$</name>
 				<message>error-regex01</message>
 			</validation>
 		</validations>
@@ -21,7 +24,7 @@
 		<title/>
 		<validations>
 			<validation>
-				<expression>regex ^([a-zA-Z0-9\-]{10})$</expression> <!-- Cislo alebo pismeno a polcka  10 znakov -->
+				<name>regex ^([a-zA-Z0-9\-]{10})$</name>
 				<message>error-regex02</message>
 			</validation>
 		</validations>
@@ -31,7 +34,7 @@
 		<title/>
 		<validations>
 			<validation>
-				<expression>regex ^(TOTOK[a-zA-Z0-9]{7})$</expression> <!-- Prefix max 12 znakov -->
+				<name>regex ^(TOTOK[a-zA-Z0-9]{7})$</name>
 				<message>error-regex03</message>
 			</validation>
 		</validations>
@@ -41,7 +44,7 @@
 		<title/>
 		<validations>
 			<validation>
-				<expression>regex ^([a-zA-Z0-9 ]{1,10})$</expression> <!-- 10 znakov vratane medzeri -->
+				<name>regex ^([a-zA-Z0-9 ]{1,10})$</name>
 				<message>error-regex04</message>
 			</validation>
 		</validations>
@@ -51,7 +54,7 @@
 		<title/>
 		<validations>
 			<validation>
-				<expression>regex ^([A-ž0-9!@#$%^&amp;*()_+\-=\[\]{};':"\\|,.&lt;&gt;\/? ]{1,100})$</expression> <!-- pismena a specialne znaky  max100 -->
+				<name>regex ^([A-ž0-9!@#$%^&amp;*()_+\-=\[\]{};':"\\|,.&lt;&gt;\/? ]{1,100})$</name>
 				<message>error-regex05</message>
 			</validation>
 		</validations>
@@ -61,7 +64,7 @@
 		<title/>
 		<validations>
 			<validation>
-				<expression>regex ^[a-zA-Z0-9\._\%\+\-]+@[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,}$</expression> <!-- E-mail -->
+				<name>regex ^[a-zA-Z0-9\._\%\+\-]+@[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,}$</name>
 				<message>error-regex06</message>
 			</validation>
 		</validations>
@@ -70,122 +73,100 @@
 		<id>t1</id>
 		<x>260</x>
 		<y>100</y>
-		<label>Test</label>
-		<dataGroup>
-			<id>t1_0</id>
-			<cols>4</cols>
-			<layout>grid</layout>
-			<dataRef>
-				<id>regex01</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>regex02</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>regex03</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>regex04</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>3</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>regex05</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>4</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>regex06</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>5</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-		<event type="assign">
-			<id>t1_assign</id>
-		</event>
-		<event type="finish">
-			<id>t1_finish</id>
-		</event>
-		<event type="cancel">
-			<id>t1_cancel</id>
-		</event>
-		<event type="delegate">
-			<id>t1_delegate</id>
-		</event>
+		<title>Test</title>
+		<flex>
+			<id>t1_flex</id>
+			<item>
+				<dataRef>
+					<id>regex01</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>regex02</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>regex03</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>regex04</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>regex05</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>regex06</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+		</flex>
 	</transition>
 	<place>
 		<id>p1</id>
 		<x>180</x>
 		<y>100</y>
 		<tokens>1</tokens>
-		<static>false</static>
 	</place>
 	<place>
 		<id>p2</id>
 		<x>340</x>
 		<y>100</y>
 		<tokens>0</tokens>
-		<static>false</static>
 	</place>
 	<arc>
 		<id>a1</id>
@@ -201,4 +182,4 @@
 		<destinationId>p2</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
-</document>
+</process>
