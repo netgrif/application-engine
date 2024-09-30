@@ -34,7 +34,10 @@
         <title/>
         <validations>
             <validation>
-                <name>maxlength 6</name>
+                <name>maxlength</name>
+                <serverArguments>
+                    <argument>6</argument>
+                </serverArguments>
                 <message>error-text03</message>
             </validation>
         </validations>
@@ -44,7 +47,10 @@
         <title/>
         <validations>
             <validation>
-                <name>minlength 3</name>
+                <name>minlength</name>
+                <serverArguments>
+                    <argument>3</argument>
+                </serverArguments>
                 <message>error-text04</message>
             </validation>
         </validations>
@@ -54,14 +60,51 @@
         <title/>
         <validations>
             <validation>
-                <name>minlength 3</name>
+                <name>minlength</name>
+                <serverArguments>
+                    <argument>3</argument>
+                </serverArguments>
                 <message>error-text05</message>
             </validation>
             <validation>
-                <name>maxlength 6</name>
+                <name>maxlength</name>
+                <serverArguments>
+                    <argument>6</argument>
+                </serverArguments>
                 <message>error-text05</message>
             </validation>
         </validations>
+    </data>
+    <data type="text">
+        <id>text06</id>
+        <title/>
+        <validations>
+            <validation>
+                <name>aaaa</name>
+                <serverArguments>
+                    <argument dynamic="true">number01.rawValue</argument>
+                </serverArguments>
+                <message>error-text06</message>
+            </validation>
+        </validations>
+    </data>
+    <data type="text">
+        <id>text07</id>
+        <title/>
+        <validations>
+            <validation>
+                <name>number01</name>
+                <serverArguments>
+                    <argument dynamic="true">number01.rawValue</argument>
+                </serverArguments>
+                <message>error-text07</message>
+            </validation>
+        </validations>
+    </data>
+    <data type="number">
+        <id>number01</id>
+        <title/>
+        <init>5</init>
     </data>
     <transition>
         <id>t1</id>
@@ -125,6 +168,19 @@
             <item>
                 <dataRef>
                     <id>text05</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>text06</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>

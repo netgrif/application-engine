@@ -94,9 +94,10 @@ class FieldTest {
         assert field.placeholder.defaultValue == "Number field placeholder"
         //TODO: release/8.0.0 validations are ignored
 //        java.lang.NullPointerException: Cannot invoke method get() on null object
-        assert field.validations.get(0).rule == "inrange 0,inf"
-        assert field.validations.get(1).rule == "inrange 0,inf"
-        assert field.validations.get(1).message.defaultValue == "Number field validation message"
+        assert field.validations.get(0).name == "inrange"
+        assert field.validations.get(0).serverArguments.argument.get(0).value == "0"
+        assert field.validations.get(0).serverArguments.argument.get(1).value == "inf"
+        assert field.validations.get(0).message.defaultValue == "Number field validation message"
     }
 
     private void assertTextField() {
@@ -105,9 +106,8 @@ class FieldTest {
         assert field.description.defaultValue == "Text field description"
         assert field.title.defaultValue == "Text"
         assert field.placeholder.defaultValue == "Text field placeholder"
-        assert field.validations.get(0).rule == "email"
-        assert field.validations.get(1).rule == "email"
-        assert field.validations.get(1).message.defaultValue == "Mail validation message"
+        assert field.validations.get(0).name == "email"
+        assert field.validations.get(0).message.defaultValue == "Mail validation message"
     }
 
     private void assertEnumerationField() {
@@ -153,11 +153,14 @@ class FieldTest {
         assert field.description.defaultValue == "Date field description"
         assert field.title.defaultValue == "Date"
         assert field.placeholder.defaultValue == "Date field placeholder"
-        assert field.validations.get(0).rule == "between today,future"
-        assert field.validations.get(1).message.defaultValue == "Date field validation message"
-        assert field.validations.get(1).rule == "between today,future"
-        assert field.validations.get(2).message.defaultValue == "Date field validation message 2"
-        assert field.validations.get(2).rule == "between today,tommorow"
+        assert field.validations.get(0).message.defaultValue == "Date field validation message"
+        assert field.validations.get(0).name == "between"
+        assert field.validations.get(0).serverArguments.argument.get(0).value == "today"
+        assert field.validations.get(0).serverArguments.argument.get(1).value == "future"
+        assert field.validations.get(1).message.defaultValue == "Date field validation message 2"
+        assert field.validations.get(1).name == "between"
+        assert field.validations.get(1).serverArguments.argument.get(0).value == "today"
+        assert field.validations.get(1).serverArguments.argument.get(1).value == "tommorow"
     }
 
     private void assertFileField() {
@@ -217,9 +220,15 @@ class FieldTest {
         assert field.description.defaultValue == "This is I18n text field"
         assert field.placeholder.defaultValue == "Text I18n field"
         assert field.defaultValue.defaultValue == "Default i18n text value"
-        assert field.validations.get(0).rule == "translationRequired sk,en"
+        assert field.validations.get(0).name == "translationRequired"
+        assert field.validations.get(0).serverArguments.argument.get(0).value == "sk"
+        assert field.validations.get(0).serverArguments.argument.get(1).value == "en"
         assert field.validations.get(0).message.defaultValue == "Slovak and English language required"
-        assert field.validations.get(1).rule == "translationOnly sk,en,cz,de"
+        assert field.validations.get(1).name == "translationOnly"
+        assert field.validations.get(1).serverArguments.argument.get(0).value == "sk"
+        assert field.validations.get(1).serverArguments.argument.get(1).value == "en"
+        assert field.validations.get(1).serverArguments.argument.get(2).value == "cz"
+        assert field.validations.get(1).serverArguments.argument.get(3).value == "de"
         assert field.validations.get(1).message.defaultValue == "Only Slovak, English, Czech and German languages allowed"
     }
 }

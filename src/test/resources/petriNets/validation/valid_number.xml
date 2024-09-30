@@ -64,7 +64,11 @@
         <title/>
         <validations>
             <validation>
-                <name>inrange 10,20</name>
+                <name>inrange</name>
+                <serverArguments>
+                    <argument>10</argument>
+                    <argument>20</argument>
+                </serverArguments>
                 <message>error-number06</message>
             </validation>
         </validations>
@@ -79,7 +83,11 @@
                 <message>error-number07-1</message>
             </validation>
             <validation>
-                <name>inrange 1,5</name>
+                <name>inrange</name>
+                <serverArguments>
+                    <argument>inf</argument>
+                    <argument>5</argument>
+                </serverArguments>
                 <message>error-number07-2</message>
             </validation>
         </validations>

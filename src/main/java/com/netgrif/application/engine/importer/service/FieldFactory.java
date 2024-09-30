@@ -49,7 +49,15 @@ public final class FieldFactory {
         if (data.getValidations() != null) {
             List<com.netgrif.application.engine.importer.model.Validation> list = data.getValidations().getValidation();
             for (com.netgrif.application.engine.importer.model.Validation item : list) {
-                field.addValidation(createValidation(item, importer));
+                Arguments clientArguments = null;
+                if (item.getClientArguments() != null) {
+                    clientArguments = new Arguments(item.getClientArguments().getArgument().stream().map(arg -> new Argument(arg.getValue(), arg.isDynamic())).collect(Collectors.toList()));
+                }
+                Arguments serverArguments = null;
+                if (item.getServerArguments() != null) {
+                    serverArguments = new Arguments(item.getServerArguments().getArgument().stream().map(arg -> new Argument(arg.getValue(), arg.isDynamic())).collect(Collectors.toList()));
+                }
+                field.addValidation(new Validation(item.getName(), clientArguments, serverArguments, importer.toI18NString(item.getMessage())));
             }
         }
         if (data.getComponent() != null) {

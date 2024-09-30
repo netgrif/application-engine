@@ -27,7 +27,7 @@
         <title/>
         <init dynamic="true">
             <![CDATA[
-			validation("String", new I18nString("I18nString"))
+			validation("String", null, null, new I18nString("I18nString"))
 			return "value"
 			]]>
         </init>
@@ -45,7 +45,7 @@
             <actions phase="pre">
                 <action id="action_1">
 					<![CDATA[
-                    validation("String", new I18nString("I18nString"))
+                    validation("String", null, null, new I18nString("I18nString"))
                     ]]>
 				</action>
             </actions>

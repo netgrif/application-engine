@@ -52,6 +52,8 @@ class TestHelper {
     private UriRunner uriRunner
     @Autowired
     private IPetriNetService petriNetService
+    @Autowired
+    private ValidationRunner validationRunner
 
     void truncateDbs() {
         template.db.drop()
@@ -74,6 +76,7 @@ class TestHelper {
         filterRunner.run()
         impersonationRunner.run()
         superCreator.run()
+        validationRunner.run()
         finisherRunner.run()
     }
 

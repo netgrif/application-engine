@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 @Data
 @AllArgsConstructor
@@ -14,9 +13,9 @@ public class Validation implements Serializable {
 
     private static final long serialVersionUID = 3287600522204188694L;
 
-    private String name;
-    private ArrayList<Expression<String>> clientArguments;
-    private ArrayList<Expression<String>> serverArguments;
+    protected String name;
+    private Arguments clientArguments;
+    private Arguments serverArguments;
     private I18nString message;
 
     public Validation() {
@@ -26,10 +25,14 @@ public class Validation implements Serializable {
 
     @Override
     public Validation clone() {
-        Validation cloned = new Validation();
+        Validation cloned =  new Validation();
         cloned.setName(name);
-        cloned.getClientArguments().addAll(clientArguments);
-        cloned.getServerArguments().addAll(serverArguments);
+        if (clientArguments != null) {
+            cloned.setClientArguments(clientArguments.clone());
+        }
+        if (serverArguments != null) {
+            cloned.setServerArguments(serverArguments.clone());
+        }
         if (this.message != null) {
             cloned.setMessage(this.message.clone());
         }

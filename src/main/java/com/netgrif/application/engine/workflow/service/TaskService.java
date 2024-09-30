@@ -107,7 +107,7 @@ public class TaskService implements ITaskService {
     protected IHistoryService historyService;
 
     @Autowired
-    protected IValidationService validation;
+    protected IValidationService validationService;
     @Autowired
     private MultiplicityEvaluator multiplicityEvaluator;
 
@@ -268,7 +268,7 @@ public class TaskService implements ITaskService {
 
         log.info("[{}]: Finishing task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), user.getSelfOrImpersonated().getEmail());
 
-        validateData(useCase, task);
+        validationService.validateTransition(useCase, transition);
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreFinishActions(), workflowService.findOne(task.getCaseId()), task, transition, params));
         useCase = workflowService.findOne(task.getCaseId());
         task = findOne(task.getStringId());
@@ -549,29 +549,6 @@ public class TaskService implements ITaskService {
             log.error("execution of task [{}] in case [{}] failed: ", task.getTitle(), useCase.getTitle(), e);
         }
         return outcomes;
-    }
-
-    void validateData(Case useCase, Task task) {
-        useCase.getDataSet().getFields().values().stream().filter(field -> field.getBehaviors().get(task.getTransitionId()) != null).forEach(field -> {
-            DataFieldBehavior behavior = field.getBehaviors().get(task.getTransitionId());
-            if (!field.getValidations().isEmpty()) {
-                validation.valid(field);
-            }
-            if (!behavior.isRequired()) {
-                return;
-            }
-            // TODO: release/8.0.0 check if needed
-//            if (useCase.getDataField(entry.getKey()).isUndefined(transition.getImportId()) && !entry.getValue().isRequired()) {
-//                continue;
-//            }
-            Object value = field.getRawValue();
-            if (value == null) {
-                throw new IllegalArgumentException("Field \"" + field.getTitle() + "\" has null value");
-            }
-            if (value instanceof String && ((String) value).isEmpty()) {
-                throw new IllegalArgumentException("Field \"" + field.getTitle() + "\" has empty value");
-            }
-        });
     }
 
     protected void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase) {

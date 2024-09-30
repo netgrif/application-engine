@@ -27,6 +27,7 @@ class RunnerController {
             MailRunner,
             DemoRunner,
             QuartzSchedulerRunner,
+            ValidationRunner,
             FinisherRunnerSuperCreator,
             FinisherRunner,
     ]

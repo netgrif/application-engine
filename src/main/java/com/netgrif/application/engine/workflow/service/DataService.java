@@ -20,11 +20,8 @@ import com.netgrif.application.engine.petrinet.domain.layout.LayoutContainer;
 import com.netgrif.application.engine.petrinet.domain.layout.LayoutItem;
 import com.netgrif.application.engine.petrinet.domain.layout.LayoutObjectType;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
-import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.application.engine.validations.interfaces.IValidationService;
+import com.netgrif.application.engine.workflow.domain.*;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
@@ -89,7 +86,7 @@ public class DataService implements IDataService {
     protected IPetriNetService petriNetService;
 
     @Autowired
-    protected IValidationService validation;
+    protected IValidationService validationService;
 
     @Value("${nae.image.preview.scaling.px:400}")
     protected int imageScale;
@@ -230,9 +227,8 @@ public class DataService implements IDataService {
             setOutcomeMessage(task, useCase, outcome, fieldId, field, DataEventType.SET);
         }
         useCase.getDataSet().get(fieldId).applyChanges(newDataField);
-        if (validationEnable) {
-            validation.valid(useCase.getDataSet().get(fieldId));
-        }
+        validationService.validateField(useCase, useCase.getDataSet().get(fieldId));
+
         useCase = workflowService.save(useCase);
         outcome.addChangedField(fieldId, newDataField);
         historyService.save(new SetDataEventLog(task, useCase, EventPhase.EXECUTION, DataSet.of(fieldId, newDataField), user));

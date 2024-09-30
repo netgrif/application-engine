@@ -14,7 +14,11 @@
         <title/>
         <validations>
             <validation>
-                <name>between today,future</name>
+                <name>between</name> <!-- od dnes do buducnosti-->
+                <serverArguments>
+                    <argument>today</argument>
+                    <argument>future</argument>
+                </serverArguments>
                 <message>error-date01</message>
             </validation>
         </validations>
@@ -24,7 +28,11 @@
         <title/>
         <validations>
             <validation>
-                <name>between past,today</name>
+                <name>between</name> <!-- od  minulosti do dnešného dňa -->
+                <serverArguments>
+                    <argument>past</argument>
+                    <argument>today</argument>
+                </serverArguments>
                 <message>error-date02</message>
             </validation>
         </validations>
@@ -34,7 +42,11 @@
         <title/>
         <validations>
             <validation>
-                <name>between 2020-03-03,today</name>
+                <name>between</name> <!-- od datumu do dnešného dňa -->
+                <serverArguments>
+                    <argument>2020-03-03</argument>
+                    <argument>today</argument>
+                </serverArguments>
                 <message>error-date03</message>
             </validation>
         </validations>
@@ -44,7 +56,11 @@
         <title/>
         <validations>
             <validation>
-                <name>between past,2020-03-03</name>
+                <name>between</name> <!-- od minulosti do datumu -->
+                <serverArguments>
+                    <argument>past</argument>
+                    <argument>2020-03-03</argument>
+                </serverArguments>
                 <message>error-date04</message>
             </validation>
         </validations>
@@ -54,7 +70,11 @@
         <title/>
         <validations>
             <validation>
-                <name>between 2020-01-01,2022-03-03</name>
+                <name>between</name> <!-- od datumu do datumu -->
+                <serverArguments>
+                    <argument>2020-01-01</argument>
+                    <argument>2022-03-03</argument>
+                </serverArguments>
                 <message>error-date05</message>
             </validation>
         </validations>
@@ -64,7 +84,7 @@
         <title/>
         <validations>
             <validation>
-                <name>workday</name>
+                <name>workday</name> <!-- pracovny den -->
                 <message>error-date06</message>
             </validation>
         </validations>
@@ -74,7 +94,7 @@
         <title/>
         <validations>
             <validation>
-                <name>weekend</name>
+                <name>weekend</name> <!-- vikend -->
                 <message>error-date07</message>
             </validation>
         </validations>
