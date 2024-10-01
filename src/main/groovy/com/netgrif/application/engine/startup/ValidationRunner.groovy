@@ -39,7 +39,8 @@ class ValidationRunner extends AbstractOrderedCommandLineRunner {
         log.info("Starting validation runner")
 
         helper.upsertNet(VALIDATION_FILE_NAME, VALIDATION_PETRI_NET_IDENTIFIER)
-        Predicate predicate = QCase.case$.processIdentifier.eq(VALIDATION_PETRI_NET_IDENTIFIER) & QCase.case$.activePlaces.get(VALIDATION_ACTIVE_PLACE_ID).isNotNull()
+        // TODO: release/8.0.0 only active, .get() does not exist on QMap
+        Predicate predicate = QCase.case$.processIdentifier.eq(VALIDATION_PETRI_NET_IDENTIFIER)
         long numberActiveValidations = caseRepository.count(predicate)
         int pageCount = (int) (numberActiveValidations / PAGE_SIZE) + 1
         pageCount.times { pageNum ->

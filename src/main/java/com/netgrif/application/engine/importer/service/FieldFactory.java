@@ -7,6 +7,7 @@ import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.service.builder.FieldBuilder;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Component;
+import com.netgrif.application.engine.petrinet.domain.dataset.Arguments;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.Validation;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
@@ -47,51 +48,41 @@ public final class FieldFactory {
             field.setPlaceholder(importer.toI18NString(data.getPlaceholder()));
         }
         if (data.getValidations() != null) {
-            List<com.netgrif.application.engine.importer.model.Validation> list = data.getValidations().getValidation();
-            for (com.netgrif.application.engine.importer.model.Validation item : list) {
-                Arguments clientArguments = null;
-                if (item.getClientArguments() != null) {
-                    clientArguments = new Arguments(item.getClientArguments().getArgument().stream().map(arg -> new Argument(arg.getValue(), arg.isDynamic())).collect(Collectors.toList()));
-                }
-                Arguments serverArguments = null;
-                if (item.getServerArguments() != null) {
-                    serverArguments = new Arguments(item.getServerArguments().getArgument().stream().map(arg -> new Argument(arg.getValue(), arg.isDynamic())).collect(Collectors.toList()));
-                }
-                field.addValidation(new Validation(item.getName(), clientArguments, serverArguments, importer.toI18NString(item.getMessage())));
-            }
+            createValidation(data, importer, field);
         }
         if (data.getComponent() != null) {
             Component component = importer.createComponent(data.getComponent());
             field.setComponent(component);
         }
-//
         setEncryption(field, data);
 //        dataValidator.checkDeprecatedAttributes(data);
         return field;
     }
 
-    private Validation createValidation(com.netgrif.application.engine.importer.model.Validation item, Importer importer) {
-        Validation validation = new Validation();
-        validation.setName(item.getName());
-        validation.setMessage(importer.toI18NString(item.getMessage()));
-        if (item.getClientArguments() != null) {
-            for (Argument argument : item.getClientArguments().getArgument()) {
-                validation.getClientArguments().add(createArgument(argument.getValue(), argument.isDynamic()));
+    private void createValidation(Data data, Importer importer, Field<?> field) {
+        for (com.netgrif.application.engine.importer.model.Validation item : data.getValidations().getValidation()) {
+            Arguments clientArguments = new Arguments();
+            if (item.getClientArguments() != null) {
+                this.createArguments(item.getServerArguments().getArgument(), clientArguments);
             }
-        }
-        if (item.getServerArguments() != null) {
-            for (Argument argument : item.getServerArguments().getArgument()) {
-                validation.getServerArguments().add(createArgument(argument.getValue(), argument.isDynamic()));
+            Arguments serverArguments = new Arguments();
+            if (item.getServerArguments() != null) {
+                this.createArguments(item.getServerArguments().getArgument(), serverArguments);
             }
+            field.addValidation(new Validation(item.getName(), clientArguments, serverArguments, importer.toI18NString(item.getMessage())));
         }
-        return validation;
     }
 
-    private Expression<String> createArgument(String value, Boolean dynamic) {
-        if (dynamic != null && dynamic) {
-            return Expression.ofDynamic(value);
+    private void createArguments(List<Argument> importedArguments, Arguments arguments) {
+        for (Argument importedArgument : importedArguments) {
+            Expression<String> argument;
+            if (importedArgument.isDynamic() != null && importedArgument.isDynamic()) {
+                argument = Expression.ofDynamic(importedArgument.getValue());
+            } else {
+                argument = Expression.ofStatic(importedArgument.getValue());
+            }
+            arguments.addArgument(argument);
         }
-        return Expression.ofStatic(value);
     }
 
     private void setEncryption(Field<?> field, Data data) {

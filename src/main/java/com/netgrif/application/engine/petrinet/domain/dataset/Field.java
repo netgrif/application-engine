@@ -85,9 +85,7 @@ public abstract class Field<T> extends Imported {
     private Map<String, String> properties;
 
     public Field() {
-        this.validations = new LinkedList<>();
-        this.events = new LinkedHashMap<>();
-        this.properties = new HashMap<>();
+        // TODO: release/8.0.0 no collection can be initialised
     }
 
     public String getStringId() {

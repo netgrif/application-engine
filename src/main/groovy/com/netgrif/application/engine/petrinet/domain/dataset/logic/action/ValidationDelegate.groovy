@@ -21,21 +21,25 @@ class ValidationDelegate {
     public static final String EMAIL_REGEX = '^[a-zA-Z0-9\\._\\%\\+\\-]+@[a-zA-Z0-9\\.\\-]+\\.[a-zA-Z]{2,}$'
 
     // todo NAE-1788: thisField keyword
-    Field<?> thisField
+    Field<?> field
 
-    Boolean notempty() { return thisField.rawValue != null }
+    Boolean isNotEmpty() {
+        return field.rawValue != null
+    }
 
     // boolean field validations
-    Boolean requiredtrue() { return thisField instanceof BooleanField && notempty() && thisField.rawValue == true }
+    Boolean requiredTrue() {
+        return field instanceof BooleanField && isNotEmpty() && field.rawValue == true
+    }
 
     // date field validations
     Boolean between(def from, def to) {
-        if (!(thisField instanceof DateField || thisField instanceof DateTimeField)) {
+        if (!(field instanceof DateField || field instanceof DateTimeField) || !isNotEmpty()) {
             return false
         }
 
-        LocalDateTime updateDate_TODAY = thisField instanceof DateField ? LocalDate.now().atStartOfDay() : LocalDateTime.now()
-        LocalDateTime thisFieldValue = thisField.rawValue instanceof LocalDateTime ? thisField.rawValue : thisField.rawValue.atStartOfDay()
+        LocalDateTime updateDate_TODAY = field instanceof DateField ? LocalDate.now().atStartOfDay() : LocalDateTime.now()
+        LocalDateTime thisFieldValue = field.rawValue instanceof LocalDateTime ? field.rawValue : (field.rawValue as LocalDate).atStartOfDay()
 
         def fromDate = from
         if (from instanceof String) {
@@ -81,10 +85,13 @@ class ValidationDelegate {
         return true
     }
 
-    Boolean workday() { return (thisField instanceof DateField || thisField instanceof DateTimeField) && notempty() && !thisField.rawValue.dayOfWeek.isWeekend() }
+    Boolean workday() {
+        return (field instanceof DateField || field instanceof DateTimeField) && isNotEmpty() && !field.rawValue.dayOfWeek.isWeekend()
+    }
 
-
-    Boolean weekend() { return (thisField instanceof DateField || thisField instanceof DateTimeField) && notempty() && thisField.rawValue.dayOfWeek.isWeekend() }
+    Boolean weekend() {
+        return (field instanceof DateField || field instanceof DateTimeField) && isNotEmpty() && field.rawValue.dayOfWeek.isWeekend()
+    }
 
     protected static LocalDate parseStringToLocalDate(String stringDate) {
         if (stringDate == null) {
@@ -109,37 +116,52 @@ class ValidationDelegate {
     }
 
     // number field validations
-    Boolean odd() { return thisField instanceof NumberField && notempty() && thisField.rawValue as Double % 2 != 0 }
+    Boolean odd() {
+        return field instanceof NumberField && isNotEmpty() && field.rawValue as Double % 2 != 0
+    }
 
-    Boolean even() { return thisField instanceof NumberField && notempty() && thisField.rawValue as Double % 2 == 0 }
+    Boolean even() {
+        return field instanceof NumberField && isNotEmpty() && field.rawValue as Double % 2 == 0
+    }
 
-    Boolean positive() { return thisField instanceof NumberField && notempty() && thisField.rawValue >= 0 }
+    Boolean positive() {
+        return field instanceof NumberField && isNotEmpty() && field.rawValue >= 0
+    }
 
-    Boolean negative() { return thisField instanceof NumberField && notempty() && thisField.rawValue <= 0 }
+    Boolean negative() {
+        return field instanceof NumberField && isNotEmpty() && field.rawValue <= 0
+    }
 
-    Boolean decimal() { return thisField instanceof NumberField && notempty() && thisField.rawValue as Double % 1 == 0 }
+    Boolean decimal() {
+        return field instanceof NumberField && isNotEmpty() && field.rawValue as Double % 1 == 0
+    }
 
     Boolean inrange(def from, def to) {
-
         if (from instanceof String && from.toLowerCase() == INF) {
             from = Double.MIN_VALUE
         }
-
         if (to instanceof String && to.toLowerCase() == INF) {
             to = Double.MAX_VALUE
         }
-        return thisField instanceof NumberField && notempty() && thisField.rawValue >= from as Double && thisField.rawValue <= to as Double
+        return field instanceof NumberField && isNotEmpty() && field.rawValue >= from as Double && field.rawValue <= to as Double
     }
 
     // text field validations
-    Boolean regex(String pattern) { return thisField instanceof TextField && notempty() && thisField.rawValue ==~ pattern }
+    Boolean regex(String pattern) {
+        return field instanceof TextField && isNotEmpty() && field.rawValue ==~ pattern
+    }
 
-    Boolean minlength(Integer minLength) { return thisField instanceof TextField && notempty() && (thisField.rawValue as String).length() >= minLength }
+    Boolean minlength(Integer minLength) {
+        return field instanceof TextField && isNotEmpty() && (field.rawValue as String).length() >= minLength
+    }
 
-    Boolean maxlength(Integer maxLength) { return thisField instanceof TextField && notempty() && (thisField.rawValue as String).length() <= maxLength }
+    Boolean maxlength(Integer maxLength) {
+        return field instanceof TextField && isNotEmpty() && (field.rawValue as String).length() <= maxLength
+    }
 
     Boolean telnumber() { return regex(TEL_NUMBER_REGEX) }
 
-    Boolean email() { return regex(EMAIL_REGEX) }
-
+    Boolean email() {
+        return regex(EMAIL_REGEX)
+    }
 }

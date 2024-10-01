@@ -23,7 +23,8 @@ abstract class ValidationExecutioner {
     @Autowired
     private IGroovyShellFactory shellFactory
 
-    void execute(Case useCase, Field<?> field, List<Validation> validations) {
+    void execute(Case useCase, Field<?> field) {
+        List<Validation> validations = field.getValidations()
         if (!validations) {
             return
         }
@@ -31,16 +32,13 @@ abstract class ValidationExecutioner {
         log.info("Validations: ${validations.collect { it.name }}")
 
         ValidationDelegate delegate = initDelegate(useCase, field, validations.collect { it.name })
+        // TODO: release/8.0.0 required fields, null raw value
         validations.each { validation ->
-            runValidation(field, validation, delegate)
+            runValidation(validation, delegate)
         }
     }
 
-    protected void runValidation(Field<?> field, Validation validation, ValidationDelegate delegate) {
-        if (field.rawValue == null) {
-            return
-        }
-
+    protected void runValidation(Validation validation, ValidationDelegate delegate) {
         Closure<Boolean> code = initCode(validation, delegate)
         if (!code()) {
             throw new IllegalArgumentException(validation.message.toString())
@@ -51,7 +49,7 @@ abstract class ValidationExecutioner {
         return this.registry.getValidation(validationName)
     }
 
-    protected static String escapeSpecialCharacters(String s){
+    protected static String escapeSpecialCharacters(String s) {
         return s.replace('\\', '\\\\')
                 .replace('\'', '\\\'')
     }
@@ -59,7 +57,7 @@ abstract class ValidationExecutioner {
     protected Closure<Boolean> initCode(Validation validation, ValidationDelegate delegate) {
         List<String> argumentList = []
         if (validation.serverArguments != null) {
-            argumentList = validation.serverArguments.argument.collect { it.isDynamic ? it.value : "'${escapeSpecialCharacters(it.value)}'" }
+            argumentList = validation.serverArguments.argument.collect { it.isDynamic() ? it.definition : "'${escapeSpecialCharacters(it.defaultValue)}'" }
         }
         String validationCall = "${validation.name}(${argumentList.join(", ")})"
         Closure<Boolean> code = this.shellFactory.getGroovyShell().evaluate("{ -> return " + validationCall + " }") as Closure<Boolean>
@@ -78,7 +76,7 @@ abstract class ValidationExecutioner {
             delegate.metaClass."$validationName" = getValidationCode(validationName)
         }
 
-        delegate.thisField = thisField
+        delegate.field = thisField
         return delegate
     }
 

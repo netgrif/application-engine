@@ -35,7 +35,7 @@ class NumberFieldValidationTest {
     @Test
     void odd() {
         ValidationDelegate delegate = getValidationDelegate()
-        delegate.thisField = new NumberField(rawValue: 5)
+        delegate.field = new NumberField(rawValue: 5)
 
         assert delegate.odd()
     }
@@ -43,7 +43,7 @@ class NumberFieldValidationTest {
     @Test
     void odd_fail() {
         ValidationDelegate delegate = getValidationDelegate()
-        delegate.thisField = new NumberField(rawValue: 4)
+        delegate.field = new NumberField(rawValue: 4)
 
         assert !delegate.odd()
     }
@@ -51,7 +51,7 @@ class NumberFieldValidationTest {
     @Test
     void even() {
         ValidationDelegate delegate = getValidationDelegate()
-        delegate.thisField = new NumberField(rawValue: 4)
+        delegate.field = new NumberField(rawValue: 4)
 
         assert delegate.even()
     }
@@ -59,7 +59,7 @@ class NumberFieldValidationTest {
     @Test
     void even_fail() {
         ValidationDelegate delegate = getValidationDelegate()
-        delegate.thisField = new NumberField(rawValue: 5)
+        delegate.field = new NumberField(rawValue: 5)
 
         assert !delegate.even()
     }
@@ -67,7 +67,7 @@ class NumberFieldValidationTest {
     @Test
     void positive() {
         ValidationDelegate delegate = getValidationDelegate()
-        delegate.thisField = new NumberField(rawValue: 4)
+        delegate.field = new NumberField(rawValue: 4)
 
         assert delegate.positive()
     }
@@ -75,7 +75,7 @@ class NumberFieldValidationTest {
     @Test
     void positive_fail() {
         ValidationDelegate delegate = getValidationDelegate()
-        delegate.thisField = new NumberField(rawValue: -4)
+        delegate.field = new NumberField(rawValue: -4)
 
         assert !delegate.positive()
     }
@@ -83,7 +83,7 @@ class NumberFieldValidationTest {
     @Test
     void negative() {
         ValidationDelegate delegate = getValidationDelegate()
-        delegate.thisField = new NumberField(rawValue: -4)
+        delegate.field = new NumberField(rawValue: -4)
 
         assert delegate.negative()
     }
@@ -91,7 +91,7 @@ class NumberFieldValidationTest {
     @Test
     void negative_fail() {
         ValidationDelegate delegate = getValidationDelegate()
-        delegate.thisField = new NumberField(rawValue: 4)
+        delegate.field = new NumberField(rawValue: 4)
 
         assert !delegate.negative()
     }
@@ -99,7 +99,7 @@ class NumberFieldValidationTest {
     @Test
     void decimal() {
         ValidationDelegate delegate = getValidationDelegate()
-        delegate.thisField = new NumberField(rawValue: 4)
+        delegate.field = new NumberField(rawValue: 4)
 
         assert delegate.decimal()
     }
@@ -107,7 +107,7 @@ class NumberFieldValidationTest {
     @Test
     void decimal_fail() {
         ValidationDelegate delegate = getValidationDelegate()
-        delegate.thisField = new NumberField(rawValue: 4.1)
+        delegate.field = new NumberField(rawValue: 4.1)
 
         assert !delegate.decimal()
     }
@@ -115,7 +115,7 @@ class NumberFieldValidationTest {
     @Test
     void inrange() {
         ValidationDelegate delegate = getValidationDelegate()
-        delegate.thisField = new NumberField(rawValue: 7)
+        delegate.field = new NumberField(rawValue: 7)
 
         assert delegate.inrange(5, 10)
 
@@ -131,7 +131,7 @@ class NumberFieldValidationTest {
     @Test
     void inrange_fail() {
         ValidationDelegate delegate = getValidationDelegate()
-        delegate.thisField = new NumberField(rawValue: 7)
+        delegate.field = new NumberField(rawValue: 7)
 
         assertThrows(NumberFormatException.class, { !delegate.inrange('totok', INF) })
     }

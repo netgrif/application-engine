@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 @Data
 @AllArgsConstructor
@@ -19,8 +20,8 @@ public class Validation implements Serializable {
     private I18nString message;
 
     public Validation() {
-        this.clientArguments = new ArrayList<>();
-        this.serverArguments = new ArrayList<>();
+        this.clientArguments = new Arguments();
+        this.serverArguments = new Arguments();
     }
 
     @Override

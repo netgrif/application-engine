@@ -6,6 +6,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ValidationExecutioner;
 import com.netgrif.application.engine.validations.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import groovy.lang.Closure;
 import lombok.extern.slf4j.Slf4j;
 import org.codehaus.groovy.control.CompilationFailedException;
@@ -17,9 +18,7 @@ import org.springframework.stereotype.Service;
 public class ValidationService implements IValidationService {
 
     private final ValidationRegistry validationRegistry;
-
     private final ValidationExecutioner validationExecutioner;
-
     private final IGroovyShellFactory shellFactory;
 
     @Autowired
@@ -32,15 +31,17 @@ public class ValidationService implements IValidationService {
     @Override
     public void validateTransition(Case useCase, Transition transition) {
         transition.getDataSet().keySet().forEach(fieldId -> {
-            if (useCase.getDataSet().get(fieldId) != null) {
-                validationExecutioner.execute(useCase, useCase.getDataSet().get(fieldId), useCase.getDataSet().get(fieldId).getValidations());
+            Field<?> field = useCase.getDataSet().get(fieldId);
+            if (null == field || isNullAndOptional(field, transition.getImportId())) {
+                return;
             }
+            validationExecutioner.execute(useCase, field);
         });
     }
 
     @Override
     public void validateField(Case useCase, Field<?> field) {
-        validationExecutioner.execute(useCase, field, field.getValidations());
+        validationExecutioner.execute(useCase, field);
     }
 
     @Override
@@ -65,5 +66,13 @@ public class ValidationService implements IValidationService {
     @Override
     public void clearValidations() {
         validationRegistry.removeAllValidations();
+    }
+
+    private boolean isNullAndOptional(Field<?> field, String transitionId) {
+        DataFieldBehavior behavior = field.getBehaviors().get(transitionId);
+        if (behavior == null) {
+            return true;
+        }
+        return !behavior.isRequired() && field.getRawValue() == null;
     }
 }

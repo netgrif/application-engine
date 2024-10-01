@@ -31,7 +31,7 @@ import com.netgrif.application.engine.rules.domain.facts.TransitionEventFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
+import com.netgrif.application.engine.validations.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.*;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
@@ -108,6 +108,7 @@ public class TaskService implements ITaskService {
 
     @Autowired
     protected IValidationService validationService;
+
     @Autowired
     private MultiplicityEvaluator multiplicityEvaluator;
 
@@ -277,8 +278,6 @@ public class TaskService implements ITaskService {
 
         finishExecution(transition, useCase.getStringId());
         task.setLastFinished(LocalDateTime.now());
-//        TODO: release/8.0.0
-//        task.setFinishedBy(task.getUserId());
         task.setAssigneeId(null);
         save(task);
         reloadTasks(workflowService.findOne(task.getCaseId()));

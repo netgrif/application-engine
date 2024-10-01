@@ -32,31 +32,31 @@ class BooleanFieldValidationTest {
     @Test
     void requiredTrue() {
         ValidationDelegate delegate = getValidationDelegate()
-        delegate.thisField = new BooleanField(rawValue: true)
+        delegate.field = new BooleanField(rawValue: true)
 
-        assert delegate.requiredtrue()
+        assert delegate.requiredTrue()
     }
     @Test
     void requiredTrue_fail() {
         ValidationDelegate delegate = getValidationDelegate()
-        delegate.thisField = new BooleanField(rawValue: false)
+        delegate.field = new BooleanField(rawValue: false)
 
-        assert !delegate.requiredtrue()
+        assert !delegate.requiredTrue()
     }
 
     @Test
     void notempty() {
         ValidationDelegate delegate = getValidationDelegate()
-        delegate.thisField = new BooleanField(rawValue: true)
+        delegate.field = new BooleanField(rawValue: true)
 
-        assert delegate.notempty()
+        assert delegate.isNotEmpty()
     }
 
     @Test
     void notempty_fail() {
         ValidationDelegate delegate = getValidationDelegate()
-        delegate.thisField = new BooleanField(rawValue: null)
+        delegate.field = new BooleanField(rawValue: null)
 
-        assert !delegate.notempty()
+        assert !delegate.isNotEmpty()
     }
 }

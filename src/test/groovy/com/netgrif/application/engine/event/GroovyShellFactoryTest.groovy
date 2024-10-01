@@ -10,6 +10,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleSe
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -74,7 +75,7 @@ class GroovyShellFactoryTest extends EngineTest {
     }
 
     @Autowired
-    GroovyShellFactoryTest(ImportHelper importHelper, WebApplicationContext wac, TestHelper testHelper, ITaskService taskService, IProcessRoleService roleService, IUserService userService) {
-        super(importHelper, wac, testHelper, taskService, roleService, userService)
+    GroovyShellFactoryTest(ImportHelper importHelper, WebApplicationContext wac, TestHelper testHelper, ITaskService taskService, IProcessRoleService roleService, IUserService userService, IWorkflowService workflowService) {
+        super(importHelper, wac, testHelper, taskService, roleService, userService, workflowService)
     }
 }

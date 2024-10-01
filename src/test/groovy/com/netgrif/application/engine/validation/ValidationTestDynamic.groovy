@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.validation
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField
@@ -63,14 +63,14 @@ class ValidationTestDynamic {
         validationService.clearValidations()
     }
 
-    private PetriNet importTextNet() {
-        PetriNet testNet = importHelper.createNet("validation/valid_text.xml", VersionType.MAJOR).get()
+    private Process importTextNet() {
+        Process testNet = importHelper.createNet("validation/valid_text.xml", VersionType.MAJOR).get()
         assert testNet != null
         return testNet
     }
 
     private Case createValidation(String name, String validationDefinitionGroovy, Boolean active = true) {
-        PetriNet net = petriNetService.getNewestVersionByIdentifier(VALIDATION_PETRI_NET_IDENTIFIER)
+        Process net = petriNetService.getNewestVersionByIdentifier(VALIDATION_PETRI_NET_IDENTIFIER)
 
         Case validationCase = importHelper.createCase("Validation ${name}", net)
         assert validationCase != null
@@ -104,10 +104,9 @@ class ValidationTestDynamic {
 
     @Test
     void textDynamic_validation() {
-
         createValidation("aaaa", "a -> thisField.rawValue.size() == a as Integer", true)
 
-        PetriNet testNet = importTextNet()
+        Process testNet = importTextNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -119,10 +118,9 @@ class ValidationTestDynamic {
 
     @Test
     void textDynamic_validation_fail() {
-
         createValidation("aaaa", "a -> thisField.rawValue.size() == a as Integer", true)
 
-        PetriNet testNet = importTextNet()
+        Process testNet = importTextNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -139,10 +137,9 @@ class ValidationTestDynamic {
 
     @Test
     void textDynamic_validation_conflictWithFieldName() {
-
         createValidation("number01", "a -> thisField.rawValue.size() == a as Integer", true)
 
-        PetriNet testNet = importTextNet()
+        Process testNet = importTextNet()
         Case aCase = importHelper.createCase("TestCase", testNet)
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
@@ -180,7 +177,7 @@ class ValidationTestDynamic {
 
     @Test
     void dynamicValidation_process_behaviors() {
-        PetriNet net = petriNetService.getNewestVersionByIdentifier(VALIDATION_PETRI_NET_IDENTIFIER)
+        Process net = petriNetService.getNewestVersionByIdentifier(VALIDATION_PETRI_NET_IDENTIFIER)
 
         Case validationCase = importHelper.createCase("Validation test", net)
         assert validationCase != null
@@ -275,7 +272,7 @@ class ValidationTestDynamic {
 
     @Test
     void dynamicValidation_process_create() {
-        PetriNet net = petriNetService.getNewestVersionByIdentifier(VALIDATION_PETRI_NET_IDENTIFIER)
+        Process net = petriNetService.getNewestVersionByIdentifier(VALIDATION_PETRI_NET_IDENTIFIER)
 
         Case validationCase = importHelper.createCase("Validation test", net)
         assert validationCase != null

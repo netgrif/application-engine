@@ -14,6 +14,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -1038,7 +1039,7 @@ class ValidationTest extends EngineTest {
     }
 
     @Autowired
-    ValidationTest(ImportHelper importHelper, WebApplicationContext wac, TestHelper testHelper, ITaskService taskService, IProcessRoleService roleService, IUserService userService) {
-        super(importHelper, wac, testHelper, taskService, roleService, userService)
+    ValidationTest(ImportHelper importHelper, WebApplicationContext wac, TestHelper testHelper, ITaskService taskService, IProcessRoleService roleService, IUserService userService, IWorkflowService workflowService) {
+        super(importHelper, wac, testHelper, taskService, roleService, userService, workflowService)
     }
 }
