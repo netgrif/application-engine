@@ -7,12 +7,13 @@ import org.springframework.hateoas.CollectionModel;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Setter
 @Getter
-public class DataFieldsResource extends CollectionModel<LocalisedField> implements Serializable {
+public class DataFieldsResource extends CollectionModel<LocalisedField> implements Serializable, Iterable<LocalisedField> {
 
     private static final long serialVersionUID = 73213276016133399L;
 
@@ -23,5 +24,10 @@ public class DataFieldsResource extends CollectionModel<LocalisedField> implemen
         this.content = content.stream()
                 .map(f -> LocalisedFieldFactory.from(f, locale))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Iterator<LocalisedField> iterator() {
+        return this.content.iterator();
     }
 }
