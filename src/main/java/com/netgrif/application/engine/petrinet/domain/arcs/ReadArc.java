@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.arcs;
 
+import com.netgrif.application.engine.petrinet.domain.throwable.IllegalMarkingException;
+
 /**
  * If there is an arc <i>a</i> with a weight <i>w=W(p,t)</i> connecting a place <i>p</i> with a transition <i>t</i>,
  * then <i>t</i> can be enabled in a marking <i>m</i> if the following condition is satisfied:<br>
@@ -25,6 +27,9 @@ public class ReadArc extends PTArc {
      */
     @Override
     public void execute() {
+        if (!this.isExecutable()) {
+            throw new IllegalMarkingException(this.source);
+        }
     }
 
     /**

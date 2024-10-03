@@ -55,11 +55,11 @@ public final class ArcImporter {
     }
 
     private Multiplicity createMultiplicity(Expression multiplicity, Importer importer) {
+        String definition = multiplicity.getValue().trim();
         if (!multiplicity.isDynamic()) {
-            return new Multiplicity(Integer.parseInt(multiplicity.getValue()));
+            return new Multiplicity(Integer.parseInt(definition));
         }
         Process process = importer.getProcess();
-        String definition = multiplicity.getValue();
         if (process.getPlace(definition) != null) {
             return new Multiplicity(definition, ReferenceType.PLACE);
         } else if (process.getField(definition).isPresent()) {

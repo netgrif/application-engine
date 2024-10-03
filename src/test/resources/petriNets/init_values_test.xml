@@ -163,12 +163,11 @@
         <title/>
         <init dynamic="true">["1", "2", "3"]</init>
     </data>
-    <!--TODO: release/8.0.0 after reload tasks-->
-    <!--<data type="taskRef">-->
-    <!--    <id>taskRef_dynamic</id>-->
-    <!--    <title/>-->
-    <!--    <init dynamic="true">useCase.tasks["t0"].taskStringId</init>-->
-    <!--</data>-->
+    <data type="taskRef">
+        <id>taskRef_dynamic</id>
+        <title/>
+        <init dynamic="true">[useCase.tasks["t0"].taskStringId]</init>
+    </data>
     <data type="text">
         <id>text_static</id>
         <title/>

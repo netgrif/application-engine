@@ -31,6 +31,6 @@ public class Multiplicity extends Expression<Integer> {
         if (this.getDefaultValue() != null) {
             return new Multiplicity(this.multiplicity);
         }
-        return new Multiplicity(this.getDefinition());
+        return new Multiplicity(this.getDefinition(), this.referenceType);
     }
 }

@@ -15,10 +15,7 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.ReferenceType;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
+import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
@@ -280,6 +277,7 @@ public class WorkflowService implements IWorkflowService {
         return this.createCase(netId, makeTitle, color, user, new HashMap<>());
     }
 
+    // TODO: release/8.0.0 remove color
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user, Map<String, String> params) {
         LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
         Process petriNet = petriNetService.clone(new ObjectId(netId));
@@ -307,10 +305,7 @@ public class WorkflowService implements IWorkflowService {
         resolveArcsWeight(useCase);
         taskService.reloadTasks(useCase);
         //TODO: release/8.0.0
-//        useCase = findOne(useCase.getStringId());
-        resolveTaskRefs(useCase);
-
-        useCase = findOne(useCase.getStringId());
+        useCase = resolveTaskRefs(useCase, params);
         outcome.addOutcomes(eventService.runActions(petriNet.getPostCreateActions(), useCase, Optional.empty(), params));
         useCase = findOne(useCase.getStringId());
         rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
@@ -445,22 +440,15 @@ public class WorkflowService implements IWorkflowService {
         return options;
     }
 
-    private void resolveTaskRefs(Case useCase) {
+    private Case resolveTaskRefs(Case useCase, Map<String, String> params) {
         // TODO: release/8.0.0
-//        useCase.getPetriNet().getDataSet().values().stream().filter(f -> f instanceof TaskField).map(TaskField.class::cast).forEach(field -> {
-//            if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty() && useCase.getDataSet().get(field.getStringId()).getValue() != null &&
-//                    useCase.getDataSet().get(field.getStringId()).getRawValue().equals(field.getDefaultValue())) {
-//                TaskField taskRef = (TaskField) useCase.getDataSet().get(field.getStringId());
-//                taskRef.setRawValue(new ArrayList<>());
-//                field.getDefaultValue().forEach(transitionId -> {
-//                    if (!useCase.getTasks().containsKey(transitionId)) {
-//                        return;
-//                    }
-//                    taskRef.getRawValue().add(useCase.getTasks().get(transitionId).getTaskStringId());
-//                });
-//            }
-//        });
-        save(useCase);
+        Case finalUseCase = findOne(useCase.getStringId());
+        useCase.getDataSet().getFields().values().stream()
+                .filter(field -> field instanceof TaskField && field.getDefaultValue() != null && field.getDefaultValue().isDynamic())
+                .forEach(field -> {
+                    dataSetInitializer.initializeValue(finalUseCase, field, params);
+                });
+        return save(useCase);
     }
 
     // TODO: release/8.0.0 getData?
@@ -529,7 +517,7 @@ public class WorkflowService implements IWorkflowService {
             if (referenceType == ReferenceType.PLACE) {
                 weight = useCase.getProcess().getPlace(definition).getTokens();
             } else if (referenceType == ReferenceType.DATA_VARIABLE) {
-                weight = (int) useCase.getDataSet().get(definition).getRawValue();
+                weight = ((Number) useCase.getDataSet().get(definition).getRawValue()).intValue();
             } else {
                 // TODO: release/8.0.0 evaluate expression
                 weight = 2;

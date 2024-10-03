@@ -53,7 +53,7 @@ class GroovyShellFactoryTest extends EngineTest {
         def user = userService.findByEmail(userService.getSystem().getEmail())
         def processRoleCount = user.processRoles.size()
         def roles = roleService.findAll(net.getStringId())
-        def roleIds = ["anonymous", "default", "newRole_1"]
+        def roleIds = ["newRole_1"]
         assert roles.size() == roleIds.size()
         roles.each { assert it.importId in roleIds }
         roleService.assignRolesToUser(

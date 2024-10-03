@@ -10,6 +10,7 @@ import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
+import org.junit.Assert
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -56,7 +57,7 @@ class TaskStateTest {
 
         List<Task> tasks = taskService.findAllByCase(useCase.stringId)
         tasks.each { task ->
-            assert (task.title as String) == "N" ? task.state == DISABLED : task.state == ENABLED
+            Assert.assertTrue(task.transitionId, (task.title as String) == "N" ? task.state == DISABLED : task.state == ENABLED)
         }
     }
 
@@ -72,13 +73,13 @@ class TaskStateTest {
         4.times { index ->
             List<Task> tasks = taskService.findAllByCase(useCase.stringId)
             String transitionId = "t${index + 1}"
-            tasks.each { t->
+            tasks.each { t ->
                 assert t.transitionId in [transitionId, allDataConfiguration.allData.id] ? t.state == ENABLED : t.state == DISABLED
             }
-            Task task = tasks.find {it.transitionId == transitionId}
+            Task task = tasks.find { it.transitionId == transitionId }
             taskService.assignTask(task.stringId)
             tasks = taskService.findAllByCase(useCase.stringId)
-            tasks.each { t->
+            tasks.each { t ->
                 assert t.transitionId in [allDataConfiguration.allData.id] ? t.state == ENABLED : t.state == DISABLED
             }
             taskService.finishTask(task.stringId)

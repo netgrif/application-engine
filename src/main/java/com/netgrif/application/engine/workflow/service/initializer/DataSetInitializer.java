@@ -4,6 +4,7 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
+import com.netgrif.application.engine.petrinet.domain.dataset.TaskField;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,9 @@ public class DataSetInitializer {
             if (field.isImmediate()) {
                 useCase.getImmediateDataFields().add(field.getStringId());
                 useCase.getImmediateData().add(useCaseField);
+            }
+            if (useCaseField instanceof TaskField) {
+                return;
             }
             if (useCaseField instanceof ChoiceField) {
                 ChoiceField<?> choiceField = (ChoiceField<?>) useCaseField;

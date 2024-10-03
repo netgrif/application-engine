@@ -49,12 +49,6 @@ class InitValuesTest extends EngineTest {
                 Assert.assertFalse(dynamicId, (dynamicInitField.rawValue as Collection).isEmpty())
             }
         }
-        // caseRef, filter, file, file list, user, user list, stringCollection, taskRef
-
-        // user, user list: allowed roles, no static init
-        // filter: metadata?, allowed nets
-        // file: FileFieldValue.fromString()
-        // fileList: FileListFieldValue.fromString()
     }
 
     @Autowired
