@@ -19,14 +19,10 @@ public class DateTimeFieldBuilder extends FieldBuilder<DateTimeField> {
     public DateTimeField build(Data data, Importer importer) {
         DateTimeField field = new DateTimeField();
         initialize(field);
-        // TODO: release/8.0.0
-//        setDefaultValue(field, data, defaultValueString -> {
-//            if (defaultValueString == null) {
-//                return;
-//            }
-//            Optional<LocalDateTime> defaultValue = DateUtils.parseDateTime(defaultValueString);
-//            field.setDefaultValue(defaultValue.orElse(null));
-//        });
+        setDefaultValue(field, data, s -> {
+            Optional<LocalDateTime> localDateTime = DateUtils.parseDateTime(s);
+            return localDateTime.orElse(null);
+        });
         return field;
     }
 

@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
+import com.netgrif.application.engine.auth.domain.LoggedUser
+import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap
 import com.netgrif.application.engine.event.IGroovyShellFactory
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
@@ -24,6 +26,9 @@ abstract class ExpressionRunner {
     @Autowired
     private IGroovyShellFactory shellFactory
 
+    @Autowired
+    private IUserService userService
+
     private Map<String, Closure> cache
 
     @Autowired
@@ -31,15 +36,14 @@ abstract class ExpressionRunner {
         cache = new MaxSizeHashMap<>(cacheSize)
     }
 
-    // TODO: release/8.0.0 fields? Map<String, String> fields
-    def run(Case useCase, Expression expression, Map<String, String> params = [:]) {
+    def run(Expression expression, Case useCase, Field<?> field = null, Map<String, String> params = [:]) {
         log.debug("Expression: $expression")
         def code = getExpressionCode(expression)
         try {
-            initCode(code.delegate, useCase, params)
+            initCode(code.delegate, useCase, field, params)
             code()
         } catch (Exception e) {
-            log.error("Action: $expression.definition")
+            log.error("Expression evaluation failed: $expression.definition")
             throw e
         }
     }
@@ -55,11 +59,15 @@ abstract class ExpressionRunner {
         return code.rehydrate(getExpressionDelegate(), code.owner, code.thisObject)
     }
 
-    protected void initCode(def delegate, Case useCase, Map<String, String> params) {
+    protected void initCode(def delegate, Case useCase, Field<?> field, Map<String, String> params) {
         delegate.metaClass.useCase = useCase
         delegate.metaClass.params = params
-        useCase.dataSet.fields.values().forEach { Field<?> field ->
-            delegate.metaClass."$field.importId" = field
+        delegate.metaClass.field = field
+        // TODO: release/8.0.0
+        delegate.metaClass.loggedUser = userService.loggedOrSystem.transformToLoggedUser()
+        delegate.metaClass.systemUser = userService.system.transformToLoggedUser()
+        useCase.dataSet.fields.values().forEach { Field<?> f ->
+            delegate.metaClass."$f.importId" = f
         }
     }
 }

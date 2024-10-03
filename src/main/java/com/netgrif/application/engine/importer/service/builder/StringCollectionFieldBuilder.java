@@ -12,12 +12,9 @@ public class StringCollectionFieldBuilder extends FieldBuilder<StringCollectionF
     @Override
     public StringCollectionField build(Data data, Importer importer) {
         StringCollectionField field = new StringCollectionField();
-        // TODO: release/8.0.0 fix
-//        setDefaultValues(field, data, defaultValues -> {
-//            if (defaultValues != null) {
-//                field.setDefaultValue(defaultValues);
-//            }
-//        });
+        initialize(field);
+        // TODO: release/8.0.0
+        setDefaultValue(field, data);
         return field;
     }
 

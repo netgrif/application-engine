@@ -1,0 +1,199 @@
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>init_values_test</id>
+    <version>1.0.0</version>
+    <title>Init values test</title>
+    <icon>device_hub</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>true</anonymousRole>
+    <data type="boolean">
+        <id>boolean_static</id>
+        <title/>
+        <init>true</init>
+    </data>
+    <data type="boolean">
+        <id>boolean_dynamic</id>
+        <title/>
+        <init dynamic="true">2 == 2</init>
+    </data>
+    <data type="button">
+        <id>button_static</id>
+        <title/>
+        <init>7</init>
+    </data>
+    <data type="button">
+        <id>button_dynamic</id>
+        <title/>
+        <init dynamic="true">5 + 2</init>
+    </data>
+    <data type="caseRef">
+        <id>caseRef_dynamic</id>
+        <title/>
+        <init dynamic="true">[useCase.stringId]</init>
+    </data>
+    <data type="date">
+        <id>date_static</id>
+        <title/>
+        <init>2024-09-30</init>
+    </data>
+    <data type="date">
+        <id>date_dynamic</id>
+        <title/>
+        <init dynamic="true">LocalDate.of(2024,9,30)</init>
+    </data>
+    <data type="dateTime">
+        <id>dateTime_static</id>
+        <title/>
+        <init>2024-09-30T12:00:00.000Z</init>
+    </data>
+    <data type="dateTime">
+        <id>dateTime_dynamic</id>
+        <title/>
+        <init dynamic="true">LocalDateTime.of(2024,9,30,12,0)</init>
+    </data>
+    <data type="enumeration">
+        <id>enumeration_static</id>
+        <title/>
+        <options>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+        </options>
+        <init>1</init>
+    </data>
+    <data type="enumeration">
+        <id>enumeration_dynamic</id>
+        <title/>
+        <options>
+            <init>["1", "2", "3"]</init>
+        </options>
+        <init dynamic="true">field.choices.first()</init>
+    </data>
+    <data type="enumeration_map">
+        <id>enumeration_map_static</id>
+        <title/>
+        <options>
+            <option key="1">1</option>
+            <option key="2">2</option>
+            <option key="3">3</option>
+        </options>
+        <init>1</init>
+    </data>
+    <data type="enumeration_map">
+        <id>enumeration_map_dynamic</id>
+        <title/>
+        <options>
+            <init>["1":"1", "2":"2", "3":"3"]</init>
+        </options>
+        <init dynamic="true">field.options.keySet().toSorted().first()</init>
+    </data>
+    <data type="file">
+        <id>file_dynamic</id>
+        <title/>
+        <init dynamic="true">FileFieldValue.fromString("pom.xml")</init>
+    </data>
+    <data type="fileList">
+        <id>fileList_dynamic</id>
+        <title/>
+        <init dynamic="true">FileListFieldValue.fromString("pom.xml")</init>
+    </data>
+    <data type="filter">
+        <id>filter_dynamic</id>
+        <title/>
+        <init dynamic="true">findCase{it.id.isNotNull()}.stringId</init>
+    </data>
+    <data type="i18n">
+        <id>i18n_static</id>
+        <title/>
+        <init>I18n</init>
+    </data>
+    <data type="i18n">
+        <id>i18n_dynamic</id>
+        <title/>
+        <init dynamic="true">"I18n"</init>
+    </data>
+    <data type="multichoice">
+        <id>multichoice_static</id>
+        <title/>
+        <options>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+        </options>
+        <init>1</init>
+    </data>
+    <data type="multichoice">
+        <id>multichoice_dynamic</id>
+        <title/>
+        <options>
+            <init>["1", "2", "3"]</init>
+        </options>
+        <init dynamic="true">["1"]</init>
+    </data>
+    <data type="multichoice_map">
+        <id>multichoice_map_static</id>
+        <title/>
+        <options>
+            <option key="1">1</option>
+            <option key="2">2</option>
+            <option key="3">3</option>
+        </options>
+        <init>1</init>
+    </data>
+    <data type="multichoice_map">
+        <id>multichoice_map_dynamic</id>
+        <title/>
+        <options>
+            <init>["1":"1", "2":"2", "3":"3"]</init>
+        </options>
+        <init dynamic="true">field.options.keySet().toSorted().first()</init>
+    </data>
+    <data type="number">
+        <id>number_static</id>
+        <title/>
+        <init>7</init>
+    </data>
+    <data type="number">
+        <id>number_dynamic</id>
+        <title/>
+        <init dynamic="true">2 + 5</init>
+    </data>
+    <data type="stringCollection">
+        <id>stringCollection_dynamic</id>
+        <title/>
+        <init dynamic="true">["1", "2", "3"]</init>
+    </data>
+    <!--TODO: release/8.0.0 after reload tasks-->
+    <!--<data type="taskRef">-->
+    <!--    <id>taskRef_dynamic</id>-->
+    <!--    <title/>-->
+    <!--    <init dynamic="true">useCase.tasks["t0"].taskStringId</init>-->
+    <!--</data>-->
+    <data type="text">
+        <id>text_static</id>
+        <title/>
+        <init>text</init>
+    </data>
+    <data type="text">
+        <id>text_dynamic</id>
+        <title/>
+        <init dynamic="true">"text"</init>
+    </data>
+    <data type="user">
+        <id>user_dynamic</id>
+        <title/>
+        <init dynamic="true">new UserFieldValue(userService.findById(loggedUser.id))</init>
+    </data>
+    <data type="userList">
+        <id>userList_dynamic</id>
+        <title/>
+        <init dynamic="true">new UserListFieldValue(new UserFieldValue(userService.findById(loggedUser.id)))</init>
+    </data>
+
+    <transition>
+        <id>t0</id>
+        <x>0</x>
+        <y>0</y>
+        <title>Task ref value</title>
+    </transition>
+</process>

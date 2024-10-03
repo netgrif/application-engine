@@ -8,7 +8,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EnumerationFieldBuilder extends FieldBuilder<EnumerationField> {
+public class EnumerationFieldBuilder extends ChoiceFieldBuilder<EnumerationField, I18nString> {
 
     @Override
     public EnumerationField build(Data data, Importer importer) {
@@ -16,16 +16,8 @@ public class EnumerationFieldBuilder extends FieldBuilder<EnumerationField> {
         initialize(field);
         if (data.getOptions() != null) {
             setFieldOptions(field, data, importer);
-        } else {
-            setFieldChoices(field, data, importer);
         }
-        // TODO: release/8.0.0 double check with NAE-1757 in 6.3.0 and write test, multichoiceFieldBuilder too
-        // TODO: release/8.0.0
-//        setDefaultValue(field, data, init -> {
-//            if (init != null && !init.equals("")) {
-//                field.setDefaultValue(new I18nString(init));
-//            }
-//        });
+        setDefaultValue(field, data, I18nString::new);
         return field;
     }
 

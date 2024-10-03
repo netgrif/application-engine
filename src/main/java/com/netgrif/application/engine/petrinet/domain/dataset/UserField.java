@@ -5,26 +5,19 @@ import com.netgrif.application.engine.importer.model.DataType;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
-import lombok.Getter;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 @Data
-public class UserField extends Field<UserFieldValue> {
-
-    private Set<String> roles;
+public class UserField extends FieldWithAllowedRoles<UserFieldValue> {
 
     public UserField() {
         this(new HashSet<>());
     }
 
     public UserField(Set<String> values) {
-        super();
-        if (values != null) {
-            this.roles = values;
-        }
+        super(values);
     }
 
     @Override
@@ -37,7 +30,6 @@ public class UserField extends Field<UserFieldValue> {
     public UserField clone() {
         UserField clone = new UserField();
         super.clone(clone);
-        clone.roles = this.roles;
         return clone;
     }
 }

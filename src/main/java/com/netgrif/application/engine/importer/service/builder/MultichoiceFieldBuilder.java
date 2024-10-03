@@ -12,7 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
 @Component
-public class MultichoiceFieldBuilder extends FieldBuilder<MultichoiceField> {
+public class MultichoiceFieldBuilder extends ChoiceFieldBuilder<MultichoiceField, LinkedHashSet<I18nString>> {
 
     @Override
     public MultichoiceField build(Data data, Importer importer) {
@@ -20,14 +20,12 @@ public class MultichoiceFieldBuilder extends FieldBuilder<MultichoiceField> {
         initialize(field);
         if (data.getOptions() != null) {
             setFieldOptions(field, data, importer);
-        } else {
-            setFieldChoices(field, data, importer);
         }
-        setDefaultValues(field, data, init -> {
-            if (init != null && !init.isEmpty()) {
-                field.setDefaultValue(Expression.ofStatic(init.stream().map(I18nString::new).collect(LinkedHashSet::new, LinkedHashSet::add, LinkedHashSet::addAll)));
-            }
-        });
+//        setDefaultValue(field, data, init -> {
+//            if (init != null && !init.isEmpty()) {
+//                field.setDefaultValue(Expression.ofStatic(init));
+//            }
+//        });
         return field;
     }
 

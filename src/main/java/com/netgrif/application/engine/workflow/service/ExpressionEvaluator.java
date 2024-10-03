@@ -4,14 +4,17 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ExpressionRunner;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ExpressionRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,12 +25,12 @@ public class ExpressionEvaluator implements IInitValueExpressionEvaluator {
 
     @Override
     public <T> T evaluate(Case useCase, Field<T> defaultField, Map<String, String> params) {
-        return (T) evaluate(useCase, defaultField.getDefaultValue(), params);
+        return (T) runner.run(defaultField.getDefaultValue(), useCase, defaultField, params);
     }
 
     @Override
     public Map<String, I18nString> evaluateOptions(Case useCase, MapOptionsField<I18nString, ?> field, Map<String, String> params) {
-        Object result = evaluate(useCase, field.getExpression(), params);
+        Object result = evaluate(useCase, field.getOptionsExpression(), params);
         if (!(result instanceof Map)) {
             throw new IllegalArgumentException("[" + useCase.getStringId() + "] Dynamic options not an instance of Map: " + field.getImportId());
         }
@@ -61,6 +64,6 @@ public class ExpressionEvaluator implements IInitValueExpressionEvaluator {
 
     @Override
     public Object evaluate(Case useCase, Expression<?> expression, Map<String, String> params) {
-        return runner.run(useCase, expression, params);
+        return runner.run(expression, useCase, null, params);
     }
 }

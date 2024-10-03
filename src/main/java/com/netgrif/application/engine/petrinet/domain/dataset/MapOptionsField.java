@@ -12,15 +12,7 @@ import java.util.Map;
 public abstract class MapOptionsField<T, U> extends Field<U> {
 
     protected Map<String, T> options;
-    protected Expression optionsExpression;
-
-    public Expression getExpression() {
-        return optionsExpression;
-    }
-
-    public void setExpression(Expression choicesExpression) {
-        this.optionsExpression = choicesExpression;
-    }
+    protected Expression<Map<String, T>> optionsExpression;
 
     public boolean isDynamic() {
         return this.optionsExpression != null;

@@ -287,7 +287,7 @@
     <xs:complexType name="option">
         <xs:simpleContent>
             <xs:extension base="i18nStringType">
-                <xs:attribute name="key" type="xs:string" use="required"/>
+                <xs:attribute name="key" type="xs:string"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>

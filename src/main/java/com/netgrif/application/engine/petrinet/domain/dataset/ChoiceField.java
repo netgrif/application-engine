@@ -7,6 +7,7 @@ import lombok.Data;
 import java.util.*;
 
 @Data
+// TODO: release/8.0.0 rename
 public abstract class ChoiceField<T> extends Field<T> {
 
     protected LinkedHashSet<I18nString> choices;
@@ -27,16 +28,16 @@ public abstract class ChoiceField<T> extends Field<T> {
         }
     }
 
-    public ChoiceField(Expression expression) {
+    public ChoiceField(Expression<LinkedHashSet<I18nString>> expression) {
         this();
         this.choicesExpression = expression;
     }
 
-    public Expression getExpression() {
+    public Expression<LinkedHashSet<I18nString>> getExpression() {
         return choicesExpression;
     }
 
-    public void setExpression(Expression choicesExpression) {
+    public void setExpression(Expression<LinkedHashSet<I18nString>> choicesExpression) {
         this.choicesExpression = choicesExpression;
     }
 

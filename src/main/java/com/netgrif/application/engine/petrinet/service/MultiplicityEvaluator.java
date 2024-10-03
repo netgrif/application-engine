@@ -13,7 +13,7 @@ public class MultiplicityEvaluator {
     private ExpressionRunner runner;
 
     public int evaluate(Multiplicity multiplicity, Case useCase) {
-        Object run = runner.run(useCase, multiplicity);
+        Object run = runner.run(multiplicity, useCase);
         if (!(run instanceof Integer)) {
             throw new IllegalStateException("Multiplicity could not be evaluated");
         }

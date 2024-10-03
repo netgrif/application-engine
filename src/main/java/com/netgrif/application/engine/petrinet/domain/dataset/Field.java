@@ -51,6 +51,8 @@ import static com.netgrif.application.engine.petrinet.domain.dataset.logic.Field
         @JsonSubTypes.Type(value = MultichoiceField.class, name = "MULTICHOICE"),
         @JsonSubTypes.Type(value = MultichoiceMapField.class, name = "MULTICHOICE_MAP"),
         @JsonSubTypes.Type(value = NumberField.class, name = "NUMBER"),
+        // TODO: release/8.0.0 check name value
+        @JsonSubTypes.Type(value = StringCollectionField.class, name = "STRINGCOLLECTION"),
         @JsonSubTypes.Type(value = TaskField.class, name = "TASK_REF"),
         @JsonSubTypes.Type(value = TextField.class, name = "TEXT"),
         @JsonSubTypes.Type(value = UserField.class, name = "USER"),

@@ -21,9 +21,6 @@ public class DataSetInitializer {
     }
 
     public void populateDataSet(Case useCase, Map<String, String> params) {
-        ArrayList<Field<?>> dynamicValueFields = new ArrayList<>();
-        ArrayList<ChoiceField<?>> dynamicChoiceFields = new ArrayList<>();
-        ArrayList<MapOptionsField<I18nString, ?>> dynamicOptionFields = new ArrayList<>();
         useCase.getProcess().getDataSet().forEach((fieldId, field) -> {
             Field<?> useCaseField = field.clone();
             useCase.getDataSet().put(fieldId, useCaseField);
@@ -31,34 +28,29 @@ public class DataSetInitializer {
                 useCase.getImmediateDataFields().add(field.getStringId());
                 useCase.getImmediateData().add(useCaseField);
             }
-            // TODO: release/8.0.0
-            if (useCaseField.getDefaultValue() != null) {
-                if (useCaseField.getDefaultValue().isDynamic()) {
-                    dynamicValueFields.add(useCaseField);
-                } else {
-                    useCaseField.applyDefaultValue();
-                }
-            }
             if (useCaseField instanceof ChoiceField) {
                 ChoiceField<?> choiceField = (ChoiceField<?>) useCaseField;
                 if (choiceField.isDynamic()) {
-                    dynamicChoiceFields.add(choiceField);
+                    initializeChoices(useCase, choiceField, params);
                 }
             }
             if (useCaseField instanceof MapOptionsField) {
                 MapOptionsField<I18nString, ?> optionsField = (MapOptionsField<I18nString, ?>) useCaseField;
                 if (optionsField.isDynamic()) {
-                    dynamicOptionFields.add(optionsField);
+                    initializeOptions(useCase, optionsField, params);
+                }
+            }
+            if (useCaseField.getDefaultValue() != null) {
+                if (useCaseField.getDefaultValue().isDynamic()) {
+                    initializeValue(useCase, useCaseField, params);
+                } else {
+                    useCaseField.applyDefaultValue();
                 }
             }
         });
-
-        dynamicChoiceFields.forEach(f -> this.initializeChoices(useCase, f, params));
-        dynamicOptionFields.forEach(f -> this.initializeOptions(useCase, f, params));
-        dynamicValueFields.forEach(f -> this.initializeValue(useCase, f, params));
     }
 
-    public <t> void initializeValue(Case useCase, Field<t> field, Map<String, String> params) {
+    public <T> void initializeValue(Case useCase, Field<T> field, Map<String, String> params) {
         field.setRawValue(initValueExpressionEvaluator.evaluate(useCase, field, params));
     }
 

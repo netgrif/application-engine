@@ -60,7 +60,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
         } else {
             Page<Case> cases = searchConfigs(impersonator.getId(), pageable);
             List<IUser> users = cases.getContent().stream()
-                    .map(c -> ((UserFieldValue) c.getDataSet().get("impersonated").getRawValue()).getId())
+                    .map(c -> (String) c.getDataSet().get("impersonated").getRawValue())
                     .distinct()
                     .map(id -> userService.findById(id))
                     .collect(Collectors.toList());

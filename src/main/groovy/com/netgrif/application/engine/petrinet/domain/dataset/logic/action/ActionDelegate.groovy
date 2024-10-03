@@ -131,9 +131,6 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     UserDetailsServiceImpl userDetailsService
 
     @Autowired
-    IDataValidationExpressionEvaluator dataValidationExpressionEvaluator
-
-    @Autowired
     IInitValueExpressionEvaluator initValueExpressionEvaluator
 
     @Autowired
