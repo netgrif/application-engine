@@ -1,26 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
 	<id>permissions_test_combined_2</id>
-	<initials>PTC</initials>
+	<version>1.0.0</version>
 	<title>Permissions test combined 2</title>
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
-	<!-- TRANSACTIONS -->
-	<!-- ROLES -->
-	<!-- PROCESS ROLE REFS -->
-	<!-- PROCESS USER REFS -->
-	<!-- DATA -->
-	<!-- I18NS -->
-	<!-- TRANSITIONS -->
+	<properties>
+		<property key="initials">PTC</property>
+	</properties>
 	<transition>
 		<id>t1</id>
 		<x>608</x>
 		<y>296</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label></label>
+		<title/>
+		<flex>
+			<id>t1_flex</id>
+		</flex>
 	</transition>
-	<!-- PLACES -->
-	<!-- ARCS -->
-</document>
+</process>

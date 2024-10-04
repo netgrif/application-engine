@@ -1,43 +1,37 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
 	<id>permissions_test_default_11</id>
-	<initials>PTD</initials>
+	<version>1.0.0</version>
 	<title>Permissions test default 11</title>
 	<defaultRole>true</defaultRole>
-	<!-- TRANSACTIONS -->
-	<!-- ROLES -->
-	<!-- PROCESS ROLE REFS -->
-	<!-- PROCESS USER REFS -->
-	<usersRef>
+	<anonymousRole>false</anonymousRole>
+	<properties>
+		<property key="initials">PTD</property>
+	</properties>
+	<userRef>
 		<id>userList</id>
 		<caseLogic>
-			<view>true</view>
 			<delete>true</delete>
+			<view>true</view>
 		</caseLogic>
-	</usersRef>
-	<!-- DATA -->
+	</userRef>
 	<data type="userList">
 		<id>userList</id>
-		<title></title>
+		<title/>
 	</data>
-	<!-- I18NS -->
-	<!-- TRANSITIONS -->
 	<transition>
 		<id>t1</id>
 		<x>608</x>
 		<y>296</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label></label>
-		<usersRef>
+		<title/>
+		<flex>
+			<id>t1_flex</id>
+		</flex>
+		<roleRef>
 			<id>userList</id>
 			<logic>
 				<view>true</view>
-				<delegate>true</delegate>
+				<reassign>true</reassign>
 			</logic>
-		</usersRef>
+		</roleRef>
 	</transition>
-	<!-- PLACES -->
-	<!-- ARCS -->
-</document>
+</process>

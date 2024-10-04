@@ -13,10 +13,7 @@ import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.model.EventType;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.Transition;
-import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
-import com.netgrif.application.engine.petrinet.domain.arcs.ArcOrderComparator;
-import com.netgrif.application.engine.petrinet.domain.arcs.PTArc;
-import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc;
+import com.netgrif.application.engine.petrinet.domain.arcs.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
@@ -362,12 +359,14 @@ public class TaskService implements ITaskService {
     private Task returnTokens(Task task, String useCaseId) {
         Case useCase = workflowService.findOne(useCaseId);
         Process net = useCase.getProcess();
-        net.getArcs().get(task.getTransitionId()).getInput()
-                .forEach(arc -> {
-                    arc.rollbackExecution(useCase.getConsumedTokens().get(arc.getStringId()));
-                    useCase.getConsumedTokens().remove(arc.getStringId());
-                });
-        workflowService.updateMarking(useCase);
+        ArcCollection arcs = net.getArcs().get(task.getTransitionId());
+        if (arcs != null) {
+            arcs.getInput().forEach(arc -> {
+                arc.rollbackExecution(useCase.getConsumedTokens().get(arc.getStringId()));
+                useCase.getConsumedTokens().remove(arc.getStringId());
+            });
+            workflowService.updateMarking(useCase);
+        }
         task.setAssigneeId(null);
         // TODO: NAE-1848 should this be null?
         task.setLastAssigned(null);

@@ -1,57 +1,51 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
 	<id>permissions_test_anonymous_6</id>
-	<initials>PTA</initials>
+	<version>1.0.0</version>
 	<title>Permissions test anonymous 6</title>
+	<defaultRole>false</defaultRole>
 	<anonymousRole>true</anonymousRole>
-	<!-- TRANSACTIONS -->
-	<!-- ROLES -->
+	<properties>
+		<property key="initials">PTA</property>
+	</properties>
+	<roleRef>
+		<id>anonymous</id>
+		<caseLogic>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>netRole</id>
+		<caseLogic>
+			<delete>false</delete>
+			<view>false</view>
+		</caseLogic>
+	</roleRef>
 	<role>
 		<id>netRole</id>
 		<title>Net role</title>
 	</role>
-	<!-- PROCESS ROLE REFS -->
-	<roleRef>
-		<id>anonymous</id>
-		<caseLogic>
-			<view>true</view>
-			<delete>true</delete>
-		</caseLogic>
-	</roleRef>
-	<roleRef>
-		<id>netRole</id>
-		<caseLogic>
-			<view>false</view>
-			<delete>false</delete>
-		</caseLogic>
-	</roleRef>
-	<!-- PROCESS USER REFS -->
-	<!-- DATA -->
-	<!-- I18NS -->
-	<!-- TRANSITIONS -->
 	<transition>
 		<id>t1</id>
 		<x>608</x>
 		<y>296</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label></label>
+		<title/>
+		<flex>
+			<id>t1_flex</id>
+		</flex>
 		<roleRef>
 			<id>anonymous</id>
 			<logic>
 				<view>true</view>
-				<delegate>true</delegate>
+				<reassign>true</reassign>
 			</logic>
 		</roleRef>
 		<roleRef>
 			<id>netRole</id>
 			<logic>
 				<view>false</view>
-				<delegate>false</delegate>
+				<reassign>false</reassign>
 			</logic>
 		</roleRef>
 	</transition>
-	<!-- PLACES -->
-	<!-- ARCS -->
-</document>
+</process>
