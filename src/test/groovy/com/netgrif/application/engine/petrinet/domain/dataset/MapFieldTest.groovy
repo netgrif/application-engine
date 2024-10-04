@@ -64,7 +64,7 @@ class MapFieldTest {
         assert field.options["third"].defaultValue == "Third option"
         assert field.options["third"].getTranslation("sk") == "Tretia možnosť"
         assert field.options["third"].getTranslation("de") == "Dritte Option"
-        assert field.defaultValue == "second"
+        assert field.defaultValue.defaultValue == "second"
     }
 
     @Test
