@@ -283,7 +283,9 @@ public class WorkflowService implements IWorkflowService {
         Process petriNet = petriNetService.clone(new ObjectId(netId));
         int rulesExecuted;
         Case useCase = new Case(petriNet);
+        useCase = taskService.createTasks(useCase);
         dataSetInitializer.populateDataSet(useCase, params);
+        useCase = save(useCase);
         useCase.setAuthor(loggedOrImpersonated.transformToAuthor());
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(makeTitle.apply(useCase));
@@ -305,7 +307,7 @@ public class WorkflowService implements IWorkflowService {
         resolveArcsWeight(useCase);
         taskService.reloadTasks(useCase);
         //TODO: release/8.0.0
-        useCase = resolveTaskRefs(useCase, params);
+        useCase = findOne(useCase.getStringId());
         outcome.addOutcomes(eventService.runActions(petriNet.getPostCreateActions(), useCase, Optional.empty(), params));
         useCase = findOne(useCase.getStringId());
         rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
@@ -444,9 +446,18 @@ public class WorkflowService implements IWorkflowService {
         // TODO: release/8.0.0
         Case finalUseCase = findOne(useCase.getStringId());
         useCase.getDataSet().getFields().values().stream()
-                .filter(field -> field instanceof TaskField && field.getDefaultValue() != null && field.getDefaultValue().isDynamic())
+                .filter(field -> field instanceof TaskField && field.getDefaultValue() != null)
                 .forEach(field -> {
-                    dataSetInitializer.initializeValue(finalUseCase, field, params);
+                    if (field.getDefaultValue().isDynamic()) {
+                        dataSetInitializer.initializeValue(finalUseCase, field, params);
+                    } else {
+                        List<String> defaultValue = ((TaskField) field).getDefaultValue().getDefaultValue();
+                        ((TaskField) field).setRawValue(
+                                defaultValue.stream()
+                                        .map(useCase::getTaskStringId)
+                                        .collect(Collectors.toList())
+                        );
+                    }
                 });
         return save(useCase);
     }

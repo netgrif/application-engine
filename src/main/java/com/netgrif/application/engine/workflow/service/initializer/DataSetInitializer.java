@@ -9,8 +9,9 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class DataSetInitializer {
@@ -29,9 +30,6 @@ public class DataSetInitializer {
                 useCase.getImmediateDataFields().add(field.getStringId());
                 useCase.getImmediateData().add(useCaseField);
             }
-            if (useCaseField instanceof TaskField) {
-                return;
-            }
             if (useCaseField instanceof ChoiceField) {
                 ChoiceField<?> choiceField = (ChoiceField<?>) useCaseField;
                 if (choiceField.isDynamic()) {
@@ -49,6 +47,13 @@ public class DataSetInitializer {
                     initializeValue(useCase, useCaseField, params);
                 } else {
                     useCaseField.applyDefaultValue();
+                    if (useCaseField instanceof TaskField && useCaseField.getRawValue() != null) {
+                        TaskField taskRef = (TaskField) useCaseField;
+                        String value = taskRef.getRawValue().get(0);
+                        taskRef.setRawValue(Arrays.stream(value.split(","))
+                                .map(useCase::getTaskStringId)
+                                .collect(Collectors.toList()));
+                    }
                 }
             }
         });

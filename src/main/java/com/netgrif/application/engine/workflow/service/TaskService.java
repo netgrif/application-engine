@@ -11,14 +11,12 @@ import com.netgrif.application.engine.history.domain.taskevents.CancelTaskEventL
 import com.netgrif.application.engine.history.domain.taskevents.FinishTaskEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.model.EventType;
-import com.netgrif.application.engine.petrinet.domain.DataRef;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.ArcOrderComparator;
 import com.netgrif.application.engine.petrinet.domain.arcs.PTArc;
 import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
@@ -32,7 +30,10 @@ import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.validations.interfaces.IValidationService;
-import com.netgrif.application.engine.workflow.domain.*;
+import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.State;
+import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.*;
@@ -456,16 +457,7 @@ public class TaskService implements ITaskService {
     public void reloadTasks(Case useCase) {
         log.info("[{}]: Reloading tasks in [{}]", useCase.getStringId(), useCase.getTitle());
         Process net = useCase.getProcess();
-        List<Task> tasks;
-        // create tasks on first reload (create case)
-        if (useCase.getTasks().isEmpty()) {
-            tasks = net.getTransitions().values().stream()
-                    .map(transition -> createFromTransition(transition, useCase))
-                    .collect(Collectors.toList());
-        } else {
-            tasks = taskRepository.findAllByCaseId(useCase.getStringId());
-        }
-        // update tasks state
+        List<Task> tasks = taskRepository.findAllByCaseId(useCase.getStringId());
         Task autoTriggered = null;
         for (Task task : tasks) {
             Transition transition = net.getTransition(task.getTransitionId());
@@ -485,6 +477,14 @@ public class TaskService implements ITaskService {
         if (autoTriggered != null) {
             executeTransition(autoTriggered, workflowService.findOne(useCase.getStringId()));
         }
+    }
+
+    @Override
+    public Case createTasks(Case useCase) {
+        Process net = useCase.getProcess();
+        net.getTransitions().values()
+                .forEach(transition -> createFromTransition(transition, useCase));
+        return workflowService.save(useCase);
     }
 
     boolean isExecutable(Transition transition, Case useCase) {
