@@ -21,11 +21,8 @@ public class MultichoiceFieldBuilder extends ChoiceFieldBuilder<MultichoiceField
         if (data.getOptions() != null) {
             setFieldOptions(field, data, importer);
         }
-//        setDefaultValue(field, data, init -> {
-//            if (init != null && !init.isEmpty()) {
-//                field.setDefaultValue(Expression.ofStatic(init));
-//            }
-//        });
+        // TODO: release/8.0.0
+        setDefaultValue(field, data);
         return field;
     }
 

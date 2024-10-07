@@ -1,54 +1,44 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
     <id>dynamic_init</id>
+    <version>1.0.0</version>
     <title>dynamic_init</title>
     <defaultRole>true</defaultRole>
-    <initials>DVT</initials>
-    <!-- ROLES -->
-    <data type="text" immediate="true">
-        <id>text</id>
-        <title>Text</title>
-        <init dynamic="true">userService.findByEmail("super@netgrif.com", true).name</init>
-    </data>
-
-    <data type="number" immediate="true">
-        <id>number</id>
-        <title>number</title>
-        <init dynamic="true">userService.findByEmail("super@netgrif.com", true).name.length()</init>
-    </data>
-
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">DVT</property>
+    </properties>
     <data type="date" immediate="true">
         <id>date</id>
         <title>date</title>
-        <init dynamic="true">java.time.LocalDate.now()</init>
+        <init dynamic="true">
+            <![CDATA[
+			java.time.LocalDate.now()
+			]]>
+        </init>
     </data>
-
     <data type="dateTime" immediate="true">
         <id>dateTime</id>
         <title>dateTime</title>
-        <init dynamic="true">java.time.LocalDateTime.now()</init>
-    </data>
-
-    <data type="user" immediate="true">
-        <id>user</id>
-        <title>user</title>
         <init dynamic="true">
-            def user = userService.getLoggedOrSystem()
-            return new com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue(user.getStringId(), user.name, user.surname, user.email)
+            <![CDATA[
+			java.time.LocalDateTime.now()
+			]]>
         </init>
     </data>
-
     <data type="multichoice">
         <id>multichoice</id>
         <title>multichoice</title>
-        <values>ABC</values>
-        <values>DEF</values>
-        <values>GHI</values>
+        <options>
+            <option key="ABC">ABC</option>
+            <option key="DEF">DEF</option>
+            <option key="GHI">GHI</option>
+        </options>
         <init dynamic="true">
-            ["ABC", "DEF"]
+            <![CDATA[
+			["ABC", "DEF"]
+			]]>
         </init>
     </data>
-
     <data type="multichoice_map">
         <id>multichoice_map</id>
         <title>multichoice_map</title>
@@ -58,46 +48,111 @@
             <option key="GHI">ghi display</option>
         </options>
         <init dynamic="true">
-            ["ABC", "DEF"]
+            <![CDATA[
+			["ABC", "DEF"]
+			]]>
         </init>
     </data>
-
+    <data type="number" immediate="true">
+        <id>number</id>
+        <title>number</title>
+        <init dynamic="true">
+            <![CDATA[
+			userService.findByEmail("super@netgrif.com").name.length()
+			]]>
+        </init>
+    </data>
+    <data type="text" immediate="true">
+        <id>text</id>
+        <title>Text</title>
+        <init dynamic="true">
+            <![CDATA[
+			userService.findByEmail("super@netgrif.com").name
+			]]>
+        </init>
+    </data>
+    <data type="user" immediate="true">
+        <id>user</id>
+        <title>user</title>
+        <init dynamic="true">
+            <![CDATA[
+			def user = userService.getLoggedOrSystem()
+			return new com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue(user.getStringId(), user.name, user.surname, user.email)
+			]]>
+        </init>
+    </data>
     <transition>
         <id>transition</id>
         <x>0</x>
         <y>0</y>
-        <label>whatever</label>
-
-        <dataRef>
-            <id>text</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>number</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>date</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>dateTime</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>user</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
+        <title>whatever</title>
+        <flex>
+            <id>transition_flex</id>
+            <item>
+                <dataRef>
+                    <id>text</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>number</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>date</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>dateTime</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>user</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
-
-</document>
+</process>
