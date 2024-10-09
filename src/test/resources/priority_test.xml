@@ -1,86 +1,91 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document>
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>test</id>
-    <initials>TST</initials>
+    <version>1.0.0</version>
     <title>Test</title>
     <defaultRole>false</defaultRole>
-    <place>
-        <id>1</id>
-        <x>180</x>
-        <y>220</y>
-        <label></label>
-        <tokens>1</tokens>
-        <isStatic>false</isStatic>
-    </place>
-    <place>
-        <id>8</id>
-        <x>420</x>
-        <y>220</y>
-        <label></label>
-        <tokens>0</tokens>
-        <isStatic>false</isStatic>
-    </place>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TST</property>
+    </properties>
     <transition>
-        <id>2</id>
+        <id>t2</id>
         <x>300</x>
         <y>140</y>
-        <label>3</label>
-        <priority>3</priority>
+        <title>3</title>
+        <properties>
+            <property key="priority">3</property>
+        </properties>
     </transition>
     <transition>
-        <id>3</id>
+        <id>t3</id>
         <x>300</x>
         <y>220</y>
-        <label>1</label>
-        <priority>1</priority>
+        <title>1</title>
+        <properties>
+            <property key="priority">1</property>
+        </properties>
     </transition>
     <transition>
-        <id>4</id>
+        <id>t4</id>
         <x>300</x>
         <y>300</y>
-        <label>2</label>
-        <priority>2</priority>
+        <title>2</title>
+        <properties>
+            <property key="priority">2</property>
+        </properties>
     </transition>
+    <place>
+        <id>p1</id>
+        <x>180</x>
+        <y>220</y>
+        <tokens>1</tokens>
+    </place>
+    <place>
+        <id>p8</id>
+        <x>420</x>
+        <y>220</y>
+        <tokens>0</tokens>
+    </place>
     <arc>
-        <id>5</id>
+        <id>a10</id>
         <type>regular</type>
-        <sourceId>1</sourceId>
-        <destinationId>2</destinationId>
+        <sourceId>t3</sourceId>
+        <destinationId>p8</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>6</id>
+        <id>a11</id>
         <type>regular</type>
-        <sourceId>1</sourceId>
-        <destinationId>3</destinationId>
+        <sourceId>t4</sourceId>
+        <destinationId>p8</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>7</id>
+        <id>a5</id>
         <type>regular</type>
-        <sourceId>1</sourceId>
-        <destinationId>4</destinationId>
+        <sourceId>p1</sourceId>
+        <destinationId>t2</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>9</id>
+        <id>a6</id>
         <type>regular</type>
-        <sourceId>2</sourceId>
-        <destinationId>8</destinationId>
+        <sourceId>p1</sourceId>
+        <destinationId>t3</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>10</id>
+        <id>a7</id>
         <type>regular</type>
-        <sourceId>3</sourceId>
-        <destinationId>8</destinationId>
+        <sourceId>p1</sourceId>
+        <destinationId>t4</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>11</id>
+        <id>a9</id>
         <type>regular</type>
-        <sourceId>4</sourceId>
-        <destinationId>8</destinationId>
+        <sourceId>t2</sourceId>
+        <destinationId>p8</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
-</document>
+</process>

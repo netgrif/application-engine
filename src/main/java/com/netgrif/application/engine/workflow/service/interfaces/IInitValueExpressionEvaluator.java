@@ -9,17 +9,16 @@ import com.netgrif.application.engine.workflow.domain.Case;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 
 public interface IInitValueExpressionEvaluator {
 
-    <T> T evaluate(Case useCase, Field<T> defaultField, Map<String, String> params);
+    <T> T evaluateValue(Case useCase, Field<T> defaultField, Map<String, String> params);
 
     Map<String, I18nString> evaluateOptions(Case useCase, MapOptionsField<I18nString, ?> field, Map<String, String> params);
 
-    LinkedHashSet<I18nString> evaluateChoices(Case useCase, ChoiceField field, Map<String, String> params);
+    <T> LinkedHashSet<I18nString> evaluateChoices(Case useCase, ChoiceField<T> field, Map<String, String> params);
 
-    I18nString evaluateCaseName(Case useCase, Expression<?> expression, Map<String, String> params);
+    <T> T evaluate(Case useCase, Expression<T> expression, Map<String, String> params);
 
-    Object evaluate(Case useCase, Expression<?> expression, Map<String, String> params);
+    String evaluateTitle(Expression<String> expression, Map<String, String> params);
 }

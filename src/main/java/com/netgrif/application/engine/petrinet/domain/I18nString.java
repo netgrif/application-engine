@@ -53,8 +53,9 @@ public class I18nString implements Serializable {
     }
 
     public String getTranslation(Locale locale) {
-        if (locale == null)
+        if (locale == null) {
             return defaultValue;
+        }
         return getTranslation(locale.getLanguage());
     }
 

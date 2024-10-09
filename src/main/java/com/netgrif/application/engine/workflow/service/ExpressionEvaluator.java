@@ -8,13 +8,11 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ExpressionRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
+import groovy.lang.GString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,7 +22,7 @@ public class ExpressionEvaluator implements IInitValueExpressionEvaluator {
     private ExpressionRunner runner;
 
     @Override
-    public <T> T evaluate(Case useCase, Field<T> defaultField, Map<String, String> params) {
+    public <T> T evaluateValue(Case useCase, Field<T> defaultField, Map<String, String> params) {
         return (T) runner.run(defaultField.getDefaultValue(), useCase, defaultField, params);
     }
 
@@ -43,9 +41,9 @@ public class ExpressionEvaluator implements IInitValueExpressionEvaluator {
     }
 
     @Override
-    public LinkedHashSet<I18nString> evaluateChoices(Case useCase, ChoiceField field, Map<String, String> params) {
+    public <T> LinkedHashSet<I18nString> evaluateChoices(Case useCase, ChoiceField<T> field, Map<String, String> params) {
         Object result = evaluate(useCase, field.getExpression(), params);
-        if (!(result instanceof Collection)) {
+        if (result == null) {
             throw new IllegalArgumentException("[" + useCase.getStringId() + "] Dynamic choices not an instance of Collection: " + field.getImportId());
         }
         Collection<Object> collection = (Collection) result;
@@ -53,17 +51,17 @@ public class ExpressionEvaluator implements IInitValueExpressionEvaluator {
     }
 
     @Override
-    public I18nString evaluateCaseName(Case useCase, Expression<?> expression, Map<String, String> params) {
-        Object result = evaluate(useCase, expression, params);
-        if (result instanceof I18nString) {
-            return (I18nString) result;
-        } else {
-            return new I18nString(result.toString());
-        }
+    public <T> T evaluate(Case useCase, Expression<T> expression, Map<String, String> params) {
+        return runner.run(expression, useCase, null, params);
     }
 
     @Override
-    public Object evaluate(Case useCase, Expression<?> expression, Map<String, String> params) {
-        return runner.run(expression, useCase, null, params);
+    public String evaluateTitle(Expression<String> expression, Map<String, String> params) {
+        Object title = this.evaluate(null, expression, params);
+        if (title instanceof GString) {
+            // due to ClassCastException
+            return title.toString();
+        }
+        return (String) title;
     }
 }

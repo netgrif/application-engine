@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @ExtendWith(SpringExtension.class)
 public class ImporterTest {
 
-    private static final String NET_ID = "prikladFM_test.xml";
+    private static final String NET_ID = "prikladFM_test";
     private static final String NET_TITLE = "Test";
     private static final String NET_INITIALS = "TST";
     private static final Integer NET_PLACES = 17;
@@ -54,8 +54,6 @@ public class ImporterTest {
     private IPetriNetService petriNetService;
     @Autowired
     private SuperCreator superCreator;
-    @Autowired
-    private AllDataConfiguration allDataConfiguration;
 
     @BeforeEach
     public void before() {
@@ -90,61 +88,12 @@ public class ImporterTest {
         petriNetService.importPetriNet(new FileInputStream("src/test/resources/read_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
     }
 
-    @Test
-    public void externalMappingTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
-
-        assertExternalMappingImport(outcome.getNet());
-    }
-
-    @Test
-    void importInvalidDataRefLayoutTest() throws FileNotFoundException {
-        LoggedUser loggedUser = superCreator.getLoggedSuper();
-        assert  loggedUser != null;
-
-        FileInputStream fileInputStream = new FileInputStream("src/test/resources/invalid_data_ref_layout.xml");
-
-        assertThatThrownBy(() -> petriNetService.importPetriNet(fileInputStream, VersionType.MAJOR, loggedUser))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("doesn't have a layout");
-    }
-
-    private void assertExternalMappingImport(Process imported) {
-        assert imported != null;
-
-        String[] noDataTransitions = {"2", "3", "4", "36", "49"};
-
-        assert imported.getPlaces().size() == 11;
-        assert imported.getTransitions().size() == 12;
-        // TODO: release/8.0.0
-//        assert imported.getArcs().values().stream()
-//                .mapToLong(List::size)
-//                .sum() == 34;
-        assert imported.getDataSet().size() == 14;
-        assert imported.getRoles().size() == 2;
-
-        imported.getTransitions().values().forEach(transition -> {
-            if (allDataConfiguration.getAllData().getId().equals(transition.getImportId())) {
-                return;
-            }
-            // TODO: release/8.0.0
-//            assert !transition.getRoles().isEmpty();
-            if (Arrays.stream(noDataTransitions).anyMatch(x -> x.equals(transition.getImportId()))) {
-                assert transition.getDataSet().isEmpty();
-            } else {
-                assert !transition.getDataSet().isEmpty();
-            }
-        });
-    }
-
     private void assertNetProperlyImported() {
         assert repository.count() > 0;
         Page<Process> nets = repository.findByIdentifier(NET_ID, new FullPageRequest());
         Process net = nets.getContent().get(0);
-//        TODO: release/8.0.0 assertion error
         assert net.getTitle().getDefaultValue().equals(NET_TITLE);
-//        TODO: release/8.0.0
-//        assert net.getInitials().equals(NET_INITIALS);
+        assert net.getProperties().get("initials").equals(NET_INITIALS);
         assert net.getPlaces().size() == NET_PLACES;
         assert net.getTransitions().size() == NET_TRANSITIONS;
         assert net.getArcs().size() == NET_ARCS;

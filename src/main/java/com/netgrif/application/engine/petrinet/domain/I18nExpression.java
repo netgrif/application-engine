@@ -1,10 +1,12 @@
 package com.netgrif.application.engine.petrinet.domain;
 
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 @Data
 @AllArgsConstructor
@@ -24,5 +26,13 @@ public class I18nExpression extends I18nString {
         clone.setTranslations(new HashMap<>(this.getTranslations()));
         clone.setDynamic(this.dynamic);
         return clone;
+    }
+
+    public Expression<String> getExpression(Locale locale) {
+        String translation = this.getTranslation(locale);
+        if (this.dynamic) {
+            return Expression.ofDynamic(translation);
+        }
+        return Expression.ofStatic(translation);
     }
 }

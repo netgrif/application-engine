@@ -5,11 +5,9 @@ import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedHashSet;
-import java.util.stream.Collectors;
 
 @Component
 public class MultichoiceFieldBuilder extends ChoiceFieldBuilder<MultichoiceField, LinkedHashSet<I18nString>> {
@@ -21,8 +19,11 @@ public class MultichoiceFieldBuilder extends ChoiceFieldBuilder<MultichoiceField
         if (data.getOptions() != null) {
             setFieldOptions(field, data, importer);
         }
-        // TODO: release/8.0.0
-        setDefaultValue(field, data);
+        setDefaultValue(field, data, s -> {
+            LinkedHashSet<I18nString> value = new LinkedHashSet<>();
+            value.add(new I18nString(s));
+            return value;
+        });
         return field;
     }
 

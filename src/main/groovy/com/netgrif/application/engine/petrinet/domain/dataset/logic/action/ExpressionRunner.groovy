@@ -36,12 +36,12 @@ abstract class ExpressionRunner {
         cache = new MaxSizeHashMap<>(cacheSize)
     }
 
-    def run(Expression expression, Case useCase, Field<?> field = null, Map<String, String> params = [:]) {
+    <T> T run(Expression<T> expression, Case useCase = null, Field<?> field = null, Map<String, String> params = [:]) {
         log.debug("Expression: $expression")
         def code = getExpressionCode(expression)
         try {
             initCode(code.delegate, useCase, field, params)
-            code()
+            return code() as T
         } catch (Exception e) {
             log.error("Expression evaluation failed: $expression.definition")
             throw e
@@ -60,14 +60,16 @@ abstract class ExpressionRunner {
     }
 
     protected void initCode(def delegate, Case useCase, Field<?> field, Map<String, String> params) {
-        delegate.metaClass.useCase = useCase
+        if (useCase != null) {
+            delegate.metaClass.useCase = useCase
+            useCase.dataSet.fields.values().forEach { Field<?> f ->
+                delegate.metaClass."$f.importId" = f
+            }
+        }
         delegate.metaClass.params = params
         delegate.metaClass.field = field
         // TODO: release/8.0.0
         delegate.metaClass.loggedUser = userService.loggedOrSystem.transformToLoggedUser()
         delegate.metaClass.systemUser = userService.system.transformToLoggedUser()
-        useCase.dataSet.fields.values().forEach { Field<?> f ->
-            delegate.metaClass."$f.importId" = f
-        }
     }
 }

@@ -257,7 +257,9 @@ public class Importer {
             I18nExpression caseName = new I18nExpression(importedProcess.getCaseName().getValue());
             caseName.setDynamic(importedProcess.getCaseName().isDynamic());
             caseName.setKey(importedProcess.getCaseName().getId());
-            caseName.setTranslations(i18n.get(caseName.getKey()).getTranslations());
+            if (i18n.containsKey(caseName.getKey())) {
+                caseName.setTranslations(i18n.get(caseName.getKey()).getTranslations());
+            }
             process.setDefaultCaseName(caseName);
         }
         createProperties(importedProcess.getProperties(), process.getProperties());

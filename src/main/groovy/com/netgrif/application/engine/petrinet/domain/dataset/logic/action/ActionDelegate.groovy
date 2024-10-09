@@ -298,7 +298,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         if (!field.hasDefault()) {
             return null
         } else if (field.isDynamicDefaultValue()) {
-            return initValueExpressionEvaluator.evaluate(useCase, field, params)
+            return initValueExpressionEvaluator.evaluateValue(useCase, field, params)
         }
         return field.defaultValue
     }

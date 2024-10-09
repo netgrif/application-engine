@@ -60,7 +60,7 @@ public class DataSetInitializer {
     }
 
     public <T> void initializeValue(Case useCase, Field<T> field, Map<String, String> params) {
-        field.setRawValue(initValueExpressionEvaluator.evaluate(useCase, field, params));
+        field.setRawValue(initValueExpressionEvaluator.evaluateValue(useCase, field, params));
     }
 
     public void initializeChoices(Case useCase, ChoiceField<?> field, Map<String, String> params) {

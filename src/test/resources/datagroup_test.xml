@@ -1,133 +1,162 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document>
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>test</id>
-    <initials>TST</initials>
+    <version>1.0.0</version>
     <title>Test</title>
-
+    <defaultRole>false</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TST</property>
+    </properties>
+    <role>
+        <id>role1</id>
+        <title>Agent</title>
+    </role>
+    <role>
+        <id>role2</id>
+        <title>Premium</title>
+    </role>
     <data type="text">
-        <id>1</id>
+        <id>data1</id>
         <title>Field 1</title>
         <init>10</init>
     </data>
     <data type="text">
-        <id>2</id>
+        <id>data2</id>
         <title>Field 2</title>
     </data>
     <data type="text">
-        <id>3</id>
+        <id>data3</id>
         <title>Field 3</title>
     </data>
     <data type="text">
-        <id>4</id>
+        <id>data4</id>
         <title>Field 4</title>
     </data>
     <data type="text">
-        <id>5</id>
+        <id>data5</id>
         <title>Field 5</title>
     </data>
     <data type="text">
-        <id>6</id>
+        <id>data6</id>
         <title>Field 6</title>
     </data>
-
-    <role>
-        <id>1</id>
-        <name>Agent</name>
-    </role>
-    <role>
-        <id>2</id>
-        <name>Premium</name>
-    </role>
-
-    <place>
-        <id>2</id>
-        <x>274</x>
-        <y>187</y>
-        <label></label>
-        <tokens>1</tokens>
-        <isStatic>false</isStatic>
-    </place>
-    <place>
-        <id>3</id>
-        <x>506</x>
-        <y>186</y>
-        <label></label>
-        <tokens>0</tokens>
-        <isStatic>false</isStatic>
-    </place>
-
     <transition>
-        <id>1</id>
+        <id>t1</id>
         <x>362</x>
         <y>183</y>
-        <label>Test data groups</label>
+        <title>Test data groups</title>
+        <flex>
+            <id>t1_flex</id>
+            <item>
+                <dataRef>
+                    <id>data1</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>data2</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>data3</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>data4</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>data5</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>data6</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
         <roleRef>
-            <id>1</id>
+            <id>role1</id>
             <logic>
                 <perform>true</perform>
             </logic>
         </roleRef>
-
-        <dataGroup>
-            <id>1</id>
-            <title>Left</title>
-            <alignment>start</alignment>
-            <dataRef>
-                <id>1</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>2</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>3</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>2</id>
-            <title>Right</title>
-            <alignment>end</alignment>
-            <dataRef>
-                <id>4</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>5</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>6</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
     </transition>
-
+    <place>
+        <id>p2</id>
+        <x>274</x>
+        <y>187</y>
+        <tokens>1</tokens>
+    </place>
+    <place>
+        <id>p3</id>
+        <x>506</x>
+        <y>186</y>
+        <tokens>0</tokens>
+    </place>
     <arc>
-        <id>4</id>
+        <id>a4</id>
         <type>regular</type>
-        <sourceId>2</sourceId>
-        <destinationId>1</destinationId>
+        <sourceId>p2</sourceId>
+        <destinationId>t1</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>5</id>
+        <id>a5</id>
         <type>regular</type>
-        <sourceId>1</sourceId>
-        <destinationId>3</destinationId>
+        <sourceId>t1</sourceId>
+        <destinationId>p3</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
-</document>
+</process>

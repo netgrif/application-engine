@@ -221,7 +221,7 @@ public class WorkflowService implements IWorkflowService {
             locale = LocaleContextHolder.getLocale();
         }
         if (title == null) {
-            return this.createCase(netId, resolveDefaultCaseTitle(netId, locale, params), color, user, params);
+            title = resolveDefaultCaseTitle(netId, locale, params);
         }
         return this.createCase(netId, title, color, user, params);
     }
@@ -321,17 +321,16 @@ public class WorkflowService implements IWorkflowService {
         return outcome;
     }
 
-    protected Function<Case, String> resolveDefaultCaseTitle(String netId, Locale locale, Map<String, String> params) {
+    protected String resolveDefaultCaseTitle(String netId, Locale locale, Map<String, String> params) {
         Process petriNet = petriNetService.clone(new ObjectId(netId));
-        Function<Case, String> makeTitle;
         I18nExpression caseTitle = petriNet.getDefaultCaseName();
-//        TODO: release/8.0.0
-//        if (caseTitle.isDynamic()) {
-//            makeTitle = (u) -> initValueExpressionEvaluator.evaluateCaseName(u, petriNet.getDefaultCaseName(), params).getTranslation(locale);
-//        } else {
-        makeTitle = (u) -> petriNet.getDefaultCaseName().getTranslation(locale);
-//        }
-        return makeTitle;
+        String title;
+        if (caseTitle.isDynamic()) {
+            title = initValueExpressionEvaluator.evaluateTitle(petriNet.getDefaultCaseName().getExpression(locale), params);
+        } else {
+            title = caseTitle.getTranslation(locale);
+        }
+        return title;
     }
 
     @Override

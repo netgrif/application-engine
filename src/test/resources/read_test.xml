@@ -1,55 +1,55 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document>
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>test</id>
-    <initials>TST</initials>
+    <version>1.0.0</version>
     <title>Test</title>
     <defaultRole>false</defaultRole>
-    <!-- ROLES -->
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TST</property>
+    </properties>
     <role>
-        <id>1</id>
-        <name>Role</name>
+        <id>r1</id>
+        <title>Role</title>
     </role>
-    <place>
-        <id>1</id>
-        <x>142</x>
-        <y>79</y>
-        <label>IN</label>
-        <tokens>1</tokens>
-        <static>false</static>
-    </place>
-    <place>
-        <id>6</id>
-        <x>384</x>
-        <y>78</y>
-        <label>OUT</label>
-        <tokens>0</tokens>
-        <static>false</static>
-    </place>
     <transition>
-        <id>3</id>
+        <id>t3</id>
         <x>265</x>
         <y>89</y>
-        <label>Test read arc</label>
+        <title>Test read arc</title>
         <roleRef>
-            <id>1</id>
+            <id>r1</id>
             <logic>
-                <assign>true</assign>
                 <perform>true</perform>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
+    <place>
+        <id>p1</id>
+        <x>142</x>
+        <y>79</y>
+        <title>IN</title>
+        <tokens>1</tokens>
+    </place>
+    <place>
+        <id>p6</id>
+        <x>384</x>
+        <y>78</y>
+        <title>OUT</title>
+        <tokens>0</tokens>
+    </place>
     <arc>
-        <id>4</id>
+        <id>a4</id>
         <type>read</type>
-        <sourceId>1</sourceId>
-        <destinationId>3</destinationId>
+        <sourceId>p1</sourceId>
+        <destinationId>t3</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>7</id>
+        <id>a7</id>
         <type>regular</type>
-        <sourceId>3</sourceId>
-        <destinationId>6</destinationId>
+        <sourceId>t3</sourceId>
+        <destinationId>p6</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
-</document>
+</process>
