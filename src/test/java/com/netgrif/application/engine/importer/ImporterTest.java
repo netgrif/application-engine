@@ -1,20 +1,22 @@
 package com.netgrif.application.engine.importer;
 
+import com.netgrif.application.engine.EngineTest;
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.importer.service.AllDataConfiguration;
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,19 +24,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
-public class ImporterTest {
+public class ImporterTest extends EngineTest {
 
     private static final String NET_ID = "prikladFM_test";
     private static final String NET_TITLE = "Test";
@@ -44,21 +42,6 @@ public class ImporterTest {
     private static final Integer NET_ARCS = 21;
     private static final Integer NET_FIELDS = 27;
     private static final Integer NET_ROLES = 3;
-    @Autowired
-    private TestHelper testHelper;
-    @Autowired
-    private PetriNetRepository repository;
-    @Autowired
-    private IWorkflowService workflowService;
-    @Autowired
-    private IPetriNetService petriNetService;
-    @Autowired
-    private SuperCreator superCreator;
-
-    @BeforeEach
-    public void before() {
-        testHelper.truncateDbs();
-    }
 
     @Test
     public void importPetriNet() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
@@ -89,8 +72,8 @@ public class ImporterTest {
     }
 
     private void assertNetProperlyImported() {
-        assert repository.count() > 0;
-        Page<Process> nets = repository.findByIdentifier(NET_ID, new FullPageRequest());
+        assert processRepository.count() > 0;
+        Page<Process> nets = processRepository.findByIdentifier(NET_ID, new FullPageRequest());
         Process net = nets.getContent().get(0);
         assert net.getTitle().getDefaultValue().equals(NET_TITLE);
         assert net.getProperties().get("initials").equals(NET_INITIALS);
@@ -99,5 +82,11 @@ public class ImporterTest {
         assert net.getArcs().size() == NET_ARCS;
         assert net.getDataSet().size() == NET_FIELDS;
         assert net.getRoles().size() == NET_ROLES;
+    }
+
+    @Autowired
+    public ImporterTest(ImportHelper importHelper, WebApplicationContext wac, TestHelper testHelper, ITaskService taskService, IProcessRoleService roleService, IUserService userService, IWorkflowService workflowService, IPetriNetService petriNetService, SuperCreator superCreator,
+                        PetriNetRepository processRepository) {
+        super(importHelper, wac, testHelper, taskService, roleService, userService, workflowService, petriNetService, superCreator, processRepository);
     }
 }
