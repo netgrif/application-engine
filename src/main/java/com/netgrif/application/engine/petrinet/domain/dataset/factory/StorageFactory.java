@@ -1,34 +1,30 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.factory;
 
-import com.netgrif.application.engine.files.minio.MinIoProperties;
-import com.netgrif.application.engine.files.throwable.StorageNotEnabledException;
+import com.netgrif.application.engine.files.IStorageResolverService;
+import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.importer.model.Data;
-import com.netgrif.application.engine.petrinet.domain.dataset.*;
+import com.netgrif.application.engine.petrinet.domain.dataset.Storage;
+import lombok.extern.slf4j.Slf4j;
 
-import static com.netgrif.application.engine.files.minio.MinIoStorageService.getBucketOrDefault;
+import java.util.Set;
 
+@Slf4j
 public class StorageFactory {
 
-    public static Storage createStorage(Data data, String defaultStorageType, MinIoProperties minIoProperties) {
+    public static Storage createStorage(Data data, IStorageResolverService storageResolverService, String defaultStorageType) {
+        if (data == null) return null;
         Storage storage;
-        StorageType storageType = StorageType.valueOf((data.getStorage() == null || data.getStorage().getType() == null) ? defaultStorageType : data.getStorage().getType().toUpperCase());
-        switch (storageType) {
-            case MINIO:
-                storage = new MinIoStorage();
-                if (!minIoProperties.isEnabled()) {
-                    throw new StorageNotEnabledException("Storage of type [" + StorageType.MINIO + "] is not enabled.");
-                }
-                if (data.getStorage().getHost() != null) {
-                    storage.setHost(data.getStorage().getHost());
-                }
-                if (data.getStorage().getBucket() != null) {
-                    ((MinIoStorage) storage).setBucket(getBucketOrDefault(data.getStorage().getBucket()));
-                }
-                break;
-            default:
-                storage = new Storage(StorageType.valueOf(defaultStorageType));
-                break;
+        String storageType = (data.getStorage() == null || data.getStorage().getType() == null) ? defaultStorageType : data.getStorage().getType().toLowerCase();
+
+        Set<String> storageTypes = storageResolverService.availableStorageTypes();
+        if (storageTypes.contains(storageType)) {
+            IStorageService storageService = storageResolverService.resolve(storageType);
+            storage = storageService.createStorage(data);
+        } else {
+            log.warn("Storage of type [" + storageType + "] is not enabled. Fallback to " + defaultStorageType);
+            storage = new Storage(defaultStorageType);
         }
+
         return storage;
     }
 }

@@ -4,8 +4,9 @@ import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.files.throwable.BadRequestException;
 import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import com.netgrif.application.engine.files.throwable.StorageException;
+import com.netgrif.application.engine.importer.model.Data;
+import com.netgrif.application.engine.petrinet.domain.dataset.Storage;
 import com.netgrif.application.engine.petrinet.domain.dataset.StorageField;
-import com.netgrif.application.engine.petrinet.domain.dataset.StorageType;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,10 @@ import java.io.*;
 @Slf4j
 @Service
 public class LocalStorageService implements IStorageService {
-    FileStorageConfiguration fileStorageConfiguration;
+
+    public static final String LOCAL_TYPE = "local";
+
+    private FileStorageConfiguration fileStorageConfiguration;
 
     @Autowired
     public void setFileStorageConfiguration(FileStorageConfiguration fileStorageConfiguration) {
@@ -25,8 +29,13 @@ public class LocalStorageService implements IStorageService {
     }
 
     @Override
-    public StorageType getType() {
-        return StorageType.LOCAL;
+    public String getType() {
+        return LOCAL_TYPE;
+    }
+
+    @Override
+    public Storage createStorage(Data data) {
+        return new Storage(LOCAL_TYPE);
     }
 
     @Override

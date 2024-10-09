@@ -4,9 +4,11 @@ import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.files.throwable.BadRequestException;
 import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import com.netgrif.application.engine.files.throwable.StorageException;
+import com.netgrif.application.engine.files.throwable.StorageNotEnabledException;
+import com.netgrif.application.engine.importer.model.Data;
 import com.netgrif.application.engine.petrinet.domain.dataset.MinIoStorage;
+import com.netgrif.application.engine.petrinet.domain.dataset.Storage;
 import com.netgrif.application.engine.petrinet.domain.dataset.StorageField;
-import com.netgrif.application.engine.petrinet.domain.dataset.StorageType;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
@@ -31,6 +33,9 @@ import java.security.NoSuchAlgorithmException;
         havingValue = "true"
 )
 public class MinIoStorageService implements IStorageService {
+
+    public static final String MINIO_TYPE = "minio";
+
     private MinIoProperties properties;
 
     @Autowired
@@ -39,8 +44,23 @@ public class MinIoStorageService implements IStorageService {
     }
 
     @Override
-    public StorageType getType() {
-        return StorageType.MINIO;
+    public String getType() {
+        return MINIO_TYPE;
+    }
+
+    @Override
+    public Storage createStorage(Data data) {
+        Storage storage = new MinIoStorage();
+        if (!properties.isEnabled()) {
+            throw new StorageNotEnabledException("Storage of type [" + MINIO_TYPE + "] is not enabled.");
+        }
+        if (data.getStorage().getHost() != null) {
+            storage.setHost(data.getStorage().getHost());
+        }
+        if (data.getStorage().getBucket() != null) {
+            ((MinIoStorage) storage).setBucket(getBucketOrDefault(data.getStorage().getBucket()));
+        }
+        return storage;
     }
 
     @Override
@@ -49,7 +69,7 @@ public class MinIoStorageService implements IStorageService {
         try (MinioClient minioClient = client(storage.getHost())) {
             return minioClient.getObject(
                     GetObjectArgs.builder()
-                            .bucket(storage.getBucket() )
+                            .bucket(storage.getBucket())
                             .object(path)
                             .build()
             );
