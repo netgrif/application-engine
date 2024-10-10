@@ -16,7 +16,7 @@ import java.util.stream.StreamSupport;
 /**
  * Service for managing UriNode objects
  */
-@Service
+//@Service
 public class UriService implements IUriService {
 
     private static final int FIRST_LEVEL = 0;
