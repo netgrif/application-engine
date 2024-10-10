@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
+import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.User;
@@ -81,13 +82,12 @@ public class TaskServiceTest {
 
     @Autowired
     private SuperAdminConfiguration configuration;
+    @Autowired
+    private TestHelper testHelper;
 
     @BeforeEach
     public void setUp() throws Exception {
-        mongoTemplate.getDb().drop();
-        taskRepository.deleteAll();
-        userRunner.run("");
-        uriRunner.run();
+        testHelper.truncateDbs();
 
         petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
         Process net = petriNetRepository.findAll().get(0);

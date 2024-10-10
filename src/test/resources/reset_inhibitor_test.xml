@@ -1,83 +1,86 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document>
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>test</id>
-    <initials>TST</initials>
+    <version>1.0.0</version>
     <title>Test</title>
     <defaultRole>false</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TST</property>
+    </properties>
+    <processEvents/>
+    <caseEvents/>
+    <role>
+        <id>role1</id>
+        <title>Agent</title>
+    </role>
     <data type="number">
-        <id>1</id>
+        <id>data1</id>
         <title>Poradové číslo</title>
     </data>
-    <role>
-        <id>1</id>
-        <name>Agent</name>
-    </role>
-    <place>
-        <id>1</id>
-        <x>274</x>
-        <y>203</y>
-        <label>start</label>
-        <tokens>5</tokens>
-        <isStatic>false</isStatic>
-    </place>
-    <place>
-        <id>4</id>
-        <x>527</x>
-        <y>197</y>
-        <label>end</label>
-        <tokens>0</tokens>
-        <isStatic>false</isStatic>
-    </place>
     <transition>
-        <id>2</id>
+        <id>t2</id>
         <x>411</x>
         <y>142</y>
-        <label>reset</label>
+        <title>reset</title>
         <roleRef>
-            <id>1</id>
+            <id>role1</id>
             <logic>
                 <perform>true</perform>
             </logic>
         </roleRef>
     </transition>
     <transition>
-        <id>3</id>
+        <id>t3</id>
         <x>402</x>
         <y>257</y>
-        <label>inhibit</label>
+        <title>inhibit</title>
         <roleRef>
-            <id>1</id>
+            <id>role1</id>
             <logic>
                 <perform>true</perform>
             </logic>
         </roleRef>
     </transition>
+    <place>
+        <id>p1</id>
+        <x>274</x>
+        <y>203</y>
+        <title>start</title>
+        <tokens>5</tokens>
+    </place>
+    <place>
+        <id>p4</id>
+        <x>527</x>
+        <y>197</y>
+        <title>end</title>
+        <tokens>0</tokens>
+    </place>
     <arc>
-        <id>5</id>
+        <id>a5</id>
         <type>inhibitor</type>
-        <sourceId>1</sourceId>
-        <destinationId>3</destinationId>
+        <sourceId>p1</sourceId>
+        <destinationId>t3</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>6</id>
+        <id>a6</id>
         <type>reset</type>
-        <sourceId>1</sourceId>
-        <destinationId>2</destinationId>
+        <sourceId>p1</sourceId>
+        <destinationId>t2</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>7</id>
+        <id>a7</id>
         <type>regular</type>
-        <sourceId>2</sourceId>
-        <destinationId>4</destinationId>
+        <sourceId>t2</sourceId>
+        <destinationId>p4</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>8</id>
+        <id>a8</id>
         <type>regular</type>
-        <sourceId>3</sourceId>
-        <destinationId>4</destinationId>
+        <sourceId>t3</sourceId>
+        <destinationId>p4</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
-</document>
+</process>
