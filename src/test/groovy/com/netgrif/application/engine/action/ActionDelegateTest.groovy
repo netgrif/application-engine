@@ -68,12 +68,12 @@ class ActionDelegateTest {
         String mail = "test@netgrif.com";
         MessageResource messageResource = actionDelegate.inviteUser(mail)
         assert messageResource.getContent().success
-        IUser user = userService.findByEmail(mail, false)
+        IUser user = userService.findByEmail(mail)
         assert user != null
         MimeMessage[] messages = smtpServer.getReceivedMessages()
         assert messages
         actionDelegate.deleteUser(mail)
-        IUser user2 = userService.findByEmail(mail, false)
+        IUser user2 = userService.findByEmail(mail)
         assert user2 == null
         smtpServer.stop()
     }
