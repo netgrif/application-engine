@@ -16,6 +16,8 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -30,7 +32,10 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Keywo
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(indexName = "#{@elasticCaseIndex}")
-public class ElasticCase {
+public class ElasticCase implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 7536959921044863265L;
 
     @Id
     private String id;

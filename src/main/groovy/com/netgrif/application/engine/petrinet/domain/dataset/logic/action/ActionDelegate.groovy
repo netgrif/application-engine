@@ -1595,7 +1595,7 @@ class ActionDelegate {
         filterCase.setIcon(icon)
         filterCase.dataSet[DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID].value = (title instanceof I18nString) ? title : new I18nString(title as String)
         filterCase = workflowService.save(filterCase)
-        Task newFilterTask = findTask { it._id.eq(new ProcessResourceId(filterCase.tasks.find { it.transition == DefaultFiltersRunner.AUTO_CREATE_TRANSITION }.task)) }
+        Task newFilterTask = taskService.findOne(filterCase.tasks.find { it.transition == DefaultFiltersRunner.AUTO_CREATE_TRANSITION }.task)
         assignTask(newFilterTask)
 
         def setDataMap = [
@@ -2105,7 +2105,7 @@ class ActionDelegate {
             parentItemCase = appendChildCaseIdAndSave(parentItemCase, menuItemCase.stringId)
         }
         menuItemCase = workflowService.save(menuItemCase)
-        Task newItemTask = findTask { it._id.eq(new ObjectId(menuItemCase.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)) }
+        Task newItemTask = taskService.findOne(menuItemCase.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)
         String nodePath = createNodePath(body.uri, sanitizedIdentifier)
         uriService.getOrCreate(nodePath, UriContentType.CASE)
 
@@ -2156,7 +2156,7 @@ class ActionDelegate {
         } else {
             folder = workflowService.save(folder)
         }
-        Task newItemTask = findTask { it._id.eq(new ObjectId(folder.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)) }
+        Task newItemTask = taskService.findOne(folder.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)
         assignTask(newItemTask)
         setData(newItemTask, body.toDataSet(null, node.path))
         finishTask(newItemTask)
@@ -2251,7 +2251,7 @@ class ActionDelegate {
         String newNodePath = createNodePath(node.path, sanitizedIdentifier)
         uriService.getOrCreate(newNodePath, UriContentType.CASE)
 
-        Task newItemTask = findTask { it._id.eq(new ObjectId(duplicated.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)) }
+        Task newItemTask = taskService.findOne(duplicated.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)
         Map updatedDataSet = [
                 (MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE.attributeId): [
                         "value": null,
