@@ -83,10 +83,4 @@ public class ImporterTest extends EngineTest {
         assert net.getDataSet().size() == NET_FIELDS;
         assert net.getRoles().size() == NET_ROLES;
     }
-
-    @Autowired
-    public ImporterTest(ImportHelper importHelper, WebApplicationContext wac, TestHelper testHelper, ITaskService taskService, IProcessRoleService roleService, IUserService userService, IWorkflowService workflowService, IPetriNetService petriNetService, SuperCreator superCreator,
-                        PetriNetRepository processRepository) {
-        super(importHelper, wac, testHelper, taskService, roleService, userService, workflowService, petriNetService, superCreator, processRepository);
-    }
 }

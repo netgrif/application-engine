@@ -15,41 +15,26 @@ import org.springframework.web.context.WebApplicationContext
 
 @SpringBootTest
 abstract class EngineTest {
-    public ImportHelper importHelper
-    public TestHelper testHelper
-    public SuperCreator superCreator
-    public WebApplicationContext wac
-    public ITaskService taskService
-    public IProcessRoleService roleService
-    public IUserService userService
-    public IWorkflowService workflowService
-    public IPetriNetService petriNetService
-    public PetriNetRepository processRepository
-
     @Autowired
-    EngineTest(
-            ImportHelper importHelper,
-            WebApplicationContext wac,
-            TestHelper testHelper,
-            ITaskService taskService,
-            IProcessRoleService roleService,
-            IUserService userService,
-            IWorkflowService workflowService,
-            IPetriNetService petriNetService,
-            SuperCreator superCreator,
-            PetriNetRepository processRepository
-    ) {
-        this.importHelper = importHelper
-        this.wac = wac
-        this.testHelper = testHelper
-        this.taskService = taskService
-        this.roleService = roleService
-        this.userService = userService
-        this.workflowService = workflowService
-        this.petriNetService = petriNetService
-        this.superCreator = superCreator
-        this.processRepository = processRepository
-    }
+    public ImportHelper importHelper
+    @Autowired
+    public TestHelper testHelper
+    @Autowired
+    public SuperCreator superCreator
+    @Autowired
+    public WebApplicationContext wac
+    @Autowired
+    public ITaskService taskService
+    @Autowired
+    public IProcessRoleService roleService
+    @Autowired
+    public IUserService userService
+    @Autowired
+    public IWorkflowService workflowService
+    @Autowired
+    public IPetriNetService petriNetService
+    @Autowired
+    public PetriNetRepository processRepository
 
     @BeforeEach
     void before() {

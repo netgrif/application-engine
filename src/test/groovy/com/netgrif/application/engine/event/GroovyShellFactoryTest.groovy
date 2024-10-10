@@ -1,25 +1,16 @@
 package com.netgrif.application.engine.event
 
 import com.netgrif.application.engine.EngineTest
-import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.LoggedUser
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.Process
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
-import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.QTask
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.web.context.WebApplicationContext
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -72,10 +63,5 @@ class GroovyShellFactoryTest extends EngineTest {
         def task = taskService.searchOne(QTask.task.transitionId.eq("t1"))
         assert task != null
         assert task.assigneeId != null
-    }
-
-    @Autowired
-    GroovyShellFactoryTest(ImportHelper importHelper, WebApplicationContext wac, TestHelper testHelper, ITaskService taskService, IProcessRoleService roleService, IUserService userService, IWorkflowService workflowService) {
-        super(importHelper, wac, testHelper, taskService, roleService, userService, workflowService)
     }
 }

@@ -4,8 +4,11 @@ import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
+import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.Assert
@@ -49,10 +52,5 @@ class InitValuesTest extends EngineTest {
                 Assert.assertFalse(dynamicId, (dynamicInitField.rawValue as Collection).isEmpty())
             }
         }
-    }
-
-    @Autowired
-    InitValuesTest(ImportHelper importHelper, WebApplicationContext wac, TestHelper testHelper, ITaskService taskService, IProcessRoleService roleService, IUserService userService, IWorkflowService workflowService) {
-        super(importHelper, wac, testHelper, taskService, roleService, userService, workflowService)
     }
 }

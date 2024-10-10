@@ -1037,9 +1037,4 @@ class ValidationTest extends EngineTest {
         })
         Assertions.assertEquals("error-number07-2", thrown.getMessage());
     }
-
-    @Autowired
-    ValidationTest(ImportHelper importHelper, WebApplicationContext wac, TestHelper testHelper, ITaskService taskService, IProcessRoleService roleService, IUserService userService, IWorkflowService workflowService) {
-        super(importHelper, wac, testHelper, taskService, roleService, userService, workflowService)
-    }
 }

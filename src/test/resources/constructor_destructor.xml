@@ -1,13 +1,54 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>constructor_destructor</id>
-    <initials>CAD</initials>
+    <version>1.0.0</version>
     <title>Constructor and Destructor</title>
     <icon>business</icon>
     <defaultRole>false</defaultRole>
-
-    <!-- ROLES -->
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">CAD</property>
+    </properties>
+    <roleRef>
+        <id>process_role</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>false</delete>
+        </caseLogic>
+    </roleRef>
+    <processEvents>
+        <event type="upload">
+            <id>upload</id>
+            <actions phase="post">
+                <action id="action_0">
+					<![CDATA[
+                    createCase("constructor_destructor", "Construct")
+                    ]]>
+				</action>
+            </actions>
+        </event>
+    </processEvents>
+    <caseEvents>
+        <event type="create">
+            <id>create</id>
+            <actions phase="post">
+                <action id="action_1">
+					<![CDATA[
+                    change text value { "Its working..." }
+                    ]]>
+				</action>
+            </actions>
+        </event>
+        <event type="delete">
+            <id>pdf</id>
+            <actions phase="post">
+                <action id="action_2">
+					<![CDATA[
+                    createCase("constructor_destructor", "Destruct")
+                    ]]>
+				</action>
+            </actions>
+        </event>
+    </caseEvents>
     <role>
         <id>process_role</id>
         <title>Process role</title>
@@ -17,44 +58,4 @@
         <title>Text</title>
         <init>text</init>
     </data>
-
-    <roleRef>
-        <id>process_role</id>
-        <caseLogic>
-            <create>true</create>
-            <delete>false</delete>
-        </caseLogic>
-    </roleRef>
-
-    <processEvents>
-        <event type="upload">
-            <id>upload</id>
-            <actions phase="post">
-                <action>
-                    createCase("constructor_destructor", "Construct")
-                </action>
-            </actions>
-        </event>
-    </processEvents>
-    <caseEvents>
-        <event type="create">
-            <id>create</id>
-            <actions phase="post">
-                <action>
-                    text: f.text;
-
-                    change text value {return "Its working..."}
-                </action>
-            </actions>
-        </event>
-        <event type="delete">
-            <id>pdf</id>
-            <actions phase="post">
-                <action>
-                    createCase("constructor_destructor", "Destruct")
-                </action>
-            </actions>
-        </event>
-    </caseEvents>
-
-</document>
+</process>
