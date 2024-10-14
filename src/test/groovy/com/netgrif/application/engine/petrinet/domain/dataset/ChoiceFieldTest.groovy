@@ -61,7 +61,7 @@ class ChoiceFieldTest {
         assert netOptional.getNet() != null
         def net = netOptional.getNet()
 
-        Set<I18nString> choices = ((ChoiceField) net.dataSet["enum"]).choices
+        Set<I18nString> choices = ((ChoiceField) net.dataSet["enumeration"]).choices
         assert choices.size() == 3
         assert choices.find { it.defaultValue == "Choice 1" }
         assert choices.find { it.defaultValue == "Choice 2" }

@@ -6,6 +6,8 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
@@ -23,6 +25,8 @@ abstract class EngineTest {
     public SuperCreator superCreator
     @Autowired
     public WebApplicationContext wac
+
+    // SERVICE
     @Autowired
     public ITaskService taskService
     @Autowired
@@ -34,7 +38,13 @@ abstract class EngineTest {
     @Autowired
     public IPetriNetService petriNetService
     @Autowired
+    public IDataService dataService
+
+    // REPOSITORY
+    @Autowired
     public PetriNetRepository processRepository
+    @Autowired
+    public CaseRepository caseRepository
 
     @BeforeEach
     void before() {

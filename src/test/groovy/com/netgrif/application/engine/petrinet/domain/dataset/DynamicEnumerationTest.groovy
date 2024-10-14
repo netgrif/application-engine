@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -28,33 +29,7 @@ import java.util.stream.Collectors
 @ActiveProfiles(["test"])
 @CompileStatic
 @ExtendWith(SpringExtension.class)
-class DynamicEnumerationTest {
-
-    @Autowired
-    private TestHelper testHelper;
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private IPetriNetService petriNetService;
-
-    @Autowired
-    private SuperCreator superCreator;
-
-    @Autowired
-    private IDataService dataService;
-
-    @Autowired
-    private ITaskService taskService;
-
-    @Autowired
-    private CaseRepository caseRepository;
-
-    @BeforeEach
-    public void before() {
-        testHelper.truncateDbs();
-    }
+class DynamicEnumerationTest extends EngineTest {
 
     @Test
     void testDynamicEnum() {

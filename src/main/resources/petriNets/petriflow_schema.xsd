@@ -395,7 +395,6 @@
     <xs:complexType name="action">
         <xs:simpleContent>
             <xs:extension base="xs:string">
-                <xs:attribute name="trigger"/>
                 <xs:attribute name="type" type="actionType"/>
                 <xs:attribute name="id"/>
             </xs:extension>
