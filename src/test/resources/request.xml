@@ -41,10 +41,10 @@
         <validations>
             <validation>
                 <name>inrange</name>
-                <arguments type="server">
+                <serverArguments>
                     <argument>1000</argument>
                     <argument>2999</argument>
-                </arguments>
+                </serverArguments>
             </validation>
         </validations>
     </data>
