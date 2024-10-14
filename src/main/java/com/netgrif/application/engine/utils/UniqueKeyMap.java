@@ -3,17 +3,16 @@ package com.netgrif.application.engine.utils;
 import lombok.NoArgsConstructor;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 
 /**
  * Extends {@link LinkedHashMap} with a feature to throw {@link IllegalArgumentException} if the key already exists when
  * putting the key using {@link UniqueKeyMap#put(String, Object)}
- * */
+ */
 @NoArgsConstructor
 public class UniqueKeyMap<K extends String, V> extends LinkedHashMap<K, V> {
 
-    public UniqueKeyMap(UniqueKeyMap<K,V> m) {
+    public UniqueKeyMap(UniqueKeyMap<K, V> m) {
         super(m);
     }
 
@@ -26,4 +25,8 @@ public class UniqueKeyMap<K extends String, V> extends LinkedHashMap<K, V> {
         return null;
     }
 
+    @Override
+    public UniqueKeyMap<K, V> clone() {
+        return new UniqueKeyMap<>(this);
+    }
 }

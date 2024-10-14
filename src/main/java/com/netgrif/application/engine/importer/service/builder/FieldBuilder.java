@@ -5,6 +5,7 @@ import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
+import com.netgrif.application.engine.utils.UniqueKeyMap;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehaviors;
 import org.bson.types.ObjectId;
 
@@ -23,7 +24,7 @@ public abstract class FieldBuilder<T extends Field<?>> {
         field.setEvents(new HashMap<>());
         field.setBehaviors(new DataFieldBehaviors());
         field.setValidations(new ArrayList<>());
-        field.setProperties(new HashMap<>());
+        field.setProperties(new UniqueKeyMap<>());
     }
 
     public <U> void setDefaultValue(Field<U> field, Data data) {

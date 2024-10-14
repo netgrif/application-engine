@@ -396,6 +396,7 @@ public class Importer {
         if (importData.getEvent() != null) {
             importData.getEvent().forEach(event -> field.addEvent(createDataEvent(event)));
         }
+        createProperties(importData.getProperties(), field.getProperties());
         process.addDataSetField(field);
     }
 

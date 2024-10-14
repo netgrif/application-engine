@@ -12,6 +12,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavio
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.utils.FieldUtils;
+import com.netgrif.application.engine.utils.UniqueKeyMap;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehaviors;
 import com.netgrif.application.engine.workflow.domain.DataFieldValue;
@@ -83,8 +84,7 @@ public abstract class Field<T> extends Imported {
     @JsonIgnore
     private Long version = 0L;
     // TODO: release/8.0.0 6.2.5: parentTaskId, parentCaseId
-    // TODO: release/8.0.0 unique key map
-    private Map<String, String> properties;
+    private UniqueKeyMap<String, String> properties;
 
     public Field() {
         // TODO: release/8.0.0 no collection can be initialised
@@ -192,6 +192,9 @@ public abstract class Field<T> extends Imported {
         clone.encryption = this.encryption;
         if (this.component != null) {
             clone.component = this.component.clone();
+        }
+        if (this.properties != null) {
+            clone.properties = this.properties.clone();
         }
     }
 

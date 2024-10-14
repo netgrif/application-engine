@@ -94,14 +94,14 @@ class FileListFieldTest {
     void testRemoteAttribute() {
         Process net = getNet()
         assert net.getField(FIELD_ID).isPresent()
-        assert (net.getField(FIELD_ID).get() as FileListField).isRemote()
+        assert (net.getField(FIELD_ID).get()).getProperties().get("remote") == "true"
     }
 
     @Test
     void downloadFileByCaseAndName() {
         Process net = getNet()
 
-        IUser user = userService.findByEmail(configuration.email, true)
+        IUser user = userService.findByEmail(configuration.email)
         assert user != null
 
         Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getCase()
@@ -122,7 +122,7 @@ class FileListFieldTest {
     void downloadFileByTask() {
         Process net = getNet()
 
-        IUser user = userService.findByEmail(configuration.email, true)
+        IUser user = userService.findByEmail(configuration.email)
         assert user != null
 
         Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getCase()

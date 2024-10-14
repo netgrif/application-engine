@@ -10,8 +10,6 @@ import lombok.Data;
 @Data
 public class FileField extends Field<FileFieldValue> {
 
-    private Boolean remote;
-
     public FileField() {
         super();
     }
@@ -37,7 +35,7 @@ public class FileField extends Field<FileFieldValue> {
      * @return path to the saved file
      */
     public String getFilePath(String caseId) {
-        if (this.remote) {
+        if (this.isRemote()) {
             return this.getValue().getValue().getPath();
         }
         return FileStorageConfiguration.getPath(caseId, getStringId(), this.getValue().getValue().getName());
@@ -51,11 +49,10 @@ public class FileField extends Field<FileFieldValue> {
     public FileField clone() {
         FileField clone = new FileField();
         super.clone(clone);
-        clone.remote = this.remote;
         return clone;
     }
 
     public boolean isRemote() {
-        return this.remote != null && this.remote;
+        return "true".equals(getProperties().get("remote"));
     }
 }

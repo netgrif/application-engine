@@ -11,7 +11,6 @@ import java.util.Optional;
 
 @Data
 public class FileListField extends Field<FileListFieldValue> {
-    private Boolean remote;
 
     public FileListField() {
         super();
@@ -46,29 +45,21 @@ public class FileListField extends Field<FileListFieldValue> {
      * @return path to the saved file
      */
     public String getFilePath(String caseId, String name) {
-        if (this.remote) {
+        if (this.isRemote()) {
             Optional<FileFieldValue> first = this.getValue().getValue().getNamesPaths().stream().filter(fileFieldValue -> fileFieldValue.getName().equals(name)).findFirst();
-            if (first.isEmpty()) {
-                return null;
-            }
-            return first.get().getPath();
+            return first.map(FileFieldValue::getPath).orElse(null);
         }
         return FileStorageConfiguration.getPath(caseId, getStringId(), name);
     }
 
     public boolean isRemote() {
-        return this.remote;
-    }
-
-    public void setRemote(boolean remote) {
-        this.remote = remote;
+        return "true".equals(getProperties().get("remote"));
     }
 
     @Override
     public FileListField clone() {
         FileListField clone = new FileListField();
         super.clone(clone);
-        clone.remote = this.remote;
         return clone;
     }
 }

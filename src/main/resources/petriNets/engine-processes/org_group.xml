@@ -4,6 +4,7 @@
 	<id>org_group</id>
 	<version>1.0.0</version>
 	<title>Organization group</title>
+	<caseName dynamic="true"></caseName>
 	<icon>home</icon>
 	<defaultRole>true</defaultRole>
 	<!-- FUNCTIONS -->
