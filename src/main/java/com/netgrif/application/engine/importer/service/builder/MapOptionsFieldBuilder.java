@@ -8,8 +8,8 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public abstract class MapOptionsFieldBuilder<T extends MapOptionsField<I18nString, V>, V> extends FieldBuilder<T> {
@@ -31,8 +31,8 @@ public abstract class MapOptionsFieldBuilder<T extends MapOptionsField<I18nStrin
         if (option == null || option.isEmpty()) {
             return;
         }
-        Map<String, I18nString> options = option.stream()
-                .collect(Collectors.toMap(Option::getKey, importer::toI18NString));
+        LinkedHashMap<String, I18nString> options = option.stream()
+                .collect(Collectors.toMap(Option::getKey, importer::toI18NString, (o1, o2) -> o1, LinkedHashMap::new));
         field.setOptions(options);
     }
 

@@ -54,15 +54,12 @@
             <xs:element type="i18nStringType" name="title"/>
             <xs:element type="i18nStringType" name="placeholder" minOccurs="0"/>
             <xs:element type="i18nStringType" name="desc" minOccurs="0"/>
-            <xs:choice>
-                <xs:element type="i18nStringTypeWithExpression" name="values" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element type="options" name="options" minOccurs="0">
-                    <xs:unique name="optionUniqueKey">
-                        <xs:selector xpath="./option"/>
-                        <xs:field xpath="@key"/>
-                    </xs:unique>
-                </xs:element>
-            </xs:choice>
+            <xs:element type="options" name="options" minOccurs="0">
+                <xs:unique name="optionUniqueKey">
+                    <xs:selector xpath="./option"/>
+                    <xs:field xpath="@key"/>
+                </xs:unique>
+            </xs:element>
             <xs:element type="validations" name="validations" minOccurs="0"/>
             <xs:element type="init" name="init" minOccurs="0"/>
             <xs:element type="component" name="component" minOccurs="0"/>

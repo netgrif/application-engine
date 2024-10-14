@@ -336,9 +336,7 @@ class ImporterTest {
         assert multichoice.getRawValue() == multichoice_like_map.getRawValue()
         assert enumeration.getRawValue() == enumeration_like_map.getRawValue()
 
-        // TODO: release/8.0.0
-//        assert equalSet(multichoice.getDefaultValue(), multichoice_like_map.getDefaultValue())
-        assert enumeration.getDefaultValue() == enumeration_like_map.getDefaultValue()
+        assert enumeration.getDefaultValue().getDefaultValue() == enumeration_like_map.getDefaultValue().getDefaultValue()
     }
 
     @Test

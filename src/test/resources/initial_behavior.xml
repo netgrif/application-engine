@@ -24,12 +24,12 @@
     <data type="date" immediate="true">
         <id>date</id>
         <title>Date</title>
-        <init>01.01.2019</init>
+        <init>2019-01-01</init>
     </data>
     <data type="dateTime" immediate="true">
         <id>datetime</id>
         <title>Datetime</title>
-        <init>01.01.2019 20:00</init>
+        <init>2019-01-01T20:00:00.000Z</init>
     </data>
     <data type="enumeration" immediate="true">
         <id>enumeration</id>

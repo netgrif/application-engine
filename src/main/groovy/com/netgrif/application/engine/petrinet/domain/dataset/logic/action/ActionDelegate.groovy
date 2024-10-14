@@ -64,6 +64,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 
 import java.text.Normalizer
+import java.time.LocalDate
 import java.util.stream.Collectors
 
 /**

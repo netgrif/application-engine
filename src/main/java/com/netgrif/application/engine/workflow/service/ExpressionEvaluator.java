@@ -27,7 +27,7 @@ public class ExpressionEvaluator implements IInitValueExpressionEvaluator {
     }
 
     @Override
-    public Map<String, I18nString> evaluateOptions(Case useCase, MapOptionsField<I18nString, ?> field, Map<String, String> params) {
+    public LinkedHashMap<String, I18nString> evaluateOptions(Case useCase, MapOptionsField<I18nString, ?> field, Map<String, String> params) {
         Object result = evaluate(useCase, field.getOptionsExpression(), params);
         if (!(result instanceof Map)) {
             throw new IllegalArgumentException("[" + useCase.getStringId() + "] Dynamic options not an instance of Map: " + field.getImportId());
@@ -36,7 +36,7 @@ public class ExpressionEvaluator implements IInitValueExpressionEvaluator {
         if (map.values().stream().anyMatch(it -> !(it instanceof I18nString))) {
             return map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, it -> new I18nString(it.getValue().toString()), (o1, o2) -> o1, LinkedHashMap::new));
         } else {
-            return (Map<String, I18nString>) result;
+            return (LinkedHashMap<String, I18nString>) result;
         }
     }
 

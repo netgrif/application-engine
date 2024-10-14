@@ -209,11 +209,11 @@ public class NextGroupService implements INextGroupService {
     public void addUser(IUser user, Case groupCase) {
         // TODO: release/8.0.0: WorkflowServiceTest#createCaseWithLocale - Cannot invoke "com.netgrif.application.engine.workflow.domain.Case.getDataField(String)" because "groupCase" is null
         MapOptionsField<I18nString, String> field = (MapOptionsField<I18nString, String>) groupCase.getDataSet().get(GROUP_MEMBERS_FIELD);
-        Map<String, I18nString> existingUsers = field.getOptions();
+        LinkedHashMap<String, I18nString> existingUsers = field.getOptions();
         if (existingUsers == null) {
-            existingUsers = new HashMap<>();
+            existingUsers = new LinkedHashMap<>();
         }
-        field.setOptions(addUser(user, existingUsers));
+        field.setOptions(new LinkedHashMap<>(addUser(user, existingUsers)));
         workflowService.save(groupCase);
         user.addGroup(groupCase.getStringId());
         userService.save(user);
@@ -232,7 +232,7 @@ public class NextGroupService implements INextGroupService {
         MapOptionsField<I18nString, String> field = (MapOptionsField<I18nString, String>) groupCase.getDataSet().get(GROUP_MEMBERS_FIELD);
         Map<String, I18nString> existingUsers = field.getOptions();
         userIds.add(user.getStringId());
-        field.setOptions(removeUser(userIds, existingUsers, groupCase));
+        field.setOptions(new LinkedHashMap<>(removeUser(userIds, existingUsers, groupCase)));
         workflowService.save(groupCase);
     }
 
