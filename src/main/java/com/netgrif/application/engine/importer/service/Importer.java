@@ -1055,22 +1055,39 @@ public class Importer {
             throw new IllegalArgumentException("Role ID '" + ProcessRole.ANONYMOUS_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
         }
 
+        ProcessRole role;
+        if (shouldInitializeRole(importRole)) {
+            role = initRole(importRole);
+        } else {
+            role = new ArrayList<>(processRoleService.findAllByImportId(ProcessRole.GLOBAL + importRole.getId())).get(0);
+        }
+        role.set_id(new ProcessResourceId(new ObjectId(net.getStringId())));
+
+        net.addRole(role);
+        roles.put(importRole.getId(), role);
+    }
+
+    protected boolean shouldInitializeRole(Role importRole) {
+        return importRole.isGlobal() == null || !importRole.isGlobal() ||
+                (importRole.isGlobal() && processRoleService.findAllByImportId(ProcessRole.GLOBAL + importRole.getId()).isEmpty());
+    }
+
+    protected ProcessRole initRole(Role importRole) {
         ProcessRole role = new ProcessRole();
         Map<EventType, com.netgrif.application.engine.petrinet.domain.events.Event> events = createEventsMap(importRole.getEvent());
-
-        role.setImportId(importRole.getId());
+        role.setImportId(importRole.isGlobal() != null && importRole.isGlobal() ? ProcessRole.GLOBAL + importRole.getId() : importRole.getId());
         role.setEvents(events);
-
         if (importRole.getName() == null) {
             role.setName(toI18NString(importRole.getTitle()));
         } else {
             role.setName(toI18NString(importRole.getName()));
         }
-        role.set_id(new ProcessResourceId(new ObjectId(net.getStringId())));
-
-        role.setNetId(net.getStringId());
-        net.addRole(role);
-        roles.put(importRole.getId(), role);
+        if (importRole.isGlobal() != null && importRole.isGlobal()) {
+            role.setGlobal(importRole.isGlobal());
+        } else {
+            role.setNetId(net.getStringId());
+        }
+        return role;
     }
 
     protected Map<EventType, com.netgrif.application.engine.petrinet.domain.events.Event> createEventsMap(List<com.netgrif.application.engine.importer.model.Event> events) {
