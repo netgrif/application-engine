@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.validation
 
-class LocalizedValidation {
+class LocalizedValidation implements Serializable {
+
+    static final long serialVersionUID = 412530951556364618L
 
     private String validationRule
 

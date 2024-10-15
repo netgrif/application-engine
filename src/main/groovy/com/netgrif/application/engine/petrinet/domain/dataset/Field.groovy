@@ -15,6 +15,7 @@ import com.netgrif.application.engine.petrinet.domain.events.DataEventType
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
 import org.bson.types.ObjectId
+import org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient
 import org.springframework.data.mongodb.core.mapping.Document
@@ -313,7 +314,7 @@ abstract class Field<T> extends Imported {
     @Override
     @QueryType(PropertyType.NONE)
     MetaClass getMetaClass() {
-        return this.metaClass
+        return this.metaClass != null ? this.metaClass  : ((MetaClassRegistryImpl) GroovySystem.getMetaClassRegistry()).getMetaClass(this)
     }
 
     void clone(Field clone) {

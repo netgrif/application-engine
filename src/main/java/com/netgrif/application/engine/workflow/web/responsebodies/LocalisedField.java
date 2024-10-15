@@ -10,13 +10,15 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.L
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 @Data
-public class LocalisedField {
+public class LocalisedField implements Serializable {
 
+    private static final long serialVersionUID = 412530951556364614L;
     private String stringId;
 
     private FieldType type;
