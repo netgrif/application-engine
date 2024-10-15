@@ -27,15 +27,15 @@ public class CaseEventHandler extends AbstractMongoEventListener<Case> {
             return;
         }
 
-        ObjectId objectId = document.getObjectId("_id");
+        String objectId = ((Document)document.get("_id")).get("shortProcessId") + "-" + ((Document)document.get("_id")).get("objectId").toString();
         if (objectId != null) {
-            service.remove(objectId.toString());
+            service.remove(objectId);
             return;
         }
 
-        objectId = document.getObjectId("petriNetObjectId");
+        objectId = document.getObjectId("petriNetObjectId").toString();
         if (objectId != null) {
-            service.removeByPetriNetId(objectId.toString());
+            service.removeByPetriNetId(objectId);
             return;
         }
 

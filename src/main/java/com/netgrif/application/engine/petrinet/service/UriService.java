@@ -5,6 +5,7 @@ import com.netgrif.application.engine.petrinet.domain.UriContentType;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +16,15 @@ import java.util.stream.StreamSupport;
 /**
  * Service for managing UriNode objects
  */
-@Service
+//@Service
 public class UriService implements IUriService {
 
     private static final int FIRST_LEVEL = 0;
 
+    @Getter
     private final UriNodeRepository uriNodeRepository;
 
+    @Getter
     private final UriProperties uriProperties;
 
     public UriService(UriNodeRepository uriNodeRepository, UriProperties uriProperties) {

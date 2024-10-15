@@ -28,7 +28,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.netgrif.application.engine.startup.ImpersonationRunner.IMPERSONATION_CONFIG_PETRI_NET_IDENTIFIER;
+import static com.netgrif.application.engine.startup.runner.ImpersonationRunner.IMPERSONATION_CONFIG_PETRI_NET_IDENTIFIER;
 
 @Service
 public class ImpersonationAuthorizationService implements IImpersonationAuthorizationService {

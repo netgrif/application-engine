@@ -191,19 +191,19 @@ public class WorkflowController {
         }
     }
 
-    @Deprecated
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
-    @Operation(summary = "Get all case data", security = {@SecurityRequirement(name = "BasicAuth")})
-    @GetMapping(value = "/case/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
-    public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
-        try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            return new DataFieldsResource(workflowService.getData(caseId), locale);
-        } catch (UnsupportedEncodingException e) {
-            log.error("Getting all case data of [" + caseId + "] failed:", e);
-            return new DataFieldsResource(new ArrayList<>(), locale);
-        }
-    }
+//    @Deprecated
+//    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+//    @Operation(summary = "Get all case data", security = {@SecurityRequirement(name = "BasicAuth")})
+//    @GetMapping(value = "/case/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
+//    public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
+//        try {
+//            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
+//            return new DataFieldsResource(workflowService.getData(caseId), locale);
+//        } catch (UnsupportedEncodingException e) {
+//            log.error("Getting all case data of [" + caseId + "] failed:", e);
+//            return new DataFieldsResource(new ArrayList<>(), locale);
+//        }
+//    }
 
     @PreAuthorize("@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
     @Operation(summary = "Delete case", security = {@SecurityRequirement(name = "BasicAuth")})

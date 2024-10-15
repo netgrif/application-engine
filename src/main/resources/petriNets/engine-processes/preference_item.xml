@@ -543,7 +543,7 @@
 				return
 			}
 
-			def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+			def filterCase = findCase({it._id.eq(new com.netgrif.application.engine.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
 			change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
 
 			if (filterCase.dataSet["filter_type"].value == "Case") {
@@ -1208,7 +1208,7 @@
 							return
 						}
 
-						def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+						def filterCase = findCase({it._id.eq(new com.netgrif.application.engine.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
 						if (!menu_name.value) {
 							change menu_name value {return filterCase.dataSet["i18n_filter_name"].value}
 						}
@@ -1919,7 +1919,7 @@
 						filterCaseRef: f.filter_case;
 
 						change filterCaseRef value { [new_filter_id.value] }
-						def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+						def filterCase = findCase({it._id.eq(new com.netgrif.application.engine.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
 						change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
 					</action>
 				</actions>

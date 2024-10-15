@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
@@ -45,10 +46,12 @@ public interface IUserService {
     Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable);
 
     void addDefaultRole(IUser user);
+    void addAnonymousRole(IUser user);
 
     List<IUser> findAllByProcessRoles(Set<String> roleIds, boolean small);
 
     void addDefaultAuthorities(IUser user);
+    void addAnonymousAuthorities(IUser user);
 
     IUser assignAuthority(String userId, String authorityId);
 
@@ -67,6 +70,7 @@ public interface IUserService {
     Page<IUser> searchAllCoMembers(String query, LoggedUser principal, Boolean small, Pageable pageable);
 
     IUser removeRole(IUser user, String roleStringId);
+    IUser removeRole(IUser user, ProcessRole processRole);
 
     void removeRoleOfDeletedPetriNet(PetriNet net);
 
