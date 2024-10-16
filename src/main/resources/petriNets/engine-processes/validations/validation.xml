@@ -73,8 +73,8 @@
 					make [validation_definition_groovy, num_arguments_groovy], editable on init when { validation_type.rawValue && validation_type.rawValue.contains("server") }
 					make [validation_definition_groovy, num_arguments_groovy], editable on detail when { validation_type.rawValue && validation_type.rawValue.contains("server") }
 					make [validation_definition_groovy, num_arguments_groovy], hidden on transitions when { !validation_type.rawValue || !validation_type.rawValue.contains("server") }
-					make [validation_definition_javascript, num_arguments_javascript], editable on init_trans when { validation_type.rawValue && validation_type.rawValue.contains("client") }
-					make [validation_definition_javascript, num_arguments_javascript], editable on detail_trans when { validation_type.rawValue && validation_type.rawValue.contains("client") }
+					make [validation_definition_javascript, num_arguments_javascript], editable on init when { validation_type.rawValue && validation_type.rawValue.contains("client") }
+					make [validation_definition_javascript, num_arguments_javascript], editable on detail when { validation_type.rawValue && validation_type.rawValue.contains("client") }
 					make [validation_definition_javascript, num_arguments_javascript], hidden on transitions when { !validation_type.rawValue || !validation_type.rawValue.contains("client") }
 					]]>
 				</action>
@@ -135,9 +135,9 @@
 				<action id="action_2">
 					<![CDATA[
 					make [validation_definition_groovy, num_arguments_groovy], visible on detail when { validation_type.rawValue && validation_type.rawValue.contains("server") }
-					make [validation_definition_groovy, num_arguments_groovy], hidden on detail_trans when { !validation_type.rawValue || !validation_type.rawValue.contains("server") }
-					make [validation_definition_javascript, num_arguments_javascript], visible on detail_trans when { validation_type.rawValue && validation_type.rawValue.contains("client") }
-					make [validation_definition_javascript, num_arguments_javascript], hidden on detail_trans when { !validation_type.rawValue || !validation_type.rawValue.contains("client") }
+					make [validation_definition_groovy, num_arguments_groovy], hidden on detail when { !validation_type.rawValue || !validation_type.rawValue.contains("server") }
+					make [validation_definition_javascript, num_arguments_javascript], visible on detail when { validation_type.rawValue && validation_type.rawValue.contains("client") }
+					make [validation_definition_javascript, num_arguments_javascript], hidden on detail when { !validation_type.rawValue || !validation_type.rawValue.contains("client") }
 					]]>
 				</action>
 			</actions>
@@ -160,9 +160,9 @@
 				<action id="action_3">
 					<![CDATA[
 					make [validation_definition_groovy, num_arguments_groovy], editable on detail when { validation_type.rawValue && validation_type.rawValue.contains("server") }
-					make [validation_definition_groovy, num_arguments_groovy], hidden on detail_trans when { !validation_type.rawValue || !validation_type.rawValue.contains("server") }
-					make [validation_definition_javascript, num_arguments_javascript], editable on detail_trans when { validation_type.rawValue && validation_type.rawValue.contains("client") }
-					make [validation_definition_javascript, num_arguments_javascript], hidden on detail_trans when { !validation_type.rawValue || !validation_type.rawValue.contains("client") }
+					make [validation_definition_groovy, num_arguments_groovy], hidden on detail when { !validation_type.rawValue || !validation_type.rawValue.contains("server") }
+					make [validation_definition_javascript, num_arguments_javascript], editable on detail when { validation_type.rawValue && validation_type.rawValue.contains("client") }
+					make [validation_definition_javascript, num_arguments_javascript], hidden on detail when { !validation_type.rawValue || !validation_type.rawValue.contains("client") }
 					if (validation_type.rawValue && validation_type.rawValue.contains("server")) {
 						validationService.unregisterValidation(name.rawValue)
 					}

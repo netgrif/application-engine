@@ -1,143 +1,107 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		  xsi:noNamespaceSchemaLocation="../petriflow_schema_layout.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
 	<id>preference_filter_item</id>
-	<initials>PFI</initials>
+	<version>1.0.0</version>
 	<title>Preference filter item</title>
 	<icon>list</icon>
 	<defaultRole>true</defaultRole>
-	<transitionRole>false</transitionRole>
-	<!-- TRANSACTIONS -->
-	<!-- ROLES -->
-	<!-- PROCESS ROLE REFS -->
-	<!-- PROCESS USER REFS -->
-	<!-- DATA -->
-	<data type="text" >
-		<id>menu_identifier</id>
-		<title name="menu_identifier">Identifier of menu which is this menu entry part of.</title>
-		<init>default</init>
-	</data>
-	<data type="enumeration" immediate="true">
-		<id>entry_name</id>
+	<anonymousRole>false</anonymousRole>
+	<properties>
+		<property key="initials">PFI</property>
+	</properties>
+	<processEvents/>
+	<caseEvents/>
+	<data type="button">
+		<id>add_allowed_roles</id>
 		<title/>
+		<placeholder id="allow_roles">Allow view for roles</placeholder>
+		<event type="set">
+			<actions phase="post">
+				<action id="action_4">
+					<![CDATA[
+					change allowed_roles options {return configurableMenuService.addSelectedRoles(allowed_roles, processes_available, roles_available)}
+					change roles_available value {[]}
+					change roles_available options {[:]}
+					change processes_available value {null}
+					]]>
+				</action>
+			</actions>
+		</event>
 	</data>
-	<data type="text" >
+	<data type="button">
+		<id>add_banned_roles</id>
+		<title/>
+		<placeholder id="ban_roles">Ban view for roles</placeholder>
+		<event type="set">
+			<actions phase="post">
+				<action id="action_6">
+					<![CDATA[
+					change banned_roles options {return configurableMenuService.addSelectedRoles(banned_roles, processes_available, roles_available)}
+					change roles_available value {[]}
+					change roles_available options {[:]}
+					change processes_available value {null}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="multichoice_map">
+		<id>allowed_nets</id>
+		<title id="allowed_nets">Allowed nets</title>
+	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>allowed_roles</id>
+		<title id="roles_allowed">Allowed roles</title>
+		<desc id="roles_allowed_desc">List of roles allowed to view this menu entry.</desc>
+	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>banned_roles</id>
+		<title id="roles_banned">Banned roles</title>
+		<desc id="roles_banned_desc">List of roles not allowed to view this menu entry.</desc>
+	</data>
+	<data type="text" immediate="true">
+		<id>create_case_button_icon</id>
+		<title id="create_case_button_icon">"New case" button icon identifier</title>
+		<event type="set">
+			<actions phase="post">
+				<action id="action_10">
+					<![CDATA[
+					if (create_case_button_icon.rawValue == "") {
+						change create_case_button_icon_preview value {"""<span></span>"""}
+						return;
+					}
+					change create_case_button_icon_preview value {
+						"""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">""" + create_case_button_icon.rawValue + """</span>"""
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text" immediate="true">
+		<id>create_case_button_icon_preview</id>
+		<title id="create_case_button_icon_preview">Menu icon preview</title>
+		<component>
+			<id>htmltextarea</id>
+		</component>
+	</data>
+	<data type="text" immediate="true">
+		<id>create_case_button_title</id>
+		<title id="create_case_button_title">"New case" button title</title>
+	</data>
+	<data type="text" immediate="true">
+		<id>default_headers</id>
+		<title id="default_headers">Set default headers</title>
+	</data>
+	<data type="text">
 		<id>entry_default_name</id>
-		<title name="menu_item_title">Menu item title</title>
+		<title id="menu_item_title">Menu item title</title>
 	</data>
 	<data type="text">
 		<id>entry_marker</id>
 		<title/>
 	</data>
-	<data type="button">
-		<id>move_option_up</id>
-		<title/>
-		<placeholder name="move_up">Up</placeholder>
-		<event type="set">
-			<id>move_option_up_set</id>
-			<actions phase="post">
-				<action>
-					parentId: f.parentId;
-
-					if (!task.isPresent()) {
-						return
-					}
-
-					def parentCase = findCase({it.id.eq(new org.bson.types.ObjectId(parentId.value.value))});
-
-					def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value.value
-
-					def currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
-
-					if (currentIndex != 0) {
-						previousTaskRefValue.remove(currentIndex)
-						previousTaskRefValue.add(currentIndex - 1, task.get().stringId)
-
-						def parentTask = findTask({it.caseId.eq(parentId.value.value).and(it.transitionId.eq("navigationMenuConfig"))})
-						def dataSet = new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
-								"filter_tasks"      : new com.netgrif.application.engine.petrinet.domain.dataset.TaskField(rawValue: previousTaskRefValue),
-						])
-						setDataWithPropagation(parentTask, dataSet)
-					}
-				</action>
-			</actions>
-		</event>
-	</data>
-	<data type="button">
-		<id>move_option_down</id>
-		<title/>
-		<placeholder name="move_down">Down</placeholder>
-		<event type="set">
-			<id>move_option_down_set</id>
-			<actions phase="post">
-				<action>
-					parentId: f.parentId;
-
-					if (!task.isPresent()) {
-						return
-					}
-
-					def parentCase = findCase({it.id.eq(new org.bson.types.ObjectId(parentId.value.value))});
-
-					def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value.value
-
-					def currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
-
-					if (currentIndex != previousTaskRefValue.size() - 1) {
-						previousTaskRefValue.remove(currentIndex)
-						previousTaskRefValue.add(currentIndex + 1, task.get().stringId)
-
-						def parentTask = findTask({it.caseId.eq(parentId.value.value).and(it.transitionId.eq("navigationMenuConfig"))})
-						def dataSet = new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
-								"filter_tasks"      : new com.netgrif.application.engine.petrinet.domain.dataset.TaskField(rawValue: previousTaskRefValue),
-						])
-						setDataWithPropagation(parentTask, dataSet)
-					}
-				</action>
-			</actions>
-		</event>
-	</data>
-	<data type="button">
-		<id>remove_option</id>
-		<title/>
-		<placeholder name="remove">Remove</placeholder>
-		<event type="set">
-			<id>remove_option_set</id>
-			<actions phase="post">
-				<action>
-					<!--@formatter:off-->
-					parentId: f.parentId,
-					filterCase: f.filter_case;
-
-					if (!task.isPresent()) {
-						return;
-					}
-					def parentCase = findCase({ it.id.eq(new org.bson.types.ObjectId(parentId.value.value)) });
-					def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value.value
-					def currentIndex = previousTaskRefValue.findIndexOf({ id -> id == task.get().stringId })
-
-					previousTaskRefValue.remove(currentIndex)
-
-					def previousCaseRefValue = parentCase.dataSet.get("referenced_filters").value.value
-					currentIndex = previousCaseRefValue.findIndexOf({ id -> id == filterCase.value.value[0] })
-					previousCaseRefValue.remove(currentIndex)
-
-					def parentTask = findTask({ it.caseId.eq(parentId.value.value).and(it.transitionId.eq("navigationMenuConfig")) })
-					def dataSet = new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
-						"filter_tasks"      : new com.netgrif.application.engine.petrinet.domain.dataset.TaskField(rawValue: previousTaskRefValue),
-						"referenced_filters": new com.netgrif.application.engine.petrinet.domain.dataset.CaseField(rawValue: previousCaseRefValue),
-					])
-					setDataWithPropagation(parentTask, dataSet)
-					async.run {
-						workflowService.deleteCase(useCase.stringId)
-					}
-					<!--@formatter:on-->
-				</action>
-			</actions>
-		</event>
-	</data>
-	<data type="taskRef">
-		<id>filter_preview</id>
+	<data type="enumeration" immediate="true">
+		<id>entry_name</id>
 		<title/>
 	</data>
 	<data type="caseRef">
@@ -147,62 +111,130 @@
 			<allowedNet>filter</allowedNet>
 		</allowedNets>
 	</data>
-	<data type="text" immediate="true">
-		<id>parentId</id>
+	<data type="taskRef">
+		<id>filter_preview</id>
 		<title/>
-	</data>
-	<data type="boolean" immediate="true">
-		<id>use_icon</id>
-		<title name="display_icon">Display menu icon?</title>
-		<init>true</init>
-	</data>
-	<data type="text">
-		<id>icon_preview</id>
-		<title name="icon_preview">Menu icon preview</title>
-		<component>
-			<name>htmltextarea</name>
-		</component>
 	</data>
 	<data type="text" immediate="true">
 		<id>icon_name</id>
-		<title name="icon_identifier">Menu icon identifier</title>
-		<desc name="icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
+		<title id="icon_identifier">Menu icon identifier</title>
+		<desc id="icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
 		<event type="set">
-			<id>icon_name_set</id>
 			<actions phase="post">
-				<action>
-					iconIdentifier: f.this,
-					iconPreview: f.icon_preview;
-
-					if (iconIdentifier.value.value == "") {
-						change iconPreview value {<![CDATA["""<span></span>"""]]>}
+				<action id="action_3">
+					<![CDATA[
+					if (icon_name.rawValue == "") {
+						change icon_preview value {"""<span></span>"""}
 						return;
 					}
-
-					change iconPreview value {
-						<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + iconIdentifier.value.value + <![CDATA["""</span>"""]]>
+					change icon_preview value {
+						"""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">""" + icon_name.rawValue + """</span>"""
 					}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>icon_preview</id>
+		<title id="icon_preview">Menu icon preview</title>
+		<component>
+			<id>htmltextarea</id>
+		</component>
+	</data>
+	<data type="text">
+		<id>menu_identifier</id>
+		<title id="menu_identifier">Identifier of menu which is this menu entry part of.</title>
+		<init>default</init>
+	</data>
+	<data type="text" immediate="true">
+		<id>menu_item_identifier</id>
+		<title>Identifikátor (Filter API)</title>
+	</data>
+	<data type="button">
+		<id>move_option_down</id>
+		<title/>
+		<placeholder id="move_down">Down</placeholder>
+		<event type="set">
+			<actions phase="post">
+				<action id="action_1">
+					<![CDATA[
+					if (!task.isPresent()) {
+						return;
+					}
+					def parentCase = findCase({it.id.eq(new org.bson.types.ObjectId(parentId.rawValue))});
+					def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").rawValue
+					def currentIndex = previousTaskRefValue.findIndexOf({ id -> id == task.get().stringId})
+					if (currentIndex != previousTaskRefValue.size() - 1) {
+						previousTaskRefValue.remove(currentIndex)
+						previousTaskRefValue.add(currentIndex + 1, task.get().stringId)
+						def parentTask = findTask({it.caseId.eq(parentId.rawValue).and(it.transitionId.eq("navigationMenuConfig"))})
+						def dataSet = new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
+								"filter_tasks"      : new com.netgrif.application.engine.petrinet.domain.dataset.TaskField(rawValue: previousTaskRefValue),
+						])
+						setDataWithPropagation(parentTask, dataSet)
+					}
+					]]>
 				</action>
 			</actions>
 		</event>
 	</data>
 	<data type="button">
-		<id>add_allowed_roles</id>
+		<id>move_option_up</id>
 		<title/>
-		<placeholder name="allow_roles">Allow view for roles</placeholder>
+		<placeholder id="move_up">Up</placeholder>
 		<event type="set">
-			<id>add_allowed_roles_set</id>
 			<actions phase="post">
-				<action>
-					allowedRoles: f.allowed_roles,
-					processesAvailable: f.processes_available,
-					rolesAvailable: f.roles_available;
-
-					change allowedRoles options {return configurableMenuService.addSelectedRoles(allowedRoles, processesAvailable, rolesAvailable)}
-
-					change rolesAvailable value {[]}
-					change rolesAvailable options {[:]}
-					change processesAvailable value {null}
+				<action id="action_0">
+					<![CDATA[
+					if (!task.isPresent()) {
+						return
+					}
+					def parentCase = findCase({it.id.eq(new org.bson.types.ObjectId(parentId.rawValue))});
+					def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").rawValue
+					def currentIndex = previousTaskRefValue.findIndexOf({ id -> id == task.get().stringId})
+					if (currentIndex != 0) {
+						previousTaskRefValue.remove(currentIndex)
+						previousTaskRefValue.add(currentIndex - 1, task.get().stringId)
+						def parentTask = findTask({it.caseId.eq(parentId.rawValue).and(it.transitionId.eq("navigationMenuConfig"))})
+						def dataSet = new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
+								"filter_tasks"      : new com.netgrif.application.engine.petrinet.domain.dataset.TaskField(rawValue: previousTaskRefValue),
+						])
+						setDataWithPropagation(parentTask, dataSet)
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>new_filter_id</id>
+		<title/>
+	</data>
+	<data type="text" immediate="true">
+		<id>parentId</id>
+		<title/>
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>processes_available</id>
+		<title id="available_processes">Your processes</title>
+		<desc id="available_processes_desc">Select a process containing roles you wish to add to allowed or banned roles lists.</desc>
+		<event type="get">
+			<actions phase="pre">
+				<action id="action_8">
+					<![CDATA[
+					change processes_available options {return configurableMenuService.getNetsByAuthorAsMapOptions(loggedUser(), org.springframework.context.i18n.LocaleContextHolder.locale)}
+					]]>
+				</action>
+			</actions>
+		</event>
+		<event type="set">
+			<actions phase="post">
+				<action id="action_9">
+					<![CDATA[
+					change roles_available options {return configurableMenuService.getAvailableRolesFromNet(processes_available, allowed_roles, banned_roles)}
+					change roles_available value {[]}
+					]]>
 				</action>
 			</actions>
 		</event>
@@ -210,42 +242,17 @@
 	<data type="button">
 		<id>remove_allowed_roles</id>
 		<title/>
-		<placeholder name="remove_from_allowed_roles">Remove from allowed roles</placeholder>
+		<placeholder id="remove_from_allowed_roles">Remove from allowed roles</placeholder>
 		<event type="set">
-			<id>remove_allowed_roles_set</id>
 			<actions phase="post">
-				<action>
-					allowedRoles: f.allowed_roles,
-					processesAvailable: f.processes_available,
-					rolesAvailable: f.roles_available;
-
-					change allowedRoles options {return configurableMenuService.removeSelectedRoles(allowedRoles)}
-
-					change allowedRoles value {[]}
-					change rolesAvailable value {[]}
-					change rolesAvailable options {[:]}
-					change processesAvailable value {null}
-				</action>
-			</actions>
-		</event>
-	</data>
-	<data type="button">
-		<id>add_banned_roles</id>
-		<title/>
-		<placeholder name="ban_roles">Ban view for roles</placeholder>
-		<event type="set">
-			<id>add_banned_roles_set</id>
-			<actions phase="post">
-				<action>
-					bannedRoles: f.banned_roles,
-					processesAvailable: f.processes_available,
-					rolesAvailable: f.roles_available;
-
-					change bannedRoles options {return configurableMenuService.addSelectedRoles(bannedRoles, processesAvailable, rolesAvailable)}
-
-					change rolesAvailable value {[]}
-					change rolesAvailable options {[:]}
-					change processesAvailable value {null}
+				<action id="action_5">
+					<![CDATA[
+					change allowed_roles options {return configurableMenuService.removeSelectedRoles(allowed_roles)}
+					change allowed_roles value {[]}
+					change roles_available value {[]}
+					change roles_available options {[:]}
+					change processes_available value {null}
+					]]>
 				</action>
 			</actions>
 		</event>
@@ -253,211 +260,168 @@
 	<data type="button">
 		<id>remove_banned_roles</id>
 		<title/>
-		<placeholder name="remove_from_banned_roles">Remove from banned roles</placeholder>
+		<placeholder id="remove_from_banned_roles">Remove from banned roles</placeholder>
 		<event type="set">
-			<id>remove_banned_roles_set</id>
 			<actions phase="post">
-				<action>
-					bannedRoles: f.banned_roles,
-					processesAvailable: f.processes_available,
-					rolesAvailable: f.roles_available;
-
-					change bannedRoles options {return configurableMenuService.removeSelectedRoles(bannedRoles)}
-
-					change bannedRoles value {[]}
-					change rolesAvailable value {[]}
-					change rolesAvailable options {[:]}
-					change processesAvailable value {null}
+				<action id="action_7">
+					<![CDATA[
+					change banned_roles options {return configurableMenuService.removeSelectedRoles(banned_roles)}
+					change banned_roles value {[]}
+					change roles_available value {[]}
+					change roles_available options {[:]}
+					change processes_available value {null}
+					]]>
 				</action>
 			</actions>
 		</event>
 	</data>
-	<data type="enumeration_map" immediate="true">
-		<id>processes_available</id>
-		<title name="available_processes">Your processes</title>
-		<desc name="available_processes_desc">Select a process containing roles you wish to add to allowed or banned roles lists.</desc>
-		<event type="get">
-			<id>processes_available_get</id>
-			<actions phase="pre">
-				<action>
-					processes: f.this;
-
-					change processes options {return configurableMenuService.getNetsByAuthorAsMapOptions(loggedUser(), org.springframework.context.i18n.LocaleContextHolder.locale)}
-				</action>
-			</actions>
-		</event>
+	<data type="button">
+		<id>remove_option</id>
+		<title/>
+		<placeholder id="remove">Remove</placeholder>
 		<event type="set">
-			<id>processes_available_set</id>
 			<actions phase="post">
-				<action>
-					processes: f.this,
-					allowedRoles: f.allowed_roles,
-					bannedRoles: f.banned_roles,
-					rolesAvailable: f.roles_available;
-
-					change rolesAvailable options {return configurableMenuService.getAvailableRolesFromNet(processes, allowedRoles, bannedRoles)}
-					change rolesAvailable value {[]}
+				<action id="action_2">
+					<![CDATA[
+					if (!task.isPresent()) {
+						return;
+					}
+					def parentCase = findCase({ it.id.eq(new org.bson.types.ObjectId(parentId.rawValue)) });
+					def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").rawValue
+					def currentIndex = previousTaskRefValue.findIndexOf({ id -> id == task.get().stringId })
+					previousTaskRefValue.remove(currentIndex)
+					def previousCaseRefValue = parentCase.dataSet.get("referenced_filters").rawValue
+					currentIndex = previousCaseRefValue.findIndexOf({ id -> id == filter_case.rawValue[0] })
+					previousCaseRefValue.remove(currentIndex)
+					def parentTask = findTask({ it.caseId.eq(parentId.rawValue).and(it.transitionId.eq("navigationMenuConfig")) })
+					def dataSet = new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
+							"filter_tasks"      : new com.netgrif.application.engine.petrinet.domain.dataset.TaskField(rawValue: previousTaskRefValue),
+							"referenced_filters": new com.netgrif.application.engine.petrinet.domain.dataset.CaseField(rawValue: previousCaseRefValue),
+					])
+					setDataWithPropagation(parentTask, dataSet)
+					async.run {
+						workflowService.deleteCase(useCase.stringId)
+					}
+					]]>
 				</action>
 			</actions>
 		</event>
 	</data>
 	<data type="multichoice_map" immediate="true">
 		<id>roles_available</id>
-		<title name="available_roles">Available roles from selected process</title>
+		<title id="available_roles">Available roles from selected process</title>
 	</data>
-	<data type="multichoice_map" immediate="true">
-		<id>allowed_roles</id>
-		<title name="roles_allowed">Allowed roles</title>
-		<desc name="roles_allowed_desc">List of roles allowed to view this menu entry.</desc>
+	<data type="boolean" immediate="true">
+		<id>use_icon</id>
+		<title id="display_icon">Display menu icon?</title>
+		<init>true</init>
 	</data>
-	<data type="multichoice_map" immediate="true">
-		<id>banned_roles</id>
-		<title name="roles_banned">Banned roles</title>
-		<desc name="roles_banned_desc">List of roles not allowed to view this menu entry.</desc>
-	</data>
-  	<data type="text">
-		<id>new_filter_id</id>
-		<title/>
-	</data>
-	<data type="text" immediate="true">
-		<id>menu_item_identifier</id>
-		<title>Identifikátor (Filter API)</title>
-	</data>
-	<data type="text" immediate="true">
-		<id>create_case_button_title</id>
-		<title name="create_case_button_title">"New case" button title</title>
-	</data>
-	<data type="text" immediate="true">
-		<id>create_case_button_icon_preview</id>
-		<title name="create_case_button_icon_preview">Menu icon preview</title>
-		<component>
-			<name>htmltextarea</name>
-		</component>
-	</data>
-	<data type="text" immediate="true">
-		<id>create_case_button_icon</id>
-		<title name="create_case_button_icon">"New case" button icon identifier</title>
-		<event type="set">
-			<id>create_case_button_icon_set</id>
-			<actions phase="post">
-				<action>
-					create_case_button_icon_preview: f.create_case_button_icon_preview,
-					create_case_button_icon: f.create_case_button_icon;
-
-
-					if (create_case_button_icon.value.value == "") {
-						change create_case_button_icon_preview value {<![CDATA["""<span></span>"""]]>}
-						return;
-					}
-
-					change create_case_button_icon_preview value {
-						<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + create_case_button_icon.value.value + <![CDATA["""</span>"""]]>
-					}
-				</action>
-			</actions>
-		</event>
- 	</data>
-
-	<data type="text" immediate="true">
-		<id>default_headers</id>
-		<title name="default_headers">Set default headers</title>
-	</data>
-
-	<data type="multichoice_map">
-		<id>allowed_nets</id>
-		<title name="allowed_nets">Allowed nets</title>
-	</data>
-
-	<!-- I18NS -->
 	<i18n locale="sk">
-		<i18nString name="menu_item_title">Názov položky menu</i18nString>
-		<i18nString name="move_up">Posunúť nahor</i18nString>
-		<i18nString name="move_down">Posunúť nadol</i18nString>
-		<i18nString name="remove">Odstrániť</i18nString>
-		<i18nString name="display_icon">Zobrazovať ikonu?</i18nString>
-		<i18nString name="icon_preview">Náhľad ikony</i18nString>
-		<i18nString name="icon_identifier">Identifikátor ikony</i18nString>
-		<i18nString name="icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
-		<i18nString name="allow_roles">Pridaj k povoleným roliam</i18nString>
-		<i18nString name="remove_from_allowed_roles">Odstráň z povolených rolí</i18nString>
-		<i18nString name="ban_roles">Pridaj k zakázaným roliam</i18nString>
-		<i18nString name="remove_from_banned_roles">Odstráň zo zakázaných rolí</i18nString>
-		<i18nString name="processes_available">Vaše procesy</i18nString>
-		<i18nString name="available_processes_desc">Vyberte proces obsahujúci roly ktoré chcete pridať do zoznamu povolených alebo zakázaných rolí.</i18nString>
-		<i18nString name="roles_available">Dostupné roly</i18nString>
-		<i18nString name="allowed_roles">Povolené roly</i18nString>
-		<i18nString name="allowed_roles_desc">Zoznam rolí ktoré budú upravovaný menu záznam vidieť.</i18nString>
-		<i18nString name="banned_roles">Zakázané roly</i18nString>
-		<i18nString name="banned_roles_desc">Zoznam rolí pre ktoré bude upravovaný menu záznam skrytý.</i18nString>
-		<i18nString name="create_case_button_title">Názov tlačidla "Nová inštancia"</i18nString>
-		<i18nString name="create_case_button_icon">Identifikátor ikony tlačidla "Nová inštancia"</i18nString>
-		<i18nString name="create_case_button_icon_preview">Náhľad ikony</i18nString>
-		<i18nString name="default_headers">Predvolené hlavičky</i18nString>
+		<i18nString id="menu_item_title">Názov položky menu</i18nString>
+		<i18nString id="move_up">Posunúť nahor</i18nString>
+		<i18nString id="move_down">Posunúť nadol</i18nString>
+		<i18nString id="remove">Odstrániť</i18nString>
+		<i18nString id="display_icon">Zobrazovať ikonu?</i18nString>
+		<i18nString id="icon_preview">Náhľad ikony</i18nString>
+		<i18nString id="icon_identifier">Identifikátor ikony</i18nString>
+		<i18nString id="icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
+		<i18nString id="allow_roles">Pridaj k povoleným roliam</i18nString>
+		<i18nString id="remove_from_allowed_roles">Odstráň z povolených rolí</i18nString>
+		<i18nString id="ban_roles">Pridaj k zakázaným roliam</i18nString>
+		<i18nString id="remove_from_banned_roles">Odstráň zo zakázaných rolí</i18nString>
+		<i18nString id="processes_available">Vaše procesy</i18nString>
+		<i18nString id="available_processes_desc">Vyberte proces obsahujúci roly ktoré chcete pridať do zoznamu povolených alebo zakázaných rolí.</i18nString>
+		<i18nString id="roles_available">Dostupné roly</i18nString>
+		<i18nString id="allowed_roles">Povolené roly</i18nString>
+		<i18nString id="allowed_roles_desc">Zoznam rolí ktoré budú upravovaný menu záznam vidieť.</i18nString>
+		<i18nString id="banned_roles">Zakázané roly</i18nString>
+		<i18nString id="banned_roles_desc">Zoznam rolí pre ktoré bude upravovaný menu záznam skrytý.</i18nString>
+		<i18nString id="create_case_button_title">Názov tlačidla "Nová inštancia"</i18nString>
+		<i18nString id="create_case_button_icon">Identifikátor ikony tlačidla "Nová inštancia"</i18nString>
+		<i18nString id="create_case_button_icon_preview">Náhľad ikony</i18nString>
+		<i18nString id="default_headers">Predvolené hlavičky</i18nString>
 	</i18n>
 	<i18n locale="de">
-		<i18nString name="menu_item_title">Menüpunkttitel</i18nString>
-		<i18nString name="move_up">nach oben</i18nString>
-		<i18nString name="move_down">nach unten</i18nString>
-		<i18nString name="remove">entfernen</i18nString>
-		<i18nString name="display_icon">Menüikone anzeigen</i18nString>
-		<i18nString name="icon_preview">Ikonevorschau</i18nString>
-		<i18nString name="icon_identifier">Ikone ID</i18nString>
-		<i18nString name="icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
-		<i18nString name="allow_roles">Zu zulässigen Rollen hinzufügen</i18nString>
-		<i18nString name="remove_from_allowed_roles">Aus zulässigen Rollen entfernen</i18nString>
-		<i18nString name="ban_roles">Zu verbotenen Rollen hinzufügen</i18nString>
-		<i18nString name="remove_from_banned_roles">Aus verbotenen Rollen entfernen</i18nString>
-		<i18nString name="processes_available">Ihre Prozesse</i18nString>
-		<i18nString name="available_processes_desc">Wählen Sie einen Prozess mit Rollen aus, die Sie zu Listen mit zulässigen oder verbotenen Rollen hinzufügen möchten.</i18nString>
-		<i18nString name="roles_available">Verfügbare Rollen</i18nString>
-		<i18nString name="allowed_roles">Zulässige Rollen</i18nString>
-		<i18nString name="allowed_roles_desc">Liste der Rollen, die diesen Menüeintrag anzeigen dürfen.</i18nString>
-		<i18nString name="banned_roles">Verbotene Rollen</i18nString>
-		<i18nString name="banned_roles_desc">Liste der Rollen, die diesen Menüeintrag nicht anzeigen dürfen.</i18nString>
-		<i18nString name="create_case_button_title">Schaltflächentitel "Neuer Fall"</i18nString>
-		<i18nString name="create_case_button_icon">Ikone ID</i18nString>
-		<i18nString name="create_case_button_icon_preview">Ikonevorschau</i18nString>
-		<i18nString name="default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
+		<i18nString id="menu_item_title">Menüpunkttitel</i18nString>
+		<i18nString id="move_up">nach oben</i18nString>
+		<i18nString id="move_down">nach unten</i18nString>
+		<i18nString id="remove">entfernen</i18nString>
+		<i18nString id="display_icon">Menüikone anzeigen</i18nString>
+		<i18nString id="icon_preview">Ikonevorschau</i18nString>
+		<i18nString id="icon_identifier">Ikone ID</i18nString>
+		<i18nString id="icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
+		<i18nString id="allow_roles">Zu zulässigen Rollen hinzufügen</i18nString>
+		<i18nString id="remove_from_allowed_roles">Aus zulässigen Rollen entfernen</i18nString>
+		<i18nString id="ban_roles">Zu verbotenen Rollen hinzufügen</i18nString>
+		<i18nString id="remove_from_banned_roles">Aus verbotenen Rollen entfernen</i18nString>
+		<i18nString id="processes_available">Ihre Prozesse</i18nString>
+		<i18nString id="available_processes_desc">Wählen Sie einen Prozess mit Rollen aus, die Sie zu Listen mit zulässigen oder verbotenen Rollen hinzufügen möchten.</i18nString>
+		<i18nString id="roles_available">Verfügbare Rollen</i18nString>
+		<i18nString id="allowed_roles">Zulässige Rollen</i18nString>
+		<i18nString id="allowed_roles_desc">Liste der Rollen, die diesen Menüeintrag anzeigen dürfen.</i18nString>
+		<i18nString id="banned_roles">Verbotene Rollen</i18nString>
+		<i18nString id="banned_roles_desc">Liste der Rollen, die diesen Menüeintrag nicht anzeigen dürfen.</i18nString>
+		<i18nString id="create_case_button_title">Schaltflächentitel "Neuer Fall"</i18nString>
+		<i18nString id="create_case_button_icon">Ikone ID</i18nString>
+		<i18nString id="create_case_button_icon_preview">Ikonevorschau</i18nString>
+		<i18nString id="default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
 	</i18n>
-	<!-- TRANSITIONS -->
+	<transition>
+		<id>change_filter</id>
+		<x>420</x>
+		<y>350</y>
+		<title>[Change filter]</title>
+		<flex>
+			<id>change_filter_flex</id>
+			<item>
+				<dataRef>
+					<id>new_filter_id</id>
+					<logic>
+						<behavior>editable</behavior>
+						<required>true</required>
+					</logic>
+					<event type="set">
+						<id>set_event_0</id>
+						<actions phase="post">
+							<action id="action_14">
+								<![CDATA[
+								change filter_case value { [new_filter_id.rawValue] }
+								def filterCase = findCase({it.id.eq(filter_case.rawValue[0])})
+								change entry_default_name value {return filterCase.title}
+								change entry_name value {return filterCase.dataSet["i18n_filter_name"].rawValue}
+								change filter_preview value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+								change icon_name value {filterCase.icon_name}
+								]]>
+							</action>
+						</actions>
+					</event>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+		</flex>
+	</transition>
 	<transition>
 		<id>init</id>
 		<x>420</x>
 		<y>260</y>
-		<label/>
-		<grid>
-			<id>init_grid</id>
+		<title/>
+		<flex>
+			<id>init_flex</id>
 			<item>
 				<dataRef>
 					<id>filter_case</id>
 					<logic>
 						<behavior>forbidden</behavior>
 					</logic>
-					<event type="set">
-						<id>filter_case_init_set</id>
-						<actions phase="post">
-							<action>
-								filterTaskRef: f.filter_preview,
-								filterCaseRef: f.filter_case,
-								entryDefaultName: f.entry_default_name,
-								entryName: f.entry_name,
-								icon: f.icon_name;
-
-								def filterCase = findCase({it.id.eq(filterCaseRef.value.value[0])})
-
-								change entryDefaultName value {return filterCase.title}
-
-								change entryName value {return filterCase.dataSet["i18n_filter_name"].value.value}
-
-								change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
-
-								change icon value {filterCase.icon}
-							</action>
-						</actions>
-					</event>
 				</dataRef>
 				<properties>
-					<grid-column>1 / 2</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -468,7 +432,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>1 / 2</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -479,26 +445,20 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>1 / 2</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
-			<properties>
-				<display>grid</display>
-				<grid-template-columns>1fr</grid-template-columns>
-				<justify-items>stretch</justify-items>
-				<align-items>stretch</align-items>
-				<justify-content>stretch</justify-content>
-				<align-content>stretch</align-content>
-			</properties>
-		</grid>
+		</flex>
 	</transition>
 	<transition>
 		<id>view</id>
 		<x>660</x>
 		<y>260</y>
-		<label/>
-		<grid>
-			<id>view_grid</id>
+		<title/>
+		<flex>
+			<id>view_flex</id>
 			<item>
 				<dataRef>
 					<id>entry_default_name</id>
@@ -506,29 +466,26 @@
 						<behavior>editable</behavior>
 					</logic>
 					<event type="set">
-						<id>entry_default_name_view_set</id>
 						<actions phase="post">
-							<action>
-								entryName: f.entry_name,
-								filterTask: f.filter_preview,
-								filterCaseRef: f.filter_case,
-								entryDefaultName: f.entry_default_name;
-
-								def filterCase = findCase({it.id.eq(new org.bson.types.ObjectId(filterCaseRef.value.value[0]))})
-								filterCase.setTitle(entryDefaultName.value.value)
+							<action id="action_11">
+								<![CDATA[
+								def filterCase = findCase({it.id.eq(new org.bson.types.ObjectId(filter_case.rawValue[0]))})
+								filterCase.setTitle(entry_default_name.rawValue)
 								workflowService.save(filterCase)
-								def filterTask = findTask({ it.id.eq(filterTask.value.value[0])})
-								setData(filterTask, [
-										"new_title": ["type":"text", "value": entryDefaultName.value.value]
+								def filter_preview = findTask({ it.id.eq(filter_preview.rawValue[0])})
+								setData(filter_preview, [
+										"new_title": ["type":"text", "value": entry_default_name.rawValue]
 								])
-
-								change entryName value {return new com.netgrif.application.engine.petrinet.domain.I18nString(entryDefaultName.value.value)}
+								change entry_name value {return new com.netgrif.application.engine.petrinet.domain.I18nString(entry_default_name.rawValue)}
+								]]>
 							</action>
 						</actions>
 					</event>
 				</dataRef>
 				<properties>
-					<grid-column>1 / span 2</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -539,7 +496,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>3 / 4</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -550,7 +509,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>4 / 5</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -561,7 +522,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>5 / 6</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -572,8 +535,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>1 / 2</grid-column>
-					<grid-row>2 / span 2</grid-row>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -584,8 +548,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>2 / 3</grid-column>
-					<grid-row>2 / span 2</grid-row>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -596,7 +561,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>3 / 4</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -607,7 +574,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>4 / 5</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -618,7 +587,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>5 / 6</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -629,7 +600,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>3 / 4</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -640,7 +613,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>4 / 5</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -651,7 +626,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>5 / 6</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -661,25 +638,23 @@
 						<behavior>editable</behavior>
 					</logic>
 					<event type="set">
-						<id>use_icon_view_set</id>
+						<id>0</id>
 						<actions phase="post">
-							<action>
-								trans: t.this,
-								iconPreview: f.icon_preview,
-								iconName: f.icon_name,
-								useIcon: f.use_icon;
-
-								make iconPreview,visible on trans when {useIcon.value.value}
-								make iconName,editable on trans when {useIcon.value.value}
-
-								make iconPreview,hidden on trans when {!useIcon.value.value}
-								make iconName,hidden on trans when {!useIcon.value.value}
+							<action id="action_12">
+								<![CDATA[
+								make icon_preview,visible on this when {use_icon.rawValue}
+								make icon_name,editable on this when {use_icon.rawValue}
+								make icon_preview,hidden on this when {!use_icon.rawValue}
+								make icon_name,hidden on this when {!use_icon.rawValue}
+								]]>
 							</action>
 						</actions>
 					</event>
 				</dataRef>
 				<properties>
-					<grid-column>1 / 2</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -690,7 +665,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>2 / 3</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -700,21 +677,21 @@
 						<behavior>editable</behavior>
 					</logic>
 					<event type="set">
-						<id>icon_name_view_set</id>
 						<actions phase="post">
-							<action>
-								iconIdentifier: f.icon_name,
-								filterCaseId: f.filter_case;
-
-								def filterCase = findCase({it.id.eq(new org.bson.types.ObjectId(filterCaseId.value.value[0]))})
-								filterCase.setIcon(iconIdentifier.value.value)
+							<action id="action_13">
+								<![CDATA[
+								def filterCase = findCase({it.id.eq(new org.bson.types.ObjectId(filter_case.rawValue[0]))})
+								filterCase.setIcon(icon_name.rawValue)
 								workflowService.save(filterCase)
+								]]>
 							</action>
 						</actions>
 					</event>
 				</dataRef>
 				<properties>
-					<grid-column>3 / span 2</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -725,7 +702,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>1 / span 5</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -736,7 +715,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>1 / 2</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -747,7 +728,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>2 / 3</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -758,7 +741,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>1 / span 2</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -769,7 +754,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>3 / 4</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -780,7 +767,9 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>4 / span 2</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
 			<item>
@@ -791,91 +780,25 @@
 					</logic>
 				</dataRef>
 				<properties>
-					<grid-column>1 / span 4</grid-column>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
-			<properties>
-				<display>grid</display>
-				<grid-template-columns>repeat(5, 1fr)</grid-template-columns>
-				<justify-items>stretch</justify-items>
-				<align-items>stretch</align-items>
-				<justify-content>stretch</justify-content>
-				<align-content>stretch</align-content>
-			</properties>
-		</grid>
+		</flex>
 	</transition>
-
-	<transition>
-		<id>change_filter</id>
-		<x>420</x>
-		<y>350</y>
-		<label>[Change filter]</label>
-		<grid>
-			<id>change_filter_grid</id>
-			<item>
-				<dataRef>
-					<id>new_filter_id</id>
-					<logic>
-						<behavior>editable</behavior>
-						<behavior>required</behavior>
-					</logic>
-					<event type="set">
-						<id>new_filter_id_change_filter_set</id>
-						<actions phase="post">
-							<action>
-								new_filter_id: f.new_filter_id,
-								filterTaskRef: f.filter_preview,
-								filterCaseRef: f.filter_case,
-								entryDefaultName: f.entry_default_name,
-								entryName: f.entry_name,
-								icon: f.icon_name;
-
-								change filterCaseRef value { [new_filter_id.value.value] }
-								def filterCase = findCase({it.id.eq(filterCaseRef.value.value[0])})
-
-								change entryDefaultName value {return filterCase.title}
-
-								change entryName value {return filterCase.dataSet["i18n_filter_name"].value.value}
-
-								change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
-
-								change icon value {filterCase.icon}
-							</action>
-						</actions>
-					</event>
-				</dataRef>
-				<properties>
-					<grid-column>1 / 2</grid-column>
-				</properties>
-			</item>
-			<properties>
-				<display>grid</display>
-				<grid-template-columns>1fr</grid-template-columns>
-				<justify-items>stretch</justify-items>
-				<align-items>stretch</align-items>
-				<justify-content>stretch</justify-content>
-				<align-content>stretch</align-content>
-			</properties>
-		</grid>
-	</transition>
-	<!-- PLACES -->
 	<place>
 		<id>p1</id>
 		<x>300</x>
 		<y>260</y>
-		<label/>
 		<tokens>1</tokens>
-		<static>false</static>
 	</place>
 	<place>
 		<id>p2</id>
 		<x>540</x>
 		<y>260</y>
-		<label/>
 		<tokens>0</tokens>
-		<static>false</static>
 	</place>
-	<!-- ARCS -->
 	<arc>
 		<id>a4</id>
 		<type>regular</type>
@@ -904,4 +827,4 @@
 		<destinationId>change_filter</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
-</document>
+</process>

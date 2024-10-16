@@ -47,6 +47,10 @@ class ValidationRunner extends AbstractOrderedCommandLineRunner {
             caseRepository.findAll(predicate, PageRequest.of(pageNum, PAGE_SIZE))
                     .getContent()
                     .each { Case validationCase ->
+                        Integer marking = validationCase.activePlaces[VALIDATION_ACTIVE_PLACE_ID]
+                        if (marking == null || marking == 0) {
+                            return
+                        }
                         validationService.registerValidation(
                                 validationCase.getDataSet().get(VALIDATION_NAME_FIELD_ID).rawValue as String,
                                 validationCase.getDataSet().get(VALIDATION_GROOVY_DEFINITION_FIELD_ID).rawValue as String

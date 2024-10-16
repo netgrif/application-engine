@@ -4,6 +4,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
+import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
@@ -39,6 +40,8 @@ abstract class EngineTest {
     public IPetriNetService petriNetService
     @Autowired
     public IDataService dataService
+    @Autowired
+    public IUriService uriService
 
     // REPOSITORY
     @Autowired

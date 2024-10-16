@@ -668,6 +668,9 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         if (value != null) {
             // TODO: release/8.0.0 should be in data service
             if (field instanceof CaseField) {
+                if (value.every {it == null}) {
+                    return;
+                }
                 value = ((List) value).stream().map({ entry -> entry instanceof Case ? entry.getStringId() : entry }).collect(Collectors.toList())
                 dataService.validateCaseRefValue((List<String>) value, ((CaseField) field).getAllowedNets())
             }

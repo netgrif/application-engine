@@ -1,44 +1,66 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
     <id>filter</id>
     <version>1.0.0</version>
     <title id="process_title">Filter</title>
     <icon>filter_alt</icon>
     <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">FTR</property>
+    </properties>
     <caseName id="case_name">New filter</caseName>
-    <!-- CASE EVENTS -->
+    <processEvents/>
     <caseEvents>
         <event type="create">
             <id>case_create</id>
             <actions phase="post">
-                <action>
-                    caseId: f.filter_case_id;
-
-                    change caseId value {return useCase.stringId};
-                </action>
+                <action id="action_0">
+					<![CDATA[
+                    change filter_case_id value {return useCase.stringId};
+                    ]]>
+				</action>
             </actions>
         </event>
     </caseEvents>
-    <!-- TRANSACTIONS -->
-    <!-- ROLES -->
     <role>
         <id>system</id>
         <title>System</title>
     </role>
-    <!-- PROCESS ROLE REFS -->
-    <!-- PROCESS USER REFS -->
-    <!-- FUNCTIONS -->
-    <function scope="process" id="initializeMyFullFilterTaskRef">
-        {
-            com.netgrif.application.engine.petrinet.domain.dataset.TaskField myFullFilter
-                ->
-                change myFullFilter value {return [findTask({it.caseId.eq(useCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
-        }
+    <function scope="process" name="initializeMyFullFilterTaskRef">
+        <![CDATA[
+		{ com.netgrif.application.engine.petrinet.domain.dataset.TaskField myFullFilter ->
+		    change myFullFilter value {return [findTask({it.caseId.eq(useCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+		}
+		]]>
     </function>
-    <!-- DATA -->
+    <data type="multichoice_map">
+        <id>allowed_nets</id>
+        <title id="allowed_nets">Allowed nets</title>
+    </data>
+    <data type="button">
+        <id>and_me</id>
+        <title/>
+        <placeholder id="and">AND</placeholder>
+    </data>
+    <data type="button">
+        <id>and_view</id>
+        <title/>
+        <placeholder id="and">AND</placeholder>
+    </data>
+    <data type="i18n">
+        <id>divider_1</id>
+        <title/>
+        <component>
+            <id>divider</id>
+        </component>
+    </data>
     <data type="filter" immediate="true">
         <id>filter</id>
         <title id="filter_field">Filter</title>
+    </data>
+    <data type="text">
+        <id>filter_case_id</id>
+        <title/>
     </data>
     <data type="enumeration_map" immediate="true">
         <id>filter_type</id>
@@ -48,103 +70,9 @@
             <option key="Task" id="filter_type_task">Task filter</option>
         </options>
     </data>
-    <data type="enumeration_map" immediate="true">
-        <id>visibility</id>
-        <title id="filter_visibility">Filter visibility</title>
-        <options>
-            <option key="public" id="filter_visibility_public">Public</option>
-            <option key="private" id="filter_visibility_private">Private</option>
-        </options>
-        <init>public</init>
-    </data>
-    <data type="text" immediate="true">
-        <id>origin_view_id</id>
-        <title id="origin_view_id">Origin ViewId</title>
-        <event type="set">
-            <id>origin_view_id_set</id>
-            <actions phase="post">
-                <action>
-                    origin_view_id: f.origin_view_id,
-                    and_view: f.and_view,
-                    trimmed_origin_view_id: f.trimmed_origin_view_id,
-                    t1: t.view_filter,
-                    t2: t.view_as_ancestor;
-
-                    if (origin_view_id.rawValue == "") {
-                        return;
-                    }
-
-                    // the same regex is used in the frontend FilterExtractionService. Please keep them in sync
-                    def match = origin_view_id.rawValue =~ "^.*?(-\\d+)?\$"
-                    match.matches()
-
-                    def trimmed_id;
-
-                    if (match.start(1) == -1) {
-                        trimmed_id = origin_view_id.rawValue
-                    } else {
-                        trimmed_id = origin_view_id.rawValue.substring(0, match.start(1))
-                    }
-
-                    change trimmed_origin_view_id value {trimmed_id}
-                    make and_view, visible on t1 when {true}
-                    make and_view, visible on t2 when {true}
-                    make trimmed_origin_view_id, visible on t1 when {true}
-                    make trimmed_origin_view_id, visible on t2 when {true}
-                    make origin_view_id, hidden on t1 when {true}
-                    make origin_view_id, hidden on t2 when {true}
-                </action>
-            </actions>
-        </event>
-    </data>
-    <data type="text" immediate="true">
-        <id>parent_filter_id</id>
-        <title id="parent_filter_id">parent filter ID</title>
-        <event type="set">
-            <id>parent_filter_id_set</id>
-            <actions phase="post">
-                <action>
-                    parent_filter_id: f.parent_filter_id,
-                    ancestor_task_ref: f.taskref_and_parent;
-
-                    def ancestor_view_filter = findTask({it.caseId.eq(parent_filter_id.rawValue).and(it.task.transitionId.eq("view_as_ancestor"))})
-
-                    change ancestor_task_ref value {[ancestor_view_filter.stringId]}
-                </action>
-            </actions>
-        </event>
-    </data>
-    <data type="text">
-        <id>new_title</id>
-        <title id="filter_name">Filter name</title>
-    </data>
     <data type="i18n" immediate="true">
         <id>i18n_filter_name</id>
         <title/>
-    </data>
-    <data type="text">
-        <id>filter_case_id</id>
-        <title/>
-    </data>
-    <data type="text">
-        <id>menu_identifier</id>
-        <title/>
-    </data>
-    <data type="button">
-        <id>and_me</id>
-        <placeholder id="and">AND</placeholder>
-    </data>
-    <data type="button">
-        <id>and_view</id>
-        <placeholder id="and">AND</placeholder>
-    </data>
-    <data type="taskRef">
-        <id>taskref_and_parent</id>
-        <title/>
-    </data>
-    <data type="text">
-        <id>trimmed_origin_view_id</id>
-        <title id="filter_from_view_id">Filter from view with ID</title>
     </data>
     <data type="number">
         <id>is_imported</id>
@@ -153,9 +81,11 @@
         <event type="set">
             <id>is_imported_set</id>
             <actions phase="post">
-                <action>
+                <action id="action_3">
+					<![CDATA[
                     change is_not_imported value { return 0 }
-                </action>
+                    ]]>
+				</action>
             </actions>
         </event>
     </data>
@@ -163,6 +93,10 @@
         <id>is_not_imported</id>
         <title>not imported</title>
         <init>1</init>
+    </data>
+    <data type="text">
+        <id>menu_identifier</id>
+        <title/>
     </data>
     <data type="text">
         <id>missing_allowed_nets</id>
@@ -185,18 +119,74 @@
         <id>my_full_filter</id>
         <title/>
     </data>
-    <data type="multichoice_map">
-        <id>allowed_nets</id>
-        <title id="allowed_nets">Allowed nets</title>
+    <data type="text">
+        <id>new_title</id>
+        <title id="filter_name">Filter name</title>
     </data>
-    <data type="i18n">
-        <id>divider_1</id>
+    <data type="text" immediate="true">
+        <id>origin_view_id</id>
+        <title id="origin_view_id">Origin ViewId</title>
+        <event type="set">
+            <id>origin_view_id_set</id>
+            <actions phase="post">
+                <action id="action_1">
+					<![CDATA[
+                    if (origin_view_id.rawValue == "") {
+                        return;
+                    }
+                    // the same regex is used in the frontend FilterExtractionService. Please keep them in sync
+                    def match = origin_view_id.rawValue =~ "^.*?(-\\d+)?\$"
+                    match.matches()
+                    def trimmed_id;
+                    if (match.start(1) == -1) {
+                        trimmed_id = origin_view_id.rawValue
+                    } else {
+                        trimmed_id = origin_view_id.rawValue.substring(0, match.start(1))
+                    }
+                    change trimmed_origin_view_id value {trimmed_id}
+                    make and_view, visible on view_filter when {true}
+                    make and_view, visible on view_as_ancestor when {true}
+                    make trimmed_origin_view_id, visible on t1 when {true}
+                    make trimmed_origin_view_id, visible on t2 when {true}
+                    make origin_view_id, hidden on t1 when {true}
+                    make origin_view_id, hidden on t2 when {true}
+                    ]]>
+				</action>
+            </actions>
+        </event>
+    </data>
+    <data type="text" immediate="true">
+        <id>parent_filter_id</id>
+        <title id="parent_filter_id">parent filter ID</title>
+        <event type="set">
+            <id>parent_filter_id_set</id>
+            <actions phase="post">
+                <action id="action_2">
+					<![CDATA[
+                    def ancestor_view_filter = findTask({it.caseId.eq(parent_filter_id.rawValue).and(it.task.transitionId.eq("view_as_ancestor"))})
+                    change taskref_and_parent value {[ancestor_view_filter.stringId]}
+                    ]]>
+				</action>
+            </actions>
+        </event>
+    </data>
+    <data type="taskRef">
+        <id>taskref_and_parent</id>
         <title/>
-        <component>
-            <id>divider</id>
-        </component>
     </data>
-    <!-- I18NS -->
+    <data type="text">
+        <id>trimmed_origin_view_id</id>
+        <title id="filter_from_view_id">Filter from view with ID</title>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>visibility</id>
+        <title id="filter_visibility">Filter visibility</title>
+        <options>
+            <option key="public" id="filter_visibility_public">Public</option>
+            <option key="private" id="filter_visibility_private">Private</option>
+        </options>
+        <init>public</init>
+    </data>
     <i18n locale="sk">
         <i18nString id="process_title">Filter</i18nString>
         <i18nString id="case_name">Nový Filter</i18nString>
@@ -245,99 +235,71 @@
         <i18nString id="parent_filter_id">Elternfilter-ID</i18nString>
         <i18nString id="allowed_nets">Erlaubte Netze</i18nString>
     </i18n>
-    <!-- TRANSITIONS -->
+    <transition>
+        <id>auto_create</id>
+        <x>500</x>
+        <y>180</y>
+        <title>Automated new filter</title>
+        <event type="finish">
+            <id>auto_create_finish</id>
+            <actions phase="post">
+                <action id="action_6">
+					<![CDATA[
+                    initializeMyFullFilterTaskRef(my_full_filter)
+                    ]]>
+				</action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>frontend_create</id>
+        <x>380</x>
+        <y>260</y>
+        <title>Set filter metadata</title>
+        <event type="finish">
+            <id>frontend_create_finish</id>
+            <actions phase="post">
+                <action id="action_5">
+					<![CDATA[
+                    initializeMyFullFilterTaskRef(my_full_filter)
+                    ]]>
+				</action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>import_filter</id>
+        <x>740</x>
+        <y>180</y>
+        <title id="import_filter">Import filter</title>
+        <event type="finish">
+            <id>import_filter_finish</id>
+            <actions phase="post">
+                <action id="action_7">
+					<![CDATA[
+                    changeCaseProperty "title" about { new_title.rawValue }
+                    ]]>
+				</action>
+            </actions>
+        </event>
+    </transition>
     <transition>
         <id>newFilter</id>
         <x>620</x>
         <y>260</y>
         <title id="create_new_filter">Create new filter</title>
         <assignPolicy>auto</assignPolicy>
-        <grid>
-            <id>newFilter_grid</id>
-            <item>
-                <dataRef>
-                    <id>my_full_filter</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>divider_1</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>visibility</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                        <behavior>required</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>new_title</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                        <behavior>required</behavior>
-                    </logic>
-                    <event type="set">
-                        <id>new_title_newFilter_set</id>
-                        <actions phase="post">
-                            <action>
-                                change i18n_filter_name value { new com.netgrif.application.engine.petrinet.domain.I18nString(new_title.rawValue) }
-                            </action>
-                        </actions>
-                    </event>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>allowed_nets</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-            <properties>
-                <display>grid</display>
-                <grid-template-columns>1fr</grid-template-columns>
-                <justify-items>stretch</justify-items>
-                <align-items>stretch</align-items>
-                <justify-content>stretch</justify-content>
-                <align-content>stretch</align-content>
-            </properties>
-        </grid>
         <event type="finish">
             <id>newFilter_finish</id>
+            <title id="save">Save</title>
             <actions phase="post">
-                <action>
-                    // TODO: release/8.0.0
+                <action id="action_4">
+					<![CDATA[
                     useCase.setTitle(new_title.rawValue)
                     workflowService.save(useCase)
-                </action>
+                    ]]>
+				</action>
             </actions>
-            <title name="save">Save</title>
         </event>
     </transition>
     <transition>
@@ -345,225 +307,18 @@
         <x>740</x>
         <y>380</y>
         <title id="details">Details</title>
-        <grid>
-            <id>t2_grid</id>
-            <item>
-                <dataRef>
-                    <id>filter_type</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>visibility</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>2 / 3</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>divider_1</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / span 2</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>my_full_filter</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / span 2</grid-column>
-                </properties>
-            </item>
-            <properties>
-                <display>grid</display>
-                <grid-template-columns>repeat(2, 1fr)</grid-template-columns>
-                <justify-items>stretch</justify-items>
-                <align-items>stretch</align-items>
-                <justify-content>stretch</justify-content>
-                <align-content>stretch</align-content>
-            </properties>
-        </grid>
     </transition>
     <transition>
-        <id>frontend_create</id>
-        <x>380</x>
-        <y>260</y>
-        <title>Set filter metadata</title>
-        <grid>
-            <id>frontend_create_grid</id>
-            <item>
-                <dataRef>
-                    <id>filter</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>filter_type</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>origin_view_id</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>parent_filter_id</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>allowed_nets</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-            <properties>
-                <display>grid</display>
-                <grid-template-columns>1fr</grid-template-columns>
-                <justify-items>stretch</justify-items>
-                <align-items>stretch</align-items>
-                <justify-content>stretch</justify-content>
-                <align-content>stretch</align-content>
-            </properties>
-        </grid>
-        <event type="finish">
-            <id>frontend_create_finish</id>
-            <actions phase="post">
-                <action>
-                    taskRef: f.my_full_filter;
-
-                    initializeMyFullFilterTaskRef(taskRef)
-                </action>
-            </actions>
-        </event>
-    </transition>
-    <transition>
-        <id>auto_create</id>
-        <x>500</x>
-        <y>180</y>
-        <title>Automated new filter</title>
-        <grid>
-            <id>auto_create_grid</id>
-            <item>
-                <dataRef>
-                    <id>filter</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>filter_type</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>2 / 3</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>visibility</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>3 / 4</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>origin_view_id</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>4 / 5</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>parent_filter_id</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-            <properties>
-                <display>grid</display>
-                <grid-template-columns>repeat(4, 1fr)</grid-template-columns>
-                <justify-items>stretch</justify-items>
-                <align-items>stretch</align-items>
-                <justify-content>stretch</justify-content>
-                <align-content>stretch</align-content>
-            </properties>
-        </grid>
-        <event type="finish">
-            <id>auto_create_finish</id>
-            <actions phase="post">
-                <action>
-                    taskRef: f.my_full_filter;
-
-                    initializeMyFullFilterTaskRef(taskRef)
-                </action>
-            </actions>
-        </event>
+        <id>view_as_ancestor</id>
+        <x>451</x>
+        <y>418</y>
+        <title/>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>view_filter</id>
@@ -576,329 +331,7 @@
                 <view>true</view>
             </logic>
         </roleRef>
-        <grid>
-            <id>view_filter_grid</id>
-            <item>
-                <dataRef>
-                    <id>filter</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / span 4</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>filter_case_id</id>
-                    <logic>
-                        <behavior>hidden</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / span 4</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>origin_view_id</id>
-                    <logic>
-                        <behavior>forbidden</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / span 4</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>taskref_and_parent</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / span 4</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>new_title</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-                    <event type="set">
-                        <id>new_title_view_filter_set</id>
-                        <actions phase="post">
-                            <action>
-                                name: f.new_title,
-                                i18nName: f.i18n_filter_name;
-
-                                change i18nName value { new com.netgrif.application.engine.petrinet.domain.I18nString(name.rawValue) }
-                            </action>
-                        </actions>
-                    </event>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / span 4</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>divider_1</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / span 4</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>and_view</id>
-                    <logic>
-                        <behavior>forbidden</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>trimmed_origin_view_id</id>
-                    <logic>
-                        <behavior>forbidden</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>2 / span 3</grid-column>
-                </properties>
-            </item>
-            <properties>
-                <display>grid</display>
-                <grid-template-columns>repeat(4, 1fr)</grid-template-columns>
-                <justify-items>stretch</justify-items>
-                <align-items>stretch</align-items>
-                <justify-content>stretch</justify-content>
-                <align-content>stretch</align-content>
-            </properties>
-        </grid>
     </transition>
-    <transition>
-        <id>view_as_ancestor</id>
-        <x>451</x>
-        <y>418</y>
-        <roleRef>
-            <id>system</id>
-            <logic>
-                <view>true</view>
-            </logic>
-        </roleRef>
-        <grid>
-            <id>view_as_ancestor_grid</id>
-            <item>
-                <dataRef>
-                    <id>and_me</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>filter</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>2 / span 3</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>taskref_and_parent</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / span 4</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>divider_1</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / span 4</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>and_view</id>
-                    <logic>
-                        <behavior>forbidden</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>trimmed_origin_view_id</id>
-                    <logic>
-                        <behavior>forbidden</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>2 / span 3</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>origin_view_id</id>
-                    <logic>
-                        <behavior>forbidden</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / span 3</grid-column>
-                </properties>
-            </item>
-            <properties>
-                <display>grid</display>
-                <grid-template-columns>repeat(4, 1fr)</grid-template-columns>
-                <justify-items>stretch</justify-items>
-                <align-items>stretch</align-items>
-                <justify-content>stretch</justify-content>
-                <align-content>stretch</align-content>
-            </properties>
-        </grid>
-    </transition>
-    <transition>
-        <id>import_filter</id>
-        <x>740</x>
-        <y>180</y>
-        <title id="import_filter">Import filter</title>
-        <grid>
-            <id>import_filter_grid</id>
-            <item>
-                <dataRef>
-                    <id>new_title</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-                    <event type="get">
-                        <id>new_title_import_filter_get</id>
-                        <actions phase="pre">
-                            <action>
-                                name: f.new_title;
-
-                                change name value { useCase.getTitle() }
-                            </action>
-                        </actions>
-                    </event>
-                    <event type="set">
-                        <id>new_title_import_filter_set</id>
-                        <actions phase="post">
-                            <action>
-                                name: f.new_title,
-                                i18nName: f.i18n_filter_name;
-
-                                change i18nName value { new com.netgrif.application.engine.petrinet.domain.I18nString(name.rawValue) }
-                            </action>
-                        </actions>
-                    </event>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>filter_type</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>2 / 3</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>visibility</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>3 / 4</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>missing_allowed_nets</id>
-                    <logic>
-                        <behavior>hidden</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / span 2</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>divider_1</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / span 4</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>my_full_filter</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / span 4</grid-column>
-                </properties>
-            </item>
-            <properties>
-                <display>grid</display>
-                <grid-template-columns>repeat(4, 1fr)</grid-template-columns>
-                <justify-items>stretch</justify-items>
-                <align-items>stretch</align-items>
-                <justify-content>stretch</justify-content>
-                <align-content>stretch</align-content>
-            </properties>
-        </grid>
-        <event type="finish">
-            <id>import_filter_finish</id>
-            <actions phase="post">
-                <action>
-                    changeCaseProperty "title" about { new_title.rawValue }
-                </action>
-            </actions>
-        </event>
-    </transition>
-    <!-- PLACES -->
     <place>
         <id>p1</id>
         <x>260</x>
@@ -929,7 +362,59 @@
         <y>340</y>
         <tokens>0</tokens>
     </place>
-    <!-- ARCS -->
+    <arc>
+        <id>a12</id>
+        <type>regular</type>
+        <sourceId>import_filter</sourceId>
+        <destinationId>p2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a13</id>
+        <type>regular</type>
+        <sourceId>auto_create</sourceId>
+        <destinationId>p4</destinationId>
+        <multiplicity dynamic="true">
+            <![CDATA[
+			is_imported
+			]]>
+        </multiplicity>
+    </arc>
+    <arc>
+        <id>a14</id>
+        <type>regular</type>
+        <sourceId>p4</sourceId>
+        <destinationId>import_filter</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a15</id>
+        <type>regular</type>
+        <sourceId>frontend_create</sourceId>
+        <destinationId>p5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a18</id>
+        <type>read</type>
+        <sourceId>p5</sourceId>
+        <destinationId>view_as_ancestor</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a19</id>
+        <type>read</type>
+        <sourceId>p5</sourceId>
+        <destinationId>view_filter</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a20</id>
+        <type>regular</type>
+        <sourceId>auto_create</sourceId>
+        <destinationId>p5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
     <arc>
         <id>a3</id>
         <type>regular</type>
@@ -977,55 +462,10 @@
         <type>regular</type>
         <sourceId>auto_create</sourceId>
         <destinationId>p2</destinationId>
-        <multiplicity dynamic="true">is_not_imported</multiplicity>
-    </arc>
-    <arc>
-        <id>a12</id>
-        <type>regular</type>
-        <sourceId>import_filter</sourceId>
-        <destinationId>p2</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>a13</id>
-        <type>regular</type>
-        <sourceId>auto_create</sourceId>
-        <destinationId>p4</destinationId>
-        <multiplicity dynamic="true">is_imported</multiplicity>
-    </arc>
-    <arc>
-        <id>a14</id>
-        <type>regular</type>
-        <sourceId>p4</sourceId>
-        <destinationId>import_filter</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>a15</id>
-        <type>regular</type>
-        <sourceId>frontend_create</sourceId>
-        <destinationId>p5</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>a18</id>
-        <type>read</type>
-        <sourceId>p5</sourceId>
-        <destinationId>view_as_ancestor</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>a19</id>
-        <type>read</type>
-        <sourceId>p5</sourceId>
-        <destinationId>view_filter</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>a20</id>
-        <type>regular</type>
-        <sourceId>auto_create</sourceId>
-        <destinationId>p5</destinationId>
-        <multiplicity>1</multiplicity>
+        <multiplicity dynamic="true">
+            <![CDATA[
+			is_not_imported
+			]]>
+        </multiplicity>
     </arc>
 </process>

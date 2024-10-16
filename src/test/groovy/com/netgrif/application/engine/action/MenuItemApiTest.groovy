@@ -1,30 +1,20 @@
 package com.netgrif.application.engine.action
 
-import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.UriContentType
 import com.netgrif.application.engine.petrinet.domain.UriNode
 import com.netgrif.application.engine.petrinet.domain.dataset.ButtonField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
-import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.FilterRunner
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.menu.MenuItemConstants
-import com.netgrif.application.engine.workflow.service.interfaces.IDataService
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.PageRequest
@@ -37,45 +27,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
-class MenuItemApiTest {
-
-    @Autowired
-    private TestHelper testHelper
-
-    @Autowired
-    private ImportHelper helper
-
-    @Autowired
-    private FilterRunner filterRunner
-
-    @Autowired
-    private IUserService userService
-
-    @Autowired
-    private IWorkflowService workflowService
-
-    @Autowired
-    private IDataService dataService
-
-    @Autowired
-    private IUriService uriService
-
-    @Autowired
-    private INextGroupService nextGroupService
-
-    @Autowired
-    private IElasticCaseService elasticCaseService
-
-    @Autowired
-    private ITaskService taskService
-
-    @Autowired
-    private SuperCreator superCreator
+class MenuItemApiTest extends EngineTest {
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
-        helper.createNet("filter_api_test.xml")
+        super.before()
+        importHelper.createNet("filter_api_test.xml")
     }
 
     @Test
@@ -87,19 +44,19 @@ class MenuItemApiTest {
         Thread.sleep(4000)
         UriNode leafNode = uriService.findByUri("/netgrif/test/new_menu_item")
         assert item.uriNodeId == uriService.findByUri("/netgrif/test").stringId
-        assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_ICON.attributeId].value == "device_hub"
-        assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME.attributeId].value == new I18nString("FILTER")
-        assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_IDENTIFIER.attributeId].value.toString() == "new_menu_item"
-        assert (item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_FILTER_CASE.attributeId].value as List)[0] == filter.stringId
-        assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_ALLOWED_ROLES.attributeId].options.containsKey("role_1:filter_api_test")
-        assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_BANNED_ROLES.attributeId].options.containsKey("role_2:filter_api_test")
-        assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS.attributeId].value == "meta-title,meta-title"
-        assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS.attributeId].value == "meta-title,meta-title"
+        assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_ICON.attributeId).rawValue == "device_hub"
+        assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME.attributeId).rawValue == new I18nString("FILTER")
+        assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_IDENTIFIER.attributeId).rawValue.toString() == "new_menu_item"
+        assert (item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_FILTER_CASE.attributeId).rawValue as List)[0] == filter.stringId
+        assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_ALLOWED_ROLES.attributeId).options.containsKey("role_1:filter_api_test")
+        assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_BANNED_ROLES.attributeId).options.containsKey("role_2:filter_api_test")
+        assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS.attributeId).rawValue == "meta-title,meta-title"
+        assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS.attributeId).rawValue == "meta-title,meta-title"
 
-        assert filter.dataSet["filter"].filterMetadata["filterType"] == "Case"
-        assert filter.dataSet["filter"].allowedNets == ["filter", "preference_item"]
-        assert filter.dataSet["filter"].value == "processIdentifier:filter OR processIdentifier:preference_item"
-        assert filter.dataSet["filter_type"].value == "Case"
+        assert filter.dataSet.get("filter").filterMetadata["filterType"] == "Case"
+        assert filter.dataSet.get("filter").allowedNets == ["filter", "preference_item"]
+        assert filter.dataSet.get("filter").rawValue == "processIdentifier:filter OR processIdentifier:preference_item"
+        assert filter.dataSet.get("filter_type").rawValue == "Case"
         assert leafNode != null
 
         Case testFolder = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId}.textValue.keyword:\"/netgrif/test\"", PageRequest.of(0, 1))[0]
@@ -110,14 +67,14 @@ class MenuItemApiTest {
 
         assert testFolder != null && testNode != null
         assert testFolder.uriNodeId == testNode.stringId
-        assert testFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value == [netgrifFolder.stringId]
-        assert (testFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as ArrayList).contains(item.stringId)
-        assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value == [testFolder.stringId]
+        assert testFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId).rawValue == [netgrifFolder.stringId]
+        assert (testFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId).rawValue as ArrayList).contains(item.stringId)
+        assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId).rawValue == [testFolder.stringId]
         assert netgrifFolder.uriNodeId == netgrifNode.stringId
-        assert netgrifFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value == [rootFolder.stringId]
-        assert (netgrifFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as ArrayList).contains(testFolder.stringId)
-        assert rootFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value == []
-        assert (rootFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as ArrayList).contains(netgrifFolder.stringId)
+        assert netgrifFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId).rawValue == [rootFolder.stringId]
+        assert (netgrifFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId).rawValue as ArrayList).contains(testFolder.stringId)
+        assert rootFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId).rawValue == []
+        assert (rootFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId).rawValue as ArrayList).contains(netgrifFolder.stringId)
     }
 
     @Test
@@ -137,15 +94,15 @@ class MenuItemApiTest {
         Case item = getMenuItem(caze)
         Case filter = getFilter(caze)
 
-        assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME.attributeId].value.toString() == "CHANGED FILTER"
-        assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_ALLOWED_ROLES.attributeId].options.entrySet()[0].key.contains("role_2")
-        assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS.attributeId].value == "meta-title,meta-title,meta-title"
-        assert item.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS.attributeId].value == "meta-title,meta-title,meta-title"
+        assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME.attributeId).rawValue.toString() == "CHANGED FILTER"
+        assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_ALLOWED_ROLES.attributeId).options.entrySet()[0].key.contains("role_2")
+        assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS.attributeId).rawValue == "meta-title,meta-title,meta-title"
+        assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS.attributeId).rawValue == "meta-title,meta-title,meta-title"
         assert item.uriNodeId == newUri.stringId
 
-        assert filter.dataSet["filter"].allowedNets == ["filter"]
-        assert filter.dataSet["filter"].filterMetadata["defaultSearchCategories"] == false
-        assert filter.dataSet["filter"].value == "processIdentifier:filter"
+        assert filter.dataSet.get("filter").allowedNets == ["filter"]
+        assert filter.dataSet.get("filter").filterMetadata["defaultSearchCategories"] == false
+        assert filter.dataSet.get("filter").rawValue == "processIdentifier:filter"
     }
 
     @Test
@@ -163,9 +120,9 @@ class MenuItemApiTest {
     @Test
     void testMoveMenuItem() {
         Case apiCase = createMenuItem("/netgrif/test")
-        String viewId = apiCase.dataSet["menu_stringId"].value
+        String viewId = apiCase.dataSet.get("menu_stringId").rawValue
         apiCase = createMenuItem("/netgrif2/test2", "new_menu_item2")
-        String viewId2 = apiCase.dataSet["menu_stringId"].value
+        String viewId2 = apiCase.dataSet.get("menu_stringId").rawValue
 
 
         // move view
@@ -184,7 +141,7 @@ class MenuItemApiTest {
         Case folderCase = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId}.textValue:\"/netgrif2\"", PageRequest.of(0, 1))[0]
 
         assert viewCase.uriNodeId == node.stringId
-        ArrayList<String> childIds = folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as ArrayList<String>
+        ArrayList<String> childIds = folderCase.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId).rawValue as ArrayList<String>
         assert childIds.contains(viewId) && childIds.size() == 2
 
 
@@ -210,21 +167,21 @@ class MenuItemApiTest {
 
         folderCase = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId}.textValue:\"/netgrif/test3\"", PageRequest.of(0, 1))[0]
         Case folderCase2 = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId}.textValue:\"/netgrif\"", PageRequest.of(0, 1))[0]
-        assert folderCase != null && folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value == [folderCase2.stringId]
+        assert folderCase != null && folderCase.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId).rawValue == [folderCase2.stringId]
 
         folderCase = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId}.textValue:\"/netgrif/test3/netgrif2\"", PageRequest.of(0, 1))[0]
         assert folderCase != null
         node = uriService.findByUri("/netgrif/test3")
         assert node != null
         assert folderCase.uriNodeId == node.stringId
-        assert folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId].value == "/netgrif/test3/netgrif2"
+        assert folderCase.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId).rawValue == "/netgrif/test3/netgrif2"
 
-        childIds = folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as ArrayList<String>
+        childIds = folderCase.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId).rawValue as ArrayList<String>
         assert childIds.size() == 2
 
         folderCase = workflowService.findOne(childIds[0])
         node = uriService.findByUri("/netgrif/test3/netgrif2")
-        assert folderCase.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId].value == "/netgrif/test3/netgrif2/test2"
+        assert folderCase.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId).rawValue == "/netgrif/test3/netgrif2/test2"
         assert folderCase.uriNodeId == node.stringId
 
         viewCase = workflowService.findOne(viewId2)
@@ -236,9 +193,9 @@ class MenuItemApiTest {
     void testDuplicateMenuItem() {
         String starterUri = "/netgrif/test"
         Case apiCase = createMenuItem(starterUri, "new_menu_item")
-        String itemId = apiCase.dataSet["menu_stringId"].value
+        String itemId = apiCase.dataSet.get("menu_stringId").rawValue
         Case origin = workflowService.findOne(itemId)
-        Case testFolder = workflowService.findOne((origin.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value as ArrayList<String>)[0])
+        Case testFolder = workflowService.findOne((origin.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId).rawValue as ArrayList<String>)[0])
 
         String newTitle = "New title"
         String newIdentifier = "new_identifier"
@@ -247,21 +204,21 @@ class MenuItemApiTest {
         taskService.assignTask(duplicateTaskId)
 
         assertThrows(IllegalArgumentException.class, () -> {
-            testFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE.attributeId].value = new I18nString("")
-            testFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER.attributeId].value = newIdentifier
+            testFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE.attributeId).rawValue = new I18nString("")
+            testFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER.attributeId).rawValue = newIdentifier
             testFolder = workflowService.save(testFolder)
             taskService.finishTask(duplicateTaskId)
         })
 
         assertThrows(IllegalArgumentException.class, () -> {
-            testFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE.attributeId].value = new I18nString(newTitle)
-            testFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER.attributeId].value = "new_menu_item"
+            testFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE.attributeId).rawValue = new I18nString(newTitle)
+            testFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER.attributeId).rawValue = "new_menu_item"
             testFolder = workflowService.save(testFolder)
             taskService.finishTask(duplicateTaskId)
         })
 
-        testFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE.attributeId].value = new I18nString(newTitle)
-        testFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER.attributeId].value = newIdentifier
+        testFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE.attributeId).rawValue = new I18nString(newTitle)
+        testFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER.attributeId).rawValue = newIdentifier
         testFolder = workflowService.save(testFolder)
         taskService.finishTask(duplicateTaskId)
 
@@ -272,14 +229,14 @@ class MenuItemApiTest {
 
         assert duplicated.uriNodeId == testFolder.uriNodeId
         assert leafNode != null
-        assert duplicated.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE.attributeId].value == null
-        assert duplicated.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER.attributeId].value == null
+        assert duplicated.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE.attributeId).rawValue == null
+        assert duplicated.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER.attributeId).rawValue == null
         assert duplicated.title == newTitle
-        assert duplicated.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME.attributeId].value == new I18nString(newTitle)
-        assert duplicated.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_IDENTIFIER.attributeId].value == newIdentifier
-        assert duplicated.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId].value == "/netgrif/" + newIdentifier
-        assert duplicated.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value == []
-        assert duplicated.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_HAS_CHILDREN.attributeId].value == false
+        assert duplicated.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME.attributeId).rawValue == new I18nString(newTitle)
+        assert duplicated.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_IDENTIFIER.attributeId).rawValue == newIdentifier
+        assert duplicated.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId).rawValue == "/netgrif/" + newIdentifier
+        assert duplicated.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId).rawValue == []
+        assert duplicated.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_HAS_CHILDREN.attributeId).rawValue == false
         assert duplicated.activePlaces["initialized"] == 1
     }
 
@@ -310,20 +267,20 @@ class MenuItemApiTest {
     void testRemoveMenuItem() {
         String starterUri = "/netgrif/test"
         Case apiCase = createMenuItem(starterUri, "new_menu_item")
-        String leafItemId = apiCase.dataSet["menu_stringId"].value
+        String leafItemId = apiCase.dataSet.get("menu_stringId").rawValue
 
         Case testFolder = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId}.textValue:\"/netgrif/test\"", PageRequest.of(0, 1))[0]
-        String netgrifFolderId = (testFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId].value as ArrayList<String>)[0]
+        String netgrifFolderId = (testFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_PARENT_ID.attributeId).rawValue as ArrayList<String>)[0]
 
         Case netgrifFolder = workflowService.findOne(netgrifFolderId)
-        assert (netgrifFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as ArrayList).contains(testFolder.stringId)
+        assert (netgrifFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId).rawValue as ArrayList).contains(testFolder.stringId)
         assert workflowService.findOne(testFolder.stringId) != null
         assert workflowService.findOne(leafItemId) != null
 
         workflowService.deleteCase(testFolder)
         sleep(2000)
         netgrifFolder = workflowService.findOne(netgrifFolderId)
-        assert !(netgrifFolder.dataSet[MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId].value as ArrayList).contains(testFolder.stringId)
+        assert !(netgrifFolder.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS.attributeId).rawValue as ArrayList).contains(testFolder.stringId)
         assertThrows(IllegalArgumentException.class, () -> {
             workflowService.findOne(testFolder.stringId)
         })
