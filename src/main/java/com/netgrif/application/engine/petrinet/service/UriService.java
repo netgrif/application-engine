@@ -7,11 +7,8 @@ import com.netgrif.application.engine.petrinet.domain.repository.UriNodeReposito
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * Service for managing UriNode objects
@@ -66,6 +63,16 @@ public class UriService implements IUriService {
             throw new IllegalStateException("Exactly one root uri node must exist!");
         }
         return nodes.getFirst();
+    }
+
+    /**
+     * Retrieves all default uri node for app
+     *
+     * @return default uriNode
+     */
+    @Override
+    public UriNode getDefault() {
+        return uriNodeRepository.findByPath(uriProperties.getSeparator() + uriProperties.getName());
     }
 
     /**
@@ -266,17 +273,7 @@ public class UriService implements IUriService {
      */
     @Override
     public UriNode createDefault() {
-        UriNode uriNode = uriNodeRepository.findByPath(uriProperties.getSeparator());
-        if (uriNode == null) {
-            uriNode = new UriNode();
-            uriNode.setName(uriProperties.getName());
-            uriNode.setLevel(FIRST_LEVEL);
-            uriNode.setPath(uriProperties.getSeparator());
-            uriNode.setParentId(null);
-            uriNode.addContentType(UriContentType.DEFAULT);
-            uriNode = uriNodeRepository.save(uriNode);
-        }
-        return uriNode;
+        return getOrCreate(uriProperties.getSeparator() + uriProperties.getName(), UriContentType.DEFAULT);
     }
 
     @Override

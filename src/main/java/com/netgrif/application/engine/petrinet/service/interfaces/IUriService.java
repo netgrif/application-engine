@@ -29,6 +29,8 @@ public interface IUriService {
      */
     UriNode getRoot();
 
+    UriNode getDefault();
+
     /**
      * Retrieves UriNode based on level
      *
