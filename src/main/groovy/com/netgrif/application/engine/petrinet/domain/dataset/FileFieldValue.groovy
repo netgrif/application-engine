@@ -1,5 +1,8 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
+import com.netgrif.application.engine.configuration.ApplicationContextProvider
+import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration
+
 class FileFieldValue implements Serializable {
 
     private static final long serialVersionUID = 1299918326436821185L
@@ -46,6 +49,19 @@ class FileFieldValue implements Serializable {
 
     void setPath(String path) {
         this.path = path
+    }
+
+    String getPath(String caseId, String fieldId) {
+        FileStorageConfiguration fileStorageConfiguration = ApplicationContextProvider.getBean("fileStorageConfiguration") as FileStorageConfiguration
+        return "${fileStorageConfiguration.getStoragePath()}/${caseId}/${fieldId}-${name}"
+    }
+
+    String getPreviewPath(String caseId, String fieldId, boolean isRemote) {
+        if (isRemote) {
+            return "${caseId}-${fieldId}-${name}.file_preview"
+        }
+        FileStorageConfiguration fileStorageConfiguration = ApplicationContextProvider.getBean("fileStorageConfiguration") as FileStorageConfiguration
+        return "${fileStorageConfiguration.getStoragePath()}/file_preview/${caseId}/${fieldId}-${name}"
     }
 
     String getPreviewPath() {
