@@ -99,7 +99,10 @@ public class CaseSearchRequest implements Serializable {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class PetriNet {
+    public static class PetriNet implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 4251438418424494690L;
 
         public String identifier;
 
@@ -113,7 +116,10 @@ public class CaseSearchRequest implements Serializable {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Author {
+    public static class Author implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = -4013905721499512553L;
 
         public String id;
 
