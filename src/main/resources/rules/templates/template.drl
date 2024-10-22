@@ -17,7 +17,7 @@ import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.workflow.domain.*
 import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.events.*
-import com.netgrif.application.engine.rules.domain.facts.*
+import com.netgrif.netgrifdrools.rules.domain.facts.*
 
 import org.quartz.*
 
