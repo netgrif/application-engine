@@ -8,7 +8,7 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepositor
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -34,7 +34,7 @@ class ImporterTest {
     @Autowired
     private IPetriNetService petriNetService
     @Autowired
-    private SuperCreator superCreator
+    private SuperCreatorRunner superCreator
     @Autowired
     private ProcessRoleRepository processRoleRepository
     @Autowired

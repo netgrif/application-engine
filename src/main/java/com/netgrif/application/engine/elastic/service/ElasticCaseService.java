@@ -11,6 +11,7 @@ import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.application.engine.event.events.workflow.IndexCaseEvent;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
@@ -22,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.*;
@@ -72,6 +74,9 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     @Autowired
+    protected ApplicationEventPublisher publisher;
+
+    @Autowired
     public void setElasticCasePrioritySearch(IElasticCasePrioritySearch iElasticCasePrioritySearch) {
         this.iElasticCasePrioritySearch = iElasticCasePrioritySearch;
     }
@@ -104,6 +109,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                     repository.save(elasticCase);
                 }
                 log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
+                publisher.publishEvent(new IndexCaseEvent(useCase));
             } catch (InvalidDataAccessApiUsageException ignored) {
                 log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" has duplicates, will be reindexed");
                 repository.deleteAllByStringId(useCase.getStringId());

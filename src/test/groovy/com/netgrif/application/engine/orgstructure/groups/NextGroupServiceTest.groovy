@@ -8,7 +8,7 @@ import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.startup.GroupRunner
+import com.netgrif.application.engine.startup.runner.GroupRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase

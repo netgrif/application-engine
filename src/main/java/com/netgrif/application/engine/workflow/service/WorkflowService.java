@@ -6,6 +6,9 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.application.engine.event.events.workflow.CaseEvent;
+import com.netgrif.application.engine.event.events.workflow.CreateCaseEvent;
+import com.netgrif.application.engine.event.events.workflow.DeleteCaseEvent;
 import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventLog;
 import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
@@ -21,8 +24,8 @@ import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
-import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
+//import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
+//import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.security.service.EncryptionService;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.*;
@@ -89,8 +92,8 @@ public class WorkflowService implements IWorkflowService {
     @Autowired
     protected FieldFactory fieldFactory;
 
-    @Autowired
-    protected IRuleEngine ruleEngine;
+//    @Autowired
+//    protected IRuleEngine ruleEngine;
 
     @Autowired
     protected FieldActionsRunner actionsRunner;
@@ -145,13 +148,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case findOneNoNet(String caseId) {
-        String[] parts = caseId.split("-");
-        if (parts.length < 2) {
-            throw new IllegalArgumentException("Invalid NetgrifId format: " + caseId);
-        }
-        String objectIdPart = parts[1];
-
-        ObjectId objectId = new ObjectId(objectIdPart);
+        ObjectId objectId = extractObjectId(caseId);
         Optional<Case> caseOptional = repository.findByIdObjectId(objectId);
         if (caseOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
@@ -334,7 +331,7 @@ public class WorkflowService implements IWorkflowService {
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user, Map<String, String> params) {
         LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
-        int rulesExecuted;
+//        int rulesExecuted;
         Case useCase = new Case(petriNet);
         useCase.populateDataSet(initValueExpressionEvaluator, params);
         useCase.setColor(color);
@@ -345,10 +342,7 @@ public class WorkflowService implements IWorkflowService {
 
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
         outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty(), params));
-        rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
-        if (rulesExecuted > 0) {
-            useCase = save(useCase);
-        }
+        //evaluateRules(new CreateCaseEvent(new CreateCaseEventOutcome(null, outcome.getOutcomes()), EventPhase.PRE));
 
         historyService.save(new CreateCaseEventLog(useCase, EventPhase.PRE));
         log.info("[" + useCase.getStringId() + "]: Case " + useCase.getTitle() + " created");
@@ -361,14 +355,16 @@ public class WorkflowService implements IWorkflowService {
         useCase = findOne(useCase.getStringId());
         outcome.addOutcomes(eventService.runActions(petriNet.getPostCreateActions(), useCase, Optional.empty(), params));
         useCase = findOne(useCase.getStringId());
-        rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
-        if (rulesExecuted > 0) {
-            useCase = save(useCase);
-        }
+        useCase = evaluateRules(new CreateCaseEvent(new CreateCaseEventOutcome(useCase, outcome.getOutcomes()), EventPhase.POST));
+//        rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
+//        if (rulesExecuted > 0) {
+//            useCase = save(useCase);
+//        }
 
         historyService.save(new CreateCaseEventLog(useCase, EventPhase.POST));
         outcome.setCase(setImmediateDataFields(useCase));
         addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
+//        publisher.publishEvent(new CreateCaseEvent(outcome));
         return outcome;
     }
 
@@ -409,6 +405,7 @@ public class WorkflowService implements IWorkflowService {
 
         DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty(), params));
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
+        useCase = evaluateRules(new DeleteCaseEvent(outcome, EventPhase.PRE));
         log.info("[" + useCase.getStringId() + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting case " + useCase.getTitle());
 
         taskService.deleteTasksByCase(useCase.getStringId());
@@ -416,7 +413,9 @@ public class WorkflowService implements IWorkflowService {
 
         outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty(), params));
         addMessageToOutcome(useCase.getPetriNet(), CaseEventType.DELETE, outcome);
+        useCase = evaluateRules(new DeleteCaseEvent(outcome, EventPhase.POST));
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.POST));
+//        publisher.publishEvent(new DeleteCaseEvent(outcome));
         return outcome;
     }
 
@@ -454,7 +453,8 @@ public class WorkflowService implements IWorkflowService {
         if (tasks.isEmpty()) {
             return true;
         }
-        Optional<Case> caseOptional = repository.findById(caseId);
+        ObjectId objectId = extractObjectId(caseId);
+        Optional<Case> caseOptional = repository.findByIdObjectId(objectId);
         if (caseOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
         }
@@ -511,24 +511,25 @@ public class WorkflowService implements IWorkflowService {
         save(useCase);
     }
 
-    @Deprecated
-    public List<Field> getData(String caseId) {
-        Optional<Case> optionalUseCase = repository.findById(caseId);
-        if (!optionalUseCase.isPresent())
-            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
-        Case useCase = optionalUseCase.get();
-        List<Field> fields = new ArrayList<>();
-        useCase.getDataSet().forEach((id, dataField) -> {
-            if (dataField.isDisplayable() || useCase.getPetriNet().isDisplayableInAnyTransition(id)) {
-                Field field = fieldFactory.buildFieldWithoutValidation(useCase, id, null);
-                field.setBehavior(dataField.applyOnlyVisibleBehavior());
-                fields.add(field);
-            }
-        });
-
-        LongStream.range(0L, fields.size()).forEach(l -> fields.get((int) l).setOrder(l));
-        return fields;
-    }
+//    @Deprecated
+//    public List<Field> getData(String caseId) {
+//        ObjectId objectId = extractObjectId(caseId);
+//        Optional<Case> optionalUseCase = repository.findByIdObjectId(objectId);
+//        if (!optionalUseCase.isPresent())
+//            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
+//        Case useCase = optionalUseCase.get();
+//        List<Field> fields = new ArrayList<>();
+//        useCase.getDataSet().forEach((id, dataField) -> {
+//            if (dataField.isDisplayable() || useCase.getPetriNet().isDisplayableInAnyTransition(id)) {
+//                Field field = fieldFactory.buildFieldWithoutValidation(useCase, id, null);
+//                field.setBehavior(dataField.applyOnlyVisibleBehavior());
+//                fields.add(field);
+//            }
+//        });
+//
+//        LongStream.range(0L, fields.size()).forEach(l -> fields.get((int) l).setOrder(l));
+//        return fields;
+//    }
 
     private void setImmediateDataFieldsReadOnly(Case useCase) {
         List<Field> immediateData = new ArrayList<>();
@@ -621,5 +622,20 @@ public class WorkflowService implements IWorkflowService {
             outcome.setMessage(net.getCaseEvents().get(type).getMessage());
         }
         return outcome;
+    }
+
+    private ObjectId extractObjectId(String caseId) {
+        String[] parts = caseId.split("-");
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Invalid NetgrifId format: " + caseId);
+        }
+        String objectIdPart = parts[1];
+
+        return new ObjectId(objectIdPart);
+    }
+
+    private Case evaluateRules(CaseEvent event) {
+        publisher.publishEvent(event);
+        return findOne(event.getCaseEventOutcome().getCase().getStringId());
     }
 }

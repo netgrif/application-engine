@@ -8,7 +8,7 @@ import com.netgrif.application.engine.petrinet.domain.arcs.ReadArc
 import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -33,7 +33,7 @@ class PetriNetTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator
+    private SuperCreatorRunner superCreator
 
     @Autowired
     private ProcessRoleRepository processRoleRepository

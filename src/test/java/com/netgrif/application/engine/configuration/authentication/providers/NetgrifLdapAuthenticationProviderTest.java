@@ -14,7 +14,7 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.startup.SuperCreator;
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -57,7 +57,7 @@ class NetgrifLdapAuthenticationProviderTest {
     private LdapUserService userService;
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreatorRunner superCreator;
 
     @Autowired
     private IPetriNetService petriNetService;
