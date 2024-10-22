@@ -125,7 +125,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
-
+        log.debug("Searching for query with logged user [{}]", user.getId());
         LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
         pageable = resolveUnmappedSortAttributes(pageable);
         NativeSearchQuery query = buildQuery(requests, loggedOrImpersonated, pageable, locale, isIntersection);
@@ -136,6 +136,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             Page<ElasticCase> indexedCases = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
             total = indexedCases.getTotalElements();
+            log.debug("Found [{}] total elements of page [{}]", casePage.size(), pageable.getPageNumber());
         } else {
             casePage = Collections.emptyList();
             total = 0;

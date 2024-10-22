@@ -1,32 +1,36 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
+import com.netgrif.application.engine.files.local.LocalStorageService
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
 
+
 class Storage implements Serializable {
     static final long serialVersionUID = 9172755427878929926L
-    private StorageType type
+  
+    private String type
+  
     private String host
 
     Storage() {
-        this.type = StorageType.LOCAL
+        this.type = LocalStorageService.LOCAL_TYPE
     }
 
-    Storage(StorageType type) {
+    Storage(String type) {
         this()
         this.type = type
     }
 
-    Storage(StorageType type, String host) {
+    Storage(String type, String host) {
         this(type)
         this.host = host
     }
 
-    StorageType getType() {
+    String getType() {
         return type
     }
 
-    void setType(StorageType type) {
+    void setType(String type) {
         this.type = type
     }
 
