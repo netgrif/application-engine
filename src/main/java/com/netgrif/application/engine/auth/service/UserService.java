@@ -336,13 +336,13 @@ public class UserService extends AbstractUserService {
     }
 
 
-/*    private User loadProcessRoles(User user) {
-        if (user == null)
-            return null;
-        user.setProcessRoles(processRoleRepository.findAllById(user.getUserProcessRoles()
-                .stream().map(UserProcessRole::getRoleId).collect(Collectors.toList())));
-        return user;
-    }*/
+//   private User loadProcessRoles(User user) {
+//        if (user == null)
+//            return null;
+//        user.setProcessRoles(processRoleRepository.findAllById(user.getUserProcessRoles()
+//                .stream().map(UserProcessRole::getRoleId).collect(Collectors.toList())));
+//        return user;
+//    }
 
     private User loadGroups(User user) {
         if (user == null)
