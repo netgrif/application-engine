@@ -44,7 +44,6 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.3](h
 - [NAE-1945] External resource loader
 - [NAE-2008] Serialisation of classes
 
-
 ### Changed
 - [NAE-1947] HistoryService findAllSetDataEventLogs is not working
 - [NAE-1979] Optimize Maven Resources Plugin Configuration for Correct File Filtering and Copying
