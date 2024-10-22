@@ -4,9 +4,12 @@ import com.netgrif.application.engine.files.local.LocalStorageService
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
 
-class Storage {
 
+class Storage implements Serializable {
+    static final long serialVersionUID = 9172755427878929926L
+  
     private String type
+  
     private String host
 
     Storage() {

@@ -7,12 +7,15 @@ import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.Task
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaskSearchRequest {
+public class TaskSearchRequest implements Serializable {
+
+    private static final long serialVersionUID = -6170395213624655037L;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<String> role;
