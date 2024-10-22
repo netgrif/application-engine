@@ -7,7 +7,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.2](https://github.com/netgrif/application-engine/commits/v6.3.2)
 
-## [6.4.0](https://github.com/netgrif/application-engine/releases/tag/v6.4.0) (2024-09-26)
+## [6.4.0](https://github.com/netgrif/application-engine/releases/tag/v6.4.0) (2024-10-22)
 
 ### Fixed
 - [NAE-1908] NAE-1906 Improvements
