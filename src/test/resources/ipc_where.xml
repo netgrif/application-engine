@@ -1,18 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>test</id>
-    <initials>TST</initials>
+    <version>1.0.0</version>
     <title>Test</title>
     <defaultRole>true</defaultRole>
-    <data type="number">
-        <id>field</id>
-        <title>Field</title>
-        <init>0</init>
-    </data>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TST</property>
+    </properties>
+    <processEvents/>
+    <caseEvents/>
     <data type="number">
         <id>count</id>
         <title>Count</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <id>field</id>
+        <title>Field</title>
         <init>0</init>
     </data>
     <data type="number">
@@ -21,56 +26,49 @@
         <init>0</init>
     </data>
     <transition>
-        <id>task</id>
-        <x>0</x>
-        <y>0</y>
-        <label>Task</label>
-        <event type="finish">
-            <id>1</id>
-            <actions phase="post">
-                <action>
-                    <!-- @formatter:off -->
-                    field: f.field;
-                    execute "synchronized" where {
-                        it.title.eq("Case 1")
-                    } with (new DataSet([
-                        "field": new NumberField(rawValue: 69.0)
-                    ]))
-                    <!-- @formatter:on -->
-                </action>
-                <action>
-                    <!-- @formatter:off -->
-                    field: f.field;
-                    change field about {
-                    findCase({it.title.eq("Case 1")});
-                    return 0 as Double;
-                    }
-                    <!-- @formatter:on -->
-                </action>
-                <action>
-                    <!-- @formatter:off -->
-                    field: f.count;
-
-                    def cases = findCases({it.title.startsWith("Case ")});
-
-                    change field value { return cases.size(); }
-                    <!-- @formatter:on -->
-                </action>
-                <action>
-                    <!-- @formatter:off -->
-                    field: f.paged;
-
-                    def cases = findCases({ it.title.startsWith("Case ")}, org.springframework.data.domain.PageRequest.of(1, 4));
-                    change field value { return cases.size(); }
-                    <!-- @formatter:on -->
-                </action>
-            </actions>
-        </event>
-    </transition>
-    <transition>
         <id>synchronized</id>
         <x>0</x>
         <y>0</y>
-        <label>Synchronized</label>
+        <title>Synchronized</title>
     </transition>
-</document>
+    <transition>
+        <id>task</id>
+        <x>0</x>
+        <y>0</y>
+        <title>Task</title>
+        <event type="finish">
+            <id>t1</id>
+            <actions phase="post">
+                <action id="action_1">
+					<![CDATA[
+                    execute "synchronized" where {
+                        it.title.eq("Case 1")
+                    } with (new DataSet([
+                            "field": new NumberField(rawValue: 69.0)
+                    ]))
+                    ]]>
+				</action>
+                <action id="action_2">
+					<![CDATA[
+                    change field about {
+                        findCase({it.title.eq("Case 1")});
+                        return 0 as Double;
+                    }
+                    ]]>
+				</action>
+                <action id="action_3">
+					<![CDATA[
+                    def cases = findCases({it.title.startsWith("Case ")});
+                    change count value { return cases.size(); }
+                    ]]>
+				</action>
+                <action id="action_4">
+					<![CDATA[
+                    def cases = findCases({ it.title.startsWith("Case ")}, org.springframework.data.domain.PageRequest.of(1, 4));
+                    change paged value { return cases.size(); }
+                    ]]>
+				</action>
+            </actions>
+        </event>
+    </transition>
+</process>
