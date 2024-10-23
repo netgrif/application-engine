@@ -1,10 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>test</id>
-    <initials>TST</initials>
+    <version>1.0.0</version>
     <title>Test</title>
     <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TST</property>
+    </properties>
+    <processEvents/>
+    <caseEvents/>
     <data type="number">
         <id>field</id>
         <title>Field</title>
@@ -14,18 +19,18 @@
         <id>task</id>
         <x>0</x>
         <y>0</y>
-        <label>Task</label>
+        <title>Task</title>
         <event type="finish">
-            <id>1</id>
+            <id>task1</id>
             <actions phase="post">
-                <action>
-                    <!-- @formatter:off -->
+                <action id="action_0">
+					<![CDATA[
                     def tasks = findTasks( { it.transitionId.eq("work_task"); } );
                     assignTasks(tasks);
                     finishTasks(tasks[0..5]);
                     cancelTasks(tasks[7..9]);
-                    <!-- @formatter:on -->
-                </action>
+                    ]]>
+				</action>
             </actions>
         </event>
     </transition>
@@ -33,6 +38,6 @@
         <id>work_task</id>
         <x>0</x>
         <y>0</y>
-        <label>Work task</label>
+        <title>Work task</title>
     </transition>
-</document>
+</process>

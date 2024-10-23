@@ -23,6 +23,7 @@ public class DataSetInitializer {
     }
 
     public void populateDataSet(Case useCase, Map<String, String> params) {
+        // TODO: release/8.0.0 depending fields
         useCase.getProcess().getDataSet().forEach((fieldId, field) -> {
             Field<?> useCaseField = field.clone();
             useCase.getDataSet().put(fieldId, useCaseField);

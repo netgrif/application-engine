@@ -12,6 +12,7 @@ import com.querydsl.core.annotations.QueryType;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
+import org.apache.tools.ant.taskdefs.Local;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -81,6 +82,8 @@ public class Case implements Serializable {
 
     public Case() {
         id = new ObjectId();
+        // TODO: release/8.0.0 spring auditing
+        creationDate = LocalDateTime.now();
     }
 
     public Case(Process petriNet) {

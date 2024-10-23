@@ -229,7 +229,7 @@ class TaskApiTest {
         helper.assignTaskToSuper(TASK_BULK_TASK, control.stringId)
         helper.finishTaskAsSuper(TASK_BULK_TASK, control.stringId)
 
-        assert taskRepository.findAll(QTask.task.userId.eq(userService.system.getStringId())).size() == 2
+        assert taskRepository.findAll(QTask.task.assigneeId.eq(userService.system.getStringId())).size() == 2
     }
 
     public static final String TASK_GETTER_NET_FILE = "ipc_data.xml"

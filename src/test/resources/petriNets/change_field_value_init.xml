@@ -1,124 +1,165 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
     <id>change_field_value_init</id>
+    <version>1.0.0</version>
     <title>change_field_value_init</title>
     <defaultRole>true</defaultRole>
-    <initials>CFVI</initials>
-    <!-- ROLES -->
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">CFVI</property>
+    </properties>
+    <processEvents/>
+    <caseEvents/>
+    <data type="text" immediate="true">
+        <id>text_dynamic</id>
+        <title>text_dynamic</title>
+        <init dynamic="true">
+            <![CDATA[
+			text_static.rawValue + " DYNAMIC"
+			]]>
+        </init>
+    </data>
     <data type="text" immediate="true">
         <id>text_static</id>
         <title>text_static</title>
         <init>TEST VALUE</init>
     </data>
-
-    <data type="text" immediate="true">
-        <id>text_dynamic</id>
-        <title>text_dynamic</title>
-        <init dynamic="true">
-            text_static.rawValue + " DYNAMIC"
-        </init>
-    </data>
-
     <transition>
         <id>transition0</id>
         <x>0</x>
         <y>0</y>
-        <label>whatever 0</label>
-
-        <dataRef>
-            <id>text_static</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>text_dynamic</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-
+        <title>whatever 0</title>
+        <flex>
+            <id>transition0_flex</id>
+            <item>
+                <dataRef>
+                    <id>text_static</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>text_dynamic</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
         <event type="finish">
             <id>finish</id>
-
             <actions phase="pre">
-                <action>
-                    text_static: f.text_static,
-                    text_dynamic: f.text_dynamic;
-
+                <action id="action_0">
+					<![CDATA[
                     change text_static value { "CHANGED VALUE OF text_static" }
                     change text_dynamic value { "CHANGED VALUE OF text_dynamic" }
-                </action>
+                    ]]>
+				</action>
             </actions>
         </event>
     </transition>
-
     <transition>
         <id>transition1</id>
         <x>0</x>
         <y>0</y>
-        <label>whatever 1</label>
-
-        <dataRef>
-            <id>text_static</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>text_dynamic</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-
+        <title>whatever 1</title>
+        <flex>
+            <id>transition1_flex</id>
+            <item>
+                <dataRef>
+                    <id>text_static</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>text_dynamic</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
         <event type="finish">
             <id>finish</id>
-
             <actions phase="pre">
-                <action>
-                    text_static: f.text_static,
-                    text_dynamic: f.text_dynamic;
-
+                <action id="action_1">
+					<![CDATA[
                     change text_static value { init }
                     change text_dynamic value { init }
-                </action>
+                    ]]>
+				</action>
             </actions>
         </event>
     </transition>
-
     <transition>
         <id>transition2</id>
         <x>0</x>
         <y>0</y>
-        <label>whatever 2</label>
-
-        <dataRef>
-            <id>text_static</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>text_dynamic</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-
+        <title>whatever 2</title>
+        <flex>
+            <id>transition2_flex</id>
+            <item>
+                <dataRef>
+                    <id>text_static</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>text_dynamic</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
         <event type="finish">
             <id>finish</id>
-
             <actions phase="pre">
-                <action>
-                    text_static: f.text_static,
-                    text_dynamic: f.text_dynamic;
-
+                <action id="action_2">
+					<![CDATA[
                     change text_dynamic value { init text_static }
                     change text_static value { init text_dynamic }
-                </action>
+                    ]]>
+				</action>
             </actions>
         </event>
     </transition>
-
-</document>
+</process>

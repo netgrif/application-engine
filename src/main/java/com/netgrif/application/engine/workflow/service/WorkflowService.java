@@ -283,12 +283,12 @@ public class WorkflowService implements IWorkflowService {
         Process petriNet = petriNetService.clone(new ObjectId(netId));
         int rulesExecuted;
         Case useCase = new Case(petriNet);
-        useCase = taskService.createTasks(useCase);
-        dataSetInitializer.populateDataSet(useCase, params);
-        useCase = save(useCase);
         useCase.setAuthor(loggedOrImpersonated.transformToAuthor());
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(makeTitle.apply(useCase));
+        useCase = taskService.createTasks(useCase);
+        dataSetInitializer.populateDataSet(useCase, params);
+        useCase = save(useCase);
         // TODO: release/7.0.0 6.2.5
         // TODO: release/8.0.0 useCase.setUriNodeId(petriNet.getUriNodeId());
 //        UriNode uriNode = uriService.getOrCreate(petriNet, UriContentType.CASE);
