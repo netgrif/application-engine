@@ -163,7 +163,7 @@ public class PublicTaskController extends AbstractTaskController {
 
     @Override
     @Operation(summary = "Download preview for file field value")
-    @GetMapping(value = "/{id}/file_preview/{field}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/{id}/file_preview", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFilePreview(@PathVariable("id") String taskId, @RequestParam("fieldId") String fieldId) throws FileNotFoundException {
         return super.getFilePreview(taskId, fieldId);
     }
