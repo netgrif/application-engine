@@ -19,12 +19,15 @@ public class ProcessRoleFactory implements IProcessRoleFactory {
         /*if (!role.getStringId().equals(userProcessRole.getRoleId())) {
             throw new IllegalArgumentException(String.format("ProcessRole StringId (%s) and UserProcessRole roleId (%s) must match!", role.getStringId(), userProcessRole.getRoleId()));
         }*/
-        ProcessRole result = new ProcessRole(role, locale);
-        PetriNet net = petriNetService.get(new ObjectId(role.getNetId()));
-        result.setNetStringId(net.getStringId());
-        result.setNetImportId(net.getImportId());
-        result.setNetVersion(net.getVersion().toString());
-        return result;
+        if (!role.isGlobal()) {
+            ProcessRole result = new ProcessRole(role, locale);
+            PetriNet net = petriNetService.get(new ObjectId(role.getNetId()));
+            result.setNetStringId(net.getStringId());
+            result.setNetImportId(net.getImportId());
+            result.setNetVersion(net.getVersion().toString());
+            return result;
+        }
+        return new ProcessRole(role, locale);
     }
 
 }

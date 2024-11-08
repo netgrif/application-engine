@@ -18,5 +18,11 @@ enum FileFieldDataType {
                 return item
             }
         }
+        return null
+    }
+
+    static FileFieldDataType resolveTypeFromName(String name) {
+        int dot = name.lastIndexOf(".")
+        return resolveType((dot == -1) ? "" : name.substring(dot + 1))
     }
 }
