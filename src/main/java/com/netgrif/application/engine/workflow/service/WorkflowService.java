@@ -638,4 +638,5 @@ public class WorkflowService implements IWorkflowService {
         publisher.publishEvent(event);
         return findOne(event.getCaseEventOutcome().getCase().getStringId());
     }
+
 }
