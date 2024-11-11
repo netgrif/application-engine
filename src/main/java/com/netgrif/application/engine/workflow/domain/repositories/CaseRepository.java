@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow.domain.repositories;
 
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QCase;
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +34,20 @@ public interface CaseRepository extends MongoRepository<Case, String>, QuerydslP
 
     @Query("{ '_id.objectId': ?0 }")
     Optional<Case> findByIdObjectId(ObjectId objectId);
+
+    default Optional<Case> findById(String compositeId) {
+        String[] parts = compositeId.split(ProcessResourceId.ID_SEPARATOR);
+        if (parts.length == 2) {
+            String networkId = parts[0];
+            ObjectId objectId = new ObjectId(parts[1]);
+            return findByNetworkIdAndObjectId(networkId, objectId);
+        } else {
+            return findByIdObjectId(new ObjectId(compositeId));
+        }
+    }
+
+    @Query("{ '_id.shortProcessId': ?0, '_id.objectId': ?1 }")
+    Optional<Case> findByNetworkIdAndObjectId(String ProcessId, ObjectId objectId);
 
     @Override
     default void customize(QuerydslBindings bindings, QCase qCase) {
