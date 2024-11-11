@@ -25,10 +25,7 @@ import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.security.service.EncryptionService;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.DataField;
-import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.TaskPair;
+import com.netgrif.application.engine.workflow.domain.*;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
@@ -425,24 +422,10 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public void deleteInstancesOfPetriNet(PetriNet net) {
         log.info("[" + net.getStringId() + "]: User " + userService.getLoggedOrSystem().getStringId() + " is deleting all cases and tasks of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
-
-        taskService.deleteTasksByPetriNetId(net.getStringId());
-        CaseSearchRequest request = new CaseSearchRequest();
-        CaseSearchRequest.PetriNet netRequest = new CaseSearchRequest.PetriNet();
-        netRequest.processId = net.getStringId();
-        request.process = Collections.singletonList(netRequest);
-        long countCases = elasticCaseService.count(Collections.singletonList(request), userService.getLoggedOrSystem().transformToLoggedUser(), Locale.getDefault(), false);
-        log.info("[" + net.getStringId() + "]: User " + userService.getLoggedOrSystem().getStringId() + " is deleting " + countCases + " cases of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
-        long pageCount = (countCases / 100) + 1;
-        LongStream.range(0, pageCount)
-                .forEach(i -> elasticCaseService.search(
-                                Collections.singletonList(request),
-                                userService.getLoggedOrSystem().transformToLoggedUser(),
-                                PageRequest.of((int) i, 100),
-                                Locale.getDefault(),
-                                false)
-                        .getContent()
-                        .forEach(this::deleteCase));
+        List<Case> cases = this.searchAll(QCase.case$.petriNetObjectId.eq(net.getObjectId())).getContent();
+        if (!cases.isEmpty()) {
+            cases.forEach(this::deleteCase);
+        }
     }
 
     @Override

@@ -1,12 +1,14 @@
 package com.netgrif.application.engine.importer.service;
 
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.files.minio.MinIoProperties;
+import com.netgrif.application.engine.files.throwable.StorageNotEnabledException;
 import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.Format;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
+import com.netgrif.application.engine.petrinet.domain.dataset.factory.StorageFactory;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation;
 import com.netgrif.application.engine.petrinet.domain.views.View;
@@ -15,6 +17,7 @@ import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataValidationExpressionEvaluator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,9 +29,14 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static com.netgrif.application.engine.files.minio.MinIoStorageService.getBucketOrDefault;
+
 @org.springframework.stereotype.Component
 @Slf4j
 public final class FieldFactory {
+
+    @Value("${nae.storage.default-type}")
+    private String defaultStorageType;
 
     @Autowired
     private FormatFactory formatFactory;
@@ -43,10 +51,13 @@ public final class FieldFactory {
     private IDataValidator dataValidator;
 
     @Autowired
-    private IUserService userService;
+    private IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
+    private MinIoProperties minIoProperties;
 
     @Autowired
-    private IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
+    public void setMinIoProperties(MinIoProperties minIoProperties) {
+        this.minIoProperties = minIoProperties;
+    }
 
     public static Set<I18nString> parseMultichoiceValue(Case useCase, String fieldId) {
         Object values = useCase.getFieldValue(fieldId);
@@ -514,7 +525,7 @@ public final class FieldFactory {
 
     private FileField buildFileField(Data data) {
         FileField fileField = new FileField();
-        fileField.setRemote(data.getRemote() != null);
+        resolveStorage(data, fileField);
         setDefaultValue(fileField, data, defaultValue -> {
             if (defaultValue != null) {
                 fileField.setDefaultValue(defaultValue);
@@ -525,7 +536,7 @@ public final class FieldFactory {
 
     private FileListField buildFileListField(Data data) {
         FileListField fileListField = new FileListField();
-        fileListField.setRemote(data.getRemote() != null);
+        resolveStorage(data, fileListField);
         setDefaultValues(fileListField, data, defaultValues -> {
             if (defaultValues != null && !defaultValues.isEmpty()) {
                 fileListField.setDefaultValue(defaultValues);
@@ -842,4 +853,7 @@ public final class FieldFactory {
         }
     }
 
+    private void resolveStorage(Data data, StorageField<?> field) {
+        field.setStorage(StorageFactory.createStorage(data, defaultStorageType, minIoProperties));
+    }
 }
