@@ -145,13 +145,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case findOneNoNet(String caseId) {
-        String[] parts = caseId.split("-");
-        if (parts.length < 2) {
-            throw new IllegalArgumentException("Invalid NetgrifId format: " + caseId);
-        }
-        String objectIdPart = parts[1];
-
-        ObjectId objectId = new ObjectId(objectIdPart);
+        ObjectId objectId = extractObjectId(caseId);
         Optional<Case> caseOptional = repository.findByIdObjectId(objectId);
         if (caseOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
@@ -454,7 +448,8 @@ public class WorkflowService implements IWorkflowService {
         if (tasks.isEmpty()) {
             return true;
         }
-        Optional<Case> caseOptional = repository.findById(caseId);
+        ObjectId objectId = extractObjectId(caseId);
+        Optional<Case> caseOptional = repository.findByIdObjectId(objectId);
         if (caseOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
         }
@@ -511,24 +506,25 @@ public class WorkflowService implements IWorkflowService {
         save(useCase);
     }
 
-    @Deprecated
-    public List<Field> getData(String caseId) {
-        Optional<Case> optionalUseCase = repository.findById(caseId);
-        if (!optionalUseCase.isPresent())
-            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
-        Case useCase = optionalUseCase.get();
-        List<Field> fields = new ArrayList<>();
-        useCase.getDataSet().forEach((id, dataField) -> {
-            if (dataField.isDisplayable() || useCase.getPetriNet().isDisplayableInAnyTransition(id)) {
-                Field field = fieldFactory.buildFieldWithoutValidation(useCase, id, null);
-                field.setBehavior(dataField.applyOnlyVisibleBehavior());
-                fields.add(field);
-            }
-        });
-
-        LongStream.range(0L, fields.size()).forEach(l -> fields.get((int) l).setOrder(l));
-        return fields;
-    }
+//    @Deprecated
+//    public List<Field> getData(String caseId) {
+//        ObjectId objectId = extractObjectId(caseId);
+//        Optional<Case> optionalUseCase = repository.findByIdObjectId(objectId);
+//        if (!optionalUseCase.isPresent())
+//            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
+//        Case useCase = optionalUseCase.get();
+//        List<Field> fields = new ArrayList<>();
+//        useCase.getDataSet().forEach((id, dataField) -> {
+//            if (dataField.isDisplayable() || useCase.getPetriNet().isDisplayableInAnyTransition(id)) {
+//                Field field = fieldFactory.buildFieldWithoutValidation(useCase, id, null);
+//                field.setBehavior(dataField.applyOnlyVisibleBehavior());
+//                fields.add(field);
+//            }
+//        });
+//
+//        LongStream.range(0L, fields.size()).forEach(l -> fields.get((int) l).setOrder(l));
+//        return fields;
+//    }
 
     private void setImmediateDataFieldsReadOnly(Case useCase) {
         List<Field> immediateData = new ArrayList<>();
@@ -621,5 +617,15 @@ public class WorkflowService implements IWorkflowService {
             outcome.setMessage(net.getCaseEvents().get(type).getMessage());
         }
         return outcome;
+    }
+
+    private ObjectId extractObjectId(String caseId) {
+        String[] parts = caseId.split("-");
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Invalid NetgrifId format: " + caseId);
+        }
+        String objectIdPart = parts[1];
+
+        return new ObjectId(objectIdPart);
     }
 }

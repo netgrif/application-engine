@@ -45,10 +45,24 @@ public abstract class AbstractUserService implements IUserService {
     }
 
     @Override
+    public void addAnonymousRole(IUser user) {
+        user.addProcessRole(processRoleService.defaultRole());
+    }
+
+    @Override
     public void addDefaultAuthorities(IUser user) {
         if (user.getAuthorities().isEmpty()) {
             HashSet<Authority> authorities = new HashSet<>();
             authorities.add(authorityService.getOrCreate(Authority.user));
+            user.setAuthorities(authorities);
+        }
+    }
+
+    @Override
+    public void addAnonymousAuthorities(IUser user) {
+        if (user.getAuthorities().isEmpty()) {
+            HashSet<Authority> authorities = new HashSet<>();
+            authorities.add(authorityService.getOrCreate(Authority.anonymous));
             user.setAuthorities(authorities);
         }
     }
@@ -92,7 +106,8 @@ public abstract class AbstractUserService implements IUserService {
         return removeRole(user, processRoleService.findByImportId(roleStringId));
     }
 
-    protected IUser removeRole(IUser user, ProcessRole role) {
+    @Override
+    public IUser removeRole(IUser user, ProcessRole role) {
         user.removeProcessRole(role);
         securityContextService.saveToken(user.getStringId());
         securityContextService.reloadSecurityContext(user.transformToLoggedUser());
