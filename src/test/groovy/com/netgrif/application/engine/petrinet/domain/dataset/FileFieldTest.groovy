@@ -82,7 +82,7 @@ class FileFieldTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreatorRunner superCreator;
+    private SuperCreatorRunner superCreator
 
     private MockMvc mockMvc
 

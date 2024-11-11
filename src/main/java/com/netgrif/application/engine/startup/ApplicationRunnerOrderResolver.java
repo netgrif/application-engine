@@ -90,7 +90,21 @@ public class ApplicationRunnerOrderResolver {
          * @return {@code true} if all unresolved runners have been successfully sorted and the unresolved list is empty;
          * {@code false} otherwise.
          */
-        public boolean sortUnresolvedRunners() {
+
+        public boolean resolveAllRunners() {
+            sortUnresolvedRunners();
+            replaced.values().forEach(this::removeRunner);
+            return unresolved.isEmpty();
+        }
+
+        protected void removeRunner(Class<?> runnerClass) {
+            int classIndex = indexOfClass(sorted, runnerClass);
+            if (classIndex == -1) return;
+            T runner = sorted.remove(classIndex);
+            if (runner != null) removeRunner(runnerClass);
+        }
+
+        protected boolean sortUnresolvedRunners() {
             boolean changed = false;
             changed = changed || resolveSortingAnnotation(BeforeRunner.class, this::insertBeforeRunner);
             changed = changed || resolveSortingAnnotation(AfterRunner.class, this::insertAfterRunner);

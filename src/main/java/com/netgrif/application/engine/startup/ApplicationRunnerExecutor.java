@@ -74,6 +74,7 @@ public abstract class ApplicationRunnerExecutor<T> implements ApplicationRunner 
         Map<String, T> customRunners = (Map<String, T>) ApplicationContextProvider.getAppContext().getBeansOfType(GenericTypeResolver.resolveTypeArgument(getClass(), ApplicationRunnerExecutor.class));
         ApplicationRunnerOrderResolver.SortedRunners<T> runners = orderResolver.sortByRunnerOrderAnnotation(customRunners.values());
         runners.sortUnresolvedRunners();
+        runners.resolveAllRunners();
         return runners;
     }
 
