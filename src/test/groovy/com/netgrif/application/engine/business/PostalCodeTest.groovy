@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.business
 
-import com.netgrif.application.engine.startup.PostalCodeImporter
+import com.netgrif.application.engine.startup.runner.PostalCodeImporter
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

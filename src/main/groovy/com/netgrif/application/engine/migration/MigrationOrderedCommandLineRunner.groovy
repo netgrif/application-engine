@@ -1,15 +1,14 @@
 package com.netgrif.application.engine.migration
 
-
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.AbstractOrderedCommandLineRunner
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
 
 @Component
-abstract class MigrationOrderedCommandLineRunner extends AbstractOrderedCommandLineRunner {
+abstract class MigrationOrderedCommandLineRunner implements CommandLineRunner { // TODO rework migrations
 
     private static final Logger log = LoggerFactory.getLogger(MigrationOrderedCommandLineRunner)
 

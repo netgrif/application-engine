@@ -29,10 +29,10 @@ public class QuartzConfiguration {
     @Autowired
     private AutowiringSpringBeanJobFactory jobFactory;
 
-    @Value("${spring.data.mongodb.host:null}")
+    @Value("${spring.data.mongodb.host:#{null}}")
     private String addresses;
 
-    @Value("${spring.data.mongodb.uri:null}")
+    @Value("${spring.data.mongodb.uri:#{null}}")
     private String uri;
 
     @Value("${nae.quartz.dbName:nae}")

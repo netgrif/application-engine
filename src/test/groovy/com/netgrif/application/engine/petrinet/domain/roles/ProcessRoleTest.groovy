@@ -8,7 +8,7 @@ import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.hamcrest.CoreMatchers
@@ -72,7 +72,7 @@ class ProcessRoleTest {
     private ProcessRoleRepository userProcessRoleRepository
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreatorRunner superCreator;
 
     @Autowired
     TestHelper testHelper

@@ -16,10 +16,10 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.application.engine.startup.DefaultRoleRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
-import com.netgrif.application.engine.startup.SuperCreator;
-import com.netgrif.application.engine.startup.SystemUserRunner;
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
+import com.netgrif.application.engine.startup.runner.SystemUserRunner;
+import com.netgrif.application.engine.startup.runner.DefaultRoleRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -84,7 +84,7 @@ public class VariableArcsTest {
     private SystemUserRunner userRunner;
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreatorRunner superCreator;
 
     @Autowired
     private TestHelper testHelper;
@@ -100,7 +100,7 @@ public class VariableArcsTest {
     @BeforeEach
     public void before() throws Exception {
         testHelper.truncateDbs();
-        userRunner.run("");
+        userRunner.run(null);
         repository.deleteAll();
         assertNotNull(processRoleService.defaultRole());
         testHelper.truncateDbs();

@@ -11,7 +11,7 @@ import com.netgrif.application.engine.petrinet.domain.repository.UriNodeReposito
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.*
+import com.netgrif.application.engine.startup.runner.*
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.MongoTemplate
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component
 class TestHelper {
 
     @Autowired
-    private SuperCreator superCreator
+    private SuperCreatorRunner superCreator
     @Autowired
     private MongoTemplate template
     @Autowired
