@@ -255,7 +255,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public FinishTaskEventOutcome finishTask(Task task, IUser user) throws TransitionNotExecutableException {
-        return finishTask(task, user, null);
+        return finishTask(task, user, new HashMap<>());
     }
 
     @Override
@@ -323,7 +323,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public CancelTaskEventOutcome cancelTask(Task task, IUser user) {
-        return cancelTask(task, user, null);
+        return cancelTask(task, user, new HashMap<>());
     }
 
     @Override

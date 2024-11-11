@@ -27,20 +27,23 @@ public class ProcessRole extends Imported {
 
     public static final String ANONYMOUS_ROLE = "anonymous";
 
+    public static final String GLOBAL = "global_";
+
+    @Setter
+    private boolean global;
+
     @Id
     @Setter
     private ProcessResourceId _id;
 
     private I18nString name;
 
-    @Getter
     @Setter
     private String netId;
 
     @Setter
     private String description;
 
-    @Getter
     @Setter
     private Map<EventType, Event> events;
 
