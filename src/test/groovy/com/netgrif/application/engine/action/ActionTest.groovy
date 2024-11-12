@@ -6,6 +6,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Field
 import com.netgrif.application.engine.petrinet.domain.events.*
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId
 import com.netgrif.application.engine.workflow.domain.Task
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Test
@@ -32,11 +33,11 @@ class ActionTest {
     @Test
     void testActionImports() {
         Case dummy = new Case()
-        Task task = Task.with()._id(new ObjectId()).transitionId("0").build()
+        Task task = Task.with()._id(new ProcessResourceId()).transitionId("0").build()
         Action testAction = new Action('''
             println LocalDate.now()
             println LocalDate.MAX
-            println new ObjectId().toString()
+            println new ProcessResourceId().toString()
         ''', "set")
         runner.run(testAction, dummy, Optional.of(task), new HashMap<>())
     }
