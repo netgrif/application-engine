@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.importer.service;
 
+import com.netgrif.application.engine.files.IStorageResolverService;
 import com.netgrif.application.engine.files.minio.MinIoProperties;
-import com.netgrif.application.engine.files.throwable.StorageNotEnabledException;
 import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Component;
@@ -29,13 +29,11 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static com.netgrif.application.engine.files.minio.MinIoStorageService.getBucketOrDefault;
-
 @org.springframework.stereotype.Component
 @Slf4j
 public final class FieldFactory {
 
-    @Value("${nae.storage.default-type}")
+    @Value("${nae.storage.default-type:local}")
     private String defaultStorageType;
 
     @Autowired
@@ -53,10 +51,16 @@ public final class FieldFactory {
     @Autowired
     private IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
     private MinIoProperties minIoProperties;
+    private IStorageResolverService storageResolverService;
 
     @Autowired
     public void setMinIoProperties(MinIoProperties minIoProperties) {
         this.minIoProperties = minIoProperties;
+    }
+
+    @Autowired
+    public void setStorageResolverService(IStorageResolverService storageResolverService) {
+        this.storageResolverService = storageResolverService;
     }
 
     public static Set<I18nString> parseMultichoiceValue(Case useCase, String fieldId) {
@@ -854,6 +858,6 @@ public final class FieldFactory {
     }
 
     private void resolveStorage(Data data, StorageField<?> field) {
-        field.setStorage(StorageFactory.createStorage(data, defaultStorageType, minIoProperties));
+        field.setStorage(StorageFactory.createStorage(data, storageResolverService, defaultStorageType));
     }
 }

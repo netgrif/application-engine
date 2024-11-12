@@ -1,10 +1,13 @@
-package com.netgrif.application.engine.petrinet.domain.dataset;
+package com.netgrif.application.engine.petrinet.domain.dataset
+
+import com.netgrif.application.engine.files.minio.MinIoStorageService;
 
 class MinIoStorage extends Storage {
+
     private String bucket
 
     MinIoStorage() {
-        super(StorageType.MINIO)
+        super(MinIoStorageService.MINIO_TYPE)
     }
 
     String getBucket() {

@@ -5,9 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.2](https://github.com/netgrif/application-engine/commits/v6.3.2)
+Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.3](https://github.com/netgrif/application-engine/commits/v6.3.3)
 
-## [6.4.0](https://github.com/netgrif/application-engine/releases/tag/v6.4.0) (2024-09-26)
+## [6.4.0](https://github.com/netgrif/application-engine/releases/tag/v6.4.0) (2024-10-22)
 
 ### Fixed
 - [NAE-1908] NAE-1906 Improvements
@@ -42,6 +42,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.2](h
 - [NAE-1946] Remote file connector to S3
 - [NAE-1927] Shared Roles
 - [NAE-1945] External resource loader
+- [NAE-2008] Serialisation of classes
 
 ### Changed
 - [NAE-1947] HistoryService findAllSetDataEventLogs is not working

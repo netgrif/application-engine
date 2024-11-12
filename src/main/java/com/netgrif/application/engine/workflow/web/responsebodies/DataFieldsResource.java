@@ -9,16 +9,16 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-public class DataFieldsResource extends CollectionModel<LocalisedField> implements Serializable {
+@Setter
+@Getter
+public class DataFieldsResource extends CollectionModel<LocalisedField> implements Serializable, Iterable<LocalisedField> {
 
-    @Serial
     private static final long serialVersionUID = 73213276016133399L;
 
-    @Getter
-    @Setter
     private Collection<LocalisedField> content;
 
     public DataFieldsResource(Collection<Field> content, Locale locale) {
@@ -28,5 +28,8 @@ public class DataFieldsResource extends CollectionModel<LocalisedField> implemen
                 .collect(Collectors.toList());
     }
 
-
+    @Override
+    public Iterator<LocalisedField> iterator() {
+        return this.content.iterator();
+    }
 }

@@ -1,21 +1,24 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
+import com.netgrif.application.engine.files.local.LocalStorageService
+
 abstract class StorageField<T> extends Field<T> {
-    static final long serialVersionUID = -9172755427378929924L
+
+    public static final long serialVersionUID = -9172755427378929924L
     private Storage storage
 
     StorageField() {
         super()
     }
 
-    StorageType getStorageType() {
+    String getStorageType() {
         if (storage == null) {
-            return StorageType.LOCAL
+            return LocalStorageService.LOCAL_TYPE
         }
         return storage.getType()
     }
 
-    void setStorageType(StorageType storageType) {
+    void setStorageType(String storageType) {
         this.storage.setType(storageType)
     }
 
