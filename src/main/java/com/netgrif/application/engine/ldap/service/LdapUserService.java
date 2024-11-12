@@ -14,10 +14,6 @@ import org.springframework.stereotype.Service;
 
 import javax.naming.Name;
 
-@Slf4j
-@Service
-@Primary
-@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapUserService extends UserService {
 
     @Autowired
@@ -25,6 +21,7 @@ public class LdapUserService extends UserService {
 
     @Autowired
     private LdapGroupRefService ldapGroupRefService;
+
 
     public LdapUser findByDn(Name dn) {
         return ldapUserRepository.findByDn(dn.toString());

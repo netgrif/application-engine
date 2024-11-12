@@ -27,7 +27,7 @@ public class ApplicationRunnerOrderResolver {
      * @param <T>     the type of the runners
      * @param runners the collection of runners to be sorted
      * @return a {@link SortedRunners} object containing two lists: one with the sorted runners and one with the unresolved runners.
-     * To resolve order of the unresolved list call {@link SortedRunners#resolveAllRunners()} method.
+     * To resolve order of the unresolved list call {@link SortedRunners#sortUnresolvedRunners()} method.
      */
     public <T> SortedRunners<T> sortByRunnerOrderAnnotation(Collection<T> runners) {
         if (runners == null) return null;
@@ -90,6 +90,7 @@ public class ApplicationRunnerOrderResolver {
          * @return {@code true} if all unresolved runners have been successfully sorted and the unresolved list is empty;
          * {@code false} otherwise.
          */
+
         public boolean resolveAllRunners() {
             sortUnresolvedRunners();
             replaced.values().forEach(this::removeRunner);

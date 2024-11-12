@@ -1,6 +1,10 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
+import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
+import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.files.throwable.StorageException;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;

@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -13,7 +15,10 @@ import java.util.stream.Collectors;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CaseSearchRequest {
+public class CaseSearchRequest implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 5468800723081186371L;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<PetriNet> process;
@@ -94,7 +99,10 @@ public class CaseSearchRequest {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class PetriNet {
+    public static class PetriNet implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 4251438418424494690L;
 
         public String identifier;
 
@@ -108,7 +116,10 @@ public class CaseSearchRequest {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Author {
+    public static class Author implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = -4013905721499512553L;
 
         public String id;
 
