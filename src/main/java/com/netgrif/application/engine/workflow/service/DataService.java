@@ -12,6 +12,8 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.files.StorageResolverService;
 import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.files.throwable.StorageException;
+import com.netgrif.application.engine.event.events.data.GetDataEvent;
+import com.netgrif.application.engine.event.events.data.SetDataEvent;
 import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
 import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
@@ -190,6 +192,7 @@ public class DataService implements IDataService {
         LongStream.range(0L, dataSetFields.size())
                 .forEach(index -> dataSetFields.get((int) index).setOrder(index));
         outcome.setData(dataSetFields);
+        publisher.publishEvent(new GetDataEvent(outcome));
         return outcome;
     }
 
@@ -300,6 +303,7 @@ public class DataService implements IDataService {
         });
         updateDataset(useCase);
         outcome.setCase(workflowService.save(useCase));
+        publisher.publishEvent(new SetDataEvent(outcome));
         return outcome;
     }
 

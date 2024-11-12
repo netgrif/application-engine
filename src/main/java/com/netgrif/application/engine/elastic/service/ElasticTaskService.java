@@ -11,6 +11,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.elastic.domain.ElasticTaskJob;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
+import com.netgrif.application.engine.event.events.task.IndexTaskEvent;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
@@ -24,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -38,6 +40,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
@@ -60,6 +64,9 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
 
     @Autowired
     protected IPetriNetService petriNetService;
+
+    @Autowired
+    protected ApplicationEventPublisher publisher;
 
     protected List<String> fullTextFieldMap = ImmutableList.of(
             "title^1f",
@@ -114,7 +121,13 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     @Async
     @Override
     public void index(ElasticTask task) {
-        elasticTaskQueueManager.scheduleOperation(new ElasticTaskJob(ElasticJob.INDEX, task));
+        Future<ElasticTask> taskFuture = elasticTaskQueueManager.scheduleOperation(new ElasticTaskJob(ElasticJob.INDEX, task));
+        if (taskFuture instanceof CompletableFuture<ElasticTask>) {
+            ((CompletableFuture<ElasticTask>) taskFuture).thenApply(elasticTask -> {
+                publisher.publishEvent(new IndexTaskEvent(elasticTask));
+                return null;
+            });
+        }
     }
 
     @Override
