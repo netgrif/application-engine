@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.domain.repositories;
 
+import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.domain.Task;
 import org.bson.types.ObjectId;
@@ -33,7 +34,7 @@ public interface TaskRepository extends MongoRepository<Task, String>, QuerydslP
 
     List<Task> findAllByTransitionIdInAndCaseId(Collection<String> transitionIds, String caseId);
 
-    List<Task> findAllBy_idIn(Iterable<String> id);
+    List<Task> findAllBy_idIn(Iterable<ProcessResourceId> id);
 
     void deleteAllByCaseIdAndUserIdIsNull(String caseId);
 

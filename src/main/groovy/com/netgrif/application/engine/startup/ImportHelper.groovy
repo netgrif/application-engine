@@ -250,6 +250,12 @@ class ImportHelper {
         return mapper.readTree(json) as ObjectNode
     }
 
+    static ObjectNode populateDatasetWithObject(Map<String, Map<String, Object>> data) {
+        ObjectMapper mapper = new ObjectMapper()
+        String json = mapper.writeValueAsString(data)
+        return mapper.readTree(json) as ObjectNode
+    }
+
     static String getCaseColor() {
         return "color-fg-amber-500"
     }

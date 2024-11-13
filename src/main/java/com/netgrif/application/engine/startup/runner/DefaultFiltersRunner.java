@@ -440,7 +440,7 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
             Task newFilterTask = this.taskService.searchOne(QTask.task.transitionId.eq(AUTO_CREATE_TRANSITION).and(QTask.task.caseId.eq(filterCase.getStringId())));
             this.taskService.assignTask(newFilterTask, this.userService.getLoggedOrSystem());
 
-            Map<String, Map<String, String>> setDataMap = new LinkedHashMap<>();
+            Map<String, Map<String, Object>> setDataMap = new LinkedHashMap<>();
             setDataMap.put(FILTER_TYPE_FIELD_ID, Map.of(
                     "type", "enumeration_map",
                     "value", filterType
@@ -452,8 +452,8 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
             setDataMap.put(FILTER_FIELD_ID, Map.of(
                     "type", "filter",
                     "value", filterQuery,
-                    "allowedNets", allowedNets.toString(),
-                    "filterMetadata", filterMetadata.toString() // TODO this is a map of <String, Object> that needs to be converted to string
+                    "allowedNets", allowedNets,
+                    "filterMetadata", filterMetadata // TODO this is a map of <String, Object> that needs to be converted to string
             ));
 
             if (originId != null) {
@@ -463,7 +463,7 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
                 ));
             }
 
-            this.dataService.setData(newFilterTask, ImportHelper.populateDataset(setDataMap));
+            this.dataService.setData(newFilterTask, ImportHelper.populateDatasetWithObject(setDataMap));
             if (isImported) {
                 this.dataService.setData(newFilterTask, ImportHelper.populateDataset(Map.of(
                         IS_IMPORTED, Map.of(

@@ -713,7 +713,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<Task> findAllById(List<String> ids) {
-        return taskRepository.findAllBy_idIn(ids).stream()
+        return taskRepository.findAllBy_idIn(ids.stream().map(ProcessResourceId::new).toList()).stream()
                 .filter(Objects::nonNull)
                 .sorted(Ordering.explicit(ids).onResultOf(Task::getStringId))
                 .peek(this::setUser)
