@@ -28,10 +28,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleSe
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
-import com.netgrif.application.engine.workflow.domain.TaskPair;
+import com.netgrif.application.engine.workflow.domain.*;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.*;
@@ -411,7 +408,7 @@ public class TaskService implements ITaskService {
         IUser delegatedUser = userService.resolveById(delegatedId, true);
         IUser delegateUser = getUserFromLoggedUser(loggedUser);
 
-        Optional<Task> taskOptional = taskRepository.findById(taskId);
+        Optional<Task> taskOptional = findOptionalById(taskId);
         if (taskOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         }
@@ -492,7 +489,7 @@ public class TaskService implements ITaskService {
             } else {
                 if (taskId != null) {
                     // task exists - delete task if not assigned
-                    Optional<Task> optionalTask = taskRepository.findById(taskId);
+                    Optional<Task> optionalTask = findOptionalById(taskId);
                     if (optionalTask.isEmpty()) {
                         continue;
                     }
@@ -628,13 +625,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public Task findOne(String taskId) {
-        String[] parts = taskId.split("-");
-        if (parts.length < 2) {
-            throw new IllegalArgumentException("Invalid NetgrifId format: " + taskId);
-        }
-        String objectIdPart = parts[1];
-        ObjectId objectId = new ObjectId(objectIdPart);
-        Optional<Task> taskOptional = taskRepository.findByIdObjectId(objectId);
+        Optional<Task> taskOptional = findOptionalById(taskId);
         if (taskOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         }
@@ -700,19 +691,24 @@ public class TaskService implements ITaskService {
 
     @Override
     public Task findById(String id) {
-        String[] parts = id.split("-");
-        if (parts.length < 2) {
-            throw new IllegalArgumentException("Invalid NetgrifId format: " + id);
-        }
-        String objectIdPart = parts[1];
-        ObjectId objectId = new ObjectId(objectIdPart);
-        Optional<Task> taskOptional = taskRepository.findByIdObjectId(objectId);
+        Optional<Task> taskOptional = findOptionalById(id);
         if (taskOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find task with id [" + id + "]");
         }
         Task task = taskOptional.get();
         this.setUser(task);
         return task;
+    }
+
+    @Override
+    public Optional<Task> findOptionalById(String id) {
+        String[] parts = id.split(ProcessResourceId.ID_SEPARATOR);
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Invalid NetgrifId format: " + id);
+        }
+        String objectIdPart = parts[1];
+        ObjectId objectId = new ObjectId(objectIdPart);
+        return taskRepository.findByIdObjectId(objectId);
     }
 
     @Override
@@ -783,7 +779,7 @@ public class TaskService implements ITaskService {
     @Override
     public void resolveUserRef(Case useCase) {
         useCase.getTasks().forEach(taskPair -> {
-            Optional<Task> taskOptional = taskRepository.findById(taskPair.getTask());
+            Optional<Task> taskOptional = findOptionalById(taskPair.getTask());
             taskOptional.ifPresent(task -> resolveUserRef(task, useCase));
         });
 

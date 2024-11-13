@@ -17,10 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public interface ITaskService {
 
@@ -35,6 +32,8 @@ public interface ITaskService {
     long count(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection);
 
     Page<Task> findByCases(Pageable pageable, List<String> cases);
+
+    Optional<Task> findOptionalById(String id);
 
     List<Task> findAllById(List<String> ids);
 

@@ -5,10 +5,11 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.application.engine.event.evaluators.Evaluator;
 import com.netgrif.application.engine.event.events.workflow.CaseEvent;
 import com.netgrif.application.engine.event.events.workflow.CreateCaseEvent;
 import com.netgrif.application.engine.event.events.workflow.DeleteCaseEvent;
+import com.netgrif.application.engine.event.services.EvaluationService;
 import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventLog;
 import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
@@ -24,8 +25,6 @@ import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
-//import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
-//import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.security.service.EncryptionService;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.*;
@@ -92,9 +91,6 @@ public class WorkflowService implements IWorkflowService {
     @Autowired
     protected FieldFactory fieldFactory;
 
-//    @Autowired
-//    protected IRuleEngine ruleEngine;
-
     @Autowired
     protected FieldActionsRunner actionsRunner;
 
@@ -109,16 +105,23 @@ public class WorkflowService implements IWorkflowService {
 
     @Lazy
     @Autowired
-    private IEventService eventService;
+    protected IEventService eventService;
 
     @Autowired
-    private IHistoryService historyService;
+    protected IHistoryService historyService;
 
     protected IElasticCaseService elasticCaseService;
+
+    protected EvaluationService evaluationService;
 
     @Autowired
     public void setElasticCaseService(IElasticCaseService elasticCaseService) {
         this.elasticCaseService = elasticCaseService;
+    }
+
+    @Autowired
+    public void setEvaluationService(EvaluationService evaluationService) {
+        this.evaluationService = evaluationService;
     }
 
     @Override
@@ -160,7 +163,7 @@ public class WorkflowService implements IWorkflowService {
     public List<Case> findAllById(List<String> ids) {
         List<ObjectId> objectIds = ids.stream()
                 .map(id -> {
-                    String[] parts = id.split("-");
+                    String[] parts = id.split(ProcessResourceId.ID_SEPARATOR);
                     if (parts.length < 2) {
                         throw new IllegalArgumentException("Invalid NetgrifId format: " + id);
                     }
@@ -405,7 +408,7 @@ public class WorkflowService implements IWorkflowService {
 
         DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty(), params));
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
-        useCase = evaluateRules(new DeleteCaseEvent(outcome, EventPhase.PRE));
+        useCase = ((Evaluator<DeleteCaseEvent, Case>) evaluationService.getEvaluator("default")).apply(new DeleteCaseEvent(outcome, EventPhase.PRE));;
         log.info("[" + useCase.getStringId() + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting case " + useCase.getTitle());
 
         taskService.deleteTasksByCase(useCase.getStringId());
@@ -413,7 +416,7 @@ public class WorkflowService implements IWorkflowService {
 
         outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty(), params));
         addMessageToOutcome(useCase.getPetriNet(), CaseEventType.DELETE, outcome);
-        useCase = evaluateRules(new DeleteCaseEvent(outcome, EventPhase.POST));
+        ((Evaluator<DeleteCaseEvent, Case>) evaluationService.getEvaluator("noContext")).apply(new DeleteCaseEvent(outcome, EventPhase.POST));
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.POST));
 //        publisher.publishEvent(new DeleteCaseEvent(outcome));
         return outcome;
@@ -625,7 +628,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private ObjectId extractObjectId(String caseId) {
-        String[] parts = caseId.split("-");
+        String[] parts = caseId.split(ProcessResourceId.ID_SEPARATOR);
         if (parts.length < 2) {
             throw new IllegalArgumentException("Invalid NetgrifId format: " + caseId);
         }
