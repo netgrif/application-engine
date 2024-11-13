@@ -152,13 +152,19 @@ class UriServiceTest {
     @Test
     void createDefaultTest() {
         UriNode uriNode = uriService.createDefault()
-        assert uriNode != null && uriNode.level == 0
+        assert uriNode != null && uriNode.level == 1
 
         uriNodeRepository.deleteById(uriNode.stringId)
 
         uriNode = uriService.createDefault()
-        assert uriNode != null && uriNode.level == 0
+        assert uriNode != null && uriNode.level == 1
     }
 
-
+    @Test
+    void getRootTest() {
+        UriNode uriNode = uriService.createDefault()
+        assert uriNode != null && uriNode.level == 1
+        uriNode = uriService.getRoot()
+        assert uriNode != null && uriNode.level == 0
+    }
 }

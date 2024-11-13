@@ -170,8 +170,9 @@ public class UriService implements IUriService {
         node.setParentId(newParent.getStringId());
         node.setLevel(newParent.getLevel() + 1);
 
-        oldParent.getChildrenId().remove(node.getStringId());
-        newParent.getChildrenId().add(node.getStringId());
+        oldParent.getChildrenId().remove(oldNodePath);
+        newParent.getChildrenId().add(newNodePath);
+        uriNodeRepository.saveAll(List.of(oldParent, newParent, node));
 
         List<UriNode> childrenToSave = new ArrayList<>();
         if (!node.getChildrenId().isEmpty()) {
@@ -200,7 +201,7 @@ public class UriService implements IUriService {
             String diff = calcPathDifference(oldPath, oldParentPath);
             String newPath = newParentPath + diff;
             node.setPath(newPath);
-
+            node.setParentId(newParentPath);
             updated.add(node);
 
             node = populateDirectRelatives(node);
