@@ -37,7 +37,7 @@ class ActionTest {
         Action testAction = new Action('''
             println LocalDate.now()
             println LocalDate.MAX
-            println new ObjectId().toString()
+            println new ProcessResourceId().toString()
         ''', "set")
         runner.run(testAction, dummy, Optional.of(task), new HashMap<>())
     }
