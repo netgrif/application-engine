@@ -431,7 +431,8 @@
 			<id>assign-test</id>
 			<actions phase="post">
 				<action id="action_1">
-					def other = findCase { it.processIdentifier.eq(useCase.petriNet.identifier).and(it._id.ne(useCase.stringId)) }
+					def other = findCase { it.processIdentifier.eq(useCase.petriNet.identifier).and(it._id.ne(new com.netgrif.application.engine.workflow.domain.ProcessResourceId(useCase.stringId))) }
+					println(other.stringId)
 					generatePdf sourceTransitionId: '2', targetFileFieldId: 'file', targetCase: other
 				</action>
 			</actions>
