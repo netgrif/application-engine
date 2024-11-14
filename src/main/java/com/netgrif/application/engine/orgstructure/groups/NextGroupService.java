@@ -6,7 +6,6 @@ import com.netgrif.application.engine.auth.service.interfaces.IRegistrationServi
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
@@ -29,10 +28,8 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
