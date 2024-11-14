@@ -825,7 +825,7 @@ public class TaskService implements ITaskService {
                 .assignPolicy(transition.getAssignPolicy())
                 .dataFocusPolicy(transition.getDataFocusPolicy())
                 .finishPolicy(transition.getFinishPolicy())
-                .create();
+                .build();
         transition.getEvents().forEach((type, event) -> task.addEventTitle(type, event.getTitle()));
         task.addAssignedUserPolicy(transition.getAssignedUserPolicy());
         for (Trigger trigger : transition.getTriggers()) {

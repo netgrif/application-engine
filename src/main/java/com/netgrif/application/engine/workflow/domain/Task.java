@@ -34,11 +34,10 @@ public class Task implements Serializable {
     private static final long serialVersionUID = -7112277728921547546L;
 
     @Id
-    private ProcessResourceId _id = new ProcessResourceId();
+    private ProcessResourceId _id;
 
     @Indexed
     @Getter
-    @Setter
     private String processId;
 
     @Indexed
@@ -196,6 +195,9 @@ public class Task implements Serializable {
     private Map<String, String> tags = new HashMap<>();
 
     public Task() {
+        if (this.processId != null && !this.processId.isEmpty()) {
+            this._id = new ProcessResourceId(new ObjectId(this.processId));
+        }
     }
 
     @JsonIgnore
@@ -203,8 +205,24 @@ public class Task implements Serializable {
         return _id;
     }
 
+    public void setProcessId(String processId) {
+        this.processId = processId;
+        if (processId != null && !processId.isEmpty()) {
+            this._id = new ProcessResourceId(new ObjectId(processId));
+        }
+    }
+
+    public ProcessResourceId get_id() {
+        if (this._id == null) {
+            this._id = this.processId != null && !this.processId.isEmpty()
+                    ? new ProcessResourceId(new ObjectId(this.processId))
+                    : new ProcessResourceId();
+        }
+        return this._id;
+    }
+
     public String getStringId() {
-        return _id.toString();
+        return get_id().toString();
     }
 
     public String getTransitionId() {
@@ -348,59 +366,6 @@ public class Task implements Serializable {
         AUTO,
         TIME,
         MESSAGE,
-    }
-
-    public static class TaskBuilder {
-
-        private ProcessResourceId _id;
-        private String processId;
-
-        private String caseId;
-        private String transitionId;
-        private TaskLayout layout;
-        private I18nString title;
-        private String caseColor;
-        private String caseTitle;
-        private Integer priority;
-        private String userId;
-        private IUser user;
-        private List triggers = new LinkedList<>();
-        private Map<String, Map<String, Boolean>> roles = new HashMap<>();
-        private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
-        private Map<String, Map<String, Boolean>> users = new HashMap<>();
-        private List viewRoles = new LinkedList<>();
-        private List viewUserRefs = new LinkedList<>();
-        private List viewUsers = new LinkedList<>();
-        private List negativeViewRoles = new LinkedList<>();
-        private List negativeViewUsers = new LinkedList<>();
-        private LocalDateTime startDate;
-        private LocalDateTime finishDate;
-        private String finishedBy;
-        private String transactionId;
-        private Boolean requiredFilled;
-        private LinkedHashSet immediateDataFields = new LinkedHashSet<>();
-        private List immediateData = new LinkedList<>();
-        private String icon;
-        private AssignPolicy assignPolicy = AssignPolicy.MANUAL;
-        private DataFocusPolicy dataFocusPolicy = DataFocusPolicy.MANUAL;
-        private FinishPolicy finishPolicy = FinishPolicy.MANUAL;
-        private Map<EventType, I18nString> eventTitles = new HashMap<>();
-        private Map<String, Boolean> assignedUserPolicy = new HashMap<>();
-        private Map<String, String> tags = new HashMap<>();
-
-        public TaskBuilder processId(String processId) {
-            this.processId = processId;
-            this._id = new ProcessResourceId(new ObjectId(processId));
-            return this;
-        }
-
-        public Task create() {
-            if (this._id == null && this.processId != null) {
-                this._id = new ProcessResourceId(new ObjectId(this.processId));
-            }
-            return new Task(_id, processId, caseId, transitionId, layout, title, caseColor, caseTitle, priority, userId, user, triggers, roles, userRefs, users, viewRoles, viewUserRefs, viewUsers, negativeViewRoles, negativeViewUsers, startDate, finishDate, finishedBy, transactionId, requiredFilled, immediateDataFields, immediateData, icon, assignPolicy, dataFocusPolicy, finishPolicy, eventTitles, assignedUserPolicy, new HashMap<>(), tags);
-        }
-
     }
 
 }
