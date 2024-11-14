@@ -33,6 +33,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 
@@ -138,10 +139,8 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Case findByName(String name) {
-        CaseSearchRequest request = new CaseSearchRequest();
-        request.query = "title.keyword:\"" + name + "\"";
-        List<Case> result = elasticCaseService.search(Collections.singletonList(request), userService.getSystem().transformToLoggedUser(), PageRequest.of(0, 1), LocaleContextHolder.getLocale(), false).getContent();
-        return !result.isEmpty() ? result.get(0) : null;
+        List<Case> result = workflowService.search(groupCase().and(QCase.case$.title.eq(name)), Pageable.ofSize(1)).toList();
+        return !result.isEmpty() ? result.getFirst() : null;
     }
 
     @Override
