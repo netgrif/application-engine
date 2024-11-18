@@ -22,12 +22,15 @@ import java.io.Serializable;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Document
 public class Case implements Serializable {
 
     private static final long serialVersionUID = 3687481049847498422L;
+
+    private static final AtomicInteger counter = new AtomicInteger(0);
 
     @Id
     @Getter
@@ -43,6 +46,7 @@ public class Case implements Serializable {
     private LocalDateTime lastModified;
 
     @Getter
+    @Indexed
     private String visualId;
 
     @NotNull
@@ -276,14 +280,18 @@ public class Case implements Serializable {
 
     private String generateVisualId() {
         SecureRandom random = new SecureRandom();
-        int n = _id.getTimestamp() + random.nextInt(99999999);
-        if (this.title != null) {
-            n += title.length();
-        }
+        long n = _id.getTimestamp();
+        int count = counter.incrementAndGet();
+        int k = random.nextInt(99999);
+        String timestamp = String.format("%011d", n);
+        String counterString = String.format("%03d", count);
+        String suffix = String.format("%04d", k);
+        String finalId = timestamp + counterString + suffix;
+
         if (this.petriNet != null) {
-            return petriNet.getInitials() + "-" + n;
+            return petriNet.getInitials() + "-" + finalId;
         }
-        return n + "";
+        return finalId;
     }
 
     public Object getFieldValue(String fieldId) {
