@@ -2495,7 +2495,7 @@ class ActionDelegate {
         return findMenuItem(uri, name)
     }
 
-     Map<String, I18nString> collectRolesForPreferenceItem(List<ProcessRole> roles) {
+    Map<String, I18nString> collectRolesForPreferenceItem(List<ProcessRole> roles) {
         return roles.collectEntries { role ->
             if (role.isGlobal()) {
                 return [(role.importId + ":" + GLOBAL_ROLE), ("$role.name (🌍 Global role)" as String)]
