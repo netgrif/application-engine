@@ -1958,7 +1958,7 @@ class ActionDelegate {
 
     }
 
-    private void updateMenuItemRoles(Case item, Closure cl, String roleFieldId) {
+    void updateMenuItemRoles(Case item, Closure cl, String roleFieldId) {
         item = workflowService.findOne(item.stringId)
         def roles = cl()
         def dataField = item.dataSet[roleFieldId]
@@ -2495,7 +2495,7 @@ class ActionDelegate {
         return findMenuItem(uri, name)
     }
 
-    private Map<String, I18nString> collectRolesForPreferenceItem(List<ProcessRole> roles) {
+     Map<String, I18nString> collectRolesForPreferenceItem(List<ProcessRole> roles) {
         return roles.collectEntries { role ->
             if (role.isGlobal()) {
                 return [(role.importId + ":" + GLOBAL_ROLE), ("$role.name (🌍 Global role)" as String)]
@@ -2506,7 +2506,7 @@ class ActionDelegate {
         } as Map<String, I18nString>
     }
 
-    private Map<String, I18nString> collectRolesForPreferenceItem(Map<String, String> roles) {
+    Map<String, I18nString> collectRolesForPreferenceItem(Map<String, String> roles) {
         Map<String, PetriNet> temp = [:]
         return roles.collectEntries { entry ->
             if (entry.value.equals(GLOBAL_ROLE)) {
