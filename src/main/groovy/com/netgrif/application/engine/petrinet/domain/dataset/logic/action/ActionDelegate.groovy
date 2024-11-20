@@ -35,6 +35,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.V
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.rules.domain.RuleRepository
 import com.netgrif.application.engine.startup.DefaultFiltersRunner
@@ -91,6 +92,7 @@ class ActionDelegate {
     static final String ALWAYS_GENERATE = "always"
     static final String ONCE_GENERATE = "once"
     static final String TRANSITIONS = "transitions"
+    public static final String GLOBAL_ROLE = "GLOBAL_ROLE"
 
     @Value('${nae.mail.from}')
     private String mailFrom
@@ -127,6 +129,9 @@ class ActionDelegate {
 
     @Autowired
     INextGroupService nextGroupService
+
+    @Autowired
+    IProcessRoleService processRoleService
 
     @Autowired
     IRegistrationService registrationService
@@ -624,13 +629,13 @@ class ActionDelegate {
     }
 
     def change(Field field, Case targetCase = this.useCase, Optional<Task> targetTask = this.task) {
-        [about      : { cl -> // TODO: deprecated
+        [about              : { cl -> // TODO: deprecated
             changeFieldValue(field, cl, targetCase, targetTask)
         },
-         value      : { cl ->
-            changeFieldValue(field, cl, targetCase, targetTask)
+         value              : { cl ->
+             changeFieldValue(field, cl, targetCase, targetTask)
          },
-         choices    : { cl ->
+         choices            : { cl ->
              if (!(field instanceof MultichoiceField || field instanceof EnumerationField))
                  return
 
@@ -649,7 +654,7 @@ class ActionDelegate {
              }
              saveChangedChoices(field, targetCase, targetTask)
          },
-         allowedNets: { cl ->
+         allowedNets        : { cl ->
              if (!(field instanceof CaseField)) // TODO make this work with FilterField as well
                  return
 
@@ -667,7 +672,7 @@ class ActionDelegate {
              }
              saveChangedAllowedNets(field, targetCase, targetTask)
          },
-         options    : { cl ->
+         options            : { cl ->
              if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField
                      || field instanceof MultichoiceField || field instanceof EnumerationField))
                  return
@@ -703,7 +708,7 @@ class ActionDelegate {
              }
 
          },
-         validations: { cl ->
+         validations        : { cl ->
              changeFieldValidations(field, cl, targetCase, targetTask)
          },
          componentProperties: { cl ->
@@ -755,9 +760,9 @@ class ActionDelegate {
                 value.each { id -> users.add(new UserFieldValue(userService.findById(id as String, false))) }
                 value = new UserListFieldValue(users)
             }
-            if (field instanceof TaskField && targetTask.isPresent()) {
-                dataService.validateTaskRefValue(value, targetTask.get().getStringId());
-            }
+//            if (field instanceof TaskField && targetTask.isPresent()) {
+//                dataService.validateTaskRefValue(value, targetTask.get().getStringId());
+//            }
             field.value = value
             saveChangedValue(field, targetCase)
         }
@@ -1633,7 +1638,7 @@ class ActionDelegate {
      "filterType"             : "Case",
      "defaultSearchCategories": true,
      "inheritAllowedNets"     : false
- ] }</pre>
+     ] }</pre>
      * <li> <code>changeFilter filter title { new I18nString("New title") }</code>
      * <li> <code>changeFilter filter title { "New title" }</code>
      * <li> <code>changeFilter filter icon { "filter_alt" }</code>
@@ -1881,31 +1886,31 @@ class ActionDelegate {
      * @param item {@link Case} instance of preference_item.xml
      */
     def changeMenuItem(Case item) {
-        [allowedRoles  : { cl ->
+        [allowedRoles          : { cl ->
             updateMenuItemRoles(item, cl as Closure, MenuItemConstants.PREFERENCE_ITEM_FIELD_ALLOWED_ROLES.attributeId)
         },
-         bannedRoles   : { cl ->
+         bannedRoles           : { cl ->
              updateMenuItemRoles(item, cl as Closure, MenuItemConstants.PREFERENCE_ITEM_FIELD_BANNED_ROLES.attributeId)
          },
-         caseDefaultHeaders: { cl ->
+         caseDefaultHeaders    : { cl ->
              String defaultHeaders = cl() as String
              setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS.attributeId): ["type": "text", "value": defaultHeaders]
              ])
          },
-         taskDefaultHeaders: { cl ->
+         taskDefaultHeaders    : { cl ->
              String defaultHeaders = cl() as String
              setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS.attributeId): ["type": "text", "value": defaultHeaders]
              ])
          },
-         filter        : { cl ->
+         filter                : { cl ->
              def filter = cl() as Case
              setData("change_filter", item, [
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_NEW_FILTER_ID.attributeId): ["type": "text", "value": filter.stringId]
              ])
          },
-         uri           : { cl ->
+         uri                   : { cl ->
              def uri = cl() as String
              def aCase = useCase
              if (useCase == null || item.stringId != useCase.stringId) {
@@ -1913,20 +1918,20 @@ class ActionDelegate {
              }
              moveMenuItem(aCase, uri)
          },
-         title         : { cl ->
+         title                 : { cl ->
              def value = cl()
              I18nString newName = (value instanceof I18nString) ? value : new I18nString(value as String)
              setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME.attributeId): ["type": "i18n", "value": newName]
              ])
          },
-         menuIcon         : { cl ->
+         menuIcon              : { cl ->
              def value = cl()
              setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_ICON.attributeId): ["type": "text", "value": value]
              ])
          },
-         tabIcon         : { cl ->
+         tabIcon               : { cl ->
              def value = cl()
              setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_TAB_ICON.attributeId): ["type": "text", "value": value]
@@ -1938,13 +1943,13 @@ class ActionDelegate {
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_REQUIRE_TITLE_IN_CREATION.attributeId): ["type": "boolean", "value": value]
              ])
          },
-         useCustomView: { cl ->
+         useCustomView         : { cl ->
              def value = cl()
              setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_USE_CUSTOM_VIEW.attributeId): ["type": "boolean", "value": value]
              ])
          },
-         customViewSelector: { cl ->
+         customViewSelector    : { cl ->
              def value = cl()
              setData(MenuItemConstants.PREFERENCE_ITEM_SETTINGS_TRANS_ID.attributeId, item, [
                      (MenuItemConstants.PREFERENCE_ITEM_FIELD_CUSTOM_VIEW_SELECTOR.attributeId): ["type": "text", "value": value]
@@ -1953,7 +1958,7 @@ class ActionDelegate {
 
     }
 
-    private void updateMenuItemRoles(Case item, Closure cl, String roleFieldId) {
+    void updateMenuItemRoles(Case item, Closure cl, String roleFieldId) {
         item = workflowService.findOne(item.stringId)
         def roles = cl()
         def dataField = item.dataSet[roleFieldId]
@@ -2136,7 +2141,7 @@ class ActionDelegate {
 
     protected Case getOrCreateFolderItem(String uri) {
         UriNode node = uriService.getOrCreate(uri, UriContentType.CASE)
-        MenuItemBody body = new MenuItemBody(new I18nString(node.name),"folder")
+        MenuItemBody body = new MenuItemBody(new I18nString(node.name), "folder")
         return getOrCreateFolderRecursive(node, body)
     }
 
@@ -2255,30 +2260,30 @@ class ActionDelegate {
 
         Task newItemTask = findTask { it._id.eq(new ObjectId(duplicated.tasks.find { it.transition == MenuItemConstants.PREFERENCE_ITEM_FIELD_INIT_TRANS_ID.attributeId }.task)) }
         Map updatedDataSet = [
-                (MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE.attributeId): [
+                (MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE.attributeId)               : [
                         "value": null,
-                        "type": "text"
+                        "type" : "text"
                 ],
-                (MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER.attributeId): [
+                (MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER.attributeId)          : [
                         "value": null,
-                        "type": "text"
+                        "type" : "text"
                 ],
-                (MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME.attributeId): [
+                (MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME.attributeId)                     : [
                         "value": newTitle,
-                        "type": "i18n"
+                        "type" : "i18n"
                 ],
-                (MenuItemConstants.PREFERENCE_ITEM_FIELD_TAB_NAME.attributeId): [
+                (MenuItemConstants.PREFERENCE_ITEM_FIELD_TAB_NAME.attributeId)                      : [
                         "value": newTitle,
-                        "type": "i18n"
+                        "type" : "i18n"
                 ],
-                (MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId): [
+                (MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId)                     : [
                         "value": newNodePath,
-                        "type": "text"
+                        "type" : "text"
                 ],
                 // Must be reset by button, because we have the same dataSet reference between originItem and duplicated
                 (MenuItemConstants.PREFERENCE_ITEM_FIELD_DUPLICATE_RESET_CHILD_ITEM_IDS.attributeId): [
                         "value": 0,
-                        "type": "button"
+                        "type" : "button"
                 ],
         ]
         assignTask(newItemTask)
@@ -2490,22 +2495,38 @@ class ActionDelegate {
         return findMenuItem(uri, name)
     }
 
-    private Map<String, I18nString> collectRolesForPreferenceItem(List<ProcessRole> roles) {
+    Map<String, I18nString> collectRolesForPreferenceItem(List<ProcessRole> roles) {
         return roles.collectEntries { role ->
-            PetriNet net = petriNetService.get(new ObjectId(role.netId))
-            return [(role.importId + ":" + net.identifier), ("$role.name ($net.title)" as String)]
+            if (role.isGlobal()) {
+                return [(role.importId + ":" + GLOBAL_ROLE), ("$role.name (🌍 Global role)" as String)]
+            } else {
+                PetriNet net = petriNetService.get(new ObjectId(role.netId))
+                return [(role.importId + ":" + net.identifier), ("$role.name ($net.title)" as String)]
+            }
         } as Map<String, I18nString>
     }
 
-    private Map<String, I18nString> collectRolesForPreferenceItem(Map<String, String> roles) {
+    Map<String, I18nString> collectRolesForPreferenceItem(Map<String, String> roles) {
         Map<String, PetriNet> temp = [:]
         return roles.collectEntries { entry ->
-            if (!temp.containsKey(entry.value)) {
-                temp.put(entry.value, petriNetService.getNewestVersionByIdentifier(entry.value))
+            if (entry.value.equals(GLOBAL_ROLE)) {
+                Set<ProcessRole> findGlobalRole = processRoleService.findAllByImportId(ProcessRole.GLOBAL + entry.key)
+                if (findGlobalRole == null || findGlobalRole.isEmpty()) {
+                    return
+                }
+                ProcessRole role = findGlobalRole.find { it.isGlobal() }
+                if (role == null) {
+                    return
+                }
+                return [(role.importId + ":" + GLOBAL_ROLE), ("$role.name (🌍 Global role)" as String)]
+            } else {
+                if (!temp.containsKey(entry.value)) {
+                    temp.put(entry.value, petriNetService.getNewestVersionByIdentifier(entry.value))
+                }
+                PetriNet net = temp[entry.value]
+                ProcessRole role = net.roles.find { it.value.importId == entry.key }.value
+                return [(role.importId + ":" + net.identifier), ("$role.name ($net.title)" as String)]
             }
-            PetriNet net = temp[entry.value]
-            ProcessRole role = net.roles.find { it.value.importId == entry.key }.value
-            return [(role.importId + ":" + net.identifier), ("$role.name ($net.title)" as String)]
         } as Map<String, I18nString>
     }
 
@@ -2802,7 +2823,7 @@ class ActionDelegate {
     Map<String, I18nString> findOptionsBasedOnSelectedNode(UriNode node, List<String> splitPathList) {
         Map<String, I18nString> options = new HashMap<>()
 
-        options.putAll(splitPathList.collectEntries { [(it): new I18nString(it)]})
+        options.putAll(splitPathList.collectEntries { [(it): new I18nString(it)] })
 
         Set<String> childrenIds = node.getChildrenId()
         if (!childrenIds.isEmpty()) {
