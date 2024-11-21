@@ -28,6 +28,8 @@ public interface IProcessRoleService {
 
     List<ProcessRole> findAll();
 
+    Set<ProcessRole> findAllGlobalRoles();
+
     List<ProcessRole> findAll(String netId);
 
     ProcessRole defaultRole();

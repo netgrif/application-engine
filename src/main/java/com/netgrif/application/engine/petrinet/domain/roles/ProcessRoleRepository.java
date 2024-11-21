@@ -21,6 +21,8 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
 
     Set<ProcessRole> findAllByImportId(String importId);
 
+    Set<ProcessRole> findAllByGlobalIsTrue();
+
     @Query("{ '_id.objectId': ?0 }")
     Optional<ProcessRole> findByIdObjectId(ObjectId objectId);
 

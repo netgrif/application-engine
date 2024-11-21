@@ -43,6 +43,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.3](h
 - [NAE-1927] Shared Roles
 - [NAE-1945] External resource loader
 - [NAE-2008] Serialisation of classes
+- [NAE-2016] Global roles for menu items permissions
 
 ### Changed
 - [NAE-1947] HistoryService findAllSetDataEventLogs is not working

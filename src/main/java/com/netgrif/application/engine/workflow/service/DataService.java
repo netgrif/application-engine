@@ -906,7 +906,7 @@ public class DataService implements IDataService {
                 break;
             case "taskRef":
                 List<String> listTask = parseListStringValues(node);
-                validateTaskRefValue(listTask, taskId);
+//                validateTaskRefValue(listTask, taskId);
                 value = listTask;
                 break;
             case "stringCollection":
@@ -1119,9 +1119,10 @@ public class DataService implements IDataService {
         });
     }
 
-    public void validateTaskRefValue(List<String> taskIds, String restrictedTaskId) throws IllegalArgumentException {
-        if (taskIds != null && taskIds.contains(restrictedTaskId)) {
-            throw new IllegalArgumentException(String.format("Task with id '%s' cannot be added to task ref, since it is a task which is displaying task ref", restrictedTaskId));
-        }
-    }
+//    public void validateTaskRefValue(List<String> taskIds, String restrictedTaskId) throws IllegalArgumentException {
+//        if (taskIds != null && taskIds.contains(restrictedTaskId)) {
+//            throw new IllegalArgumentException(String.format("Task with id '%s' cannot be added to task ref, since it is a task which is displaying task ref", restrictedTaskId));
+//        }
+//    }
+
 }

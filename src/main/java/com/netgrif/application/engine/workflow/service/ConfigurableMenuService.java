@@ -11,6 +11,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapFiel
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.service.interfaces.IConfigurableMenuService;
@@ -23,10 +24,16 @@ import java.util.stream.Collectors;
 @Service
 public class ConfigurableMenuService implements IConfigurableMenuService {
 
+    protected final String GLOBAL_ROLE = "GLOBAL_ROLE";
+
     @Autowired
     private PetriNetService petriNetService;
+
     @Autowired
     private StringToVersionConverter converter;
+
+    @Autowired
+    private IProcessRoleService processRoleService;
 
     /**
      * Constructs a map that can be used as a value for any {@link com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField}.
@@ -51,7 +58,8 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
         requestQuery.setAuthor(authorQuery);
         List<PetriNetReference> nets = this.petriNetService.search(requestQuery, loggedAuthor, new FullPageRequest(), locale).getContent();
 
-        Map<String, I18nString> options = new HashMap<>();
+        Map<String, I18nString> options = new LinkedHashMap<>();
+        options.put("GLOBAL_ROLE", new I18nString("🌍 Global role"));
 
         for (PetriNetReference net : nets) {
             String[] versionSplit = net.getVersion().split("\\.");
@@ -80,6 +88,16 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     @Override
     public Map<String, I18nString> getAvailableRolesFromNet(EnumerationMapField processField, MultichoiceMapField permittedRoles, MultichoiceMapField bannedRoles) {
 
+        if (GLOBAL_ROLE.equals(processField.getValue())) {
+            return processRoleService.findAllGlobalRoles().stream()
+                    .filter(role -> !permittedRoles.getOptions().containsKey(role.getImportId() + ":" + GLOBAL_ROLE)
+                            && !bannedRoles.getOptions().containsKey(role.getImportId() + ":" + GLOBAL_ROLE))
+                    .collect(Collectors.toMap(
+                            role -> role.getImportId() + ":" + GLOBAL_ROLE,
+                            role -> new I18nString(role.getName())
+                    ));
+        }
+
         String netImportId = processField.getValue().split(":")[0];
         String versionString = processField.getValue().split(":")[1].replace("-", ".");
         Version version = converter.convert(versionString);
@@ -87,7 +105,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
 
         return net.getRoles().values().stream()
                 .filter(role -> (!permittedRoles.getOptions().containsKey(role.getImportId() + ":" + netImportId)
-                        && !bannedRoles.getOptions().containsKey(role.getImportId() + ":" + netImportId)))
+                        && !bannedRoles.getOptions().containsKey(role.getImportId() + ":" + netImportId) && !role.isGlobal()))
                 .collect(Collectors.toMap(o -> o.getImportId() + ":" + netImportId, v -> new I18nString(v.getName())));
     }
 
