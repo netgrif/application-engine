@@ -150,7 +150,7 @@ class LoginAttemptsTest {
                 .accept(MediaTypes.HAL_JSON_VALUE)
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
-                .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_PASSWORD)))
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_BAD_PASSWORD)))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andReturn()
         assert result
@@ -158,7 +158,7 @@ class LoginAttemptsTest {
                 .accept(MediaTypes.HAL_JSON_VALUE)
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
-                .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_PASSWORD)))
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_BAD_PASSWORD)))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andReturn()
         assert result
@@ -166,7 +166,7 @@ class LoginAttemptsTest {
                 .accept(MediaTypes.HAL_JSON_VALUE)
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
-                .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_PASSWORD)))
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_BAD_PASSWORD)))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andReturn()
         assert result
@@ -174,7 +174,7 @@ class LoginAttemptsTest {
                 .accept(MediaTypes.HAL_JSON_VALUE)
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
-                .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_PASSWORD)))
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, USER_BAD_PASSWORD)))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andReturn()
         assert result
