@@ -7,6 +7,29 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.3](https://github.com/netgrif/application-engine/commits/v6.3.3)
 
+## [7.0.0](https://github.com/netgrif/application-engine/releases/tag/v7.0.0) (2024-11-22)
+
+### Fixed
+
+### Added
+- [NAE-1859] User reference in events
+- [NAE-1567] Global event system
+- [NAE-1988] Extend Id of processes resource for better resolution
+- [NAE-1975] NAE nodes gRPC communication
+
+### Changed
+- [NAE-1844] PDF Builder
+- [NAE-1858] Task states
+- [NAE-1862] Frontend update
+- [NAE-1972] Framework upgrade
+- [NAE-1989] RunnerController refactor
+- [NAE-2009] Update actions for v7.0.0
+
+### Removed
+
+[NAE-1854] Remove deprecated services
+
+
 ## [6.4.0](https://github.com/netgrif/application-engine/releases/tag/v6.4.0) (2024-10-22)
 
 ### Fixed
