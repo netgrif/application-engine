@@ -27,11 +27,29 @@ public class ElasticsearchProperties {
 
     private boolean drop;
 
-    private int port;
+    private boolean ignoreSSL;
 
-    private int searchPort;
+    private int connectTimeout = -1;
+
+    private int socketTimeout = -1;
+
+    private int connectionRequestTimeout = -1;
+
+    private int port = 9300;
+
+    private int searchPort = 9200;
 
     private String url;
+
+    private boolean ssl = false;
+
+    private String proxyHost;
+
+    private int proxyPort;
+
+    private String username;
+
+    private String password;
 
     private Map<String, String> index;
 
