@@ -1,12 +1,10 @@
 package com.netgrif.application.engine.workflow.domain;
 
-import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
-@Builder
 public class TaskPair implements Serializable {
 
     private static final long serialVersionUID = -3865322078419904394L;
