@@ -298,7 +298,7 @@ public class DataService implements IDataService {
                 applyFieldConnectedChanges(useCase, field);
             }
         });
-        update(useCase);
+        updateDataset(useCase);
         outcome.setCase(workflowService.save(useCase));
         return outcome;
     }
@@ -657,7 +657,7 @@ public class DataService implements IDataService {
                 EventPhase.PRE, useCase, referencingTask, params));
         outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
                 EventPhase.POST, useCase, referencingTask, params));
-        update(useCase);
+        updateDataset(useCase);
         workflowService.save(useCase);
         return outcomes;
     }
@@ -752,7 +752,7 @@ public class DataService implements IDataService {
         return new UserFieldValue(user);
     }
 
-    private void update(Case useCase) {
+    private void updateDataset(Case useCase) {
         Case current = workflowService.findOne(useCase.getStringId());
         current.getDataSet().forEach((id, dataField) -> {
             if (dataField.isNewerThen(useCase.getDataField(id))) {
