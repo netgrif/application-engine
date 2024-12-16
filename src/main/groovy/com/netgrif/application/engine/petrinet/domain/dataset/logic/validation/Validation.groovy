@@ -3,6 +3,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.validation
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
+import org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl
 
 class Validation implements Serializable {
 
@@ -57,6 +58,6 @@ class Validation implements Serializable {
     @Override
     @QueryType(PropertyType.NONE)
     MetaClass getMetaClass() {
-        return this.metaClass
+        return this.metaClass != null ? this.metaClass  : ((MetaClassRegistryImpl) GroovySystem.getMetaClassRegistry()).getMetaClass(this)
     }
 }

@@ -3,6 +3,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic
 import com.netgrif.application.engine.petrinet.domain.layout.Layout
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
+import org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl
 
 class FieldLayout extends Layout {
     private int x
@@ -96,6 +97,6 @@ class FieldLayout extends Layout {
     @Override
     @QueryType(PropertyType.NONE)
     MetaClass getMetaClass() {
-        return this.metaClass
+        return this.metaClass != null ? this.metaClass  : ((MetaClassRegistryImpl) GroovySystem.getMetaClassRegistry()).getMetaClass(this)
     }
 }

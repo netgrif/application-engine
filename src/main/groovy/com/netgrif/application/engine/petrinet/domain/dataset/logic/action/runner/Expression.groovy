@@ -3,6 +3,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runn
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
 import org.bson.types.ObjectId
+import org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl
 
 class Expression implements Serializable {
 
@@ -37,7 +38,7 @@ class Expression implements Serializable {
     @Override
     @QueryType(PropertyType.NONE)
     MetaClass getMetaClass() {
-        return this.metaClass
+        return this.metaClass != null ? this.metaClass  : ((MetaClassRegistryImpl) GroovySystem.getMetaClassRegistry()).getMetaClass(this)
     }
 
     @Override

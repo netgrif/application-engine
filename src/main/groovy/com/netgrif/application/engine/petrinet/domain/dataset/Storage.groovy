@@ -3,6 +3,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 import com.netgrif.application.engine.files.local.LocalStorageService
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
+import org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl
 
 class Storage implements Serializable {
     @Serial
@@ -43,6 +44,6 @@ class Storage implements Serializable {
     @Override
     @QueryType(PropertyType.NONE)
     MetaClass getMetaClass() {
-        return this.metaClass
+        return this.metaClass != null ? this.metaClass  : ((MetaClassRegistryImpl) GroovySystem.getMetaClassRegistry()).getMetaClass(this)
     }
 }
