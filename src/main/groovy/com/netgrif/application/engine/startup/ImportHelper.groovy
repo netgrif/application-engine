@@ -163,7 +163,7 @@ class ImportHelper {
         List<ProcessRole> roles = processRoleService.findAll(net.stringId)
         Map<String, ProcessRole> map = [:]
         net.roles.values().each { netRole ->
-            map[netRole.name.getDefaultValue()] = roles.find { it.roleId == netRole.stringId }
+            map[netRole.name.getDefaultValue()] = roles.find { it.stringId == netRole.stringId }
         }
         return map
     }
