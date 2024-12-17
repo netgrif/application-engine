@@ -15,7 +15,6 @@ import org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.elasticsearch.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Setting;
@@ -291,9 +290,18 @@ public class ElasticIndexService implements IElasticIndexService {
         try {
             return elasticsearchTemplate.searchScrollContinue(scrollId, 60000, clazz, IndexCoordinates.of(indexName));
         } catch (Exception e) {
-            log.error("scrollFirst:", e);
+            log.error("scroll:", e);
         }
         return null;
+    }
+
+    @Override
+    public void clearScrollHits(List<String> scrollIds) {
+        try {
+            elasticsearchTemplate.searchScrollClear(scrollIds);
+        } catch (Exception e) {
+            log.error("clearScrollHits:", e);
+        }
     }
 
     private String getIdFromSource(Object source) {
