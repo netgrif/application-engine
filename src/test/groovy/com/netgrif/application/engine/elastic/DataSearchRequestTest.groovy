@@ -226,6 +226,7 @@ class DataSearchRequestTest {
 
     @Test
     void testDatSearchRequests() {
+        sleep(2000)
         testCases.each { testCase ->
             CaseSearchRequest request = new CaseSearchRequest()
             request.data = new HashMap<>()
