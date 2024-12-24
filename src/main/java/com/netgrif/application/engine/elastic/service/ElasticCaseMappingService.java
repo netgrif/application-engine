@@ -1,8 +1,6 @@
 package com.netgrif.application.engine.elastic.service;
 
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.domain.BooleanField;
 import com.netgrif.application.engine.elastic.domain.ButtonField;
 import com.netgrif.application.engine.elastic.domain.DateField;
@@ -11,14 +9,13 @@ import com.netgrif.application.engine.elastic.domain.I18nField;
 import com.netgrif.application.engine.elastic.domain.NumberField;
 import com.netgrif.application.engine.elastic.domain.TextField;
 import com.netgrif.application.engine.elastic.domain.UserField;
-import com.netgrif.application.engine.elastic.domain.*;
 import com.netgrif.application.engine.elastic.domain.UserListField;
+import com.netgrif.application.engine.elastic.domain.*;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -27,14 +24,10 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class ElasticCaseMappingService implements IElasticCaseMappingService {
-
-    @Autowired
-    private IUserService userService;
 
     @Override
     public ElasticCase transform(Case useCase) {
@@ -109,8 +102,8 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformI18nField(com.netgrif.application.engine.workflow.domain.DataField dataField, com.netgrif.application.engine.petrinet.domain.dataset.I18nField netField) {
-        Set<String> keys = netField.getValue().getTranslations().keySet();
-        Set<String> values = new HashSet<>(netField.getValue().getTranslations().values());
+        Set<String> keys = ((I18nString) dataField.getValue()).getTranslations().keySet();
+        Set<String> values = new HashSet<>(((I18nString) dataField.getValue()).getTranslations().values());
         values.add(((I18nString) dataField.getValue()).getDefaultValue());
         return Optional.of(new I18nField(keys, values));
     }
@@ -179,6 +172,9 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
     protected List<String> collectTranslations(I18nString i18nString) {
         List<String> translations = new ArrayList<>();
+        if (i18nString == null) {
+            return translations;
+        }
         translations.add(i18nString.getDefaultValue());
         translations.addAll(i18nString.getTranslations().values());
         return translations;

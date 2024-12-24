@@ -18,10 +18,6 @@ public enum AuthorizationType {
         value = v;
     }
 
-    public String value() {
-        return value;
-    }
-
     public static AuthorizationType fromValue(String v) {
         for (AuthorizationType c : AuthorizationType.values()) {
             if (c.value.equals(v)) {
@@ -29,5 +25,9 @@ public enum AuthorizationType {
             }
         }
         throw new IllegalArgumentException(v);
+    }
+
+    public String value() {
+        return value;
     }
 }

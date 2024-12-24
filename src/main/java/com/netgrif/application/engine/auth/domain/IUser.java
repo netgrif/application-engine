@@ -10,9 +10,15 @@ public interface IUser {
 
     String getEmail();
 
+    void setEmail(String email);
+
     String getName();
 
+    void setName(String name);
+
     String getSurname();
+
+    void setSurname(String surname);
 
     String getFullName();
 
@@ -22,23 +28,17 @@ public interface IUser {
 
     UserState getState();
 
+    void setState(UserState state);
+
     Set<Authority> getAuthorities();
+
+    void setAuthorities(Set<Authority> authorities);
 
     Set<ProcessRole> getProcessRoles();
 
-    Set<String> getNextGroups();
-
-    void setEmail(String email);
-
-    void setName(String name);
-
-    void setSurname(String surname);
-
-    void setState(UserState state);
-
     void setProcessRoles(Set<ProcessRole> processRoles);
 
-    void setAuthorities(Set<Authority> authorities);
+    Set<String> getNextGroups();
 
     void setNextGroups(Set<String> nextGroups);
 
@@ -58,12 +58,12 @@ public interface IUser {
 
     boolean isActive();
 
-    void setImpersonated(IUser user);
-
     boolean isImpersonating();
 
     IUser getSelfOrImpersonated();
 
     IUser getImpersonated();
+
+    void setImpersonated(IUser user);
 
 }

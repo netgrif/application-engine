@@ -5,7 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.2](https://github.com/netgrif/application-engine/commits/v6.3.2)
+Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.4.0](https://github.com/netgrif/application-engine/commits/v6.4.0)
+
+## [6.4.0](https://github.com/netgrif/application-engine/releases/tag/v6.4.0) (2024-12-23)
+
+### Fixed
+- [NAE-1908] NAE-1906 Improvements
+- [NAE-1937] Fix the problem with empty string in filter
+- [NAE-1884] Improve execution of auto trigger tasks
+- [NAE-1956] setData fails on setting allowedNets without value key
+- [NAE-1959] Indexing enumerationMap field fails when no options exist
+- [NAE-1960] Enumeration Map does not propagate changes when selecting
+- [NAE-1967] Elasticsearch disable dynamic field mapping
+- [NAE-2006] WorkflowService.deleteInstancesOfPetriNet does not remove all cases
+- [NAE-1983] Public view file handling
+- [NAE-2007] Vulnerabilities fix
+- [NAE-1952] Fix Loading Issue for Duplicate TaskRef Entries
+- [NAE-2014] Mismatch in PublicTaskController and TaskController endpoint
+- [NAE-2024] Collective bug fix
+- [NAE-1948] Bugs after merge to 6.4.0
+
+### Added
+- [NAE-1901] Taskref list rendering update
+- [NAE-1497] Frontend Actions
+- [NAE-1916] Serializable core objects
+- [NAE-1918] Tags on process resources
+- [NAE-1929] Data field type list of strings
+- [NAE-1936] Disable create case button using menu items
+- [NAE-1876] Process URI v2
+- [NAE-1882] Filter folder process
+- [NAE-1906] Merge NAE-1882 with NAE-1904
+- [NAE-1908] switch UriNode to MongoDB
+- [NAE-1944] Server-side JavaScript Code Injection (SSJI)
+- [NAE-1654] Find actions for Elasticsearch
+- [NAE-1813] Field id as path variable in TaskController
+- [NAE-1955] Update setData to handle options / choices
+- [NAE-1958] Make component properties changeable
+- [NAE-1962] Event properties
+- [NAE-1946] Remote file connector to S3
+- [NAE-1927] Shared Roles
+- [NAE-1945] External resource loader
+- [NAE-2008] Serialisation of classes
+- [NAE-2016] Global roles for menu items permissions
+
+### Changed
+- [NAE-1947] HistoryService findAllSetDataEventLogs is not working
+- [NAE-1979] Optimize Maven Resources Plugin Configuration for Correct File Filtering and Copying
+
 
 ## [6.3.3](https://github.com/netgrif/application-engine/releases/tag/v6.3.3) (2024-01-19)
 
@@ -19,7 +65,6 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.2](h
 ### Added
 
 - [NAE-1932] Enhancement of Redis Connector to Support Authentication
-
 
 ## [6.3.2](https://github.com/netgrif/application-engine/releases/tag/v6.3.2) (2023-11-08)
 

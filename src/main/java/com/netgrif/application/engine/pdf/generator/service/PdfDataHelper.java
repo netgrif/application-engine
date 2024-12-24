@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 @Service
 public class PdfDataHelper implements IPdfDataHelper {
 
+    private static final String DIVIDER = "divider";
     @Autowired
     private ITaskService taskService;
 
@@ -67,8 +68,6 @@ public class PdfDataHelper implements IPdfDataHelper {
     @Getter
     @Setter
     private int originalCols;
-
-    private static final String DIVIDER = "divider";
 
     @Override
     public void setupDataHelper(PdfResource resource) {
@@ -121,7 +120,7 @@ public class PdfDataHelper implements IPdfDataHelper {
         if (dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals("grid")) {
             fields = fields.stream().sorted(Comparator.<LocalisedField, Integer>comparing(f -> f.getLayout().getY()).thenComparing(f -> f.getLayout().getX())).collect(Collectors.toList());
         }
-       fields.forEach(field -> {
+        fields.forEach(field -> {
                     if (field.getType().equals(FieldType.TASK_REF)) {
                         Optional<DataGroup> taskRefGroup = this.dataGroups.stream().filter(dg -> Objects.equals(dg.getParentTaskRefId(), field.getStringId())).findFirst();
                         taskRefGroup.ifPresent(this::generateFromDataGroup);

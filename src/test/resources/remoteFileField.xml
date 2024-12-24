@@ -9,8 +9,11 @@
         <id>file</id>
         <title>Remote File</title>
         <placeholder>Remote file</placeholder>
-        <init>test-file.txt:https://netgrif.com</init>
-        <remote/>
+        <storage>
+            <type>minio</type>
+            <host>host_1</host>
+            <bucket>default</bucket>
+        </storage>
     </data>
     <transition>
         <id>task</id>
@@ -20,8 +23,11 @@
         <dataRef>
             <id>file</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>editable</behavior>
             </logic>
+            <component>
+                <name>preview</name>
+            </component>
         </dataRef>
     </transition>
 </document>

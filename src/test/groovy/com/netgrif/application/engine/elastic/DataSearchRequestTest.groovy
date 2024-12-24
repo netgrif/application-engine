@@ -226,6 +226,7 @@ class DataSearchRequestTest {
 
     @Test
     void testDatSearchRequests() {
+        sleep(2000) //Elastic Index
         testCases.each { testCase ->
             CaseSearchRequest request = new CaseSearchRequest()
             request.data = new HashMap<>()
@@ -234,6 +235,7 @@ class DataSearchRequestTest {
             log.info(String.format("Testing %s == %s", testCase.getKey(), testCase.getValue()))
 
             Page<Case> result = searchService.search([request] as List, mockService.mockLoggedUser(), PageRequest.of(0, 100), null, false)
+            assert result
             assert result.size() == 1
         }
     }

@@ -13,6 +13,7 @@ import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepos
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Filter
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation
@@ -27,7 +28,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateFilterBody
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
-import groovy.json.JsonOutput
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -87,6 +87,9 @@ class ImportHelper {
     @Autowired
     private ProcessRoleService processRoleService
 
+    @Autowired
+    private IUriService uriService
+
     private final ClassLoader loader = ImportHelper.getClassLoader()
 
 
@@ -106,13 +109,13 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = userService.getSystem().transformToLoggedUser()) {
-        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author)
+    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().stringId) {
+        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author, uriNodeId)
     }
 
-    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser()) {
+    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().stringId) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        PetriNet petriNet = petriNetService.importPetriNet(netStream, release, author).getNet()
+        PetriNet petriNet = petriNetService.importPetriNet(netStream, release, author, uriNodeId).getNet()
         log.info("Imported '${petriNet?.title?.defaultValue}' ['${petriNet?.identifier}', ${petriNet?.stringId}]")
         return Optional.of(petriNet)
     }
@@ -160,7 +163,7 @@ class ImportHelper {
         List<ProcessRole> roles = processRoleService.findAll(net.stringId)
         Map<String, ProcessRole> map = [:]
         net.roles.values().each { netRole ->
-            map[netRole.name.getDefaultValue()] = roles.find { it.roleId == netRole.stringId }
+            map[netRole.name.getDefaultValue()] = roles.find { it.stringId == netRole.stringId }
         }
         return map
     }

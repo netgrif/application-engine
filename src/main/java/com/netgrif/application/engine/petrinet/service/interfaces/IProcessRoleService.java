@@ -5,6 +5,7 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface IProcessRoleService {
@@ -23,7 +24,11 @@ public interface IProcessRoleService {
 
     void assignRolesToUser(String userId, Set<String> roleIds, LoggedUser user);
 
+    void assignRolesToUser(String userId, Set<String> roleIds, LoggedUser user, Map<String, String> params);
+
     List<ProcessRole> findAll();
+
+    Set<ProcessRole> findAllGlobalRoles();
 
     List<ProcessRole> findAll(String netId);
 

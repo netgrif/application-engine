@@ -13,12 +13,12 @@ public class ResourceFileLoader {
 
     private static ResourceLoader resourceLoader;
 
+    public static File loadResourceFile(String path) throws IOException {
+        return resourceLoader.getResource(path).getFile();
+    }
+
     @Autowired
     public void setResourceLoader(@Qualifier("webApplicationContext") ResourceLoader resourceLoader) {
         ResourceFileLoader.resourceLoader = resourceLoader;
-    }
-
-    public static File loadResourceFile(String path) throws IOException {
-        return resourceLoader.getResource(path).getFile();
     }
 }

@@ -57,7 +57,7 @@ public class Authority implements GrantedAuthority {
     }
 
     public void addUser(IUser user) {
-        if(users == null) {
+        if (users == null) {
             users = new HashSet<>();
         }
         users.add(user.getStringId());

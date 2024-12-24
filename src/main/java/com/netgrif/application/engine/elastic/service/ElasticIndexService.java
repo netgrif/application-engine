@@ -1,7 +1,10 @@
 package com.netgrif.application.engine.elastic.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
 import org.elasticsearch.action.admin.indices.open.OpenIndexResponse;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
@@ -12,6 +15,7 @@ import org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.elasticsearch.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.Resource;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Setting;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -25,16 +29,16 @@ import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import lombok.extern.slf4j.Slf4j;
 
+import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Service
 public class ElasticIndexService implements IElasticIndexService {
+
+    private static final String PLACEHOLDERS = "petriNetIndex, caseIndex, taskIndex";
 
     @Autowired
     private ApplicationContext context;
@@ -45,7 +49,8 @@ public class ElasticIndexService implements IElasticIndexService {
     @Autowired
     private ElasticsearchOperations operations;
 
-    private static final String PLACEHOLDERS = "caseIndex, taskIndex";
+    @Autowired
+    private ElasticsearchProperties elasticsearchProperties;
 
     @Override
     public boolean indexExists(String indexName) {
@@ -89,18 +94,15 @@ public class ElasticIndexService implements IElasticIndexService {
             if (!this.indexExists(indexName)) {
                 // https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html
                 HashMap<String, Object> settingMap = new HashMap<>();
+                applySettings(settingMap, clazz);
                 settingMap.put("number_of_shards", getShardsFromClass(clazz));
                 settingMap.put("number_of_replicas", getReplicasFromClass(clazz));
-                settingMap.put("max_result_window", 10000000);
-//                HashMap<String, Object> analyzer = new HashMap<>();  //TODO: Analyzer
-//                HashMap<String, Object> netgrif = new HashMap<>();
-//                HashMap<String, Object> filter = new HashMap<>();
-//                String[] stringArray = { "lowercase", "asciifolding"};
-//                netgrif.put("tokenizer", "keyword");
-//                netgrif.put("filter", stringArray);
-//                filter.put("netgrif", netgrif);
-//                analyzer.put("analyzer", filter);
-//                settingMap.put("analysis", analyzer);
+
+                Map<String, Object> analysisSettings = prepareAnalysisSettings();
+                if (analysisSettings != null) {
+                    settingMap.put("analysis", analysisSettings);
+                }
+
                 Document settings = Document.from(settingMap);
                 log.info("Creating new index - {} ", indexName);
                 return elasticsearchTemplate.indexOps(IndexCoordinates.of(indexName)).create(settings);
@@ -111,6 +113,65 @@ public class ElasticIndexService implements IElasticIndexService {
             log.error("createIndex:", e);
         }
         return false;
+    }
+
+    @Override
+    public void applySettings(HashMap<String, Object> settingMap, Class<?> clazz) {
+        Map<String, Object> settings = elasticsearchProperties.getIndexSettings();
+        if ((settings != null || settingMap != null) && !settings.isEmpty()) {
+            settingMap.putAll(settings);
+        }
+
+        String className = clazz.getSimpleName();
+        Map<String, Object> classSpecificSettings = elasticsearchProperties.getClassSpecificSettings(className);
+        if (classSpecificSettings != null && !classSpecificSettings.isEmpty()) {
+            settingMap.putAll(classSpecificSettings);
+        }
+    }
+
+    @Override
+    public Map<String, Object> prepareAnalysisSettings() {
+        if (!elasticsearchProperties.isAnalyzerEnabled()) {
+            return null;
+        }
+        if (elasticsearchProperties.getAnalyzerPathFile() != null) {
+            Map<String, Object> fileSettings = parseAnalysisSettings();
+            if (fileSettings != null) {
+                return fileSettings;
+            } else {
+                log.error("Failed to load analysis settings from file, falling back to default settings.");
+            }
+        }
+
+        Map<String, Object> defaultAnalyzer = new HashMap<>();
+        defaultAnalyzer.put("type", "custom");
+        defaultAnalyzer.put("tokenizer", "standard");
+        defaultAnalyzer.put("filter", elasticsearchProperties.getDefaultFilters());
+        defaultAnalyzer.put("char_filter", List.of("html_strip"));
+
+        Map<String, Object> defaultSearchAnalyzer = new HashMap<>(defaultAnalyzer);
+        defaultSearchAnalyzer.put("filter", elasticsearchProperties.getDefaultSearchFilters());
+
+        Map<String, Object> analyzers = new HashMap<>();
+        analyzers.put("default", defaultAnalyzer);
+        analyzers.put("default_search", defaultSearchAnalyzer);
+
+        Map<String, Object> analysisSettings = new HashMap<>();
+        analysisSettings.put("analyzer", analyzers);
+
+        return analysisSettings;
+    }
+
+    protected Map<String, Object> parseAnalysisSettings() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Resource resource = elasticsearchProperties.getAnalyzerPathFile();
+
+        try (InputStream inputStream = resource.getInputStream()) {
+            return objectMapper.readValue(inputStream, HashMap.class);
+        } catch (Exception e) {
+            log.error("Failed to parse settings file", e);
+            return null;
+        }
     }
 
     @Override
@@ -183,13 +244,21 @@ public class ElasticIndexService implements IElasticIndexService {
         try {
             String indexName = getIndexName(clazz, placeholders);
             Document mapping = operations.indexOps(clazz).createMapping();
+            applyMappingSettings(mapping);
             return elasticsearchTemplate.indexOps(IndexCoordinates.of(indexName)).putMapping(mapping);
         } catch (Exception e) {
-            log.error("deleteIndex:", e);
+            log.error("Error in putMapping:", e);
             return false;
         }
     }
 
+    @Override
+    public void applyMappingSettings(Document mapping) {
+        Map<String, Object> settings = elasticsearchProperties.getMappingSettings();
+        if (settings != null) {
+            settings.forEach(mapping::put);
+        }
+    }
 
     @Override
     public boolean putTemplate(String name, String source) {
@@ -221,9 +290,18 @@ public class ElasticIndexService implements IElasticIndexService {
         try {
             return elasticsearchTemplate.searchScrollContinue(scrollId, 60000, clazz, IndexCoordinates.of(indexName));
         } catch (Exception e) {
-            log.error("scrollFirst:", e);
+            log.error("scroll:", e);
         }
         return null;
+    }
+
+    @Override
+    public void clearScrollHits(List<String> scrollIds) {
+        try {
+            elasticsearchTemplate.searchScrollClear(scrollIds);
+        } catch (Exception e) {
+            log.error("clearScrollHits:", e);
+        }
     }
 
     private String getIdFromSource(Object source) {
