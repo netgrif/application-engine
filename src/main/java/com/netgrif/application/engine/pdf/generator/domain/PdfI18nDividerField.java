@@ -20,7 +20,7 @@ public class PdfI18nDividerField extends PdfField {
     }
 
     public PdfI18nDividerField(String fieldId, DataGroup dataGroup, String label, FieldType type,
-                        int x, int bottomY, int width, int height, PdfResource resource) {
+                               int x, int bottomY, int width, int height, PdfResource resource) {
         super(resource);
         this.fieldId = fieldId;
         this.dataGroup = dataGroup;
@@ -37,7 +37,7 @@ public class PdfI18nDividerField extends PdfField {
     }
 
     public PdfI18nDividerField(String fieldId, String label, List<String> values, FieldType type,
-                        int x, int bottomY, int width, int height, PdfResource resource) {
+                               int x, int bottomY, int width, int height, PdfResource resource) {
         super(resource);
         this.fieldId = fieldId;
         this.label = label;

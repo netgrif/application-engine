@@ -37,12 +37,6 @@ public class MailService implements IMailService {
     public static final String SERVER = "server";
     public static final String NAME = "name";
 
-    @Autowired
-    private IRegistrationService registrationService;
-
-    @Autowired
-    private ServerAuthProperties serverAuthProperties;
-
     @Getter
     @Value("${nae.mail.redirect-to.port}")
     protected String port;
@@ -66,6 +60,12 @@ public class MailService implements IMailService {
     @Getter
     @Setter
     protected Configuration configuration;
+
+    @Autowired
+    private IRegistrationService registrationService;
+
+    @Autowired
+    private ServerAuthProperties serverAuthProperties;
 
     @Override
     public void sendRegistrationEmail(RegisteredUser user) throws MessagingException, IOException, TemplateException {

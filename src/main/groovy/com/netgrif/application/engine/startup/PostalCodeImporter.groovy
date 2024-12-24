@@ -17,10 +17,10 @@ class PostalCodeImporter extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(PostalCodeImporter.class.name)
 
-    @Value("\${nae.postal.codes.import}")
+    @Value('${nae.postal.codes.import}')
     Boolean importPostalCode
 
-    @Value("\${nae.postal.codes.csv}")
+    @Value('${nae.postal.codes.csv}')
     String postalCodesPath
 
     @Autowired

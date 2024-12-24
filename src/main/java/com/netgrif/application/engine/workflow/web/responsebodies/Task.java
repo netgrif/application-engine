@@ -73,6 +73,8 @@ public class Task {
 
     private Map<String, Boolean> assignedUserPolicy;
 
+    private Map<String, String> tags;
+
     public Task(com.netgrif.application.engine.workflow.domain.Task task, Locale locale) {
         this._id = task.getObjectId();
         this.caseId = task.getCaseId();
@@ -100,6 +102,7 @@ public class Task {
         this.cancelTitle = task.getTranslatedEventTitle(EventType.CANCEL, locale);
         this.delegateTitle = task.getTranslatedEventTitle(EventType.DELEGATE, locale);
         this.assignedUserPolicy = task.getAssignedUserPolicy();
+        this.tags = task.getTags();
     }
 
     public Task(ElasticTask entity) {

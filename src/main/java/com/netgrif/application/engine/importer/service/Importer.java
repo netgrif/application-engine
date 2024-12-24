@@ -189,6 +189,7 @@ public class Importer {
         net.setDefaultRoleEnabled(document.isDefaultRole() != null && document.isDefaultRole());
         net.setAnonymousRoleEnabled(document.isAnonymousRole() != null && document.isAnonymousRole());
 
+
         document.getRole().forEach(this::createRole);
         document.getData().forEach(this::createDataSet);
         document.getTransaction().forEach(this::createTransaction);
@@ -216,6 +217,9 @@ public class Importer {
             net.setDefaultCaseNameExpression(new Expression(document.getCaseName().getValue()));
         } else {
             net.setDefaultCaseName(toI18NString(document.getCaseName()));
+        }
+        if (document.getTags() != null) {
+            net.setTags(this.buildTagsMap(document.getTags().getTag()));
         }
 
         return Optional.of(net);
@@ -490,6 +494,10 @@ public class Importer {
         transition.setImportId(importTransition.getId());
         transition.setTitle(importTransition.getLabel() != null ? toI18NString(importTransition.getLabel()) : new I18nString(""));
         transition.setPosition(importTransition.getX(), importTransition.getY());
+        if (importTransition.getTags() != null) {
+            transition.setTags(this.buildTagsMap(importTransition.getTags().getTag()));
+        }
+
         if (importTransition.getLayout() != null) {
             transition.setLayout(new TaskLayout(importTransition));
         }
@@ -826,11 +834,10 @@ public class Importer {
     @Transactional
     protected void addDataComponent(Transition transition, DataRef dataRef) throws MissingIconKeyException {
         String fieldId = getField(dataRef.getId()).getStringId();
-        Component component;
-        if ((dataRef.getComponent()) == null)
-            component = getField(dataRef.getId()).getComponent();
-        else
+        Component component = null;
+        if ((dataRef.getComponent()) != null) {
             component = componentFactory.buildComponent(dataRef.getComponent(), this, getField(dataRef.getId()));
+        }
         transition.addDataSet(fieldId, null, null, null, component);
     }
 
@@ -1047,22 +1054,38 @@ public class Importer {
             throw new IllegalArgumentException("Role ID '" + ProcessRole.ANONYMOUS_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
         }
 
+        ProcessRole role;
+        if (shouldInitializeRole(importRole)) {
+            role = initRole(importRole);
+        } else {
+            role = new ArrayList<>(processRoleService.findAllByImportId(ProcessRole.GLOBAL + importRole.getId())).get(0);
+        }
+
+        net.addRole(role);
+        roles.put(importRole.getId(), role);
+    }
+
+    protected boolean shouldInitializeRole(Role importRole) {
+        return importRole.isGlobal() == null || !importRole.isGlobal() ||
+                (importRole.isGlobal() && processRoleService.findAllByImportId(ProcessRole.GLOBAL + importRole.getId()).isEmpty());
+    }
+
+    protected ProcessRole initRole(Role importRole) {
         ProcessRole role = new ProcessRole();
         Map<EventType, com.netgrif.application.engine.petrinet.domain.events.Event> events = createEventsMap(importRole.getEvent());
-
-        role.setImportId(importRole.getId());
+        role.setImportId(importRole.isGlobal() != null && importRole.isGlobal() ? ProcessRole.GLOBAL + importRole.getId() : importRole.getId());
         role.setEvents(events);
-
         if (importRole.getName() == null) {
             role.setName(toI18NString(importRole.getTitle()));
         } else {
             role.setName(toI18NString(importRole.getName()));
         }
-        role.set_id(new ObjectId());
-
-        role.setNetId(net.getStringId());
-        net.addRole(role);
-        roles.put(importRole.getId(), role);
+        if (importRole.isGlobal() != null && importRole.isGlobal()) {
+            role.setGlobal(importRole.isGlobal());
+        } else {
+            role.setNetId(net.getStringId());
+        }
+        return role;
     }
 
     protected Map<EventType, com.netgrif.application.engine.petrinet.domain.events.Event> createEventsMap(List<com.netgrif.application.engine.importer.model.Event> events) {
@@ -1296,5 +1319,15 @@ public class Importer {
         }
         if (!missingMetaData.isEmpty())
             throw new MissingPetriNetMetaDataException(missingMetaData);
+    }
+
+    protected Map<String, String> buildTagsMap(List<Tag> tagsList) {
+        Map<String, String> tags = new HashMap<>();
+        if (tagsList != null) {
+            tagsList.forEach(tag -> {
+                tags.put(tag.getKey(), tag.getValue());
+            });
+        }
+        return tags;
     }
 }

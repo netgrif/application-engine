@@ -1,5 +1,5 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
-	<id>netgrif/test/filter_api_test</id>
+	<id>filter_api_test</id>
 	<initials>FTT</initials>
 	<title>filter_api_test</title>
 	<icon>device_hub</icon>
@@ -22,7 +22,7 @@
 			<id>upload</id>
 			<actions phase="post">
 				<action>
-					createCase("netgrif/test/filter_api_test")
+					createCase("filter_api_test")
 				</action>
 			</actions>
 		</event>
@@ -41,7 +41,7 @@
 	<data type="text">
 		<id>query</id>
 		<title/>
-		<init>processIdentifier:"netgrif/test/filter_api_test"</init>
+		<init>processIdentifier:"filter_api_test"</init>
 	</data>
 	<data type="text">
 		<id>icon</id>
@@ -82,25 +82,14 @@
 					title: f.title,
 					allowed_nets: f.allowed_nets,
 					query: f.query,
-					group: f.group,
 					identifier: f.identifier,
 					icon: f.icon;
 
 					def filter = createCaseFilter(title.value, query.value, allowed_nets.value.split(",") as List, icon.value)
-					def item
+					def item = createMenuItem(uri.value, identifier.value, title.value, icon.value, filter,
+									["role_1": "filter_api_test"], ["role_2": "filter_api_test"],
+									["meta-title,meta-title"], ["meta-title,meta-title"])
 
-					if (group.value) {
-						item = createMenuItem(uri.value, identifier.value,
-								filter,
-								group.value,
-								["role_1": "netgrif/test/filter_api_test"]
-						)
-					} else {
-						item = createMenuItem(uri.value, identifier.value,
-								filter,
-								["role_1": "netgrif/test/filter_api_test"]
-						)
-					}
 					change menu_stringId value { item.stringId }
 					change filter_stringId value { filter.stringId }
 				</action>
@@ -138,8 +127,11 @@
 					] }
 
 					changeMenuItem item filter { filter }
-					changeMenuItem item allowedRoles { ["role_2": "netgrif/test/filter_api_test"] }
+					changeMenuItem item allowedRoles { ["role_2": "filter_api_test"] }
 					changeMenuItem item uri { uri.value }
+					changeMenuItem item title { title.value }
+					changeMenuItem item caseDefaultHeaders { "meta-title,meta-title,meta-title" }
+					changeMenuItem item taskDefaultHeaders { "meta-title,meta-title,meta-title" }
 				</action>
 			</actions>
 		</event>
@@ -187,7 +179,7 @@
 							query.value,
 							type.value,
 							allowed_nets.value.split(",") as List,
-							["role_1": "netgrif/test/filter_api_test"],
+							["role_1": "filter_api_test"],
 							[:],
 							icon.value
 					)
@@ -219,6 +211,42 @@
 	<data type="text">
 		<id>found_filter</id>
 		<title>found filter</title>
+	</data>
+
+	<data type="button">
+		<id>move_item</id>
+		<title>move item</title>
+		<event type="set">
+			<actions phase="post">
+				<action>
+					move_dest_uri: f.move_dest_uri,
+					move_item_id: f.move_item_id,
+					move_folder_path: f.move_folder_path;
+
+					def item
+					if (move_item_id.value) {
+						item = workflowService.findOne(move_item_id.value)
+					} else if (move_folder_path.value) {
+						def node = uriService.findByUri(move_folder_path.value)
+						item = findFolderCase(node)
+					}
+
+					moveMenuItem(item, move_dest_uri.value)
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>move_dest_uri</id>
+		<title>found filter</title>
+	</data>
+	<data type="text">
+		<id>move_item_id</id>
+		<title>View item id to find</title>
+	</data>
+	<data type="text">
+		<id>move_folder_path</id>
+		<title>Folder item path to find</title>
 	</data>
 
 	<transition>
