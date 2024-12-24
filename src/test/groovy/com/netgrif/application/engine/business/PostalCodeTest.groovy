@@ -11,11 +11,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@Disabled
+@SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = "nae.postal.codes.import=false")
-@SuppressWarnings("GrMethodMayBeStatic")
 class PostalCodeTest {
 
     private static boolean setup = false
@@ -55,7 +53,7 @@ class PostalCodeTest {
 
     @Test
     void oneMatchTest() {
-        def psc = "841 05"
+        String psc = "841 05"
 
         List<PostalCode> cities = service.findAllByCode(psc)
 
@@ -65,7 +63,7 @@ class PostalCodeTest {
     @Test
     @Disabled("Github action")
     void multipleMatchTest() {
-        def psc = "851 10"
+        String psc = "851 10"
 
         List<PostalCode> cities = service.findAllByCode(psc)
 
