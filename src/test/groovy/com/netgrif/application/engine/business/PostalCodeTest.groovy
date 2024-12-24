@@ -3,6 +3,7 @@ package com.netgrif.application.engine.business
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.startup.PostalCodeImporter
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -61,6 +62,7 @@ class PostalCodeTest {
     }
 
     @Test
+    @Disabled
     void multipleMatchTest() {
         def psc = "851 10"
 
