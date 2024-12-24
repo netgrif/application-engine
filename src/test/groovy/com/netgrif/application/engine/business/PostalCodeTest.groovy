@@ -25,14 +25,25 @@ class PostalCodeTest {
 
     @BeforeEach
     void before() {
-        if (setup)
+        if (setup) {
             return
+        }
 
-        if (service.findAllByCode("841 05").size() == 0)
-            importer.run()
+        assert service != null: "IPostalCodeService is null!"
+        assert importer != null: "PostalCodeImporter is null!"
+
+        if (service.findAllByCode("841 05").isEmpty()) {
+            System.out.println("Data not found, running importer...")
+            importer.run();
+
+            List<PostalCode> loadedCodes = service.findAllByCode("841 05")
+            System.out.println("Loaded postal codes after import: " + loadedCodes)
+            assert !loadedCodes.isEmpty(): "Postal codes were not imported!"
+        }
 
         setup = true
     }
+
 
     @Test
     void oneMatchTest() {
