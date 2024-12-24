@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.business
 
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.startup.PostalCodeImporter
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,6 +24,9 @@ class PostalCodeTest {
     @Autowired
     private PostalCodeImporter importer
 
+    @Autowired
+    private TestHelper testHelper
+
     @BeforeEach
     void before() {
         if (setup) {
@@ -33,6 +37,8 @@ class PostalCodeTest {
         assert importer != null: "PostalCodeImporter is null!"
 
         if (service.findAllByCode("841 05").isEmpty()) {
+            testHelper.truncateDbs()
+
             System.out.println("Data not found, running importer...")
             importer.run();
 
