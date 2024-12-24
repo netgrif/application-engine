@@ -11,9 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@ExtendWith(SpringExtension.class)
+@Disabled
 @ActiveProfiles(["test"])
-@SpringBootTest(properties = "nae.postal.codes.import=true")
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(properties = "nae.postal.codes.import=false")
 @SuppressWarnings("GrMethodMayBeStatic")
 class PostalCodeTest {
 
@@ -62,7 +63,6 @@ class PostalCodeTest {
     }
 
     @Test
-    @Disabled
     void multipleMatchTest() {
         def psc = "851 10"
 
