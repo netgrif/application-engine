@@ -753,12 +753,13 @@ public class DataService implements IDataService {
     }
 
     private void updateDataset(Case useCase) {
-        Case actual = workflowService.findOne(useCase.getStringId());
-        actual.getDataSet().forEach((id, dataField) -> {
+        Case current = workflowService.findOne(useCase.getStringId());
+        current.getDataSet().forEach((id, dataField) -> {
             if (dataField.isNewerThen(useCase.getDataField(id))) {
                 useCase.getDataSet().put(id, dataField);
             }
         });
+        useCase.setTasks(current.getTasks());
     }
 
     @Override
