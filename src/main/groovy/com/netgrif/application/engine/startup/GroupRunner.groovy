@@ -4,7 +4,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.orgstructure.groups.config.GroupConfigurationProperties
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.Process
-import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.workflow.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j

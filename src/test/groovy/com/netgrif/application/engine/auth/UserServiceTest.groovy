@@ -3,7 +3,7 @@ package com.netgrif.application.engine.auth
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.Process
-import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.workflow.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import groovy.transform.CompileStatic

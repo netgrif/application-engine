@@ -3,10 +3,10 @@ package com.netgrif.application.engine.workflow.service;
 import com.netgrif.application.engine.configuration.properties.FieldActionsCacheProperties;
 import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap;
 import com.netgrif.application.engine.event.IGroovyShellFactory;
-import com.netgrif.application.engine.petrinet.domain.Function;
-import com.netgrif.application.engine.petrinet.domain.FunctionScope;
+import com.netgrif.application.engine.workflow.domain.Function;
+import com.netgrif.application.engine.workflow.domain.Scope;
 import com.netgrif.application.engine.petrinet.domain.Process;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.application.engine.workflow.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.domain.CachedFunction;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
@@ -56,7 +56,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
             return;
         }
 
-        List<CachedFunction> functions = petriNet.getFunctions(FunctionScope.NAMESPACE).stream()
+        List<CachedFunction> functions = petriNet.getFunctions(Scope.NAMESPACE).stream()
                 .map(function -> CachedFunction.build(shell, function))
                 .collect(Collectors.toList());
 

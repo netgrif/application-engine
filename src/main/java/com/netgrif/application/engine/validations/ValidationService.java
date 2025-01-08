@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.validations;
 
 import com.netgrif.application.engine.event.IGroovyShellFactory;
-import com.netgrif.application.engine.petrinet.domain.Transition;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.workflow.domain.Transition;
+import com.netgrif.application.engine.workflow.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ValidationExecutioner;
 import com.netgrif.application.engine.validations.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.Case;

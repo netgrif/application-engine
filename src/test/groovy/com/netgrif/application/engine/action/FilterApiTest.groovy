@@ -3,8 +3,7 @@ package com.netgrif.application.engine.action
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
-import com.netgrif.application.engine.petrinet.domain.UriContentType
-import com.netgrif.application.engine.petrinet.domain.dataset.*
+import com.netgrif.application.engine.workflow.domain.UriContentType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.FilterRunner
@@ -12,6 +11,11 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
+import com.netgrif.application.engine.workflow.domain.dataset.ButtonField
+import com.netgrif.application.engine.workflow.domain.dataset.Field
+import com.netgrif.application.engine.workflow.domain.dataset.FilterField
+import com.netgrif.application.engine.workflow.domain.dataset.MultichoiceMapField
+import com.netgrif.application.engine.workflow.domain.dataset.TextField
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet

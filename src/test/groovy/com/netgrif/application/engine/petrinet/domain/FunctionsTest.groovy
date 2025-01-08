@@ -3,10 +3,16 @@ package com.netgrif.application.engine.petrinet.domain
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.I18nString
+import com.netgrif.application.engine.workflow.domain.VersionType
+import com.netgrif.application.engine.workflow.domain.dataset.BooleanField
+import com.netgrif.application.engine.workflow.domain.dataset.EnumerationField
+import com.netgrif.application.engine.workflow.domain.dataset.Field
+import com.netgrif.application.engine.workflow.domain.dataset.NumberField
+import com.netgrif.application.engine.workflow.domain.dataset.TextField
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -22,7 +28,7 @@ import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.EDITABLE
+import static com.netgrif.application.engine.workflow.domain.dataset.logic.FieldBehavior.EDITABLE
 import static org.junit.jupiter.api.Assertions.assertThrows
 
 @ExtendWith(SpringExtension.class)

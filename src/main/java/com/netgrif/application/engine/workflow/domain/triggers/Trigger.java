@@ -1,9 +1,8 @@
 package com.netgrif.application.engine.workflow.domain.triggers;
 
 import com.netgrif.application.engine.importer.model.TriggerType;
-import com.netgrif.application.engine.petrinet.domain.Imported;
+import com.netgrif.application.engine.workflow.domain.Imported;
 import com.querydsl.core.annotations.PropertyType;
-import com.querydsl.core.annotations.QueryExclude;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
 import org.bson.types.ObjectId;

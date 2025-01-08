@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.workflow.domain;
 
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.application.engine.workflow.domain.dataset.logic.FieldBehavior;
 import lombok.Data;
 
-import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.*;
-import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.VISIBLE;
+import static com.netgrif.application.engine.workflow.domain.dataset.logic.FieldBehavior.*;
+import static com.netgrif.application.engine.workflow.domain.dataset.logic.FieldBehavior.VISIBLE;
 
 @Data
 public class DataFieldBehavior {

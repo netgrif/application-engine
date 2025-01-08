@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes;
 
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.application.engine.workflow.domain.I18nString;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import lombok.Data;

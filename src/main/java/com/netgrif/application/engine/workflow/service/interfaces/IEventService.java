@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.netgrif.application.engine.importer.model.DataEventType;
-import com.netgrif.application.engine.petrinet.domain.Transition;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
+import com.netgrif.application.engine.workflow.domain.Transition;
+import com.netgrif.application.engine.workflow.domain.dataset.Field;
+import com.netgrif.application.engine.workflow.domain.dataset.logic.action.Action;
+import com.netgrif.application.engine.workflow.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;

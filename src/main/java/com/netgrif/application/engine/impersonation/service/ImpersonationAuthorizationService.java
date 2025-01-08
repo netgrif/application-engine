@@ -9,10 +9,10 @@ import com.netgrif.application.engine.configuration.properties.ImpersonationProp
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService;
-import com.netgrif.application.engine.petrinet.domain.dataset.BooleanField;
-import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
-import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
+import com.netgrif.application.engine.workflow.domain.dataset.BooleanField;
+import com.netgrif.application.engine.workflow.domain.dataset.DateTimeField;
+import com.netgrif.application.engine.workflow.domain.dataset.MultichoiceMapField;
+import com.netgrif.application.engine.workflow.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.utils.DateUtils;

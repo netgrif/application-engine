@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.validation
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.petrinet.domain.dataset.BooleanField
+import com.netgrif.application.engine.workflow.domain.dataset.BooleanField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ValidationDelegate
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

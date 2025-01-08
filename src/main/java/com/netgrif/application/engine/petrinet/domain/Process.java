@@ -2,17 +2,18 @@ package com.netgrif.application.engine.petrinet.domain;
 
 import com.netgrif.application.engine.importer.model.CaseEventType;
 import com.netgrif.application.engine.importer.model.ProcessEventType;
-import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
-import com.netgrif.application.engine.petrinet.domain.arcs.ArcCollection;
-import com.netgrif.application.engine.petrinet.domain.arcs.PTArc;
-import com.netgrif.application.engine.petrinet.domain.arcs.TPArc;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
-import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
+import com.netgrif.application.engine.workflow.domain.*;
+import com.netgrif.application.engine.workflow.domain.arcs.Arc;
+import com.netgrif.application.engine.workflow.domain.arcs.ArcCollection;
+import com.netgrif.application.engine.workflow.domain.arcs.PTArc;
+import com.netgrif.application.engine.workflow.domain.arcs.TPArc;
+import com.netgrif.application.engine.workflow.domain.dataset.Field;
+import com.netgrif.application.engine.workflow.domain.dataset.logic.action.Action;
+import com.netgrif.application.engine.workflow.domain.events.CaseEvent;
+import com.netgrif.application.engine.workflow.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
-import com.netgrif.application.engine.petrinet.domain.version.Version;
+import com.netgrif.application.engine.workflow.domain.version.Version;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
 import lombok.Data;
 import org.bson.types.ObjectId;
@@ -222,7 +223,7 @@ public class Process extends ProcessObject {
         return defaultCaseName.getTranslation(locale);
     }
 
-    public List<Function> getFunctions(FunctionScope scope) {
+    public List<Function> getFunctions(Scope scope) {
         return functions.stream().filter(function -> function.getScope().equals(scope)).collect(Collectors.toList());
     }
 

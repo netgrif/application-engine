@@ -4,8 +4,8 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.history.service.IHistoryService
 import com.netgrif.application.engine.petrinet.domain.Process
-import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
+import com.netgrif.application.engine.workflow.domain.VersionType
+import com.netgrif.application.engine.workflow.domain.dataset.NumberField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case

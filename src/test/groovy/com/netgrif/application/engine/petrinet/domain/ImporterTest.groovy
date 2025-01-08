@@ -2,12 +2,14 @@ package com.netgrif.application.engine.petrinet.domain
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField
-import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
+import com.netgrif.application.engine.workflow.domain.I18nString
+import com.netgrif.application.engine.workflow.domain.VersionType
+import com.netgrif.application.engine.workflow.domain.dataset.ChoiceField
+import com.netgrif.application.engine.workflow.domain.dataset.MultichoiceField
+import com.netgrif.application.engine.workflow.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
-import com.netgrif.application.engine.petrinet.domain.version.Version
+import com.netgrif.application.engine.workflow.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -27,7 +29,7 @@ import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.*
+import static com.netgrif.application.engine.workflow.domain.dataset.logic.FieldBehavior.*
 import static org.junit.jupiter.api.Assertions.assertThrows
 
 @ExtendWith(SpringExtension.class)

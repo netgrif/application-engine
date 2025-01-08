@@ -2,7 +2,7 @@ package com.netgrif.application.engine.startup
 
 
 import com.netgrif.application.engine.petrinet.domain.Process
-import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.workflow.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired

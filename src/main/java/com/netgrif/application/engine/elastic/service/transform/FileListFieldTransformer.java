@@ -2,8 +2,8 @@ package com.netgrif.application.engine.elastic.service.transform;
 
 import com.netgrif.application.engine.elastic.domain.FileField;
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue;
+import com.netgrif.application.engine.workflow.domain.dataset.FileListField;
+import com.netgrif.application.engine.workflow.domain.dataset.FileListFieldValue;
 import org.springframework.stereotype.Component;
 
 @Component

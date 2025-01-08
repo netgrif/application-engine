@@ -6,11 +6,11 @@ import com.netgrif.application.engine.importer.model.Data;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.service.builder.FieldBuilder;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.application.engine.petrinet.domain.Component;
-import com.netgrif.application.engine.petrinet.domain.dataset.Arguments;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.Validation;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
+import com.netgrif.application.engine.workflow.domain.Component;
+import com.netgrif.application.engine.workflow.domain.dataset.Arguments;
+import com.netgrif.application.engine.workflow.domain.dataset.Field;
+import com.netgrif.application.engine.workflow.domain.dataset.Validation;
+import com.netgrif.application.engine.workflow.domain.dataset.logic.Expression;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;

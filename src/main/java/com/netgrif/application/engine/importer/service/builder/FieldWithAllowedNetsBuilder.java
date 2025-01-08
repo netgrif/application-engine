@@ -2,7 +2,7 @@ package com.netgrif.application.engine.importer.service.builder;
 
 import com.netgrif.application.engine.importer.model.AllowedNets;
 import com.netgrif.application.engine.importer.model.Data;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldWithAllowedNets;
+import com.netgrif.application.engine.workflow.domain.dataset.FieldWithAllowedNets;
 
 import java.util.ArrayList;
 

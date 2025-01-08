@@ -1,7 +1,12 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 
-import com.netgrif.application.engine.petrinet.domain.dataset.*
+import com.netgrif.application.engine.workflow.domain.dataset.BooleanField
+import com.netgrif.application.engine.workflow.domain.dataset.DateField
+import com.netgrif.application.engine.workflow.domain.dataset.DateTimeField
+import com.netgrif.application.engine.workflow.domain.dataset.Field
+import com.netgrif.application.engine.workflow.domain.dataset.NumberField
+import com.netgrif.application.engine.workflow.domain.dataset.TextField
 import groovy.util.logging.Slf4j
 
 import java.time.LocalDate

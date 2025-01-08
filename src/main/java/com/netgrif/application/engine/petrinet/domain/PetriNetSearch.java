@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain;
 
 import com.netgrif.application.engine.auth.domain.Author;
-import com.netgrif.application.engine.petrinet.domain.version.Version;
+import com.netgrif.application.engine.workflow.domain.version.Version;
 import lombok.Getter;
 import lombok.Setter;
 

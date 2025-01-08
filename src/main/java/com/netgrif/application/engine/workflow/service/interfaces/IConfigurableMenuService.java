@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
-import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
+import com.netgrif.application.engine.workflow.domain.I18nString;
+import com.netgrif.application.engine.workflow.domain.dataset.EnumerationMapField;
+import com.netgrif.application.engine.workflow.domain.dataset.MultichoiceMapField;
 
 import java.util.Locale;
 import java.util.Map;

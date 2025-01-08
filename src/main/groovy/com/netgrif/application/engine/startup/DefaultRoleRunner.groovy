@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.startup
 
 import com.netgrif.application.engine.importer.model.EventType
-import com.netgrif.application.engine.petrinet.domain.I18nString
-import com.netgrif.application.engine.petrinet.domain.events.Event
+import com.netgrif.application.engine.workflow.domain.I18nString
+import com.netgrif.application.engine.workflow.domain.events.Event
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import groovy.transform.CompileStatic

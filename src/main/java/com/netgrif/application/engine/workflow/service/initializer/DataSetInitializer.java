@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.workflow.service.initializer;
 
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
-import com.netgrif.application.engine.petrinet.domain.dataset.TaskField;
+import com.netgrif.application.engine.workflow.domain.I18nString;
+import com.netgrif.application.engine.workflow.domain.dataset.ChoiceField;
+import com.netgrif.application.engine.workflow.domain.dataset.Field;
+import com.netgrif.application.engine.workflow.domain.dataset.MapOptionsField;
+import com.netgrif.application.engine.workflow.domain.dataset.TaskField;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import org.springframework.stereotype.Component;

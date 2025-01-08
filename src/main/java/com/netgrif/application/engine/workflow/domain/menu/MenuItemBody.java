@@ -1,10 +1,9 @@
 package com.netgrif.application.engine.workflow.domain.menu;
 
-import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.*;
+import com.netgrif.application.engine.workflow.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.dataset.*;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.workflow.domain;
 
-import com.netgrif.application.engine.petrinet.domain.Function;
 import groovy.lang.Closure;
 import groovy.lang.GroovyShell;
 import lombok.Builder;

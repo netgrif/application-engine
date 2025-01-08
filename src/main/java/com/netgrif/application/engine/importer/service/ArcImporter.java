@@ -2,9 +2,9 @@ package com.netgrif.application.engine.importer.service;
 
 import com.netgrif.application.engine.importer.model.ArcType;
 import com.netgrif.application.engine.importer.model.Expression;
-import com.netgrif.application.engine.petrinet.domain.Node;
+import com.netgrif.application.engine.workflow.domain.Node;
 import com.netgrif.application.engine.petrinet.domain.Process;
-import com.netgrif.application.engine.petrinet.domain.arcs.*;
+import com.netgrif.application.engine.workflow.domain.arcs.*;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;

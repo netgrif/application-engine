@@ -13,7 +13,10 @@ import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
-import com.netgrif.application.engine.petrinet.domain.version.Version
+import com.netgrif.application.engine.workflow.domain.UriContentType
+import com.netgrif.application.engine.workflow.domain.UriNode
+import com.netgrif.application.engine.workflow.domain.VersionType
+import com.netgrif.application.engine.workflow.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper

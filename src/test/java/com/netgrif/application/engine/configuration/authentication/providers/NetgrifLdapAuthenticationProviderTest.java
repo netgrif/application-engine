@@ -11,7 +11,7 @@ import com.netgrif.application.engine.orgstructure.web.requestbodies.LdapGroupRo
 import com.netgrif.application.engine.orgstructure.web.requestbodies.LdapGroupSearchBody;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.LdapGroupResponseBody;
 import com.netgrif.application.engine.petrinet.domain.Process;
-import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.application.engine.workflow.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.SuperCreator;

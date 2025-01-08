@@ -3,7 +3,7 @@ package com.netgrif.application.engine.petrinet.converter;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.application.engine.workflow.domain.I18nString;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.io.IOException;

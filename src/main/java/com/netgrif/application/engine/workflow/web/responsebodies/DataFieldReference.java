@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.workflow.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.web.responsebodies.Reference;
 import lombok.Data;
 

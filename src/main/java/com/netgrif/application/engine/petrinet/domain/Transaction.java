@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain;
 
+import com.netgrif.application.engine.workflow.domain.I18nString;
+import com.netgrif.application.engine.workflow.domain.Transition;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;

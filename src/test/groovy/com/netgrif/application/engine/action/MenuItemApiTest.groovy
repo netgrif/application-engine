@@ -2,11 +2,11 @@ package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
-import com.netgrif.application.engine.petrinet.domain.I18nString
-import com.netgrif.application.engine.petrinet.domain.UriContentType
-import com.netgrif.application.engine.petrinet.domain.UriNode
-import com.netgrif.application.engine.petrinet.domain.dataset.ButtonField
-import com.netgrif.application.engine.petrinet.domain.dataset.TextField
+import com.netgrif.application.engine.workflow.domain.I18nString
+import com.netgrif.application.engine.workflow.domain.UriContentType
+import com.netgrif.application.engine.workflow.domain.UriNode
+import com.netgrif.application.engine.workflow.domain.dataset.ButtonField
+import com.netgrif.application.engine.workflow.domain.dataset.TextField
 import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase

@@ -2,8 +2,8 @@ package com.netgrif.application.engine.elastic.service.transform;
 
 import com.netgrif.application.engine.elastic.domain.UserField;
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListField;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
+import com.netgrif.application.engine.workflow.domain.dataset.UserListField;
+import com.netgrif.application.engine.workflow.domain.dataset.UserListFieldValue;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

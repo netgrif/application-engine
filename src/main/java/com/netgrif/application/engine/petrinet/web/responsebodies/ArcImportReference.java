@@ -1,11 +1,11 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
 import com.netgrif.application.engine.petrinet.domain.ProcessObject;
-import com.netgrif.application.engine.petrinet.domain.Position;
-import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
-import com.netgrif.application.engine.petrinet.domain.arcs.InhibitorArc;
-import com.netgrif.application.engine.petrinet.domain.arcs.ReadArc;
-import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc;
+import com.netgrif.application.engine.workflow.domain.Position;
+import com.netgrif.application.engine.workflow.domain.arcs.Arc;
+import com.netgrif.application.engine.workflow.domain.arcs.InhibitorArc;
+import com.netgrif.application.engine.workflow.domain.arcs.ReadArc;
+import com.netgrif.application.engine.workflow.domain.arcs.ResetArc;
 import lombok.Data;
 
 import java.util.List;

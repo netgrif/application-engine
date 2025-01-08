@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.utils;
 
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.workflow.domain.dataset.Field;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 

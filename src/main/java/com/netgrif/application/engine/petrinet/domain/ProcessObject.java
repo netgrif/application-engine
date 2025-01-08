@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.netgrif.application.engine.workflow.domain.Imported;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;

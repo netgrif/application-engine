@@ -1,14 +1,9 @@
 package com.netgrif.application.engine.utils;
 
-import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
-import com.netgrif.application.engine.workflow.domain.Case;
-
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 public class DateUtils {

@@ -6,9 +6,9 @@ import com.netgrif.application.engine.importer.model.DataEventType
 import com.netgrif.application.engine.importer.model.EventType
 import com.netgrif.application.engine.importer.model.ProcessEventType
 import com.netgrif.application.engine.petrinet.domain.Process
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action
+import com.netgrif.application.engine.workflow.domain.dataset.logic.action.Action
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.SetDataType
+import com.netgrif.application.engine.workflow.domain.dataset.logic.action.SetDataType
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task

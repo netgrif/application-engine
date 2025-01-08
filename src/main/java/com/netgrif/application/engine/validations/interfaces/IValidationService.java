@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.validations.interfaces;
 
-import com.netgrif.application.engine.petrinet.domain.Transition;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.workflow.domain.Transition;
+import com.netgrif.application.engine.workflow.domain.dataset.Field;
 import com.netgrif.application.engine.workflow.domain.Case;
 import groovy.lang.Closure;
 import org.codehaus.groovy.control.CompilationFailedException;

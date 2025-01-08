@@ -2,10 +2,10 @@ package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
+import com.netgrif.application.engine.workflow.domain.dataset.Field;
+import com.netgrif.application.engine.workflow.domain.dataset.FileField;
+import com.netgrif.application.engine.workflow.domain.dataset.FileListField;
+import com.netgrif.application.engine.workflow.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;

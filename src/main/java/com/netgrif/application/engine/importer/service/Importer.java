@@ -9,29 +9,31 @@ import com.netgrif.application.engine.importer.service.evaluation.IFunctionEvalu
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.importer.service.trigger.TriggerFactory;
 import com.netgrif.application.engine.importer.service.validation.IProcessValidator;
-import com.netgrif.application.engine.petrinet.domain.Component;
-import com.netgrif.application.engine.petrinet.domain.Function;
-import com.netgrif.application.engine.petrinet.domain.Place;
+import com.netgrif.application.engine.workflow.domain.*;
 import com.netgrif.application.engine.petrinet.domain.Process;
-import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.*;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
-import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
-import com.netgrif.application.engine.petrinet.domain.events.Event;
-import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
+import com.netgrif.application.engine.workflow.domain.Component;
+import com.netgrif.application.engine.workflow.domain.Function;
+import com.netgrif.application.engine.workflow.domain.Place;
+import com.netgrif.application.engine.workflow.domain.Scope;
+import com.netgrif.application.engine.workflow.domain.Transition;
+import com.netgrif.application.engine.workflow.domain.dataset.Field;
+import com.netgrif.application.engine.workflow.domain.dataset.logic.FieldBehavior;
+import com.netgrif.application.engine.workflow.domain.dataset.logic.action.Action;
+import com.netgrif.application.engine.workflow.domain.events.BaseEvent;
+import com.netgrif.application.engine.workflow.domain.events.CaseEvent;
+import com.netgrif.application.engine.workflow.domain.events.DataEvent;
+import com.netgrif.application.engine.workflow.domain.events.Event;
+import com.netgrif.application.engine.workflow.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.layout.LayoutContainer;
 import com.netgrif.application.engine.petrinet.domain.layout.LayoutItem;
 import com.netgrif.application.engine.petrinet.domain.layout.LayoutObjectType;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
-import com.netgrif.application.engine.petrinet.domain.version.Version;
+import com.netgrif.application.engine.workflow.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
-import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.BooleanUtils;
@@ -437,7 +439,7 @@ public class Importer {
         return event;
     }
 
-    protected void addBaseEventProperties(com.netgrif.application.engine.petrinet.domain.events.BaseEvent event, com.netgrif.application.engine.importer.model.BaseEvent imported) {
+    protected void addBaseEventProperties(BaseEvent event, com.netgrif.application.engine.importer.model.BaseEvent imported) {
         event.setImportId(imported.getId());
         event.setMessage(toI18NString(imported.getMessage()));
         event.setPreActions(parsePhaseActions(com.netgrif.application.engine.importer.model.EventPhaseType.PRE, imported));
@@ -493,7 +495,7 @@ public class Importer {
         Function function = new Function();
         function.setDefinition(importedFunction.getValue());
         function.setName(importedFunction.getName());
-        function.setScope(FunctionScope.valueOf(importedFunction.getScope().name()));
+        function.setScope(Scope.valueOf(importedFunction.getScope().name()));
         process.addFunction(function);
     }
 
@@ -763,10 +765,10 @@ public class Importer {
         }
     }
 
-    protected com.netgrif.application.engine.petrinet.domain.DataRef resolveDataRef(com.netgrif.application.engine.importer.model.DataRef importedDataRef, Transition transition) {
+    protected com.netgrif.application.engine.workflow.domain.DataRef resolveDataRef(com.netgrif.application.engine.importer.model.DataRef importedDataRef, Transition transition) {
         String fieldId = importedDataRef.getId();
         Field<?> field = process.getField(fieldId).get();
-        com.netgrif.application.engine.petrinet.domain.DataRef dataRef = new com.netgrif.application.engine.petrinet.domain.DataRef(field);
+        com.netgrif.application.engine.workflow.domain.DataRef dataRef = new com.netgrif.application.engine.workflow.domain.DataRef(field);
         if (!transition.getDataSet().containsKey(fieldId)) {
             transition.getDataSet().put(fieldId, dataRef);
         } else {
@@ -780,7 +782,7 @@ public class Importer {
         return dataRef;
     }
 
-    protected void addDataLogic(Field<?> field, Transition transition, DataRef importedDataRef, com.netgrif.application.engine.petrinet.domain.DataRef dataRef) {
+    protected void addDataLogic(Field<?> field, Transition transition, DataRef importedDataRef, com.netgrif.application.engine.workflow.domain.DataRef dataRef) {
         DataRefLogic logic = importedDataRef.getLogic();
         try {
             String fieldId = field.getStringId();
@@ -801,7 +803,7 @@ public class Importer {
         }
     }
 
-    protected void addDataComponent(Field<?> field, DataRef importedDataRef, com.netgrif.application.engine.petrinet.domain.DataRef dataRef) throws MissingIconKeyException {
+    protected void addDataComponent(Field<?> field, DataRef importedDataRef, com.netgrif.application.engine.workflow.domain.DataRef dataRef) throws MissingIconKeyException {
         Component component = field.getComponent();
         if (importedDataRef.getComponent() != null) {
             component = createComponent(importedDataRef.getComponent());

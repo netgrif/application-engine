@@ -75,11 +75,11 @@
     <function scope="process" name="updateFilterAutocompleteOptions">
         <![CDATA[
 		{
-		    com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
-		    com.netgrif.application.engine.petrinet.domain.dataset.TaskField previewTaskRef,
-		    com.netgrif.application.engine.petrinet.domain.dataset.CaseField selectedFilterRef,
-		    com.netgrif.application.engine.petrinet.domain.dataset.ButtonField updateBtn,
-		    com.netgrif.application.engine.petrinet.domain.Transition trans,
+		    com.netgrif.application.engine.workflow.domain.dataset.EnumerationMapField filterAutocomplete,
+		    com.netgrif.application.engine.workflow.domain.dataset.TaskField previewTaskRef,
+		    com.netgrif.application.engine.workflow.domain.dataset.CaseField selectedFilterRef,
+		    com.netgrif.application.engine.workflow.domain.dataset.ButtonField updateBtn,
+		    com.netgrif.application.engine.workflow.domain.Transition trans,
 		    boolean taskTypeOnly
 		    ->
 		    if (filterAutocomplete.getOptions()?.containsKey(filterAutocomplete.rawValue)) {
@@ -111,9 +111,9 @@
     <function scope="process" name="updateOptionsBasedOnValue">
         <![CDATA[
 		{
-		    com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField toBeUpdated,
-		    com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField valueSelector,
-		    com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField optionsHolder
+		    com.netgrif.application.engine.workflow.domain.dataset.EnumerationMapField toBeUpdated,
+		    com.netgrif.application.engine.workflow.domain.dataset.MultichoiceMapField valueSelector,
+		    com.netgrif.application.engine.workflow.domain.dataset.EnumerationMapField optionsHolder
 		    ->
 		    def existingOptions = optionsHolder.options
 		    def selectedValues = valueSelector.rawValue
@@ -590,7 +590,7 @@
                     String prefixUri = move_dest_uri.rawValue.join("/")
                     prefixUri = prefixUri.replace("//","/")
                     String newUri = prefixUri + uriService.getUriSeparator() + move_dest_uri_new_node.rawValue
-                    def newNode = uriService.getOrCreate(newUri, com.netgrif.application.engine.petrinet.domain.UriContentType.CASE)
+                    def newNode = uriService.getOrCreate(newUri, com.netgrif.application.engine.workflow.domain.UriContentType.CASE)
                     change move_dest_uri value { splitUriPath(newNode.uriPath) }
                     change move_dest_uri_new_node value { null }
                     ]]>

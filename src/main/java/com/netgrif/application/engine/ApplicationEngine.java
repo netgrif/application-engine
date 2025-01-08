@@ -1,6 +1,6 @@
 package com.netgrif.application.engine;
 
-import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
+import com.netgrif.application.engine.workflow.domain.version.StringToVersionConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

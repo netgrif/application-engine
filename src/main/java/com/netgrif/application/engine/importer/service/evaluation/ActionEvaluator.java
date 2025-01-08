@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.importer.service.evaluation;
 
-import com.netgrif.application.engine.petrinet.domain.Function;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.application.engine.workflow.domain.Function;
+import com.netgrif.application.engine.workflow.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;

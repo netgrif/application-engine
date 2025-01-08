@@ -2,7 +2,7 @@ package com.netgrif.application.engine.elastic.service.transform;
 
 import com.netgrif.application.engine.elastic.domain.TextField;
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.petrinet.domain.dataset.TaskField;
+import com.netgrif.application.engine.workflow.domain.dataset.TaskField;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

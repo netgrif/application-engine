@@ -6,8 +6,8 @@ import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.orgstructure.groups.NextGroupService
-import com.netgrif.application.engine.petrinet.domain.I18nString
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
+import com.netgrif.application.engine.workflow.domain.I18nString
+import com.netgrif.application.engine.workflow.domain.dataset.FileFieldValue
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.startup.*
 import com.netgrif.application.engine.workflow.domain.Case

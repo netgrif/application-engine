@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.petrinet.domain.roles;
 
 import com.netgrif.application.engine.importer.model.EventType;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.Imported;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.application.engine.petrinet.domain.events.Event;
+import com.netgrif.application.engine.workflow.domain.I18nString;
+import com.netgrif.application.engine.workflow.domain.Imported;
+import com.netgrif.application.engine.workflow.domain.dataset.logic.action.Action;
+import com.netgrif.application.engine.workflow.domain.events.Event;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;

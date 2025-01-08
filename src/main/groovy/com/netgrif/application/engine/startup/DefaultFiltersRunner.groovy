@@ -1,13 +1,13 @@
 package com.netgrif.application.engine.startup
 
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.petrinet.domain.I18nString
+import com.netgrif.application.engine.workflow.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.Process
-import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
-import com.netgrif.application.engine.petrinet.domain.dataset.Field
-import com.netgrif.application.engine.petrinet.domain.dataset.FilterField
-import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
-import com.netgrif.application.engine.petrinet.domain.dataset.TextField
+import com.netgrif.application.engine.workflow.domain.dataset.EnumerationMapField
+import com.netgrif.application.engine.workflow.domain.dataset.Field
+import com.netgrif.application.engine.workflow.domain.dataset.FilterField
+import com.netgrif.application.engine.workflow.domain.dataset.NumberField
+import com.netgrif.application.engine.workflow.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase

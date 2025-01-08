@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.petrinet.domain.UriContentType
+
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component

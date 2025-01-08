@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.elastic.service.transform;
 
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.petrinet.domain.dataset.BooleanField;
+import com.netgrif.application.engine.workflow.domain.dataset.BooleanField;
 import org.springframework.stereotype.Component;
 
 @Component

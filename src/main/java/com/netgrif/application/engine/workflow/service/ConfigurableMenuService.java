@@ -3,13 +3,14 @@ package com.netgrif.application.engine.workflow.service;
 import com.netgrif.application.engine.auth.domain.Author;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.application.engine.workflow.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
-import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
-import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
-import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
-import com.netgrif.application.engine.petrinet.domain.version.Version;
+import com.netgrif.application.engine.workflow.domain.dataset.EnumerationMapField;
+import com.netgrif.application.engine.workflow.domain.dataset.MapOptionsField;
+import com.netgrif.application.engine.workflow.domain.dataset.MultichoiceMapField;
+import com.netgrif.application.engine.workflow.domain.version.StringToVersionConverter;
+import com.netgrif.application.engine.workflow.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.PetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
@@ -29,7 +30,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     private StringToVersionConverter converter;
 
     /**
-     * Constructs a map that can be used as a value for any {@link com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField}.
+     * Constructs a map that can be used as a value for any {@link MapOptionsField}.
      * <p>
      * The map will contain strings related to process nets authored by the provided user.
      * <p>
@@ -63,7 +64,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     }
 
     /**
-     * Constructs a map that can be used as a value for any {@link com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField}.
+     * Constructs a map that can be used as a value for any {@link MapOptionsField}.
      * <p>
      * The map will contain roles from the net selected in the provided field, that are not present in either of the provided multichoice fields.
      * <p>
@@ -90,7 +91,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     }
 
     /**
-     * Constructs a map that can be used as a value for any {@link com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField}.
+     * Constructs a map that can be used as a value for any {@link MapOptionsField}.
      * <p>
      * The map will contain all the options from the input field except for those that are selected in the input field.
      *
@@ -105,7 +106,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     }
 
     /**
-     * Constructs a map that can be used as a value for any {@link com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField}.
+     * Constructs a map that can be used as a value for any {@link MapOptionsField}.
      * <p>
      * The map will contain a union of the options that are already present in the {@code addedRoles} field with the options selected in the {@code rolesAvailable} field.
      * <p>

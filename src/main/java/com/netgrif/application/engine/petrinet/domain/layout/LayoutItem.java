@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.layout;
 
-import com.netgrif.application.engine.petrinet.domain.DataRef;
+import com.netgrif.application.engine.workflow.domain.DataRef;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.annotation.Transient;

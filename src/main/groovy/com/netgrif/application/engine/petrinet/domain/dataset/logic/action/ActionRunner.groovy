@@ -1,11 +1,12 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 
-import com.netgrif.application.engine.petrinet.domain.Function
-import com.netgrif.application.engine.petrinet.domain.Transition
-import com.netgrif.application.engine.petrinet.domain.dataset.Field
+import com.netgrif.application.engine.workflow.domain.Function
+import com.netgrif.application.engine.workflow.domain.Transition
+import com.netgrif.application.engine.workflow.domain.dataset.Field
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.dataset.logic.action.Action
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
 import groovy.util.logging.Slf4j

@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.event.IGroovyShellFactory
-import com.netgrif.application.engine.petrinet.domain.dataset.Field
-import com.netgrif.application.engine.petrinet.domain.dataset.Validation
+import com.netgrif.application.engine.workflow.domain.dataset.Field
+import com.netgrif.application.engine.workflow.domain.dataset.Validation
 import com.netgrif.application.engine.validations.ValidationRegistry
 import com.netgrif.application.engine.workflow.domain.Case
 import groovy.util.logging.Slf4j

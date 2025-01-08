@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
+import com.netgrif.application.engine.workflow.domain.dataset.FileField;
 import lombok.Data;
 
 import java.io.InputStream;

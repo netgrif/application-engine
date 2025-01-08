@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
-import com.netgrif.application.engine.petrinet.domain.Function;
+import com.netgrif.application.engine.workflow.domain.Function;
 import com.netgrif.application.engine.petrinet.domain.Process;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.application.engine.workflow.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.workflow.domain.CachedFunction;
 import groovy.lang.Closure;
 

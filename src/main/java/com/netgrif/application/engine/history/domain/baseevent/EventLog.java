@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.history.domain.baseevent;
 
-import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
+import com.netgrif.application.engine.workflow.domain.events.EventPhase;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;

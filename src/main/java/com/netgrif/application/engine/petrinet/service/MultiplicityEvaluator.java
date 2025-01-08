@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.service;
 
-import com.netgrif.application.engine.petrinet.domain.arcs.Multiplicity;
+import com.netgrif.application.engine.workflow.domain.arcs.Multiplicity;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ExpressionRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import org.springframework.beans.factory.annotation.Autowired;

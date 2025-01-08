@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.throwable;
 
-import com.netgrif.application.engine.petrinet.domain.Place;
+import com.netgrif.application.engine.workflow.domain.Place;
 
 public class IllegalMarkingException extends IllegalStateException {
 

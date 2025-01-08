@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.validation
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.petrinet.domain.dataset.TextField
+import com.netgrif.application.engine.workflow.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ValidationDelegate
 
 //import com.netgrif.application.engine.validation.domain.ValidationDataInput

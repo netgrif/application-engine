@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.importer.service.evaluation;
 
-import com.netgrif.application.engine.petrinet.domain.Function;
+import com.netgrif.application.engine.workflow.domain.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;

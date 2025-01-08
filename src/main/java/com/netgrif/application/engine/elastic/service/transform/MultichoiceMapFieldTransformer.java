@@ -2,8 +2,8 @@ package com.netgrif.application.engine.elastic.service.transform;
 
 import com.netgrif.application.engine.elastic.domain.MapField;
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
+import com.netgrif.application.engine.workflow.domain.I18nString;
+import com.netgrif.application.engine.workflow.domain.dataset.MultichoiceMapField;
 import org.springframework.stereotype.Component;
 
 import java.util.*;

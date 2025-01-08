@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.service;
 
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.application.engine.workflow.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;

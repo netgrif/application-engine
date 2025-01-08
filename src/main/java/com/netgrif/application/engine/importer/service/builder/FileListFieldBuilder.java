@@ -3,7 +3,7 @@ package com.netgrif.application.engine.importer.service.builder;
 import com.netgrif.application.engine.importer.model.Data;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.service.Importer;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
+import com.netgrif.application.engine.workflow.domain.dataset.FileListField;
 import org.springframework.stereotype.Component;
 
 @Component

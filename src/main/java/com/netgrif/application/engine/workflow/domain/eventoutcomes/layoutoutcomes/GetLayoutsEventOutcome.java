@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.domain.eventoutcomes.layoutoutcomes;
 
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.application.engine.workflow.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.layout.LayoutContainer;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;

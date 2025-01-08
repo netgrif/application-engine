@@ -2,17 +2,22 @@ package com.netgrif.application.engine.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.auth.domain.Author;
-import com.netgrif.application.engine.petrinet.domain.PetriNetIdentifier;
+import com.netgrif.application.engine.importer.model.CaseEventType;
+import com.netgrif.application.engine.importer.model.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.Process;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.workflow.domain.arcs.ArcCollection;
+import com.netgrif.application.engine.workflow.domain.dataset.Field;
+import com.netgrif.application.engine.workflow.domain.events.CaseEvent;
+import com.netgrif.application.engine.workflow.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
+import com.netgrif.application.engine.workflow.domain.version.Version;
+import com.netgrif.application.engine.utils.UniqueKeyMap;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
-import org.apache.tools.ant.taskdefs.Local;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -26,6 +31,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * todo javadoc
+ * */
 @Data
 @Document
 public class Case implements Serializable {
@@ -35,27 +43,40 @@ public class Case implements Serializable {
     @Id
     @Setter(AccessLevel.NONE)
     private ObjectId id;
-    @LastModifiedDate
-    private LocalDateTime lastModified;
-    @NotNull
-    private ObjectId petriNetObjectId;
-    @JsonIgnore
-    @Transient
-    @QueryType(PropertyType.NONE)
-    private Process process;
     @NotNull
     @Indexed
     private String processIdentifier;
-    /**
-     * Contains identifiers of super petri nets. The last element is the closest parent, the first is the furthest parent.
-     * */
-    private List<PetriNetIdentifier> parentPetriNetIdentifiers;
-    @JsonIgnore
-    private Map<String, Integer> activePlaces = new HashMap<>();
+    @Setter(AccessLevel.NONE)
+    private Version version;
+
+    @LastModifiedDate
+    private LocalDateTime lastModified;
+    private LocalDateTime creationDate;
     @NotNull
     private String title;
     private String icon;
-    private LocalDateTime creationDate;
+    @Indexed
+    private Author author;
+    private String uriNodeId;
+    private Map<String, String> properties = new HashMap<>();
+
+    private UniqueKeyMap<String, Place> places;
+    @JsonIgnore
+    private Map<String, Integer> activePlaces = new HashMap<>();
+    @JsonIgnore
+    @QueryType(PropertyType.NONE)
+    private Map<String, Integer> consumedTokens = new HashMap<>();
+
+    private UniqueKeyMap<String, ArcCollection> arcs;//todo: import id
+
+    @Indexed
+    private Map<String, TaskPair> tasks = new HashMap<>();
+
+    private List<Function> functions;
+
+    private Map<CaseEventType, CaseEvent> caseEvents;
+    private Map<ProcessEventType, ProcessEvent> processEvents;
+
     @JsonIgnore
     @QueryType(PropertyType.NONE)
     private DataSet dataSet = new DataSet();
@@ -67,31 +88,25 @@ public class Case implements Serializable {
     @Transient
     @QueryType(PropertyType.NONE)
     private List<Field<?>> immediateData = new ArrayList<>();
-    @Indexed
-    private Author author;
-    @JsonIgnore
-    @QueryType(PropertyType.NONE)
-    private Map<String, Integer> consumedTokens = new HashMap<>();
-    @Indexed
-    private Map<String, TaskPair> tasks = new HashMap<>();
+
     @JsonIgnore
     private Map<String, Map<CasePermission, Boolean>> permissions = new HashMap<>();
-    private Map<String, String> properties = new HashMap<>();
 
-    private String uriNodeId;
-
+    /**
+     * todo javadoc
+     * */
     public Case() {
         id = new ObjectId();
         // TODO: release/8.0.0 spring auditing
         creationDate = LocalDateTime.now();
     }
 
+    /**
+     * todo javadoc
+     * */
     public Case(Process petriNet) {
         this();
-        this.process = petriNet;
-        petriNetObjectId = petriNet.getObjectId();
         processIdentifier = petriNet.getIdentifier();
-        parentPetriNetIdentifiers = new ArrayList<>(petriNet.getParentIdentifiers());
         activePlaces = petriNet.getActivePlaces();
         icon = petriNet.getIcon();
 
@@ -143,9 +158,5 @@ public class Case implements Serializable {
         TaskPair taskPair = tasks.get(task.getTransitionId());
         taskPair.setState(task.getState());
         taskPair.setUserId(task.getAssigneeId());
-    }
-
-    public String getPetriNetId() {
-        return petriNetObjectId.toString();
     }
 }

@@ -5,9 +5,8 @@ import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.drools.RefreshableKieBase;
-import com.netgrif.application.engine.importer.model.EventType;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.application.engine.workflow.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -89,9 +88,9 @@ class RuleEngineTest {
         final String TEST_FIELD = "TEST_FIELD";
 
         StoredRule rule = StoredRule.builder()
-                .when("$net: Process() $event: NetImportedFact(netId == $net.stringId, eventPhase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.PRE)")
+                .when("$net: Process() $event: NetImportedFact(netId == $net.stringId, eventPhase == com.netgrif.application.engine.workflow.domain.events.EventPhase.PRE)")
                 .then("$net.title.defaultValue = \"" + NET_TITLE_PRE + "\"; \n" +
-                        "$net.dataSet.put(\"" + TEST_FIELD + "\", new com.netgrif.application.engine.petrinet.domain.dataset.TextField()); \n" +
+                        "$net.dataSet.put(\"" + TEST_FIELD + "\", new com.netgrif.application.engine.workflow.domain.dataset.TextField()); \n" +
                         "factRepository.save($event)")
                 .identifier("rule1")
                 .lastUpdate(LocalDateTime.now())
@@ -116,7 +115,7 @@ class RuleEngineTest {
         final String NEW_INITIALS = "PST";
 
         StoredRule rule = StoredRule.builder()
-                .when("$net: Process() $event: NetImportedFact(netId == $net.stringId, eventPhase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.PRE)")
+                .when("$net: Process() $event: NetImportedFact(netId == $net.stringId, eventPhase == com.netgrif.application.engine.workflow.domain.events.EventPhase.PRE)")
                 .then("$net.title.defaultValue = \"" + NEW_INITIALS + "\"; \n" +
                         "factRepository.save($event)")
                 .identifier("rule1")
@@ -126,7 +125,7 @@ class RuleEngineTest {
         ruleRepository.save(rule);
 
 //        StoredRule rule2 = StoredRule.builder()
-//                .when("$net: Process() $event: NetImportedFact(netId == $net.stringId, eventPhase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)")
+//                .when("$net: Process() $event: NetImportedFact(netId == $net.stringId, eventPhase == com.netgrif.application.engine.workflow.domain.events.EventPhase.POST)")
 //                .then("$net.title.defaultValue = \"" + NET_TITLE_POST + "\"; \n factRepository.save($event)")
 //                .identifier("rule2")
 //                .lastUpdate(LocalDateTime.now())
@@ -163,7 +162,7 @@ class RuleEngineTest {
 
         StoredRule rule = StoredRule.builder()
                 .id(new ObjectId())
-                .when("$case: Case() $event: CaseCreatedFact(caseId == $case.stringId, eventPhase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)")
+                .when("$case: Case() $event: CaseCreatedFact(caseId == $case.stringId, eventPhase == com.netgrif.application.engine.workflow.domain.events.EventPhase.POST)")
                 .then("$case.title = \"" + NEW_CASE_TITLE + "\";    \n log.info(\"rule 1 matched\");")
                 .identifier("rule1")
                 .lastUpdate(LocalDateTime.now())
@@ -171,7 +170,7 @@ class RuleEngineTest {
                 .build();
         StoredRule rule2 = StoredRule.builder()
                 .id(new ObjectId())
-                .when("$case: Case() $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + TRANS_1 + "\", type == com.netgrif.application.engine.importer.model.EventType.FINISH, phase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)")
+                .when("$case: Case() $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + TRANS_1 + "\", type == com.netgrif.application.engine.importer.model.EventType.FINISH, phase == com.netgrif.application.engine.workflow.domain.events.EventPhase.POST)")
                 .then("insert(com.netgrif.application.engine.rules.service.RuleEngineTest.TestFact.instance($case.stringId, 0));    \n $case.dataSet.get(\"text_data\").setRawValue(\"" + TEXT_VALUE + "\");    \n log.info(\"rule 2 matched\");")
                 .identifier("rule2")
                 .lastUpdate(LocalDateTime.now())
@@ -187,7 +186,7 @@ class RuleEngineTest {
                 .build();
         StoredRule rule4 = StoredRule.builder()
                 .id(new ObjectId())
-                .when("$case: Case([\"" + TEXT_VALUE + "\"] contains dataSet.get(\"text_data\").value.value) $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + TRANS_2 + "\", type == com.netgrif.application.engine.importer.model.EventType.FINISH, phase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)")
+                .when("$case: Case([\"" + TEXT_VALUE + "\"] contains dataSet.get(\"text_data\").value.value) $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + TRANS_2 + "\", type == com.netgrif.application.engine.importer.model.EventType.FINISH, phase == com.netgrif.application.engine.workflow.domain.events.EventPhase.POST)")
                 .then("$case.title = \"" + NEW_CASE_TITLE_2 + "\";    \n log.info(\"rule 4 matched\");")
                 .identifier("rule4")
                 .lastUpdate(LocalDateTime.now())
@@ -309,7 +308,7 @@ class RuleEngineTest {
 
     @Test
     void testQueries() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        String predicate = "$event: CaseCreatedFact(eventPhase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)";
+        String predicate = "$event: CaseCreatedFact(eventPhase == com.netgrif.application.engine.workflow.domain.events.EventPhase.POST)";
         String then = "factRepository.save(com.netgrif.application.engine.rules.service.RuleEngineTest.TestFact.instance($case.stringId, %d));";
         StoredRule rule0 = rule(predicate + " $case: Case(processIdentifier == \"rule_engine_test\", title == \"FAKE_TITLE\")", String.format(then, -2));
         StoredRule rule1 = rule(predicate + " $case: Case(processIdentifier == \"FAKE_NET\")", String.format(then, -1));
@@ -335,12 +334,12 @@ class RuleEngineTest {
     @Test
     @Disabled("TODO:")
     void stressTest() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        StoredRule rule = rule("$case: Case() \n $event: CaseCreatedFact(caseId == $case.stringId, eventPhase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)", "log.info($case.stringId)");
+        StoredRule rule = rule("$case: Case() \n $event: CaseCreatedFact(caseId == $case.stringId, eventPhase == com.netgrif.application.engine.workflow.domain.events.EventPhase.POST)", "log.info($case.stringId)");
         IntStream.range(0, 10000).forEach(number -> {
             rule.setId(new ObjectId());
             ruleRepository.save(rule);
         });
-        StoredRule rule2 = rule("$case: Case() \n $event: CaseCreatedFact(caseId == $case.stringId, eventPhase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)", "$case.title = \"NEW_TITLE\"");
+        StoredRule rule2 = rule("$case: Case() \n $event: CaseCreatedFact(caseId == $case.stringId, eventPhase == com.netgrif.application.engine.workflow.domain.events.EventPhase.POST)", "$case.title = \"NEW_TITLE\"");
         ruleRepository.save(rule2);
 
         Case caze = newCase();
@@ -350,14 +349,14 @@ class RuleEngineTest {
     }
 
     private StoredRule transitionRulePre(String type) {
-        String when = "$case: Case() $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + RuleEngineTest.TRANS_1 + "\", type == " + type + ", phase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.PRE)";
+        String when = "$case: Case() $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + RuleEngineTest.TRANS_1 + "\", type == " + type + ", phase == com.netgrif.application.engine.workflow.domain.events.EventPhase.PRE)";
         String then = "$case.dataSet.get(\"text_data\").setRawValue(\"" + TEXT_VALUE + "\");";
 
         return rule(when, then);
     }
 
     private StoredRule transitionRulePost(String type) {
-        String when = "$case: Case() $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + RuleEngineTest.TRANS_1 + "\", type == " + type + ", phase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)";
+        String when = "$case: Case() $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + RuleEngineTest.TRANS_1 + "\", type == " + type + ", phase == com.netgrif.application.engine.workflow.domain.events.EventPhase.POST)";
         String then = "$case.dataSet.get(\"number_data\").setRawValue(" + NUM_VALUE + ");";
 
         return rule(when, then);

@@ -2,7 +2,7 @@ package com.netgrif.application.engine.elastic.service.transform;
 
 import com.netgrif.application.engine.elastic.domain.DateField;
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
+import com.netgrif.application.engine.workflow.domain.dataset.DateTimeField;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

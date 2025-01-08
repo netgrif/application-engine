@@ -4,9 +4,9 @@ import com.netgrif.application.engine.importer.model.Data;
 import com.netgrif.application.engine.importer.model.Init;
 import com.netgrif.application.engine.importer.model.Option;
 import com.netgrif.application.engine.importer.service.Importer;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.Expression;
+import com.netgrif.application.engine.workflow.domain.I18nString;
+import com.netgrif.application.engine.workflow.domain.dataset.ChoiceField;
+import com.netgrif.application.engine.workflow.domain.dataset.logic.Expression;
 
 import java.util.LinkedHashSet;
 import java.util.List;

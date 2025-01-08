@@ -25,10 +25,30 @@ import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
 import com.netgrif.application.engine.mail.interfaces.IMailService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.*
-import com.netgrif.application.engine.petrinet.domain.dataset.*
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
+import com.netgrif.application.engine.workflow.domain.dataset.Arguments
+import com.netgrif.application.engine.workflow.domain.dataset.BooleanField
+import com.netgrif.application.engine.workflow.domain.dataset.CaseField
+import com.netgrif.application.engine.workflow.domain.dataset.ChoiceField
+import com.netgrif.application.engine.workflow.domain.dataset.EnumerationField
+import com.netgrif.application.engine.workflow.domain.dataset.EnumerationMapField
+import com.netgrif.application.engine.workflow.domain.dataset.Field
+import com.netgrif.application.engine.workflow.domain.dataset.FileField
+import com.netgrif.application.engine.workflow.domain.dataset.FileFieldValue
+import com.netgrif.application.engine.workflow.domain.dataset.FileListField
+import com.netgrif.application.engine.workflow.domain.dataset.FilterField
+import com.netgrif.application.engine.workflow.domain.dataset.I18nField
+import com.netgrif.application.engine.workflow.domain.dataset.MapOptionsField
+import com.netgrif.application.engine.workflow.domain.dataset.MultichoiceField
+import com.netgrif.application.engine.workflow.domain.dataset.MultichoiceMapField
+import com.netgrif.application.engine.workflow.domain.dataset.NumberField
+import com.netgrif.application.engine.workflow.domain.dataset.TextField
+import com.netgrif.application.engine.workflow.domain.dataset.UserFieldValue
+import com.netgrif.application.engine.workflow.domain.dataset.UserListField
+import com.netgrif.application.engine.workflow.domain.dataset.UserListFieldValue
+import com.netgrif.application.engine.workflow.domain.dataset.Validation
+import com.netgrif.application.engine.workflow.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.domain.version.Version
+import com.netgrif.application.engine.workflow.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.rules.domain.RuleRepository
@@ -37,6 +57,7 @@ import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.validations.interfaces.IValidationService
 import com.netgrif.application.engine.workflow.domain.*
+import com.netgrif.application.engine.workflow.domain.dataset.logic.action.Action
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome
@@ -64,7 +85,6 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 
 import java.text.Normalizer
-import java.time.LocalDate
 import java.util.stream.Collectors
 
 /**

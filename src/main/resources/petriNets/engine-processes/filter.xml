@@ -28,7 +28,7 @@
     </role>
     <function scope="process" name="initializeMyFullFilterTaskRef">
         <![CDATA[
-		{ com.netgrif.application.engine.petrinet.domain.dataset.TaskField myFullFilter ->
+		{ com.netgrif.application.engine.workflow.domain.dataset.TaskField myFullFilter ->
 		    change myFullFilter value {return [findTask({it.caseId.eq(useCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
 		}
 		]]>
