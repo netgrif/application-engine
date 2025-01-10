@@ -15,7 +15,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import com.netgrif.application.engine.workflow.domain.repositories.UseCaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import org.junit.jupiter.api.BeforeEach
@@ -39,7 +39,7 @@ class TaskApiTest {
     private ImportHelper helper
 
     @Autowired
-    private CaseRepository caseRepository
+    private UseCaseRepository caseRepository
 
     @Autowired
     private TaskRepository taskRepository

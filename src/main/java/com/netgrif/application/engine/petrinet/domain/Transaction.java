@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain;
 
+import com.netgrif.application.engine.workflow.domain.CaseElement;
 import com.netgrif.application.engine.workflow.domain.I18nString;
 import com.netgrif.application.engine.workflow.domain.Transition;
 import lombok.Getter;
@@ -16,7 +17,7 @@ import java.util.List;
  * transitions' ObjectId.
  */
 @Document
-public class Transaction extends ProcessObject {
+public class Transaction extends CaseElement {
 
     @Getter
     @Setter

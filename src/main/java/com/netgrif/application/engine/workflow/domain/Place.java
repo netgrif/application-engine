@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.domain;
 
-import com.netgrif.application.engine.petrinet.domain.throwable.IllegalMarkingException;
+import com.netgrif.application.engine.workflow.domain.throwable.IllegalMarkingException;
+import com.netgrif.application.engine.importer.model.Scope;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Place extends Node {
 
     private int tokens;
+    private Scope scope;
 
     public void addTokens(int tokens) {
         this.tokens += tokens;

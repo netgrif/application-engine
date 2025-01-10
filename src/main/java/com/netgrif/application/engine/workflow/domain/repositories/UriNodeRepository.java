@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.petrinet.domain.repository;
+package com.netgrif.application.engine.workflow.domain.repositories;
 
 import com.netgrif.application.engine.workflow.domain.UriNode;
 import org.springframework.data.mongodb.repository.MongoRepository;

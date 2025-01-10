@@ -139,10 +139,10 @@ public class WorkflowController {
 
     @Operation(summary = "Get all cases by user that created them", security = {@SecurityRequirement(name = "BasicAuth")})
     @RequestMapping(value = "/case/author/{id}", method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<CaseResource> findAllByAuthor(@PathVariable("id") String authorId, @RequestBody String petriNet, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
-        Page<Case> cases = workflowService.findAllByAuthor(authorId, petriNet, pageable);
+    public PagedModel<CaseResource> findAllByAuthor(@PathVariable("id") String authorId, @RequestBody String templateCaseId, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
+        Page<Case> cases = workflowService.findAllByAuthor(authorId, templateCaseId, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
-                .findAllByAuthor(authorId, petriNet, pageable, assembler)).withRel("author");
+                .findAllByAuthor(authorId, templateCaseId, pageable, assembler)).withRel("author");
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
         return resources;

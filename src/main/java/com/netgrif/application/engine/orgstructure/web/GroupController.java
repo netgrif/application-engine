@@ -49,7 +49,7 @@ public class GroupController {
     public GroupsResource getAllGroups() {
         List<Case> groups = service.findAllGroups();
         Set<Group> groupResponse = groups.stream()
-                .map(aCase -> new Group(aCase.getStringId(), aCase.getTitle()))
+                .map(aCase -> new Group(aCase.getStringId(), aCase.getTitle().getDefaultValue()))
                 .collect(Collectors.toCollection(HashSet::new));
         return new GroupsResource(groupResponse);
     }

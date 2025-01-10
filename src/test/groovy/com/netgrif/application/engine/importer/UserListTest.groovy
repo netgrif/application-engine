@@ -6,15 +6,15 @@ import com.netgrif.application.engine.workflow.domain.dataset.Field
 import com.netgrif.application.engine.workflow.domain.dataset.UserFieldValue
 import com.netgrif.application.engine.workflow.domain.dataset.UserListField
 import com.netgrif.application.engine.workflow.domain.dataset.UserListFieldValue
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
+import com.netgrif.application.engine.workflow.domain.throwable.MissingProcessMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.Task
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportProcessEventOutcome
+import com.netgrif.application.engine.workflow.domain.repositories.UseCaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
@@ -45,7 +45,7 @@ class UserListTest {
     private SuperCreator superCreator;
 
     @Autowired
-    private CaseRepository caseRepository;
+    private UseCaseRepository caseRepository;
 
     @Autowired
     private IDataService dataService;
@@ -59,8 +59,8 @@ class UserListTest {
     }
 
     @Test
-    void testUserList() throws MissingPetriNetMetaDataException, IOException {
-        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/user_list.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+    void testUserList() throws MissingProcessMetaDataException, IOException {
+        ImportProcessEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/user_list.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
 
         assert net.getNet() != null;
         Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("User List"));

@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.history.domain.caseevents;
 
-import com.netgrif.application.engine.history.domain.petrinetevents.PetriNetEventLog;
+import com.netgrif.application.engine.history.domain.processevents.ProcessEventLog;
+import com.netgrif.application.engine.workflow.domain.I18nString;
 import com.netgrif.application.engine.workflow.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.Data;
@@ -11,11 +12,11 @@ import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public abstract class CaseEventLog extends PetriNetEventLog {
+public abstract class CaseEventLog extends ProcessEventLog {
 
     protected String caseId;
 
-    protected String caseTitle;
+    protected I18nString caseTitle;
 
     private Map<String, Integer> activePlaces;
 
@@ -30,7 +31,7 @@ public abstract class CaseEventLog extends PetriNetEventLog {
     }
 
     protected CaseEventLog(ObjectId triggerId, Case useCase, EventPhase eventPhase) {
-        super(triggerId, eventPhase, useCase.getPetriNetObjectId());
+        super(triggerId, eventPhase, useCase.getTemplateCaseId());
         this.caseId = useCase.getStringId();
         this.caseTitle = useCase.getTitle();
         this.activePlaces = useCase.getActivePlaces();

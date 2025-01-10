@@ -4,13 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.auth.domain.Author;
 import com.netgrif.application.engine.importer.model.CaseEventType;
 import com.netgrif.application.engine.importer.model.ProcessEventType;
-import com.netgrif.application.engine.petrinet.domain.Process;
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.workflow.domain.arcs.Arc;
 import com.netgrif.application.engine.workflow.domain.arcs.ArcCollection;
+import com.netgrif.application.engine.workflow.domain.arcs.PTArc;
+import com.netgrif.application.engine.workflow.domain.arcs.TPArc;
 import com.netgrif.application.engine.workflow.domain.dataset.Field;
+import com.netgrif.application.engine.workflow.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.workflow.domain.events.CaseEvent;
 import com.netgrif.application.engine.workflow.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
-import com.netgrif.application.engine.workflow.domain.version.Version;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import com.querydsl.core.annotations.PropertyType;
@@ -43,34 +46,29 @@ public class Case implements Serializable {
     @Id
     @Setter(AccessLevel.NONE)
     private ObjectId id;
+    private ObjectId templateCaseId;
+    @NotNull
+    @Indexed
+    private Scope scope;
     @NotNull
     @Indexed
     private String processIdentifier;
-    @Setter(AccessLevel.NONE)
     private Version version;
-
     @LastModifiedDate
     private LocalDateTime lastModified;
     private LocalDateTime creationDate;
     @NotNull
-    private String title;
+    private I18nString title;
     private String icon;
     @Indexed
     private Author author;
     private String uriNodeId;
-    private Map<String, String> properties = new HashMap<>();
+    private UniqueKeyMap<String, String> properties;
 
-    private UniqueKeyMap<String, Place> places;
-    @JsonIgnore
-    private Map<String, Integer> activePlaces = new HashMap<>();
-    @JsonIgnore
-    @QueryType(PropertyType.NONE)
-    private Map<String, Integer> consumedTokens = new HashMap<>();
-
-    private UniqueKeyMap<String, ArcCollection> arcs;//todo: import id
+    private Workflow workflow;
 
     @Indexed
-    private Map<String, TaskPair> tasks = new HashMap<>();
+    private Map<String, TaskPair> tasks;
 
     private List<Function> functions;
 
@@ -79,49 +77,37 @@ public class Case implements Serializable {
 
     @JsonIgnore
     @QueryType(PropertyType.NONE)
-    private DataSet dataSet = new DataSet();
+    private DataSet dataSet;
     /**
      * List of data fields importIds
      */
     @JsonIgnore
-    private LinkedHashSet<String> immediateDataFields = new LinkedHashSet<>();
+    private LinkedHashSet<String> immediateDataFields;
     @Transient
     @QueryType(PropertyType.NONE)
-    private List<Field<?>> immediateData = new ArrayList<>();
+    private List<Field<?>> immediateData;
 
     @JsonIgnore
-    private Map<String, Map<CasePermission, Boolean>> permissions = new HashMap<>();
+    private Map<String, Map<CasePermission, Boolean>> permissions;
 
     /**
      * todo javadoc
      * */
-    public Case() {
+    public Case(Scope scope) {
         id = new ObjectId();
+        this.scope = scope;
         // TODO: release/8.0.0 spring auditing
         creationDate = LocalDateTime.now();
-    }
-
-    /**
-     * todo javadoc
-     * */
-    public Case(Process petriNet) {
-        this();
-        processIdentifier = petriNet.getIdentifier();
-        activePlaces = petriNet.getActivePlaces();
-        icon = petriNet.getIcon();
-
-        permissions = petriNet.getPermissions().entrySet().stream()
-                .filter(role -> role.getValue().containsKey(CasePermission.DELETE) || role.getValue().containsKey(CasePermission.VIEW))
-                .map(role -> {
-                    Map<CasePermission, Boolean> permissionMap = new HashMap<>();
-                    if (role.getValue().containsKey(CasePermission.DELETE))
-                        permissionMap.put(CasePermission.DELETE, role.getValue().get(CasePermission.DELETE));
-                    if (role.getValue().containsKey(CasePermission.VIEW)) {
-                        permissionMap.put(CasePermission.VIEW, role.getValue().get(CasePermission.VIEW));
-                    }
-                    return new AbstractMap.SimpleEntry<>(role.getKey(), permissionMap);
-                })
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+        workflow = new Workflow();
+        properties = new UniqueKeyMap<>();
+        tasks = new HashMap<>();
+        functions = new ArrayList<>();
+        caseEvents = new HashMap<>();
+        processEvents = new HashMap<>();
+        dataSet = new DataSet();
+        immediateDataFields = new LinkedHashSet<>();
+        immediateData = new ArrayList<>();
+        permissions = new HashMap<>();
     }
 
     public String getStringId() {
@@ -158,5 +144,244 @@ public class Case implements Serializable {
         TaskPair taskPair = tasks.get(task.getTransitionId());
         taskPair.setState(task.getState());
         taskPair.setUserId(task.getAssigneeId());
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public void addArc(Arc<?, ?> arc) {
+        String transitionId = arc.getTransition().getStringId();
+        ArcCollection arcCollection = workflow.getArcs().get(transitionId);
+        if (arcCollection == null) {
+            arcCollection = new ArcCollection();
+            workflow.getArcs().put(transitionId, arcCollection);
+        }
+        if (arc instanceof PTArc) {
+            arcCollection.addInput((PTArc) arc);
+        } else {
+            arcCollection.addOutput((TPArc) arc);
+        }
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public Map<String, ArcCollection> getArcs() {
+        return workflow.getArcs();
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public List<PTArc> getInputArcsOf(String transitionId) {
+        if (getArcs().containsKey(transitionId)) {
+            return getArcs().get(transitionId).getInput();
+        }
+        return new LinkedList<>();
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public List<TPArc> getOutputArcsOf(String transitionId) {
+        if (getArcs().containsKey(transitionId)) {
+            return getArcs().get(transitionId).getOutput();
+        }
+        return new LinkedList<>();
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public void addPlace(Place place) {
+        workflow.getPlaces().put(place.getStringId(), place);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public Place getPlace(String id) {
+        return workflow.getPlaces().get(id);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public Map<String, Integer> getActivePlaces() {
+        return workflow.getActivePlaces();
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public void setActivePlaces(Map<String, Integer> activePlaces) {
+        workflow.setActivePlaces(activePlaces);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public Map<String, Integer> getConsumedTokens() {
+        return workflow.getConsumedTokens();
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public void addTransition(Transition transition) {
+        workflow.getTransitions().put(transition.getStringId(), transition);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public Transition getTransition(String id) {
+        // TODO: release/8.0.0 change
+        if ("fake".equals(id)) {
+            return new Transition();
+        }
+        return workflow.getTransitions().get(id);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public Map<String, Transition> getTransitions() {
+        return workflow.getTransitions();
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public void addDataSetField(Field<?> field) {
+        this.dataSet.put(field.getStringId(), field);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public void addProcessEvent(ProcessEvent processEvent) {
+        processEvents.put(processEvent.getType(), processEvent);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public void addCaseEvent(CaseEvent caseEvent) {
+        caseEvents.put(caseEvent.getType(), caseEvent);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public void addFunction(Function function) {
+        functions.add(function);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public void addPermission(String actorId, Map<CasePermission, Boolean> permissions) {
+        if (this.permissions.containsKey(actorId) && this.permissions.get(actorId) != null) {
+            this.permissions.get(actorId).putAll(permissions);
+        } else {
+            this.permissions.put(actorId, permissions);
+        }
+    }
+
+    public void addRole(ProcessRole role) {
+        // todo 2026 roly
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public ProcessRole getRole(String id) {
+        // todo 2026 roly
+        return null;
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public Optional<Field<?>> getField(String id) {
+        return Optional.ofNullable(dataSet.get(id));
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public void incrementVersion(VersionType byType) {
+        this.version.increment(byType);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public void initializeArcs() {
+        workflow.getArcs().values().forEach(list -> {
+            list.getOutput().forEach(arc -> {
+                arc.setSource(getTransition(arc.getSourceId()));
+                arc.setDestination(getPlace(arc.getDestinationId()));
+            });
+            list.getInput().forEach(arc -> {
+                arc.setSource(getPlace(arc.getSourceId()));
+                arc.setDestination(getTransition(arc.getDestinationId()));
+            });
+        });
+    }
+
+
+
+    public List<Action> getPreCreateActions() {
+        return getPreCaseActions(CaseEventType.CREATE);
+    }
+
+    public List<Action> getPostCreateActions() {
+        return getPostCaseActions(CaseEventType.CREATE);
+    }
+
+    public List<Action> getPreDeleteActions() {
+        return getPreCaseActions(CaseEventType.DELETE);
+    }
+
+    public List<Action> getPostDeleteActions() {
+        return getPostCaseActions(CaseEventType.DELETE);
+    }
+
+    public List<Action> getPreUploadActions() {
+        return getPreProcessActions(ProcessEventType.UPLOAD);
+    }
+
+    public List<Action> getPostUploadActions() {
+        return getPostProcessActions(ProcessEventType.UPLOAD);
+    }
+
+    private List<Action> getPreCaseActions(CaseEventType type) {
+        if (caseEvents.containsKey(type)) {
+            return caseEvents.get(type).getPreActions();
+        }
+        return new LinkedList<>();
+    }
+
+    private List<Action> getPostCaseActions(CaseEventType type) {
+        if (caseEvents.containsKey(type)) {
+            return caseEvents.get(type).getPostActions();
+        }
+        return new LinkedList<>();
+    }
+
+    private List<Action> getPreProcessActions(ProcessEventType type) {
+        if (processEvents.containsKey(type)) {
+            return processEvents.get(type).getPreActions();
+        }
+        return new LinkedList<>();
+    }
+
+    private List<Action> getPostProcessActions(ProcessEventType type) {
+        if (processEvents.containsKey(type)) {
+            return processEvents.get(type).getPostActions();
+        }
+        return new LinkedList<>();
     }
 }

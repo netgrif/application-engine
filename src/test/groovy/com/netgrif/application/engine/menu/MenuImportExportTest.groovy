@@ -16,7 +16,7 @@ import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.menu.MenuAndFilters
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import com.netgrif.application.engine.workflow.domain.repositories.UseCaseRepository
 import com.netgrif.application.engine.workflow.service.UserFilterSearchService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IMenuImportExportService
@@ -81,7 +81,7 @@ class MenuImportExportTest {
     TestHelper testHelper
 
     @Autowired
-    private CaseRepository repository;
+    private UseCaseRepository repository;
 
     @Autowired
     IWorkflowService workflowService
@@ -108,7 +108,7 @@ class MenuImportExportTest {
     private UserService userService
 
     @Autowired
-    private CaseRepository caseRepository
+    private UseCaseRepository caseRepository
 
     @Autowired
     private NextGroupService nextGroupService

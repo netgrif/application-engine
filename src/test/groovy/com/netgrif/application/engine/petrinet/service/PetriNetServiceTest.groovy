@@ -16,15 +16,16 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepositor
 import com.netgrif.application.engine.workflow.domain.UriContentType
 import com.netgrif.application.engine.workflow.domain.UriNode
 import com.netgrif.application.engine.workflow.domain.VersionType
-import com.netgrif.application.engine.workflow.domain.version.Version
+import com.netgrif.application.engine.workflow.domain.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportProcessEventOutcome
+import com.netgrif.application.engine.workflow.domain.repositories.UseCaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
+import com.netgrif.application.engine.workflow.service.UriService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.BeforeEach
@@ -77,7 +78,7 @@ class PetriNetServiceTest {
     private UriService uriService
 
     @Autowired
-    private CaseRepository caseRepository
+    private UseCaseRepository caseRepository
 
     @Autowired
     private ProcessRoleRepository processRoleRepository
@@ -105,7 +106,7 @@ class PetriNetServiceTest {
         long processCount = petriNetRepository.count()
         long taskCount = taskRepository.count()
 
-        ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportProcessEventOutcome testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert testNetOptional.getNet() != null
         assert petriNetRepository.count() == processCount + 1
         Process testNet = testNetOptional.getNet()

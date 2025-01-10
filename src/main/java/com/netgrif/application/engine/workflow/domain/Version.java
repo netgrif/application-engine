@@ -1,6 +1,5 @@
-package com.netgrif.application.engine.workflow.domain.version;
+package com.netgrif.application.engine.workflow.domain;
 
-import com.netgrif.application.engine.workflow.domain.VersionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

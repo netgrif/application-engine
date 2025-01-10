@@ -4,22 +4,18 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.netgrif.application.engine.importer.model.DataEventType;
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.workflow.domain.Component;
-import com.netgrif.application.engine.workflow.domain.I18nString;
-import com.netgrif.application.engine.workflow.domain.Imported;
+import com.netgrif.application.engine.workflow.domain.*;
 import com.netgrif.application.engine.workflow.domain.dataset.logic.Expression;
 import com.netgrif.application.engine.workflow.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.workflow.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.workflow.domain.events.DataEvent;
 import com.netgrif.application.engine.utils.FieldUtils;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
-import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
-import com.netgrif.application.engine.workflow.domain.DataFieldBehaviors;
-import com.netgrif.application.engine.workflow.domain.DataFieldValue;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import com.netgrif.application.engine.importer.model.Scope;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.annotate.JsonIgnore;
 import org.bson.types.ObjectId;
@@ -85,6 +81,7 @@ public abstract class Field<T> extends Imported {
     private Long version = 0L;
     // TODO: release/8.0.0 6.2.5: parentTaskId, parentCaseId
     private UniqueKeyMap<String, String> properties;
+    private Scope scope;
 
     public Field() {
         // TODO: release/8.0.0 no collection can be initialised

@@ -5,7 +5,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import com.netgrif.application.engine.workflow.domain.repositories.UseCaseRepository
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.junit.jupiter.api.Test
@@ -29,7 +29,7 @@ class ConcurrencyTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private CaseRepository caseRepository
+    private UseCaseRepository caseRepository
 
     @Autowired
     private SuperCreator superCreator

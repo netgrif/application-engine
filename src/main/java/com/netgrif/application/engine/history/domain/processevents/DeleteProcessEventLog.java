@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.history.domain.petrinetevents;
+package com.netgrif.application.engine.history.domain.processevents;
 
 import com.netgrif.application.engine.workflow.domain.events.EventPhase;
 import lombok.EqualsAndHashCode;
@@ -7,9 +7,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "eventLogs")
 @EqualsAndHashCode(callSuper = true)
-public class DeletePetriNetEventLog extends PetriNetEventLog {
+public class DeleteProcessEventLog extends ProcessEventLog {
 
-    public DeletePetriNetEventLog(ObjectId triggerId, EventPhase eventPhase, ObjectId netId) {
+    public DeleteProcessEventLog(ObjectId triggerId, EventPhase eventPhase, ObjectId netId) {
         super(triggerId, eventPhase, netId);
     }
 }

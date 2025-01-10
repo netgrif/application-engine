@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.domain.arcs;
 
-import com.netgrif.application.engine.petrinet.domain.throwable.IllegalMarkingException;
+import com.netgrif.application.engine.workflow.domain.throwable.IllegalMarkingException;
 
 /**
  * If there is an arc <i>a</i> with a weight <i>w=W(p,t)</i> connecting a place <i>p</i> with a transition <i>t</i>,

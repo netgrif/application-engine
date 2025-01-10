@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.layout;
 
-import com.netgrif.application.engine.petrinet.domain.ProcessObject;
+import com.netgrif.application.engine.workflow.domain.CaseElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.annotation.Transient;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
-public class LayoutContainer extends ProcessObject {
+public class LayoutContainer extends CaseElement {
 
     private LayoutObjectType layoutType;
 

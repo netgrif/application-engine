@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.petrinet.domain.throwable;
+package com.netgrif.application.engine.workflow.domain.throwable;
 
 public class IllegalArcNodeException extends RuntimeException {
 

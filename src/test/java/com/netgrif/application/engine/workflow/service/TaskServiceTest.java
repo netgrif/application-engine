@@ -12,8 +12,8 @@ import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyE
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.workflow.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
-import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.application.engine.workflow.domain.throwable.MissingProcessMetaDataException;
+import com.netgrif.application.engine.workflow.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.startup.SystemUserRunner;
@@ -21,7 +21,7 @@ import com.netgrif.application.engine.startup.UriRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
+import com.netgrif.application.engine.workflow.domain.repositories.UseCaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -54,7 +54,7 @@ public class TaskServiceTest {
     private PetriNetRepository petriNetRepository;
 
     @Autowired
-    private CaseRepository caseRepository;
+    private UseCaseRepository caseRepository;
 
     @Autowired
     private TaskRepository taskRepository;
@@ -95,7 +95,7 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void resetArcTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
+    public void resetArcTest() throws TransitionNotExecutableException, MissingProcessMetaDataException, IOException, MissingIconKeyException {
         Process net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet();
         LoggedUser loggedUser = mockLoggedUser();
         CreateCaseEventOutcome outcome = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);

@@ -17,8 +17,8 @@ import com.netgrif.application.engine.workflow.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.workflow.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.workflow.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.petrinet.domain.throwable.IllegalMarkingException;
-import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.application.engine.workflow.domain.throwable.IllegalMarkingException;
+import com.netgrif.application.engine.workflow.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.MultiplicityEvaluator;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.rules.domain.facts.TransitionEventFact;
@@ -166,7 +166,7 @@ public class TaskService implements ITaskService {
     @Override
     public AssignTaskEventOutcome assignTask(Task task, IUser user, Map<String, String> params) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(task.getCaseId());
-        Transition transition = useCase.getProcess().getTransition(task.getTransitionId());
+        Transition transition = useCase.getTransition(task.getTransitionId());
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreAssignActions(), workflowService.findOne(task.getCaseId()), task, transition, params));
         useCase = workflowService.findOne(task.getCaseId());
         task = findOne(task.getStringId());
@@ -190,8 +190,8 @@ public class TaskService implements ITaskService {
 
     protected Case assignTaskToUser(IUser user, Task task, String useCaseId) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(useCaseId);
-        useCase.getProcess().initializeArcs();
-        Transition transition = useCase.getProcess().getTransition(task.getTransitionId());
+        useCase.initializeArcs();
+        Transition transition = useCase.getTransition(task.getTransitionId());
 
         log.info("[{}]: Assigning task [{}] to user [{}]", useCaseId, task.getTitle(), user.getSelfOrImpersonated().getEmail());
 
@@ -263,7 +263,7 @@ public class TaskService implements ITaskService {
     @Override
     public FinishTaskEventOutcome finishTask(Task task, IUser user, Map<String, String> params) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(task.getCaseId());
-        Transition transition = useCase.getProcess().getTransition(task.getTransitionId());
+        Transition transition = useCase.getTransition(task.getTransitionId());
 
         log.info("[{}]: Finishing task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), user.getSelfOrImpersonated().getEmail());
 
@@ -330,7 +330,7 @@ public class TaskService implements ITaskService {
     @Override
     public CancelTaskEventOutcome cancelTask(Task task, IUser user, Map<String, String> params) {
         Case useCase = workflowService.findOne(task.getCaseId());
-        Transition transition = useCase.getProcess().getTransition(task.getTransitionId());
+        Transition transition = useCase.getTransition(task.getTransitionId());
 
         log.info("[{}]: Canceling task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), user.getSelfOrImpersonated().getEmail());
 
@@ -358,8 +358,7 @@ public class TaskService implements ITaskService {
 
     private Task returnTokens(Task task, String useCaseId) {
         Case useCase = workflowService.findOne(useCaseId);
-        Process net = useCase.getProcess();
-        ArcCollection arcs = net.getArcs().get(task.getTransitionId());
+        ArcCollection arcs = useCase.getArcs().get(task.getTransitionId());
         if (arcs != null) {
             arcs.getInput().forEach(arc -> {
                 arc.rollbackExecution(useCase.getConsumedTokens().get(arc.getStringId()));
@@ -393,7 +392,7 @@ public class TaskService implements ITaskService {
         Task task = taskOptional.get();
 
         Case useCase = workflowService.findOne(task.getCaseId());
-        Transition transition = useCase.getProcess().getTransition(task.getTransitionId());
+        Transition transition = useCase.getTransition(task.getTransitionId());
 
         log.info("[{}]: Delegating task [{}] to user [{}]", useCase.getStringId(), task.getTitle(), delegatedUser.getEmail());
 
@@ -455,11 +454,10 @@ public class TaskService implements ITaskService {
     @Override
     public void reloadTasks(Case useCase) {
         log.info("[{}]: Reloading tasks in [{}]", useCase.getStringId(), useCase.getTitle());
-        Process net = useCase.getProcess();
         List<Task> tasks = taskRepository.findAllByCaseId(useCase.getStringId());
         Task autoTriggered = null;
         for (Task task : tasks) {
-            Transition transition = net.getTransition(task.getTransitionId());
+            Transition transition = useCase.getTransition(task.getTransitionId());
             if (isExecutable(transition, useCase)) {
                 task.setState(State.ENABLED);
                 if (task.isAutoTriggered()) {
@@ -480,14 +478,13 @@ public class TaskService implements ITaskService {
 
     @Override
     public Case createTasks(Case useCase) {
-        Process net = useCase.getProcess();
-        net.getTransitions().values()
+        useCase.getTransitions().values()
                 .forEach(transition -> createFromTransition(transition, useCase));
         return workflowService.save(useCase);
     }
 
     boolean isExecutable(Transition transition, Case useCase) {
-        List<PTArc> arcsOfTransition = useCase.getProcess().getInputArcsOf(transition.getImportId());
+        List<PTArc> arcsOfTransition = useCase.getInputArcsOf(transition.getImportId());
         if (arcsOfTransition == null) {
             return true;
         }
@@ -498,7 +495,7 @@ public class TaskService implements ITaskService {
         try {
             arcsOfTransition.forEach(Arc::execute);
         } catch (IllegalMarkingException e) {
-            useCase.getProcess().setActivePlaces(markingBefore);
+            useCase.setActivePlaces(markingBefore);
             return false;
         }
         return true;
@@ -508,7 +505,7 @@ public class TaskService implements ITaskService {
         Case useCase = workflowService.findOne(useCaseId);
         log.info("[{}]: Finish execution of task [{}] in case [{}]", useCaseId, transition.getTitle(), useCase.getTitle());
         // TODO: release/8.0.0 set multiplicity
-        useCase.getProcess().getOutputArcsOf(transition.getImportId()).forEach(Arc::execute);
+        useCase.getOutputArcsOf(transition.getImportId()).forEach(Arc::execute);
         workflowService.updateMarking(useCase);
         workflowService.save(useCase);
     }
@@ -517,7 +514,7 @@ public class TaskService implements ITaskService {
         log.info("[{}]: Start execution of {} in case {}", useCase.getStringId(), transition.getTitle(), useCase.getTitle());
 
         try {
-            useCase.getProcess().getInputArcsOf(transition.getImportId()).stream()
+            useCase.getInputArcsOf(transition.getImportId()).stream()
                     .sorted((a1, a2) -> ArcOrderComparator.getInstance().compare(a1, a2))
                     .forEach(arc -> {
                         int consumed = arc.getMultiplicity();
@@ -748,7 +745,6 @@ public class TaskService implements ITaskService {
         // TODO: NAE-1969 check layout
         final Task task = Task.with()
                 .title(transition.getTitle())
-                .processId(useCase.getPetriNetId())
                 .caseId(useCase.getId().toString())
                 .transitionId(transition.getImportId())
                 .properties(transition.getProperties())

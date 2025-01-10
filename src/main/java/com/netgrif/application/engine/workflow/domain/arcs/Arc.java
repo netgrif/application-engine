@@ -1,11 +1,8 @@
 package com.netgrif.application.engine.workflow.domain.arcs;
 
-import com.netgrif.application.engine.petrinet.domain.*;
+import com.netgrif.application.engine.importer.model.Scope;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
-import com.netgrif.application.engine.workflow.domain.Node;
-import com.netgrif.application.engine.workflow.domain.Place;
-import com.netgrif.application.engine.workflow.domain.Position;
-import com.netgrif.application.engine.workflow.domain.Transition;
+import com.netgrif.application.engine.workflow.domain.*;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Transient;
@@ -14,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public abstract class Arc<S extends Node, D extends Node> extends ProcessObject {
+public abstract class Arc<S extends Node, D extends Node> extends CaseElement {
 
     @Transient
     protected S source;
@@ -25,6 +22,7 @@ public abstract class Arc<S extends Node, D extends Node> extends ProcessObject 
     protected Multiplicity multiplicityExpression;
     protected List<Position> breakpoints;
     protected UniqueKeyMap<String, String> properties;
+    private Scope scope;
 
     public Arc() {
         this.setObjectId(new ObjectId());

@@ -8,8 +8,8 @@ import com.netgrif.application.engine.workflow.domain.dataset.ChoiceField
 import com.netgrif.application.engine.workflow.domain.dataset.MultichoiceField
 import com.netgrif.application.engine.workflow.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
-import com.netgrif.application.engine.workflow.domain.version.Version
+import com.netgrif.application.engine.workflow.domain.throwable.MissingProcessMetaDataException
+import com.netgrif.application.engine.workflow.domain.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -322,7 +322,7 @@ class ImporterTest {
     }
 
     @Test
-    void enumerationMultichoiceOptionsTest() throws IOException, MissingPetriNetMetaDataException {
+    void enumerationMultichoiceOptionsTest() throws IOException, MissingProcessMetaDataException {
         Process net = petriNetService.importPetriNet(new ClassPathResource("/enumeration_multichoice_options.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
 
         assert net != null

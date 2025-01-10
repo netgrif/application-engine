@@ -48,7 +48,6 @@ import com.netgrif.application.engine.workflow.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.workflow.domain.dataset.Validation
 import com.netgrif.application.engine.workflow.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.workflow.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.rules.domain.RuleRepository

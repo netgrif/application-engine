@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CaseRepository extends MongoRepository<Case, String>, QuerydslPredicateExecutor<Case>, QuerydslBinderCustomizer<QCase> {
+public interface UseCaseRepository extends MongoRepository<Case, String>, QuerydslPredicateExecutor<Case>, QuerydslBinderCustomizer<QCase> {
 
     List<Case> findAllByProcessIdentifier(String identifier);
 
@@ -22,9 +22,9 @@ public interface CaseRepository extends MongoRepository<Case, String>, QuerydslP
 
     Page<Case> findAllByUriNodeId(String uri, Pageable pageable);
 
-    List<Case> findAllByPetriNetObjectId(ObjectId petriNetObjectId);
+    List<Case> findAllByTemplateCaseId(ObjectId petriNetObjectId);
 
-    void deleteAllByPetriNetObjectId(ObjectId petriNetObjectId);
+    void deleteAllByTemplateCaseId(ObjectId petriNetObjectId);
 
     @Override
     default void customize(QuerydslBindings bindings, QCase qCase) {

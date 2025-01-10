@@ -4,10 +4,10 @@ import com.netgrif.application.engine.EngineTest;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.workflow.domain.VersionType;
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.application.engine.workflow.domain.throwable.MissingProcessMetaDataException;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportProcessEventOutcome;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,14 +33,14 @@ public class ImporterTest extends EngineTest {
     private static final Integer NET_ROLES = 3;
 
     @Test
-    public void importPetriNet() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
+    public void importPetriNet() throws MissingProcessMetaDataException, IOException, MissingIconKeyException {
         petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
         assertNetProperlyImported();
     }
 
     @Test
-    public void priorityTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/priority_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+    public void priorityTest() throws MissingProcessMetaDataException, IOException, MissingIconKeyException {
+        ImportProcessEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/priority_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
         assert outcome.getNet() != null;
 
         CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), outcome.getNet().getTitle().getDefaultValue(), "color", superCreator.getLoggedSuper());
@@ -49,14 +49,14 @@ public class ImporterTest extends EngineTest {
     }
 
     @Test
-    public void dataGroupTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+    public void dataGroupTest() throws MissingProcessMetaDataException, IOException, MissingIconKeyException {
+        ImportProcessEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
 
         assert outcome.getNet() != null;
     }
 
     @Test
-    public void readArcImportTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
+    public void readArcImportTest() throws MissingProcessMetaDataException, IOException, MissingIconKeyException {
         petriNetService.importPetriNet(new FileInputStream("src/test/resources/read_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
     }
 

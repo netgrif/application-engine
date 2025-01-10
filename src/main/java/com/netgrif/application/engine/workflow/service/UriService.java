@@ -1,9 +1,9 @@
-package com.netgrif.application.engine.petrinet.service;
+package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.configuration.properties.UriProperties;
 import com.netgrif.application.engine.workflow.domain.UriContentType;
 import com.netgrif.application.engine.workflow.domain.UriNode;
-import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository;
+import com.netgrif.application.engine.workflow.domain.repositories.UriNodeRepository;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;

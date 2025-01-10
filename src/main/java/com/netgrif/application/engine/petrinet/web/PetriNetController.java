@@ -6,13 +6,13 @@ import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.workflow.domain.VersionType;
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
-import com.netgrif.application.engine.workflow.domain.version.StringToVersionConverter;
+import com.netgrif.application.engine.workflow.domain.throwable.MissingProcessMetaDataException;
+import com.netgrif.application.engine.utils.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportProcessEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
@@ -90,10 +90,10 @@ public class PetriNetController {
             @RequestParam(value = "file", required = true) MultipartFile multipartFile,
             @RequestParam(value = "uriNodeId", required = true) String uriNodeId,
             @RequestParam(value = "meta", required = false) String releaseType,
-            Authentication auth, Locale locale) throws MissingPetriNetMetaDataException, MissingIconKeyException {
+            Authentication auth, Locale locale) throws MissingProcessMetaDataException, MissingIconKeyException {
         try {
             VersionType release = releaseType == null ? VersionType.MAJOR : VersionType.valueOf(releaseType.trim().toUpperCase());
-            ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(multipartFile.getInputStream(), release, (LoggedUser) auth.getPrincipal(), uriNodeId);
+            ImportProcessEventOutcome importPetriNetOutcome = service.importPetriNet(multipartFile.getInputStream(), release, (LoggedUser) auth.getPrincipal(), uriNodeId);
             return EventOutcomeWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully", importPetriNetOutcome);
         } catch (IOException e) {
             log.error("Importing Petri net failed: ", e);

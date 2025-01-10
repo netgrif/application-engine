@@ -3,11 +3,11 @@ package com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcome
 import com.netgrif.application.engine.workflow.domain.I18nString;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.PetriNetEventOutcome;
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ProcessEventOutcome;
 
 import java.util.List;
 
-public abstract class CaseEventOutcome extends PetriNetEventOutcome {
+public abstract class CaseEventOutcome extends ProcessEventOutcome {
 
     private Case aCase;
 
@@ -16,7 +16,6 @@ public abstract class CaseEventOutcome extends PetriNetEventOutcome {
     }
 
     protected CaseEventOutcome(Case aCase) {
-        super(aCase.getProcess());
         this.aCase = aCase;
     }
 
@@ -26,12 +25,12 @@ public abstract class CaseEventOutcome extends PetriNetEventOutcome {
     }
 
     protected CaseEventOutcome(I18nString message, Case aCase) {
-        super(message, aCase.getProcess());
+        super(message, null, null);
         this.aCase = aCase;
     }
 
     protected CaseEventOutcome(I18nString message, List<EventOutcome> outcomes, Case aCase) {
-        super(message, outcomes, aCase.getProcess());
+        super(message, outcomes, null, null);
         this.aCase = aCase;
     }
 
@@ -41,6 +40,5 @@ public abstract class CaseEventOutcome extends PetriNetEventOutcome {
 
     public void setCase(Case aCase) {
         this.aCase = aCase;
-        setNet(aCase.getProcess());
     }
 }

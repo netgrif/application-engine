@@ -5,8 +5,8 @@ import com.netgrif.application.engine.workflow.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportProcessEventOutcome
+import com.netgrif.application.engine.workflow.domain.repositories.UseCaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import org.junit.jupiter.api.BeforeEach
@@ -41,7 +41,7 @@ class DynamicChoicesTest {
     private ITaskService taskService;
 
     @Autowired
-    private CaseRepository caseRepository;
+    private UseCaseRepository caseRepository;
 
     @BeforeEach
     void before() {
@@ -50,7 +50,7 @@ class DynamicChoicesTest {
 
     @Test
     void testDynamicEnum() {
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_choices.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        ImportProcessEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_choices.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
 
         assert optNet.getNet() != null;
         def net = optNet.getNet()

@@ -3,7 +3,7 @@ package com.netgrif.application.engine
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
-import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository
+import com.netgrif.application.engine.workflow.domain.repositories.UriNodeRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService

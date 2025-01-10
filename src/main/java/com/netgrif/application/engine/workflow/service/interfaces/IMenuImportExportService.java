@@ -5,7 +5,7 @@ import com.netgrif.application.engine.workflow.domain.dataset.EnumerationMapFiel
 import com.netgrif.application.engine.workflow.domain.dataset.FileField;
 import com.netgrif.application.engine.workflow.domain.dataset.FileFieldValue;
 import com.netgrif.application.engine.workflow.domain.dataset.MultichoiceMapField;
-import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.application.engine.workflow.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.IllegalMenuFileException;
 import com.netgrif.application.engine.workflow.domain.menu.MenuEntry;

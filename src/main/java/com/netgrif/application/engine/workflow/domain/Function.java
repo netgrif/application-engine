@@ -1,14 +1,14 @@
 package com.netgrif.application.engine.workflow.domain;
 
 
-import com.netgrif.application.engine.petrinet.domain.ProcessObject;
 import lombok.Getter;
 import lombok.Setter;
+import com.netgrif.application.engine.importer.model.Scope;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class Function extends ProcessObject {
+public class Function extends CaseElement {
 
     @Getter
     @Setter

@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.petrinet.domain.throwable;
+package com.netgrif.application.engine.workflow.domain.throwable;
 
 import com.netgrif.application.engine.workflow.domain.Place;
 

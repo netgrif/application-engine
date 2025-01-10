@@ -6,6 +6,7 @@ import com.netgrif.application.engine.workflow.domain.Imported;
 import com.netgrif.application.engine.workflow.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.workflow.domain.events.Event;
 import lombok.Data;
+import com.netgrif.application.engine.importer.model.Scope;
 import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -27,6 +28,7 @@ public class ProcessRole extends Imported {
     private String netId;
     private String description;
     private Map<EventType, Event> events;
+    private Scope scope;
 
     public ProcessRole(ObjectId id) {
         this.id = id;

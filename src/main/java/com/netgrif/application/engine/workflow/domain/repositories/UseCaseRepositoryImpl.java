@@ -5,10 +5,10 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.Reference;
 import com.netgrif.application.engine.workflow.domain.QCase;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.core.types.dsl.StringPath;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.data.querydsl.binding.SingleValueBinding;
@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Repository("caseRepository")
-public abstract class CaseRepositoryImpl implements CaseRepository {
+public abstract class UseCaseRepositoryImpl implements UseCaseRepository {
 
-    @Autowired
-    private IPetriNetService petriNetService;
+    private final IPetriNetService petriNetService;
 
     @Override
     public void customize(QuerydslBindings bindings, QCase qCase) {

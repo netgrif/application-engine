@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.repositories;
 
 import com.netgrif.application.engine.petrinet.domain.Process;
-import com.netgrif.application.engine.workflow.domain.version.Version;
+import com.netgrif.application.engine.workflow.domain.Version;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

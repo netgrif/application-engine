@@ -16,6 +16,7 @@ import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Transient;
+import com.netgrif.application.engine.importer.model.Scope;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.*;
@@ -36,6 +37,7 @@ public class Transition extends Node {
     private Map<EventType, Event> events;
     @Transient
     private Boolean hasAutoTrigger;
+    private Scope scope;
 
     public Transition() {
         super();

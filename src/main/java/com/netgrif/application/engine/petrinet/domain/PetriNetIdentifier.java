@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain;
 
-import com.netgrif.application.engine.workflow.domain.version.Version;
+import com.netgrif.application.engine.workflow.domain.Version;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;

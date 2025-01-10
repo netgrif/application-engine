@@ -7,8 +7,8 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.drools.RefreshableKieBase;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.workflow.domain.VersionType;
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
-import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.application.engine.workflow.domain.throwable.MissingProcessMetaDataException;
+import com.netgrif.application.engine.workflow.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.rules.domain.FactRepository;
 import com.netgrif.application.engine.rules.domain.RuleRepository;
@@ -17,7 +17,7 @@ import com.netgrif.application.engine.rules.domain.facts.*;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportProcessEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
@@ -83,7 +83,7 @@ class RuleEngineTest {
     }
 
     @Test
-    void testNetImportRulePRE() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+    void testNetImportRulePRE() throws IOException, MissingProcessMetaDataException, MissingIconKeyException {
         final String NET_TITLE_PRE = "PRE_TITLE";
         final String TEST_FIELD = "TEST_FIELD";
 
@@ -98,7 +98,7 @@ class RuleEngineTest {
                 .build();
         ruleRepository.save(rule);
 
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superUser);
+        ImportProcessEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superUser);
 
         assert outcome.getNet() != null;
         assert outcome.getNet().getTitle().getDefaultValue().equals(NET_TITLE_PRE);
@@ -106,11 +106,11 @@ class RuleEngineTest {
         assert outcome.getNet().getDataSet().get(TEST_FIELD) != null;
 
         List<Fact> facts = factRepository.findAll(QNetImportedFact.netImportedFact.netId.eq(outcome.getNet().getStringId()), PageRequest.of(0, 100)).getContent();
-        assert facts.size() == 1 && facts.get(0) instanceof NetImportedFact;
+        assert facts.size() == 1 && facts.get(0) instanceof ProcessImportedFact;
     }
 
     @Test
-    void testNetImportRulePOST() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+    void testNetImportRulePOST() throws IOException, MissingProcessMetaDataException, MissingIconKeyException {
         final String NET_TITLE_POST = "POST_TITLE";
         final String NEW_INITIALS = "PST";
 
@@ -135,7 +135,7 @@ class RuleEngineTest {
         // TODO: release/8.0.0 refresh stops rules from firing
         assert refreshableKieBase.shouldRefresh();
 
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superUser);
+        ImportProcessEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superUser);
 
 //        assert !refreshableKieBase.shouldRefresh();
 
@@ -150,14 +150,14 @@ class RuleEngineTest {
     }
 
     @Test
-    void testTransitionRules() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
+    void testTransitionRules() throws IOException, MissingProcessMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
         final String TRANS_1 = "2";
         final String TRANS_2 = "4";
         final String NEW_CASE_TITLE = "new case title";
         final String NEW_CASE_TITLE_2 = "new case title 2";
         final String TEXT_VALUE = "TEXT FIELD VALUE";
 
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superUser);
+        ImportProcessEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superUser);
         assert outcome != null;
 
         StoredRule rule = StoredRule.builder()
@@ -222,7 +222,7 @@ class RuleEngineTest {
     }
 
     @Test
-    void assignRuleTest() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
+    void assignRuleTest() throws IOException, MissingProcessMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
         StoredRule rule = transitionRulePre("com.netgrif.application.engine.importer.model.EventType.ASSIGN");
         StoredRule rule2 = transitionRulePost("com.netgrif.application.engine.importer.model.EventType.ASSIGN");
 
@@ -243,7 +243,7 @@ class RuleEngineTest {
     }
 
     @Test
-    void testDelegate() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
+    void testDelegate() throws IOException, MissingProcessMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
         StoredRule rule = transitionRulePre("com.netgrif.application.engine.importer.model.EventType.DELEGATE");
         StoredRule rule2 = transitionRulePost("com.netgrif.application.engine.importer.model.EventType.DELEGATE");
 
@@ -264,7 +264,7 @@ class RuleEngineTest {
     }
 
     @Test
-    void testFinish() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
+    void testFinish() throws IOException, MissingProcessMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
         StoredRule rule = transitionRulePre("com.netgrif.application.engine.importer.model.EventType.FINISH");
         StoredRule rule2 = transitionRulePost("com.netgrif.application.engine.importer.model.EventType.FINISH");
 
@@ -285,7 +285,7 @@ class RuleEngineTest {
     }
 
     @Test
-    void testCancel() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
+    void testCancel() throws IOException, MissingProcessMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
         StoredRule rule = transitionRulePre("com.netgrif.application.engine.importer.model.EventType.CANCEL");
         StoredRule rule2 = transitionRulePost("com.netgrif.application.engine.importer.model.EventType.CANCEL");
 
@@ -307,7 +307,7 @@ class RuleEngineTest {
     }
 
     @Test
-    void testQueries() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+    void testQueries() throws IOException, MissingProcessMetaDataException, MissingIconKeyException {
         String predicate = "$event: CaseCreatedFact(eventPhase == com.netgrif.application.engine.workflow.domain.events.EventPhase.POST)";
         String then = "factRepository.save(com.netgrif.application.engine.rules.service.RuleEngineTest.TestFact.instance($case.stringId, %d));";
         StoredRule rule0 = rule(predicate + " $case: Case(processIdentifier == \"rule_engine_test\", title == \"FAKE_TITLE\")", String.format(then, -2));
@@ -333,7 +333,7 @@ class RuleEngineTest {
 
     @Test
     @Disabled("TODO:")
-    void stressTest() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+    void stressTest() throws IOException, MissingProcessMetaDataException, MissingIconKeyException {
         StoredRule rule = rule("$case: Case() \n $event: CaseCreatedFact(caseId == $case.stringId, eventPhase == com.netgrif.application.engine.workflow.domain.events.EventPhase.POST)", "log.info($case.stringId)");
         IntStream.range(0, 10000).forEach(number -> {
             rule.setId(new ObjectId());
@@ -374,8 +374,8 @@ class RuleEngineTest {
                 .build();
     }
 
-    private Case newCase() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superUser);
+    private Case newCase() throws IOException, MissingProcessMetaDataException, MissingIconKeyException {
+        ImportProcessEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superUser);
         return workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color", superUser).getCase();
     }
 

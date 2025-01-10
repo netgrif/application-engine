@@ -4,6 +4,8 @@ import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.rules.domain.facts.ScheduledRuleFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
+import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.service.interfaces.ITemplateCaseService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,22 +16,23 @@ import org.springframework.stereotype.Component;
 @Component
 // RuleJobs need autowired fields otherwise AutowiringSpringBeanJobFactory::createJobInstance will fail
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
-public class PetriNetRuleEvaluationJob extends RuleJob {
+public class ProcessRuleEvaluationJob extends RuleJob {
 
-    public static final String NET_ID = "netId";
+    public static final String NET_ID = "templateCaseId";
 
     @Autowired
     private IRuleEngine ruleEngine;
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private ITemplateCaseService templateCaseService;
 
     @Override
     public void doExecute(JobExecutionContext context) {
-        String netId = getInstanceId(context);
-        log.info("Executing PetriNetRuleEvaluationJob for net " + netId + " of rule " + getRuleIdentifier(context));
-        Process net = petriNetService.getPetriNet(netId);
-        ruleEngine.evaluateRules(net, new ScheduledRuleFact(netId, getRuleIdentifier(context)));
+        // todo 2026 toto asi bude rozjebane
+        String templateCaseId = getInstanceId(context);
+        log.info("Executing ProcessRuleEvaluationJob for template case [{}] of rule {}", templateCaseId, getRuleIdentifier(context));
+        Case templateCase = templateCaseService.findOne(templateCaseId);
+        ruleEngine.evaluateRules(templateCase, new ScheduledRuleFact(templateCaseId, getRuleIdentifier(context)));
     }
 
     @Override

@@ -6,8 +6,8 @@ import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventL
 import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventLog;
 import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
 import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
-import com.netgrif.application.engine.history.domain.petrinetevents.DeletePetriNetEventLog;
-import com.netgrif.application.engine.history.domain.petrinetevents.ImportPetriNetEventLog;
+import com.netgrif.application.engine.history.domain.processevents.DeleteProcessEventLog;
+import com.netgrif.application.engine.history.domain.processevents.ImportProcessEventLog;
 import com.netgrif.application.engine.history.domain.taskevents.AssignTaskEventLog;
 import com.netgrif.application.engine.history.domain.taskevents.CancelTaskEventLog;
 import com.netgrif.application.engine.history.domain.taskevents.FinishTaskEventLog;
@@ -101,8 +101,8 @@ public class HistoryService implements IHistoryService {
     }
 
     @Override
-    public List<DeletePetriNetEventLog> findAllDeletePetriNetEventLogsByNetId(ObjectId netId) {
-        return findAllByNetId(netId, DeletePetriNetEventLog.class);
+    public List<DeleteProcessEventLog> findAllDeletePetriNetEventLogsByNetId(ObjectId netId) {
+        return findAllByNetId(netId, DeleteProcessEventLog.class);
     }
 
     @Override
@@ -111,8 +111,8 @@ public class HistoryService implements IHistoryService {
     }
 
     @Override
-    public List<ImportPetriNetEventLog> findAllImportPetriNetEventLogsByNetId(ObjectId netId) {
-        return findAllByNetId(netId, ImportPetriNetEventLog.class);
+    public List<ImportProcessEventLog> findAllImportPetriNetEventLogsByNetId(ObjectId netId) {
+        return findAllByNetId(netId, ImportProcessEventLog.class);
     }
 
     @Override

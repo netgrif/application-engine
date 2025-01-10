@@ -1,7 +1,6 @@
-package com.netgrif.application.engine.petrinet.domain;
+package com.netgrif.application.engine.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netgrif.application.engine.workflow.domain.Imported;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
@@ -11,13 +10,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Document
-public abstract class ProcessObject extends Imported {
+public abstract class CaseElement extends Imported {
 
     @Id
     @JsonIgnore
     protected ObjectId id;
 
-    public ProcessObject() {
+    public CaseElement() {
         this.id = new ObjectId();
     }
 

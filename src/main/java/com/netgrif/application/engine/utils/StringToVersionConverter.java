@@ -1,12 +1,13 @@
-package com.netgrif.application.engine.workflow.domain.version;
+package com.netgrif.application.engine.utils;
 
+import com.netgrif.application.engine.workflow.domain.Version;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.stereotype.Component;
 
-import static com.netgrif.application.engine.workflow.domain.version.Version.LATEST;
+import static com.netgrif.application.engine.workflow.domain.Version.LATEST;
 
 @Slf4j
 @Component

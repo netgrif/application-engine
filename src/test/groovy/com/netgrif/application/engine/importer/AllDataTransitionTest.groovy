@@ -5,10 +5,10 @@ import com.netgrif.application.engine.importer.service.AllDataConfiguration
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.workflow.domain.Transition
 import com.netgrif.application.engine.workflow.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
+import com.netgrif.application.engine.workflow.domain.throwable.MissingProcessMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportProcessEventOutcome
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -47,8 +47,8 @@ class AllDataTransitionTest {
     }
 
     @Test
-    void testAllData() throws MissingPetriNetMetaDataException, IOException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(resourceFile.inputStream, VersionType.MAJOR, superCreator.getLoggedSuper());
+    void testAllData() throws MissingProcessMetaDataException, IOException {
+        ImportProcessEventOutcome outcome = petriNetService.importPetriNet(resourceFile.inputStream, VersionType.MAJOR, superCreator.getLoggedSuper());
         assert outcome.getNet() != null;
         Process net = outcome.getNet()
 

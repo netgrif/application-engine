@@ -54,6 +54,7 @@ public final class FieldFactory {
             Component component = importer.createComponent(data.getComponent());
             field.setComponent(component);
         }
+        field.setScope(data.getScope());
         setEncryption(field, data);
 //        dataValidator.checkDeprecatedAttributes(data);
         return field;

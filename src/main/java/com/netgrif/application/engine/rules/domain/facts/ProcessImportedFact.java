@@ -6,12 +6,12 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class NetImportedFact extends PetriNetFact {
+public class ProcessImportedFact extends ProcessFact {
 
     private EventPhase eventPhase;
 
-    public NetImportedFact(String netId, EventPhase eventPhase) {
-        super(netId);
+    public ProcessImportedFact(String templateCaseId, EventPhase eventPhase) {
+        super(templateCaseId);
         this.eventPhase = eventPhase;
     }
 }

@@ -11,7 +11,7 @@ import com.netgrif.application.engine.workflow.domain.dataset.BooleanField
 import com.netgrif.application.engine.workflow.domain.dataset.CaseField
 import com.netgrif.application.engine.workflow.domain.dataset.Field
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import com.netgrif.application.engine.workflow.domain.repositories.UseCaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import groovy.transform.CompileStatic
@@ -49,7 +49,7 @@ class CaseFieldTest {
     private SuperCreator superCreator
 
     @Autowired
-    private CaseRepository caseRepository
+    private UseCaseRepository caseRepository
 
     @Autowired
     private IWorkflowService workflowService

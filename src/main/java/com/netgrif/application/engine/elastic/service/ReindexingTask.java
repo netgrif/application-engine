@@ -8,7 +8,7 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskSer
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
+import com.netgrif.application.engine.workflow.domain.repositories.UseCaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
@@ -34,7 +34,7 @@ import java.util.List;
 public class ReindexingTask {
 
     private int pageSize;
-    private CaseRepository caseRepository;
+    private UseCaseRepository caseRepository;
     private TaskRepository taskRepository;
     private ElasticCaseRepository elasticCaseRepository;
     private IElasticCaseService elasticCaseService;
@@ -46,7 +46,7 @@ public class ReindexingTask {
 
     @Autowired
     public ReindexingTask(
-            CaseRepository caseRepository,
+            UseCaseRepository caseRepository,
             TaskRepository taskRepository,
             ElasticCaseRepository elasticCaseRepository,
             @Qualifier("reindexingTaskElasticCaseService")

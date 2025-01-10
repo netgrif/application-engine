@@ -31,7 +31,7 @@ import com.netgrif.application.engine.workflow.domain.dataset.*;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
+import com.netgrif.application.engine.workflow.domain.repositories.UseCaseRepository;
 import com.netgrif.application.engine.workflow.service.initializer.DataSetInitializer;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
@@ -60,7 +60,7 @@ import java.util.stream.LongStream;
 public class WorkflowService implements IWorkflowService {
 
     @Autowired
-    protected CaseRepository repository;
+    protected UseCaseRepository repository;
 
     @Autowired
     protected IPetriNetService petriNetService;
@@ -108,9 +108,6 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case save(Case useCase) {
-        if (useCase.getProcess() == null) {
-            setPetriNet(useCase);
-        }
         encryptDataSet(useCase);
         useCase = repository.save(useCase);
         try {
@@ -334,8 +331,8 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public Page<Case> findAllByAuthor(String authorId, String petriNet, Pageable pageable) {
-        Predicate query = QCase.case$.author.id.eq(authorId).and(QCase.case$.petriNetId.eq(petriNet));
+    public Page<Case> findAllByAuthor(String authorId, String templateCaseId, Pageable pageable) {
+        Predicate query = QCase.case$.author.id.eq(authorId).and(QCase.case$.templateCaseId.eq(new ObjectId(templateCaseId)));
         Page<Case> cases = repository.findAll(query, pageable);
         cases.forEach(this::initialize);
         return cases;
@@ -354,14 +351,14 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public DeleteCaseEventOutcome deleteCase(Case useCase, Map<String, String> params) {
-        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getProcess().getPreDeleteActions(), useCase, Optional.empty(), params));
+        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPreDeleteActions(), useCase, Optional.empty(), params));
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
         log.info("[{}]: User [{}] is deleting case {}", useCase.getStringId(), userService.getLoggedOrSystem().getStringId(), useCase.getTitle());
 
         taskService.deleteTasksByCase(useCase.getStringId());
         repository.delete(useCase);
 
-        outcome.addOutcomes(eventService.runActions(useCase.getProcess().getPostDeleteActions(), null, Optional.empty(), params));
+        outcome.addOutcomes(eventService.runActions(useCase.getPostDeleteActions(), null, Optional.empty(), params));
         addMessageToOutcome(useCase.getProcess(), CaseEventType.DELETE, outcome);
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.POST));
         return outcome;
@@ -406,8 +403,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public void updateMarking(Case useCase) {
-        Process net = useCase.getProcess();
-        useCase.setActivePlaces(net.getActivePlaces());
+        useCase.setActivePlaces(useCase.getActivePlaces());
     }
 
     @Override
@@ -437,7 +433,7 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public Map<String, I18nString> listToMap(List<Case> cases) {
         Map<String, I18nString> options = new HashMap<>();
-        cases.forEach(aCase -> options.put(aCase.getStringId(), new I18nString(aCase.getTitle())));
+        cases.forEach(aCase -> options.put(aCase.getStringId(), aCase.getTitle()));
         return options;
     }
 
@@ -489,10 +485,9 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private Map<Field<?>, String> getEncryptedDataSet(Case useCase) {
-        Process net = useCase.getProcess();
         Map<Field<?>, String> encryptedDataSet = new HashMap<>();
 
-        for (Map.Entry<String, Field<?>> entry : net.getDataSet().entrySet()) {
+        for (Map.Entry<String, Field<?>> entry : useCase.getDataSet().entrySet()) {
             String encryption = entry.getValue().getEncryption();
             if (encryption != null) {
                 encryptedDataSet.put(useCase.getDataSet().get(entry.getKey()), encryption);
@@ -503,7 +498,6 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private void setPetriNet(Case useCase) {
-        Process model = useCase.getProcess();
         if (model == null) {
             model = petriNetService.clone(useCase.getPetriNetObjectId());
             useCase.setProcess(model);
@@ -513,7 +507,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private void resolveArcsWeight(Case useCase) {
-        useCase.getProcess().getArcs().values().forEach(arcCollection -> {
+        useCase.getArcs().values().forEach(arcCollection -> {
             arcCollection.getInput().forEach(arc -> this.resolveWeight(arc, useCase));
             arcCollection.getOutput().forEach(arc -> this.resolveWeight(arc, useCase));
         });
@@ -525,7 +519,7 @@ public class WorkflowService implements IWorkflowService {
             String definition = arc.getMultiplicityExpression().getDefinition();
             ReferenceType referenceType = arc.getMultiplicityExpression().getReferenceType();
             if (referenceType == ReferenceType.PLACE) {
-                weight = useCase.getProcess().getPlace(definition).getTokens();
+                weight = useCase.getPlace(definition).getTokens();
             } else if (referenceType == ReferenceType.DATA_VARIABLE) {
                 weight = ((Number) useCase.getDataSet().get(definition).getRawValue()).intValue();
             } else {

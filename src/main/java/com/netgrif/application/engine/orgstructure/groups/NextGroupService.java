@@ -14,7 +14,7 @@ import com.netgrif.application.engine.workflow.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.workflow.domain.dataset.EnumerationMapField;
 import com.netgrif.application.engine.workflow.domain.dataset.MapOptionsField;
-import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.application.engine.workflow.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -341,7 +341,7 @@ public class NextGroupService implements INextGroupService {
     }
 
     protected Case findUserDefaultGroup(IUser author) {
-        return workflowService.searchOne(QCase.case$.author.id.eq(author.getStringId()).and(QCase.case$.title.eq(author.getFullName())));
+        return workflowService.searchOne(QCase.case$.author.id.eq(author.getStringId()).and(QCase.case$.title.defaultValue.eq(author.getFullName())));
     }
 
     protected Task getGroupInitTask(Case groupCase) {

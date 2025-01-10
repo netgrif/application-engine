@@ -25,6 +25,7 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
 
     @Override
     public boolean canCallDelete(LoggedUser user, String caseId) {
+        // todo 2026 roly
         Case requestedCase = workflowService.findOne(caseId);
         Boolean rolePerm = userHasAtLeastOneRolePermission(user.getSelfOrImpersonated().transformToUser(), requestedCase.getProcess(), CasePermission.DELETE);
         Boolean userPerm = userHasUserListPermission(user.transformToUser(), requestedCase, CasePermission.DELETE);

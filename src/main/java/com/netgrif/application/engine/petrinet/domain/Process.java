@@ -13,7 +13,7 @@ import com.netgrif.application.engine.workflow.domain.events.CaseEvent;
 import com.netgrif.application.engine.workflow.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
-import com.netgrif.application.engine.workflow.domain.version.Version;
+import com.netgrif.application.engine.workflow.domain.Version;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
 import lombok.Data;
 import org.bson.types.ObjectId;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Data
 @Document
 @CompoundIndex(name = "cmp-idx-one", def = "{'identifier': 1, 'version.major': -1, 'version.minor': -1, 'version.patch': -1}")
-public class Process extends ProcessObject {
+public class Process extends CaseElement {
 
     @Indexed
     private String identifier;
@@ -193,7 +193,7 @@ public class Process extends ProcessObject {
     public Map<String, Integer> getActivePlaces() {
         return places.values().stream()
                 .filter(Place::hasAnyTokens)
-                .collect(Collectors.toMap(ProcessObject::getStringId, Place::getTokens));
+                .collect(Collectors.toMap(CaseElement::getStringId, Place::getTokens));
     }
 
     public void setActivePlaces(Map<String, Integer> activePlaces) {

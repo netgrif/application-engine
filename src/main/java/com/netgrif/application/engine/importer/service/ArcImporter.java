@@ -2,6 +2,7 @@ package com.netgrif.application.engine.importer.service;
 
 import com.netgrif.application.engine.importer.model.ArcType;
 import com.netgrif.application.engine.importer.model.Expression;
+import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Node;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.workflow.domain.arcs.*;
@@ -36,6 +37,7 @@ public final class ArcImporter {
         }
         arc.setImportId(importArc.getId());
         arc.setMultiplicityExpression(createMultiplicity(importArc.getMultiplicity(), importer));
+        arc.setScope(importArc.getScope());
         importer.createProperties(importArc.getProperties(), arc.getProperties());
         return arc;
     }
@@ -59,10 +61,10 @@ public final class ArcImporter {
         if (!multiplicity.isDynamic()) {
             return new Multiplicity(Integer.parseInt(definition));
         }
-        Process process = importer.getProcess();
-        if (process.getPlace(definition) != null) {
+        Case templateCase = importer.getResult().getTemplateCase();
+        if (templateCase.getPlace(definition) != null) {
             return new Multiplicity(definition, ReferenceType.PLACE);
-        } else if (process.getField(definition).isPresent()) {
+        } else if (templateCase.getField(definition).isPresent()) {
             return new Multiplicity(definition, ReferenceType.DATA_VARIABLE);
         } else {
             return new Multiplicity(definition);

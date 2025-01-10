@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow.domain;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netgrif.application.engine.petrinet.converter.I18nStringSerializer;
+import com.netgrif.application.engine.workflow.domain.dataset.logic.Expression;
 import lombok.Data;
 
 import java.util.*;
@@ -19,6 +20,8 @@ public class I18nString implements Serializable {
     private String defaultValue;
 
     private String key;
+
+    private Expression<String> expression;
 
     /**
      * locale - translation

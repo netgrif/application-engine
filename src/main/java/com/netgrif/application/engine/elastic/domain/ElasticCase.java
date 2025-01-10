@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.I18nString;
 import com.netgrif.application.engine.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,7 +20,6 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -52,9 +52,9 @@ public class ElasticCase {
     private String processIdentifier;
 
     @Field(type = Keyword)
-    private String processId;
+    private String templateCaseId;
 
-    private String title;
+    private I18nString title;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -118,7 +118,7 @@ public class ElasticCase {
         mongoId = useCase.getStringId();   //TODO: Duplication
         lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
         processIdentifier = useCase.getProcessIdentifier();
-        processId = useCase.getPetriNetId();
+        templateCaseId = useCase.getTemplateCaseId().toString();
 //        TODO: release/8.0.0
 //        visualId = useCase.getVisualId();
         title = useCase.getTitle();

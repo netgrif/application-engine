@@ -5,8 +5,8 @@ import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventL
 import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventLog;
 import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
 import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
-import com.netgrif.application.engine.history.domain.petrinetevents.DeletePetriNetEventLog;
-import com.netgrif.application.engine.history.domain.petrinetevents.ImportPetriNetEventLog;
+import com.netgrif.application.engine.history.domain.processevents.DeleteProcessEventLog;
+import com.netgrif.application.engine.history.domain.processevents.ImportProcessEventLog;
 import com.netgrif.application.engine.history.domain.taskevents.AssignTaskEventLog;
 import com.netgrif.application.engine.history.domain.taskevents.CancelTaskEventLog;
 import com.netgrif.application.engine.history.domain.taskevents.FinishTaskEventLog;
@@ -45,11 +45,11 @@ public interface IHistoryService {
 
     List<SetDataEventLog> findAllSetDataEventLogsByTaskId(ObjectId taskId);
 
-    List<DeletePetriNetEventLog> findAllDeletePetriNetEventLogsByNetId(ObjectId netId);
+    List<DeleteProcessEventLog> findAllDeletePetriNetEventLogsByNetId(ObjectId netId);
 
     List<SetDataEventLog> findAllSetDataEventLogsByTaskId(String taskId);
 
-    List<ImportPetriNetEventLog> findAllImportPetriNetEventLogsByNetId(ObjectId netId);
+    List<ImportProcessEventLog> findAllImportPetriNetEventLogsByNetId(ObjectId netId);
 
     List<AssignTaskEventLog> findAllAssignTaskEventLogsByTaskId(ObjectId taskId);
 

@@ -12,7 +12,7 @@ import com.netgrif.application.engine.export.service.interfaces.IExportService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.dataset.Field;
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
+import com.netgrif.application.engine.workflow.domain.repositories.UseCaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -42,7 +42,7 @@ public class ExportService implements IExportService {
     private IElasticTaskService elasticTaskService;
 
     @Autowired
-    private CaseRepository caseRepository;
+    private UseCaseRepository caseRepository;
 
     @Autowired
     private ITaskService taskService;
