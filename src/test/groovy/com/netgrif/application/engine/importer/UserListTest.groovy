@@ -76,7 +76,7 @@ class UserListTest {
         ] as Map<String, Field<?>>), superCreator.getLoggedSuper())
 
 //        TODO: release/8.0.0
-//        assert taskService.findById(task.stringId).users.get(superCreator.getSuperUser().getStringId())
-//        assert caseRepository.findById(caseOpt.get().stringId).get().users.get(superCreator.getSuperUser().getStringId())
+        assert taskService.findById(task.stringId).permissions.get(superCreator.getSuperUser().getStringId())
+        assert caseRepository.findById(caseOpt.get().stringId).get().permissions.get(superCreator.getSuperUser().getStringId())
     }
 }

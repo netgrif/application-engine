@@ -1,35 +1,33 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		  xsi:noNamespaceSchemaLocation="../petriflow_schema_layout.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
 	<id>impersonation_users_select</id>
 	<version>1.0.0</version>
-	<initials>IPU</initials>
-	<title name="title">Impersonators configuration - user select</title>
+	<title id="title">Impersonators configuration - user select</title>
 	<icon>home</icon>
 	<defaultRole>false</defaultRole>
 	<anonymousRole>false</anonymousRole>
-	<transitionRole>false</transitionRole>
-
+	<properties>
+		<property key="initials">IPU</property>
+	</properties>
+	<processEvents/>
+	<caseEvents/>
 	<data type="text">
 		<id>parentId</id>
 		<title/>
 	</data>
 	<data type="enumeration_map">
 		<id>select_impersonator</id>
-		<title name="select_impersonator">Select impersonator</title>
-		<placeholder name="select_impersonator_placeholder">Search by name or email address</placeholder>
+		<title id="select_impersonator">Select impersonator</title>
+		<placeholder id="select_impersonator_placeholder">Search by name or email address</placeholder>
 		<component>
-			<name>autocomplete_dynamic</name>
+			<id>autocomplete_dynamic</id>
 		</component>
 		<event type="set">
 			<id>select_impersonator_set</id>
-
 			<actions phase="post">
-				<action>
-					select_impersonator: f.select_impersonator;
-
+				<action id="action_25">
+					<![CDATA[
 					if (!select_impersonator.value) {
 						change select_impersonator options { [:] }
-
 					} else if (!select_impersonator.options.containsKey(select_impersonator.value)) {
 						def selectableUsers = userService.searchAllCoMembers(
 								select_impersonator.value,
@@ -40,60 +38,25 @@
 							[*selectableUsers].sort { it?.surname }.collectEntries { [(it.id): ("${it?.fullName} ($it.email)" as String)] }
 						}
 					}
+					]]>
 				</action>
 			</actions>
 		</event>
 	</data>
-
 	<i18n locale="sk">
-		<i18nString name="select_impersonator">Výber zastupiteľa</i18nString>
-		<i18nString name="select_impersonator_placeholder">Vyhľadajte podľa mena alebo emailovej adresy</i18nString>
-		<i18nString name="title">Konfigurácia zastupiteľov - user select</i18nString>
+		<i18nString id="select_impersonator">Výber zastupiteľa</i18nString>
+		<i18nString id="select_impersonator_placeholder">Vyhľadajte podľa mena alebo emailovej adresy</i18nString>
+		<i18nString id="title">Konfigurácia zastupiteľov - user select</i18nString>
 	</i18n>
 	<i18n locale="de">
-		<i18nString name="select_impersonator">Vertreter auswählen</i18nString>
-		<i18nString name="select_impersonator_placeholder">Suche nach Name oder E-Mail-Adresse</i18nString>
-		<i18nString name="title">Vertreter Konfiguration - user select</i18nString>
+		<i18nString id="select_impersonator">Vertreter auswählen</i18nString>
+		<i18nString id="select_impersonator_placeholder">Suche nach Name oder E-Mail-Adresse</i18nString>
+		<i18nString id="title">Vertreter Konfiguration - user select</i18nString>
 	</i18n>
-
 	<transition>
 		<id>select_user</id>
 		<x>500</x>
 		<y>180</y>
-		<label>[select user]</label>
-		<grid>
-			<id>select_user_grid</id>
-			<item>
-				<dataRef>
-					<id>select_impersonator</id>
-					<logic>
-						<behavior>editable</behavior>
-					</logic>
-				</dataRef>
-				<properties>
-					<grid-column>1 / 2</grid-column>
-				</properties>
-			</item>
-			<properties>
-				<display>grid</display>
-				<grid-template-columns>1fr</grid-template-columns>
-				<justify-items>stretch</justify-items>
-				<align-items>stretch</align-items>
-				<justify-content>stretch</justify-content>
-				<align-content>stretch</align-content>
-			</properties>
-		</grid>
-		<event type="assign">
-			<id>select_user_assign</id>
-		</event>
-		<event type="finish">
-			<id>select_user_finish</id>
-		</event>
-		<event type="cancel">
-			<id>select_user_cancel</id>
-		</event>
-		<event type="delegate">
-			<id>select_user_delegate</id>
-		</event>
+		<title>[select user]</title>
 	</transition>
-</document>
+</process>

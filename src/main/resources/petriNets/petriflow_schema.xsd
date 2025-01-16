@@ -380,6 +380,7 @@
     </xs:simpleType>
     <xs:complexType name="dataRef">
         <xs:sequence>
+            <!--TODO: release/8.0.0 own Id and refId-->
             <xs:element type="identifier" name="id"/>
             <xs:element type="dataRefLogic" name="logic"/>
             <xs:element type="component" name="component" minOccurs="0"/>

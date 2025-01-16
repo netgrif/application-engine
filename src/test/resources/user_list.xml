@@ -1,26 +1,29 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>user_list</id>
+    <version>1.0.0</version>
     <title>User list</title>
-    <initials>ULT</initials>
-    <data type="userList">
-        <id>users_1</id>
-    </data>
-    <usersRef>
+    <defaultRole>false</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">ULT</property>
+    </properties>
+    <roleRef>
         <id>users_1</id>
         <caseLogic>
             <create>false</create>
             <delete>true</delete>
         </caseLogic>
-    </usersRef>
+    </roleRef>
     <processEvents>
         <event type="upload">
             <id>upload</id>
             <actions phase="post">
-                <action>
+                <action id="action_0">
+					<![CDATA[
                     createCase("user_list", "User List")
-                </action>
+                    ]]>
+				</action>
             </actions>
         </event>
     </processEvents>
@@ -28,19 +31,21 @@
         <event type="create">
             <id>create</id>
             <actions phase="post">
-                <action>
-                    text: f.text;
-
+                <action id="action_1">
+					<![CDATA[
                     change text value {return "Its working..."}
-                </action>
+                    ]]>
+				</action>
             </actions>
         </event>
         <event type="delete">
             <id>pdf</id>
             <actions phase="post">
-                <action>
+                <action id="action_2">
+					<![CDATA[
                     createCase("user_list", "Destruct")
-                </action>
+                    ]]>
+				</action>
             </actions>
         </event>
     </caseEvents>
@@ -49,16 +54,20 @@
         <title>Text</title>
         <init>text</init>
     </data>
-
+    <data type="userList">
+        <id>users_1</id>
+        <title/>
+    </data>
     <transition>
-        <id>1</id>
-        <label>Title</label>
-        <usersRef>
+        <id>t1</id>
+        <x>0</x>
+        <y>0</y>
+        <title>Title</title>
+        <roleRef>
             <id>users_1</id>
             <logic>
                 <perform>true</perform>
             </logic>
-        </usersRef>
+        </roleRef>
     </transition>
-
-</document>
+</process>

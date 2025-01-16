@@ -1,15 +1,14 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		  xsi:noNamespaceSchemaLocation="../petriflow_schema_layout.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
 	<id>impersonation_config</id>
 	<version>1.0.0</version>
-	<initials>IPC</initials>
-	<title name="caseName">Impersonators configuration</title>
+	<title id="caseName">Impersonators configuration</title>
 	<icon>supervisor_account</icon>
 	<defaultRole>false</defaultRole>
 	<anonymousRole>false</anonymousRole>
-	<transitionRole>false</transitionRole>
-	<caseName name="caseName">Impersonators configuration</caseName>
-
+	<properties>
+		<property key="initials">IPC</property>
+	</properties>
+	<caseName id="caseName">Impersonators configuration</caseName>
 	<roleRef>
 		<id>admin_imp</id>
 		<caseLogic>
@@ -19,15 +18,15 @@
 		</caseLogic>
 	</roleRef>
 	<roleRef>
-		<id>user_imp</id>
+		<id>defaultRole</id>
 		<caseLogic>
-			<create>true</create>
 			<view>true</view>
 		</caseLogic>
 	</roleRef>
 	<roleRef>
-		<id>default</id>
+		<id>user_imp</id>
 		<caseLogic>
+			<create>true</create>
 			<view>true</view>
 		</caseLogic>
 	</roleRef>
@@ -38,82 +37,89 @@
 			<view>true</view>
 		</caseLogic>
 	</userRef>
-
+	<processEvents/>
 	<caseEvents>
 		<event type="create">
 			<id>case_create</id>
 			<actions phase="post">
-				<action>
-					<!--@formatter:off-->
-					impersonated_email: f.impersonated_email,
-					impersonated: f.impersonated,
-					config_owner: f.config_owner;
-
+				<action id="action_0">
+					<![CDATA[
 					IUser user = userService.loggedOrSystem
 					UserFieldValue impersonatedValue = new UserFieldValue(user)
 					change impersonated value { impersonatedValue }
 					change impersonated_email value { user.email }
 					change config_owner value { new UserListFieldValue([impersonatedValue]) }
-					<!--@formatter:on-->
+					]]>
 				</action>
-				<action>
-					<!--@formatter:off-->
-					user_select_caseId: f.user_select_caseId,
-					user_select_taskRef: f.user_select_taskRef;
-
+				<action id="action_1">
+					<![CDATA[
 					def userSelectCase = createCase("impersonation_users_select")
 					def taskId = userSelectCase.getTaskStringId("select_user")
 					change user_select_taskRef value { [taskId] }
 					change user_select_caseId value { userSelectCase.stringId }
 					setData(taskId, new DataSet([
-					"parentId": new TextField(rawValue: useCase.stringId)
+							"parentId": new TextField(rawValue: useCase.stringId)
 					]))
-					<!--@formatter:on-->
+					setData(taskId, [
+							"parentId":  [
+									value: useCase.stringId,
+									options: ...
+									]
+					])
+					]]>
 				</action>
 			</actions>
 		</event>
 	</caseEvents>
-
 	<role>
 		<id>admin_imp</id>
 		<title>Admin</title>
 	</role>
 	<role>
 		<id>user_imp</id>
-		<title name="role_user">User</title>
+		<title id="role_user">User</title>
 	</role>
-
 	<function scope="process" name="validateUser">
+		<![CDATA[
 		{ String ownerId ->
 			def user = userService.loggedOrSystem
-			def adminProcessRole = useCase.petriNet.roles.values().find { it.importId == "admin_imp" }
-			if (user.stringId != ownerId &amp;&amp; !user.getProcessRoles().any { it.stringId == adminProcessRole.stringId }) {
+			def adminProcessRole = useCase.process.roles.values().find { it.importId == "admin_imp" }
+			if (user.stringId != ownerId && !user.getProcessRoles().any { it.stringId == adminProcessRole.stringId }) {
 				throw new IllegalArgumentException("User is not allowed to manipulate other users' impersonation configurations!")
 			}
 		}
+		]]>
 	</function>
-
-	<data type="text" immediate="true">
-		<id>impersonated_email</id>
-		<title name="impersonated_email">Impersonated email</title>
-	</data>
-	<data type="multichoice_map" immediate="true">
-		<id>impersonators</id>
-		<title name="impersonators">Configured impersonators</title>
-		<component>
-			<name>list</name>
-		</component>
+	<data type="button">
+		<id>add_selected</id>
+		<title/>
+		<placeholder id="add_selected">Add selected</placeholder>
 		<event type="set">
-			<id>impersonators_set</id>
-			<actions phase="post">
-				<action>
-					<!--@formatter:off-->
-					impersonated: f.impersonated;
-
+			<id>add_selected_set</id>
+			<actions phase="pre">
+				<action id="action_10">
+					<![CDATA[
 					if (impersonated.rawValue) {
 						validateUser(impersonated.rawValue.id)
 					}
-					<!--@formatter:on-->
+					]]>
+				</action>
+				<action id="action_11">
+					<![CDATA[
+					def userSelectCase = workflowService.findOne(user_select_caseId.value)
+					def selectedUserField = userSelectCase.dataSet["select_impersonator"]
+					if (!selectedUserField.value || !selectedUserField.options[selectedUserField.value]) {
+						return
+					}
+					def options = impersonators.options != null ? impersonators.options : [:] as java.util.Map
+					options.put(selectedUserField.value, selectedUserField.options[selectedUserField.value])
+					options = options.sort { it.value }
+					change impersonators options { options }
+					change impersonators value { options.keySet() }
+					setData((user_select_taskRef.value as List)[0], [
+							"select_impersonator": ["type": "enumeration_map", "value": ""]
+					])
+					]]>
 				</action>
 			</actions>
 		</event>
@@ -122,198 +128,82 @@
 		<id>config_owner</id>
 		<title/>
 	</data>
-	<data type="dateTime" immediate="true">
-		<id>valid_from</id>
-		<title name="valid_from">Valid from</title>
-		<event type="set">
-			<id>valid_from_set</id>
-			<actions phase="pre">
-				<action>
-					impersonated: f.impersonated;
-
-					if (impersonated.rawValue) {
-						validateUser(impersonated.rawValue.id)
-					}
-				</action>
-			</actions>
-		</event>
-	</data>
-	<data type="dateTime" immediate="true">
-		<id>valid_to</id>
-		<title name="valid_to">Valid until</title>
-		<event type="set">
-			<id>valid_to_set</id>
-			<actions phase="pre">
-				<action>
-					impersonated: f.impersonated;
-
-					if (impersonated.rawValue) {
-						validateUser(impersonated.rawValue.id)
-					}
-				</action>
-			</actions>
-		</event>
-	</data>
-	<data type="boolean" immediate="true">
-		<id>is_active</id>
-		<title name="is_active">Is active</title>
-		<event type="set">
-			<id>is_active_set</id>
-			<actions phase="pre">
-				<action>
-					impersonated: f.impersonated;
-
-					if (impersonated.rawValue) {
-						validateUser(impersonated.rawValue.id)
-					}
-				</action>
-			</actions>
-		</event>
-	</data>
 	<data type="user" immediate="true">
 		<id>impersonated</id>
-		<title name="impersonated">User to impersonate</title>
+		<title id="impersonated">User to impersonate</title>
 		<event type="set">
 			<id>impersonated_set</id>
 			<actions phase="pre">
-				<action>
-					impersonated: f.impersonated;
-
+				<action id="action_6">
+					<![CDATA[
 					if (impersonated.rawValue) {
 						validateUser(impersonated.rawValue.id)
 					}
+					]]>
 				</action>
 			</actions>
 			<actions phase="post">
-				<action>
-					impersonated_email: f.impersonated_email,
-                    impersonated: f.impersonated;
-
-                    change impersonated_email value { impersonated.rawValue.email }
-				</action>
-			</actions>
-		</event>
-	</data>
-
-	<data type="button">
-		<id>remove_impersonator</id>
-		<title/>
-		<placeholder name="remove_impersonator">Remove selected</placeholder>
-		<event type="set">
-			<id>remove_impersonator_set</id>
-			<actions phase="pre">
-				<action>
-					impersonated: f.impersonated;
-
-					if (impersonated.rawValue) {
-						validateUser(impersonated.rawValue.id)
-					}
-				</action>
-				<action>
-					impersonators: f.impersonators;
-
-                    if (impersonators.value != null &amp;&amp; impersonators.options != null) {
-						def options = impersonators.options
-						def values = impersonators.value
-						values.each { it -&gt; options.remove(it) }
-						change impersonators value { null }
-						change impersonators options { options }
-                    }
-				</action>
-			</actions>
-		</event>
-	</data>
-	<data type="button">
-		<id>add_selected</id>
-		<title/>
-		<placeholder name="add_selected">Add selected</placeholder>
-		<event type="set">
-			<id>add_selected_set</id>
-			<actions phase="pre">
-				<action>
-					impersonated: f.impersonated;
-
-					if (impersonated.rawValue) {
-						validateUser(impersonated.rawValue.id)
-					}
-				</action>
-				<action>
-					user_select_caseId: f.user_select_caseId,
-					user_select_taskRef: f.user_select_taskRef,
-					impersonators: f.impersonators;
-
-					def userSelectCase = workflowService.findOne(user_select_caseId.value)
-					def selectedUserField = userSelectCase.dataSet["select_impersonator"]
-
-					if (!selectedUserField.value || !selectedUserField.options[selectedUserField.value]) {
-						return
-					}
-
-					def options = impersonators.options != null ? impersonators.options : [:] as java.util.Map
-					options.put(selectedUserField.value, selectedUserField.options[selectedUserField.value])
-					options = options.sort { it.value }
-					change impersonators options { options }
-					change impersonators value { options.keySet() }
-
-					setData((user_select_taskRef.value as List)[0], [
-					        "select_impersonator": ["type": "enumeration_map", "value": ""]
-					])
+				<action id="action_7">
+					<![CDATA[
+					change impersonated_email value { impersonated.rawValue.email }
+					]]>
 				</action>
 			</actions>
 		</event>
 	</data>
 	<data type="multichoice_map" immediate="true">
 		<id>impersonated_authorities</id>
-		<title name="impersonated_authorities">Impersonated authorities</title>
+		<title id="impersonated_authorities">Impersonated authorities</title>
 		<event type="set">
 			<id>impersonated_authorities_set</id>
 			<actions phase="pre">
-				<action>
-					impersonated: f.impersonated;
-
+				<action id="action_12">
+					<![CDATA[
 					if (impersonated.rawValue) {
 						validateUser(impersonated.rawValue.id)
 					}
+					]]>
 				</action>
 			</actions>
 		</event>
 		<event type="get">
 			<id>impersonated_authorities_get</id>
 			<actions phase="post">
-				<action>
-					impersonated: f.impersonated,
-					impersonated_authorities: f.impersonated_authorities;
-
+				<action id="action_13">
+					<![CDATA[
 					def impersonatedUser = userService.findById(impersonated.rawValue.id, false)
 					change impersonated_authorities options {
 						impersonatedUser.authorities.collectEntries { [(it.stringId): (it.name)] }
 					}
+					]]>
 				</action>
 			</actions>
 		</event>
 	</data>
+	<data type="text" immediate="true">
+		<id>impersonated_email</id>
+		<title id="impersonated_email">Impersonated email</title>
+	</data>
 	<data type="multichoice_map" immediate="true">
 		<id>impersonated_roles</id>
-		<title name="impersonated_roles">Impersonated roles</title>
+		<title id="impersonated_roles">Impersonated roles</title>
 		<event type="set">
 			<id>impersonated_roles_set</id>
 			<actions phase="pre">
-				<action>
-					impersonated: f.impersonated;
-
+				<action id="action_14">
+					<![CDATA[
 					if (impersonated.rawValue) {
 						validateUser(impersonated.rawValue.id)
 					}
+					]]>
 				</action>
 			</actions>
 		</event>
 		<event type="get">
 			<id>impersonated_roles</id>
 			<actions phase="post">
-				<action>
-					impersonated: f.impersonated,
-					impersonated_roles: f.impersonated_roles;
-
+				<action id="action_15">
+					<![CDATA[
 					def impersonatedUser = userService.findById(impersonated.rawValue.id, false)
 					change impersonated_roles options {
 						return impersonatedUser.processRoles.findAll { it.netId }.sort { it.netId }.collectEntries {
@@ -321,274 +211,256 @@
 							return [(it.stringId): ("$it.name ($net.title $net.identifier-$net.version)" as String)]
 						}
 					}
+					]]>
 				</action>
 			</actions>
 		</event>
 	</data>
-	<data type="taskRef">
-		<id>user_select_taskRef</id>
+	<data type="multichoice_map" immediate="true">
+		<id>impersonators</id>
+		<title id="impersonators">Configured impersonators</title>
+		<component>
+			<id>list</id>
+		</component>
+		<event type="set">
+			<id>impersonators_set</id>
+			<actions phase="post">
+				<action id="action_2">
+					<![CDATA[
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>is_active</id>
+		<title id="is_active">Is active</title>
+		<event type="set">
+			<id>is_active_set</id>
+			<actions phase="pre">
+				<action id="action_5">
+					<![CDATA[
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>remove_impersonator</id>
 		<title/>
+		<placeholder id="remove_impersonator">Remove selected</placeholder>
+		<event type="set">
+			<id>remove_impersonator_set</id>
+			<actions phase="pre">
+				<action id="action_8">
+					<![CDATA[
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
+					]]>
+				</action>
+				<action id="action_9">
+					<![CDATA[
+					if (impersonators.value != null && impersonators.options != null) {
+						def options = impersonators.options
+						def values = impersonators.value
+						values.each { it -> options.remove(it) }
+						change impersonators value { null }
+						change impersonators options { options }
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="text">
 		<id>user_select_caseId</id>
 		<title/>
 	</data>
-
+	<data type="taskRef">
+		<id>user_select_taskRef</id>
+		<title/>
+	</data>
+	<data type="dateTime" immediate="true">
+		<id>valid_from</id>
+		<title id="valid_from">Valid from</title>
+		<event type="set">
+			<id>valid_from_set</id>
+			<actions phase="pre">
+				<action id="action_3">
+					<![CDATA[
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="dateTime" immediate="true">
+		<id>valid_to</id>
+		<title id="valid_to">Valid until</title>
+		<event type="set">
+			<id>valid_to_set</id>
+			<actions phase="pre">
+				<action id="action_4">
+					<![CDATA[
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
 	<i18n locale="sk">
-		<i18nString name="caseName">Konfigurácia zastupiteľov</i18nString>
-		<i18nString name="role_user">Používateľ</i18nString>
-		<i18nString name="impersonated_email">E-mail zastúpeného</i18nString>
-		<i18nString name="impersonators">Nastavení zastupitelia</i18nString>
-		<i18nString name="valid_from">Platnosť od</i18nString>
-		<i18nString name="valid_to">Platnosť do</i18nString>
-		<i18nString name="is_active">Aktívna konfigurácia</i18nString>
-		<i18nString name="impersonated">Používateľ na zastúpenie</i18nString>
-		<i18nString name="remove_impersonator">Vymazať označených</i18nString>
-		<i18nString name="add_selected">Pridať vybraného</i18nString>
-		<i18nString name="impersonated_authorities">Zastúpené autority</i18nString>
-		<i18nString name="impersonated_roles">Zastúpené procesné roly</i18nString>
-		<i18nString name="configure_impersonators">Výber zastupiteľov</i18nString>
-		<i18nString name="deactivate">Deaktivovať</i18nString>
-		<i18nString name="reactivate">Znovu aktivovať</i18nString>
-		<i18nString name="publish">Publikovať</i18nString>
+		<i18nString id="caseName">Konfigurácia zastupiteľov</i18nString>
+		<i18nString id="role_user">Používateľ</i18nString>
+		<i18nString id="impersonated_email">E-mail zastúpeného</i18nString>
+		<i18nString id="impersonators">Nastavení zastupitelia</i18nString>
+		<i18nString id="valid_from">Platnosť od</i18nString>
+		<i18nString id="valid_to">Platnosť do</i18nString>
+		<i18nString id="is_active">Aktívna konfigurácia</i18nString>
+		<i18nString id="impersonated">Používateľ na zastúpenie</i18nString>
+		<i18nString id="remove_impersonator">Vymazať označených</i18nString>
+		<i18nString id="add_selected">Pridať vybraného</i18nString>
+		<i18nString id="impersonated_authorities">Zastúpené autority</i18nString>
+		<i18nString id="impersonated_roles">Zastúpené procesné roly</i18nString>
+		<i18nString id="configure_impersonators">Výber zastupiteľov</i18nString>
+		<i18nString id="deactivate">Deaktivovať</i18nString>
+		<i18nString id="reactivate">Znovu aktivovať</i18nString>
+		<i18nString id="publish">Publikovať</i18nString>
 	</i18n>
-
 	<i18n locale="de">
-		<i18nString name="caseName">Vertreter Konfiguration</i18nString>
-		<i18nString name="role_user">Benutzer</i18nString>
-		<i18nString name="impersonated_email">E-Mail-Adresse des Vertreters</i18nString>
-		<i18nString name="impersonators">Konfigurierte Vertreter</i18nString>
-		<i18nString name="valid_from">Gültig ab</i18nString>
-		<i18nString name="valid_to">Gültig bis</i18nString>
-		<i18nString name="is_active">Aktive Konfiguration</i18nString>
-		<i18nString name="impersonated">Benutzer zu vertreten</i18nString>
-		<i18nString name="remove_impersonator">Ausgewählte löschen</i18nString>
-		<i18nString name="add_selected">Ausgewählte hinzufügen</i18nString>
-		<i18nString name="impersonated_authorities">Vertretene Berechtigungen</i18nString>
-		<i18nString name="impersonated_roles">Vertretene Rollen</i18nString>
-		<i18nString name="configure_impersonators">Vertreter auswählen</i18nString>
-		<i18nString name="deactivate">Deaktivieren</i18nString>
-		<i18nString name="reactivate">Reaktivieren</i18nString>
-		<i18nString name="publish">Veröffentlichen</i18nString>
+		<i18nString id="caseName">Vertreter Konfiguration</i18nString>
+		<i18nString id="role_user">Benutzer</i18nString>
+		<i18nString id="impersonated_email">E-Mail-Adresse des Vertreters</i18nString>
+		<i18nString id="impersonators">Konfigurierte Vertreter</i18nString>
+		<i18nString id="valid_from">Gültig ab</i18nString>
+		<i18nString id="valid_to">Gültig bis</i18nString>
+		<i18nString id="is_active">Aktive Konfiguration</i18nString>
+		<i18nString id="impersonated">Benutzer zu vertreten</i18nString>
+		<i18nString id="remove_impersonator">Ausgewählte löschen</i18nString>
+		<i18nString id="add_selected">Ausgewählte hinzufügen</i18nString>
+		<i18nString id="impersonated_authorities">Vertretene Berechtigungen</i18nString>
+		<i18nString id="impersonated_roles">Vertretene Rollen</i18nString>
+		<i18nString id="configure_impersonators">Vertreter auswählen</i18nString>
+		<i18nString id="deactivate">Deaktivieren</i18nString>
+		<i18nString id="reactivate">Reaktivieren</i18nString>
+		<i18nString id="publish">Veröffentlichen</i18nString>
 	</i18n>
-
 	<transition>
 		<id>t2</id>
 		<x>500</x>
 		<y>180</y>
-		<label name="configure_impersonators">Configure impersonators</label>
+		<title id="configure_impersonators">Configure impersonators</title>
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>
 			<id>admin_imp</id>
 			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
 				<view>true</view>
 				<cancel>true</cancel>
 				<assign>true</assign>
+				<reassign>true</reassign>
+				<perform>true</perform>
 			</logic>
 		</roleRef>
-		<userRef>
+		<roleRef>
 			<id>config_owner</id>
 			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
 				<view>true</view>
 				<cancel>true</cancel>
 				<assign>true</assign>
+				<reassign>true</reassign>
+				<perform>true</perform>
 			</logic>
-		</userRef>
-		<grid>
-            <id>t2_grid</id>
-            <item>
-                <dataRef>
-                    <id>user_select_taskRef</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / span 2</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>add_selected</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-					<component>
-						<name>stroked</name>
-					</component>
-                </dataRef>
-                <properties>
-                    <grid-column>2 / 3</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>impersonators</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>remove_impersonator</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-					<component>
-						<name>stroked</name>
-					</component>
-                </dataRef>
-                <properties>
-                    <grid-column>2 / 3</grid-column>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>impersonated_roles</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-					<component>
-						<name>list</name>
-					</component>
-                </dataRef>
-                <properties>
-                    <grid-column>1 / 2</grid-column>
-                </properties>
-            </item>
-			<item>
-				<dataRef>
-					<id>impersonated_authorities</id>
-					<logic>
-						<behavior>editable</behavior>
-					</logic>
-					<component>
-						<name>list</name>
-					</component>
-				</dataRef>
-				<properties>
-					<grid-column>2 / 3</grid-column>
-				</properties>
-			</item>
-			<item>
-				<dataRef>
-					<id>valid_from</id>
-					<logic>
-						<behavior>editable</behavior>
-					</logic>
-				</dataRef>
-				<properties>
-					<grid-column>1 / 2</grid-column>
-				</properties>
-			</item>
-			<item>
-				<dataRef>
-					<id>valid_to</id>
-					<logic>
-						<behavior>editable</behavior>
-					</logic>
-				</dataRef>
-				<properties>
-					<grid-column>2 / 3</grid-column>
-				</properties>
-			</item>
-            <properties>
-                <display>grid</display>
-                <grid-template-columns>repeat(2, 1fr)</grid-template-columns>
-				<justify-items>stretch</justify-items>
-				<align-items>stretch</align-items>
-				<justify-content>stretch</justify-content>
-				<align-content>stretch</align-content>
-            </properties>
-        </grid>
+		</roleRef>
 		<event type="finish">
 			<id>t2_finish</id>
+			<title id="publish">Publish</title>
 			<actions phase="pre">
-				<action>
-					impersonated: f.impersonated;
-
+				<action id="action_16">
+					<![CDATA[
 					if (impersonated.rawValue) {
 						validateUser(impersonated.rawValue.id)
 					}
+					]]>
 				</action>
 			</actions>
 			<actions phase="post">
-				<action>
-					impersonated: f.impersonated;
-
+				<action id="action_17">
+					<![CDATA[
 					impersonationService.removeImpersonatorByImpersonated(impersonated.rawValue.id)
+					]]>
 				</action>
-				<action>
-					is_active: f.is_active;
-
+				<action id="action_18">
+					<![CDATA[
 					change is_active value { true }
+					]]>
 				</action>
 			</actions>
-			<title name="publish">Publish</title>
 		</event>
 	</transition>
 	<transition>
 		<id>t3</id>
 		<x>660</x>
 		<y>300</y>
-		<label name="deactivate">Deactivate</label>
+		<title id="deactivate">Deactivate</title>
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>
 			<id>admin_imp</id>
 			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
 				<view>true</view>
 				<cancel>true</cancel>
 				<assign>true</assign>
+				<reassign>true</reassign>
+				<perform>true</perform>
 			</logic>
 		</roleRef>
-		<userRef>
+		<roleRef>
 			<id>config_owner</id>
 			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
 				<view>true</view>
 				<cancel>true</cancel>
 				<assign>true</assign>
+				<reassign>true</reassign>
+				<perform>true</perform>
 			</logic>
-		</userRef>
+		</roleRef>
 		<event type="assign">
 			<id>t3_assign</id>
 			<actions phase="pre">
-				<action>
-					impersonated: f.impersonated;
-
+				<action id="action_19">
+					<![CDATA[
 					if (impersonated.rawValue) {
 						validateUser(impersonated.rawValue.id)
 					}
+					]]>
 				</action>
 			</actions>
 		</event>
 		<event type="finish">
 			<id>t3_finish</id>
 			<actions phase="pre">
-				<action>
-					impersonated: f.impersonated;
-
+				<action id="action_20">
+					<![CDATA[
 					if (impersonated.rawValue) {
 						validateUser(impersonated.rawValue.id)
 					}
+					]]>
 				</action>
 			</actions>
 			<actions phase="post">
-				<action>
-					is_active: f.is_active;
-
+				<action id="action_21">
+					<![CDATA[
 					change is_active value { false }
+					]]>
 				</action>
 			</actions>
 		</event>
@@ -597,123 +469,56 @@
 		<id>t4</id>
 		<x>820</x>
 		<y>180</y>
-		<label name="reactivate">Reactivate</label>
+		<title id="reactivate">Reactivate</title>
 		<assignPolicy>auto</assignPolicy>
-
 		<roleRef>
 			<id>admin_imp</id>
 			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
 				<view>true</view>
 				<cancel>true</cancel>
 				<assign>true</assign>
+				<reassign>true</reassign>
+				<perform>true</perform>
 			</logic>
 		</roleRef>
-		<userRef>
+		<roleRef>
 			<id>config_owner</id>
 			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
 				<view>true</view>
 				<cancel>true</cancel>
 				<assign>true</assign>
+				<reassign>true</reassign>
+				<perform>true</perform>
 			</logic>
-		</userRef>
-		<grid>
-			<id>t4_grid</id>
-			<item>
-				<dataRef>
-					<id>impersonators</id>
-					<logic>
-						<behavior>visible</behavior>
-					</logic>
-				</dataRef>
-				<properties>
-					<grid-column>1 / span 2</grid-column>
-				</properties>
-			</item>
-			<item>
-				<dataRef>
-					<id>impersonated_roles</id>
-					<logic>
-						<behavior>visible</behavior>
-					</logic>
-				</dataRef>
-				<properties>
-					<grid-column>1 / 2</grid-column>
-				</properties>
-			</item>
-			<item>
-				<dataRef>
-					<id>impersonated_authorities</id>
-					<logic>
-						<behavior>visible</behavior>
-					</logic>
-				</dataRef>
-				<properties>
-					<grid-column>2 / 3</grid-column>
-				</properties>
-			</item>
-			<item>
-				<dataRef>
-					<id>valid_from</id>
-					<logic>
-						<behavior>visible</behavior>
-					</logic>
-				</dataRef>
-				<properties>
-					<grid-column>1 / 2</grid-column>
-				</properties>
-			</item>
-			<item>
-				<dataRef>
-					<id>valid_to</id>
-					<logic>
-						<behavior>visible</behavior>
-					</logic>
-				</dataRef>
-				<properties>
-					<grid-column>2 / 3</grid-column>
-				</properties>
-			</item>
-			<properties>
-				<display>grid</display>
-				<grid-template-columns>repeat(2, 1fr)</grid-template-columns>
-				<justify-items>stretch</justify-items>
-				<align-items>stretch</align-items>
-				<justify-content>stretch</justify-content>
-				<align-content>stretch</align-content>
-			</properties>
-		</grid>
+		</roleRef>
 		<event type="assign">
 			<id>t4_assign</id>
 			<actions phase="pre">
-				<action>
-					impersonated: f.impersonated;
-
+				<action id="action_22">
+					<![CDATA[
 					if (impersonated.rawValue) {
 						validateUser(impersonated.rawValue.id)
 					}
+					]]>
 				</action>
 			</actions>
 		</event>
 		<event type="finish">
 			<id>t4_finish</id>
 			<actions phase="pre">
-				<action>
-					impersonated: f.impersonated;
-
+				<action id="action_23">
+					<![CDATA[
 					if (impersonated.rawValue) {
 						validateUser(impersonated.rawValue.id)
 					}
+					]]>
 				</action>
 			</actions>
 			<actions phase="post">
-				<action>
-					is_active: f.is_active;
-
+				<action id="action_24">
+					<![CDATA[
 					change is_active value { true }
+					]]>
 				</action>
 			</actions>
 		</event>
@@ -722,26 +527,41 @@
 		<id>p2</id>
 		<x>660</x>
 		<y>180</y>
-		<label/>
 		<tokens>1</tokens>
-		<static>false</static>
 	</place>
 	<place>
 		<id>p3</id>
 		<x>820</x>
 		<y>300</y>
-		<label/>
 		<tokens>0</tokens>
-		<static>false</static>
 	</place>
 	<place>
 		<id>p4</id>
 		<x>660</x>
 		<y>100</y>
-		<label/>
 		<tokens>0</tokens>
-		<static>false</static>
 	</place>
+	<arc>
+		<id>a14</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a15</id>
+		<type>regular</type>
+		<sourceId>t2</sourceId>
+		<destinationId>p4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a16</id>
+		<type>read</type>
+		<sourceId>p4</sourceId>
+		<destinationId>t3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
 	<arc>
 		<id>a2</id>
 		<type>regular</type>
@@ -777,25 +597,4 @@
 		<destinationId>p2</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
-	<arc>
-		<id>a14</id>
-		<type>regular</type>
-		<sourceId>p2</sourceId>
-		<destinationId>t2</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>a15</id>
-		<type>regular</type>
-		<sourceId>t2</sourceId>
-		<destinationId>p4</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>a16</id>
-		<type>read</type>
-		<sourceId>p4</sourceId>
-		<destinationId>t3</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-</document>
+</process>

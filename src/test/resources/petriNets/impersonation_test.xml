@@ -1,12 +1,14 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
 	<id>impersonation_test</id>
 	<version>1.0.0</version>
-	<initials>IMP</initials>
 	<title>impersonation_test</title>
 	<icon>home</icon>
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
-	<transitionRole>false</transitionRole>
+	<properties>
+		<property key="initials">IMP</property>
+	</properties>
 	<roleRef>
 		<id>test_role</id>
 		<caseLogic>
@@ -14,6 +16,8 @@
 			<delete>true</delete>
 		</caseLogic>
 	</roleRef>
+	<processEvents/>
+	<caseEvents/>
 	<role>
 		<id>test_role</id>
 		<title>TEST</title>
@@ -22,12 +26,12 @@
 		<id>test_role_2</id>
 		<title>TEST 2</title>
 	</role>
-	<data type="text">
-		<id>text_0</id>
-		<title/>
-	</data>
 	<data type="file">
 		<id>file_0</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>text_0</id>
 		<title/>
 	</data>
 	<data type="userList" immediate="true">
@@ -38,64 +42,48 @@
 		<id>t1</id>
 		<x>580</x>
 		<y>140</y>
-		<label/>
+		<title/>
+		<flex>
+			<id>t1_flex</id>
+			<item>
+				<dataRef>
+					<id>text_0</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>file_0</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+		</flex>
 		<roleRef>
 			<id>test_role</id>
 			<logic>
 				<perform>true</perform>
 			</logic>
 		</roleRef>
-		<dataGroup>
-			<id>t1_0</id>
-			<cols>4</cols>
-			<layout>grid</layout>
-			<dataRef>
-				<id>text_0</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>file_0</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-		<event type="assign">
-			<id>t1_assign</id>
-		</event>
-		<event type="finish">
-			<id>t1_finish</id>
-		</event>
-		<event type="cancel">
-			<id>t1_cancel</id>
-		</event>
-		<event type="delegate">
-			<id>t1_delegate</id>
-		</event>
 	</transition>
 	<transition>
 		<id>t2</id>
 		<x>820</x>
 		<y>140</y>
-		<label/>
+		<title/>
 		<roleRef>
 			<id>test_role_2</id>
 			<logic>
@@ -107,12 +95,12 @@
 		<id>t3</id>
 		<x>580</x>
 		<y>300</y>
-		<label/>
-		<userRef>
+		<title/>
+		<roleRef>
 			<id>user_list</id>
 			<logic>
 				<perform>true</perform>
 			</logic>
-		</userRef>
+		</roleRef>
 	</transition>
-</document>
+</process>

@@ -99,8 +99,9 @@ public class Case implements Serializable {
                 .filter(role -> role.getValue().containsKey(CasePermission.DELETE) || role.getValue().containsKey(CasePermission.VIEW))
                 .map(role -> {
                     Map<CasePermission, Boolean> permissionMap = new HashMap<>();
-                    if (role.getValue().containsKey(CasePermission.DELETE))
+                    if (role.getValue().containsKey(CasePermission.DELETE)) {
                         permissionMap.put(CasePermission.DELETE, role.getValue().get(CasePermission.DELETE));
+                    }
                     if (role.getValue().containsKey(CasePermission.VIEW)) {
                         permissionMap.put(CasePermission.VIEW, role.getValue().get(CasePermission.VIEW));
                     }

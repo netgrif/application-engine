@@ -1,38 +1,43 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-    <id>arc_order_test.xml</id>
-    <initials>TST</initials>
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>arc_order_test</id>
+    <version>1.0.0</version>
     <title>Test</title>
-    <!-- TRANSITIONS -->
-    <transition>
-        <id>1</id>
+    <defaultRole>false</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TST</property>
+    </properties>
+    <processEvents/>
+    <caseEvents/>
+    <role scope="">
+        <id></id>
+        <title></title>
+    </role>
+    <transition scope="process">
+        <id>t1</id>
         <x>0</x>
         <y>0</y>
-        <label>1</label>
+        <title>t1</title>
     </transition>
-    <!-- PLACES -->
     <place>
-        <id>2</id>
+        <id>p2</id>
         <x>0</x>
         <y>0</y>
-        <label/>
         <tokens>5</tokens>
-        <static>false</static>
     </place>
-    <!-- ARCS -->
     <arc>
-        <id>7</id>
-        <type>reset</type>
-        <sourceId>2</sourceId>
-        <destinationId>1</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>3</id>
+        <id>a3</id>
         <type>regular</type>
-        <sourceId>2</sourceId>
-        <destinationId>1</destinationId>
+        <sourceId>p2</sourceId>
+        <destinationId>t1</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
-</document>
+    <arc>
+        <id>a7</id>
+        <type>reset</type>
+        <sourceId>p2</sourceId>
+        <destinationId>t1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</process>

@@ -21,7 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class ArcOrderTest {
 
     public static final String NET_FILE = "arc_order_test.xml"
-    public static final String NET_TASK = "1"
+    public static final String NET_TASK = "t1"
 
     @Autowired
     private Importer importer
@@ -42,7 +42,6 @@ class ArcOrderTest {
         return ArcOrderTest.getClassLoader().getResourceAsStream(name)
     }
 
-
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
@@ -52,13 +51,12 @@ class ArcOrderTest {
     void testOrder() {
         def net = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
 
-        def arcs = net.getArcsOfTransition(NET_TASK)
+        def arcs = net.getInputArcsOf(NET_TASK)
         def sorted = arcs.sort { a1, a2 -> ArcOrderComparator.getInstance().compare(a1, a2) }
         assert sorted.last() instanceof ResetArc
 
         def instance = helper.createCase("Arc Case", net)
         helper.assignTaskToSuper(NET_TASK, instance.stringId)
-
         assert true
     }
 }
