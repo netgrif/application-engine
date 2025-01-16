@@ -10,10 +10,6 @@
     </properties>
     <processEvents/>
     <caseEvents/>
-    <role scope="">
-        <id></id>
-        <title></title>
-    </role>
     <transition scope="process">
         <id>t1</id>
         <x>0</x>
