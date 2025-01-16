@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.ScopedCase;
 import com.netgrif.application.engine.workflow.domain.repositories.ScopedCaseRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IScopedCaseService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ public class ScopedCaseService implements IScopedCaseService {
      * todo javadoc
      * */
     @Override
-    public void save(Case scopedCase) {
+    public void save(ScopedCase scopedCase) {
         repository.save(scopedCase);
     }
 
@@ -26,7 +27,7 @@ public class ScopedCaseService implements IScopedCaseService {
      * todo javadoc
      * */
     @Override
-    public void saveAll(Iterable<Case> scopedCases) {
+    public void saveAll(Iterable<ScopedCase> scopedCases) {
        repository.saveAll(scopedCases);
     }
 }

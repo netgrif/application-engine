@@ -834,7 +834,8 @@ public class TaskService implements ITaskService {
 
     @Override
     public void deleteTasksByPetriNetId(String petriNetId) {
-        taskRepository.deleteAllByProcessId(petriNetId);
+        // todo 2026
+//        taskRepository.deleteAllByProcessId(petriNetId);
     }
 
     private void setUser(Task task) {

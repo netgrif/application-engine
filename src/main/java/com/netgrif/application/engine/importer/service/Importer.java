@@ -266,6 +266,9 @@ public class Importer {
                 }
             }
             templateCase.setTitle(caseTitle);
+        } else {
+            // todo 2026 preklady
+            templateCase.setTitle(new I18nString(importedProcess.getTitle().getValue()));
         }
         createProperties(importedProcess.getProperties(), templateCase.getProperties());
 
@@ -385,11 +388,15 @@ public class Importer {
     }
 
     protected boolean isInputArc(com.netgrif.application.engine.importer.model.Arc importArc) {
-        return result.getTemplateCase().getPlace(importArc.getSourceId()) != null;
+        return result.getTemplateCase().getPlace(importArc.getSourceId()) != null
+                || result.getProcessScopedCase().getPlace(importArc.getSourceId()) != null;
     }
 
     protected Place getPlace(String id) {
         Place place = result.getTemplateCase().getPlace(id);
+        if (place == null) {
+            place = result.getProcessScopedCase().getPlace(id);
+        }
         if (place == null) {
             throw new IllegalArgumentException("Place with id [" + id + "] not found.");
         }
@@ -398,6 +405,9 @@ public class Importer {
 
     protected Transition getTransition(String id) {
         Transition transition = result.getTemplateCase().getTransition(id);
+        if (transition == null) {
+            transition = result.getProcessScopedCase().getTransition(id);
+        }
         if (transition == null) {
             throw new IllegalArgumentException("Transition with id [" + id + "] not found.");
         }
@@ -819,7 +829,7 @@ public class Importer {
 
     protected com.netgrif.application.engine.workflow.domain.DataRef resolveDataRef(com.netgrif.application.engine.importer.model.DataRef importedDataRef, Transition transition) {
         String fieldId = importedDataRef.getId();
-        Field<?> field = result.getTemplateCase().getField(fieldId).get();
+        Field<?> field = result.getTemplateCase().getField(fieldId).orElseGet(() -> result.getProcessScopedCase().getField(fieldId).get());
         com.netgrif.application.engine.workflow.domain.DataRef dataRef = new com.netgrif.application.engine.workflow.domain.DataRef(field);
         if (!transition.getDataSet().containsKey(fieldId)) {
             transition.getDataSet().put(fieldId, dataRef);

@@ -207,6 +207,13 @@ public class Case implements Serializable {
     /**
      * todo javadoc
      * */
+    public Map<String, Place> getPlaces() {
+        return workflow.getPlaces();
+    }
+
+    /**
+     * todo javadoc
+     * */
     public Map<String, Integer> getActivePlaces() {
         return workflow.getActivePlaces();
     }

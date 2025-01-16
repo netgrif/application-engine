@@ -66,30 +66,31 @@ class RuleEvaluationScheduleServiceTest {
     @Test
     @Disabled
     void testScheduledRule() throws IOException, MissingProcessMetaDataException, RuleEvaluationScheduleException, InterruptedException, MissingIconKeyException {
-        LoggedUser user = superCreator.getLoggedSuper();
-        ImportProcessEventOutcome importOutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, user);
-
-        StoredRule rule = StoredRule.builder()
-                .when("$case: Case() $event: ScheduledRuleFact(instanceId == $case.stringId, ruleIdentifier == \"rule2\")")
-                .then("log.info(\"matched rule\"); \n $case.dataSet.get(\"number_data\").value.value += " + 1.0 + "; \n workflowService.save($case);")
-                .identifier("rule2")
-                .lastUpdate(LocalDateTime.now())
-                .enabled(true)
-                .build();
-        ruleRepository.save(rule);
-
-        CreateCaseEventOutcome caseOutcome = workflowService.createCase(importOutcome.getNet().getStringId(), "Original title", "original color", user);
-        ScheduleOutcome outcome = ruleEvaluationScheduleService.scheduleRuleEvaluationForCase(caseOutcome.getCase(), "rule2", TriggerBuilder.newTrigger().withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1).withRepeatCount(5)));
-
-        assert outcome.getJobDetail() != null;
-        assert outcome.getTrigger() != null;
-
-        Thread.sleep(10000);
-        String id = caseOutcome.getCase().getStringId();
-        assert id != null;
-        Case caze = workflowService.findOne(id);
-        assert caze != null;
-        assert caze.getDataSet().get("number_data").getValue().getValue().equals(5561.0);
+        // todo 2026
+//        LoggedUser user = superCreator.getLoggedSuper();
+//        ImportProcessEventOutcome importOutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, user);
+//
+//        StoredRule rule = StoredRule.builder()
+//                .when("$case: Case() $event: ScheduledRuleFact(instanceId == $case.stringId, ruleIdentifier == \"rule2\")")
+//                .then("log.info(\"matched rule\"); \n $case.dataSet.get(\"number_data\").value.value += " + 1.0 + "; \n workflowService.save($case);")
+//                .identifier("rule2")
+//                .lastUpdate(LocalDateTime.now())
+//                .enabled(true)
+//                .build();
+//        ruleRepository.save(rule);
+//
+//        CreateCaseEventOutcome caseOutcome = workflowService.createCase(importOutcome.getNet().getStringId(), "Original title", "original color", user);
+//        ScheduleOutcome outcome = ruleEvaluationScheduleService.scheduleRuleEvaluationForCase(caseOutcome.getCase(), "rule2", TriggerBuilder.newTrigger().withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1).withRepeatCount(5)));
+//
+//        assert outcome.getJobDetail() != null;
+//        assert outcome.getTrigger() != null;
+//
+//        Thread.sleep(10000);
+//        String id = caseOutcome.getCase().getStringId();
+//        assert id != null;
+//        Case caze = workflowService.findOne(id);
+//        assert caze != null;
+//        assert caze.getDataSet().get("number_data").getValue().getValue().equals(5561.0);
     }
 
     @AfterEach

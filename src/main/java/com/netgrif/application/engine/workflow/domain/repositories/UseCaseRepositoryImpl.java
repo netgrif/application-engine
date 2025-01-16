@@ -28,31 +28,31 @@ public abstract class UseCaseRepositoryImpl implements UseCaseRepository {
 
     @Override
     public void customize(QuerydslBindings bindings, QCase qCase) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        List<PetriNetReference> nets = petriNetService.getReferencesByUsersProcessRoles(((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated(), null);
-        Set<String> netIds = nets.stream().map(Reference::getStringId).collect(Collectors.toSet());
-        Set<String> netIdentifiers = nets.stream().map(PetriNetReference::getIdentifier).collect(Collectors.toSet());
-
-        bindings.bind(qCase.petriNetId).first((stringPath, s) -> {
-            if (!netIds.contains(s))
-                return Expressions.asBoolean(false);
-            return stringPath.equalsIgnoreCase(s);
-        });
-        bindings.bind(qCase.processIdentifier).first((path, string) -> {
-            if (!netIdentifiers.contains(string))
-                return Expressions.asBoolean(false);
-            return path.equalsIgnoreCase(string);
-        });
-        bindings.bind(String.class).first((SingleValueBinding<StringPath, String>) StringExpression::equalsIgnoreCase);
-//        bindings.bind(qCase.dataSet).first((path, map) ->
-//                map.entrySet().stream()
-//                        .map(o -> {
-//                            QDataField field = qCase.dataSet.get(o.getKey());
-//                            if (field == null || o.getValue() == null || o.getValue().getValue() == null)
-//                                return Expressions.asBoolean(false);
-//                            return field.value.eq(o.getValue().getValue().toString());
-//                        })
-//                        .reduce(BooleanExpression::and).get());
-        bindings.bind(qCase.title).first(StringExpression::likeIgnoreCase);
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        List<PetriNetReference> nets = petriNetService.getReferencesByUsersProcessRoles(((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated(), null);
+//        Set<String> netIds = nets.stream().map(Reference::getStringId).collect(Collectors.toSet());
+//        Set<String> netIdentifiers = nets.stream().map(PetriNetReference::getIdentifier).collect(Collectors.toSet());
+//
+//        bindings.bind(qCase.petriNetId).first((stringPath, s) -> {
+//            if (!netIds.contains(s))
+//                return Expressions.asBoolean(false);
+//            return stringPath.equalsIgnoreCase(s);
+//        });
+//        bindings.bind(qCase.processIdentifier).first((path, string) -> {
+//            if (!netIdentifiers.contains(string))
+//                return Expressions.asBoolean(false);
+//            return path.equalsIgnoreCase(string);
+//        });
+//        bindings.bind(String.class).first((SingleValueBinding<StringPath, String>) StringExpression::equalsIgnoreCase);
+////        bindings.bind(qCase.dataSet).first((path, map) ->
+////                map.entrySet().stream()
+////                        .map(o -> {
+////                            QDataField field = qCase.dataSet.get(o.getKey());
+////                            if (field == null || o.getValue() == null || o.getValue().getValue() == null)
+////                                return Expressions.asBoolean(false);
+////                            return field.value.eq(o.getValue().getValue().toString());
+////                        })
+////                        .reduce(BooleanExpression::and).get());
+//        bindings.bind(qCase.title).first(StringExpression::likeIgnoreCase);
     }
 }

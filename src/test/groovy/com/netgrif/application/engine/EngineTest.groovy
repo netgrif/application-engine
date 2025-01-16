@@ -1,12 +1,14 @@
 package com.netgrif.application.engine
 
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.importer.service.interfaces.IProcessImportService
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.workflow.domain.repositories.TemplateCaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.UseCaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -37,7 +39,7 @@ abstract class EngineTest {
     @Autowired
     public IWorkflowService workflowService
     @Autowired
-    public IPetriNetService petriNetService
+    public IProcessImportService processImportService
     @Autowired
     public IDataService dataService
     @Autowired
@@ -45,7 +47,7 @@ abstract class EngineTest {
 
     // REPOSITORY
     @Autowired
-    public PetriNetRepository processRepository
+    public TemplateCaseRepository templateCaseRepository
     @Autowired
     public UseCaseRepository caseRepository
 

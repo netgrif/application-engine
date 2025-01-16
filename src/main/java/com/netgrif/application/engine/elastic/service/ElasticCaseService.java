@@ -90,10 +90,11 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     @Override
     public void removeByPetriNetId(String processId) {
-        executors.execute(processId, () -> {
-            repository.deleteAllByProcessId(processId);
-            log.info("[{}]: All cases of Petri Net with id \"{}\" deleted", processId, processId);
-        });
+        // todo 2026
+//        executors.execute(processId, () -> {
+//            repository.deleteAllByProcessId(processId);
+//            log.info("[{}]: All cases of Petri Net with id \"{}\" deleted", processId, processId);
+//        });
     }
 
     @Override

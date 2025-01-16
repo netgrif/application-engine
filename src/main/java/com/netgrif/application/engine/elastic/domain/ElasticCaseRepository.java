@@ -12,5 +12,6 @@ public interface ElasticCaseRepository extends ElasticsearchRepository<ElasticCa
 
     void deleteAllByStringId(String id);
 
-    void deleteAllByProcessId(String processId);
+    // todo 2026
+//    void deleteAllByProcessId(String processId);
 }

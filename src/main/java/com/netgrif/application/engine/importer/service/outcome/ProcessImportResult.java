@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.importer.service.outcome;
 
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.Scope;
+import com.netgrif.application.engine.workflow.domain.*;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -12,16 +11,16 @@ import java.util.List;
 public class ProcessImportResult {
     public static ProcessImportResult EMPTY = new ProcessImportResult();
 
-    private Case templateCase;
-    private Case processScopedCase;
+    private TemplateCase templateCase;
+    private ScopedCase processScopedCase;
 
     private List<String> errors;
     private List<String> warnings;
     private List<String> infos;
 
     public ProcessImportResult() {
-        templateCase = new Case(Scope.USECASE);
-        processScopedCase = new Case(Scope.PROCESS);
+        templateCase = new TemplateCase(Scope.USECASE);
+        processScopedCase = new ScopedCase(Scope.PROCESS);
         errors = new ArrayList<>();
         warnings = new ArrayList<>();
         infos = new ArrayList<>();

@@ -16,7 +16,8 @@ public interface ElasticTaskRepository extends ElasticsearchRepository<ElasticTa
 
     ElasticTask deleteAllByTaskId(String taskId);
 
-    void deleteAllByProcessId(String processId);
+    // todo 2026
+//    void deleteAllByProcessId(String processId);
 
-    List<ElasticTask> findAllByProcessId(String processId);
+//    List<ElasticTask> findAllByProcessId(String processId);
 }

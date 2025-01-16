@@ -64,7 +64,8 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     }
 
     void setAllToSuperUser() {
-        setAllGroups()
+        // todo 2026
+//        setAllGroups()
         setAllProcessRoles()
         setAllAuthorities()
         log.info("Super user updated")

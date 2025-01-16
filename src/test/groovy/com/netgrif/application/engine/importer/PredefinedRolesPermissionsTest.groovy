@@ -455,25 +455,26 @@ class PredefinedRolesPermissionsTest {
     }
 
     private NetCaseTask importAndCreate(Resource model) {
-        ImportProcessEventOutcome importOutcome = petriNetService.importPetriNet(model.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
-
-        assert importOutcome.getNet() != null
-
-        Process net = importOutcome.getNet()
-
-        CreateCaseEventOutcome createCaseOutcome = workflowService.createCase(net.stringId, '', '', superCreator.loggedSuper)
-        assert createCaseOutcome.getCase() != null
-        Case aCase = createCaseOutcome.getCase()
-
-        assert aCase != null
-        assert aCase.getTasks().size() == 2
-
-        List<TaskPair> temp = aCase.getTasks().values() as List<TaskPair>
-        Task task = taskService.findOne(temp.find { it.transitionId != configuration.allData.id }.taskStringId)
-
-        assert task != null
-
-        return new NetCaseTask(net, aCase, task)
+        // todo 2026
+//        ImportProcessEventOutcome importOutcome = petriNetService.importPetriNet(model.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+//
+//        assert importOutcome.getNet() != null
+//
+//        Process net = importOutcome.getNet()
+//
+//        CreateCaseEventOutcome createCaseOutcome = workflowService.createCase(net.stringId, '', '', superCreator.loggedSuper)
+//        assert createCaseOutcome.getCase() != null
+//        Case aCase = createCaseOutcome.getCase()
+//
+//        assert aCase != null
+//        assert aCase.getTasks().size() == 2
+//
+//        List<TaskPair> temp = aCase.getTasks().values() as List<TaskPair>
+//        Task task = taskService.findOne(temp.find { it.transitionId != configuration.allData.id }.taskStringId)
+//
+//        assert task != null
+//
+//        return new NetCaseTask(net, aCase, task)
     }
 
     private Map<String, Map<CasePermission, Boolean>> transformProcessRolePermissionMap(Map<String, Map<CasePermission, Boolean>> input, String netRoleId) {

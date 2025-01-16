@@ -147,31 +147,32 @@ public class ElasticTaskQueueManager {
     }
 
     public void removeTasksByProcess(String processId) {
-        List<ElasticTask> tasks = repository.findAllByProcessId(processId);
-        long maxWaitTime = 30;
-        long baseWaitTime = 1;
-
-        tasks.forEach(task -> {
-            ElasticTaskJob job = new ElasticTaskJob(ElasticJob.REMOVE, task);
-            CompletableFuture<ElasticTask> removeJobFuture = CompletableFuture.supplyAsync(() -> processTask(job), elasticTaskExecutor);
-
-            long waitTime = baseWaitTime;
-            while (true) {
-                try {
-                    removeJobFuture.get(waitTime, TimeUnit.SECONDS);
-                    break;
-                } catch (TimeoutException e) {
-                    if (waitTime >= maxWaitTime) {
-                        log.error("Timeout: Task {} did not complete within {} seconds", task.getTaskId(), maxWaitTime);
-                        break;
-                    }
-                    waitTime *= 2;
-                } catch (InterruptedException | ExecutionException e) {
-                    log.error("Exception during task execution: {}", e.getMessage(), e);
-                    break;
-                }
-            }
-        });
+        // todo 2026
+//        List<ElasticTask> tasks = repository.findAllByProcessId(processId);
+//        long maxWaitTime = 30;
+//        long baseWaitTime = 1;
+//
+//        tasks.forEach(task -> {
+//            ElasticTaskJob job = new ElasticTaskJob(ElasticJob.REMOVE, task);
+//            CompletableFuture<ElasticTask> removeJobFuture = CompletableFuture.supplyAsync(() -> processTask(job), elasticTaskExecutor);
+//
+//            long waitTime = baseWaitTime;
+//            while (true) {
+//                try {
+//                    removeJobFuture.get(waitTime, TimeUnit.SECONDS);
+//                    break;
+//                } catch (TimeoutException e) {
+//                    if (waitTime >= maxWaitTime) {
+//                        log.error("Timeout: Task {} did not complete within {} seconds", task.getTaskId(), maxWaitTime);
+//                        break;
+//                    }
+//                    waitTime *= 2;
+//                } catch (InterruptedException | ExecutionException e) {
+//                    log.error("Exception during task execution: {}", e.getMessage(), e);
+//                    break;
+//                }
+//            }
+//        });
     }
 
 }

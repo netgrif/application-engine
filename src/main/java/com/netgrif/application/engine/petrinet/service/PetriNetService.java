@@ -213,38 +213,38 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public ImportProcessEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author, String uriNodeId, Map<String, String> params) throws IOException, MissingProcessMetaDataException, MissingIconKeyException {
         ImportProcessEventOutcome outcome = new ImportProcessEventOutcome();
-        ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
-        IOUtils.copy(xmlFile, xmlCopy);
-        Optional<Process> imported = getImporter().importPetriNet(new ByteArrayInputStream(xmlCopy.toByteArray()));
-        if (imported.isEmpty()) {
-            return outcome;
-        }
-        Process net = imported.get();
-        net.setUriNodeId(uriNodeId);
-
-        // TODO: release/8.0.0 fix cacheable
-        Process existingNet = getNewestVersionByIdentifier(net.getIdentifier());
-        if (existingNet != null) {
-            net.setVersion(existingNet.getVersion());
-            net.incrementVersion(releaseType);
-        }
-        processRoleService.saveAll(net.getRoles().values());
-        net.setAuthorId(author.getId());
-        functionCacheService.cachePetriNetFunctions(net);
-        // TODO: release/8.0.0
-//        Path savedPath = getImporter().saveNetFile(net, new ByteArrayInputStream(xmlCopy.toByteArray()));
-        xmlCopy.close();
-//        log.info("Petri net {} (v{}) imported successfully and saved in a folder: {}", net.getTitle(), net.getVersion(), savedPath.toString());
-
-        outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params));
-        evaluateRules(net, EventPhase.PRE);
-        historyService.save(new ImportProcessEventLog(null, EventPhase.PRE, net.getObjectId()));
-        save(net);
-        outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), params));
-        evaluateRules(net, EventPhase.POST);
-        historyService.save(new ImportProcessEventLog(null, EventPhase.POST, net.getObjectId()));
-        addMessageToOutcome(net, ProcessEventType.UPLOAD, outcome);
-        outcome.setNet(imported.get());
+//        ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
+//        IOUtils.copy(xmlFile, xmlCopy);
+//        Optional<Process> imported = getImporter().importPetriNet(new ByteArrayInputStream(xmlCopy.toByteArray()));
+//        if (imported.isEmpty()) {
+//            return outcome;
+//        }
+//        Process net = imported.get();
+//        net.setUriNodeId(uriNodeId);
+//
+//        // TODO: release/8.0.0 fix cacheable
+//        Process existingNet = getNewestVersionByIdentifier(net.getIdentifier());
+//        if (existingNet != null) {
+//            net.setVersion(existingNet.getVersion());
+//            net.incrementVersion(releaseType);
+//        }
+//        processRoleService.saveAll(net.getRoles().values());
+//        net.setAuthorId(author.getId());
+//        functionCacheService.cachePetriNetFunctions(net);
+//        // TODO: release/8.0.0
+////        Path savedPath = getImporter().saveNetFile(net, new ByteArrayInputStream(xmlCopy.toByteArray()));
+//        xmlCopy.close();
+////        log.info("Petri net {} (v{}) imported successfully and saved in a folder: {}", net.getTitle(), net.getVersion(), savedPath.toString());
+//
+//        outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params));
+//        evaluateRules(net, EventPhase.PRE);
+//        historyService.save(new ImportProcessEventLog(null, EventPhase.PRE, net.getObjectId()));
+//        save(net);
+//        outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), params));
+//        evaluateRules(net, EventPhase.POST);
+//        historyService.save(new ImportProcessEventLog(null, EventPhase.POST, net.getObjectId()));
+//        addMessageToOutcome(net, ProcessEventType.UPLOAD, outcome);
+//        outcome.setNet(imported.get());
         return outcome;
     }
 
@@ -256,10 +256,10 @@ public class PetriNetService implements IPetriNetService {
     }
 
     protected void evaluateRules(Process net, EventPhase phase) {
-        int rulesExecuted = ruleEngine.evaluateRules(net, new ProcessImportedFact(net.getStringId(), phase));
-        if (rulesExecuted > 0) {
-            save(net);
-        }
+//        int rulesExecuted = ruleEngine.evaluateRules(net, new ProcessImportedFact(net.getStringId(), phase));
+//        if (rulesExecuted > 0) {
+//            save(net);
+//        }
     }
 
     @Override
@@ -354,19 +354,20 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public PetriNetImportReference getNetFromCase(String caseId) {
-        Case useCase = workflowService.findOne(caseId);
-        PetriNetImportReference pn = new PetriNetImportReference();
-        useCase.getProcess().getTransitions().forEach((key, value) -> pn.getTransitions().add(new TransitionImportReference(value)));
-        useCase.getProcess().getPlaces().forEach((key, value) -> pn.getPlaces().add(new PlaceImportReference(value)));
-        // TODO: release/8.0.0 needed?
-//        useCase.getProcess().getArcs().forEach((key, arcs) -> {
-//            arcs.forEach(arc -> pn.getArcs().add(new ArcImportReference(arc)));
-//        });
-        pn.getAssignedTasks().addAll(historyService.findAllAssignTaskEventLogsByCaseId(caseId)
-                .stream().map(TaskEventLog::getTransitionId).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
-        pn.getFinishedTasks().addAll(historyService.findAllFinishTaskEventLogsByCaseId(caseId)
-                .stream().map(TaskEventLog::getTransitionId).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
-        return pn;
+//        Case useCase = workflowService.findOne(caseId);
+//        PetriNetImportReference pn = new PetriNetImportReference();
+//        useCase.getProcess().getTransitions().forEach((key, value) -> pn.getTransitions().add(new TransitionImportReference(value)));
+//        useCase.getProcess().getPlaces().forEach((key, value) -> pn.getPlaces().add(new PlaceImportReference(value)));
+//        // TODO: release/8.0.0 needed?
+////        useCase.getProcess().getArcs().forEach((key, arcs) -> {
+////            arcs.forEach(arc -> pn.getArcs().add(new ArcImportReference(arc)));
+////        });
+//        pn.getAssignedTasks().addAll(historyService.findAllAssignTaskEventLogsByCaseId(caseId)
+//                .stream().map(TaskEventLog::getTransitionId).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
+//        pn.getFinishedTasks().addAll(historyService.findAllFinishTaskEventLogsByCaseId(caseId)
+//                .stream().map(TaskEventLog::getTransitionId).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
+//        return pn;
+        return null;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.TemplateCase;
 import com.netgrif.application.engine.workflow.domain.repositories.TemplateCaseRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.ITemplateCaseService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class TemplateCaseService implements ITemplateCaseService {
      * */
     @Override
     public Case findLatestTemplateCase(String processIdentifier) {
-        Optional<Case> templateCaseOpt = repository.findByProcessIdentifier(processIdentifier, PageRequest.of(0, 1,
+        Optional<TemplateCase> templateCaseOpt = repository.findByProcessIdentifier(processIdentifier, PageRequest.of(0, 1,
                         Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).stream()
                 .findFirst();
         return templateCaseOpt.orElseThrow(() -> new IllegalArgumentException(
@@ -35,7 +36,7 @@ public class TemplateCaseService implements ITemplateCaseService {
      * */
     @Override
     public Case findOne(String templateCaseId) {
-        Optional<Case> caseOptional = repository.findById(templateCaseId);
+        Optional<TemplateCase> caseOptional = repository.findById(templateCaseId);
         if (caseOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find Case with id [" + templateCaseId + "]");
         }
@@ -47,7 +48,7 @@ public class TemplateCaseService implements ITemplateCaseService {
      * todo javadoc
      * */
     @Override
-    public void save(Case templateCase) {
+    public void save(TemplateCase templateCase) {
         repository.save(templateCase);
     }
 
@@ -55,7 +56,7 @@ public class TemplateCaseService implements ITemplateCaseService {
      * todo javadoc
      * */
     @Override
-    public void saveAll(Iterable<Case> templateCases) {
+    public void saveAll(Iterable<TemplateCase> templateCases) {
         repository.saveAll(templateCases);
     }
 }

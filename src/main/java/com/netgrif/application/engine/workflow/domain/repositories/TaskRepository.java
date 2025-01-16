@@ -26,7 +26,8 @@ public interface TaskRepository extends MongoRepository<Task, String>, QuerydslP
 
     List<Task> findAllByIdIn(Iterable<String> id);
 
-    void deleteAllByProcessId(String processId);
+    // todo 2026
+//    void deleteAllByProcessId(String processId);
 
     @Override
     default void customize(QuerydslBindings bindings, QTask qTask) {

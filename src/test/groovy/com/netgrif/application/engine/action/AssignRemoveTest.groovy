@@ -65,18 +65,19 @@ class AssignRemoveTest {
     @Test
     @Disabled("Create functions or update test")
     void testAssignAndRemoveRole() throws MissingProcessMetaDataException, IOException {
-        ImportProcessEventOutcome netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/role_assign_remove_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-
-        assert netOptional.getNet() != null
-        def net = netOptional.getNet()
-        def roleCount = userService.system.processRoles.size()
-
-        // create
-        Case caze = workflowService.createCase(net.stringId, 'TEST', '', userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
-        assert userService.system.processRoles.size() == roleCount + 4
-
-        // delete
-        workflowService.deleteCase(caze.stringId)
-        assert userService.system.processRoles.size() == roleCount
+        // todo 2026
+//        ImportProcessEventOutcome netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/role_assign_remove_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+//
+//        assert netOptional.getNet() != null
+//        def net = netOptional.getNet()
+//        def roleCount = userService.system.processRoles.size()
+//
+//        // create
+//        Case caze = workflowService.createCase(net.stringId, 'TEST', '', userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+//        assert userService.system.processRoles.size() == roleCount + 4
+//
+//        // delete
+//        workflowService.deleteCase(caze.stringId)
+//        assert userService.system.processRoles.size() == roleCount
     }
 }

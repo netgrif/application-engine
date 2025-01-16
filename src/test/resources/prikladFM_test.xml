@@ -104,6 +104,10 @@
             <option key="C">C</option>
         </options>
     </data>
+    <data type="text" scope="process">
+        <id>data30</id>
+        <title>Text field</title>
+    </data>
     <data type="text">
         <id>data3</id>
         <title>Lokalizácia</title>
@@ -868,6 +872,23 @@
             </logic>
         </roleRef>
     </transition>
+    <transition scope="process">
+        <id>t243</id>
+        <x>656</x>
+        <y>528</y>
+        <title/>
+        <flex>
+            <id>t243_flex</id>
+            <item>
+                <dataRef>
+                    <id>data30</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+            </item>
+        </flex>
+    </transition>
     <place>
         <id>p0</id>
         <x>100</x>
@@ -985,6 +1006,12 @@
         <x>260</x>
         <y>180</y>
         <title>B</title>
+        <tokens>0</tokens>
+    </place>
+    <place scope="process">
+        <id>p241</id>
+        <x>560</x>
+        <y>528</y>
         <tokens>0</tokens>
     </place>
     <arc>
@@ -1315,6 +1342,13 @@
         <type>regular</type>
         <sourceId>t1</sourceId>
         <destinationId>p8</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc scope="process">
+        <id>a246</id>
+        <type>regular</type>
+        <sourceId>p241</sourceId>
+        <destinationId>t243</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </process>

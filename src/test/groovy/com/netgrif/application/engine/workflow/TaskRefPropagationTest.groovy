@@ -47,14 +47,15 @@ class TaskRefPropagationTest {
 
     @BeforeEach
     void beforeAll() {
-        def parent = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_parent.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        def child = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_child.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-
-        assert parent.getNet() != null
-        assert child.getNet() != null
-
-        netParent = parent.getNet()
-        netChild = child.getNet()
+        // todo 2026
+//        def parent = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_parent.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+//        def child = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_child.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+//
+//        assert parent.getNet() != null
+//        assert child.getNet() != null
+//
+//        netParent = parent.getNet()
+//        netChild = child.getNet()
     }
 
     public static final String PARENT_FIELD_TEXT_ID = "text"

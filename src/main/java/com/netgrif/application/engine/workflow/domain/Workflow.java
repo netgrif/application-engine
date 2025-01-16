@@ -24,8 +24,9 @@ public class Workflow {
 
     public Workflow() {
         places = new UniqueKeyMap<>();
+        arcs = new UniqueKeyMap<>();
+        transitions = new UniqueKeyMap<>();
         activePlaces = new HashMap<>();
         consumedTokens = new HashMap<>();
-        arcs = new UniqueKeyMap<>();
     }
 }

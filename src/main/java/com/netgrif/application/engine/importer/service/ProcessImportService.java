@@ -10,6 +10,7 @@ import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyE
 import com.netgrif.application.engine.rules.domain.facts.ProcessImportedFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.TemplateCase;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.throwable.MissingProcessMetaDataException;
@@ -146,7 +147,7 @@ public class ProcessImportService implements IProcessImportService {
         }
     }
 
-    private void evaluateRules(Case templateCase, EventPhase phase) {
+    private void evaluateRules(TemplateCase templateCase, EventPhase phase) {
         int rulesExecuted = ruleEngine.evaluateRules(templateCase, new ProcessImportedFact(templateCase.getStringId(), phase));
         if (rulesExecuted > 0) {
             templateCaseService.save(templateCase);
