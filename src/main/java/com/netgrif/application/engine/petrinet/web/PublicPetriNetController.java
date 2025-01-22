@@ -77,11 +77,12 @@ public class PublicPetriNetController {
         return resources;
     }
 
+    // TODO: release/8.0.0 deprecated
     @Operation(summary = "Get roles of process")
     @GetMapping(value = "/{netId}/roles", produces = MediaTypes.HAL_JSON_VALUE)
     public ProcessRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
         netId = decodeUrl(netId);
-        return new ProcessRolesResource(roleService.findAll(netId), petriNetService.getPetriNet(netId).getPermissions(), netId, locale);
+        return new ProcessRolesResource(roleService.findAll(netId), petriNetService.getPetriNet(netId).getPermissions(), locale);
     }
 
     @Operation(summary = "Get data fields of transitions")

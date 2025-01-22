@@ -228,19 +228,20 @@ public class MenuImportExportService implements IMenuImportExportService {
                         resultMessage.append("\n- Missing net with import ID: \"").append(netImportId).append("\"").append("for role ").append(roleImportId).append("\n");
                         netCheck.set(false);
                     } else {
-                        Optional<ProcessRole> role = net.getRoles().values().stream().filter(r -> r.getImportId().equals(roleImportId))
-                                .findFirst();
-                        if (role.isPresent()) {
-                            //TODO: extend funcionality - add translations to nets and roles
-                            if (menuEntryRole.getAuthorizationType().equals(AuthorizationType.allowed)) {
-                                allowedRoles.put(roleImportId + ":" + netImportId, new I18nString(role.get().getName() + "(" + net.getTitle() + ")"));
-                            } else {
-                                bannedRoles.put(roleImportId + ":" + netImportId, new I18nString(role.get().getName() + "(" + net.getTitle() + ")"));
-                            }
-                        } else {
-                            resultMessage.append("\n- Role with import ID \"").append(roleImportId).append("\" ").append("does not exist in the latest present version of net \"").append(netImportId).append("\"\n");
-                            netCheck.set(false);
-                        }
+                        // TODO: release/8.0.0 fix
+//                        Optional<ProcessRole> role = net.getRoles().values().stream().filter(r -> r.getImportId().equals(roleImportId))
+//                                .findFirst();
+//                        if (role.isPresent()) {
+//                            TODO: extend funcionality - add translations to nets and roles
+//                            if (menuEntryRole.getAuthorizationType().equals(AuthorizationType.allowed)) {
+//                                allowedRoles.put(roleImportId + ":" + netImportId, new I18nString(role.get().getName() + "(" + net.getTitle() + ")"));
+//                            } else {
+//                                bannedRoles.put(roleImportId + ":" + netImportId, new I18nString(role.get().getName() + "(" + net.getTitle() + ")"));
+//                            }
+//                        } else {
+//                            resultMessage.append("\n- Role with import ID \"").append(roleImportId).append("\" ").append("does not exist in the latest present version of net \"").append(netImportId).append("\"\n");
+//                            netCheck.set(false);
+//                        }
                     }
                 }
             });

@@ -179,7 +179,9 @@ class NetgrifLdapAuthenticationProviderTest {
     void assignRoleGroup() throws Exception {
         Process net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/role_all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet();
         assert net != null;
-        Map<String, ProcessRole> roles = net.getRoles();
+        // TODO: release/8.0.0 fix
+//        Map<String, ProcessRole> roles = net.getRoles();
+        Map<String, ProcessRole> roles = null;
         assert roles != null;
 
         List<LdapGroupRef> ldapGroupsTest = ldapGroupRefService.searchGroups("test1");
@@ -215,7 +217,9 @@ class NetgrifLdapAuthenticationProviderTest {
 
         Process net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/role_all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet();
         assert net != null;
-        Map<String, ProcessRole> roles = net.getRoles();
+        // TODO: release/8.0.0 fix
+//        Map<String, ProcessRole> roles = net.getRoles();
+        Map<String, ProcessRole> roles = null;
         assert roles != null;
 
         List<LdapGroupRef> ldapGroupsTest = ldapGroupRefService.searchGroups("test1");

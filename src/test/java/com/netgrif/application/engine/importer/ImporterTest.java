@@ -81,6 +81,5 @@ public class ImporterTest extends EngineTest {
         assert net.getTransitions().size() == NET_TRANSITIONS;
         assert net.getArcs().size() == NET_ARCS;
         assert net.getDataSet().size() == NET_FIELDS;
-        assert net.getRoles().size() == NET_ROLES;
     }
 }

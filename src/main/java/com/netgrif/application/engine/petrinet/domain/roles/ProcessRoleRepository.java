@@ -11,8 +11,6 @@ import java.util.Set;
 @Repository
 public interface ProcessRoleRepository extends MongoRepository<ProcessRole, String>, QuerydslPredicateExecutor<ProcessRole> {
 
-    Set<ProcessRole> findAllByNetId(String netId);
-
     Set<ProcessRole> findAllByImportIdIn(Set<String> importIds);
 
     Set<ProcessRole> findAllByName_DefaultValue(String name);

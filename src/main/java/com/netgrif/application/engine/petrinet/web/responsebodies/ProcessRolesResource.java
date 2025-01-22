@@ -2,31 +2,21 @@ package com.netgrif.application.engine.petrinet.web.responsebodies;
 
 
 import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
-import com.netgrif.application.engine.petrinet.web.PetriNetController;
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ProcessRolesResource extends EntityModel<ProcessRolesAndPermissions> {
 
-    public ProcessRolesResource(ProcessRolesAndPermissions content, String netId) {
+    public ProcessRolesResource(ProcessRolesAndPermissions content) {
         super(content, new ArrayList<>());
-        buildLinks(netId);
     }
 
-    public ProcessRolesResource(Collection<com.netgrif.application.engine.petrinet.domain.roles.ProcessRole> content, Map<String, Map<CasePermission, Boolean>> permissions, String netId, Locale locale) {
-        this(new ProcessRolesAndPermissions(content.stream().map(role -> new ProcessRole(
-                role.getStringId(), role.getName().getTranslation(locale), role.getDescription()
-        )).collect(Collectors.toList()), permissions), netId);
-    }
-
-    private void buildLinks(String netId) {
-        add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetriNetController.class)
-                .getRoles(netId, null)).withSelfRel());
+    public ProcessRolesResource(List<ProcessRole> content, Map<String, Map<CasePermission, Boolean>> permissions, Locale locale) {
+        this(new ProcessRolesAndPermissions(content, permissions));
     }
 }

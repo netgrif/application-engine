@@ -107,28 +107,6 @@ class ImportHelper {
         return Optional.of(petriNet)
     }
 
-    ProcessRole getProcessRoleByImportId(Process net, String roleId) {
-        ProcessRole role = net.roles.values().find { it -> it.importId == roleId }
-        return role
-    }
-
-    Map<String, ProcessRole> getProcessRolesByImportId(Process net, Map<String, String> importId) {
-        HashMap<String, ProcessRole> roles = new HashMap<>()
-        importId.each { it ->
-            roles.put(it.getKey(), getProcessRoleByImportId(net, it.getValue()))
-        }
-        return roles
-    }
-
-    Map<String, ProcessRole> getProcessRoles(Process net) {
-        List<ProcessRole> roles = processRoleService.findAll(net.stringId)
-        Map<String, ProcessRole> map = [:]
-        net.roles.values().each { netRole ->
-            map[netRole.name.getDefaultValue()] = roles.find { it.roleId == netRole.stringId }
-        }
-        return map
-    }
-
     IUser createUser(User user, Authority[] authorities, ProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
         roles.each { user.addProcessRole(it) }

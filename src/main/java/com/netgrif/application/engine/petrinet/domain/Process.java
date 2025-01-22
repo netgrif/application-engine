@@ -10,7 +10,6 @@ import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
 import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
@@ -18,7 +17,6 @@ import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -41,8 +39,6 @@ public class Process extends ProcessObject {
     private UniqueKeyMap<String, Map<CasePermission, Boolean>> permissions;
     private Map<ProcessEventType, ProcessEvent> processEvents;
     private Map<CaseEventType, CaseEvent> caseEvents;
-    @DBRef
-    private UniqueKeyMap<String, ProcessRole> roles;
     private List<Function> functions;
     private UniqueKeyMap<String, Field<?>> dataSet;
     private UniqueKeyMap<String, Transition> transitions;
@@ -69,7 +65,6 @@ public class Process extends ProcessObject {
         transitions = new UniqueKeyMap<>();
         arcs = new UniqueKeyMap<>();
         dataSet = new UniqueKeyMap<>();
-        roles = new UniqueKeyMap<>();
         processEvents = new HashMap<>();
         caseEvents = new HashMap<>();
         permissions = new UniqueKeyMap<>();
@@ -87,10 +82,6 @@ public class Process extends ProcessObject {
 
     public void addTransition(Transition transition) {
         this.transitions.put(transition.getStringId(), transition);
-    }
-
-    public void addRole(ProcessRole role) {
-        this.roles.put(role.getStringId(), role);
     }
 
     public void addPermission(String actorId, Map<CasePermission, Boolean> permissions) {
@@ -278,10 +269,6 @@ public class Process extends ProcessObject {
         return new LinkedList<>();
     }
 
-    public ProcessRole getRole(String id) {
-        return roles.get(id);
-    }
-
     @Override
     public String getStringId() {
         return id.toString();
@@ -299,7 +286,6 @@ public class Process extends ProcessObject {
         clone.setCreationDate(this.creationDate);
         clone.setVersion(this.version == null ? null : this.version.clone());
         clone.setTransitions(this.transitions == null ? null : this.transitions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, UniqueKeyMap::new)));
-        clone.setRoles(this.roles == null ? null : this.roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (v1, v2) -> v1, UniqueKeyMap::new)));
         clone.setImportXmlPath(this.importXmlPath);
         clone.setImportId(this.importId);
         clone.setDataSet(this.dataSet.entrySet()

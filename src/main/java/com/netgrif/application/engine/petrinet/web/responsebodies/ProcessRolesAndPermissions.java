@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
 import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import lombok.Data;
 
 import java.util.ArrayList;

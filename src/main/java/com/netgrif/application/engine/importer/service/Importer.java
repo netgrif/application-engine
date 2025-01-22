@@ -58,6 +58,8 @@ public class Importer {
     protected com.netgrif.application.engine.importer.model.Process importedProcess;
     @Getter
     protected Process process;
+    @Getter
+    protected ImportResult result;
     protected ProcessRole defaultRole;
     protected ProcessRole anonymousRole;
     protected boolean isDefaultRoleEnabled = false;
@@ -110,9 +112,10 @@ public class Importer {
         this.i18n = new HashMap<>();
         this.missingMetaData = new ArrayList<>();
         this.actions = new LinkedList<>();
+        this.result = new ImportResult();
     }
 
-    public Optional<Process> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
+    public ImportResult importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
             initialize();
             unmarshallXml(xml);
@@ -120,7 +123,7 @@ public class Importer {
         } catch (JAXBException e) {
             log.error("Importing Petri net failed: ", e);
         }
-        return Optional.empty();
+        return new ImportResult();
     }
 
     protected void initialize() {
@@ -135,7 +138,7 @@ public class Importer {
         return importedProcess;
     }
 
-    protected Optional<Process> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
+    protected ImportResult createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
         initializePetriNet();
 
         importedProcess.getI18N().forEach(this::addI18N);
@@ -143,7 +146,6 @@ public class Importer {
         setMetaData();
         addAllDataTransition();
 
-        // TODO: release/8.0.0 static resources
         importedProcess.getRole().forEach(this::createRole);
         importedProcess.getData().forEach(this::createDataSet);
         importedProcess.getPlace().forEach(this::createPlace);
@@ -165,8 +167,7 @@ public class Importer {
         actionEvaluator.evaluate(actions, process.getFunctions());
         processValidator.validate(process);
 
-        // TODO: release/8.0.0 import result as in builder
-        return Optional.of(process);
+        return this.result;
     }
 
     protected void initializePetriNet() throws IllegalArgumentException {
@@ -176,6 +177,7 @@ public class Importer {
         } else {
             process = new Process();
         }
+        result.setProcess(process);
     }
 
     protected void initializeWithChildPetriNet(Extension extension) {
@@ -196,13 +198,6 @@ public class Importer {
                 parentNet.getVersion(),
                 parentNet.getObjectId()
         ));
-        UniqueKeyMap<String, ProcessRole> processRolesWithNewIds = new UniqueKeyMap<>();
-        for (Map.Entry<String, ProcessRole> entry : process.getRoles().entrySet()) {
-            ObjectId newId = new ObjectId();
-            entry.getValue().setId(newId);
-            processRolesWithNewIds.put(newId.toString(), entry.getValue());
-        }
-        process.setRoles(processRolesWithNewIds);
     }
 
     protected static boolean areExtensionAttributesEmpty(Extension extension) {
@@ -556,8 +551,11 @@ public class Importer {
 
     protected void createProcessPermissions(com.netgrif.application.engine.importer.model.CaseRoleRef roleRef) {
         com.netgrif.application.engine.importer.model.CaseLogic logic = roleRef.getCaseLogic();
-        ProcessRole role = process.getRole(roleRef.getId());
-        if (logic == null || role == null) {
+        if (logic == null) {
+            return;
+        }
+        ProcessRole role = this.findRole(roleRef.getId());
+        if (role == null) {
             // TODO: release/8.0.0 warn
             return;
         }
@@ -566,7 +564,7 @@ public class Importer {
 
     protected void createTaskPermissions(Transition transition, com.netgrif.application.engine.importer.model.RoleRef roleRef) {
         com.netgrif.application.engine.importer.model.RoleRefLogic logic = roleRef.getLogic();
-        ProcessRole role = process.getRole(roleRef.getId());
+        ProcessRole role = this.findRole(roleRef.getId());
         if (logic == null || role == null) {
             // TODO: release/8.0.0 warn
             return;
@@ -608,7 +606,6 @@ public class Importer {
         place.setImportId(importPlace.getId());
         place.setTokens(importPlace.getTokens());
         place.setTitle(toI18NString(importPlace.getTitle()));
-        // TODO: release/8.0.0 scope
         createProperties(importPlace.getProperties(), place.getProperties());
         process.addPlace(place);
     }
@@ -627,9 +624,7 @@ public class Importer {
         if (importRole.getEvent() != null) {
             importRole.getEvent().forEach(event -> role.addEvent(createEvent(event)));
         }
-
-        role.setNetId(process.getStringId());
-        process.addRole(role);
+        // TODO: release/8.0.0 role
     }
 
     protected com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy toAssignPolicy(com.netgrif.application.engine.importer.model.AssignPolicy policy) {
@@ -817,5 +812,9 @@ public class Importer {
 
     protected boolean isTrue(Boolean permission) {
         return (permission != null && permission);
+    }
+
+    protected ProcessRole findRole(String importId) {
+        return result.getRoles().getOrDefault(importId, processRoleService.findByImportId(importId));
     }
 }

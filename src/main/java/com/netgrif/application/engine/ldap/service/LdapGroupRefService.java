@@ -80,21 +80,23 @@ public class LdapGroupRefService implements ILdapGroupRefService {
 
     @Override
     public void deleteProcessRoleByPetrinet(String petriNet) {
-        ldapGroupRoleRepository.findAll().stream()
-                .filter(ldapGroup -> ldapGroup.getProcessesRoles().stream().anyMatch(processRole -> processRole.getNetId().equals(petriNet)))
-                .forEach(it -> deleteProcessRole(it, petriNet));
+        // TODO: release/8.0.0
+//        ldapGroupRoleRepository.findAll().stream()
+//                .filter(ldapGroup -> ldapGroup.getProcessesRoles().stream().anyMatch(processRole -> processRole.getNetId().equals(petriNet)))
+//                .forEach(it -> deleteProcessRole(it, petriNet));
     }
 
     @Override
     public void deleteProcessRole(LdapGroup ldapGroup, String petriNet) {
-        Set<ProcessRole> processRoles = ldapGroup.getProcessesRoles();
-        processRoles.forEach(it -> {
-            if (it.getNetId().equals(petriNet)) {
-                processRoles.remove(it);
-            }
-        });
-        ldapGroup.setProcessesRoles(processRoles);
-        ldapGroupRoleRepository.save(ldapGroup);
+//        TODO: release/8.0.0
+//        Set<ProcessRole> processRoles = ldapGroup.getProcessesRoles();
+//        processRoles.forEach(it -> {
+//            if (it.getNetId().equals(petriNet)) {
+//                processRoles.remove(it);
+//            }
+//        });
+//        ldapGroup.setProcessesRoles(processRoles);
+//        ldapGroupRoleRepository.save(ldapGroup);
     }
 
     @Override

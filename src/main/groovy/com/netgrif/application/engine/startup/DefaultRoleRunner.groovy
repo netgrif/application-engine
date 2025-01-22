@@ -33,7 +33,7 @@ class DefaultRoleRunner extends AbstractOrderedCommandLineRunner {
         ProcessRole defaultRole = new ProcessRole(
                 importId: ProcessRole.DEFAULT_ROLE,
                 name: new I18nString(ProcessRole.DEFAULT_ROLE),
-                description: "Default system process role",
+                description: new I18nString("Default system process role"),
                 events: new LinkedHashMap<EventType, Event>()
         )
         defaultRole = repository.save(defaultRole)

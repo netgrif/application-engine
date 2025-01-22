@@ -101,10 +101,11 @@ public abstract class AbstractUserService implements IUserService {
 
     @Override
     public void removeRoleOfDeletedPetriNet(Process net) {
-        List<IUser> users = findAllByProcessRoles(net.getRoles().keySet());
-        users.forEach(u -> {
-            net.getRoles().forEach((k, role) -> removeRole(u, role));
-        });
+        // TODO: release/8.0.0 delete
+//        List<IUser> users = findAllByProcessRoles(net.getRoles().keySet());
+//        users.forEach(u -> {
+//            net.getRoles().forEach((k, role) -> removeRole(u, role));
+//        });
     }
 
     @Override

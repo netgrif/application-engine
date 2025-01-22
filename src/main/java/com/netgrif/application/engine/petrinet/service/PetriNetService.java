@@ -12,6 +12,7 @@ import com.netgrif.application.engine.history.domain.petrinetevents.ImportPetriN
 import com.netgrif.application.engine.history.domain.taskevents.TaskEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.model.ProcessEventType;
+import com.netgrif.application.engine.importer.service.ImportResult;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
@@ -215,11 +216,11 @@ public class PetriNetService implements IPetriNetService {
         ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
         ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
         IOUtils.copy(xmlFile, xmlCopy);
-        Optional<Process> imported = getImporter().importPetriNet(new ByteArrayInputStream(xmlCopy.toByteArray()));
-        if (imported.isEmpty()) {
+        ImportResult imported = getImporter().importPetriNet(new ByteArrayInputStream(xmlCopy.toByteArray()));
+        if (imported.getProcess() == null) {
             return outcome;
         }
-        Process net = imported.get();
+        Process net = imported.getProcess();
         net.setUriNodeId(uriNodeId);
 
         // TODO: release/8.0.0 fix cacheable
@@ -228,7 +229,7 @@ public class PetriNetService implements IPetriNetService {
             net.setVersion(existingNet.getVersion());
             net.incrementVersion(releaseType);
         }
-        processRoleService.saveAll(net.getRoles().values());
+        processRoleService.saveAll(imported.getRoles().values());
         net.setAuthorId(author.getId());
         functionCacheService.cachePetriNetFunctions(net);
         // TODO: release/8.0.0
@@ -244,7 +245,7 @@ public class PetriNetService implements IPetriNetService {
         evaluateRules(net, EventPhase.POST);
         historyService.save(new ImportPetriNetEventLog(null, EventPhase.POST, net.getObjectId()));
         addMessageToOutcome(net, ProcessEventType.UPLOAD, outcome);
-        outcome.setNet(imported.get());
+        outcome.setNet(imported.getProcess());
         return outcome;
     }
 

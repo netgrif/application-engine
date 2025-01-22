@@ -24,8 +24,7 @@ public class ProcessRole extends Imported {
     @Id
     private ObjectId id;
     private I18nString name;
-    private String netId;
-    private String description;
+    private I18nString description;
     private Map<EventType, Event> events;
 
     public ProcessRole(ObjectId id) {
@@ -100,8 +99,7 @@ public class ProcessRole extends Imported {
         clone.setStringId(this.getStringId());
         clone.setImportId(this.importId);
         clone.setName(this.name == null ? null : this.name.clone());
-        clone.setNetId(this.netId);
-        clone.setDescription(this.description);
+        clone.setDescription(this.description == null ? null : this.description.clone());
         return clone;
     }
 }

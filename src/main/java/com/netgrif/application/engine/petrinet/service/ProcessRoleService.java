@@ -90,7 +90,9 @@ public class ProcessRoleService implements IProcessRoleService {
         Set<ProcessRole> rolesNewToUser = getRolesNewToUser(userOldRoles, requestedRoles);
         Set<ProcessRole> rolesRemovedFromUser = getRolesRemovedFromUser(userOldRoles, requestedRoles);
 
-        String idOfPetriNetContainingRole = getPetriNetIdRoleBelongsTo(rolesNewToUser, rolesRemovedFromUser);
+        String idOfPetriNetContainingRole = null;
+        // TODO: release/8.0.0 fix
+//        String idOfPetriNetContainingRole = getPetriNetIdRoleBelongsTo(rolesNewToUser, rolesRemovedFromUser);
 
         if (idOfPetriNetContainingRole == null) {
             return;
@@ -125,22 +127,6 @@ public class ProcessRoleService implements IProcessRoleService {
         userRolesAfterPreActions.removeAll(rolesRemovedFromUser);
 
         return new HashSet<>(userRolesAfterPreActions);
-    }
-
-    private String getPetriNetIdRoleBelongsTo(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles) {
-        if (!newRoles.isEmpty()) {
-            return getPetriNetIdFromFirstRole(newRoles);
-        }
-
-        if (!removedRoles.isEmpty()) {
-            return getPetriNetIdFromFirstRole(removedRoles);
-        }
-
-        return null;
-    }
-
-    private String getPetriNetIdFromFirstRole(Set<ProcessRole> newRoles) {
-        return newRoles.iterator().next().getNetId();
     }
 
     private void replaceUserRolesAndPublishEvent(Set<String> requestedRolesIds, IUser user, Set<ProcessRole> requestedRoles) {
@@ -227,15 +213,8 @@ public class ProcessRoleService implements IProcessRoleService {
 
     @Override
     public List<ProcessRole> findAll(String netId) {
-        Optional<Process> netOptional = netRepository.findById(netId);
-        if (netOptional.isEmpty()) {
-            throw new IllegalArgumentException("Could not find model with id [" + netId + "]");
-        }
-        return findAll(netOptional.get());
-    }
-
-    private List<ProcessRole> findAll(Process net) {
-        return new LinkedList<>(net.getRoles().values());
+        // TODO: release/8.0.0 fix
+        return null;
     }
 
     @Override
@@ -298,7 +277,9 @@ public class ProcessRoleService implements IProcessRoleService {
     @Override
     public void deleteRolesOfNet(Process net, LoggedUser loggedUser) {
         log.info("[{}]: Initiating deletion of all roles of Petri net {} version {}", net.getStringId(), net.getIdentifier(), net.getVersion().toString());
-        List<ObjectId> deletedRoleIds = this.findAll(net).stream().map(ProcessRole::getId).collect(Collectors.toList());
+        // TODO: release/8.0.0 fix
+//        List<ObjectId> deletedRoleIds = this.findAll(net).stream().map(ProcessRole::getId).collect(Collectors.toList());
+        List<ObjectId> deletedRoleIds = null;
         Set<String> deletedRoleStringIds = deletedRoleIds.stream().map(ObjectId::toString).collect(Collectors.toSet());
 
         List<IUser> usersWithRemovedRoles = this.userService.findAllByProcessRoles(deletedRoleStringIds);

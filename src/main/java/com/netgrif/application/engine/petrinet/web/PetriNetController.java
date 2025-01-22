@@ -146,7 +146,7 @@ public class PetriNetController {
     @GetMapping(value = "/{netId}/roles", produces = MediaTypes.HAL_JSON_VALUE)
     public ProcessRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
         netId = decodeUrl(netId);
-        return new ProcessRolesResource(roleService.findAll(netId), service.getPetriNet(decodeUrl(netId)).getPermissions(), netId, locale);
+        return new ProcessRolesResource(roleService.findAll(netId), service.getPetriNet(decodeUrl(netId)).getPermissions(), locale);
     }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
