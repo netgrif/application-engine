@@ -3,6 +3,7 @@ package com.netgrif.application.engine.auth.web;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.throwable.UnauthorisedRequestException;
+import com.netgrif.application.engine.auth.service.UserResourceHelperService;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
@@ -79,6 +80,9 @@ public class UserController {
     @Autowired
     private ISecurityContextService securityContextService;
 
+    @Autowired
+    private UserResourceHelperService userResourceHelperService;
+
     protected UserResourceAssembler getUserResourceAssembler(String selfRel) {
         UserResourceAssembler result = userResourceAssemblerProvider.get();
         result.initialize(selfRel);
@@ -123,13 +127,15 @@ public class UserController {
             throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
         }
         IUser user = userService.resolveById(userId);
-        return new UserResource(new User(user), "profile");
+        return new UserResource(userResourceHelperService.getUser(user, locale), "profile");
+//        return new UserResource(new User(user), "profile");
     }
 
     @Operation(summary = "Get logged user", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource getLoggedUser(Authentication auth, Locale locale) {
-        return new UserResource(new User(((LoggedUser)auth.getPrincipal()).transformToUser()), "me");
+        return userResourceHelperService.getResource((LoggedUser) auth.getPrincipal(), locale);
+//        return new UserResource(new User(((LoggedUser)auth.getPrincipal()).transformToUser()), "me");
     }
 
     @Operation(summary = "Update user", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -149,7 +155,8 @@ public class UserController {
             securityContextService.reloadSecurityContext(loggedUser);
         }
         log.info("Updating user {} with data {}", user.getEmail(), updates.toString());
-        return new UserResource(new User(user), "profile");
+        return new UserResource(userResourceHelperService.getUser(user, locale), "profile");
+//        return new UserResource(new User(user), "profile");
     }
 
     @Operation(summary = "Get all users with specified roles", security = {@SecurityRequirement(name = "BasicAuth")})

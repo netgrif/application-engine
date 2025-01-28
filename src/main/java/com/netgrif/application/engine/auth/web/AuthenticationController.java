@@ -4,6 +4,7 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.auth.service.InvalidUserTokenException;
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl;
+import com.netgrif.application.engine.auth.service.UserResourceHelperService;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.auth.web.requestbodies.ChangePasswordRequest;
@@ -66,6 +67,9 @@ public class AuthenticationController {
 
     @Autowired
     private ISecurityContextService securityContextService;
+
+    @Autowired
+    private UserResourceHelperService userResourceHelperService;
 
     @Operation(summary = "New user registration")
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
@@ -137,7 +141,9 @@ public class AuthenticationController {
     @Operation(summary = "Login to the system", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/login", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource login(Authentication auth, Locale locale) {
-        return new UserResource(new User(userService.findByAuth(auth)), "profile");
+        // TODO: user resource helper
+        return new UserResource(userResourceHelperService.getUser(userService.findByAuth(auth), locale), "login");
+//        return new UserResource(new User(userService.findByAuth(auth)), "profile");
     }
 
     @Operation(summary = "Reset password")

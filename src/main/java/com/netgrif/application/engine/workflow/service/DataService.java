@@ -286,7 +286,6 @@ public class DataService implements IDataService {
                     item.setDataRefId(null);
                     continue;
                 }
-                item.setDataRef(dataRefs.get(item.getDataRefId()));
 
                 Field<?> field = useCase.getDataSet().get(item.getDataRefId());
                 DataFieldBehavior behavior = field.getBehaviors().get(task.getTransitionId());
@@ -294,6 +293,7 @@ public class DataService implements IDataService {
                 if (behavior.isForbidden()) {
                     continue;
                 }
+                item.setDataRef(dataRefs.get(item.getDataRefId()));
                 outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, null, new HashMap<>()));
                 historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE, user));
 

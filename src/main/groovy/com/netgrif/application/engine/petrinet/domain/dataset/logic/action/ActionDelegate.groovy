@@ -62,6 +62,10 @@ import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+//import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
+//import com.netgrif.application.engine.petrinet.domain.dataset.TaskField
+//import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
+
 
 import java.text.Normalizer
 import java.time.LocalDate
@@ -554,7 +558,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     // TODO: release/8.0.0 merge targetCase
-    def change(Field field) {
+    def change(Field field, Case targetCase = this.useCase, Optional<Task> targetTask = this.task) {
         [about      : { cl -> // TODO: deprecated
             changeFieldValue(field, cl)
         },
