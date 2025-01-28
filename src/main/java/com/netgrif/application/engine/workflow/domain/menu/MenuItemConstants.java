@@ -10,6 +10,7 @@ public enum MenuItemConstants {
     // FIELDS
     PREFERENCE_ITEM_FIELD_NEW_FILTER_ID("new_filter_id"),
     PREFERENCE_ITEM_FIELD_FILTER_CASE("filter_case"),
+    PREFERENCE_ITEM_FIELD_CONTAINS_FILTER("contains_filter"),
     PREFERENCE_ITEM_FIELD_PARENT_ID("parentId"),
     PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS("childItemIds"),
     PREFERENCE_ITEM_FIELD_HAS_CHILDREN("hasChildren"),
@@ -33,6 +34,7 @@ public enum MenuItemConstants {
     PREFERENCE_ITEM_FIELD_USE_CUSTOM_VIEW("use_custom_view"),
     PREFERENCE_ITEM_FIELD_CUSTOM_VIEW_SELECTOR("custom_view_selector"),
     PREFERENCE_ITEM_FIELD_CASE_VIEW_SEARCH_TYPE("case_view_search_type"),
+    PREFERENCE_ITEM_FIELD_IS_AUTO_SELECT("is_auto_select"),
     PREFERENCE_ITEM_FIELD_CREATE_CASE_BUTTON_TITLE("create_case_button_title"),
     PREFERENCE_ITEM_FIELD_CREATE_CASE_BUTTON_ICON("create_case_button_icon"),
     PREFERENCE_ITEM_FIELD_BANNED_NETS_IN_CREATION("case_banned_nets_in_creation"),
