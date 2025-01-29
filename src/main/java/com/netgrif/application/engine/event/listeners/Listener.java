@@ -2,39 +2,65 @@ package com.netgrif.application.engine.event.listeners;
 
 
 import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
-import com.netgrif.application.engine.event.dispatchers.common.DispatchMethod;
 import com.netgrif.application.engine.event.events.Event;
 import com.netgrif.application.engine.event.events.EventAction;
+import lombok.Getter;
 
-import java.util.function.Function;
+import java.util.EventListener;
+import java.util.EventObject;
+import java.util.Set;
 
-
-public abstract class Listener {
+@Getter
+public abstract class Listener implements EventListener {
 
     public Listener() {
+
+    }
+    //todo: register global
+
+    /**
+     * Register this listener to dispatcher.
+     *
+     * @param dispatcher     Dispatcher, to listen Events
+     * @param event          Clas of event, which this Listener will be subscribed to
+     * @param dispatchMethod synchronous or asynchronous
+     * @see AbstractDispatcher#registerListener(Listener, Class, AbstractDispatcher.DispatchMethod)
+     */
+    public void register(AbstractDispatcher dispatcher, Class<? extends EventObject> event, AbstractDispatcher.DispatchMethod dispatchMethod) {
+        dispatcher.registerListener(this, event, dispatchMethod);
     }
 
-    public Listener(AbstractDispatcher dispatcher, EventAction eventAction, DispatchMethod method) {
-        dispatcher.registerListener(this, eventAction, method);
+    public void registerAll(AbstractDispatcher dispatcher, Set<Class<? extends EventObject>> events, AbstractDispatcher.DispatchMethod dispatchMethod) {
+        events.forEach(event -> dispatcher.registerListener(this, event, dispatchMethod));
     }
 
-    /***
+    public void unregister(AbstractDispatcher dispatcher, Class<? extends EventObject> event, AbstractDispatcher.DispatchMethod dispatchMethod) {
+        dispatcher.unregisterListener(this, event, dispatchMethod);
+    }
+
+    public void unregisterAll(AbstractDispatcher dispatcher, Set<Class<? extends EventObject>> events, AbstractDispatcher.DispatchMethod dispatchMethod) {
+        events.forEach(event -> dispatcher.unregisterListener(this, event, dispatchMethod));
+    }
+
+    /**
      * <p>Abstract method for handling synchronous events. This method will be invoked by Dispatcher if the Listener is registered.
-     * See {@link AbstractDispatcher#registerListener(Listener, EventAction, DispatchMethod)}</p>
-     * @param event {@link Event} object, final type of the object is determined based on {@link EventAction}
+     *
+     * @param event      {@link Event} object, final type of the object is determined based on {@link EventAction}
      * @param dispatcher {@link AbstractDispatcher} from which the event was dispatched
+     * @see AbstractDispatcher#registerListener(Listener, Class, AbstractDispatcher.DispatchMethod)
      */
-    public abstract void onEvent(Event event, AbstractDispatcher dispatcher);
+    public abstract void onEvent(final EventObject event, AbstractDispatcher dispatcher);
 
-    /***
+    /**
      * <p>Abstract method for handling asynchronous events. This method will be invoked by Dispatcher if the Listener is registered.
-     * See {@link AbstractDispatcher#registerListener(Listener, EventAction, DispatchMethod)}</p>
-     * @param event {@link Event} object, final type of the object is determined based on {@link EventAction}
+     *
+     * @param event      {@link Event} object, final type of the object is determined based on {@link EventAction}
      * @param dispatcher {@link AbstractDispatcher} from which the event was dispatched
+     * @see AbstractDispatcher#registerListener(Listener, Class, AbstractDispatcher.DispatchMethod)
      */
-    public abstract void onAsyncEvent(Event event, AbstractDispatcher dispatcher);
+    public abstract void onAsyncEvent(final EventObject event, AbstractDispatcher dispatcher);
 
-    public String getName(){
+    public String getName() {
         return this.getClass().getSimpleName();
     }
 

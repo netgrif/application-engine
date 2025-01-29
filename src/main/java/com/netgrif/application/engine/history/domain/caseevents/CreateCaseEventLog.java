@@ -1,19 +1,22 @@
 package com.netgrif.application.engine.history.domain.caseevents;
 
+import com.netgrif.application.engine.event.events.workflow.CreateCaseEvent;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataField;
 import lombok.EqualsAndHashCode;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.io.Serial;
 import java.util.Map;
 
-@Document(collection = "eventLogs")
+//todo
 @EqualsAndHashCode(callSuper = true)
 public class CreateCaseEventLog extends CaseEventLog {
 
-    @Field("dataSetValues")
+
+    @Serial
+    private static final long serialVersionUID = -7202365131803028246L;
+
     private Map<String, DataField> dataSetValues;
 
     public CreateCaseEventLog() {
@@ -31,5 +34,9 @@ public class CreateCaseEventLog extends CaseEventLog {
 
     public void setDataSetValues(Map<String, DataField> values) {
         this.dataSetValues = values;
+    }
+
+    public static CreateCaseEventLog fromEvent(CreateCaseEvent event) {
+        return new CreateCaseEventLog(event.getCaseEventOutcome().getCase(), event.getEventPhase());
     }
 }
