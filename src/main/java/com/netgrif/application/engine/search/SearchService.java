@@ -16,6 +16,7 @@ import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -76,13 +77,14 @@ public class SearchService implements ISearchService {
                 if (evaluator.getMultiple()) {
                     return petriNetRepository.findAll(predicate, new FullPageRequest()).getContent();
                 }
-                return petriNetRepository.findOne(predicate);
+                return petriNetRepository.findAll(predicate, PageRequest.of(0, 1))
+                        .getContent().stream().findFirst().orElse(null);
             case CASE:
                 if (predicate != null) {
                     if (evaluator.getMultiple()) {
                         return workflowService.searchAll(predicate).getContent();
                     }
-                    return workflowService.searchOne(predicate);
+                    return workflowService.searchAll(predicate).getContent().stream().findFirst().orElse(null);
                 }
 
                 List<Case> cases = findCasesElastic(elasticQuery);
@@ -91,12 +93,13 @@ public class SearchService implements ISearchService {
                 if (evaluator.getMultiple()) {
                     return taskService.searchAll(predicate).getContent();
                 }
-                return taskService.searchOne(predicate);
+                return taskService.searchAll(predicate).getContent().stream().findFirst().orElse(null);
             case USER:
                 if (evaluator.getMultiple()) {
                     return userRepository.findAll(predicate, new FullPageRequest()).getContent();
                 }
-                return userRepository.findOne(predicate).orElse(null);
+                return userRepository.findAll(predicate, PageRequest.of(0, 1))
+                        .getContent().stream().findFirst().orElse(null);
         }
         return null;
     }

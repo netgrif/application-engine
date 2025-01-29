@@ -9,25 +9,25 @@ query: resource=(PROCESS | PROCESSES) delimeter processConditions EOF # processQ
 processConditions: processOrExpression ;
 processOrExpression: processAndExpression (SPACE OR SPACE processAndExpression)* ;
 processAndExpression: processConditionGroup (SPACE AND SPACE processConditionGroup)* ;
-processConditionGroup: processCondition | '(' SPACE? processConditions SPACE? ')' SPACE? ;
+processConditionGroup: processCondition | (NOT SPACE)? '(' SPACE? processConditions SPACE? ')' SPACE? ;
 processCondition: (NOT SPACE)? processComparisons SPACE? ;
 
 caseConditions: caseOrExpression ;
 caseOrExpression: caseAndExpression (SPACE OR SPACE caseAndExpression)* ;
 caseAndExpression: caseConditionGroup (SPACE AND SPACE caseConditionGroup)* ;
-caseConditionGroup: caseCondition | '(' SPACE? caseConditions SPACE? ')' SPACE? ;
+caseConditionGroup: caseCondition | (NOT SPACE)? '(' SPACE? caseConditions SPACE? ')' SPACE? ;
 caseCondition: (NOT SPACE)? caseComparisons SPACE? ;
 
 taskConditions: taskOrExpression ;
 taskOrExpression: taskAndExpression (SPACE OR SPACE taskAndExpression)* ;
 taskAndExpression: taskConditionGroup (SPACE AND SPACE taskConditionGroup)* ;
-taskConditionGroup: taskCondition | '(' SPACE? taskConditions SPACE? ')' SPACE? ;
+taskConditionGroup: taskCondition | (NOT SPACE)? '(' SPACE? taskConditions SPACE? ')' SPACE? ;
 taskCondition: (NOT SPACE)? taskComparisons SPACE? ;
 
 userConditions: userOrExpression ;
 userOrExpression: userAndExpression (SPACE OR SPACE userAndExpression)* ;
 userAndExpression: userConditionGroup (SPACE AND SPACE userConditionGroup)* ;
-userConditionGroup: userCondition | '(' SPACE? userConditions SPACE? ')' SPACE? ;
+userConditionGroup: userCondition | (NOT SPACE)? '(' SPACE? userConditions SPACE? ')' SPACE? ;
 userCondition: (NOT SPACE)? userComparisons SPACE? ;
 
 // delimeter
@@ -74,13 +74,13 @@ userComparisons: idComparison
                ;
 
 // attribute comparisons
-idComparison: ID SPACE stringComparison ;
+idComparison: ID SPACE objectIdComparison ;
 titleComparison: TITLE SPACE stringComparison ;
 identifierComparison: IDENTIFIER SPACE stringComparison ;
 versionComparison: VERSION SPACE op=(EQ | LT | GT | LTE | GTE) SPACE VERSION_NUMBER ;
 creationDateComparison: CREATION_DATE SPACE dateComparison # cdDate
                       | CREATION_DATE SPACE dateTimeComparison # cdDateTime
-                      ; // todo NAE-1997: date/datetime?
+                      ;
 processIdComparison: PROCESS_ID SPACE stringComparison ;
 processIdentifierComparison: PROCESS_IDENTIFIER SPACE stringComparison ;
 authorComparison: AUTHOR SPACE stringComparison ;
@@ -90,10 +90,10 @@ userIdComparison: USER_ID SPACE stringComparison ;
 caseIdComparison: CASE_ID SPACE stringComparison ;
 lastAssignComparison: LAST_ASSIGN SPACE dateComparison # laDate
                     | LAST_ASSIGN SPACE dateTimeComparison # laDateTime
-                    ; // todo NAE-1997: date/datetime?
+                    ;
 lastFinishComparison: LAST_FINISH SPACE dateComparison # lfDate
                     | LAST_FINISH SPACE dateTimeComparison # lfDateTime
-                    ; // todo NAE-1997: date/datetime?
+                    ;
 nameComparison: NAME SPACE stringComparison ;
 surnameComparison: SURNAME SPACE stringComparison ;
 emailComparison: EMAIL SPACE stringComparison ;
@@ -103,12 +103,13 @@ dataValueComparison: dataValue SPACE stringComparison # dataString
               | dataValue SPACE dateTimeComparison # dataDatetime
               | dataValue SPACE booleanComparison # dataBoolean
               ;
-dataOptionsComparison: dataOptions stringComparison ;
+dataOptionsComparison: dataOptions SPACE stringComparison ;
 placesComparison: places SPACE numberComparison ;
 tasksStateComparison: tasksState SPACE op=EQ SPACE state=(ENABLED | DISABLED) ;
 tasksUserIdComparison: tasksUserId SPACE stringComparison ;
 
 // basic comparisons
+objectIdComparison: op=EQ SPACE STRING ;
 stringComparison: op=(EQ | CONTAINS) SPACE STRING ;
 numberComparison: op=(EQ | LT | GT | LTE | GTE) SPACE NUMBER ;
 dateComparison: op=(EQ | LT | GT | LTE | GTE) SPACE DATE ;

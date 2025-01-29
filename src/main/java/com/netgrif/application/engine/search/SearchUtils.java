@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.search;
 
-import com.netgrif.application.engine.antlr4.QueryLangLexer;
-import com.netgrif.application.engine.antlr4.QueryLangParser;
+import com.netgrif.application.engine.search.antlr4.QueryLangLexer;
+import com.netgrif.application.engine.search.antlr4.QueryLangParser;
 import com.netgrif.application.engine.petrinet.domain.QPetriNet;
 import com.netgrif.application.engine.petrinet.domain.version.QVersion;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
@@ -13,6 +13,8 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.bson.types.ObjectId;
+import org.bson.types.QObjectId;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,12 +26,13 @@ import java.util.Map;
 public class SearchUtils {
 
     public static final Map<ComparisonType, List<Integer>> comparisonOperators = Map.of(
+            ComparisonType.ID, List.of(QueryLangParser.EQ),
             ComparisonType.STRING, List.of(QueryLangParser.EQ, QueryLangParser.CONTAINS),
             ComparisonType.NUMBER, List.of(QueryLangParser.EQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
             ComparisonType.DATE, List.of(QueryLangParser.EQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
             ComparisonType.DATETIME, List.of(QueryLangParser.EQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
             ComparisonType.BOOLEAN, List.of(QueryLangParser.EQ),
-            ComparisonType.OPTIONS, List.of(QueryLangParser.CONTAINS)
+            ComparisonType.OPTIONS, List.of(QueryLangParser.EQ, QueryLangParser.CONTAINS)
     );
 
     public static String toDateString(LocalDate localDate) {
@@ -95,10 +98,27 @@ public class SearchUtils {
         return queryLangString.replace("'", "");
     }
 
+    public static ObjectId getObjectIdValue(String queryLangString) {
+        String objectId = getStringValue(queryLangString);
+        if (ObjectId.isValid(objectId)) {
+            return new ObjectId(objectId);
+        }
+
+        throw new IllegalArgumentException("Invalid objectId: " + objectId);
+    }
+
     public static void checkOp(ComparisonType type, Token op) {
         if (!comparisonOperators.get(type).contains(op.getType())) {
             throw new IllegalArgumentException("Operator " + op.getText() + " is not applicable for type " + type.toString());
         }
+    }
+
+    public static Predicate buildObjectIdPredicate(QObjectId qObjectId, Token op, ObjectId objectId) {
+        if (op.getType() == QueryLangParser.EQ) {
+            return qObjectId.eq(objectId);
+        }
+
+        throw new UnsupportedOperationException("Operator " + op.getText() + " is not available for id comparison");
     }
 
     public static Predicate buildStringPredicate(StringPath stringPath, Token op, String string) {

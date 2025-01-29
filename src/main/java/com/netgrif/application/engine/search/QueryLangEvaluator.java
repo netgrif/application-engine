@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.search;
 
-import com.netgrif.application.engine.antlr4.QueryLangBaseListener;
-import com.netgrif.application.engine.antlr4.QueryLangParser;
+import com.netgrif.application.engine.search.antlr4.QueryLangBaseListener;
+import com.netgrif.application.engine.search.antlr4.QueryLangParser;
 import com.netgrif.application.engine.auth.domain.QUser;
 import com.netgrif.application.engine.petrinet.domain.QPetriNet;
 import com.netgrif.application.engine.search.enums.ComparisonType;
@@ -17,6 +17,8 @@ import lombok.Getter;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
+import org.bson.types.ObjectId;
+import org.bson.types.QObjectId;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -97,12 +99,20 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         setElasticQuery(current, elasticQuery.isBlank() ? null : elasticQuery);
     }
 
-    private void processConditionGroup(ParseTree child, ParseTree current) {
+    private void processConditionGroup(ParseTree child, ParseTree current, Boolean not) {
         Predicate predicate = getMongoQuery(child);
         String elasticQuery = getElasticQuery(child);
 
-        setMongoQuery(current, (predicate));
-        setElasticQuery(current, elasticQuery != null ? "(" + elasticQuery + ")" : null);
+        if (predicate != null) {
+            predicate = not ? (predicate).not() : (predicate);
+        }
+
+        if (elasticQuery != null) {
+            elasticQuery = not ? "NOT (" + elasticQuery + ")" : "(" + elasticQuery + ")";
+        }
+
+        setMongoQuery(current, predicate);
+        setElasticQuery(current, elasticQuery);
     }
 
     private void processCondition(ParseTree child, ParseTree current, Boolean not) {
@@ -195,7 +205,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitProcessConditionGroup(QueryLangParser.ProcessConditionGroupContext ctx) {
-        processConditionGroup(ctx.processCondition() != null ? ctx.processCondition() : ctx.processConditions(), ctx);
+        processConditionGroup(ctx.processCondition() != null ? ctx.processCondition() : ctx.processConditions(), ctx, ctx.NOT() != null);
     }
 
     @Override
@@ -228,7 +238,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitCaseConditionGroup(QueryLangParser.CaseConditionGroupContext ctx) {
-        processConditionGroup(ctx.caseCondition() != null ? ctx.caseCondition() : ctx.caseConditions(), ctx);
+        processConditionGroup(ctx.caseCondition() != null ? ctx.caseCondition() : ctx.caseConditions(), ctx, ctx.NOT() != null);
     }
 
     @Override
@@ -261,7 +271,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitTaskConditionGroup(QueryLangParser.TaskConditionGroupContext ctx) {
-        processConditionGroup(ctx.taskCondition() != null ? ctx.taskCondition() : ctx.taskConditions(), ctx);
+        processConditionGroup(ctx.taskCondition() != null ? ctx.taskCondition() : ctx.taskConditions(), ctx, ctx.NOT() != null);
     }
 
     @Override
@@ -294,7 +304,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitUserConditionGroup(QueryLangParser.UserConditionGroupContext ctx) {
-        processConditionGroup(ctx.userCondition() != null ? ctx.userCondition() : ctx.userConditions(), ctx);
+        processConditionGroup(ctx.userCondition() != null ? ctx.userCondition() : ctx.userConditions(), ctx, ctx.NOT() != null);
     }
 
     @Override
@@ -324,29 +334,30 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitIdComparison(QueryLangParser.IdComparisonContext ctx) {
-        StringPath stringPath;
-        Token op = ctx.stringComparison().op;
-        String string = getStringValue(ctx.stringComparison().STRING().getText());
+        QObjectId qObjectId;
+        Token op = ctx.objectIdComparison().op;
+        checkOp(ComparisonType.ID, op);
+        ObjectId objectId = getObjectIdValue(ctx.objectIdComparison().STRING().getText());
 
         switch (type) {
             case PROCESS:
-                stringPath = QPetriNet.petriNet.stringId;
+                qObjectId = QPetriNet.petriNet.id;
                 break;
             case CASE:
-                stringPath = QCase.case$.stringId;
-                setElasticQuery(ctx, buildElasticQuery("stringId", op, string));
+                qObjectId = QCase.case$.id;
+                setElasticQuery(ctx, buildElasticQuery("stringId", op, objectId.toString()));
                 break;
             case TASK:
-                stringPath = QTask.task.stringId;
+                qObjectId = QTask.task.id;
                 break;
             case USER:
-                stringPath = QUser.user.stringId;
+                qObjectId = QUser.user.id;
                 break;
             default:
                 throw new IllegalArgumentException("Unknown query type: " + type);
         }
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string));
+        setMongoQuery(ctx, buildObjectIdPredicate(qObjectId, op, objectId));
     }
 
     @Override
@@ -487,8 +498,10 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         switch (ctx.state.getType()) {
             case QueryLangParser.ENABLED:
                 setMongoQuery(ctx, QTask.task.state.eq(State.ENABLED));
+                break;
             case QueryLangParser.DISABLED:
                 setMongoQuery(ctx, QTask.task.state.eq(State.DISABLED));
+                break;
         }
     }
 
@@ -632,7 +645,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     public void enterDataOptionsComparison(QueryLangParser.DataOptionsComparisonContext ctx) {
         String fieldId = ctx.dataOptions().fieldId.getText();
         Token op = ctx.stringComparison().op;
-        checkOp(ComparisonType.BOOLEAN, op);
+        checkOp(ComparisonType.STRING, op);
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
         setMongoQuery(ctx, null);
