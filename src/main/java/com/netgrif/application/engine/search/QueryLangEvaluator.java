@@ -30,8 +30,8 @@ import static com.netgrif.application.engine.search.SearchUtils.*;
 
 public class QueryLangEvaluator extends QueryLangBaseListener {
 
-    ParseTreeProperty<String> elasticQuery = new ParseTreeProperty<>();
-    ParseTreeProperty<Predicate> mongoQuery = new ParseTreeProperty<>();
+    private final ParseTreeProperty<String> elasticQuery = new ParseTreeProperty<>();
+    private final ParseTreeProperty<Predicate> mongoQuery = new ParseTreeProperty<>();
 
     @Getter
     private QueryType type;

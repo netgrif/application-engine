@@ -4,16 +4,13 @@ import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.User;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.search.interfaces.ISearchService;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
-import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,13 +20,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import static com.netgrif.application.engine.search.SearchUtils.toDateTimeString;
+import java.util.stream.Collectors;
 
 @Slf4j
 @SpringBootTest
@@ -72,6 +66,38 @@ public class SearchTaskTest {
         return importHelper.createUser(user, authorities, processRoles);
     }
 
+
+    private static Task convertToTask(Object taskObject) {
+        assert taskObject instanceof Task;
+        return (Task) taskObject;
+    }
+
+    private static List<Task> convertToTaskList(Object taskListObject) {
+        assert taskListObject instanceof List<?>;
+        for (Object userObject : (List<?>) taskListObject) {
+            assert userObject instanceof Task;
+        }
+
+        return (List<Task>) taskListObject;
+    }
+
+    private void compareTasks(Task actual, Task expected) {
+        assert actual.getStringId().equals(expected.getStringId());
+    }
+
+    private void compareTasks(Task actual, List<Task> expected) {
+        List<String> expectedStringIds = expected.stream().map(Task::getStringId).collect(Collectors.toList());
+
+        assert expectedStringIds.contains(actual.getStringId());
+    }
+
+    private void compareTasks(List<Task> actual, List<Task> expected) {
+        List<String> actualStringIds = actual.stream().map(Task::getStringId).collect(Collectors.toList());
+        List<String> expectedStringIds = expected.stream().map(Task::getStringId).collect(Collectors.toList());
+
+        assert actualStringIds.containsAll(expectedStringIds);
+    }
+
     @Test
     public void testSearchById() {
         PetriNet net = importPetriNet("search/search_test.xml");
@@ -87,9 +113,7 @@ public class SearchTaskTest {
         assert count == 1;
 
         Object foundTask = searchService.search(query);
-
-        assert foundTask instanceof Task;
-        assert foundTask.equals(task);
+        compareTasks(convertToTask(foundTask), task);
     }
 
     @Test
@@ -113,13 +137,10 @@ public class SearchTaskTest {
         assert count == 2;
 
         Object foundTask = searchService.search(query);
-
-        assert foundTask instanceof Task;
-        assert foundTask.equals(task) || foundTask.equals(task2);
+        compareTasks(convertToTask(foundTask), List.of(task, task2));
 
         Object foundTasks = searchService.search(queryMore);
-        assert foundTasks instanceof List;
-        assert ((List<Task>) foundTasks).containsAll(List.of(task, task2));
+        compareTasks(convertToTaskList(foundTasks), List.of(task, task2));
     }
 
     @Test
@@ -137,26 +158,16 @@ public class SearchTaskTest {
         Task task3 = taskService.findOne(task3Id);
 
         String query = String.format("task: title eq '%s'", task.getTitle());
-        String queryOther = String.format("task: title eq '%s'", task3.getTitle());
         String queryMore = String.format("tasks: title eq '%s'", task.getTitle());
 
         long count = searchService.count(query);
-        assert count == 2;
-
-        count = searchService.count(queryOther);
-        assert count == 1;
+        assert count == 3;
 
         Object foundTask = searchService.search(query);
-        assert foundTask instanceof Task;
-        assert foundTask.equals(task) || foundTask.equals(task2);
-
-        foundTask = searchService.search(queryOther);
-        assert foundTask instanceof Task;
-        assert foundTask.equals(task3);
+        compareTasks(convertToTask(foundTask), List.of(task, task2, task3));
 
         Object foundTasks = searchService.search(queryMore);
-        assert foundTasks instanceof List;
-        assert ((List<Task>) foundTasks).containsAll(List.of(task, task2));
+        compareTasks(convertToTaskList(foundTasks), List.of(task, task2));
     }
 
     @Test
@@ -169,39 +180,42 @@ public class SearchTaskTest {
         Case case2 = importHelper.createCase("Search Test", net);
         Case case3 = importHelper.createCase("Search Test2", net);
 
+        importHelper.assignTask("Test", case1.getStringId(), user1.transformToLoggedUser());
+        importHelper.finishTask("Test", case1.getStringId(), user1.transformToLoggedUser());
+        importHelper.assignTask("Test", case2.getStringId(), user1.transformToLoggedUser());
+        importHelper.finishTask("Test", case2.getStringId(), user1.transformToLoggedUser());
+
         String taskId = case1.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task = taskService.findOne(taskId);
         String task2Id = case2.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task2 = taskService.findOne(task2Id);
         String task3Id = case3.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task3 = taskService.findOne(task3Id);
+        String task4Id = case1.getTasks().get(TEST_TRANSITION2_ID).getTaskStringId();
+        Task task4 = taskService.findOne(task4Id);
+        String task5Id = case2.getTasks().get(TEST_TRANSITION2_ID).getTaskStringId();
+        Task task5 = taskService.findOne(task5Id);
+        String task6Id = case3.getTasks().get(TEST_TRANSITION2_ID).getTaskStringId();
+        Task task6 = taskService.findOne(task6Id);
 
-        importHelper.assignTask("Test", case1.getStringId(), user1.transformToLoggedUser());
-        importHelper.finishTask("Test", case1.getStringId(), user1.transformToLoggedUser());
-        importHelper.assignTask("Test", case2.getStringId(), user1.transformToLoggedUser());
-        importHelper.finishTask("Test", case2.getStringId(), user1.transformToLoggedUser());
-
-        String query = String.format("task: state eq %s", "disabled");
-        String queryOther = String.format("task: state eq %s", "enabled");
-        String queryMore = String.format("tasks: state eq %s", "disabled");
+        String query = String.format("task: processId eq '%s' and state eq %s", net.getStringId(), "disabled");
+        String queryOther = String.format("tasks: processId eq '%s' and state eq %s", net.getStringId(), "enabled");
+        String queryMore = String.format("tasks: processId eq '%s' and state eq %s", net.getStringId(), "disabled");
 
         long count = searchService.count(query);
-        assert count == 2;
+        assert count == 4;
 
         count = searchService.count(queryOther);
-        assert count == 1;
+        assert count == 5;
 
         Object foundTask = searchService.search(query);
-        assert foundTask instanceof Task;
-        assert foundTask.equals(task) || foundTask.equals(task2);
+        compareTasks(convertToTask(foundTask), List.of(task, task2, task4, task5));
 
-        foundTask = searchService.search(queryOther);
-        assert foundTask instanceof Task;
-        assert foundTask.equals(task3);
+        Object foundTasks = searchService.search(queryOther);
+        compareTasks(convertToTaskList(foundTasks), List.of(task3, task6));
 
-        Object foundTasks = searchService.search(queryMore);
-        assert foundTasks instanceof List;
-        assert ((List<Task>) foundTasks).containsAll(List.of(task, task2));
+        foundTasks = searchService.search(queryMore);
+        compareTasks(convertToTaskList(foundTasks), List.of(task, task2, task4, task5));
     }
 
     @Test
@@ -226,9 +240,9 @@ public class SearchTaskTest {
         importHelper.assignTask("Test", case2.getStringId(), user1.transformToLoggedUser());
         importHelper.assignTask("Test", case3.getStringId(), user2.transformToLoggedUser());
 
-        String query = String.format("case: tasks.t1.userId eq '%s'", user1.getStringId());
-        String queryOther = String.format("case: tasks.t1.userId eq '%s'", user2.getStringId());
-        String queryMore = String.format("cases: tasks.t1.userId eq '%s'", user1.getStringId());
+        String query = String.format("task: userId eq '%s'", user1.getStringId());
+        String queryOther = String.format("task: userId eq '%s'", user2.getStringId());
+        String queryMore = String.format("tasks: userId eq '%s'", user1.getStringId());
 
         long count = searchService.count(query);
         assert count == 2;
@@ -237,16 +251,13 @@ public class SearchTaskTest {
         assert count == 1;
 
         Object foundTask = searchService.search(query);
-        assert foundTask instanceof Task;
-        assert foundTask.equals(task) || foundTask.equals(task2);
+        compareTasks(convertToTask(foundTask), List.of(task, task2));
 
         foundTask = searchService.search(queryOther);
-        assert foundTask instanceof Task;
-        assert foundTask.equals(task3);
+        compareTasks(convertToTask(foundTask), task3);
 
-        Object cases = searchService.search(queryMore);
-        assert cases instanceof List;
-        assert ((List<Task>) cases).containsAll(List.of(task, task2));
+        Object foundTasks = searchService.search(queryMore);
+        compareTasks(convertToTaskList(foundTasks), List.of(task, task2));
     }
 
     @Test
@@ -262,28 +273,27 @@ public class SearchTaskTest {
         Task task2 = taskService.findOne(task2Id);
         String task3Id = case2.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task3 = taskService.findOne(task3Id);
+        String task4Id = case2.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
+        Task task4 = taskService.findOne(task4Id);
 
         String query = String.format("task: caseId eq '%s'", case1.getStringId());
         String queryOther = String.format("task: caseId eq '%s'", case2.getStringId());
         String queryMore = String.format("tasks: caseId eq '%s'", case1.getStringId());
 
         long count = searchService.count(query);
-        assert count == 2;
+        assert count == 3;
 
         count = searchService.count(queryOther);
-        assert count == 1;
+        assert count == 3;
 
         Object foundTask = searchService.search(query);
-        assert foundTask instanceof Task;
-        assert foundTask.equals(task) || foundTask.equals(task2);
+        compareTasks(convertToTask(foundTask), List.of(task, task2));
 
         foundTask = searchService.search(queryOther);
-        assert foundTask instanceof Task;
-        assert foundTask.equals(task3);
+        compareTasks(convertToTask(foundTask), List.of(task3, task4));
 
         Object foundTasks = searchService.search(queryMore);
-        assert foundTasks instanceof List;
-        assert ((List<Task>) foundTasks).containsAll(List.of(task, task2));
+        compareTasks(convertToTaskList(foundTasks), List.of(task, task2));
     }
 
     @Test
@@ -307,22 +317,19 @@ public class SearchTaskTest {
         String queryMore = String.format("tasks: processId eq '%s'", net.getStringId());
 
         long count = searchService.count(query);
-        assert count == 2;
+        assert count == 6;
 
         count = searchService.count(queryOther);
-        assert count == 1;
+        assert count == 2;
 
         Object foundTask = searchService.search(query);
-        assert foundTask instanceof Task;
-        assert foundTask.equals(task) || foundTask.equals(task2);
+        compareTasks(convertToTask(foundTask), List.of(task, task2));
 
         foundTask = searchService.search(queryOther);
-        assert foundTask instanceof Task;
-        assert foundTask.equals(task3);
+        compareTasks(convertToTask(foundTask), task3);
 
         Object foundTasks = searchService.search(queryMore);
-        assert foundTasks instanceof List;
-        assert ((List<Task>) foundTasks).containsAll(List.of(task, task2));
+        compareTasks(convertToTaskList(foundTasks), List.of(task, task2));
     }
 
     @Test
@@ -354,16 +361,13 @@ public class SearchTaskTest {
         assert count == 2;
 
         Object foundTask = searchService.search(query);
-        assert foundTask instanceof Task;
-        assert foundTask.equals(task);
+        compareTasks(convertToTask(foundTask), task);
 
         foundTask = searchService.search(queryBefore);
-        assert foundTask instanceof Task;
-        assert foundTask.equals(task) || foundTask.equals(task2);
+        compareTasks(convertToTask(foundTask), List.of(task, task2));
 
         Object foundTasks = searchService.search(queryMore);
-        assert foundTasks instanceof List;
-        assert ((List<Task>) foundTasks).containsAll(List.of(task, task2));
+        compareTasks(convertToTaskList(foundTasks), List.of(task, task2));
     }
 
     @Test
@@ -386,7 +390,7 @@ public class SearchTaskTest {
         String task2Id = case2.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task2 = taskService.findOne(task2Id);
 
-        String query = String.format("task: lastFinish eq %s", SearchUtils.toDateTimeString(task.getLastAssigned()));
+        String query = String.format("task: lastFinish eq %s", SearchUtils.toDateTimeString(task.getLastFinished()));
         String queryBefore = String.format("task: lastFinish > %s", SearchUtils.toDateTimeString(before));
         String queryMore = String.format("tasks: lastFinish > %s", SearchUtils.toDateTimeString(before));
 
@@ -397,15 +401,12 @@ public class SearchTaskTest {
         assert count == 2;
 
         Object foundTask = searchService.search(query);
-        assert foundTask instanceof Task;
-        assert foundTask.equals(task);
+        compareTasks(convertToTask(foundTask), task);
 
         foundTask = searchService.search(queryBefore);
-        assert foundTask instanceof Task;
-        assert foundTask.equals(task) || foundTask.equals(task2);
+        compareTasks(convertToTask(foundTask), List.of(task, task2));
 
         Object foundTasks = searchService.search(queryMore);
-        assert foundTasks instanceof List;
-        assert ((List<Task>) foundTasks).containsAll(List.of(task, task2));
+        compareTasks(convertToTaskList(foundTasks), List.of(task, task2));
     }
 }

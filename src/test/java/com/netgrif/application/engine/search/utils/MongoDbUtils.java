@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.search;
+package com.netgrif.application.engine.search.utils;
 
 import com.querydsl.core.types.Predicate;
 

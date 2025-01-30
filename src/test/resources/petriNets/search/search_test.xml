@@ -214,13 +214,6 @@
 		<id>a3</id>
 		<type>regular</type>
 		<sourceId>p1</sourceId>
-		<destinationId>search_test_t1</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>a4</id>
-		<type>regular</type>
-		<sourceId>p1</sourceId>
 		<destinationId>search_test_t2</destinationId>
         <multiplicity>1</multiplicity>
     </arc>

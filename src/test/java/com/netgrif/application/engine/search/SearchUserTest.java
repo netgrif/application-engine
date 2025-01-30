@@ -18,6 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @SpringBootTest
@@ -49,6 +50,37 @@ public class SearchUserTest {
         return importHelper.createUser(user, authorities, processRoles);
     }
 
+    private static IUser convertToIUser(Object userObject) {
+        assert userObject instanceof IUser;
+        return (IUser) userObject;
+    }
+
+    private static List<IUser> convertToIUserList(Object userListObject) {
+        assert userListObject instanceof List<?>;
+        for (Object userObject : (List<?>) userListObject) {
+            assert userObject instanceof IUser;
+        }
+
+        return (List<IUser>) userListObject;
+    }
+
+    private void compareUsers(IUser actual, IUser expected) {
+        assert actual.getStringId().equals(expected.getStringId());
+    }
+
+    private void compareUsers(IUser actual, List<IUser> expected) {
+        List<String> expectedStringIds = expected.stream().map(IUser::getStringId).collect(Collectors.toList());
+
+        assert expectedStringIds.contains(actual.getStringId());
+    }
+
+    private void compareUsers(List<IUser> actual, List<IUser> expected) {
+        List<String> actualStringIds = actual.stream().map(IUser::getStringId).collect(Collectors.toList());
+        List<String> expectedStringIds = expected.stream().map(IUser::getStringId).collect(Collectors.toList());
+
+        assert actualStringIds.containsAll(expectedStringIds);
+    }
+
     @Test
     public void testSearchById() {
         IUser user1 = createUser("name1", "surname1", "email1", "user");
@@ -60,9 +92,7 @@ public class SearchUserTest {
         assert count == 1;
 
         Object foundUser = searchService.search(query);
-
-        assert foundUser instanceof User;
-        assert foundUser.equals(user1);
+        compareUsers(convertToIUser(foundUser), user1);
     }
 
     @Test
@@ -76,9 +106,7 @@ public class SearchUserTest {
         assert count == 1;
 
         Object foundUser = searchService.search(query);
-
-        assert foundUser instanceof User;
-        assert foundUser.equals(user1);
+        compareUsers(convertToIUser(foundUser), user1);
     }
 
     @Test
@@ -93,9 +121,7 @@ public class SearchUserTest {
         assert count == 2;
 
         Object foundUsers = searchService.search(query);
-
-        assert foundUsers instanceof List;
-        assert ((List<User>) foundUsers).containsAll(List.of(user1, user3));
+        compareUsers(convertToIUserList(foundUsers), List.of(user1, user3));
     }
 
     @Test
@@ -104,15 +130,13 @@ public class SearchUserTest {
         IUser user2 = createUser("name2", "surname2", "email2", "admin");
         IUser user3 = createUser("name1", "surname1", "email3", "user");
 
-        String query = String.format("users: surname eq '%s'", user1.getName());
+        String query = String.format("users: surname eq '%s'", user1.getSurname());
 
         long count = searchService.count(query);
         assert count == 2;
 
         Object foundUsers = searchService.search(query);
-
-        assert foundUsers instanceof List;
-        assert ((List<User>) foundUsers).containsAll(List.of(user1, user3));
+        compareUsers(convertToIUserList(foundUsers), List.of(user1, user3));
     }
 
 }

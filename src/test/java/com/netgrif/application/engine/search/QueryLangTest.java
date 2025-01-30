@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.domain.User;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.QPetriNet;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
+import com.netgrif.application.engine.search.utils.MongoDbUtils;
 import com.netgrif.application.engine.workflow.domain.*;
 import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
