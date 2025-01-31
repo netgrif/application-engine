@@ -9,25 +9,33 @@ query: resource=(PROCESS | PROCESSES) delimeter processConditions EOF # processQ
 processConditions: processOrExpression ;
 processOrExpression: processAndExpression (SPACE OR SPACE processAndExpression)* ;
 processAndExpression: processConditionGroup (SPACE AND SPACE processConditionGroup)* ;
-processConditionGroup: processCondition | (NOT SPACE)? '(' SPACE? processConditions SPACE? ')' SPACE? ;
+processConditionGroup: processCondition # processConditionGroupBasic
+                     | (NOT SPACE)? '(' SPACE? processConditions SPACE? ')' SPACE? # processConditionGroupParenthesis
+                     ;
 processCondition: (NOT SPACE)? processComparisons SPACE? ;
 
 caseConditions: caseOrExpression ;
 caseOrExpression: caseAndExpression (SPACE OR SPACE caseAndExpression)* ;
 caseAndExpression: caseConditionGroup (SPACE AND SPACE caseConditionGroup)* ;
-caseConditionGroup: caseCondition | (NOT SPACE)? '(' SPACE? caseConditions SPACE? ')' SPACE? ;
+caseConditionGroup: caseCondition # caseConditionGroupBasic
+                  | (NOT SPACE)? '(' SPACE? caseConditions SPACE? ')' SPACE? # caseConditionGroupParenthesis
+                  ;
 caseCondition: (NOT SPACE)? caseComparisons SPACE? ;
 
 taskConditions: taskOrExpression ;
 taskOrExpression: taskAndExpression (SPACE OR SPACE taskAndExpression)* ;
 taskAndExpression: taskConditionGroup (SPACE AND SPACE taskConditionGroup)* ;
-taskConditionGroup: taskCondition | (NOT SPACE)? '(' SPACE? taskConditions SPACE? ')' SPACE? ;
+taskConditionGroup: taskCondition # taskConditionGroupBasic
+                  | (NOT SPACE)? '(' SPACE? taskConditions SPACE? ')' SPACE? # taskConditionGroupParenthesis
+                  ;
 taskCondition: (NOT SPACE)? taskComparisons SPACE? ;
 
 userConditions: userOrExpression ;
 userOrExpression: userAndExpression (SPACE OR SPACE userAndExpression)* ;
 userAndExpression: userConditionGroup (SPACE AND SPACE userConditionGroup)* ;
-userConditionGroup: userCondition | (NOT SPACE)? '(' SPACE? userConditions SPACE? ')' SPACE? ;
+userConditionGroup: userCondition # userConditionGroupBasic
+                  | (NOT SPACE)? '(' SPACE? userConditions SPACE? ')' SPACE? # userConditionGroupParenthesis
+                  ;
 userCondition: (NOT SPACE)? userComparisons SPACE? ;
 
 // delimeter

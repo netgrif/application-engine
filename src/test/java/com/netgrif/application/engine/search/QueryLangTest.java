@@ -20,6 +20,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import static com.netgrif.application.engine.search.SearchUtils.evaluateQuery;
@@ -33,9 +34,6 @@ public class QueryLangTest {
 
     @Autowired
     MongoOperations mongoOperations;
-
-    // todo NAE-1997:: simple queries logical elastic string query comparison
-    // todo NAE-1997:: complex queries logical elastic string query comparison
 
     @Test
     public void testSimpleMongodbProcessQuery() {
@@ -159,6 +157,8 @@ public class QueryLangTest {
         // or comparison
         actual = evaluateQuery(String.format("process: id eq '%s' or title eq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QPetriNet.petriNet.id.eq(GENERIC_OBJECT_ID).or(QPetriNet.petriNet.title.defaultValue.eq("test"));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
 
         // or not comparison
         actual = evaluateQuery(String.format("process: id eq '%s' or not title eq 'test'", GENERIC_OBJECT_ID)).getFullMongoQuery();
@@ -664,6 +664,483 @@ public class QueryLangTest {
                         .or(QUser.user.email.eq("test1").and(QUser.user.name.eq("test"))));
 
         compareMongoQueries(mongoDbUtils, actual, expected);
+    }
+
+    @Test
+    public void testSimpleElasticProcessQuery() {
+        // elastic query should be always null
+        // id comparison
+        String actual = evaluateQuery(String.format("process: id eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // identifier comparison
+        actual = evaluateQuery("process: identifier eq 'test'").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("process: identifier contains 'test'").getFullElasticQuery();
+        assert actual == null;
+
+        // version comparison
+        actual = evaluateQuery("process: version eq 1.1.1").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("process: version lt 1.1.1").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("process: version lte 1.1.1").getFullElasticQuery();
+        assert actual == null;
+
+
+        actual = evaluateQuery("process: version gt 1.1.1").getFullElasticQuery();
+        assert actual == null;
+
+
+        actual = evaluateQuery("process: version gte 1.1.1").getFullElasticQuery();
+        assert actual == null;
+
+
+        // title comparison
+        actual = evaluateQuery("process: title eq 'test'").getFullElasticQuery();
+        assert actual == null;
+
+
+        actual = evaluateQuery("process: title contains 'test'").getFullElasticQuery();
+        assert actual == null;
+
+
+        // creationDate comparison
+        actual = evaluateQuery("process: creationDate eq 2011-12-03T10:15:30").getFullElasticQuery();
+        assert actual == null;
+
+
+        actual = evaluateQuery("process: creationDate lt 2011-12-03T10:15:30").getFullElasticQuery();
+        assert actual == null;
+
+
+        actual = evaluateQuery("process: creationDate lte 2011-12-03T10:15:30").getFullElasticQuery();
+        assert actual == null;
+
+
+        actual = evaluateQuery("process: creationDate gt 2011-12-03T10:15:30").getFullElasticQuery();
+        assert actual == null;
+
+
+        actual = evaluateQuery("process: creationDate gte 2011-12-03T10:15:30").getFullElasticQuery();
+        assert actual == null;
+    }
+
+    @Test
+    public void testComplexElasticProcessQuery() {
+        // elastic query should be always null
+        // not comparison
+        String actual = evaluateQuery(String.format("process: not id eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // and comparison
+        actual = evaluateQuery(String.format("process: id eq '%s' and title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // and not comparison
+        actual = evaluateQuery(String.format("process: id eq '%s' and not title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // or comparison
+        actual = evaluateQuery(String.format("process: id eq '%s' or title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // or not comparison
+        actual = evaluateQuery(String.format("process: id eq '%s' or not title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // parenthesis comparison
+        actual = evaluateQuery(String.format("process: id eq '%s' and (title eq 'test' or title eq 'test1')", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // parenthesis not comparison
+        actual = evaluateQuery(String.format("process: id eq '%s' and not (title eq 'test' or title eq 'test1')", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+
+        // nested parenthesis comparison
+        actual = evaluateQuery(String.format("process: id eq '%s' and (title eq 'test' or (title eq 'test1' and identifier eq 'test'))", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+    }
+
+    @Test
+    public void testSimpleElasticCaseQuery() {
+        LocalDateTime localDateTime = LocalDateTime.of(2011, 12, 3, 10, 15, 30);
+
+        // id comparison
+        String actual = evaluateQuery(String.format("case: id eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        String expected = String.format("stringId:%s", GENERIC_OBJECT_ID);
+        assert expected.equals(actual);
+
+        // processId comparison
+        actual = evaluateQuery("case: processId eq 'test'").getFullElasticQuery();
+        expected = "processId:test";
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: processId contains 'test'").getFullElasticQuery();
+        expected = "processId:*test*";
+        assert expected.equals(actual);
+
+        // processIdentifier comparison
+        actual = evaluateQuery("case: processIdentifier eq 'test'").getFullElasticQuery();
+        expected = "processIdentifier:test";
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: processIdentifier contains 'test'").getFullElasticQuery();
+        expected = "processIdentifier:*test*";
+        assert expected.equals(actual);
+
+        // title comparison
+        actual = evaluateQuery("case: title eq 'test'").getFullElasticQuery();
+        expected = "title:test";
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: title contains 'test'").getFullElasticQuery();
+        expected = "title:*test*";
+        assert expected.equals(actual);
+
+        // creationDate comparison
+        actual = evaluateQuery("case: creationDate eq 2011-12-03T10:15:30").getFullElasticQuery();
+        expected = String.format("creationDateSortable:%s", Timestamp.valueOf(localDateTime).getTime());
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: creationDate lt 2011-12-03T10:15:30").getFullElasticQuery();
+        expected = String.format("creationDateSortable:<%s", Timestamp.valueOf(localDateTime).getTime());
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: creationDate lte 2011-12-03T10:15:30").getFullElasticQuery();
+        expected = String.format("creationDateSortable:<=%s", Timestamp.valueOf(localDateTime).getTime());
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: creationDate gt 2011-12-03T10:15:30").getFullElasticQuery();
+        expected = String.format("creationDateSortable:>%s", Timestamp.valueOf(localDateTime).getTime());
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: creationDate gte 2011-12-03T10:15:30").getFullElasticQuery();
+        expected = String.format("creationDateSortable:>=%s", Timestamp.valueOf(localDateTime).getTime());
+        assert expected.equals(actual);
+
+        // author comparison
+        actual = evaluateQuery("case: author eq 'test'").getFullElasticQuery();
+        expected = "author:test";
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: author contains 'test'").getFullElasticQuery();
+        expected = "author:*test*";
+        assert expected.equals(actual);
+
+        // places comparison
+        actual = evaluateQuery("case: places.p1.marking eq 1").getFullElasticQuery();
+        expected = "places.p1.marking:1";
+        assert expected.equals(actual);
+
+        // task state comparison
+        actual = evaluateQuery("case: tasks.t1.state eq enabled").getFullElasticQuery();
+        expected = String.format("tasks.t1.state:%s", State.ENABLED);
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: tasks.t1.state eq disabled").getFullElasticQuery();
+        expected = String.format("tasks.t1.state:%s", State.DISABLED);
+        assert expected.equals(actual);
+
+        // task userId comparison
+        actual = evaluateQuery("case: tasks.t1.userId eq 'test'").getFullElasticQuery();
+        expected = "tasks.t1.userId:test";
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: tasks.t1.userId contains 'test'").getFullElasticQuery();
+        expected = "tasks.t1.userId:*test*";
+        assert expected.equals(actual);
+
+        // data value comparison
+        actual = evaluateQuery("case: data.field1.value eq 'test'").getFullElasticQuery();
+        expected = "dataSet.field1.textValue:test";
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: data.field1.value contains 'test'").getFullElasticQuery();
+        expected = "dataSet.field1.textValue:*test*";
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: data.field1.value eq 1").getFullElasticQuery();
+        expected = "dataSet.field1.numberValue:1";
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: data.field1.value lt 1").getFullElasticQuery();
+        expected = "dataSet.field1.numberValue:<1";
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: data.field1.value lte 1").getFullElasticQuery();
+        expected = "dataSet.field1.numberValue:<=1";
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: data.field1.value gt 1").getFullElasticQuery();
+        expected = "dataSet.field1.numberValue:>1";
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: data.field1.value gte 1").getFullElasticQuery();
+        expected = "dataSet.field1.numberValue:>=1";
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: data.field1.value eq 2011-12-03T10:15:30").getFullElasticQuery();
+        expected = String.format("dataSet.field1.timestampValue:%s", Timestamp.valueOf(localDateTime).getTime());
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: data.field1.value lt 2011-12-03T10:15:30").getFullElasticQuery();
+        expected = String.format("dataSet.field1.timestampValue:<%s", Timestamp.valueOf(localDateTime).getTime());
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: data.field1.value lte 2011-12-03T10:15:30").getFullElasticQuery();
+        expected = String.format("dataSet.field1.timestampValue:<=%s", Timestamp.valueOf(localDateTime).getTime());
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: data.field1.value gt 2011-12-03T10:15:30").getFullElasticQuery();
+        expected = String.format("dataSet.field1.timestampValue:>%s", Timestamp.valueOf(localDateTime).getTime());
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: data.field1.value gte 2011-12-03T10:15:30").getFullElasticQuery();
+        expected = String.format("dataSet.field1.timestampValue:>=%s", Timestamp.valueOf(localDateTime).getTime());
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: data.field1.value eq true").getFullElasticQuery();
+        expected = "dataSet.field1.booleanValue:true";
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: data.field1.value eq false").getFullElasticQuery();
+        expected = "dataSet.field1.booleanValue:false";
+        assert expected.equals(actual);
+
+        // data options comparison
+        actual = evaluateQuery("case: data.field1.options eq 'test'").getFullElasticQuery();
+        expected = "dataSet.field1.options:test";
+        assert expected.equals(actual);
+
+        actual = evaluateQuery("case: data.field1.options contains 'test'").getFullElasticQuery();
+        expected = "dataSet.field1.options:*test*";
+        assert expected.equals(actual);
+    }
+
+    @Test
+    public void testComplexElasticCaseQuery() {
+        // not comparison
+        String actual = evaluateQuery(String.format("case: not id eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        String expected = String.format("NOT stringId:%s", GENERIC_OBJECT_ID);
+        assert expected.equals(actual);
+
+        // and comparison
+        actual = evaluateQuery(String.format("case: id eq '%s' and title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("stringId:%s AND title:test", GENERIC_OBJECT_ID);
+        assert expected.equals(actual);
+
+        // and not comparison
+        actual = evaluateQuery(String.format("case: id eq '%s' and not title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("stringId:%s AND NOT title:test", GENERIC_OBJECT_ID);
+        assert expected.equals(actual);
+
+        // or comparison
+        actual = evaluateQuery(String.format("case: id eq '%s' or title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("stringId:%s OR title:test", GENERIC_OBJECT_ID);
+        assert expected.equals(actual);
+
+        // or not comparison
+        actual = evaluateQuery(String.format("case: id eq '%s' or not title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("stringId:%s OR NOT title:test", GENERIC_OBJECT_ID);
+        assert expected.equals(actual);
+
+        // parenthesis comparison
+        actual = evaluateQuery(String.format("case: id eq '%s' and (title eq 'test' or title eq 'test1')", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("stringId:%s AND (title:test OR title:test1)", GENERIC_OBJECT_ID);
+        assert expected.equals(actual);
+
+        // nested parenthesis comparison
+        actual = evaluateQuery(String.format("case: id eq '%s' and (title eq 'test' or (title eq 'test1' and processIdentifier eq 'test'))", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("stringId:%s AND (title:test OR (title:test1 AND processIdentifier:test))", GENERIC_OBJECT_ID);
+        assert expected.equals(actual);
+    }
+
+    @Test
+    public void testSimpleElasticTaskQuery() {
+        // elastic query should be always null
+        // id comparison
+        String actual = evaluateQuery(String.format("task: id eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // transitionId comparison
+        actual = evaluateQuery("task: transitionId eq 'test'").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("task: transitionId contains 'test'").getFullElasticQuery();
+        assert actual == null;
+
+        // title comparison
+        actual = evaluateQuery("task: title eq 'test'").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("task: title contains 'test'").getFullElasticQuery();
+        assert actual == null;
+
+        // state comparison
+        actual = evaluateQuery("task: state eq enabled").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("task: state eq disabled").getFullElasticQuery();
+        assert actual == null;
+
+        // userId comparison
+        actual = evaluateQuery("task: userId eq 'test'").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("task: userId contains 'test'").getFullElasticQuery();
+        assert actual == null;
+
+        // caseId comparison
+        actual = evaluateQuery("task: caseId eq 'test'").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("task: caseId contains 'test'").getFullElasticQuery();
+        assert actual == null;
+
+        // processId comparison
+        actual = evaluateQuery("task: processId eq 'test'").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("task: processId contains 'test'").getFullElasticQuery();
+        assert actual == null;
+
+        // lastAssign comparison
+        actual = evaluateQuery("task: lastAssign eq 2011-12-03T10:15:30").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("task: lastAssign lt 2011-12-03T10:15:30").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("task: lastAssign lte 2011-12-03T10:15:30").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("task: lastAssign gt 2011-12-03T10:15:30").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("task: lastAssign gte 2011-12-03T10:15:30").getFullElasticQuery();
+        assert actual == null;
+
+        // lastFinish comparison
+        actual = evaluateQuery("task: lastFinish eq 2011-12-03T10:15:30").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("task: lastFinish lt 2011-12-03T10:15:30").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("task: lastFinish lte 2011-12-03T10:15:30").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("task: lastFinish gt 2011-12-03T10:15:30").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("task: lastFinish gte 2011-12-03T10:15:30").getFullElasticQuery();
+        assert actual == null;
+    }
+
+    @Test
+    public void testComplexElasticTaskQuery() {
+        // elastic query should be always null
+        // not comparison
+        String actual = evaluateQuery(String.format("task: not id eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // and comparison
+        actual = evaluateQuery(String.format("task: id eq '%s' and title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // and not comparison
+        actual = evaluateQuery(String.format("task: id eq '%s' and not title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // or comparison
+        actual = evaluateQuery(String.format("task: id eq '%s' or title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // or not comparison
+        actual = evaluateQuery(String.format("task: id eq '%s' or not title eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // parenthesis comparison
+        actual = evaluateQuery(String.format("task: id eq '%s' and (title eq 'test' or title eq 'test1')", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // parenthesis not comparison
+        actual = evaluateQuery(String.format("task: id eq '%s' and not (title eq 'test' or title eq 'test1')", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // nested parenthesis comparison
+        actual = evaluateQuery(String.format("task: id eq '%s' and (title eq 'test' or (title eq 'test1' and processId eq 'test'))", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+    }
+
+    @Test
+    public void testSimpleElasticUserQuery() {
+        // elastic query should be always null
+        // id comparison
+        String actual = evaluateQuery(String.format("user: id eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // name comparison
+        actual = evaluateQuery("user: name eq 'test'").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("user: name contains 'test'").getFullElasticQuery();
+        assert actual == null;
+
+        // surname comparison
+        actual = evaluateQuery("user: surname eq 'test'").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("user: surname contains 'test'").getFullElasticQuery();
+        assert actual == null;
+
+        // email comparison
+        actual = evaluateQuery("user: email eq 'test'").getFullElasticQuery();
+        assert actual == null;
+
+        actual = evaluateQuery("user: email contains 'test'").getFullElasticQuery();
+        assert actual == null;
+    }
+
+    @Test
+    public void testComplexElasticUserQuery() {
+        // elastic query should be always null
+        // not comparison
+        String actual = evaluateQuery(String.format("user: not id eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // and comparison
+        actual = evaluateQuery(String.format("user: id eq '%s' and email eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // and not comparison
+        actual = evaluateQuery(String.format("user: id eq '%s' and not email eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // or comparison
+        actual = evaluateQuery(String.format("user: id eq '%s' or email eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // or not comparison
+        actual = evaluateQuery(String.format("user: id eq '%s' or not email eq 'test'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // parenthesis comparison
+        actual = evaluateQuery(String.format("user: id eq '%s' and (email eq 'test' or email eq 'test1')", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // parenthesis not comparison
+        actual = evaluateQuery(String.format("user: id eq '%s' and not (email eq 'test' or email eq 'test1')", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
+
+        // nested parenthesis comparison
+        actual = evaluateQuery(String.format("user: id eq '%s' and (email eq 'test' or (email eq 'test1' and name eq 'test'))", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        assert actual == null;
     }
 
     @Test

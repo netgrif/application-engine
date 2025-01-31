@@ -99,7 +99,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         setElasticQuery(current, elasticQuery.isBlank() ? null : elasticQuery);
     }
 
-    private void processConditionGroup(ParseTree child, ParseTree current, Boolean not) {
+    private void processConditionGroup(ParseTree child, ParseTree current, Boolean not, Boolean parenthesis) {
         Predicate predicate = getMongoQuery(child);
         String elasticQuery = getElasticQuery(child);
 
@@ -108,7 +108,13 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         }
 
         if (elasticQuery != null) {
-            elasticQuery = not ? "NOT (" + elasticQuery + ")" : "(" + elasticQuery + ")";
+            if (parenthesis) {
+                elasticQuery = "(" + elasticQuery + ")";
+            }
+
+            if (not) {
+                elasticQuery = "NOT " + elasticQuery;
+            }
         }
 
         setMongoQuery(current, predicate);
@@ -204,8 +210,13 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     }
 
     @Override
-    public void exitProcessConditionGroup(QueryLangParser.ProcessConditionGroupContext ctx) {
-        processConditionGroup(ctx.processCondition() != null ? ctx.processCondition() : ctx.processConditions(), ctx, ctx.NOT() != null);
+    public void exitProcessConditionGroupBasic(QueryLangParser.ProcessConditionGroupBasicContext ctx) {
+        processConditionGroup(ctx.processCondition(), ctx, false, false);
+    }
+
+    @Override
+    public void exitProcessConditionGroupParenthesis(QueryLangParser.ProcessConditionGroupParenthesisContext ctx) {
+        processConditionGroup(ctx.processConditions(), ctx, ctx.NOT() != null, true);
     }
 
     @Override
@@ -237,8 +248,13 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     }
 
     @Override
-    public void exitCaseConditionGroup(QueryLangParser.CaseConditionGroupContext ctx) {
-        processConditionGroup(ctx.caseCondition() != null ? ctx.caseCondition() : ctx.caseConditions(), ctx, ctx.NOT() != null);
+    public void exitCaseConditionGroupBasic(QueryLangParser.CaseConditionGroupBasicContext ctx) {
+        processConditionGroup(ctx.caseCondition(), ctx, false, false);
+    }
+
+    @Override
+    public void exitCaseConditionGroupParenthesis(QueryLangParser.CaseConditionGroupParenthesisContext ctx) {
+        processConditionGroup(ctx.caseConditions(), ctx, ctx.NOT() != null, true);
     }
 
     @Override
@@ -270,8 +286,13 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     }
 
     @Override
-    public void exitTaskConditionGroup(QueryLangParser.TaskConditionGroupContext ctx) {
-        processConditionGroup(ctx.taskCondition() != null ? ctx.taskCondition() : ctx.taskConditions(), ctx, ctx.NOT() != null);
+    public void exitTaskConditionGroupBasic(QueryLangParser.TaskConditionGroupBasicContext ctx) {
+        processConditionGroup(ctx.taskCondition(), ctx, false, false);
+    }
+
+    @Override
+    public void exitTaskConditionGroupParenthesis(QueryLangParser.TaskConditionGroupParenthesisContext ctx) {
+        processConditionGroup(ctx.taskConditions(), ctx, ctx.NOT() != null, true);
     }
 
     @Override
@@ -303,8 +324,13 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     }
 
     @Override
-    public void exitUserConditionGroup(QueryLangParser.UserConditionGroupContext ctx) {
-        processConditionGroup(ctx.userCondition() != null ? ctx.userCondition() : ctx.userConditions(), ctx, ctx.NOT() != null);
+    public void exitUserConditionGroupBasic(QueryLangParser.UserConditionGroupBasicContext ctx) {
+        processConditionGroup(ctx.userCondition(), ctx, false, false);
+    }
+
+    @Override
+    public void exitUserConditionGroupParenthesis(QueryLangParser.UserConditionGroupParenthesisContext ctx) {
+        processConditionGroup(ctx.userConditions(), ctx, ctx.NOT() != null, true);
     }
 
     @Override
@@ -616,7 +642,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         LocalDateTime localDateTime = toDateTime(ctx.dateComparison().DATE().getText());
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".timestampValue", op, Timestamp.valueOf(localDateTime).toString()));
+        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".timestampValue", op, String.valueOf(Timestamp.valueOf(localDateTime).getTime())));
     }
 
     @Override
@@ -627,7 +653,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         LocalDateTime localDateTime = toDateTime(ctx.dateTimeComparison().DATETIME().getText());
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".timestampValue", op, Timestamp.valueOf(localDateTime).toString()));
+        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".timestampValue", op, String.valueOf(Timestamp.valueOf(localDateTime).getTime())));
     }
 
     @Override
