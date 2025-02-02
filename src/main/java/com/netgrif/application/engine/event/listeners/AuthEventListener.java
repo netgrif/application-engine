@@ -52,6 +52,5 @@ public class AuthEventListener extends Listener {
         // do nothing
     }
 
-
 }
 

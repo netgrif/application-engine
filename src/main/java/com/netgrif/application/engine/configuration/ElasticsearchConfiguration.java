@@ -19,7 +19,7 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 @EnableElasticsearchRepositories(excludeFilters = {
         @ComponentScan.Filter(
                 type = FilterType.REGEX,
-                pattern = "com\\.netgrif\\.application\\.engine\\.history\\.domain\\..*"
+                pattern = "com\\.netgrif\\.application\\.engine\\.module\\..*"
         )
 })
 public class ElasticsearchConfiguration extends org.springframework.data.elasticsearch.client.elc.ElasticsearchConfiguration {
@@ -105,18 +105,4 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
         return super.elasticsearchOperations(elasticsearchConverter, elasticsearchClient);
     }
 
-    @Bean
-    @Qualifier("historyCluster")
-    public ElasticsearchOperations elasticsearchHistoryOperations(ElasticsearchConverter elasticsearchConverter) {
-        ElasticsearchHistoryConfiguration elasticsearchConfiguration = new ElasticsearchHistoryConfiguration();
-        ClientConfiguration clientConfiguration = elasticsearchConfiguration.clientConfiguration();
-        RestClient restClient = elasticsearchConfiguration.elasticsearchRestClient(clientConfiguration);
-        ElasticsearchTransport transport = new RestClientTransport(
-                restClient,
-                new JacksonJsonpMapper()
-        );
-        ElasticsearchClient elasticsearchClient = elasticsearchClient(transport);
-
-        return elasticsearchConfiguration.elasticsearchOperations(elasticsearchConverter, elasticsearchClient);
-    }
 }

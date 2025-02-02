@@ -28,7 +28,7 @@ public abstract class NaeEventPublisher {
      * @param event - the NaeEvent instance (can be extended class), that contains the source object;
      * */
     public void publish(Event event) {
-        log.info("Publishing event " + event.getTimestamp());
+        log.info("Publishing event {}", event.getTime());
         this.applicationEventPublisher.publishEvent(event);
     }
 }

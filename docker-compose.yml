@@ -33,26 +33,6 @@ services:
         reservations:
           cpus: "0.5"
           memory: "512M"
-# Zmensit resources
-  docker-elastic-history:
-    image: elasticsearch:8.15.3
-    environment:
-      - cluster.name=elasticsearch
-      - discovery.type=single-node
-      - http.host=0.0.0.0
-      - xpack.security.enabled=false
-      - transport.host=0.0.0.0
-    ports:
-      - "9201:9200"
-      - "9301:9300"
-    deploy:
-      resources:
-        limits:
-          cpus: "2"
-          memory: "2G"
-        reservations:
-          cpus: "0.5"
-          memory: "512M"
 
   docker-redis:
     image: redis:7.4.1

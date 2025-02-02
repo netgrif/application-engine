@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.List;
 
+@Deprecated(since = "7.0.0")
 public interface IHistoryService {
 
     void save(EventLog eventLog);

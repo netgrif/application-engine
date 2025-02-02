@@ -15,7 +15,8 @@ public class UserDispatcher extends AbstractDispatcher {
                 UserLogoutEvent.class,
                 UserRegistrationEvent.class,
                 UserRoleChangeEvent.class,
-                AdminActionEvent.class
+                AdminActionEvent.class,
+                ImpersonationEvent.class
         ));
     }
 
@@ -66,6 +67,16 @@ public class UserDispatcher extends AbstractDispatcher {
 
     @EventListener
     public void handleAsyncUseRoleChangeEvent(AdminActionEvent event) {
+        dispatchAsync(event);
+    }
+
+    @EventListener
+    public void handleUserImpersonationEvent(ImpersonationEvent event) {
+        dispatch(event);
+    }
+
+    @EventListener
+    public void handleAsyncUserImpersonationEvent(ImpersonationEvent event) {
         dispatchAsync(event);
     }
 }

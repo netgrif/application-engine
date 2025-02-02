@@ -1,11 +1,11 @@
 package com.netgrif.application.engine.event.evaluators;
 
 import lombok.Getter;
-import org.springframework.context.ApplicationEvent;
 
+import java.util.EventObject;
 import java.util.function.Function;
 
-public class Evaluator<E extends ApplicationEvent, R> {
+public class Evaluator<E extends EventObject, R> {
     @Getter
     private final String type;
     private final Function<E, R> evaluationFunction;

@@ -2,12 +2,12 @@ package com.netgrif.application.engine.event.events;
 
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import lombok.Getter;
-import org.springframework.context.ApplicationEvent;
 
 import java.io.Serial;
 import java.time.LocalDateTime;
+import java.util.EventObject;
 
-public abstract class Event extends ApplicationEvent {
+public abstract class Event extends EventObject {
     @Serial
     private static final long serialVersionUID = -9102232475981679124L;
     @Getter
