@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.history.domain.taskevents;
 
 import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.event.events.task.CancelTaskEvent;
+import com.netgrif.core.event.events.task.DelegateTaskEvent;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.adapter.workflow.domain.Case;
 import com.netgrif.adapter.workflow.domain.Task;
@@ -8,7 +10,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "eventLogs")
 @EqualsAndHashCode(callSuper = true)
 public class DelegateTaskEventLog extends TaskEventLog {
 
@@ -26,5 +27,10 @@ public class DelegateTaskEventLog extends TaskEventLog {
         super(task, useCase, eventPhase, delegator.getStringId(), delegator.isImpersonating() ? delegator.getImpersonated().getStringId() : null);
         this.delegator = getUserId();
         this.delegate = delegate;
+    }
+
+
+    public static DelegateTaskEventLog fromEvent(DelegateTaskEvent event) {
+        return new DelegateTaskEventLog(event.getTaskEventOutcome().getTask(), event.getTaskEventOutcome().getCase(), event.getEventPhase(), event.getUser(), event.getDelegate());
     }
 }

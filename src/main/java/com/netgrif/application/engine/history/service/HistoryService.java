@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@Deprecated(since = "7.0.0")
 public class HistoryService implements IHistoryService {
     protected String clazz = "', _class: '";
 

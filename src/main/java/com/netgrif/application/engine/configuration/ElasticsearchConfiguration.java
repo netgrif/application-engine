@@ -1,13 +1,27 @@
 package com.netgrif.application.engine.configuration;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.netgrif.application.engine.configuration.properties.UriProperties;
 import com.netgrif.application.engine.workflow.service.CaseEventHandler;
+import org.elasticsearch.client.RestClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
+import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 @Configuration
+@EnableElasticsearchRepositories(excludeFilters = {
+        @ComponentScan.Filter(
+                type = FilterType.REGEX,
+                pattern = "com\\.netgrif\\.application\\.engine\\.module\\..*"
+        )
+})
 public class ElasticsearchConfiguration extends org.springframework.data.elasticsearch.client.elc.ElasticsearchConfiguration {
 
     @Value("${spring.data.elasticsearch.url}")
@@ -84,4 +98,11 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
                 .connectedTo(url + ":" + port)
                 .build();
     }
+
+    @Bean
+    @Primary
+    public ElasticsearchOperations elasticsearchOperations(ElasticsearchConverter elasticsearchConverter, ElasticsearchClient elasticsearchClient) {
+        return super.elasticsearchOperations(elasticsearchConverter, elasticsearchClient);
+    }
+
 }

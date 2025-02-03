@@ -369,6 +369,7 @@ public class PetriNetService implements IPetriNetService {
         useCase.getPetriNet().getArcs().forEach((key, arcs) -> {
             arcs.forEach(arc -> pn.getArcs().add(new ArcImportReference(arc)));
         });
+        //TODO: HistoryService zmizne
         pn.getAssignedTasks().addAll(historyService.findAllAssignTaskEventLogsByCaseId(caseId)
                 .stream().map(TaskEventLog::getTransitionId).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
         pn.getFinishedTasks().addAll(historyService.findAllFinishTaskEventLogsByCaseId(caseId)

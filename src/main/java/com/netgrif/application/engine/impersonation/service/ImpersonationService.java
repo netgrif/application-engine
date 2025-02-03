@@ -6,8 +6,9 @@ import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;
+import com.netgrif.application.engine.event.events.user.ImpersonationEvent;
+import com.netgrif.application.engine.event.events.user.ImpersonationPhase;
 import com.netgrif.application.engine.history.domain.impersonationevents.ImpersonationEndEventLog;
-import com.netgrif.application.engine.history.domain.impersonationevents.ImpersonationStartEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
 import com.netgrif.application.engine.impersonation.domain.repository.ImpersonatorRepository;
@@ -20,6 +21,7 @@ import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.adapter.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -38,6 +40,9 @@ public class ImpersonationService implements IImpersonationService {
 
     @Autowired
     protected IHistoryService historyService;
+
+    @Autowired
+    protected ApplicationEventPublisher publisher;
 
     @Autowired
     protected IImpersonationSessionService sessionService;
@@ -90,11 +95,11 @@ public class ImpersonationService implements IImpersonationService {
         securityContextService.saveToken(loggedUser.getId());
         securityContextService.reloadSecurityContext(loggedUser);
         log.info(loggedUser.getFullName() + " has just impersonated user " + impersonatedLogged.getFullName());
-        historyService.save(
-                new ImpersonationStartEventLog(loggedUser.getId(), impersonatedLogged.getId(),
-                        impersonatedLogged.getProcessRoles().stream().map(ProcessRole::getStringId).toList(),
-                        ((LoggedUserImpl) impersonatedLogged).getAuthorities().stream().map(au -> ((Authority) au).getStringId()).collect(Collectors.toList()))
-        );
+//        historyService.save(
+//                new ImpersonationStartEventLog(loggedUser.getId(), impersonatedLogged.getId(),
+//                        new ArrayList<>(impersonatedLogged.getProcessRoles()),
+//                        impersonatedLogged.getAuthorities().stream().map(au -> ((Authority) au).getStringId()).collect(Collectors.toList()))
+//        );
         return loggedUser;
     }
 
@@ -126,7 +131,8 @@ public class ImpersonationService implements IImpersonationService {
         log.info(impersonator.getFullName() + " has stopped impersonating user " + impersonated.getFullName());
         securityContextService.saveToken(impersonator.getId());
         securityContextService.reloadSecurityContext(impersonator);
-        historyService.save(new ImpersonationEndEventLog(impersonator.getId(), impersonated.getId()));
+//        historyService.save(new ImpersonationEndEventLog(impersonator.getId(), impersonated.getId()));
+        publisher.publishEvent(new ImpersonationEvent( impersonator, impersonated, ImpersonationPhase.STOP));
         return impersonator;
     }
 
@@ -134,7 +140,8 @@ public class ImpersonationService implements IImpersonationService {
     public void onSessionDestroy(LoggedUser impersonator) {
         removeImpersonator(impersonator.getId());
         log.info(impersonator.getFullName() + " has logged out and stopped impersonating user " + impersonator.getImpersonated().getFullName());
-        historyService.save(new ImpersonationEndEventLog(impersonator.getId(), impersonator.getImpersonated().getId()));
+//        historyService.save(new ImpersonationEndEventLog(impersonator.getId(), impersonator.getImpersonated().getId()));
+        publisher.publishEvent(new ImpersonationEvent( impersonator,  impersonator.getImpersonated(), ImpersonationPhase.STOP));
     }
 
     @Override
@@ -170,7 +177,7 @@ public class ImpersonationService implements IImpersonationService {
                 .entrySet().stream()
                 .filter(it -> it.getValue() != null)
                 .min(Map.Entry.comparingByValue());
-            updateImpersonatedId(loggedUser, id, configs, earliestEndingConfig.map(Map.Entry::getValue).orElse(null));
+        updateImpersonatedId(loggedUser, id, configs, earliestEndingConfig.map(Map.Entry::getValue).orElse(null));
     }
 
     protected void updateImpersonatedId(LoggedUser loggedUser, String id, List<Case> configs, LocalDateTime validUntil) {

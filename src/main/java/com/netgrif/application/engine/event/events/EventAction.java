@@ -17,5 +17,7 @@ public enum EventAction {
     CASE_DELETE,
     CASE_INDEXED,
     DATA_GET,
-    DATA_SET
+    DATA_SET,
+    AUTH_SUCCESS,
+    AUTH_FAIL,
 }

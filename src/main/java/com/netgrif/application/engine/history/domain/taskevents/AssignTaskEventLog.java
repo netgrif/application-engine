@@ -7,7 +7,6 @@ import com.netgrif.adapter.workflow.domain.Task;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "eventLogs")
 @EqualsAndHashCode(callSuper = true)
 public class AssignTaskEventLog extends TaskEventLog {
 
@@ -18,5 +17,9 @@ public class AssignTaskEventLog extends TaskEventLog {
 
     public AssignTaskEventLog(Task task, Case useCase, EventPhase eventPhase, IUser user) {
         super(task, useCase, eventPhase, user.getStringId(), user.isImpersonating() ? user.getImpersonated().getStringId() : null);
+    }
+
+    public static AssignTaskEventLog fromEvent(AssignTaskEvent event) {
+        return new AssignTaskEventLog(event.getTaskEventOutcome().getTask(), event.getTaskEventOutcome().getCase(), event.getEventPhase(), event.getUser());
     }
 }

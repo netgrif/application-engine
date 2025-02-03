@@ -145,7 +145,7 @@ public class DataService implements IDataService {
                 return;
             Field field = useCase.getPetriNet().getField(fieldId).get();
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, params));
-            historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE, user));
+//            historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE, user));
 
             if (outcome.getMessage() == null) {
                 Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
@@ -178,7 +178,7 @@ public class DataService implements IDataService {
                 }
             }
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task, params));
-            historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST, user));
+//            historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST, user));
         });
 
         workflowService.save(useCase);
@@ -193,7 +193,7 @@ public class DataService implements IDataService {
         LongStream.range(0L, dataSetFields.size())
                 .forEach(index -> dataSetFields.get((int) index).setOrder(index));
         outcome.setData(dataSetFields);
-        publisher.publishEvent(new GetDataEvent(outcome));
+        publisher.publishEvent(new GetDataEvent(outcome, user));
         return outcome;
     }
 

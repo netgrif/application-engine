@@ -1,17 +1,25 @@
 package com.netgrif.application.engine.history.domain.baseevent;
 
+import com.netgrif.application.engine.event.events.Event;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.elasticsearch.annotations.Document;
 
+
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
-@Document(collection = "eventLogs")
-public abstract class EventLog {
+//TODO
+@Document(indexName = "#{@eventLogIndex}")
+public abstract class EventLog implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 7650412902302046885L;
 
     @Id
     @Getter
