@@ -14,6 +14,7 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.StringPath;
 import lombok.Getter;
+import lombok.Setter;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
@@ -37,6 +38,9 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     private QueryType type;
     @Getter
     private Boolean multiple;
+    @Getter
+    @Setter
+    private Boolean searchWithElastic = false;
     @Getter
     private Predicate fullMongoQuery;
     @Getter
@@ -115,19 +119,6 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
             if (not) {
                 elasticQuery = "NOT " + elasticQuery;
             }
-        }
-
-        setMongoQuery(current, predicate);
-        setElasticQuery(current, elasticQuery);
-    }
-
-    private void processCondition(ParseTree child, ParseTree current, Boolean not) {
-        Predicate predicate = getMongoQuery(child);
-        String elasticQuery = getElasticQuery(child);
-
-        if (not) {
-            predicate = predicate != null ? predicate.not() : null;
-            elasticQuery = elasticQuery != null ? "NOT " + elasticQuery : null;
         }
 
         setMongoQuery(current, predicate);
@@ -221,7 +212,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitProcessCondition(QueryLangParser.ProcessConditionContext ctx) {
-        processCondition(ctx.processComparisons(), ctx, ctx.NOT() != null);
+        processBasicExpression(ctx.processComparisons(), ctx);
     }
 
     @Override
@@ -259,7 +250,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitCaseCondition(QueryLangParser.CaseConditionContext ctx) {
-        processCondition(ctx.caseComparisons(), ctx, ctx.NOT() != null);
+        processBasicExpression(ctx.caseComparisons(), ctx);
     }
 
     @Override
@@ -297,7 +288,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitTaskCondition(QueryLangParser.TaskConditionContext ctx) {
-        processCondition(ctx.taskComparisons(), ctx, ctx.NOT() != null);
+        processBasicExpression(ctx.taskComparisons(), ctx);
     }
 
     @Override
@@ -335,7 +326,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitUserCondition(QueryLangParser.UserConditionContext ctx) {
-        processCondition(ctx.userComparisons(), ctx, ctx.NOT() != null);
+        processBasicExpression(ctx.userComparisons(), ctx);
     }
 
     @Override
@@ -362,6 +353,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     public void exitIdComparison(QueryLangParser.IdComparisonContext ctx) {
         QObjectId qObjectId;
         Token op = ctx.objectIdComparison().op;
+        boolean not = ctx.objectIdComparison().NOT() != null;
         checkOp(ComparisonType.ID, op);
         ObjectId objectId = getObjectIdValue(ctx.objectIdComparison().STRING().getText());
 
@@ -371,7 +363,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 break;
             case CASE:
                 qObjectId = QCase.case$.id;
-                setElasticQuery(ctx, buildElasticQuery("stringId", op, objectId.toString()));
+                setElasticQuery(ctx, buildElasticQuery("stringId", op, objectId.toString(), not));
                 break;
             case TASK:
                 qObjectId = QTask.task.id;
@@ -383,13 +375,14 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 throw new IllegalArgumentException("Unknown query type: " + type);
         }
 
-        setMongoQuery(ctx, buildObjectIdPredicate(qObjectId, op, objectId));
+        setMongoQuery(ctx, buildObjectIdPredicate(qObjectId, op, objectId, not));
     }
 
     @Override
     public void exitTitleComparison(QueryLangParser.TitleComparisonContext ctx) {
         StringPath stringPath;
         Token op = ctx.stringComparison().op;
+        boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
         switch (type) {
@@ -398,7 +391,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 break;
             case CASE:
                 stringPath = QCase.case$.title;
-                setElasticQuery(ctx, buildElasticQuery("title", op, string));
+                setElasticQuery(ctx, buildElasticQuery("title", op, string, not));
                 break;
             case TASK:
                 stringPath = QTask.task.title.defaultValue;
@@ -407,30 +400,33 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 throw new IllegalArgumentException("Unknown query type: " + type);
         }
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
     }
 
     @Override
     public void exitIdentifierComparison(QueryLangParser.IdentifierComparisonContext ctx) {
         StringPath stringPath = QPetriNet.petriNet.identifier;
         Token op = ctx.stringComparison().op;
+        boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
     }
 
     @Override
     public void exitVersionComparison(QueryLangParser.VersionComparisonContext ctx) {
         Token op = ctx.op;
+        boolean not = ctx.NOT() != null;
         String versionString = ctx.VERSION_NUMBER().getText();
 
-        setMongoQuery(ctx, buildVersionPredicate(op, versionString));
+        setMongoQuery(ctx, buildVersionPredicate(op, versionString, not));
     }
 
     @Override
     public void exitCdDate(QueryLangParser.CdDateContext ctx) {
         DateTimePath<LocalDateTime> dateTimePath;
         Token op = ctx.dateComparison().op;
+        boolean not = ctx.dateComparison().NOT() != null;
         LocalDateTime localDateTime = toDateTime(ctx.dateComparison().DATE().getText());
 
         switch (type) {
@@ -439,19 +435,20 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 break;
             case CASE:
                 dateTimePath = QCase.case$.creationDate;
-                setElasticQuery(ctx, buildElasticQuery("creationDateSortable", op, String.valueOf(Timestamp.valueOf(localDateTime).getTime())));
+                setElasticQuery(ctx, buildElasticQuery("creationDateSortable", op, String.valueOf(Timestamp.valueOf(localDateTime).getTime()), not));
                 break;
             default:
                 throw new IllegalArgumentException("Unknown query type: " + type);
         }
 
-        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op, localDateTime));
+        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op, localDateTime, not));
     }
 
     @Override
     public void exitCdDateTime(QueryLangParser.CdDateTimeContext ctx) {
         DateTimePath<LocalDateTime> dateTimePath;
         Token op = ctx.dateTimeComparison().op;
+        boolean not = ctx.dateTimeComparison().NOT() != null;
         LocalDateTime localDateTime = toDateTime(ctx.dateTimeComparison().DATETIME().getText());
 
         switch (type) {
@@ -460,25 +457,26 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 break;
             case CASE:
                 dateTimePath = QCase.case$.creationDate;
-                setElasticQuery(ctx, buildElasticQuery("creationDateSortable", op, String.valueOf(Timestamp.valueOf(localDateTime).getTime())));
+                setElasticQuery(ctx, buildElasticQuery("creationDateSortable", op, String.valueOf(Timestamp.valueOf(localDateTime).getTime()), not));
                 break;
             default:
                 throw new IllegalArgumentException("Unknown query type: " + type);
         }
 
-        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op, localDateTime));
+        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op, localDateTime, not));
     }
 
     @Override
     public void exitProcessIdComparison(QueryLangParser.ProcessIdComparisonContext ctx) {
         StringPath stringPath;
         Token op = ctx.stringComparison().op;
+        boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
         switch (type) {
             case CASE:
                 stringPath = QCase.case$.petriNetId;
-                setElasticQuery(ctx, buildElasticQuery("processId", op, string));
+                setElasticQuery(ctx, buildElasticQuery("processId", op, string, not));
                 break;
             case TASK:
                 stringPath = QTask.task.processId;
@@ -487,36 +485,39 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 throw new IllegalArgumentException("Unknown query type: " + type);
         }
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
     }
 
     @Override
     public void exitProcessIdentifierComparison(QueryLangParser.ProcessIdentifierComparisonContext ctx) {
         StringPath stringPath = QCase.case$.processIdentifier;
         Token op = ctx.stringComparison().op;
+        boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string));
-        setElasticQuery(ctx, buildElasticQuery("processIdentifier", op, string));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
+        setElasticQuery(ctx, buildElasticQuery("processIdentifier", op, string, not));
     }
 
     @Override
     public void exitAuthorComparison(QueryLangParser.AuthorComparisonContext ctx) {
         StringPath stringPath = QCase.case$.author.id;
         Token op = ctx.stringComparison().op;
+        boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string));
-        setElasticQuery(ctx, buildElasticQuery("author", op, string));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
+        setElasticQuery(ctx, buildElasticQuery("author", op, string, not));
     }
 
     @Override
     public void exitTransitionIdComparison(QueryLangParser.TransitionIdComparisonContext ctx) {
         StringPath stringPath = QTask.task.transitionId;
         Token op = ctx.stringComparison().op;
+        boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
     }
 
     @Override
@@ -535,81 +536,90 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     public void exitUserIdComparison(QueryLangParser.UserIdComparisonContext ctx) {
         StringPath stringPath = QTask.task.userId;
         Token op = ctx.stringComparison().op;
+        boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
     }
 
     @Override
     public void exitCaseIdComparison(QueryLangParser.CaseIdComparisonContext ctx) {
         StringPath stringPath = QTask.task.caseId;
         Token op = ctx.stringComparison().op;
+        boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
     }
 
     @Override
     public void exitLaDate(QueryLangParser.LaDateContext ctx) {
         DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastAssigned;
         Token op = ctx.dateComparison().op;
+        boolean not = ctx.dateComparison().NOT() != null;
         LocalDateTime localDateTime = toDateTime(ctx.dateComparison().DATE().getText());
 
-        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op, localDateTime));
+        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op, localDateTime, not));
     }
 
     @Override
     public void exitLaDateTime(QueryLangParser.LaDateTimeContext ctx) {
         DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastAssigned;
         Token op = ctx.dateTimeComparison().op;
+        boolean not = ctx.dateTimeComparison().NOT() != null;
         LocalDateTime localDateTime = toDateTime(ctx.dateTimeComparison().DATETIME().getText());
 
-        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op, localDateTime));
+        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op, localDateTime, not));
     }
 
     @Override
     public void exitLfDate(QueryLangParser.LfDateContext ctx) {
         DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastFinished;
         Token op = ctx.dateComparison().op;
+        boolean not = ctx.dateComparison().NOT() != null;
         LocalDateTime localDateTime = toDateTime(ctx.dateComparison().DATE().getText());
 
-        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op, localDateTime));
+        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op, localDateTime, not));
     }
 
     @Override
     public void exitLfDateTime(QueryLangParser.LfDateTimeContext ctx) {
         DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastFinished;
         Token op = ctx.dateTimeComparison().op;
+        boolean not = ctx.dateTimeComparison().NOT() != null;
         LocalDateTime localDateTime = toDateTime(ctx.dateTimeComparison().DATETIME().getText());
 
-        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op, localDateTime));
+        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op, localDateTime, not));
     }
 
     @Override
     public void exitNameComparison(QueryLangParser.NameComparisonContext ctx) {
         StringPath stringPath = QUser.user.name;
         Token op = ctx.stringComparison().op;
+        boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
     }
 
     @Override
     public void exitSurnameComparison(QueryLangParser.SurnameComparisonContext ctx) {
         StringPath stringPath = QUser.user.surname;
         Token op = ctx.stringComparison().op;
+        boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
     }
 
     @Override
     public void exitEmailComparison(QueryLangParser.EmailComparisonContext ctx) {
         StringPath stringPath = QUser.user.email;
         Token op = ctx.stringComparison().op;
+        boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
     }
 
     @Override
@@ -617,10 +627,12 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String fieldId = ctx.dataValue().fieldId.getText();
         Token op = ctx.stringComparison().op;
         checkOp(ComparisonType.STRING, op);
+        boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".textValue", op, string));
+        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".textValue", op, string, not));
+        this.searchWithElastic = true;
     }
 
     @Override
@@ -628,10 +640,12 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String fieldId = ctx.dataValue().fieldId.getText();
         Token op = ctx.numberComparison().op;
         checkOp(ComparisonType.NUMBER, op);
+        boolean not = ctx.numberComparison().NOT() != null;
         String number = ctx.numberComparison().NUMBER().getText();
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".numberValue", op, number));
+        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".numberValue", op, number, not));
+        this.searchWithElastic = true;
     }
 
     @Override
@@ -639,10 +653,12 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String fieldId = ctx.dataValue().fieldId.getText();
         Token op = ctx.dateComparison().op;
         checkOp(ComparisonType.DATE, op);
+        boolean not = ctx.dateComparison().NOT() != null;
         LocalDateTime localDateTime = toDateTime(ctx.dateComparison().DATE().getText());
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".timestampValue", op, String.valueOf(Timestamp.valueOf(localDateTime).getTime())));
+        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".timestampValue", op, String.valueOf(Timestamp.valueOf(localDateTime).getTime()), not));
+        this.searchWithElastic = true;
     }
 
     @Override
@@ -650,10 +666,12 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String fieldId = ctx.dataValue().fieldId.getText();
         Token op = ctx.dateTimeComparison().op;
         checkOp(ComparisonType.DATETIME, op);
+        boolean not = ctx.dateTimeComparison().NOT() != null;
         LocalDateTime localDateTime = toDateTime(ctx.dateTimeComparison().DATETIME().getText());
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".timestampValue", op, String.valueOf(Timestamp.valueOf(localDateTime).getTime())));
+        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".timestampValue", op, String.valueOf(Timestamp.valueOf(localDateTime).getTime()), not));
+        this.searchWithElastic = true;
     }
 
     @Override
@@ -661,10 +679,12 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String fieldId = ctx.dataValue().fieldId.getText();
         Token op = ctx.booleanComparison().op;
         checkOp(ComparisonType.BOOLEAN, op);
+        boolean not = ctx.booleanComparison().NOT() != null;
         String booleanValue = ctx.booleanComparison().BOOLEAN().getText();
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".booleanValue", op, booleanValue));
+        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".booleanValue", op, booleanValue, not));
+        this.searchWithElastic = true;
     }
 
     @Override
@@ -672,10 +692,12 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String fieldId = ctx.dataOptions().fieldId.getText();
         Token op = ctx.stringComparison().op;
         checkOp(ComparisonType.STRING, op);
+        boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".options", op, string));
+        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".options", op, string, not));
+        this.searchWithElastic = true;
     }
 
     @Override
@@ -683,10 +705,12 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String placeId = ctx.places().placeId.getText();
         Token op = ctx.numberComparison().op;
         checkOp(ComparisonType.NUMBER, op);
+        boolean not = ctx.numberComparison().NOT() != null;
         String numberValue = ctx.numberComparison().NUMBER().getText();
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("places." + placeId + ".marking", op, numberValue));
+        setElasticQuery(ctx, buildElasticQuery("places." + placeId + ".marking", op, numberValue, not));
+        this.searchWithElastic = true;
     }
 
     @Override
@@ -694,10 +718,12 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String taskId = ctx.tasksState().taskId.getText();
         Token op = ctx.op;
         checkOp(ComparisonType.STRING, op);
+        boolean not = ctx.NOT() != null;
         State state = ctx.state.getType() == QueryLangParser.ENABLED ? State.ENABLED : State.DISABLED;
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("tasks." + taskId + ".state", op, state.toString()));
+        setElasticQuery(ctx, buildElasticQuery("tasks." + taskId + ".state", op, state.toString(), not));
+        this.searchWithElastic = true;
     }
 
     @Override
@@ -705,9 +731,11 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String taskId = ctx.tasksUserId().taskId.getText();
         Token op = ctx.stringComparison().op;
         checkOp(ComparisonType.STRING, op);
+        boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("tasks." + taskId + ".userId", op, string));
+        setElasticQuery(ctx, buildElasticQuery("tasks." + taskId + ".userId", op, string, not));
+        this.searchWithElastic = true;
     }
 }

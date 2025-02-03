@@ -18,6 +18,7 @@ import org.bson.types.QObjectId;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -44,7 +45,7 @@ public class SearchUtils {
     }
 
     public static String toDateTimeString(LocalDate localDate) {
-        return localDate.atStartOfDay().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        return localDate.atTime(12, 0, 0).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
     public static String toDateTimeString(LocalDateTime localDateTime) {
@@ -56,7 +57,7 @@ public class SearchUtils {
             return LocalDateTime.parse(dateTimeString, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         } catch (DateTimeParseException ignored) {
             try {
-                return LocalDate.parse(dateTimeString, DateTimeFormatter.ISO_LOCAL_DATE).atStartOfDay();
+                return LocalDate.parse(dateTimeString, DateTimeFormatter.ISO_LOCAL_DATE).atTime(12, 0, 0);
             } catch (DateTimeParseException e) {
                 throw new IllegalArgumentException("Invalid date/datetime format");
             }
@@ -113,26 +114,40 @@ public class SearchUtils {
         }
     }
 
-    public static Predicate buildObjectIdPredicate(QObjectId qObjectId, Token op, ObjectId objectId) {
-        if (op.getType() == QueryLangParser.EQ) {
-            return qObjectId.eq(objectId);
+    public static Predicate buildObjectIdPredicate(QObjectId qObjectId, Token op, ObjectId objectId, boolean not) {
+        if (op.getType() != QueryLangParser.EQ) {
+            throw new UnsupportedOperationException("Operator " + op.getText() + " is not available for id comparison");
         }
 
-        throw new UnsupportedOperationException("Operator " + op.getText() + " is not available for id comparison");
+        Predicate predicate = qObjectId.eq(objectId);
+        if (not) {
+            predicate = predicate.not();
+        }
+        return predicate;
     }
 
-    public static Predicate buildStringPredicate(StringPath stringPath, Token op, String string) {
+    public static Predicate buildStringPredicate(StringPath stringPath, Token op, String string, boolean not) {
+        Predicate predicate = null;
         switch (op.getType()) {
             case QueryLangParser.EQ:
-                return stringPath.eq(string);
+                predicate = stringPath.eq(string);
+                break;
             case QueryLangParser.CONTAINS:
-                return stringPath.contains(string);
+                predicate = stringPath.contains(string);
+                break;
         }
 
-        throw new UnsupportedOperationException("Operator " + op.getText() + " is not available for string comparison");
+        if (predicate == null) {
+            throw new UnsupportedOperationException("Operator " + op.getText() + " is not available for string comparison");
+        }
+
+        if (not) {
+            predicate = predicate.not();
+        }
+        return predicate;
     }
 
-    public static Predicate buildVersionPredicate(Token op, String versionString) {
+    public static Predicate buildVersionPredicate(Token op, String versionString, boolean not) {
         String[] versionNumber = versionString.split("\\.");
         long major = Long.parseLong(versionNumber[0]);
         long minor = Long.parseLong(versionNumber[1]);
@@ -140,63 +155,105 @@ public class SearchUtils {
 
         QVersion qVersion = QPetriNet.petriNet.version;
 
+        Predicate predicate = null;
         switch (op.getType()) {
             case QueryLangParser.EQ:
-                return qVersion.eq(new Version(major, minor, patch));
+                predicate = qVersion.eq(new Version(major, minor, patch));
+                break;
             case QueryLangParser.GT:
-                return qVersion.major.gt(major)
+                predicate = qVersion.major.gt(major)
                         .or(qVersion.major.eq(major).and(qVersion.minor.gt(minor)))
                         .or(qVersion.major.eq(major).and(qVersion.minor.eq(minor).and(qVersion.patch.gt(patch))));
+                break;
             case QueryLangParser.GTE:
-                return qVersion.major.gt(major)
+                predicate = qVersion.major.gt(major)
                         .or(qVersion.major.eq(major).and(qVersion.minor.gt(minor)))
                         .or(qVersion.major.eq(major).and(qVersion.minor.eq(minor).and(qVersion.patch.gt(patch))))
                         .or(qVersion.eq(new Version(major, minor, patch)));
+                break;
             case QueryLangParser.LT:
-                return qVersion.major.lt(major)
+                predicate = qVersion.major.lt(major)
                         .or(qVersion.major.eq(major).and(qVersion.minor.lt(minor)))
                         .or(qVersion.major.eq(major).and(qVersion.minor.eq(minor).and(qVersion.patch.lt(patch))));
+                break;
             case QueryLangParser.LTE:
-                return qVersion.major.lt(major)
+                predicate = qVersion.major.lt(major)
                         .or(qVersion.major.eq(major).and(qVersion.minor.lt(minor)))
                         .or(qVersion.major.eq(major).and(qVersion.minor.eq(minor).and(qVersion.patch.lt(patch))))
                         .or(qVersion.eq(new Version(major, minor, patch)));
-        }
-        throw new UnsupportedOperationException("Operator " + op.getText() + " is not available for version comparison");
-    }
-
-    public static Predicate buildDateTimePredicate(DateTimePath<LocalDateTime> dateTimePath, Token op, LocalDateTime localDateTime) {
-        switch (op.getType()) {
-            case QueryLangParser.EQ:
-                return dateTimePath.eq(localDateTime);
-            case QueryLangParser.LT:
-                return dateTimePath.lt(localDateTime);
-            case QueryLangParser.LTE:
-                return dateTimePath.lt(localDateTime).or(dateTimePath.eq(localDateTime));
-            case QueryLangParser.GT:
-                return dateTimePath.gt(localDateTime);
-            case QueryLangParser.GTE:
-                return dateTimePath.gt(localDateTime).or(dateTimePath.eq(localDateTime));
+                break;
         }
 
-        throw new UnsupportedOperationException("Operator " + op.getText() + " is not available for date/datetime comparison");
+        if (predicate == null) {
+            throw new UnsupportedOperationException("Operator " + op.getText() + " is not available for version comparison");
+        }
+
+        if (not) {
+            predicate = predicate.not();
+        }
+        return predicate;
     }
 
-    public static String buildElasticQuery(String attribute, Token op, String value) {
+    public static Predicate buildDateTimePredicate(DateTimePath<LocalDateTime> dateTimePath, Token op, LocalDateTime localDateTime, boolean not) {
+        Predicate predicate = null;
         switch (op.getType()) {
             case QueryLangParser.EQ:
-                return attribute + ":" + value;
+                predicate = dateTimePath.eq(localDateTime);
+                break;
             case QueryLangParser.LT:
-                return attribute + ":<" + value;
+                predicate = dateTimePath.lt(localDateTime);
+                break;
             case QueryLangParser.LTE:
-                return attribute + ":<=" + value;
+                predicate = dateTimePath.lt(localDateTime).or(dateTimePath.eq(localDateTime));
+                break;
             case QueryLangParser.GT:
-                return attribute + ":>" + value;
+                predicate = dateTimePath.gt(localDateTime);
+                break;
             case QueryLangParser.GTE:
-                return attribute + ":>=" + value;
+                predicate = dateTimePath.gt(localDateTime).or(dateTimePath.eq(localDateTime));
+                break;
+        }
+
+        if (predicate == null) {
+            throw new UnsupportedOperationException("Operator " + op.getText() + " is not available for date/datetime comparison");
+        }
+
+        if (not) {
+            predicate = predicate.not();
+        }
+        return predicate;
+    }
+
+    public static String buildElasticQuery(String attribute, Token op, String value, boolean not) {
+        String query = null;
+        switch (op.getType()) {
+            case QueryLangParser.EQ:
+                query = attribute + ":" + value;
+                break;
+            case QueryLangParser.LT:
+                query = attribute + ":<" + value;
+                break;
+            case QueryLangParser.LTE:
+                query = attribute + ":<=" + value;
+                break;
+            case QueryLangParser.GT:
+                query = attribute + ":>" + value;
+                break;
+            case QueryLangParser.GTE:
+                query = attribute + ":>=" + value;
+                break;
             case QueryLangParser.CONTAINS:
-                return attribute + ":*" + value + "*";
+                query = attribute + ":*" + value + "*";
+                break;
         }
-        throw new UnsupportedOperationException("Operator " + op.getText() + " is not available for elastic comparison");
+
+        if (query == null) {
+            throw new UnsupportedOperationException("Operator " + op.getText() + " is not available for elastic comparison");
+        }
+
+        if (not) {
+            query = "NOT " + query;
+        }
+        return query;
     }
 }

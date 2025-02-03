@@ -28,6 +28,8 @@ import static com.netgrif.application.engine.search.SearchUtils.evaluateQuery;
 @RequiredArgsConstructor
 public class SearchService implements ISearchService {
 
+    public static final int DEFAULT_ELASTIC_PAGE_SIZE = 100000;
+
     private final PetriNetRepository petriNetRepository;
 
     private final IElasticCaseService elasticCaseService;
@@ -61,7 +63,7 @@ public class SearchService implements ISearchService {
         return elasticCaseService.search(
                 List.of(caseSearchRequest),
                 userService.getLoggedOrSystem().transformToLoggedUser(),
-                new FullPageRequest(), LocaleContextHolder.getLocale(),
+                PageRequest.of(0, DEFAULT_ELASTIC_PAGE_SIZE), LocaleContextHolder.getLocale(),
                 false
         ).getContent();
     }
@@ -80,7 +82,7 @@ public class SearchService implements ISearchService {
                 return petriNetRepository.findAll(predicate, PageRequest.of(0, 1))
                         .getContent().stream().findFirst().orElse(null);
             case CASE:
-                if (predicate != null) {
+                if (!evaluator.getSearchWithElastic()) {
                     if (evaluator.getMultiple()) {
                         return workflowService.searchAll(predicate).getContent();
                     }
@@ -114,7 +116,7 @@ public class SearchService implements ISearchService {
             case PROCESS:
                 return petriNetRepository.count(predicate);
             case CASE:
-                if (predicate != null) {
+                if (!evaluator.getSearchWithElastic()) {
                     return caseRepository.count(predicate);
                 }
                 return countCasesElastic(elasticQuery);

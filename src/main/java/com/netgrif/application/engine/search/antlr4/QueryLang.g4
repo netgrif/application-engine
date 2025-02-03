@@ -1,3 +1,4 @@
+// todo NAE-1997: generate this with plugin
 grammar QueryLang;
 
 query: resource=(PROCESS | PROCESSES) delimeter processConditions EOF # processQuery
@@ -10,33 +11,33 @@ processConditions: processOrExpression ;
 processOrExpression: processAndExpression (SPACE OR SPACE processAndExpression)* ;
 processAndExpression: processConditionGroup (SPACE AND SPACE processConditionGroup)* ;
 processConditionGroup: processCondition # processConditionGroupBasic
-                     | (NOT SPACE)? '(' SPACE? processConditions SPACE? ')' SPACE? # processConditionGroupParenthesis
+                     | (NOT SPACE?)? '(' SPACE? processConditions SPACE? ')' SPACE? # processConditionGroupParenthesis
                      ;
-processCondition: (NOT SPACE)? processComparisons SPACE? ;
+processCondition: processComparisons SPACE? ;
 
 caseConditions: caseOrExpression ;
 caseOrExpression: caseAndExpression (SPACE OR SPACE caseAndExpression)* ;
 caseAndExpression: caseConditionGroup (SPACE AND SPACE caseConditionGroup)* ;
 caseConditionGroup: caseCondition # caseConditionGroupBasic
-                  | (NOT SPACE)? '(' SPACE? caseConditions SPACE? ')' SPACE? # caseConditionGroupParenthesis
+                  | (NOT SPACE?)? '(' SPACE? caseConditions SPACE? ')' SPACE? # caseConditionGroupParenthesis
                   ;
-caseCondition: (NOT SPACE)? caseComparisons SPACE? ;
+caseCondition: caseComparisons SPACE? ;
 
 taskConditions: taskOrExpression ;
 taskOrExpression: taskAndExpression (SPACE OR SPACE taskAndExpression)* ;
 taskAndExpression: taskConditionGroup (SPACE AND SPACE taskConditionGroup)* ;
 taskConditionGroup: taskCondition # taskConditionGroupBasic
-                  | (NOT SPACE)? '(' SPACE? taskConditions SPACE? ')' SPACE? # taskConditionGroupParenthesis
+                  | (NOT SPACE?)? '(' SPACE? taskConditions SPACE? ')' SPACE? # taskConditionGroupParenthesis
                   ;
-taskCondition: (NOT SPACE)? taskComparisons SPACE? ;
+taskCondition: taskComparisons SPACE? ;
 
 userConditions: userOrExpression ;
 userOrExpression: userAndExpression (SPACE OR SPACE userAndExpression)* ;
 userAndExpression: userConditionGroup (SPACE AND SPACE userConditionGroup)* ;
 userConditionGroup: userCondition # userConditionGroupBasic
-                  | (NOT SPACE)? '(' SPACE? userConditions SPACE? ')' SPACE? # userConditionGroupParenthesis
+                  | (NOT SPACE?)? '(' SPACE? userConditions SPACE? ')' SPACE? # userConditionGroupParenthesis
                   ;
-userCondition: (NOT SPACE)? userComparisons SPACE? ;
+userCondition: userComparisons SPACE? ;
 
 // delimeter
 delimeter: WHERE_DELIMETER | COLON_DELIMETER ;
@@ -85,7 +86,7 @@ userComparisons: idComparison
 idComparison: ID SPACE objectIdComparison ;
 titleComparison: TITLE SPACE stringComparison ;
 identifierComparison: IDENTIFIER SPACE stringComparison ;
-versionComparison: VERSION SPACE op=(EQ | LT | GT | LTE | GTE) SPACE VERSION_NUMBER ;
+versionComparison: VERSION SPACE (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE VERSION_NUMBER ;
 creationDateComparison: CREATION_DATE SPACE dateComparison # cdDate
                       | CREATION_DATE SPACE dateTimeComparison # cdDateTime
                       ;
@@ -113,16 +114,16 @@ dataValueComparison: dataValue SPACE stringComparison # dataString
               ;
 dataOptionsComparison: dataOptions SPACE stringComparison ;
 placesComparison: places SPACE numberComparison ;
-tasksStateComparison: tasksState SPACE op=EQ SPACE state=(ENABLED | DISABLED) ;
+tasksStateComparison: tasksState SPACE (NOT SPACE?)? op=EQ SPACE state=(ENABLED | DISABLED) ;
 tasksUserIdComparison: tasksUserId SPACE stringComparison ;
 
 // basic comparisons
-objectIdComparison: op=EQ SPACE STRING ;
-stringComparison: op=(EQ | CONTAINS) SPACE STRING ;
-numberComparison: op=(EQ | LT | GT | LTE | GTE) SPACE NUMBER ;
-dateComparison: op=(EQ | LT | GT | LTE | GTE) SPACE DATE ;
-dateTimeComparison: op=(EQ | LT | GT | LTE | GTE) SPACE DATETIME ;
-booleanComparison: op=EQ SPACE BOOLEAN ;
+objectIdComparison: (NOT SPACE?)? op=EQ SPACE STRING ;
+stringComparison: (NOT SPACE?)? op=(EQ | CONTAINS) SPACE STRING ;
+numberComparison: (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE NUMBER ;
+dateComparison: (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE DATE ;
+dateTimeComparison: (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE DATETIME ;
+booleanComparison: (NOT SPACE?)? op=EQ SPACE BOOLEAN ;
 
 // special attribute rules
 dataValue: DATA '.' fieldId=JAVA_ID '.'VALUE ;
@@ -181,10 +182,10 @@ DISABLED: D I S A B L E D ;
 
 // basic types
 LIST: '[' SPACE? ((STRING | NUMBER) SPACE? (',' SPACE? (STRING | NUMBER) SPACE? )* )? SPACE? ']' ;
-STRING: '\'' (~('\'' | '\r' | '\n'))* '\'' ;
+STRING: '\'' (~('\'' | '\r' | '\n'))* '\'' ; // todo NAE-1997: escape???
 NUMBER: DIGIT+ ('.' DIGIT+)? ;
-DATETIME: DATE 'T' ([01] DIGIT | '2' [0-3]) ':' [0-5] DIGIT ':' [0-5] DIGIT ('.' DIGIT+)? ; // 2020-03-03T20:00:00
-DATE: DIGIT DIGIT DIGIT DIGIT '-' ('0' [1-9] | '1' [0-2]) '-' ('0' [1-9] | [12] DIGIT | '3' [01]) ; // 2020-03-03
+DATETIME: DATE 'T' ([01] DIGIT | '2' [0-3]) ':' [0-5] DIGIT ':' [0-5] DIGIT ('.' DIGIT+)? ; // 2020-03-03T20:00:00.055 // todo NAE-1997: format
+DATE: DIGIT DIGIT DIGIT DIGIT '-' ('0' [1-9] | '1' [0-2]) '-' ('0' [1-9] | [12] DIGIT | '3' [01]) ; // 2020-03-03 // todo NAE-1997: format
 BOOLEAN: T R U E | F A L S E ;
 VERSION_NUMBER: DIGIT+ '.' DIGIT+ '.' DIGIT+ ;
 JAVA_ID: [a-zA-Z$_] [a-zA-Z0-9$_]* ;

@@ -74,8 +74,8 @@ public class SearchTaskTest {
 
     private static List<Task> convertToTaskList(Object taskListObject) {
         assert taskListObject instanceof List<?>;
-        for (Object userObject : (List<?>) taskListObject) {
-            assert userObject instanceof Task;
+        for (Object taskObject : (List<?>) taskListObject) {
+            assert taskObject instanceof Task;
         }
 
         return (List<Task>) taskListObject;
