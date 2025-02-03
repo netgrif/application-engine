@@ -1,6 +1,6 @@
 //package com.netgrif.application.engine.configuration.drools;
 //
-//import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+//import com.netgrif.adapter.auth.service.UserService;
 //import com.netgrif.application.engine.configuration.drools.interfaces.IRuleEngineGlobalsProvider;
 //import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 //import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;

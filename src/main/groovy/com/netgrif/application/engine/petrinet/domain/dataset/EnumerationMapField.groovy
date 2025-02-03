@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
 
-import com.netgrif.application.engine.petrinet.domain.I18nString
+import com.netgrif.core.petrinet.domain.I18nString
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document

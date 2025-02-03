@@ -1,15 +1,14 @@
 package com.netgrif.application.engine.petrinet.service
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Author
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.core.auth.domain.Author
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
-import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch
 import com.netgrif.application.engine.petrinet.domain.UriContentType
@@ -38,8 +37,6 @@ import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
-
-import java.time.LocalDateTime
 
 @Disabled
 @ExtendWith(SpringExtension.class)
@@ -73,7 +70,7 @@ class PetriNetServiceTest {
     private IProcessRoleService userProcessRoleService
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private PetriNetRepository petriNetRepository
@@ -126,12 +123,12 @@ class PetriNetServiceTest {
         assert taskRepository.count() == taskCount + 2
         assert processRoleRepository.count() == processRoleCount + 2
 
-        def user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
+        def user = userService.findUserByUsername(CUSTOMER_USER_MAIL, null)
         assert user != null
         assert user.processRoles.size() == 1
 
         userService.addRole(user, testNet.roles.values().collect().get(0).stringId)
-        user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
+        user = userService.findUserByUsername(CUSTOMER_USER_MAIL, null)
         assert user != null
         assert user.processRoles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
@@ -143,7 +140,7 @@ class PetriNetServiceTest {
         assert caseRepository.findAllByProcessIdentifier(testNetOptional.getNet().getImportId()).size() == 0
         assert taskRepository.count() == taskCount
         assert processRoleRepository.count() == processRoleCount
-        user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
+        user = userService.findUserByUsername(CUSTOMER_USER_MAIL, null)
         assert user != null
         assert user.processRoles.size() == 1
 
@@ -174,7 +171,7 @@ class PetriNetServiceTest {
         long processCount = petriNetRepository.count()
 
 
-        def user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
+        def user = userService.findUserByUsername(CUSTOMER_USER_MAIL, null)
         assert user != null
         petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         petriNetService.importPetriNet(stream(NET_SEARCH_FILE), VersionType.MAJOR, user.transformToLoggedUser())

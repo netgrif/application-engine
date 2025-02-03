@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.importer.service.FieldFactory;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
@@ -99,7 +99,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     protected Predicate buildViewRoleQueryConstraint(LoggedUser user) {
-        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::viewRoleQuery).collect(Collectors.toList());
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(r -> viewRoleQuery(r.getStringId())).collect(Collectors.toList());
         return constructPredicateTree(roleConstraints, BooleanBuilder::or);
     }
 
@@ -117,7 +117,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     protected Predicate buildNegativeViewRoleQueryConstraint(LoggedUser user) {
-        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::negativeViewRoleQuery).collect(Collectors.toList());
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(r -> negativeViewRoleQuery(r.getStringId())).collect(Collectors.toList());
         return constructPredicateTree(roleConstraints, BooleanBuilder::or);
     }
 

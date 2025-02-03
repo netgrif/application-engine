@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.petrinet.service
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.configuration.properties.CacheProperties
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.PetriNet
@@ -44,7 +44,7 @@ class CachePetriNetServiceTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private CacheManager cacheManager

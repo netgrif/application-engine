@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.orgstructure.groups.interfaces;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.querydsl.core.types.Predicate;

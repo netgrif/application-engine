@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;

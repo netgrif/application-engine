@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.manager.web;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.manager.web.body.request.LogoutRequest;
 import com.netgrif.application.engine.manager.web.body.response.AllLoggedUsersResponse;

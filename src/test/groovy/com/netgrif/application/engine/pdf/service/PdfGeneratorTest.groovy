@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.pdf.service
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.pdf.generator.config.PdfResource

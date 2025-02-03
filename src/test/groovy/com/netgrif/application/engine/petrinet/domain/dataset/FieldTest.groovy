@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.PetriNet
@@ -33,7 +33,7 @@ class FieldTest {
     private MongoTemplate template
 
     @Autowired
-    private UserRepository userRepository
+    private UserService userService
 
     @Autowired
     private SystemUserRunner systemUserRunner

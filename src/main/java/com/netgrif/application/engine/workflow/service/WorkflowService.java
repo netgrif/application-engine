@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.event.evaluators.Evaluator;
@@ -14,7 +14,7 @@ import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventL
 import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.FieldFactory;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.TaskField;
@@ -95,7 +95,7 @@ public class WorkflowService implements IWorkflowService {
     protected FieldActionsRunner actionsRunner;
 
     @Autowired
-    protected IUserService userService;
+    protected UserService userService;
 
     @Autowired
     protected IInitValueExpressionEvaluator initValueExpressionEvaluator;
@@ -265,7 +265,7 @@ public class WorkflowService implements IWorkflowService {
         if (userListValue == null)
             return null;
         return userListValue.getUserValues().stream().map(UserFieldValue::getId)
-                .filter(id -> userService.resolveById(id, false) != null)
+                .filter(id -> userService.findById(id, null) != null)
                 .collect(Collectors.toList());
     }
 

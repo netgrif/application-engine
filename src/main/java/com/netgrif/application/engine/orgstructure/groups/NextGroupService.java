@@ -1,15 +1,16 @@
 package com.netgrif.application.engine.orgstructure.groups;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.RegisteredUser;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
@@ -53,7 +54,7 @@ public class NextGroupService implements INextGroupService {
     protected IMailAttemptService mailAttemptService;
 
     @Autowired
-    protected IUserService userService;
+    protected UserService userService;
 
     @Autowired
     protected IDataService dataService;
@@ -103,20 +104,21 @@ public class NextGroupService implements INextGroupService {
             return null;
         }
         PetriNet orgGroupNet = petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER);
-        CreateCaseEventOutcome outcome = workflowService.createCase(orgGroupNet.getStringId(), title, "", author.transformToLoggedUser());
+        CreateCaseEventOutcome outcome = workflowService.createCase(orgGroupNet.getStringId(), title, "", userService.transformToLoggedUser(author));
 
         Map<String, Map<String, String>> taskData = getInitialGroupData(author, title, outcome.getCase());
         Task initTask = getGroupInitTask(outcome.getCase());
         dataService.setData(initTask.getStringId(), ImportHelper.populateDataset(taskData));
 
         try {
-            taskService.assignTask(author.transformToLoggedUser(), initTask.getStringId());
-            taskService.finishTask(author.transformToLoggedUser(), initTask.getStringId());
+            taskService.assignTask((LoggedUser) userService.transformToLoggedUser(author), initTask.getStringId());
+            taskService.finishTask((LoggedUser) userService.transformToLoggedUser(author), initTask.getStringId());
         } catch (TransitionNotExecutableException e) {
             log.error(e.getMessage());
         }
-        author.addGroup(outcome.getCase().getStringId());
-        userService.save(author);
+        //MODULARISATION: groups to be resolved to user, to make some converter from case
+        //author.addGroup(outcome.getCase().getStringId());
+        userService.saveUser(author, null);
         return outcome;
     }
 
@@ -163,19 +165,21 @@ public class NextGroupService implements INextGroupService {
         if (!isGroupCase(groupCase)) {
             return null;
         }
-        IUser user = userService.findByEmail(email, true);
-        if (user != null && user.isActive()) {
-            log.info("User [" + user.getFullName() + "] has already been registered.");
-            user.addGroup(groupCase.getStringId());
-            userService.save(user);
-            return addUser(user, existingUsers);
+        Optional<IUser> user = userService.findUserByUsername(email, null);
+        if (user.isPresent() && user.get().isActive()) {
+            log.info("User [" + user.get().getFullName() + "] has already been registered.");
+            //MODULARISATION: groups to be resolved to user, to make some converter from case
+            //user.addGroup(groupCase.getStringId());
+            userService.saveUser(user.get(), null);
+            return addUser(user.get(), existingUsers);
         } else {
             log.info("Inviting new user to group.");
             NewUserRequest newUserRequest = new NewUserRequest();
             newUserRequest.email = email;
             RegisteredUser regUser = registrationService.createNewUser(newUserRequest);
-            regUser.addGroup(groupCase.getStringId());
-            userService.save(regUser);
+            //MODULARISATION: groups to be resolved to user, to make some converter from case
+            //regUser.addGroup(groupCase.getStringId());
+            userService.saveUser(regUser, null);
 
             try {
                 mailService.sendRegistrationEmail(regUser);
@@ -208,8 +212,9 @@ public class NextGroupService implements INextGroupService {
         }
         groupCase.getDataField(GROUP_MEMBERS_FIELD).setOptions(addUser(user, existingUsers));
         workflowService.save(groupCase);
-        user.addGroup(groupCase.getStringId());
-        userService.save(user);
+        //MODULARISATION: groups to be resolved to user, to make some converter from case
+        //user.addGroup(groupCase.getStringId());
+        userService.saveUser(user, null);
         securityContextService.saveToken(user.getStringId());
     }
 
@@ -240,10 +245,11 @@ public class NextGroupService implements INextGroupService {
                 securityContextService.saveToken(user);
             }
         });
-        userService.findAllByIds(usersToRemove, false).forEach(user -> {
+        userService.findAllByIds(usersToRemove, null).forEach(user -> {
             if (!user.getStringId().equals(authorId)) {
-                user.getNextGroups().remove(groupCase.getStringId());
-                userService.save(user);
+                //MODULARISATION: groups to be resolved to user, to make some converter from case
+                //user.getNextGroups().remove(groupCase.getStringId());
+                userService.saveUser(user, null);
             }
         });
         return existingUsers;
@@ -268,7 +274,7 @@ public class NextGroupService implements INextGroupService {
         }
         Set<String> userIds = groupCase.getDataSet().get(GROUP_MEMBERS_FIELD).getOptions().keySet();
         List<IUser> resultList = new ArrayList<>();
-        userIds.forEach(id -> resultList.add(userService.resolveById(id, true)));
+        userIds.forEach(id -> resultList.add(userService.findById(id, null)));
         return resultList;
     }
 

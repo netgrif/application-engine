@@ -1,9 +1,9 @@
 //package com.netgrif.application.engine.rules.service;
 //
 //import com.netgrif.application.engine.TestHelper;
-//import com.netgrif.application.engine.auth.domain.IUser;
-//import com.netgrif.application.engine.auth.domain.LoggedUser;
-//import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+//import com.netgrif.core.auth.domain.IUser;
+//import com.netgrif.core.auth.domain.LoggedUser;
+//import com.netgrif.adapter.auth.service.UserService;
 //import com.netgrif.application.engine.configuration.drools.RefreshableKieBase;
 //import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 //import com.netgrif.application.engine.petrinet.domain.VersionType;
@@ -63,7 +63,7 @@
 //    @Autowired
 //    private FactRepository factRepository;
 //    @Autowired
-//    private IUserService userService;
+//    private UserService userService;
 //
 //    private LoggedUser superUser;
 //

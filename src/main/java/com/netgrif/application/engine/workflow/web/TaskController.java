@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;

@@ -4,7 +4,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
 import com.google.common.collect.ImmutableList;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.domain.ElasticJob;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
 import com.netgrif.application.engine.elastic.domain.ElasticTask;
@@ -21,6 +21,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet;
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
+import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -214,10 +215,10 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     protected void addRolesQueryConstraint(ElasticTaskSearchRequest request, LoggedUser user) {
         if (request.role != null && !request.role.isEmpty()) {
             Set<String> roles = new HashSet<>(request.role);
-            roles.addAll(user.getProcessRoles());
+            roles.addAll(user.getProcessRoles().stream().map(ProcessRole::getStringId).toList());
             request.role = new ArrayList<>(roles);
         } else {
-            request.role = new ArrayList<>(user.getProcessRoles());
+            request.role = user.getProcessRoles().stream().map(ProcessRole::getStringId).toList();
         }
     }
 

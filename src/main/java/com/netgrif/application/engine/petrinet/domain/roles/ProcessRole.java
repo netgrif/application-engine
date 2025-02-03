@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.roles;
 
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Imported;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.Event;

@@ -12,7 +12,7 @@ import com.netgrif.application.engine.elastic.domain.UserField;
 import com.netgrif.application.engine.elastic.domain.UserListField;
 import com.netgrif.application.engine.elastic.domain.*;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;

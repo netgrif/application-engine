@@ -1,9 +1,11 @@
 package com.netgrif.application.engine.configuration.security;
 
-import com.netgrif.application.engine.auth.domain.*;
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.adapter.auth.domain.AuthorityImpl;
+import com.netgrif.core.auth.domain.*;
+import com.netgrif.adapter.auth.service.AuthorityService;
+import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
+import com.netgrif.core.auth.domain.enums.UserState;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,12 +37,12 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private final String[] exceptions;
 
     private final IJwtService jwtService;
-    private final IUserService userService;
-    private final IAuthorityService authorityService;
+    private final UserService userService;
+    private final AuthorityService authorityService;
 
     public PublicAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider,
                                       String[] urls, String[] exceptions, IJwtService jwtService,
-                                      IUserService userService, IAuthorityService authorityService) {
+                                      UserService userService, AuthorityService authorityService) {
         this.authenticationManager = authenticationManager;
         this.authenticationManager.getProviders().add(provider);
         this.anonymousAccessUrls = urls;
@@ -63,9 +65,9 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
 
     private void authenticate(HttpServletRequest request, String jwtToken) {
         AnonymousAuthenticationToken authRequest = new AnonymousAuthenticationToken(
-                UserProperties.ANONYMOUS_AUTH_KEY,
+                "anonymous-user",
                 jwtService.getLoggedUser(jwtToken, Authority.anonymous),
-                Collections.singleton(authorityService.getOrCreate(Authority.anonymous))
+                Collections.singleton((AuthorityImpl) authorityService.getOrCreate(Authority.anonymous))
         );
         authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
         Authentication authResult = this.authenticationManager.authenticate(authRequest);
@@ -98,20 +100,17 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
         } else {
             loggedUser = createAnonymousUser();
         }
-        loggedUser.eraseCredentials();
+        //MODULARISATION: check if its okay this way
+//        loggedUser.eraseCredentials();
         return loggedUser;
     }
 
     private LoggedUser createAnonymousUser() {
         String hash = new ObjectId().toString();
-        AnonymousUser anonymousUser = new AnonymousUser(hash + "@anonymous.nae",
-                "n/a",
-                "User",
-                "Anonymous"
-        );
+        User anonymousUser = new User();
         anonymousUser.setState(UserState.ACTIVE);
-        anonymousUser = userService.saveNewAnonymous(anonymousUser);
-        return anonymousUser.transformToLoggedUser();
+        anonymousUser = (User) userService.saveUser(anonymousUser, null);
+        return (LoggedUser) userService.transformToLoggedUser(anonymousUser);
     }
 
     private boolean isPublicApi(String path) {

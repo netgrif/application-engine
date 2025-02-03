@@ -1,8 +1,9 @@
 package com.netgrif.application.engine.configuration.authentication.providers.basic;
 
 
-import com.netgrif.application.engine.auth.domain.User;
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository;
+import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.User;
 import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +19,14 @@ import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import java.util.Optional;
+
 @Slf4j
 @Component
 public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationProvider {
 
     @Autowired
-    protected UserRepository userRepository;
+    protected UserService userService;
 
     protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
 
@@ -43,7 +46,7 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
         String name = authentication.getName();
-        User user = userRepository.findByEmail(name);
+        IUser user = userService.findByEmail(name, null);
         if (user == null) {
             log.debug("User not found");
             loginAttemptService.loginFailed(key);
@@ -51,14 +54,14 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
         String presentedPassword = authentication.getCredentials().toString();
-        if (!this.passwordEncoder.matches(presentedPassword, user.getPassword())) {
+        if (!this.passwordEncoder.matches(presentedPassword, ((User) user).getPassword())) {
             log.debug("Failed to authenticate since password does not match stored value");
             loginAttemptService.loginFailed(key);
             throw new BadCredentialsException(this.messages
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
 
-        UserDetails userDetails = user.transformToLoggedUser();
+        UserDetails userDetails = userService.transformToLoggedUser(user);
 
         UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(userDetails, presentedPassword, userDetails.getAuthorities());
         result.setDetails(authentication.getDetails());

@@ -7,8 +7,9 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.files.StorageResolverService;
 import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.files.throwable.StorageException;
@@ -80,7 +81,7 @@ public class DataService implements IDataService {
     protected IWorkflowService workflowService;
 
     @Autowired
-    protected IUserService userService;
+    protected UserService userService;
 
     @Autowired
     protected FieldFactory fieldFactory;
@@ -136,7 +137,7 @@ public class DataService implements IDataService {
         Set<String> fieldsIds = transition.getDataSet().keySet();
         List<Field> dataSetFields = new ArrayList<>();
         if (task.getUserId() != null) {
-            task.setUser(userService.findById(task.getUserId(), false));
+            task.setUser(userService.findById(task.getUserId(), null));
         }
         GetDataEventOutcome outcome = new GetDataEventOutcome(useCase, task);
         fieldsIds.forEach(fieldId -> {
@@ -228,7 +229,7 @@ public class DataService implements IDataService {
         log.info("[" + useCase.getStringId() + "]: Setting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
 
         if (task.getUserId() != null) {
-            task.setUser(userService.findById(task.getUserId(), false));
+            task.setUser(userService.findById(task.getUserId(), null));
         }
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
         values.fields().forEachRemaining(entry -> {
@@ -753,7 +754,7 @@ public class DataService implements IDataService {
 
     @Override
     public UserFieldValue makeUserFieldValue(String id) {
-        IUser user = userService.resolveById(id, true);
+        IUser user = userService.findById(id, null);
         return new UserFieldValue(user);
     }
 
@@ -1057,7 +1058,7 @@ public class DataService implements IDataService {
         }
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(I18nString.class, new I18nStringDeserializer());
+        module.addDeserializer(I18nString.class, new com.netgrif.core.petrinet.domain.I18nStringDeserializer());
         mapper.registerModule(module);
         Map<String, I18nString> optionsMapped = mapper.convertValue(optionsNode, new TypeReference<Map<String, I18nString>>() {
         });

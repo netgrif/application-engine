@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField;
 import lombok.Data;
 

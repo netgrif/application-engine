@@ -1,6 +1,6 @@
 package com.netgrif.application.engine
 
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.elastic.domain.ElasticCase
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
@@ -30,7 +30,7 @@ class TestHelper {
     private ElasticIndexService indexService
 
     @Autowired
-    private UserRepository userRepository
+    private UserService userService
 
     @Autowired
     private ProcessRoleRepository roleRepository
@@ -85,7 +85,7 @@ class TestHelper {
         indexService.deleteIndex(ElasticPetriNet.class)
         indexService.deleteIndex(ElasticCase.class)
         indexService.deleteIndex(ElasticTask.class)
-        userRepository.deleteAll()
+        userService.deleteAll()
         roleRepository.deleteAll()
         roleService.clearCache()
         actionsCacheService.clearActionCache()

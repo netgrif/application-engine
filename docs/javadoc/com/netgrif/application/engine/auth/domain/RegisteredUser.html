@@ -117,7 +117,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <!-- ======== START OF CLASS DATA ======== -->
 <main role="main">
 <div class="header">
-<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">com.netgrif.application.engine.auth.domain</a></div>
+<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">com.netgrif.core.auth.domain.Authority;</a></div>
 <h2 title="Interface RegisteredUser" class="title">Interface RegisteredUser</h2>
 </div>
 <div class="contentContainer">
@@ -126,15 +126,15 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <dl>
 <dt>All Superinterfaces:</dt>
-<dd><code><a href="IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a></code></dd>
+<dd><code><a href="IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a></code></dd>
 </dl>
 <dl>
 <dt>All Known Implementing Classes:</dt>
-<dd><code><a href="AnonymousUser.html" title="class in com.netgrif.application.engine.auth.domain">AnonymousUser</a></code>, <code><a href="../../ldap/domain/LdapUser.html" title="class in com.netgrif.application.engine.ldap.domain">LdapUser</a></code>, <code><a href="User.html" title="class in com.netgrif.application.engine.auth.domain">User</a></code></dd>
+<dd><code><a href="AnonymousUser.html" title="class in com.netgrif.core.auth.domain.Authority;">AnonymousUser</a></code>, <code><a href="../../ldap/domain/LdapUser.html" title="class in com.netgrif.application.engine.ldap.domain">LdapUser</a></code>, <code><a href="User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a></code></dd>
 </dl>
 <hr>
 <pre>public interface <span class="typeNameLabel">RegisteredUser</span>
-extends <a href="IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a></pre>
+extends <a href="IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a></pre>
 </li>
 </ul>
 </div>
@@ -182,11 +182,11 @@ extends <a href="IUser.html" title="interface in com.netgrif.application.engine.
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.com.netgrif.application.engine.auth.domain.IUser">
+<li class="blockList"><a id="methods.inherited.from.class.com.netgrif.core.auth.domain.IUser">
 <!--   -->
 </a>
-<h3>Methods inherited from interface&nbsp;com.netgrif.application.engine.auth.domain.<a href="IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a></h3>
-<code><a href="IUser.html#addAuthority(com.netgrif.application.engine.auth.domain.Authority)">addAuthority</a>, <a href="IUser.html#addGroup(java.lang.String)">addGroup</a>, <a href="IUser.html#addProcessRole(com.netgrif.application.engine.petrinet.domain.roles.ProcessRole)">addProcessRole</a>, <a href="IUser.html#getAuthorities()">getAuthorities</a>, <a href="IUser.html#getAvatar()">getAvatar</a>, <a href="IUser.html#getEmail()">getEmail</a>, <a href="IUser.html#getFullName()">getFullName</a>, <a href="IUser.html#getImpersonated()">getImpersonated</a>, <a href="IUser.html#getName()">getName</a>, <a href="IUser.html#getNextGroups()">getNextGroups</a>, <a href="IUser.html#getProcessRoles()">getProcessRoles</a>, <a href="IUser.html#getSelfOrImpersonated()">getSelfOrImpersonated</a>, <a href="IUser.html#getState()">getState</a>, <a href="IUser.html#getStringId()">getStringId</a>, <a href="IUser.html#getSurname()">getSurname</a>, <a href="IUser.html#getTelNumber()">getTelNumber</a>, <a href="IUser.html#isActive()">isActive</a>, <a href="IUser.html#isImpersonating()">isImpersonating</a>, <a href="IUser.html#removeGroup(java.lang.String)">removeGroup</a>, <a href="IUser.html#removeProcessRole(com.netgrif.application.engine.petrinet.domain.roles.ProcessRole)">removeProcessRole</a>, <a href="IUser.html#setAuthorities(java.util.Set)">setAuthorities</a>, <a href="IUser.html#setEmail(java.lang.String)">setEmail</a>, <a href="IUser.html#setImpersonated(com.netgrif.application.engine.auth.domain.IUser)">setImpersonated</a>, <a href="IUser.html#setName(java.lang.String)">setName</a>, <a href="IUser.html#setNextGroups(java.util.Set)">setNextGroups</a>, <a href="IUser.html#setProcessRoles(java.util.Set)">setProcessRoles</a>, <a href="IUser.html#setState(com.netgrif.application.engine.auth.domain.UserState)">setState</a>, <a href="IUser.html#setSurname(java.lang.String)">setSurname</a>, <a href="IUser.html#transformToAuthor()">transformToAuthor</a>, <a href="IUser.html#transformToLoggedUser()">transformToLoggedUser</a></code></li>
+<h3>Methods inherited from interface&nbsp;com.netgrif.core.auth.domain.Authority;.<a href="IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a></h3>
+<code><a href="IUser.html#addAuthority(com.netgrif.core.auth.domain.Authority;)">addAuthority</a>, <a href="IUser.html#addGroup(java.lang.String)">addGroup</a>, <a href="IUser.html#addProcessRole(com.netgrif.application.engine.petrinet.domain.roles.ProcessRole)">addProcessRole</a>, <a href="IUser.html#getAuthorities()">getAuthorities</a>, <a href="IUser.html#getAvatar()">getAvatar</a>, <a href="IUser.html#getEmail()">getEmail</a>, <a href="IUser.html#getFullName()">getFullName</a>, <a href="IUser.html#getImpersonated()">getImpersonated</a>, <a href="IUser.html#getName()">getName</a>, <a href="IUser.html#getNextGroups()">getNextGroups</a>, <a href="IUser.html#getProcessRoles()">getProcessRoles</a>, <a href="IUser.html#getSelfOrImpersonated()">getSelfOrImpersonated</a>, <a href="IUser.html#getState()">getState</a>, <a href="IUser.html#getStringId()">getStringId</a>, <a href="IUser.html#getSurname()">getSurname</a>, <a href="IUser.html#getTelNumber()">getTelNumber</a>, <a href="IUser.html#isActive()">isActive</a>, <a href="IUser.html#isImpersonating()">isImpersonating</a>, <a href="IUser.html#removeGroup(java.lang.String)">removeGroup</a>, <a href="IUser.html#removeProcessRole(com.netgrif.application.engine.petrinet.domain.roles.ProcessRole)">removeProcessRole</a>, <a href="IUser.html#setAuthorities(java.util.Set)">setAuthorities</a>, <a href="IUser.html#setEmail(java.lang.String)">setEmail</a>, <a href="IUser.html#setImpersonated(com.netgrif.core.auth.domain.IUser)">setImpersonated</a>, <a href="IUser.html#setName(java.lang.String)">setName</a>, <a href="IUser.html#setNextGroups(java.util.Set)">setNextGroups</a>, <a href="IUser.html#setProcessRoles(java.util.Set)">setProcessRoles</a>, <a href="IUser.html#setState(com.netgrif.core.auth.domain.Authority;.UserState)">setState</a>, <a href="IUser.html#setSurname(java.lang.String)">setSurname</a>, <a href="IUser.html#transformToAuthor()">transformToAuthor</a>, <a href="IUser.html#transformToLoggedUser()">transformToLoggedUser</a></code></li>
 </ul>
 </li>
 </ul>

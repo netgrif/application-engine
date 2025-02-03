@@ -13,6 +13,7 @@ import com.netgrif.application.engine.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.application.engine.workflow.domain.triggers.AutoTrigger;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
+import com.netgrif.core.petrinet.domain.I18nString;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Transient;

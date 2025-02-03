@@ -27,13 +27,14 @@ import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.ArcFactory;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
-import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
+import com.netgrif.core.workflow.domain.ProcessResourceId;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import lombok.Getter;
@@ -1076,11 +1077,14 @@ public class Importer {
         ProcessRole role = new ProcessRole();
         Map<EventType, com.netgrif.application.engine.petrinet.domain.events.Event> events = createEventsMap(importRole.getEvent());
         role.setImportId(importRole.isGlobal() != null && importRole.isGlobal() ? ProcessRole.GLOBAL + importRole.getId() : importRole.getId());
-        role.setEvents(events);
+        //MODULARISATION: events to be resolved
+//        role.setEvents(events);
         if (importRole.getName() == null) {
-            role.setName(toI18NString(importRole.getTitle()));
+            //MODULARISATION: i18nString to be resolved
+//            role.setName(toI18NString(importRole.getTitle()));
         } else {
-            role.setName(toI18NString(importRole.getName()));
+            //MODULARISATION: i18nString to be resolved
+//            role.setName(toI18NString(importRole.getName()));
         }
         if (importRole.isGlobal() != null && importRole.isGlobal()) {
             role.setGlobal(importRole.isGlobal());

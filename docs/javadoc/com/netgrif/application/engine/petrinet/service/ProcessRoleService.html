@@ -161,7 +161,7 @@ implements <a href="interfaces/IProcessRoleService.html" title="interface in com
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository,com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository,org.springframework.context.ApplicationEventPublisher,com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.RoleActionsRunner,com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService,com.netgrif.application.engine.auth.service.interfaces.IUserService,com.netgrif.application.engine.security.service.ISecurityContextService)">ProcessRoleService</a></span>&#8203;(<a href="../domain/roles/ProcessRoleRepository.html" title="interface in com.netgrif.application.engine.petrinet.domain.roles">ProcessRoleRepository</a>&nbsp;processRoleRepository,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository,com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository,org.springframework.context.ApplicationEventPublisher,com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.RoleActionsRunner,com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService,com.netgrif.adapter.auth.service.UserService,com.netgrif.application.engine.security.service.ISecurityContextService)">ProcessRoleService</a></span>&#8203;(<a href="../domain/roles/ProcessRoleRepository.html" title="interface in com.netgrif.application.engine.petrinet.domain.roles">ProcessRoleRepository</a>&nbsp;processRoleRepository,
                   <a href="../domain/repositories/PetriNetRepository.html" title="interface in com.netgrif.application.engine.petrinet.domain.repositories">PetriNetRepository</a>&nbsp;netRepository,
                   org.springframework.context.ApplicationEventPublisher&nbsp;publisher,
                   <a href="../domain/dataset/logic/action/runner/RoleActionsRunner.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner">RoleActionsRunner</a>&nbsp;roleActionsRunner,
@@ -195,9 +195,9 @@ implements <a href="interfaces/IProcessRoleService.html" title="interface in com
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#assignRolesToUser(java.lang.String,java.util.Set,com.netgrif.application.engine.auth.domain.LoggedUser)">assignRolesToUser</a></span>&#8203;(java.lang.String&nbsp;userId,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#assignRolesToUser(java.lang.String,java.util.Set,com.netgrif.core.auth.domain.Authority;.LoggedUser)">assignRolesToUser</a></span>&#8203;(java.lang.String&nbsp;userId,
                  java.util.Set&lt;java.lang.String&gt;&nbsp;requestedRolesIds,
-                 <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;loggedUser)</code></th>
+                 <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;loggedUser)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
@@ -212,8 +212,8 @@ implements <a href="interfaces/IProcessRoleService.html" title="interface in com
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deleteRolesOfNet(com.netgrif.application.engine.petrinet.domain.PetriNet,com.netgrif.application.engine.auth.domain.LoggedUser)">deleteRolesOfNet</a></span>&#8203;(<a href="../domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net,
-                <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;loggedUser)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deleteRolesOfNet(com.netgrif.application.engine.petrinet.domain.PetriNet,com.netgrif.core.auth.domain.Authority;.LoggedUser)">deleteRolesOfNet</a></span>&#8203;(<a href="../domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net,
+                <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;loggedUser)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i5" class="rowColor">
@@ -284,7 +284,7 @@ implements <a href="interfaces/IProcessRoleService.html" title="interface in com
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository,com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository,org.springframework.context.ApplicationEventPublisher,com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.RoleActionsRunner,com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService,com.netgrif.application.engine.auth.service.interfaces.IUserService,com.netgrif.application.engine.security.service.ISecurityContextService)">
+<a id="&lt;init&gt;(com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository,com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository,org.springframework.context.ApplicationEventPublisher,com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.RoleActionsRunner,com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService,com.netgrif.adapter.auth.service.UserService,com.netgrif.application.engine.security.service.ISecurityContextService)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -337,7 +337,7 @@ implements <a href="interfaces/IProcessRoleService.html" title="interface in com
 </dl>
 </li>
 </ul>
-<a id="assignRolesToUser(java.lang.String,java.util.Set,com.netgrif.application.engine.auth.domain.LoggedUser)">
+<a id="assignRolesToUser(java.lang.String,java.util.Set,com.netgrif.core.auth.domain.Authority;.LoggedUser)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -345,10 +345,10 @@ implements <a href="interfaces/IProcessRoleService.html" title="interface in com
 <h4>assignRolesToUser</h4>
 <pre class="methodSignature">public&nbsp;void&nbsp;assignRolesToUser&#8203;(java.lang.String&nbsp;userId,
                               java.util.Set&lt;java.lang.String&gt;&nbsp;requestedRolesIds,
-                              <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;loggedUser)</pre>
+                              <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;loggedUser)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IProcessRoleService.html#assignRolesToUser(java.lang.String,java.util.Set,com.netgrif.application.engine.auth.domain.LoggedUser)">assignRolesToUser</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IProcessRoleService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IProcessRoleService</a></code></dd>
+<dd><code><a href="interfaces/IProcessRoleService.html#assignRolesToUser(java.lang.String,java.util.Set,com.netgrif.core.auth.domain.Authority;.LoggedUser)">assignRolesToUser</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IProcessRoleService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IProcessRoleService</a></code></dd>
 </dl>
 </li>
 </ul>
@@ -465,17 +465,17 @@ public&nbsp;<a href="../domain/roles/ProcessRole.html" title="class in com.netgr
 </dl>
 </li>
 </ul>
-<a id="deleteRolesOfNet(com.netgrif.application.engine.petrinet.domain.PetriNet,com.netgrif.application.engine.auth.domain.LoggedUser)">
+<a id="deleteRolesOfNet(com.netgrif.application.engine.petrinet.domain.PetriNet,com.netgrif.core.auth.domain.Authority;.LoggedUser)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>deleteRolesOfNet</h4>
 <pre class="methodSignature">public&nbsp;void&nbsp;deleteRolesOfNet&#8203;(<a href="../domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net,
-                             <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;loggedUser)</pre>
+                             <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;loggedUser)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IProcessRoleService.html#deleteRolesOfNet(com.netgrif.application.engine.petrinet.domain.PetriNet,com.netgrif.application.engine.auth.domain.LoggedUser)">deleteRolesOfNet</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IProcessRoleService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IProcessRoleService</a></code></dd>
+<dd><code><a href="interfaces/IProcessRoleService.html#deleteRolesOfNet(com.netgrif.application.engine.petrinet.domain.PetriNet,com.netgrif.core.auth.domain.Authority;.LoggedUser)">deleteRolesOfNet</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IProcessRoleService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IProcessRoleService</a></code></dd>
 </dl>
 </li>
 </ul>

@@ -128,6 +128,11 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>com.netgrif</groupId>
+            <artifactId>nae-ce-user</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
         <!-- Actuator -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

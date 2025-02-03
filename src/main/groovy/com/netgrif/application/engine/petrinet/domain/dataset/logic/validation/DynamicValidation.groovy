@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.validation
 
-import com.netgrif.application.engine.petrinet.domain.I18nString
+import com.netgrif.core.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression
 import org.springframework.data.annotation.Transient
 

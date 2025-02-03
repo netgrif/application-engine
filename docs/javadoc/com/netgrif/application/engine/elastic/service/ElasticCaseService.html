@@ -191,8 +191,8 @@ implements <a href="interfaces/IElasticCaseService.html" title="interface in com
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>long</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#count(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,java.util.Locale,java.lang.Boolean)">count</a></span>&#8203;(java.util.List&lt;<a href="../web/requestbodies/CaseSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">CaseSearchRequest</a>&gt;&nbsp;requests,
-     <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#count(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,java.util.Locale,java.lang.Boolean)">count</a></span>&#8203;(java.util.List&lt;<a href="../web/requestbodies/CaseSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">CaseSearchRequest</a>&gt;&nbsp;requests,
+     <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
      java.util.Locale&nbsp;locale,
      java.lang.Boolean&nbsp;isIntersection)</code></th>
 <td class="colLast">&nbsp;</td>
@@ -219,8 +219,8 @@ implements <a href="interfaces/IElasticCaseService.html" title="interface in com
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../../workflow/domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#search(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">search</a></span>&#8203;(java.util.List&lt;<a href="../web/requestbodies/CaseSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">CaseSearchRequest</a>&gt;&nbsp;requests,
-      <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#search(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">search</a></span>&#8203;(java.util.List&lt;<a href="../web/requestbodies/CaseSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">CaseSearchRequest</a>&gt;&nbsp;requests,
+      <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
       org.springframework.data.domain.Pageable&nbsp;pageable,
       java.util.Locale&nbsp;locale,
       java.lang.Boolean&nbsp;isIntersection)</code></th>
@@ -237,7 +237,7 @@ implements <a href="interfaces/IElasticCaseService.html" title="interface in com
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;com.netgrif.application.engine.elastic.service.<a href="ElasticViewPermissionService.html" title="class in com.netgrif.application.engine.elastic.service">ElasticViewPermissionService</a></h3>
-<code><a href="ElasticViewPermissionService.html#buildViewPermissionQuery(org.elasticsearch.index.query.BoolQueryBuilder,com.netgrif.application.engine.auth.domain.LoggedUser)">buildViewPermissionQuery</a></code></li>
+<code><a href="ElasticViewPermissionService.html#buildViewPermissionQuery(org.elasticsearch.index.query.BoolQueryBuilder,com.netgrif.core.auth.domain.Authority;.LoggedUser)">buildViewPermissionQuery</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
@@ -347,36 +347,36 @@ public&nbsp;void&nbsp;setWorkflowService&#8203;(<a href="../../workflow/service/
 </dl>
 </li>
 </ul>
-<a id="search(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">
+<a id="search(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>search</h4>
 <pre class="methodSignature">public&nbsp;org.springframework.data.domain.Page&lt;<a href="../../workflow/domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;search&#8203;(java.util.List&lt;<a href="../web/requestbodies/CaseSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">CaseSearchRequest</a>&gt;&nbsp;requests,
-                                                         <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+                                                         <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
                                                          org.springframework.data.domain.Pageable&nbsp;pageable,
                                                          java.util.Locale&nbsp;locale,
                                                          java.lang.Boolean&nbsp;isIntersection)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IElasticCaseService.html#search(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">search</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IElasticCaseService.html" title="interface in com.netgrif.application.engine.elastic.service.interfaces">IElasticCaseService</a></code></dd>
+<dd><code><a href="interfaces/IElasticCaseService.html#search(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">search</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IElasticCaseService.html" title="interface in com.netgrif.application.engine.elastic.service.interfaces">IElasticCaseService</a></code></dd>
 </dl>
 </li>
 </ul>
-<a id="count(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,java.util.Locale,java.lang.Boolean)">
+<a id="count(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,java.util.Locale,java.lang.Boolean)">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>count</h4>
 <pre class="methodSignature">public&nbsp;long&nbsp;count&#8203;(java.util.List&lt;<a href="../web/requestbodies/CaseSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">CaseSearchRequest</a>&gt;&nbsp;requests,
-                  <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+                  <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
                   java.util.Locale&nbsp;locale,
                   java.lang.Boolean&nbsp;isIntersection)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IElasticCaseService.html#count(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,java.util.Locale,java.lang.Boolean)">count</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IElasticCaseService.html" title="interface in com.netgrif.application.engine.elastic.service.interfaces">IElasticCaseService</a></code></dd>
+<dd><code><a href="interfaces/IElasticCaseService.html#count(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,java.util.Locale,java.lang.Boolean)">count</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IElasticCaseService.html" title="interface in com.netgrif.application.engine.elastic.service.interfaces">IElasticCaseService</a></code></dd>
 </dl>
 </li>
 </ul>

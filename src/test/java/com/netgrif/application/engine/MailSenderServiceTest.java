@@ -3,7 +3,7 @@ package com.netgrif.application.engine;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
-import com.netgrif.application.engine.auth.domain.User;
+import com.netgrif.core.auth.domain.User;
 import com.netgrif.application.engine.mail.EmailType;
 import com.netgrif.application.engine.mail.domain.MailDraft;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
@@ -45,7 +45,11 @@ public class MailSenderServiceTest {
 
     @Test
     public void testSend() throws Exception {
-        service.sendRegistrationEmail(new User(RECIPIENT, "", "", ""));
+        User user = new User();
+        user.setUsername(RECIPIENT);
+        user.setEmail(RECIPIENT);
+        user.setPassword("");
+        service.sendRegistrationEmail(user);
 
         MimeMessage[] messages = smtpServer.getReceivedMessages();
 

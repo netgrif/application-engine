@@ -1,7 +1,7 @@
 //package com.netgrif.application.engine.rules.service;
 //
 //import com.netgrif.application.engine.TestHelper;
-//import com.netgrif.application.engine.auth.domain.LoggedUser;
+//import com.netgrif.core.auth.domain.LoggedUser;
 //import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 //import com.netgrif.application.engine.petrinet.domain.VersionType;
 //import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;

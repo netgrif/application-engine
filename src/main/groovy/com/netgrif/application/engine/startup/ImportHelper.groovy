@@ -2,21 +2,20 @@ package com.netgrif.application.engine.startup
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.netgrif.application.engine.auth.domain.*
+import com.netgrif.core.auth.domain.*
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.Filter
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
@@ -31,6 +30,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateFilterBody
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
+import com.netgrif.core.auth.domain.enums.UserState
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -55,7 +55,7 @@ class ImportHelper {
     private PetriNetRepository petriNetRepository
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private CaseRepository caseRepository
@@ -166,7 +166,7 @@ class ImportHelper {
         List<ProcessRole> roles = processRoleService.findAll(net.stringId)
         Map<String, ProcessRole> map = [:]
         net.roles.values().each { netRole ->
-            map[netRole.name.getDefaultValue()] = roles.find { it.roleId == netRole.stringId }
+            map[netRole.name.getDefaultValue()] = roles.find { it.stringId == netRole.stringId }
         }
         return map
     }
@@ -175,8 +175,8 @@ class ImportHelper {
         authorities.each { user.addAuthority(it) }
         roles.each { user.addProcessRole(it) }
         user.state = UserState.ACTIVE
-        user = userService.saveNew(user)
-        log.info("User $user.name $user.surname created")
+        user = (User) userService.saveUser(user, null)
+        log.info("User $user.firstName $user.lastName created")
         return user
     }
 
@@ -185,18 +185,18 @@ class ImportHelper {
     }
 
     Case createCase(String title, PetriNet net) {
-        return createCase(title, net, userService.getSystem().transformToLoggedUser())
+        return createCase(title, net, userService.transformToLoggedUser(userService.getSystem()))
     }
 
     Case createCaseAsSuper(String title, PetriNet net) {
-        return createCase(title, net, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
+        return createCase(title, net, superCreator.getLoggedSuper() ?: userService.transformToLoggedUser(userService.getSystem()))
     }
 
     // TODO remove deprecated classes and methods
-    @Deprecated
-    boolean createCaseFilter(String title, String query, MergeFilterOperation operation, LoggedUser user) {
-        return filterService.saveFilter(new CreateFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query), operation, user)
-    }
+//    @Deprecated
+//    boolean createCaseFilter(String title, String query, MergeFilterOperation operation, LoggedUser user) {
+//        return filterService.saveFilter(new CreateFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query), operation, user)
+//    }
 
     AssignTaskEventOutcome assignTask(String taskTitle, String caseId, LoggedUser author) {
         return taskService.assignTask(author, getTaskId(taskTitle, caseId))
@@ -219,7 +219,7 @@ class ImportHelper {
     }
 
     CancelTaskEventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {
-        return cancelTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
+        return cancelTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.transformToLoggedUser(userService.getSystem()))
     }
 
     String getTaskId(String taskTitle, String caseId) {

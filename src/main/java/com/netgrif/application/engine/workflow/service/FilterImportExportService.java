@@ -6,13 +6,13 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.google.common.collect.Lists;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.FilterProperties;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.filter.FilterImportExport;
 import com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
@@ -69,7 +69,7 @@ public class FilterImportExportService implements IFilterImportExportService {
     private static final String FIELD_MISSING_NETS_TRANSLATION = "missing_nets_translation";
 
     @Autowired
-    IUserService userService;
+    UserService userService;
 
     @Autowired
     IWorkflowService workflowService;
@@ -94,12 +94,12 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Override
     public void createFilterImport(IUser author) {
-        workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER, "Import filters " + author.getFullName(), "", author.transformToLoggedUser());
+        workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER, "Import filters " + author.getFullName(), "", userService.transformToLoggedUser(author));
     }
 
     @Override
     public void createFilterExport(IUser author) {
-        workflowService.createCaseByIdentifier(EXPORT_NET_IDENTIFIER, "Export filters " + author.getFullName(), "", author.transformToLoggedUser());
+        workflowService.createCaseByIdentifier(EXPORT_NET_IDENTIFIER, "Export filters " + author.getFullName(), "", userService.transformToLoggedUser(author));
     }
 
     /**

@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.application.engine.auth.domain.User;
-import com.netgrif.application.engine.auth.domain.UserState;
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository;
+import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.core.auth.domain.User;
+import com.netgrif.core.auth.domain.enums.UserState;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,46 +25,55 @@ public class TokenServiceTest {
     @Autowired
     IRegistrationService service;
     @Autowired
-    UserRepository repository;
+    UserService userService;
 
     @BeforeEach
     public void setUp() {
-        repository.deleteAll();
+        userService.deleteAllUsers();
     }
 
     @AfterEach
     public void cleanUp() {
-        repository.deleteAll();
+        userService.deleteAllUsers();
     }
 
     @Test
     public void removeExpired() throws Exception {
-        User expired = new User("test@test.com", null, User.UNKNOWN, User.UNKNOWN);
+        User expired = new User();
+        expired.setUsername("test1@test.com");
+        expired.setEmail("test1@test.com");
+        expired.setPassword("password");
         expired.setToken("token");
         expired.setExpirationDate(LocalDateTime.now().minusDays(10));
-        expired.setState(UserState.INVITED);
-        repository.save(expired);
+        expired.setState(UserState.INACTIVE);
+        userService.saveUser(expired, null);
 
-        User expired2 = new User("test2@test.com", null, User.UNKNOWN, User.UNKNOWN);
+        User expired2 = new User();
+        expired2.setUsername("test2@test.com");
+        expired2.setEmail("test2@test.com");
+        expired2.setPassword("password");
         expired2.setToken("token2");
-        expired2.setState(UserState.INVITED);
-        repository.save(expired2);
+        expired2.setState(UserState.INACTIVE);
+        userService.saveUser(expired2, null);
 
         service.removeExpiredUsers();
 
-        assert repository.findAll().size() == 1;
+        assert userService.findAllUsers(null).size() == 1;
     }
 
     @Test
     public void authorizeToken() throws Exception {
-        User expired = new User("test3@test.com", null, User.UNKNOWN, User.UNKNOWN);
+        User expired = new User();
         expired.setToken("token3");
-        expired.setExpirationDate(LocalDateTime.now().plusMinutes(10));
-        expired.setState(UserState.INVITED);
-        repository.save(expired);
+        expired.setUsername("test3@test.com");
+        expired.setEmail("test3@test.com");
+        expired.setPassword("password");
+        expired.setExpirationDate(LocalDateTime.now().minusDays(10));
+        expired.setState(UserState.INACTIVE);
+        userService.saveUser(expired, null);
 
         boolean authorized = service.verifyToken(service.encodeToken("test3@test.com", "token3"));
-        User token = repository.findByEmail("test3@test.com");
+        User token = (User) userService.findByEmail("test3@test.com", null);
 
         assertTokenRemoved(authorized, token);
     }

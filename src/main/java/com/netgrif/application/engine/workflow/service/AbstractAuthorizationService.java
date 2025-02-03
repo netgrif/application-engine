@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.core.auth.domain.IUser;
 
 import java.util.HashMap;
 import java.util.Map;

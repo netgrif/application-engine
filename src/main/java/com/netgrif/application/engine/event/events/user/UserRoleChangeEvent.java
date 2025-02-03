@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.event.events.user;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 
 import java.util.Collection;
@@ -14,11 +14,6 @@ public class UserRoleChangeEvent extends UserEvent {
 
     public UserRoleChangeEvent(LoggedUser user, Collection<ProcessRole> roles) {
         super(user);
-        this.roles = roles;
-    }
-
-    public UserRoleChangeEvent(IUser user, Collection<ProcessRole> roles) {
-        super(user.transformToLoggedUser());
         this.roles = roles;
     }
 

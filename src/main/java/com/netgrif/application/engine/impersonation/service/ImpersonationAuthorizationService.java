@@ -1,16 +1,16 @@
 package com.netgrif.application.engine.impersonation.service;
 
-import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.adapter.auth.service.AuthorityService;
+import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -37,13 +37,13 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     protected ImpersonationProperties properties;
 
     @Autowired
-    protected IUserService userService;
+    protected UserService userService;
 
     @Autowired
     protected IElasticCaseService elasticCaseService;
 
     @Autowired
-    protected IAuthorityService authorityService;
+    protected AuthorityService authorityService;
 
     @Autowired
     protected IWorkflowService workflowService;
@@ -54,14 +54,14 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     @Override
     public Page<IUser> getConfiguredImpersonationUsers(String query, LoggedUser impersonator, Pageable pageable) {
         if (impersonator.isAdmin()) {
-            return userService.searchAllCoMembers(query, null, null, impersonator, true, pageable);
+            return userService.searchAllCoMembers(query, null, null, impersonator, pageable);
 
         } else {
             Page<Case> cases = searchConfigs(impersonator.getId(), pageable);
             List<IUser> users = cases.getContent().stream()
                     .map(c -> ((UserFieldValue) c.getDataSet().get("impersonated").getValue()).getId())
                     .distinct()
-                    .map(id -> userService.findById(id, true))
+                    .map(id -> userService.findById(id, null))
                     .collect(Collectors.toList());
             return new PageImpl<>(users, pageable, cases.getTotalElements());
         }
@@ -75,7 +75,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
 
     @Override
     public boolean canImpersonateUser(LoggedUser impersonator, String userId) {
-        IUser impersonated = userService.findById(userId, true);
+        IUser impersonated = userService.findById(userId, null);
         return impersonator.isAdmin() || !searchConfigs(impersonator.getId(), impersonated.getStringId()).isEmpty();
     }
 
@@ -156,7 +156,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     }
 
     protected Page<Case> findCases(CaseSearchRequest request, Pageable pageable) {
-        return elasticCaseService.search(Collections.singletonList(request), userService.getSystem().transformToLoggedUser(), pageable, Locale.getDefault(), false);
+        return elasticCaseService.search(Collections.singletonList(request), userService.transformToLoggedUser(userService.getSystem()), pageable, Locale.getDefault(), false);
     }
 
     protected boolean isValidAndContainsUser(Case config, String id) {

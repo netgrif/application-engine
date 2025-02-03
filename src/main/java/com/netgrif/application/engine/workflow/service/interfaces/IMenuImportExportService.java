@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;

@@ -1,9 +1,11 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.domain.User;
-import com.netgrif.application.engine.auth.domain.UserState;
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository;
+import com.netgrif.adapter.auth.domain.LoggedUserImpl;
+import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.User;
+import com.netgrif.core.auth.domain.enums.UserState;
 import com.netgrif.application.engine.auth.service.interfaces.ILoginAttemptService;
 import com.netgrif.application.engine.event.events.user.UserLoginEvent;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,13 +19,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
 
     @Autowired
-    protected UserRepository userRepository;
+    protected UserService userService;
 
     @Autowired
     protected ApplicationEventPublisher publisher;
@@ -43,21 +47,21 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new RuntimeException("blocked");
         }
 
-        LoggedUser loggedUser = getLoggedUser(email);
+        LoggedUserImpl loggedUser = getLoggedUser(email);
 
         publisher.publishEvent(new UserLoginEvent(loggedUser));
 
         return loggedUser;
     }
 
-    protected LoggedUser getLoggedUser(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email);
+    protected LoggedUserImpl getLoggedUser(String email) throws UsernameNotFoundException {
+        IUser user = userService.findByEmail(email, null);
         if (user == null)
             throw new UsernameNotFoundException("No user was found for login: " + email);
-        if (user.getPassword() == null || user.getState() != UserState.ACTIVE)
+        if (((User) user).getPassword() == null || user.getState() != UserState.ACTIVE)
             throw new UsernameNotFoundException("User with login " + email + " cannot be logged in!");
 
-        return user.transformToLoggedUser();
+        return (LoggedUserImpl) userService.transformToLoggedUser(user);
     }
 
 

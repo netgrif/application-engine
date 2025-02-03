@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -47,7 +47,7 @@ class AssignRemoveTest {
     private CaseRepository caseRepository;
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     private static final String USER_EMAIL = "test@test.com"
 

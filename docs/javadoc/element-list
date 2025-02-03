@@ -1,9 +1,9 @@
 com.fasterxml.jackson.databind
 com.fasterxml.jackson.databind.node
 com.netgrif.application.engine
-com.netgrif.application.engine.auth.domain
-com.netgrif.application.engine.auth.domain.repositories
-com.netgrif.application.engine.auth.domain.throwable
+com.netgrif.core.auth.domain.Authority;
+com.netgrif.core.auth.domain.Authority;.repositories
+com.netgrif.core.auth.domain.Authority;.throwable
 com.netgrif.application.engine.auth.service
 com.netgrif.application.engine.auth.service.interfaces
 com.netgrif.application.engine.auth.web

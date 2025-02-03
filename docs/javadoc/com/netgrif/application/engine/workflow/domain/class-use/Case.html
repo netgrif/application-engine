@@ -273,8 +273,8 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <tbody>
 <tr class="altColor">
 <td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">ElasticCaseService.</span><code><span class="memberNameLink"><a href="../../../elastic/service/ElasticCaseService.html#search(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">search</a></span>&#8203;(java.util.List&lt;<a href="../../../elastic/web/requestbodies/CaseSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">CaseSearchRequest</a>&gt;&nbsp;requests,
-      <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><span class="typeNameLabel">ElasticCaseService.</span><code><span class="memberNameLink"><a href="../../../elastic/service/ElasticCaseService.html#search(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">search</a></span>&#8203;(java.util.List&lt;<a href="../../../elastic/web/requestbodies/CaseSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">CaseSearchRequest</a>&gt;&nbsp;requests,
+      <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
       org.springframework.data.domain.Pageable&nbsp;pageable,
       java.util.Locale&nbsp;locale,
       java.lang.Boolean&nbsp;isIntersection)</code></th>
@@ -326,8 +326,8 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <tbody>
 <tr class="altColor">
 <td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">IElasticCaseService.</span><code><span class="memberNameLink"><a href="../../../elastic/service/interfaces/IElasticCaseService.html#search(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">search</a></span>&#8203;(java.util.List&lt;<a href="../../../elastic/web/requestbodies/CaseSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">CaseSearchRequest</a>&gt;&nbsp;requests,
-      <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><span class="typeNameLabel">IElasticCaseService.</span><code><span class="memberNameLink"><a href="../../../elastic/service/interfaces/IElasticCaseService.html#search(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">search</a></span>&#8203;(java.util.List&lt;<a href="../../../elastic/web/requestbodies/CaseSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">CaseSearchRequest</a>&gt;&nbsp;requests,
+      <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
       org.springframework.data.domain.Pageable&nbsp;pageable,
       java.util.Locale&nbsp;locale,
       java.lang.Boolean&nbsp;isIntersection)</code></th>
@@ -504,18 +504,18 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tbody>
 <tr class="altColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../history/domain/dataevents/GetDataEventLog.html#%3Cinit%3E(com.netgrif.application.engine.workflow.domain.Task,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.petrinet.domain.events.EventPhase,com.netgrif.application.engine.auth.domain.IUser)">GetDataEventLog</a></span>&#8203;(<a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../history/domain/dataevents/GetDataEventLog.html#%3Cinit%3E(com.netgrif.application.engine.workflow.domain.Task,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.petrinet.domain.events.EventPhase,com.netgrif.core.auth.domain.IUser)">GetDataEventLog</a></span>&#8203;(<a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task,
                <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;useCase,
                <a href="../../../petrinet/domain/events/EventPhase.html" title="enum in com.netgrif.application.engine.petrinet.domain.events">EventPhase</a>&nbsp;eventPhase,
-               <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user)</code></th>
+               <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../history/domain/dataevents/SetDataEventLog.html#%3Cinit%3E(com.netgrif.application.engine.workflow.domain.Task,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.petrinet.domain.events.EventPhase,java.util.Map,com.netgrif.application.engine.auth.domain.IUser)">SetDataEventLog</a></span>&#8203;(<a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../history/domain/dataevents/SetDataEventLog.html#%3Cinit%3E(com.netgrif.application.engine.workflow.domain.Task,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.petrinet.domain.events.EventPhase,java.util.Map,com.netgrif.core.auth.domain.IUser)">SetDataEventLog</a></span>&#8203;(<a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task,
                <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;useCase,
                <a href="../../../petrinet/domain/events/EventPhase.html" title="enum in com.netgrif.application.engine.petrinet.domain.events">EventPhase</a>&nbsp;eventPhase,
                java.util.Map&lt;java.lang.String,&#8203;<a href="../../../petrinet/domain/dataset/logic/ChangedField.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset.logic">ChangedField</a>&gt;&nbsp;changedFields,
-               <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user)</code></th>
+               <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </tbody>
@@ -535,32 +535,32 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tbody>
 <tr class="altColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../history/domain/taskevents/AssignTaskEventLog.html#%3Cinit%3E(com.netgrif.application.engine.workflow.domain.Task,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.petrinet.domain.events.EventPhase,com.netgrif.application.engine.auth.domain.IUser)">AssignTaskEventLog</a></span>&#8203;(<a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../history/domain/taskevents/AssignTaskEventLog.html#%3Cinit%3E(com.netgrif.application.engine.workflow.domain.Task,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.petrinet.domain.events.EventPhase,com.netgrif.core.auth.domain.IUser)">AssignTaskEventLog</a></span>&#8203;(<a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task,
                   <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;useCase,
                   <a href="../../../petrinet/domain/events/EventPhase.html" title="enum in com.netgrif.application.engine.petrinet.domain.events">EventPhase</a>&nbsp;eventPhase,
-                  <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user)</code></th>
+                  <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../history/domain/taskevents/CancelTaskEventLog.html#%3Cinit%3E(com.netgrif.application.engine.workflow.domain.Task,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.petrinet.domain.events.EventPhase,com.netgrif.application.engine.auth.domain.IUser)">CancelTaskEventLog</a></span>&#8203;(<a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../history/domain/taskevents/CancelTaskEventLog.html#%3Cinit%3E(com.netgrif.application.engine.workflow.domain.Task,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.petrinet.domain.events.EventPhase,com.netgrif.core.auth.domain.IUser)">CancelTaskEventLog</a></span>&#8203;(<a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task,
                   <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;useCase,
                   <a href="../../../petrinet/domain/events/EventPhase.html" title="enum in com.netgrif.application.engine.petrinet.domain.events">EventPhase</a>&nbsp;eventPhase,
-                  <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user)</code></th>
+                  <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../history/domain/taskevents/DelegateTaskEventLog.html#%3Cinit%3E(com.netgrif.application.engine.workflow.domain.Task,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.petrinet.domain.events.EventPhase,com.netgrif.application.engine.auth.domain.IUser,java.lang.String)">DelegateTaskEventLog</a></span>&#8203;(<a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../history/domain/taskevents/DelegateTaskEventLog.html#%3Cinit%3E(com.netgrif.application.engine.workflow.domain.Task,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.petrinet.domain.events.EventPhase,com.netgrif.core.auth.domain.IUser,java.lang.String)">DelegateTaskEventLog</a></span>&#8203;(<a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task,
                     <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;useCase,
                     <a href="../../../petrinet/domain/events/EventPhase.html" title="enum in com.netgrif.application.engine.petrinet.domain.events">EventPhase</a>&nbsp;eventPhase,
-                    <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;delegator,
+                    <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;delegator,
                     java.lang.String&nbsp;delegate)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../history/domain/taskevents/FinishTaskEventLog.html#%3Cinit%3E(com.netgrif.application.engine.workflow.domain.Task,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.petrinet.domain.events.EventPhase,com.netgrif.application.engine.auth.domain.IUser)">FinishTaskEventLog</a></span>&#8203;(<a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../history/domain/taskevents/FinishTaskEventLog.html#%3Cinit%3E(com.netgrif.application.engine.workflow.domain.Task,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.petrinet.domain.events.EventPhase,com.netgrif.core.auth.domain.IUser)">FinishTaskEventLog</a></span>&#8203;(<a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task,
                   <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;useCase,
                   <a href="../../../petrinet/domain/events/EventPhase.html" title="enum in com.netgrif.application.engine.petrinet.domain.events">EventPhase</a>&nbsp;eventPhase,
-                  <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user)</code></th>
+                  <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
@@ -669,16 +669,16 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tbody>
 <tr class="altColor">
-<td class="colFirst"><code><a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a></code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">ImpersonationService.</span><code><span class="memberNameLink"><a href="../../../impersonation/service/ImpersonationService.html#applyRolesAndAuthorities(com.netgrif.application.engine.auth.domain.IUser,java.lang.String,java.util.List)">applyRolesAndAuthorities</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;impersonated,
+<td class="colFirst"><code><a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a></code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">ImpersonationService.</span><code><span class="memberNameLink"><a href="../../../impersonation/service/ImpersonationService.html#applyRolesAndAuthorities(com.netgrif.core.auth.domain.IUser,java.lang.String,java.util.List)">applyRolesAndAuthorities</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;impersonated,
                         java.lang.String&nbsp;impersonatorId,
                         java.util.List&lt;<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>protected <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a></code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">ImpersonationService.</span><code><span class="memberNameLink"><a href="../../../impersonation/service/ImpersonationService.html#doImpersonate(com.netgrif.application.engine.auth.domain.LoggedUser,com.netgrif.application.engine.auth.domain.LoggedUser,java.util.List)">doImpersonate</a></span>&#8203;(<a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;loggedUser,
-             <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;impersonatedLogged,
+<td class="colFirst"><code>protected <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a></code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">ImpersonationService.</span><code><span class="memberNameLink"><a href="../../../impersonation/service/ImpersonationService.html#doImpersonate(com.netgrif.core.auth.domain.Authority;.LoggedUser,com.netgrif.core.auth.domain.Authority;.LoggedUser,java.util.List)">doImpersonate</a></span>&#8203;(<a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;loggedUser,
+             <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;impersonatedLogged,
              java.util.List&lt;<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -689,27 +689,27 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>java.util.List&lt;<a href="../../../auth/domain/Authority.html" title="class in com.netgrif.application.engine.auth.domain">Authority</a>&gt;</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">ImpersonationAuthorizationService.</span><code><span class="memberNameLink"><a href="../../../impersonation/service/ImpersonationAuthorizationService.html#getAuthorities(java.util.List,com.netgrif.application.engine.auth.domain.IUser)">getAuthorities</a></span>&#8203;(java.util.List&lt;<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs,
-              <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;impersonated)</code></th>
+<td class="colFirst"><code>java.util.List&lt;<a href="../../../auth/domain/Authority.html" title="class in com.netgrif.core.auth.domain.Authority;">Authority</a>&gt;</code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">ImpersonationAuthorizationService.</span><code><span class="memberNameLink"><a href="../../../impersonation/service/ImpersonationAuthorizationService.html#getAuthorities(java.util.List,com.netgrif.core.auth.domain.IUser)">getAuthorities</a></span>&#8203;(java.util.List&lt;<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs,
+              <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;impersonated)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>java.util.List&lt;<a href="../../../petrinet/domain/roles/ProcessRole.html" title="class in com.netgrif.application.engine.petrinet.domain.roles">ProcessRole</a>&gt;</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">ImpersonationAuthorizationService.</span><code><span class="memberNameLink"><a href="../../../impersonation/service/ImpersonationAuthorizationService.html#getRoles(java.util.List,com.netgrif.application.engine.auth.domain.IUser)">getRoles</a></span>&#8203;(java.util.List&lt;<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs,
-        <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;impersonated)</code></th>
+<th class="colSecond" scope="row"><span class="typeNameLabel">ImpersonationAuthorizationService.</span><code><span class="memberNameLink"><a href="../../../impersonation/service/ImpersonationAuthorizationService.html#getRoles(java.util.List,com.netgrif.core.auth.domain.IUser)">getRoles</a></span>&#8203;(java.util.List&lt;<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs,
+        <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;impersonated)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>protected void</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">ImpersonationService.</span><code><span class="memberNameLink"><a href="../../../impersonation/service/ImpersonationService.html#updateImpersonatedId(com.netgrif.application.engine.auth.domain.LoggedUser,java.lang.String,java.util.List)">updateImpersonatedId</a></span>&#8203;(<a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;loggedUser,
+<th class="colSecond" scope="row"><span class="typeNameLabel">ImpersonationService.</span><code><span class="memberNameLink"><a href="../../../impersonation/service/ImpersonationService.html#updateImpersonatedId(com.netgrif.core.auth.domain.Authority;.LoggedUser,java.lang.String,java.util.List)">updateImpersonatedId</a></span>&#8203;(<a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;loggedUser,
                     java.lang.String&nbsp;id,
                     java.util.List&lt;<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>protected void</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">ImpersonationService.</span><code><span class="memberNameLink"><a href="../../../impersonation/service/ImpersonationService.html#updateImpersonatedId(com.netgrif.application.engine.auth.domain.LoggedUser,java.lang.String,java.util.List,java.time.LocalDateTime)">updateImpersonatedId</a></span>&#8203;(<a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;loggedUser,
+<th class="colSecond" scope="row"><span class="typeNameLabel">ImpersonationService.</span><code><span class="memberNameLink"><a href="../../../impersonation/service/ImpersonationService.html#updateImpersonatedId(com.netgrif.core.auth.domain.Authority;.LoggedUser,java.lang.String,java.util.List,java.time.LocalDateTime)">updateImpersonatedId</a></span>&#8203;(<a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;loggedUser,
                     java.lang.String&nbsp;id,
                     java.util.List&lt;<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs,
                     java.time.LocalDateTime&nbsp;validUntil)</code></th>
@@ -790,22 +790,22 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tbody>
 <tr class="altColor">
-<td class="colFirst"><code><a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a></code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">IImpersonationService.</span><code><span class="memberNameLink"><a href="../../../impersonation/service/interfaces/IImpersonationService.html#applyRolesAndAuthorities(com.netgrif.application.engine.auth.domain.IUser,java.lang.String,java.util.List)">applyRolesAndAuthorities</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;impersonated,
+<td class="colFirst"><code><a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a></code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">IImpersonationService.</span><code><span class="memberNameLink"><a href="../../../impersonation/service/interfaces/IImpersonationService.html#applyRolesAndAuthorities(com.netgrif.core.auth.domain.IUser,java.lang.String,java.util.List)">applyRolesAndAuthorities</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;impersonated,
                         java.lang.String&nbsp;impersonatorId,
                         java.util.List&lt;<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>java.util.List&lt;<a href="../../../auth/domain/Authority.html" title="class in com.netgrif.application.engine.auth.domain">Authority</a>&gt;</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">IImpersonationAuthorizationService.</span><code><span class="memberNameLink"><a href="../../../impersonation/service/interfaces/IImpersonationAuthorizationService.html#getAuthorities(java.util.List,com.netgrif.application.engine.auth.domain.IUser)">getAuthorities</a></span>&#8203;(java.util.List&lt;<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs,
-              <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;impersonated)</code></th>
+<td class="colFirst"><code>java.util.List&lt;<a href="../../../auth/domain/Authority.html" title="class in com.netgrif.core.auth.domain.Authority;">Authority</a>&gt;</code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">IImpersonationAuthorizationService.</span><code><span class="memberNameLink"><a href="../../../impersonation/service/interfaces/IImpersonationAuthorizationService.html#getAuthorities(java.util.List,com.netgrif.core.auth.domain.IUser)">getAuthorities</a></span>&#8203;(java.util.List&lt;<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs,
+              <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;impersonated)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>java.util.List&lt;<a href="../../../petrinet/domain/roles/ProcessRole.html" title="class in com.netgrif.application.engine.petrinet.domain.roles">ProcessRole</a>&gt;</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">IImpersonationAuthorizationService.</span><code><span class="memberNameLink"><a href="../../../impersonation/service/interfaces/IImpersonationAuthorizationService.html#getRoles(java.util.List,com.netgrif.application.engine.auth.domain.IUser)">getRoles</a></span>&#8203;(java.util.List&lt;<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs,
-        <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;impersonated)</code></th>
+<th class="colSecond" scope="row"><span class="typeNameLabel">IImpersonationAuthorizationService.</span><code><span class="memberNameLink"><a href="../../../impersonation/service/interfaces/IImpersonationAuthorizationService.html#getRoles(java.util.List,com.netgrif.core.auth.domain.IUser)">getRoles</a></span>&#8203;(java.util.List&lt;<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs,
+        <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;impersonated)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </tbody>
@@ -904,7 +904,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>protected <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a></code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">NextGroupService.</span><code><span class="memberNameLink"><a href="../../../orgstructure/groups/NextGroupService.html#findUserDefaultGroup(com.netgrif.application.engine.auth.domain.IUser)">findUserDefaultGroup</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;author)</code></th>
+<th class="colSecond" scope="row"><span class="typeNameLabel">NextGroupService.</span><code><span class="memberNameLink"><a href="../../../orgstructure/groups/NextGroupService.html#findUserDefaultGroup(com.netgrif.core.auth.domain.IUser)">findUserDefaultGroup</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;author)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </tbody>
@@ -944,7 +944,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <tbody>
 <tr class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">NextGroupService.</span><code><span class="memberNameLink"><a href="../../../orgstructure/groups/NextGroupService.html#addUser(com.netgrif.application.engine.auth.domain.IUser,com.netgrif.application.engine.workflow.domain.Case)">addUser</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><span class="typeNameLabel">NextGroupService.</span><code><span class="memberNameLink"><a href="../../../orgstructure/groups/NextGroupService.html#addUser(com.netgrif.core.auth.domain.IUser,com.netgrif.application.engine.workflow.domain.Case)">addUser</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user,
        <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;groupCase)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -965,13 +965,13 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>protected java.util.Map&lt;java.lang.String,&#8203;java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&gt;</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">NextGroupService.</span><code><span class="memberNameLink"><a href="../../../orgstructure/groups/NextGroupService.html#getInitialGroupData(com.netgrif.application.engine.auth.domain.IUser,java.lang.String,com.netgrif.application.engine.workflow.domain.Case)">getInitialGroupData</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;author,
+<th class="colSecond" scope="row"><span class="typeNameLabel">NextGroupService.</span><code><span class="memberNameLink"><a href="../../../orgstructure/groups/NextGroupService.html#getInitialGroupData(com.netgrif.core.auth.domain.IUser,java.lang.String,com.netgrif.application.engine.workflow.domain.Case)">getInitialGroupData</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;author,
                    java.lang.String&nbsp;title,
                    <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;groupCase)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>java.util.List&lt;<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.List&lt;<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&gt;</code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">NextGroupService.</span><code><span class="memberNameLink"><a href="../../../orgstructure/groups/NextGroupService.html#getMembers(com.netgrif.application.engine.workflow.domain.Case)">getMembers</a></span>&#8203;(<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;groupCase)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -989,7 +989,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">NextGroupService.</span><code><span class="memberNameLink"><a href="../../../orgstructure/groups/NextGroupService.html#removeUser(com.netgrif.application.engine.auth.domain.IUser,com.netgrif.application.engine.workflow.domain.Case)">removeUser</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><span class="typeNameLabel">NextGroupService.</span><code><span class="memberNameLink"><a href="../../../orgstructure/groups/NextGroupService.html#removeUser(com.netgrif.core.auth.domain.IUser,com.netgrif.application.engine.workflow.domain.Case)">removeUser</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user,
           <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;groupCase)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -1069,12 +1069,12 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <tbody>
 <tr class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">INextGroupService.</span><code><span class="memberNameLink"><a href="../../../orgstructure/groups/interfaces/INextGroupService.html#addUser(com.netgrif.application.engine.auth.domain.IUser,com.netgrif.application.engine.workflow.domain.Case)">addUser</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><span class="typeNameLabel">INextGroupService.</span><code><span class="memberNameLink"><a href="../../../orgstructure/groups/interfaces/INextGroupService.html#addUser(com.netgrif.core.auth.domain.IUser,com.netgrif.application.engine.workflow.domain.Case)">addUser</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user,
        <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;groupCase)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>java.util.List&lt;<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.List&lt;<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&gt;</code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">INextGroupService.</span><code><span class="memberNameLink"><a href="../../../orgstructure/groups/interfaces/INextGroupService.html#getMembers(com.netgrif.application.engine.workflow.domain.Case)">getMembers</a></span>&#8203;(<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;groupCase)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -1087,7 +1087,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">INextGroupService.</span><code><span class="memberNameLink"><a href="../../../orgstructure/groups/interfaces/INextGroupService.html#removeUser(com.netgrif.application.engine.auth.domain.IUser,com.netgrif.application.engine.workflow.domain.Case)">removeUser</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><span class="typeNameLabel">INextGroupService.</span><code><span class="memberNameLink"><a href="../../../orgstructure/groups/interfaces/INextGroupService.html#removeUser(com.netgrif.core.auth.domain.IUser,com.netgrif.application.engine.workflow.domain.Case)">removeUser</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user,
           <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;groupCase)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -1277,18 +1277,18 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a></code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">ActionDelegate.</span><code><span class="memberNameLink"><a href="../../../petrinet/domain/dataset/logic/action/ActionDelegate.html#createCase(com.netgrif.application.engine.petrinet.domain.PetriNet,java.lang.String,java.lang.String,com.netgrif.application.engine.auth.domain.IUser)">createCase</a></span>&#8203;(<a href="../../../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net,
+<th class="colSecond" scope="row"><span class="typeNameLabel">ActionDelegate.</span><code><span class="memberNameLink"><a href="../../../petrinet/domain/dataset/logic/action/ActionDelegate.html#createCase(com.netgrif.application.engine.petrinet.domain.PetriNet,java.lang.String,java.lang.String,com.netgrif.core.auth.domain.IUser)">createCase</a></span>&#8203;(<a href="../../../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net,
           java.lang.String&nbsp;title,
           java.lang.String&nbsp;color,
-          <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;author)</code></th>
+          <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;author)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a></code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">ActionDelegate.</span><code><span class="memberNameLink"><a href="../../../petrinet/domain/dataset/logic/action/ActionDelegate.html#createCase(com.netgrif.application.engine.petrinet.domain.PetriNet,java.lang.String,java.lang.String,com.netgrif.application.engine.auth.domain.IUser,java.util.Locale)">createCase</a></span>&#8203;(<a href="../../../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net,
+<th class="colSecond" scope="row"><span class="typeNameLabel">ActionDelegate.</span><code><span class="memberNameLink"><a href="../../../petrinet/domain/dataset/logic/action/ActionDelegate.html#createCase(com.netgrif.application.engine.petrinet.domain.PetriNet,java.lang.String,java.lang.String,com.netgrif.core.auth.domain.IUser,java.util.Locale)">createCase</a></span>&#8203;(<a href="../../../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net,
           java.lang.String&nbsp;title,
           java.lang.String&nbsp;color,
-          <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;author,
+          <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;author,
           java.util.Locale&nbsp;locale)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -1312,18 +1312,18 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a></code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">ActionDelegate.</span><code><span class="memberNameLink"><a href="../../../petrinet/domain/dataset/logic/action/ActionDelegate.html#createCase(java.lang.String,java.lang.String,java.lang.String,com.netgrif.application.engine.auth.domain.IUser)">createCase</a></span>&#8203;(java.lang.String&nbsp;identifier,
+<th class="colSecond" scope="row"><span class="typeNameLabel">ActionDelegate.</span><code><span class="memberNameLink"><a href="../../../petrinet/domain/dataset/logic/action/ActionDelegate.html#createCase(java.lang.String,java.lang.String,java.lang.String,com.netgrif.core.auth.domain.IUser)">createCase</a></span>&#8203;(java.lang.String&nbsp;identifier,
           java.lang.String&nbsp;title,
           java.lang.String&nbsp;color,
-          <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;author)</code></th>
+          <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;author)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a></code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">ActionDelegate.</span><code><span class="memberNameLink"><a href="../../../petrinet/domain/dataset/logic/action/ActionDelegate.html#createCase(java.lang.String,java.lang.String,java.lang.String,com.netgrif.application.engine.auth.domain.IUser,java.util.Locale)">createCase</a></span>&#8203;(java.lang.String&nbsp;identifier,
+<th class="colSecond" scope="row"><span class="typeNameLabel">ActionDelegate.</span><code><span class="memberNameLink"><a href="../../../petrinet/domain/dataset/logic/action/ActionDelegate.html#createCase(java.lang.String,java.lang.String,java.lang.String,com.netgrif.core.auth.domain.IUser,java.util.Locale)">createCase</a></span>&#8203;(java.lang.String&nbsp;identifier,
           java.lang.String&nbsp;title,
           java.lang.String&nbsp;color,
-          <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;author,
+          <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;author,
           java.util.Locale&nbsp;locale)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -2096,9 +2096,9 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a></code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">ActionDelegate.</span><code><span class="memberNameLink"><a href="../../../petrinet/domain/dataset/logic/action/ActionDelegate.html#assignTask(java.lang.String,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.auth.domain.IUser)">assignTask</a></span>&#8203;(java.lang.String&nbsp;transitionId,
+<th class="colSecond" scope="row"><span class="typeNameLabel">ActionDelegate.</span><code><span class="memberNameLink"><a href="../../../petrinet/domain/dataset/logic/action/ActionDelegate.html#assignTask(java.lang.String,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.core.auth.domain.IUser)">assignTask</a></span>&#8203;(java.lang.String&nbsp;transitionId,
           <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;aCase,
-          <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user)</code></th>
+          <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
@@ -2109,9 +2109,9 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a></code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">ActionDelegate.</span><code><span class="memberNameLink"><a href="../../../petrinet/domain/dataset/logic/action/ActionDelegate.html#cancelTask(java.lang.String,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.auth.domain.IUser)">cancelTask</a></span>&#8203;(java.lang.String&nbsp;transitionId,
+<th class="colSecond" scope="row"><span class="typeNameLabel">ActionDelegate.</span><code><span class="memberNameLink"><a href="../../../petrinet/domain/dataset/logic/action/ActionDelegate.html#cancelTask(java.lang.String,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.core.auth.domain.IUser)">cancelTask</a></span>&#8203;(java.lang.String&nbsp;transitionId,
           <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;aCase,
-          <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user)</code></th>
+          <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
@@ -2447,9 +2447,9 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">ActionDelegate.</span><code><span class="memberNameLink"><a href="../../../petrinet/domain/dataset/logic/action/ActionDelegate.html#finishTask(java.lang.String,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.auth.domain.IUser)">finishTask</a></span>&#8203;(java.lang.String&nbsp;transitionId,
+<th class="colSecond" scope="row"><span class="typeNameLabel">ActionDelegate.</span><code><span class="memberNameLink"><a href="../../../petrinet/domain/dataset/logic/action/ActionDelegate.html#finishTask(java.lang.String,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.core.auth.domain.IUser)">finishTask</a></span>&#8203;(java.lang.String&nbsp;transitionId,
           <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;aCase,
-          <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user)</code></th>
+          <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
@@ -3249,9 +3249,9 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a></code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">ImportHelper.</span><code><span class="memberNameLink"><a href="../../../startup/ImportHelper.html#createCase(java.lang.String,com.netgrif.application.engine.petrinet.domain.PetriNet,com.netgrif.application.engine.auth.domain.LoggedUser)">createCase</a></span>&#8203;(java.lang.String&nbsp;title,
+<th class="colSecond" scope="row"><span class="typeNameLabel">ImportHelper.</span><code><span class="memberNameLink"><a href="../../../startup/ImportHelper.html#createCase(java.lang.String,com.netgrif.application.engine.petrinet.domain.PetriNet,com.netgrif.core.auth.domain.Authority;.LoggedUser)">createCase</a></span>&#8203;(java.lang.String&nbsp;title,
           <a href="../../../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net,
-          <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user)</code></th>
+          <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
@@ -3567,12 +3567,12 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tbody>
 <tr class="altColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/caseoutcomes/CaseEventOutcome.html#%3Cinit%3E(com.netgrif.application.engine.petrinet.domain.I18nString,com.netgrif.application.engine.workflow.domain.Case)">CaseEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/caseoutcomes/CaseEventOutcome.html#%3Cinit%3E(com.netgrif.core.petrinet.domain.I18nString,com.netgrif.application.engine.workflow.domain.Case)">CaseEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
                 <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;aCase)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/caseoutcomes/CaseEventOutcome.html#%3Cinit%3E(com.netgrif.application.engine.petrinet.domain.I18nString,java.util.List,com.netgrif.application.engine.workflow.domain.Case)">CaseEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/caseoutcomes/CaseEventOutcome.html#%3Cinit%3E(com.netgrif.core.petrinet.domain.I18nString,java.util.List,com.netgrif.application.engine.workflow.domain.Case)">CaseEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
                 java.util.List&lt;<a href="../eventoutcomes/EventOutcome.html" title="class in com.netgrif.application.engine.workflow.domain.eventoutcomes">EventOutcome</a>&gt;&nbsp;outcomes,
                 <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;aCase)</code></th>
 <td class="colLast">&nbsp;</td>
@@ -3587,12 +3587,12 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/caseoutcomes/CreateCaseEventOutcome.html#%3Cinit%3E(com.netgrif.application.engine.petrinet.domain.I18nString,com.netgrif.application.engine.workflow.domain.Case)">CreateCaseEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/caseoutcomes/CreateCaseEventOutcome.html#%3Cinit%3E(com.netgrif.core.petrinet.domain.I18nString,com.netgrif.application.engine.workflow.domain.Case)">CreateCaseEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
                       <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;aCase)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/caseoutcomes/CreateCaseEventOutcome.html#%3Cinit%3E(com.netgrif.application.engine.petrinet.domain.I18nString,java.util.List,com.netgrif.application.engine.workflow.domain.Case)">CreateCaseEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/caseoutcomes/CreateCaseEventOutcome.html#%3Cinit%3E(com.netgrif.core.petrinet.domain.I18nString,java.util.List,com.netgrif.application.engine.workflow.domain.Case)">CreateCaseEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
                       java.util.List&lt;<a href="../eventoutcomes/EventOutcome.html" title="class in com.netgrif.application.engine.workflow.domain.eventoutcomes">EventOutcome</a>&gt;&nbsp;outcomes,
                       <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;aCase)</code></th>
 <td class="colLast">&nbsp;</td>
@@ -3607,12 +3607,12 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/caseoutcomes/DeleteCaseEventOutcome.html#%3Cinit%3E(com.netgrif.application.engine.petrinet.domain.I18nString,com.netgrif.application.engine.workflow.domain.Case)">DeleteCaseEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/caseoutcomes/DeleteCaseEventOutcome.html#%3Cinit%3E(com.netgrif.core.petrinet.domain.I18nString,com.netgrif.application.engine.workflow.domain.Case)">DeleteCaseEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
                       <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;aCase)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/caseoutcomes/DeleteCaseEventOutcome.html#%3Cinit%3E(com.netgrif.application.engine.petrinet.domain.I18nString,java.util.List,com.netgrif.application.engine.workflow.domain.Case)">DeleteCaseEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/caseoutcomes/DeleteCaseEventOutcome.html#%3Cinit%3E(com.netgrif.core.petrinet.domain.I18nString,java.util.List,com.netgrif.application.engine.workflow.domain.Case)">DeleteCaseEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
                       java.util.List&lt;<a href="../eventoutcomes/EventOutcome.html" title="class in com.netgrif.application.engine.workflow.domain.eventoutcomes">EventOutcome</a>&gt;&nbsp;outcomes,
                       <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;aCase)</code></th>
 <td class="colLast">&nbsp;</td>
@@ -3643,13 +3643,13 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tbody>
 <tr class="altColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/dataoutcomes/GetDataEventOutcome.html#%3Cinit%3E(com.netgrif.application.engine.petrinet.domain.I18nString,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.workflow.domain.Task)">GetDataEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/dataoutcomes/GetDataEventOutcome.html#%3Cinit%3E(com.netgrif.core.petrinet.domain.I18nString,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.workflow.domain.Task)">GetDataEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
                    <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;aCase,
                    <a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/dataoutcomes/GetDataEventOutcome.html#%3Cinit%3E(com.netgrif.application.engine.petrinet.domain.I18nString,java.util.List,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.workflow.domain.Task,java.util.List)">GetDataEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/dataoutcomes/GetDataEventOutcome.html#%3Cinit%3E(com.netgrif.core.petrinet.domain.I18nString,java.util.List,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.workflow.domain.Task,java.util.List)">GetDataEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
                    java.util.List&lt;<a href="../eventoutcomes/EventOutcome.html" title="class in com.netgrif.application.engine.workflow.domain.eventoutcomes">EventOutcome</a>&gt;&nbsp;outcomes,
                    <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;aCase,
                    <a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task,
@@ -3662,13 +3662,13 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/dataoutcomes/GetDataGroupsEventOutcome.html#%3Cinit%3E(com.netgrif.application.engine.petrinet.domain.I18nString,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.workflow.domain.Task)">GetDataGroupsEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/dataoutcomes/GetDataGroupsEventOutcome.html#%3Cinit%3E(com.netgrif.core.petrinet.domain.I18nString,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.workflow.domain.Task)">GetDataGroupsEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
                          <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;aCase,
                          <a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/dataoutcomes/GetDataGroupsEventOutcome.html#%3Cinit%3E(com.netgrif.application.engine.petrinet.domain.I18nString,java.util.List,java.util.List,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.workflow.domain.Task)">GetDataGroupsEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/dataoutcomes/GetDataGroupsEventOutcome.html#%3Cinit%3E(com.netgrif.core.petrinet.domain.I18nString,java.util.List,java.util.List,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.workflow.domain.Task)">GetDataGroupsEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
                          java.util.List&lt;<a href="../eventoutcomes/EventOutcome.html" title="class in com.netgrif.application.engine.workflow.domain.eventoutcomes">EventOutcome</a>&gt;&nbsp;outcomes,
                          java.util.List&lt;<a href="../../../petrinet/domain/DataGroup.html" title="class in com.netgrif.application.engine.petrinet.domain">DataGroup</a>&gt;&nbsp;data,
                          <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;aCase,
@@ -3752,13 +3752,13 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/taskoutcomes/TaskEventOutcome.html#%3Cinit%3E(com.netgrif.application.engine.petrinet.domain.I18nString,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.workflow.domain.Task)">TaskEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/taskoutcomes/TaskEventOutcome.html#%3Cinit%3E(com.netgrif.core.petrinet.domain.I18nString,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.workflow.domain.Task)">TaskEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
                 <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;aCase,
                 <a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/taskoutcomes/TaskEventOutcome.html#%3Cinit%3E(com.netgrif.application.engine.petrinet.domain.I18nString,java.util.List,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.workflow.domain.Task)">TaskEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../eventoutcomes/taskoutcomes/TaskEventOutcome.html#%3Cinit%3E(com.netgrif.core.petrinet.domain.I18nString,java.util.List,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.workflow.domain.Task)">TaskEventOutcome</a></span>&#8203;(<a href="../../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;message,
                 java.util.List&lt;<a href="../eventoutcomes/EventOutcome.html" title="class in com.netgrif.application.engine.workflow.domain.eventoutcomes">EventOutcome</a>&gt;&nbsp;outcomes,
                 <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;aCase,
                 <a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task)</code></th>
@@ -3838,7 +3838,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>protected <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a></code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">TaskService.</span><code><span class="memberNameLink"><a href="../../service/TaskService.html#assignTaskToUser(com.netgrif.application.engine.auth.domain.IUser,com.netgrif.application.engine.workflow.domain.Task,java.lang.String)">assignTaskToUser</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><span class="typeNameLabel">TaskService.</span><code><span class="memberNameLink"><a href="../../service/TaskService.html#assignTaskToUser(com.netgrif.core.auth.domain.IUser,com.netgrif.application.engine.workflow.domain.Task,java.lang.String)">assignTaskToUser</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user,
                 <a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task,
                 java.lang.String&nbsp;useCaseId)</code></th>
 <td class="colLast">&nbsp;</td>
@@ -3938,9 +3938,9 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">WorkflowService.</span><code><span class="memberNameLink"><a href="../../service/WorkflowService.html#search(java.util.Map,org.springframework.data.domain.Pageable,com.netgrif.application.engine.auth.domain.LoggedUser,java.util.Locale)">search</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.Object&gt;&nbsp;request,
+<th class="colSecond" scope="row"><span class="typeNameLabel">WorkflowService.</span><code><span class="memberNameLink"><a href="../../service/WorkflowService.html#search(java.util.Map,org.springframework.data.domain.Pageable,com.netgrif.core.auth.domain.Authority;.LoggedUser,java.util.Locale)">search</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.Object&gt;&nbsp;request,
       org.springframework.data.domain.Pageable&nbsp;pageable,
-      <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+      <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
       java.util.Locale&nbsp;locale)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -3994,7 +3994,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>protected void</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">TaskService.</span><code><span class="memberNameLink"><a href="../../service/TaskService.html#delegate(com.netgrif.application.engine.auth.domain.IUser,com.netgrif.application.engine.workflow.domain.Task,com.netgrif.application.engine.workflow.domain.Case)">delegate</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;delegated,
+<th class="colSecond" scope="row"><span class="typeNameLabel">TaskService.</span><code><span class="memberNameLink"><a href="../../service/TaskService.html#delegate(com.netgrif.core.auth.domain.IUser,com.netgrif.application.engine.workflow.domain.Task,com.netgrif.application.engine.workflow.domain.Case)">delegate</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;delegated,
         <a href="../Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&nbsp;task,
         <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;useCase)</code></th>
 <td class="colLast">&nbsp;</td>
@@ -4203,7 +4203,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>java.lang.Boolean</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">WorkflowAuthorizationService.</span><code><span class="memberNameLink"><a href="../../service/WorkflowAuthorizationService.html#userHasUserListPermission(com.netgrif.application.engine.auth.domain.IUser,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission...)">userHasUserListPermission</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><span class="typeNameLabel">WorkflowAuthorizationService.</span><code><span class="memberNameLink"><a href="../../service/WorkflowAuthorizationService.html#userHasUserListPermission(com.netgrif.core.auth.domain.IUser,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission...)">userHasUserListPermission</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user,
                          <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;useCase,
                          <a href="../../../petrinet/domain/roles/ProcessRolePermission.html" title="enum in com.netgrif.application.engine.petrinet.domain.roles">ProcessRolePermission</a>...&nbsp;permissions)</code></th>
 <td class="colLast">&nbsp;</td>
@@ -4225,10 +4225,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../eventoutcomes/caseoutcomes/CreateCaseEventOutcome.html" title="class in com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes">CreateCaseEventOutcome</a></code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">WorkflowService.</span><code><span class="memberNameLink"><a href="../../service/WorkflowService.html#createCase(java.lang.String,java.util.function.Function,java.lang.String,com.netgrif.application.engine.auth.domain.LoggedUser)">createCase</a></span>&#8203;(java.lang.String&nbsp;netId,
+<th class="colSecond" scope="row"><span class="typeNameLabel">WorkflowService.</span><code><span class="memberNameLink"><a href="../../service/WorkflowService.html#createCase(java.lang.String,java.util.function.Function,java.lang.String,com.netgrif.core.auth.domain.Authority;.LoggedUser)">createCase</a></span>&#8203;(java.lang.String&nbsp;netId,
           java.util.function.Function&lt;<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>,&#8203;java.lang.String&gt;&nbsp;makeTitle,
           java.lang.String&nbsp;color,
-          <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user)</code></th>
+          <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
@@ -4360,9 +4360,9 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">IWorkflowService.</span><code><span class="memberNameLink"><a href="../../service/interfaces/IWorkflowService.html#search(java.util.Map,org.springframework.data.domain.Pageable,com.netgrif.application.engine.auth.domain.LoggedUser,java.util.Locale)">search</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.Object&gt;&nbsp;request,
+<th class="colSecond" scope="row"><span class="typeNameLabel">IWorkflowService.</span><code><span class="memberNameLink"><a href="../../service/interfaces/IWorkflowService.html#search(java.util.Map,org.springframework.data.domain.Pageable,com.netgrif.core.auth.domain.Authority;.LoggedUser,java.util.Locale)">search</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.Object&gt;&nbsp;request,
       org.springframework.data.domain.Pageable&nbsp;pageable,
-      <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+      <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
       java.util.Locale&nbsp;locale)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -4537,7 +4537,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>java.lang.Boolean</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">IWorkflowAuthorizationService.</span><code><span class="memberNameLink"><a href="../../service/interfaces/IWorkflowAuthorizationService.html#userHasUserListPermission(com.netgrif.application.engine.auth.domain.IUser,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission...)">userHasUserListPermission</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><span class="typeNameLabel">IWorkflowAuthorizationService.</span><code><span class="memberNameLink"><a href="../../service/interfaces/IWorkflowAuthorizationService.html#userHasUserListPermission(com.netgrif.core.auth.domain.IUser,com.netgrif.application.engine.workflow.domain.Case,com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission...)">userHasUserListPermission</a></span>&#8203;(<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user,
                          <a href="../Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;useCase,
                          <a href="../../../petrinet/domain/roles/ProcessRolePermission.html" title="enum in com.netgrif.application.engine.petrinet.domain.roles">ProcessRolePermission</a>...&nbsp;permissions)</code></th>
 <td class="colLast">&nbsp;</td>

@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.configuration;
 
-import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.adapter.auth.service.AuthorityService;
+import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigProperties;
@@ -59,13 +59,13 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     private RestAuthenticationEntryPoint authenticationEntryPoint;
 
     @Autowired
-    private IAuthorityService authorityService;
+    private AuthorityService authorityService;
 
     @Autowired
     private IJwtService jwtService;
 
     @Autowired
-    private IUserService userService;
+    private UserService userService;
 
     @Autowired
     private NaeAuthProperties naeAuthProperties;

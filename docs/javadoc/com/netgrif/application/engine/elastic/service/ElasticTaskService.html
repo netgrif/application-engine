@@ -242,8 +242,8 @@ implements <a href="interfaces/IElasticTaskService.html" title="interface in com
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>protected void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addRolesQueryConstraint(com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest,com.netgrif.application.engine.auth.domain.LoggedUser)">addRolesQueryConstraint</a></span>&#8203;(<a href="../web/requestbodies/ElasticTaskSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">ElasticTaskSearchRequest</a>&nbsp;request,
-                       <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addRolesQueryConstraint(com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest,com.netgrif.core.auth.domain.Authority;.LoggedUser)">addRolesQueryConstraint</a></span>&#8203;(<a href="../web/requestbodies/ElasticTaskSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">ElasticTaskSearchRequest</a>&nbsp;request,
+                       <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
@@ -269,8 +269,8 @@ implements <a href="interfaces/IElasticTaskService.html" title="interface in com
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#buildGroupQuery(com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest,com.netgrif.application.engine.auth.domain.LoggedUser,java.util.Locale,org.elasticsearch.index.query.BoolQueryBuilder)">buildGroupQuery</a></span>&#8203;(<a href="../../workflow/web/requestbodies/TaskSearchRequest.html" title="class in com.netgrif.application.engine.workflow.web.requestbodies">TaskSearchRequest</a>&nbsp;request,
-               <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#buildGroupQuery(com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest,com.netgrif.core.auth.domain.Authority;.LoggedUser,java.util.Locale,org.elasticsearch.index.query.BoolQueryBuilder)">buildGroupQuery</a></span>&#8203;(<a href="../../workflow/web/requestbodies/TaskSearchRequest.html" title="class in com.netgrif.application.engine.workflow.web.requestbodies">TaskSearchRequest</a>&nbsp;request,
+               <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
                java.util.Locale&nbsp;locale,
                org.elasticsearch.index.query.BoolQueryBuilder&nbsp;query)</code></th>
 <td class="colLast">
@@ -293,8 +293,8 @@ implements <a href="interfaces/IElasticTaskService.html" title="interface in com
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>protected org.springframework.data.elasticsearch.core.query.NativeSearchQuery</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#buildQuery(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">buildQuery</a></span>&#8203;(java.util.List&lt;<a href="../web/requestbodies/ElasticTaskSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">ElasticTaskSearchRequest</a>&gt;&nbsp;requests,
-          <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#buildQuery(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">buildQuery</a></span>&#8203;(java.util.List&lt;<a href="../web/requestbodies/ElasticTaskSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">ElasticTaskSearchRequest</a>&gt;&nbsp;requests,
+          <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
           org.springframework.data.domain.Pageable&nbsp;pageable,
           java.util.Locale&nbsp;locale,
           java.lang.Boolean&nbsp;isIntersection)</code></th>
@@ -302,16 +302,16 @@ implements <a href="interfaces/IElasticTaskService.html" title="interface in com
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>protected org.elasticsearch.index.query.BoolQueryBuilder</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#buildSingleQuery(com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest,com.netgrif.application.engine.auth.domain.LoggedUser,java.util.Locale)">buildSingleQuery</a></span>&#8203;(<a href="../web/requestbodies/ElasticTaskSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">ElasticTaskSearchRequest</a>&nbsp;request,
-                <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#buildSingleQuery(com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest,com.netgrif.core.auth.domain.Authority;.LoggedUser,java.util.Locale)">buildSingleQuery</a></span>&#8203;(<a href="../web/requestbodies/ElasticTaskSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">ElasticTaskSearchRequest</a>&nbsp;request,
+                <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
                 java.util.Locale&nbsp;locale)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i7" class="rowColor">
 <td class="colFirst"><code>protected void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#buildStringQuery(com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest,org.elasticsearch.index.query.BoolQueryBuilder,com.netgrif.application.engine.auth.domain.LoggedUser)">buildStringQuery</a></span>&#8203;(<a href="../web/requestbodies/ElasticTaskSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">ElasticTaskSearchRequest</a>&nbsp;request,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#buildStringQuery(com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest,org.elasticsearch.index.query.BoolQueryBuilder,com.netgrif.core.auth.domain.Authority;.LoggedUser)">buildStringQuery</a></span>&#8203;(<a href="../web/requestbodies/ElasticTaskSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">ElasticTaskSearchRequest</a>&nbsp;request,
                 org.elasticsearch.index.query.BoolQueryBuilder&nbsp;query,
-                <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user)</code></th>
+                <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user)</code></th>
 <td class="colLast">
 <div class="block">See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a></div>
 </td>
@@ -356,8 +356,8 @@ implements <a href="interfaces/IElasticTaskService.html" title="interface in com
 </tr>
 <tr id="i12" class="altColor">
 <td class="colFirst"><code>long</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#count(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,java.util.Locale,java.lang.Boolean)">count</a></span>&#8203;(java.util.List&lt;<a href="../web/requestbodies/ElasticTaskSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">ElasticTaskSearchRequest</a>&gt;&nbsp;requests,
-     <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#count(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,java.util.Locale,java.lang.Boolean)">count</a></span>&#8203;(java.util.List&lt;<a href="../web/requestbodies/ElasticTaskSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">ElasticTaskSearchRequest</a>&gt;&nbsp;requests,
+     <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
      java.util.Locale&nbsp;locale,
      java.lang.Boolean&nbsp;isIntersection)</code></th>
 <td class="colLast">&nbsp;</td>
@@ -396,8 +396,8 @@ implements <a href="interfaces/IElasticTaskService.html" title="interface in com
 </tr>
 <tr id="i19" class="rowColor">
 <td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../../workflow/domain/Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#search(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">search</a></span>&#8203;(java.util.List&lt;<a href="../web/requestbodies/ElasticTaskSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">ElasticTaskSearchRequest</a>&gt;&nbsp;requests,
-      <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#search(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">search</a></span>&#8203;(java.util.List&lt;<a href="../web/requestbodies/ElasticTaskSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">ElasticTaskSearchRequest</a>&gt;&nbsp;requests,
+      <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
       org.springframework.data.domain.Pageable&nbsp;pageable,
       java.util.Locale&nbsp;locale,
       java.lang.Boolean&nbsp;isIntersection)</code></th>
@@ -414,7 +414,7 @@ implements <a href="interfaces/IElasticTaskService.html" title="interface in com
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;com.netgrif.application.engine.elastic.service.<a href="ElasticViewPermissionService.html" title="class in com.netgrif.application.engine.elastic.service">ElasticViewPermissionService</a></h3>
-<code><a href="ElasticViewPermissionService.html#buildViewPermissionQuery(org.elasticsearch.index.query.BoolQueryBuilder,com.netgrif.application.engine.auth.domain.LoggedUser)">buildViewPermissionQuery</a></code></li>
+<code><a href="ElasticViewPermissionService.html#buildViewPermissionQuery(org.elasticsearch.index.query.BoolQueryBuilder,com.netgrif.core.auth.domain.Authority;.LoggedUser)">buildViewPermissionQuery</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
@@ -628,71 +628,71 @@ public&nbsp;void&nbsp;index&#8203;(<a href="../domain/ElasticTask.html" title="c
 </dl>
 </li>
 </ul>
-<a id="search(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">
+<a id="search(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>search</h4>
 <pre class="methodSignature">public&nbsp;org.springframework.data.domain.Page&lt;<a href="../../workflow/domain/Task.html" title="class in com.netgrif.application.engine.workflow.domain">Task</a>&gt;&nbsp;search&#8203;(java.util.List&lt;<a href="../web/requestbodies/ElasticTaskSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">ElasticTaskSearchRequest</a>&gt;&nbsp;requests,
-                                                         <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+                                                         <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
                                                          org.springframework.data.domain.Pageable&nbsp;pageable,
                                                          java.util.Locale&nbsp;locale,
                                                          java.lang.Boolean&nbsp;isIntersection)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IElasticTaskService.html#search(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">search</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IElasticTaskService.html" title="interface in com.netgrif.application.engine.elastic.service.interfaces">IElasticTaskService</a></code></dd>
+<dd><code><a href="interfaces/IElasticTaskService.html#search(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">search</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IElasticTaskService.html" title="interface in com.netgrif.application.engine.elastic.service.interfaces">IElasticTaskService</a></code></dd>
 </dl>
 </li>
 </ul>
-<a id="count(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,java.util.Locale,java.lang.Boolean)">
+<a id="count(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,java.util.Locale,java.lang.Boolean)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>count</h4>
 <pre class="methodSignature">public&nbsp;long&nbsp;count&#8203;(java.util.List&lt;<a href="../web/requestbodies/ElasticTaskSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">ElasticTaskSearchRequest</a>&gt;&nbsp;requests,
-                  <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+                  <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
                   java.util.Locale&nbsp;locale,
                   java.lang.Boolean&nbsp;isIntersection)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IElasticTaskService.html#count(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,java.util.Locale,java.lang.Boolean)">count</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IElasticTaskService.html" title="interface in com.netgrif.application.engine.elastic.service.interfaces">IElasticTaskService</a></code></dd>
+<dd><code><a href="interfaces/IElasticTaskService.html#count(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,java.util.Locale,java.lang.Boolean)">count</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IElasticTaskService.html" title="interface in com.netgrif.application.engine.elastic.service.interfaces">IElasticTaskService</a></code></dd>
 </dl>
 </li>
 </ul>
-<a id="buildQuery(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">
+<a id="buildQuery(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>buildQuery</h4>
 <pre class="methodSignature">protected&nbsp;org.springframework.data.elasticsearch.core.query.NativeSearchQuery&nbsp;buildQuery&#8203;(java.util.List&lt;<a href="../web/requestbodies/ElasticTaskSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">ElasticTaskSearchRequest</a>&gt;&nbsp;requests,
-                                                                                         <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+                                                                                         <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
                                                                                          org.springframework.data.domain.Pageable&nbsp;pageable,
                                                                                          java.util.Locale&nbsp;locale,
                                                                                          java.lang.Boolean&nbsp;isIntersection)</pre>
 </li>
 </ul>
-<a id="buildSingleQuery(com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest,com.netgrif.application.engine.auth.domain.LoggedUser,java.util.Locale)">
+<a id="buildSingleQuery(com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest,com.netgrif.core.auth.domain.Authority;.LoggedUser,java.util.Locale)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>buildSingleQuery</h4>
 <pre class="methodSignature">protected&nbsp;org.elasticsearch.index.query.BoolQueryBuilder&nbsp;buildSingleQuery&#8203;(<a href="../web/requestbodies/ElasticTaskSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">ElasticTaskSearchRequest</a>&nbsp;request,
-                                                                          <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+                                                                          <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
                                                                           java.util.Locale&nbsp;locale)</pre>
 </li>
 </ul>
-<a id="addRolesQueryConstraint(com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest,com.netgrif.application.engine.auth.domain.LoggedUser)">
+<a id="addRolesQueryConstraint(com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest,com.netgrif.core.auth.domain.Authority;.LoggedUser)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>addRolesQueryConstraint</h4>
 <pre class="methodSignature">protected&nbsp;void&nbsp;addRolesQueryConstraint&#8203;(<a href="../web/requestbodies/ElasticTaskSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">ElasticTaskSearchRequest</a>&nbsp;request,
-                                       <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user)</pre>
+                                       <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user)</pre>
 </li>
 </ul>
 <a id="buildCaseQuery(com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest,org.elasticsearch.index.query.BoolQueryBuilder)">
@@ -845,7 +845,7 @@ public&nbsp;void&nbsp;index&#8203;(<a href="../domain/ElasticTask.html" title="c
  }</div>
 </li>
 </ul>
-<a id="buildStringQuery(com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest,org.elasticsearch.index.query.BoolQueryBuilder,com.netgrif.application.engine.auth.domain.LoggedUser)">
+<a id="buildStringQuery(com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest,org.elasticsearch.index.query.BoolQueryBuilder,com.netgrif.core.auth.domain.Authority;.LoggedUser)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -853,18 +853,18 @@ public&nbsp;void&nbsp;index&#8203;(<a href="../domain/ElasticTask.html" title="c
 <h4>buildStringQuery</h4>
 <pre class="methodSignature">protected&nbsp;void&nbsp;buildStringQuery&#8203;(<a href="../web/requestbodies/ElasticTaskSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">ElasticTaskSearchRequest</a>&nbsp;request,
                                 org.elasticsearch.index.query.BoolQueryBuilder&nbsp;query,
-                                <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user)</pre>
+                                <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user)</pre>
 <div class="block">See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a></div>
 </li>
 </ul>
-<a id="buildGroupQuery(com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest,com.netgrif.application.engine.auth.domain.LoggedUser,java.util.Locale,org.elasticsearch.index.query.BoolQueryBuilder)">
+<a id="buildGroupQuery(com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest,com.netgrif.core.auth.domain.Authority;.LoggedUser,java.util.Locale,org.elasticsearch.index.query.BoolQueryBuilder)">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>buildGroupQuery</h4>
 <pre class="methodSignature">public&nbsp;boolean&nbsp;buildGroupQuery&#8203;(<a href="../../workflow/web/requestbodies/TaskSearchRequest.html" title="class in com.netgrif.application.engine.workflow.web.requestbodies">TaskSearchRequest</a>&nbsp;request,
-                               <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+                               <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
                                java.util.Locale&nbsp;locale,
                                org.elasticsearch.index.query.BoolQueryBuilder&nbsp;query)</pre>
 <div class="block">Tasks of cases of group with id "5cb07b6ff05be15f0b972c4d"

@@ -210,7 +210,7 @@ implements <a href="ISecurityContextService.html" title="interface in com.netgri
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#forceReloadSecurityContext(com.netgrif.application.engine.auth.domain.LoggedUser)">forceReloadSecurityContext</a></span>&#8203;(<a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;loggedUser)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#forceReloadSecurityContext(com.netgrif.core.auth.domain.Authority;.LoggedUser)">forceReloadSecurityContext</a></span>&#8203;(<a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;loggedUser)</code></th>
 <td class="colLast">
 <div class="block">Reloads the security context according to currently logged user from database</div>
 </td>
@@ -224,7 +224,7 @@ implements <a href="ISecurityContextService.html" title="interface in com.netgri
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#reloadSecurityContext(com.netgrif.application.engine.auth.domain.LoggedUser)">reloadSecurityContext</a></span>&#8203;(<a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;loggedUser)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#reloadSecurityContext(com.netgrif.core.auth.domain.Authority;.LoggedUser)">reloadSecurityContext</a></span>&#8203;(<a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;loggedUser)</code></th>
 <td class="colLast">
 <div class="block">Reloads the security context according to currently logged user</div>
 </td>
@@ -238,7 +238,7 @@ implements <a href="ISecurityContextService.html" title="interface in com.netgri
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setUserService(com.netgrif.application.engine.auth.service.interfaces.IUserService)">setUserService</a></span>&#8203;(<a href="../../auth/service/interfaces/IUserService.html" title="interface in com.netgrif.application.engine.auth.service.interfaces">IUserService</a>&nbsp;userService)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setUserService(com.netgrif.adapter.auth.service.UserService)">setUserService</a></span>&#8203;(<a href="../../auth/service/interfaces/IUserService.html" title="interface in com.netgrif.application.engine.auth.service.interfaces">IUserService</a>&nbsp;userService)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -319,33 +319,33 @@ implements <a href="ISecurityContextService.html" title="interface in com.netgri
 </dl>
 </li>
 </ul>
-<a id="reloadSecurityContext(com.netgrif.application.engine.auth.domain.LoggedUser)">
+<a id="reloadSecurityContext(com.netgrif.core.auth.domain.Authority;.LoggedUser)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>reloadSecurityContext</h4>
-<pre class="methodSignature">public&nbsp;void&nbsp;reloadSecurityContext&#8203;(<a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;loggedUser)</pre>
+<pre class="methodSignature">public&nbsp;void&nbsp;reloadSecurityContext&#8203;(<a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;loggedUser)</pre>
 <div class="block">Reloads the security context according to currently logged user</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="ISecurityContextService.html#reloadSecurityContext(com.netgrif.application.engine.auth.domain.LoggedUser)">reloadSecurityContext</a></code>&nbsp;in interface&nbsp;<code><a href="ISecurityContextService.html" title="interface in com.netgrif.application.engine.security.service">ISecurityContextService</a></code></dd>
+<dd><code><a href="ISecurityContextService.html#reloadSecurityContext(com.netgrif.core.auth.domain.Authority;.LoggedUser)">reloadSecurityContext</a></code>&nbsp;in interface&nbsp;<code><a href="ISecurityContextService.html" title="interface in com.netgrif.application.engine.security.service">ISecurityContextService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>loggedUser</code> - the user whose context needs to be reloaded</dd>
 </dl>
 </li>
 </ul>
-<a id="forceReloadSecurityContext(com.netgrif.application.engine.auth.domain.LoggedUser)">
+<a id="forceReloadSecurityContext(com.netgrif.core.auth.domain.Authority;.LoggedUser)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>forceReloadSecurityContext</h4>
-<pre class="methodSignature">public&nbsp;void&nbsp;forceReloadSecurityContext&#8203;(<a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;loggedUser)</pre>
+<pre class="methodSignature">public&nbsp;void&nbsp;forceReloadSecurityContext&#8203;(<a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;loggedUser)</pre>
 <div class="block">Reloads the security context according to currently logged user from database</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="ISecurityContextService.html#forceReloadSecurityContext(com.netgrif.application.engine.auth.domain.LoggedUser)">forceReloadSecurityContext</a></code>&nbsp;in interface&nbsp;<code><a href="ISecurityContextService.html" title="interface in com.netgrif.application.engine.security.service">ISecurityContextService</a></code></dd>
+<dd><code><a href="ISecurityContextService.html#forceReloadSecurityContext(com.netgrif.core.auth.domain.Authority;.LoggedUser)">forceReloadSecurityContext</a></code>&nbsp;in interface&nbsp;<code><a href="ISecurityContextService.html" title="interface in com.netgrif.application.engine.security.service">ISecurityContextService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>loggedUser</code> - the user whose context needs to be reloaded</dd>
 </dl>
@@ -367,7 +367,7 @@ implements <a href="ISecurityContextService.html" title="interface in com.netgri
 </dl>
 </li>
 </ul>
-<a id="setUserService(com.netgrif.application.engine.auth.service.interfaces.IUserService)">
+<a id="setUserService(com.netgrif.adapter.auth.service.UserService)">
 <!--   -->
 </a>
 <ul class="blockListLast">

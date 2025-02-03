@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
-
+import com.netgrif.core.petrinet.domain.I18nString;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorizationService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.adapter.auth.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 public class AuthorizationService implements IAuthorizationService {
 
     @Autowired
-    private IUserService userService;
+    private UserService userService;
 
     @Override
     public boolean hasAuthority(String authority) {
         LoggedUser loggedUser = userService.getLoggedUserFromContext().getSelfOrImpersonated();
-        return loggedUser.getAuthorities().stream().anyMatch(it -> it.getAuthority().equals(Authority.ROLE + authority));
+        return loggedUser.getAuthoritySet().stream().anyMatch(it -> it.getAuthority().equals(authority));
     }
 }

@@ -3,8 +3,8 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.IUser
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.core.auth.domain.IUser
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -71,7 +71,7 @@ class FileListFieldTest {
     private IWorkflowService workflowService
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private WebApplicationContext context
@@ -146,7 +146,7 @@ class FileListFieldTest {
     void getFileByCaseAndName() {
         Case useCase = uploadTestFile()
 
-        IUser user = userService.findByEmail(USER_EMAIL, true)
+        IUser user = userService.findUserByUsername(USER_EMAIL, null)
         assert user != null
 
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
@@ -170,7 +170,7 @@ class FileListFieldTest {
 
     private Case uploadTestFile() {
         PetriNet net = getNet()
-        IUser user = userService.findByEmail(USER_EMAIL, true)
+        IUser user = userService.findUserByUsername(USER_EMAIL, null)
         assert user != null
         Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())

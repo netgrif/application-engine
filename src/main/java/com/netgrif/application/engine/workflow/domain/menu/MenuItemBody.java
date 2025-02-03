@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.domain.menu;
 
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate;
 import com.netgrif.application.engine.workflow.domain.Case;

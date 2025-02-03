@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.orgstructure.groups.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
@@ -31,7 +31,7 @@ public class GroupRunner implements ApplicationEngineStartupRunner {
 
     private final ImportHelper helper;
     private final INextGroupService nextGroupService;
-    private final IUserService userService;
+    private final UserService userService;
     private final SystemUserRunner systemCreator;
     private final IPetriNetService petriNetService;
     private final GroupConfigurationProperties groupProperties;

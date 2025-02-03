@@ -1,15 +1,14 @@
 package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.ProcessRoleService
@@ -23,7 +22,6 @@ import com.netgrif.application.engine.workflow.service.TaskSearchService
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
-import com.netgrif.application.engine.workflow.web.PublicTaskController
 import com.netgrif.application.engine.workflow.web.TaskController
 import com.netgrif.application.engine.workflow.web.WorkflowController
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
@@ -64,7 +62,7 @@ class TaskControllerTest {
     private IDataService dataService
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private IPetriNetService petriNetService
@@ -193,7 +191,7 @@ class TaskControllerTest {
     void setUserListValue() {
         assert task != null
         List<String> userIds = [] as List
-        userIds.add(userService.findByEmail(DUMMY_USER_MAIL, false).getStringId())
+        userIds.add(userService.findUserByUsername(DUMMY_USER_MAIL, null).getStringId())
         dataService.setData(task.stringId, ImportHelper.populateDataset([
                 "performable_users": [
                         "value": userIds,
@@ -210,13 +208,13 @@ class TaskControllerTest {
                 this.role = role
             }
         }
-        processRoleService.assignRolesToUser(userService.findByEmail(DUMMY_USER_MAIL, false).getStringId(), [role._id.toString()] as Set, userService.getLoggedOrSystem().transformToLoggedUser())
+        processRoleService.assignRolesToUser(userService.findUserByUsername(DUMMY_USER_MAIL, null).getStringId(), [role._id.toString()] as Set, userService.getLoggedOrSystem().transformToLoggedUser())
     }
 
     Page<Task> findTasksByMongo() {
         List<TaskSearchRequest> taskSearchRequestList = new ArrayList<>()
         taskSearchRequestList.add(new TaskSearchRequest())
-        Page<Task> tasks = taskService.search(taskSearchRequestList, new FullPageRequest(), userService.findByEmail(DUMMY_USER_MAIL, false).transformToLoggedUser(), new Locale("en"), false)
+        Page<Task> tasks = taskService.search(taskSearchRequestList, new FullPageRequest(), userService.findUserByUsername(DUMMY_USER_MAIL, null).transformToLoggedUser(), new Locale("en"), false)
         return tasks
     }
 }

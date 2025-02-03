@@ -2,11 +2,11 @@ package com.netgrif.application.engine.action
 
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
-import com.netgrif.application.engine.petrinet.domain.I18nString
+import com.netgrif.core.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.UriContentType
 import com.netgrif.application.engine.petrinet.domain.UriNode
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
@@ -48,7 +48,7 @@ class MenuItemApiTest {
     private FilterRunner filterRunner
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private IWorkflowService workflowService

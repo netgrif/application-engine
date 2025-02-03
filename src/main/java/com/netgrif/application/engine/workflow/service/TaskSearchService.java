@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
@@ -55,7 +55,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     protected Predicate buildRolesQueryConstraint(LoggedUser user) {
-        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::roleQuery).collect(Collectors.toList());
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(r -> roleQuery(r.getStringId())).collect(Collectors.toList());
         return constructPredicateTree(roleConstraints, BooleanBuilder::or);
     }
 
@@ -65,7 +65,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     protected Predicate buildViewRoleQueryConstraint(LoggedUser user) {
-        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::viewRoleQuery).collect(Collectors.toList());
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(r -> viewRoleQuery(r.getStringId())).collect(Collectors.toList());
         return constructPredicateTree(roleConstraints, BooleanBuilder::or);
     }
 
@@ -83,7 +83,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     protected Predicate buildNegativeViewRoleQueryConstraint(LoggedUser user) {
-        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::negativeViewRoleQuery).collect(Collectors.toList());
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(r -> negativeViewRoleQuery(r.getStringId())).collect(Collectors.toList());
         return constructPredicateTree(roleConstraints, BooleanBuilder::or);
     }
 

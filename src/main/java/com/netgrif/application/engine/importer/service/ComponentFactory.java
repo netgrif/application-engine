@@ -7,7 +7,7 @@ import com.netgrif.application.engine.importer.model.Option;
 import com.netgrif.application.engine.importer.model.Property;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Component;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Icon;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;

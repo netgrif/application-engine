@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.history.domain.userevents;
 
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 
 import java.util.ArrayList;

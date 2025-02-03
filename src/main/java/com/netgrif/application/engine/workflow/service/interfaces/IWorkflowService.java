@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.workflow.domain.Case;

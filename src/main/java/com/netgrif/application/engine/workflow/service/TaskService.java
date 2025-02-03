@@ -1,9 +1,10 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.core.petrinet.domain.I18nString;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.event.events.task.*;
@@ -21,7 +22,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.domain.events.EventType;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 
@@ -74,7 +75,7 @@ public class TaskService implements ITaskService {
     protected TaskRepository taskRepository;
 
     @Autowired
-    protected IUserService userService;
+    protected UserService userService;
 
     @Autowired
     protected MongoTemplate mongoTemplate;
@@ -155,7 +156,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public AssignTaskEventOutcome assignTask(String taskId, Map<String, String> params) throws TransitionNotExecutableException {
-        LoggedUser user = userService.getLoggedOrSystem().transformToLoggedUser();
+        LoggedUser user = userService.transformToLoggedUser(userService.getLoggedOrSystem());
         return assignTask(user, taskId, params);
     }
 
@@ -224,7 +225,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public FinishTaskEventOutcome finishTask(String taskId, Map<String, String> params) throws IllegalArgumentException, TransitionNotExecutableException {
-        LoggedUser user = userService.getLoggedOrSystem().transformToLoggedUser();
+        LoggedUser user = userService.transformToLoggedUser(userService.getLoggedOrSystem());
         return finishTask(user, taskId, params);
     }
 
@@ -245,7 +246,7 @@ public class TaskService implements ITaskService {
             throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
         }
         // TODO: 14. 4. 2017 replace with @PreAuthorize
-        if (!task.getUserId().equals(user.getSelfOrImpersonated().getStringId()) && !loggedUser.isAnonymous()) {
+        if (!task.getUserId().equals(user.getSelfOrImpersonated().getStringId()) && !((Boolean) loggedUser.getAttributes().containsKey("anonymous"))) {
             throw new IllegalArgumentException("User that is not assigned tried to finish task");
         }
 
@@ -405,7 +406,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId, Map<String, String> params) throws TransitionNotExecutableException {
-        IUser delegatedUser = userService.resolveById(delegatedId, true);
+        IUser delegatedUser = userService.findById(delegatedId, null);
         IUser delegateUser = getUserFromLoggedUser(loggedUser);
 
         Optional<Task> taskOptional = findOptionalById(taskId);
@@ -805,7 +806,7 @@ public class TaskService implements ITaskService {
         if (userListValue == null)
             return null;
         return userListValue.getUserValues().stream().map(UserFieldValue::getId)
-                .filter(id -> userService.resolveById(id, false) != null)
+                .filter(id -> userService.findById(id, null) != null)
                 .collect(Collectors.toList());
     }
 
@@ -873,7 +874,7 @@ public class TaskService implements ITaskService {
                 if (users.containsKey(task.getUserId()))
                     task.setUser(users.get(task.getUserId()));
                 else {
-                    task.setUser(userService.resolveById(task.getUserId(), true));
+                    task.setUser(userService.findById(task.getUserId(), null));
                     users.put(task.getUserId(), task.getUser());
                 }
             }
@@ -910,7 +911,7 @@ public class TaskService implements ITaskService {
 
     private void setUser(Task task) {
         if (task.getUserId() != null) {
-            task.setUser(userService.resolveById(task.getUserId(), true));
+            task.setUser(userService.findById(task.getUserId(), null));
         }
     }
 
@@ -937,7 +938,7 @@ public class TaskService implements ITaskService {
     }
 
     protected IUser getUserFromLoggedUser(LoggedUser loggedUser) {
-        IUser user = userService.resolveById(loggedUser.getId(), true);
+        IUser user = userService.findById(loggedUser.getId(), null);
         IUser fromLogged = loggedUser.transformToUser();
         user.setImpersonated(fromLogged.getImpersonated());
         return user;

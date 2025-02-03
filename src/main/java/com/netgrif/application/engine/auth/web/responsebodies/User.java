@@ -1,10 +1,12 @@
 package com.netgrif.application.engine.auth.web.responsebodies;
 
-import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.Group;
+import com.netgrif.core.auth.domain.IUser;
 import lombok.Data;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 public class User {
@@ -36,8 +38,8 @@ public class User {
         id = user.getStringId();
         email = user.getEmail();
         avatar = user.getAvatar();
-        name = user.getName();
-        surname = user.getSurname();
+        name = user.getFirstName();
+        surname = user.getLastName();
         fullName = user.getFullName();
     }
 
@@ -57,9 +59,10 @@ public class User {
      */
     public static User createUser(IUser user) {
         User result = new User(user);
-        result.setTelNumber(user.getTelNumber());
+        //MODULARISATION: tel number does not exists on new user
+//        result.setTelNumber(user.getTelNumber());
         result.setAuthorities(user.getAuthorities());
-        result.setNextGroups(user.getNextGroups());
+        result.setNextGroups(user.getGroups().stream().map(Group::getStringId).collect(Collectors.toSet()));
         return result;
     }
 }

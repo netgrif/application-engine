@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.validation
 
-import com.netgrif.application.engine.petrinet.domain.I18nString
+import com.netgrif.core.petrinet.domain.I18nString
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
 import org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl

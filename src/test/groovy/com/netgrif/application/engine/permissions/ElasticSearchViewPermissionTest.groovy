@@ -1,12 +1,12 @@
 package com.netgrif.application.engine.permissions
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.IUser
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
+import com.netgrif.core.auth.domain.Authority
+import com.netgrif.core.auth.domain.IUser
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
@@ -48,7 +48,7 @@ class ElasticSearchViewPermissionTest {
     private ITaskService taskService
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private SuperCreatorRunner superCreator

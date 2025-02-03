@@ -472,7 +472,7 @@
 						"new_title": ["type":"text", "value": entryDefaultName.value]
 						])
 
-						change entryName value {return new com.netgrif.application.engine.petrinet.domain.I18nString(entryDefaultName.value)}
+						change entryName value {return new com.netgrif.core.petrinet.domain.I18nString(entryDefaultName.value)}
 					</action>
 				</logic>
 				<layout>

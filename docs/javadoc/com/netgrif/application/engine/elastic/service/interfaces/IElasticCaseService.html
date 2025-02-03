@@ -152,8 +152,8 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>long</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#count(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,java.util.Locale,java.lang.Boolean)">count</a></span>&#8203;(java.util.List&lt;<a href="../../web/requestbodies/CaseSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">CaseSearchRequest</a>&gt;&nbsp;requests,
-     <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#count(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,java.util.Locale,java.lang.Boolean)">count</a></span>&#8203;(java.util.List&lt;<a href="../../web/requestbodies/CaseSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">CaseSearchRequest</a>&gt;&nbsp;requests,
+     <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
      java.util.Locale&nbsp;locale,
      java.lang.Boolean&nbsp;isIntersection)</code></th>
 <td class="colLast">&nbsp;</td>
@@ -180,8 +180,8 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../../../workflow/domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#search(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">search</a></span>&#8203;(java.util.List&lt;<a href="../../web/requestbodies/CaseSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">CaseSearchRequest</a>&gt;&nbsp;requests,
-      <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#search(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">search</a></span>&#8203;(java.util.List&lt;<a href="../../web/requestbodies/CaseSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">CaseSearchRequest</a>&gt;&nbsp;requests,
+      <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
       org.springframework.data.domain.Pageable&nbsp;pageable,
       java.util.Locale&nbsp;locale,
       java.lang.Boolean&nbsp;isIntersection)</code></th>
@@ -223,27 +223,27 @@ void&nbsp;index&#8203;(<a href="../../domain/ElasticCase.html" title="class in c
 <pre class="methodSignature">void&nbsp;indexNow&#8203;(<a href="../../domain/ElasticCase.html" title="class in com.netgrif.application.engine.elastic.domain">ElasticCase</a>&nbsp;useCase)</pre>
 </li>
 </ul>
-<a id="search(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">
+<a id="search(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,org.springframework.data.domain.Pageable,java.util.Locale,java.lang.Boolean)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>search</h4>
 <pre class="methodSignature">org.springframework.data.domain.Page&lt;<a href="../../../workflow/domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;search&#8203;(java.util.List&lt;<a href="../../web/requestbodies/CaseSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">CaseSearchRequest</a>&gt;&nbsp;requests,
-                                                  <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+                                                  <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
                                                   org.springframework.data.domain.Pageable&nbsp;pageable,
                                                   java.util.Locale&nbsp;locale,
                                                   java.lang.Boolean&nbsp;isIntersection)</pre>
 </li>
 </ul>
-<a id="count(java.util.List,com.netgrif.application.engine.auth.domain.LoggedUser,java.util.Locale,java.lang.Boolean)">
+<a id="count(java.util.List,com.netgrif.core.auth.domain.Authority;.LoggedUser,java.util.Locale,java.lang.Boolean)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>count</h4>
 <pre class="methodSignature">long&nbsp;count&#8203;(java.util.List&lt;<a href="../../web/requestbodies/CaseSearchRequest.html" title="class in com.netgrif.application.engine.elastic.web.requestbodies">CaseSearchRequest</a>&gt;&nbsp;requests,
-           <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user,
+           <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user,
            java.util.Locale&nbsp;locale,
            java.lang.Boolean&nbsp;isIntersection)</pre>
 </li>

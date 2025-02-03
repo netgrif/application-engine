@@ -2,11 +2,8 @@ package com.netgrif.application.engine.elastic
 
 import com.netgrif.application.engine.MockService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.elastic.domain.ElasticCase
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
-import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
-import com.netgrif.application.engine.elastic.domain.ElasticTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
@@ -69,7 +66,7 @@ class DataSearchRequestTest {
     private IWorkflowService workflowService
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private MockService mockService
@@ -101,7 +98,7 @@ class DataSearchRequestTest {
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
 
-        def users = userService.findAll(true)
+        def users = userService.findAllUsers(true)
         assert users.size() >= 2
         def testUser1 = users[0]
         def testUser2 = users[1]

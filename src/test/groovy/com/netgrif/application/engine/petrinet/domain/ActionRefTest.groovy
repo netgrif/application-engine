@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain
 
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -43,7 +43,7 @@ class ActionRefTest {
     private IPetriNetService petriNetService;
 
     @Autowired
-    private UserRepository userRepository
+    private UserService userService
 
     @Autowired
     private TestHelper testHelper

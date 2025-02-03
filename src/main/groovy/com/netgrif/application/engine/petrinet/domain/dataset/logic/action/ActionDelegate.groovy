@@ -1,12 +1,12 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.AsyncRunner
-import com.netgrif.application.engine.auth.domain.Author
-import com.netgrif.application.engine.auth.domain.IUser
-import com.netgrif.application.engine.auth.domain.LoggedUser
+import com.netgrif.core.auth.domain.Author;
+import com.netgrif.core.auth.domain.IUser
+import com.netgrif.core.auth.domain.LoggedUser
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
 import com.netgrif.application.engine.configuration.PublicViewProperties
@@ -43,7 +43,6 @@ import com.netgrif.application.engine.startup.runner.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.ProcessResourceId
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
@@ -114,7 +113,7 @@ class ActionDelegate {
     IWorkflowService workflowService
 
     @Autowired
-    IUserService userService
+    UserService userService
 
     @Autowired
     IPetriNetService petriNetService
@@ -758,7 +757,7 @@ class ActionDelegate {
             }
             if (field instanceof UserListField && (value instanceof String[] || value instanceof List)) {
                 LinkedHashSet<UserFieldValue> users = new LinkedHashSet<>()
-                value.each { id -> users.add(new UserFieldValue(userService.findById(id as String, false))) }
+                value.each { id -> users.add(new UserFieldValue(userService.findById(id as String, null))) }
                 value = new UserListFieldValue(users)
             }
 //            if (field instanceof TaskField && targetTask.isPresent()) {
@@ -1289,12 +1288,12 @@ class ActionDelegate {
     }
 
     def changeUserByEmail(String email, String attribute, def cl) {
-        IUser user = userService.findByEmail(email, false)
+        IUser user = userService.findUserByUsername(email, null)
         changeUser(user, attribute, cl)
     }
 
     def changeUser(String id, String attribute, def cl) {
-        IUser user = userService.findById(id, false)
+        IUser user = userService.findById(id, null)
         changeUser(user, attribute, cl)
     }
 
@@ -1310,7 +1309,7 @@ class ActionDelegate {
         }
 
         user[attribute] = cl() as String
-        userService.save(user)
+        userService.saveUser(user, null)
     }
 
     MessageResource inviteUser(String email) {
@@ -1332,7 +1331,7 @@ class ActionDelegate {
     }
 
     void deleteUser(String email) {
-        IUser user = userService.findByEmail(email, false)
+        IUser user = userService.findUserByUsername(email, null)
         if (user == null)
             log.error("Cannot find user with email [" + email + "]")
         deleteUser(user)
@@ -1352,7 +1351,7 @@ class ActionDelegate {
     }
 
     IUser findUserByEmail(String email) {
-        IUser user = userService.findByEmail(email, false)
+        IUser user = userService.findUserByUsername(email, null)
         if (user == null) {
             log.error("Cannot find user with email [" + email + "]")
             return null
@@ -1362,7 +1361,7 @@ class ActionDelegate {
     }
 
     IUser findUserById(String id) {
-        IUser user = userService.findById(id, false)
+        IUser user = userService.findById(id, null)
         if (user == null) {
             log.error("Cannot find user with id [" + id + "]")
             return null

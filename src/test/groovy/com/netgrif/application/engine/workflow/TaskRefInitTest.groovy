@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -33,7 +33,7 @@ class TaskRefInitTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private TestHelper testHelper

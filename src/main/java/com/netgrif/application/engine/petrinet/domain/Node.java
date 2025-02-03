@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain;
 
 import lombok.Getter;
 import org.bson.types.ObjectId;
+import com.netgrif.core.petrinet.domain.I18nString;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document

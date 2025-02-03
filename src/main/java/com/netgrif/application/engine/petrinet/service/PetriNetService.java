@@ -2,8 +2,8 @@ package com.netgrif.application.engine.petrinet.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.CacheProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
@@ -16,7 +16,7 @@ import com.netgrif.application.engine.history.domain.taskevents.TaskEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
+//import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
@@ -104,14 +104,14 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     protected FieldActionsRunner actionsRunner;
 
-    @Autowired(required = false)
-    protected ILdapGroupRefService ldapGroupService;
+//    @Autowired(required = false)
+//    protected ILdapGroupRefService ldapGroupService;
 
     @Autowired
     protected IFieldActionsCacheService functionCacheService;
 
     @Autowired
-    protected IUserService userService;
+    protected UserService userService;
 
     @Autowired
     protected IEventService eventService;
@@ -546,16 +546,17 @@ public class PetriNetService implements IPetriNetService {
         PetriNet petriNet = petriNetOptional.get();
         log.info("[" + processId + "]: Initiating deletion of Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
 
-        this.userService.removeRoleOfDeletedPetriNet(petriNet);
+        //MODULARISATION: replace PetriNet packages
+        //this.userService.removeRoleOfDeletedPetriNet(petriNet, null);
         this.workflowService.deleteInstancesOfPetriNet(petriNet);
         this.processRoleService.deleteRolesOfNet(petriNet, loggedUser);
-        try {
-            ldapGroupService.deleteProcessRoleByPetrinet(petriNet.getStringId());
-        } catch (NullPointerException e) {
-            log.info("LdapGroup and ProcessRole mapping are not activated...");
-        } catch (Exception ex) {
-            log.error("LdapGroup", ex);
-        }
+//        try {
+//            ldapGroupService.deleteProcessRoleByPetrinet(petriNet.getStringId());
+//        } catch (NullPointerException e) {
+//            log.info("LdapGroup and ProcessRole mapping are not activated...");
+//        } catch (Exception ex) {
+//            log.error("LdapGroup", ex);
+//        }
 
 
         log.info("[" + processId + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());

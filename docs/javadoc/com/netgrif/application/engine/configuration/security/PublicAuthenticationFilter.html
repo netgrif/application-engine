@@ -193,9 +193,9 @@ extends org.springframework.web.filter.OncePerRequestFilter</pre>
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(org.springframework.security.authentication.ProviderManager,org.springframework.security.authentication.AnonymousAuthenticationProvider,com.netgrif.application.engine.auth.domain.Authority,java.lang.String%5B%5D,java.lang.String%5B%5D,com.netgrif.application.engine.configuration.security.jwt.IJwtService,com.netgrif.application.engine.auth.service.interfaces.IUserService)">PublicAuthenticationFilter</a></span>&#8203;(org.springframework.security.authentication.ProviderManager&nbsp;authenticationManager,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(org.springframework.security.authentication.ProviderManager,org.springframework.security.authentication.AnonymousAuthenticationProvider,com.netgrif.core.auth.domain.Authority;,java.lang.String%5B%5D,java.lang.String%5B%5D,com.netgrif.application.engine.configuration.security.jwt.IJwtService,com.netgrif.adapter.auth.service.UserService)">PublicAuthenticationFilter</a></span>&#8203;(org.springframework.security.authentication.ProviderManager&nbsp;authenticationManager,
                           org.springframework.security.authentication.AnonymousAuthenticationProvider&nbsp;provider,
-                          <a href="../../auth/domain/Authority.html" title="class in com.netgrif.application.engine.auth.domain">Authority</a>&nbsp;anonymousAuthority,
+                          <a href="../../auth/domain/Authority.html" title="class in com.netgrif.core.auth.domain.Authority;">Authority</a>&nbsp;anonymousAuthority,
                           java.lang.String[]&nbsp;urls,
                           java.lang.String[]&nbsp;exceptions,
                           <a href="jwt/IJwtService.html" title="interface in com.netgrif.application.engine.configuration.security.jwt">IJwtService</a>&nbsp;jwtService,
@@ -265,7 +265,7 @@ extends org.springframework.web.filter.OncePerRequestFilter</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(org.springframework.security.authentication.ProviderManager,org.springframework.security.authentication.AnonymousAuthenticationProvider,com.netgrif.application.engine.auth.domain.Authority,java.lang.String[],java.lang.String[],com.netgrif.application.engine.configuration.security.jwt.IJwtService,com.netgrif.application.engine.auth.service.interfaces.IUserService)">
+<a id="&lt;init&gt;(org.springframework.security.authentication.ProviderManager,org.springframework.security.authentication.AnonymousAuthenticationProvider,com.netgrif.core.auth.domain.Authority;,java.lang.String[],java.lang.String[],com.netgrif.application.engine.configuration.security.jwt.IJwtService,com.netgrif.adapter.auth.service.UserService)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -273,7 +273,7 @@ extends org.springframework.web.filter.OncePerRequestFilter</pre>
 <h4>PublicAuthenticationFilter</h4>
 <pre>public&nbsp;PublicAuthenticationFilter&#8203;(org.springframework.security.authentication.ProviderManager&nbsp;authenticationManager,
                                   org.springframework.security.authentication.AnonymousAuthenticationProvider&nbsp;provider,
-                                  <a href="../../auth/domain/Authority.html" title="class in com.netgrif.application.engine.auth.domain">Authority</a>&nbsp;anonymousAuthority,
+                                  <a href="../../auth/domain/Authority.html" title="class in com.netgrif.core.auth.domain.Authority;">Authority</a>&nbsp;anonymousAuthority,
                                   java.lang.String[]&nbsp;urls,
                                   java.lang.String[]&nbsp;exceptions,
                                   <a href="jwt/IJwtService.html" title="interface in com.netgrif.application.engine.configuration.security.jwt">IJwtService</a>&nbsp;jwtService,

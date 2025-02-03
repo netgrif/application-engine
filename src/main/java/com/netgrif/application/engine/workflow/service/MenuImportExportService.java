@@ -5,15 +5,15 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.files.StorageResolverService;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner;
@@ -56,7 +56,7 @@ public class MenuImportExportService implements IMenuImportExportService {
     private static final String GROUP_NAV_TASK = "navigationMenuConfig";
 
     @Autowired
-    IUserService userService;
+    UserService userService;
 
     @Autowired
     IWorkflowService workflowService;
@@ -259,7 +259,7 @@ public class MenuImportExportService implements IMenuImportExportService {
                 petriNetService.getNewestVersionByIdentifier("preference_filter_item").getStringId(),
                 item.getEntryName() + "_" + menuIdentifier,
                 "",
-                userService.getSystem().transformToLoggedUser()
+                userService.transformToLoggedUser(userService.getSystem())
         ).getCase();
 
         QTask qTask = new QTask("task");

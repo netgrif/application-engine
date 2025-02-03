@@ -9,7 +9,7 @@ import com.netgrif.application.engine.configuration.properties.enumeration.HSTS;
 import com.netgrif.application.engine.configuration.properties.enumeration.XFrameOptionsMode;
 import com.netgrif.application.engine.configuration.properties.enumeration.XXSSProtection;
 import com.netgrif.application.engine.configuration.security.SessionUtilsProperties;
-import com.netgrif.application.engine.ldap.filters.LoginAttemptsFilter;
+//import com.netgrif.application.engine.ldap.filters.LoginAttemptsFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -235,7 +235,7 @@ public abstract class AbstractSecurityConfiguration {
 
     protected void configureFilters(HttpSecurity http) {
         if (sessionUtilsProperties.isEnabledFilter()) {
-            http.addFilterBefore(new LoginAttemptsFilter(), ChannelProcessingFilter.class);
+//            http.addFilterBefore(new LoginAttemptsFilter(), ChannelProcessingFilter.class);
         }
     }
 

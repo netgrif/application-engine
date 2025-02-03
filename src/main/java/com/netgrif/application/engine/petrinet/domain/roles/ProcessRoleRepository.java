@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.roles;
 
-import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
+import com.netgrif.core.workflow.domain.ProcessResourceId;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -11,33 +11,33 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
-public interface ProcessRoleRepository extends MongoRepository<ProcessRole, String>, QuerydslPredicateExecutor<ProcessRole> {
+public interface ProcessRoleRepository extends MongoRepository<com.netgrif.core.petrinet.domain.roles.ProcessRole, String>, QuerydslPredicateExecutor<ProcessRole> {
 
-    Set<ProcessRole> findAllByNetId(String netId);
+    Set<com.netgrif.core.petrinet.domain.roles.ProcessRole> findAllByNetId(String netId);
 
-    Set<ProcessRole> findAllByImportIdIn(Set<String> importIds);
+    Set<com.netgrif.core.petrinet.domain.roles.ProcessRole> findAllByImportIdIn(Set<String> importIds);
 
-    Set<ProcessRole> findAllByName_DefaultValue(String name);
+    Set<com.netgrif.core.petrinet.domain.roles.ProcessRole> findAllByName_DefaultValue(String name);
 
-    Set<ProcessRole> findAllByImportId(String importId);
+    Set<com.netgrif.core.petrinet.domain.roles.ProcessRole> findAllByImportId(String importId);
 
-    Set<ProcessRole> findAllByGlobalIsTrue();
+    Set<com.netgrif.core.petrinet.domain.roles.ProcessRole> findAllByGlobalIsTrue();
 
     @Query("{ '_id.objectId': ?0 }")
-    Optional<ProcessRole> findByIdObjectId(ObjectId objectId);
+    Optional<com.netgrif.core.petrinet.domain.roles.ProcessRole> findByIdObjectId(ObjectId objectId);
 
     void deleteAllBy_idIn(Collection<ProcessResourceId> ids);
 
 
         //TODO: It goes one at a time... make bulk
-    default Set<ProcessRole> findAllById(Set<String> ids) {
+    default Set<com.netgrif.core.petrinet.domain.roles.ProcessRole> findAllById(Set<String> ids) {
         return ids.stream()
                 .map(this::findByCompositeId)
                 .flatMap(Optional::stream)
                 .collect(Collectors.toSet());
     }
 
-    default Optional<ProcessRole> findByCompositeId(String compositeId) {
+    default Optional<com.netgrif.core.petrinet.domain.roles.ProcessRole> findByCompositeId(String compositeId) {
         String[] parts = compositeId.split(ProcessResourceId.ID_SEPARATOR);
         if (parts.length == 2) {
             String networkId = parts[0];
@@ -49,5 +49,5 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
     }
 
     @Query("{ '_id.shortProcessId': ?0, '_id.objectId': ?1 }")
-    Optional<ProcessRole> findByNetworkIdAndObjectId(String networkId, ObjectId objectId);
+    Optional<com.netgrif.core.petrinet.domain.roles.ProcessRole> findByNetworkIdAndObjectId(String networkId, ObjectId objectId);
 }

@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.impersonation.web;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserResourceHelperService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.impersonation.exceptions.IllegalImpersonationAttemptException;
@@ -48,7 +48,7 @@ public class ImpersonationController {
     protected IImpersonationAuthorizationService impersonationAuthorizationService;
 
     @Autowired
-    protected IUserService userService;
+    protected UserService userService;
 
     @Autowired
     protected IUserResourceHelperService userResourceHelperService;
@@ -77,7 +77,7 @@ public class ImpersonationController {
     @Operation(summary = "Impersonate user through a specific configuration", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping("/config/{id}")
     public UserResource impersonateByConfig(@PathVariable("id") String configId, Locale locale) throws IllegalImpersonationAttemptException, ImpersonatedUserHasSessionException {
-        LoggedUser loggedUser = userService.getLoggedUser().transformToLoggedUser();
+        LoggedUser loggedUser =  userService.transformToLoggedUser(userService.getLoggedUser());
         if (!impersonationAuthorizationService.canImpersonate(loggedUser, configId)) {
             throw new IllegalImpersonationAttemptException(loggedUser, configId);
         }
@@ -88,7 +88,7 @@ public class ImpersonationController {
     @Operation(summary = "Impersonate user directly by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping("/user/{id}")
     public UserResource impersonateUser(@PathVariable("id") String userId, Locale locale) throws IllegalImpersonationAttemptException, ImpersonatedUserHasSessionException {
-        LoggedUser loggedUser = userService.getLoggedUser().transformToLoggedUser();
+        LoggedUser loggedUser =  userService.transformToLoggedUser(userService.getLoggedUser());
         if (!impersonationAuthorizationService.canImpersonateUser(loggedUser, userId)) {
             throw new IllegalImpersonationAttemptException(loggedUser, userId);
         }

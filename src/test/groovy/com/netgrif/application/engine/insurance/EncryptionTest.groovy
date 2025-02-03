@@ -1,7 +1,8 @@
 package com.netgrif.application.engine.insurance
 
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.LoggedUser
+import com.netgrif.adapter.auth.domain.LoggedUserImpl
+import com.netgrif.core.auth.domain.Authority
+import com.netgrif.core.auth.domain.LoggedUser
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -88,6 +89,6 @@ class EncryptionTest {
 
     LoggedUser mockLoggedUser() {
         def authorityUser = authorityService.getOrCreate(Authority.user)
-        return new LoggedUser(superCreator.getSuperUser().getStringId(), "super@netgrif.com", "password", [authorityUser])
+        return new LoggedUserImpl(superCreator.getSuperUser().getStringId(), "super@netgrif.com", [authorityUser] as Set)
     }
 }

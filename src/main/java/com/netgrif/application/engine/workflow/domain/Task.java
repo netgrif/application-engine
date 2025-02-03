@@ -1,8 +1,9 @@
 package com.netgrif.application.engine.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.core.auth.domain.Actor;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
@@ -77,6 +78,11 @@ public class Task implements Serializable {
     @Getter
     @Setter
     private IUser user;
+
+    @Transient
+    @Getter
+    @Setter
+    private Actor actor;
 
     @DBRef
     @Setter

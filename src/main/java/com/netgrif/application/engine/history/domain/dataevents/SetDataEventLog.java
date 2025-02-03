@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.history.domain.dataevents;
 
-import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.application.engine.history.domain.taskevents.TaskEventLog;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;

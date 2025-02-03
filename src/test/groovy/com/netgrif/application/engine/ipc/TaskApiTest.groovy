@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.ipc
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.history.domain.baseevent.EventLog
 import com.netgrif.application.engine.history.domain.baseevent.repository.EventLogRepository
 import com.netgrif.application.engine.importer.service.Importer
@@ -41,7 +41,7 @@ class TaskApiTest {
     private TaskRepository taskRepository
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private EventLogRepository eventLogRepository

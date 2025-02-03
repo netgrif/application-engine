@@ -152,20 +152,20 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#canImpersonate(com.netgrif.application.engine.auth.domain.LoggedUser,java.lang.String)">canImpersonate</a></span>&#8203;(<a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;loggedUser,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#canImpersonate(com.netgrif.core.auth.domain.Authority;.LoggedUser,java.lang.String)">canImpersonate</a></span>&#8203;(<a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;loggedUser,
               java.lang.String&nbsp;configId)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#canImpersonateUser(com.netgrif.application.engine.auth.domain.LoggedUser,java.lang.String)">canImpersonateUser</a></span>&#8203;(<a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;impersonator,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#canImpersonateUser(com.netgrif.core.auth.domain.Authority;.LoggedUser,java.lang.String)">canImpersonateUser</a></span>&#8203;(<a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;impersonator,
                   java.lang.String&nbsp;userId)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code>java.util.List&lt;<a href="../../../auth/domain/Authority.html" title="class in com.netgrif.application.engine.auth.domain">Authority</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAuthorities(java.util.List,com.netgrif.application.engine.auth.domain.IUser)">getAuthorities</a></span>&#8203;(java.util.List&lt;<a href="../../../workflow/domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs,
-              <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;impersonated)</code></th>
+<td class="colFirst"><code>java.util.List&lt;<a href="../../../auth/domain/Authority.html" title="class in com.netgrif.core.auth.domain.Authority;">Authority</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAuthorities(java.util.List,com.netgrif.core.auth.domain.IUser)">getAuthorities</a></span>&#8203;(java.util.List&lt;<a href="../../../workflow/domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs,
+              <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;impersonated)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i3" class="rowColor">
@@ -174,9 +174,9 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getConfiguredImpersonationUsers(java.lang.String,com.netgrif.application.engine.auth.domain.LoggedUser,org.springframework.data.domain.Pageable)">getConfiguredImpersonationUsers</a></span>&#8203;(java.lang.String&nbsp;query,
-                               <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;impersonator,
+<td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getConfiguredImpersonationUsers(java.lang.String,com.netgrif.core.auth.domain.Authority;.LoggedUser,org.springframework.data.domain.Pageable)">getConfiguredImpersonationUsers</a></span>&#8203;(java.lang.String&nbsp;query,
+                               <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;impersonator,
                                org.springframework.data.domain.Pageable&nbsp;pageable)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -187,8 +187,8 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>java.util.List&lt;<a href="../../../petrinet/domain/roles/ProcessRole.html" title="class in com.netgrif.application.engine.petrinet.domain.roles">ProcessRole</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getRoles(java.util.List,com.netgrif.application.engine.auth.domain.IUser)">getRoles</a></span>&#8203;(java.util.List&lt;<a href="../../../workflow/domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs,
-        <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;impersonated)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getRoles(java.util.List,com.netgrif.core.auth.domain.IUser)">getRoles</a></span>&#8203;(java.util.List&lt;<a href="../../../workflow/domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs,
+        <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;impersonated)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i7" class="rowColor">
@@ -225,34 +225,34 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="getConfiguredImpersonationUsers(java.lang.String,com.netgrif.application.engine.auth.domain.LoggedUser,org.springframework.data.domain.Pageable)">
+<a id="getConfiguredImpersonationUsers(java.lang.String,com.netgrif.core.auth.domain.Authority;.LoggedUser,org.springframework.data.domain.Pageable)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getConfiguredImpersonationUsers</h4>
-<pre class="methodSignature">org.springframework.data.domain.Page&lt;<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&gt;&nbsp;getConfiguredImpersonationUsers&#8203;(java.lang.String&nbsp;query,
-                                                                            <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;impersonator,
+<pre class="methodSignature">org.springframework.data.domain.Page&lt;<a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&gt;&nbsp;getConfiguredImpersonationUsers&#8203;(java.lang.String&nbsp;query,
+                                                                            <a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;impersonator,
                                                                             org.springframework.data.domain.Pageable&nbsp;pageable)</pre>
 </li>
 </ul>
-<a id="canImpersonate(com.netgrif.application.engine.auth.domain.LoggedUser,java.lang.String)">
+<a id="canImpersonate(com.netgrif.core.auth.domain.Authority;.LoggedUser,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>canImpersonate</h4>
-<pre class="methodSignature">boolean&nbsp;canImpersonate&#8203;(<a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;loggedUser,
+<pre class="methodSignature">boolean&nbsp;canImpersonate&#8203;(<a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;loggedUser,
                        java.lang.String&nbsp;configId)</pre>
 </li>
 </ul>
-<a id="canImpersonateUser(com.netgrif.application.engine.auth.domain.LoggedUser,java.lang.String)">
+<a id="canImpersonateUser(com.netgrif.core.auth.domain.Authority;.LoggedUser,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>canImpersonateUser</h4>
-<pre class="methodSignature">boolean&nbsp;canImpersonateUser&#8203;(<a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;impersonator,
+<pre class="methodSignature">boolean&nbsp;canImpersonateUser&#8203;(<a href="../../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;impersonator,
                            java.lang.String&nbsp;userId)</pre>
 </li>
 </ul>
@@ -276,24 +276,24 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
                                    java.lang.String&nbsp;impersonatedId)</pre>
 </li>
 </ul>
-<a id="getAuthorities(java.util.List,com.netgrif.application.engine.auth.domain.IUser)">
+<a id="getAuthorities(java.util.List,com.netgrif.core.auth.domain.IUser)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getAuthorities</h4>
-<pre class="methodSignature">java.util.List&lt;<a href="../../../auth/domain/Authority.html" title="class in com.netgrif.application.engine.auth.domain">Authority</a>&gt;&nbsp;getAuthorities&#8203;(java.util.List&lt;<a href="../../../workflow/domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs,
-                                         <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;impersonated)</pre>
+<pre class="methodSignature">java.util.List&lt;<a href="../../../auth/domain/Authority.html" title="class in com.netgrif.core.auth.domain.Authority;">Authority</a>&gt;&nbsp;getAuthorities&#8203;(java.util.List&lt;<a href="../../../workflow/domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs,
+                                         <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;impersonated)</pre>
 </li>
 </ul>
-<a id="getRoles(java.util.List,com.netgrif.application.engine.auth.domain.IUser)">
+<a id="getRoles(java.util.List,com.netgrif.core.auth.domain.IUser)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getRoles</h4>
 <pre class="methodSignature">java.util.List&lt;<a href="../../../petrinet/domain/roles/ProcessRole.html" title="class in com.netgrif.application.engine.petrinet.domain.roles">ProcessRole</a>&gt;&nbsp;getRoles&#8203;(java.util.List&lt;<a href="../../../workflow/domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;configs,
-                                     <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;impersonated)</pre>
+                                     <a href="../../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;impersonated)</pre>
 </li>
 </ul>
 <a id="getConfig(java.lang.String)">

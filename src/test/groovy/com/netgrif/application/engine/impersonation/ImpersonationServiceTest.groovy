@@ -1,17 +1,16 @@
 package com.netgrif.application.engine.impersonation
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.IUser
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.IUser
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
+import com.netgrif.adapter.auth.service.*
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
-import com.netgrif.application.engine.petrinet.domain.I18nString
+import com.netgrif.core.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
@@ -71,7 +70,7 @@ class ImpersonationServiceTest {
     private ImportHelper helper
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private IElasticCaseService elasticCaseService
@@ -89,7 +88,7 @@ class ImpersonationServiceTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private IAuthorityService authorityService
+    private AuthorityService authorityService
 
     @Autowired
     private IImpersonationService impersonationService

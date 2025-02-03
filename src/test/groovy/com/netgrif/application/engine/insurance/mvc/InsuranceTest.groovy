@@ -2,10 +2,10 @@ package com.netgrif.application.engine.insurance.mvc
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
@@ -117,7 +117,7 @@ class InsuranceTest {
     private IProcessRoleService processRoleService
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private TestHelper testHelper
@@ -143,7 +143,7 @@ class InsuranceTest {
                 [auths.get("user"), auths.get("admin")] as Authority[],
                 [processRoles.get("agent"), processRoles.get("company")] as ProcessRole[])
         List<ProcessRole> roles = processRoleService.findAll(netId)
-        processRoleService.assignRolesToUser(userService.findByEmail(USER_EMAIL, false).getId(), roles.findAll { it.importId in ["1", "2"] }.collect { it.stringId } as Set, userService.getLoggedOrSystem().transformToLoggedUser())
+        processRoleService.assignRolesToUser(userService.findUserByUsername(USER_EMAIL, null).getId(), roles.findAll { it.importId in ["1", "2"] }.collect { it.stringId } as Set, userService.getLoggedOrSystem().transformToLoggedUser())
 
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
         auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic;
 
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.querydsl.core.annotations.QueryExclude;
 import lombok.Data;

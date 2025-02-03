@@ -1,10 +1,9 @@
 package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
@@ -32,7 +31,7 @@ class UserRefsTest {
     private ImportHelper importHelper
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private IWorkflowService workflowService
@@ -63,7 +62,7 @@ class UserRefsTest {
         userIds = new ArrayList<>()
         10.times {
             def _case = importHelper.createCase("$it" as String, it % 2 == 0 ? net : net)
-            String id = userService.findByEmail(userEmails[it % 2], true).getStringId()
+            String id = userService.findUserByUsername(userEmails[it % 2], null).getStringId()
             String taskId = (new ArrayList<>(_case.getTasks())).get(0).task
             _case = dataService.setData(taskId, ImportHelper.populateDataset([
                     "user_list_1": [

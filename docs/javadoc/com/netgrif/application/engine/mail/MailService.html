@@ -272,12 +272,12 @@ implements <a href="interfaces/IMailService.html" title="interface in com.netgri
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#sendPasswordResetEmail(com.netgrif.application.engine.auth.domain.RegisteredUser)">sendPasswordResetEmail</a></span>&#8203;(<a href="../auth/domain/RegisteredUser.html" title="interface in com.netgrif.application.engine.auth.domain">RegisteredUser</a>&nbsp;user)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#sendPasswordResetEmail(com.netgrif.core.auth.domain.Authority;.RegisteredUser)">sendPasswordResetEmail</a></span>&#8203;(<a href="../auth/domain/RegisteredUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">RegisteredUser</a>&nbsp;user)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#sendRegistrationEmail(com.netgrif.application.engine.auth.domain.RegisteredUser)">sendRegistrationEmail</a></span>&#8203;(<a href="../auth/domain/RegisteredUser.html" title="interface in com.netgrif.application.engine.auth.domain">RegisteredUser</a>&nbsp;user)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#sendRegistrationEmail(com.netgrif.core.auth.domain.Authority;.RegisteredUser)">sendRegistrationEmail</a></span>&#8203;(<a href="../auth/domain/RegisteredUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">RegisteredUser</a>&nbsp;user)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i5" class="rowColor">
@@ -461,19 +461,19 @@ protected&nbsp;java.lang.String mailFrom</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="sendRegistrationEmail(com.netgrif.application.engine.auth.domain.RegisteredUser)">
+<a id="sendRegistrationEmail(com.netgrif.core.auth.domain.Authority;.RegisteredUser)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>sendRegistrationEmail</h4>
-<pre class="methodSignature">public&nbsp;void&nbsp;sendRegistrationEmail&#8203;(<a href="../auth/domain/RegisteredUser.html" title="interface in com.netgrif.application.engine.auth.domain">RegisteredUser</a>&nbsp;user)
+<pre class="methodSignature">public&nbsp;void&nbsp;sendRegistrationEmail&#8203;(<a href="../auth/domain/RegisteredUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">RegisteredUser</a>&nbsp;user)
                            throws javax.mail.MessagingException,
                                   java.io.IOException,
                                   freemarker.template.TemplateException</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IMailService.html#sendRegistrationEmail(com.netgrif.application.engine.auth.domain.RegisteredUser)">sendRegistrationEmail</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IMailService.html" title="interface in com.netgrif.application.engine.mail.interfaces">IMailService</a></code></dd>
+<dd><code><a href="interfaces/IMailService.html#sendRegistrationEmail(com.netgrif.core.auth.domain.Authority;.RegisteredUser)">sendRegistrationEmail</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IMailService.html" title="interface in com.netgrif.application.engine.mail.interfaces">IMailService</a></code></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>javax.mail.MessagingException</code></dd>
 <dd><code>java.io.IOException</code></dd>
@@ -481,19 +481,19 @@ protected&nbsp;java.lang.String mailFrom</pre>
 </dl>
 </li>
 </ul>
-<a id="sendPasswordResetEmail(com.netgrif.application.engine.auth.domain.RegisteredUser)">
+<a id="sendPasswordResetEmail(com.netgrif.core.auth.domain.Authority;.RegisteredUser)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>sendPasswordResetEmail</h4>
-<pre class="methodSignature">public&nbsp;void&nbsp;sendPasswordResetEmail&#8203;(<a href="../auth/domain/RegisteredUser.html" title="interface in com.netgrif.application.engine.auth.domain">RegisteredUser</a>&nbsp;user)
+<pre class="methodSignature">public&nbsp;void&nbsp;sendPasswordResetEmail&#8203;(<a href="../auth/domain/RegisteredUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">RegisteredUser</a>&nbsp;user)
                             throws javax.mail.MessagingException,
                                    java.io.IOException,
                                    freemarker.template.TemplateException</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IMailService.html#sendPasswordResetEmail(com.netgrif.application.engine.auth.domain.RegisteredUser)">sendPasswordResetEmail</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IMailService.html" title="interface in com.netgrif.application.engine.mail.interfaces">IMailService</a></code></dd>
+<dd><code><a href="interfaces/IMailService.html#sendPasswordResetEmail(com.netgrif.core.auth.domain.Authority;.RegisteredUser)">sendPasswordResetEmail</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IMailService.html" title="interface in com.netgrif.application.engine.mail.interfaces">IMailService</a></code></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>javax.mail.MessagingException</code></dd>
 <dd><code>java.io.IOException</code></dd>

@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.auth.service;
 
 
+import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.auth.domain.RegisteredUser;
-import com.netgrif.application.engine.auth.domain.User;
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository;
+import com.netgrif.core.auth.domain.RegisteredUser;
+import com.netgrif.core.auth.domain.User;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
@@ -30,7 +30,7 @@ public class RegistrationServiceTest {
     IRegistrationService service;
 
     @Autowired
-    UserRepository repository;
+    UserService userService;
 
     @Autowired
     private TestHelper testHelper;
@@ -43,7 +43,7 @@ public class RegistrationServiceTest {
 
     @AfterEach
     public void cleanUp() {
-        repository.deleteAll();
+        userService.deleteAllUsers();
     }
 
     @Test

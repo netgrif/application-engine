@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.migration
 
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -20,7 +20,7 @@ class ActionMigration {
     private IPetriNetService petriNetService
 
     @Autowired
-    private IUserService userService;
+    private UserService userService;
 
     void migrateActions(String petriNetPath) {
         InputStream netStream = new ClassPathResource(petriNetPath).inputStream

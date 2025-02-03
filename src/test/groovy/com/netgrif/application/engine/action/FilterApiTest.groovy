@@ -2,7 +2,7 @@ package com.netgrif.application.engine.action
 
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.UriContentType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
@@ -39,7 +39,7 @@ class FilterApiTest {
     private FilterRunner filterRunner
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private IWorkflowService workflowService

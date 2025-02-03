@@ -1,11 +1,11 @@
 package com.netgrif.application.engine.auth.web;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.throwable.UnauthorisedRequestException;
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
+import com.netgrif.adapter.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserResourceHelperService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.application.engine.auth.web.responsebodies.AuthoritiesResources;
@@ -18,7 +18,7 @@ import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.settings.domain.Preferences;
 import com.netgrif.application.engine.settings.service.IPreferencesService;
 import com.netgrif.application.engine.settings.web.PreferencesResource;
-import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
+import com.netgrif.core.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAssembler;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -61,7 +60,7 @@ import java.util.stream.Collectors;
 public class UserController {
 
     @Autowired
-    private IUserService userService;
+    private UserService userService;
 
     @Autowired
     private IUserResourceHelperService userResourceHelperService;
@@ -70,7 +69,7 @@ public class UserController {
     private IProcessRoleService processRoleService;
 
     @Autowired
-    private IAuthorityService authorityService;
+    private AuthorityService authorityService;
 
     @Autowired
     private IPreferencesService preferencesService;
@@ -97,7 +96,7 @@ public class UserController {
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> getAll(@RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
         small = small != null && small;
-        Page<IUser> page = userService.findAllCoMembers((LoggedUser) auth.getPrincipal(), small, pageable);
+        Page<IUser> page = userService.findAllCoMembers((LoggedUser) auth.getPrincipal(), pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .getAll(small, pageable, assembler, auth, locale)).withRel("all");
         PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "all"), selfLink);
@@ -115,7 +114,7 @@ public class UserController {
         Page<IUser> page = userService.searchAllCoMembers(query.getFulltext(),
                 roles,
                 negativeRoles,
-                (LoggedUser) auth.getPrincipal(), small, pageable);
+                (LoggedUser) auth.getPrincipal(), pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .search(small, query, pageable, assembler, auth, locale)).withRel("search");
         PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "search"), selfLink);
@@ -133,7 +132,7 @@ public class UserController {
             log.info("User " + actualUser.getUsername() + " trying to get another user with ID " + userId);
             throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
         }
-        IUser user = userService.resolveById(userId, small);
+        IUser user = userService.findById(userId, null);
         return new UserResource(small ? userResponseFactory.getSmallUser(user) : userResponseFactory.getUser(user, locale), "profile");
     }
 
@@ -150,14 +149,15 @@ public class UserController {
         if (!serverAuthProperties.isEnableProfileEdit()) return null;
 
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        IUser user = userService.resolveById(userId, false);
+        IUser user = userService.findById(userId, null);
         if (user == null || (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to modify profile of " + user.transformToLoggedUser().getUsername());
+            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to modify profile of " + userService.transformToLoggedUser(user).getUsername());
 
         user = userService.update(user, updates);
         securityContextService.saveToken(userId);
         if (Objects.equals(loggedUser.getId(), userId)) {
-            loggedUser.setFullName(user.getFullName());
+            loggedUser.setFirstName(user.getFirstName());
+            loggedUser.setLastName(user.getLastName());
             securityContextService.reloadSecurityContext(loggedUser);
         }
         log.info("Updating user " + user.getEmail() + " with data " + updates.toString());
@@ -168,7 +168,8 @@ public class UserController {
     @PostMapping(value = "/role", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> getAllWithRole(@RequestBody Set<String> roleIds, @RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Locale locale) {
         small = small == null ? false : small;
-        Page<IUser> page = userService.findAllActiveByProcessRoles(roleIds, small, pageable);
+        Set<ProcessResourceId> roleResourceIds = roleIds == null ? null : roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet());
+        Page<IUser> page = userService.findAllActiveByProcessRoles(roleResourceIds, pageable, null);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .getAllWithRole(roleIds, small, pageable, assembler, locale)).withRel("role");
         PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "role"), selfLink);
@@ -217,7 +218,7 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public MessageResource assignAuthorityToUser(@PathVariable("id") String userId, @RequestBody String authorityId) {
-        userService.assignAuthority(userId, authorityId);
+        userService.assignAuthority(userId, null, authorityId);
         return MessageResource.successMessage("Authority " + authorityId + " assigned to user " + userId);
     }
 

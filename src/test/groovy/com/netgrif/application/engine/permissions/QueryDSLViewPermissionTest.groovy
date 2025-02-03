@@ -1,12 +1,12 @@
 package com.netgrif.application.engine.permissions
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.IUser
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.IUser
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
@@ -47,7 +47,7 @@ class QueryDSLViewPermissionTest {
     private ITaskService taskService
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private SuperCreatorRunner superCreator

@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.petrinet.domain
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.core.auth.domain.User
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows
 class FunctionsTest {
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private IDataService dataService
@@ -84,7 +84,7 @@ class FunctionsTest {
     @Test
     @Disabled("MissingMethod No signature of method")
     void testNamespaceFunction() {
-        assert userService.findByEmail("test@test.com", true) == null
+        assert userService.findUserByUsername("test@test.com", null) == null
 
         def functionResNet = petriNetService.importPetriNet(functionResNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
         def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
@@ -95,7 +95,7 @@ class FunctionsTest {
         Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
         dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["createUser": ["value": "true", "type": "boolean"]]))
 
-        User user = userService.findByEmail("test@test.com", true)
+        User user = userService.findUserByUsername("test@test.com", null)
         assert user
 
         userService.deleteUser(user)

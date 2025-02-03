@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -45,11 +45,11 @@ import java.util.Locale;
 @RequestMapping({"/api/public/task"})
 public class PublicTaskController extends AbstractTaskController {
 
-    final IUserService userService;
+    final UserService userService;
     private final ITaskService taskService;
     private final IDataService dataService;
 
-    public PublicTaskController(ITaskService taskService, IDataService dataService, IUserService userService) {
+    public PublicTaskController(ITaskService taskService, IDataService dataService, UserService userService) {
         super(taskService, dataService, null);
         this.taskService = taskService;
         this.dataService = dataService;
@@ -74,7 +74,7 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> assign(@PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = userService.getAnonymousLogged();
+        LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedUser());
         return super.assign(loggedUser, taskId, locale);
     }
 
@@ -89,7 +89,7 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> finish(@PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = userService.getAnonymousLogged();
+        LoggedUser loggedUser = (LoggedUser) userService.transformToLoggedUser(userService.getLoggedUser());
         return super.finish(loggedUser, taskId, locale);
     }
 
@@ -104,7 +104,7 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> cancel(@PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = userService.getAnonymousLogged();
+        LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedUser());
         return super.cancel(loggedUser, taskId, locale);
     }
 
@@ -203,6 +203,6 @@ public class PublicTaskController extends AbstractTaskController {
     @Operation(summary = "Generic task search on Mongo database")
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<com.netgrif.application.engine.workflow.domain.Task> assembler, Locale locale) {
-        return super.searchPublic(userService.getAnonymousLogged(), pageable, searchBody, operation, assembler, locale);
+        return super.searchPublic(userService.transformToLoggedUser(userService.getLoggedUser()), pageable, searchBody, operation, assembler, locale);
     }
 }

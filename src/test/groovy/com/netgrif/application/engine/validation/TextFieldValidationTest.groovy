@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.validation
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.petrinet.domain.I18nString
+import com.netgrif.core.petrinet.domain.I18nString
 import com.netgrif.application.engine.validation.domain.ValidationDataInput
 import com.netgrif.application.engine.validation.models.TextFieldValidation
 import com.netgrif.application.engine.workflow.domain.DataField

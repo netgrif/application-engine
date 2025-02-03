@@ -1,7 +1,8 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.core.auth.domain.Actor;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.adapter.auth.service.UserService;
 import com.querydsl.core.BooleanBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ public class MongoSearchService<T> {
     private static final String ERROR_KEY = "ERROR";
 
     @Autowired
-    private IUserService userService;
+    private UserService userService;
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -244,8 +245,8 @@ public class MongoSearchService<T> {
     }
 
     protected String resolveAuthorByEmail(String email) {
-        IUser user = userService.findByEmail(email, true);
-        return user != null ? user.getStringId() : null;
+        Optional<IUser> user = userService.findUserByUsername(email, null);
+        return user.map(Actor::getStringId).orElse(null);
     }
 
     protected BooleanBuilder constructPredicateTree(List<com.querydsl.core.types.Predicate> elementaryPredicates, BiFunction<BooleanBuilder, com.querydsl.core.types.Predicate, BooleanBuilder> nodeOperation) {

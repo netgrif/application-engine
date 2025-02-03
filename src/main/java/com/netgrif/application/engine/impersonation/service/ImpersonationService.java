@@ -1,9 +1,10 @@
 package com.netgrif.application.engine.impersonation.service;
 
-import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.adapter.auth.domain.LoggedUserImpl;
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;
 import com.netgrif.application.engine.history.domain.impersonationevents.ImpersonationEndEventLog;
 import com.netgrif.application.engine.history.domain.impersonationevents.ImpersonationStartEventLog;
@@ -14,7 +15,7 @@ import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserH
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationSessionService;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,7 @@ public class ImpersonationService implements IImpersonationService {
     protected ImpersonationProperties properties;
 
     @Autowired
-    protected IUserService userService;
+    protected UserService userService;
 
     @Autowired
     protected IHistoryService historyService;
@@ -55,11 +56,11 @@ public class ImpersonationService implements IImpersonationService {
         if (!properties.isEnabled()) {
             throw new IllegalArgumentException("Impersonation is not enabled in app properties");
         }
-        LoggedUser loggedUser = userService.getLoggedUser().transformToLoggedUser();
-        IUser impersonated = userService.findById(impersonatedId, false);
+        LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedUser());
+        IUser impersonated = userService.findById(impersonatedId, null);
 
         List<Case> configs = impersonationAuthorizationService.searchConfigs(loggedUser.getId(), impersonated.getStringId());
-        LoggedUser impersonatedLogged = applyRolesAndAuthorities(impersonated, loggedUser.getId(), configs).transformToLoggedUser();
+        LoggedUser impersonatedLogged = userService.transformToLoggedUser(applyRolesAndAuthorities(impersonated, loggedUser.getId(), configs));
 
         return doImpersonate(loggedUser, impersonatedLogged, configs);
     }
@@ -70,10 +71,10 @@ public class ImpersonationService implements IImpersonationService {
             throw new IllegalArgumentException("Impersonation is not enabled in app properties");
         }
         Case config = impersonationAuthorizationService.getConfig(configId);
-        LoggedUser loggedUser = userService.getLoggedUser().transformToLoggedUser();
-        IUser impersonated = userService.findById(impersonationAuthorizationService.getImpersonatedUserId(config), false);
+        LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedUser());
+        IUser impersonated = userService.findById(impersonationAuthorizationService.getImpersonatedUserId(config), null);
 
-        LoggedUser impersonatedLogged = applyRolesAndAuthorities(impersonated, loggedUser.getId(), Collections.singletonList(config)).transformToLoggedUser();
+        LoggedUser impersonatedLogged = userService.transformToLoggedUser(applyRolesAndAuthorities(impersonated, loggedUser.getId(), Collections.singletonList(config)));
         return doImpersonate(loggedUser, impersonatedLogged, Collections.singletonList(config));
     }
 
@@ -91,8 +92,8 @@ public class ImpersonationService implements IImpersonationService {
         log.info(loggedUser.getFullName() + " has just impersonated user " + impersonatedLogged.getFullName());
         historyService.save(
                 new ImpersonationStartEventLog(loggedUser.getId(), impersonatedLogged.getId(),
-                        new ArrayList<>(impersonatedLogged.getProcessRoles()),
-                        impersonatedLogged.getAuthorities().stream().map(au -> ((Authority) au).getStringId()).collect(Collectors.toList()))
+                        impersonatedLogged.getProcessRoles().stream().map(ProcessRole::getStringId).toList(),
+                        ((LoggedUserImpl) impersonatedLogged).getAuthorities().stream().map(au -> ((Authority) au).getStringId()).collect(Collectors.toList()))
         );
         return loggedUser;
     }
@@ -150,7 +151,7 @@ public class ImpersonationService implements IImpersonationService {
 
     @Override
     public IUser applyRolesAndAuthorities(IUser impersonated, String impersonatorId, List<Case> configs) {
-        if (userService.findById(impersonatorId, true).transformToLoggedUser().isAdmin()) {
+        if ((Boolean) userService.findById(impersonatorId, null).getAttributeValue("admin")) {
             return impersonated;
         }
         List<Authority> authorities = impersonationAuthorizationService.getAuthorities(configs, impersonated);

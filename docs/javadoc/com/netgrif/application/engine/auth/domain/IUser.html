@@ -117,7 +117,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <!-- ======== START OF CLASS DATA ======== -->
 <main role="main">
 <div class="header">
-<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">com.netgrif.application.engine.auth.domain</a></div>
+<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">com.netgrif.core.auth.domain.Authority;</a></div>
 <h2 title="Interface IUser" class="title">Interface IUser</h2>
 </div>
 <div class="contentContainer">
@@ -126,11 +126,11 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <dl>
 <dt>All Known Subinterfaces:</dt>
-<dd><code><a href="RegisteredUser.html" title="interface in com.netgrif.application.engine.auth.domain">RegisteredUser</a></code></dd>
+<dd><code><a href="RegisteredUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">RegisteredUser</a></code></dd>
 </dl>
 <dl>
 <dt>All Known Implementing Classes:</dt>
-<dd><code><a href="AbstractUser.html" title="class in com.netgrif.application.engine.auth.domain">AbstractUser</a></code>, <code><a href="AnonymousUser.html" title="class in com.netgrif.application.engine.auth.domain">AnonymousUser</a></code>, <code><a href="../../ldap/domain/LdapUser.html" title="class in com.netgrif.application.engine.ldap.domain">LdapUser</a></code>, <code><a href="User.html" title="class in com.netgrif.application.engine.auth.domain">User</a></code></dd>
+<dd><code><a href="AbstractUser.html" title="class in com.netgrif.core.auth.domain.Authority;">AbstractUser</a></code>, <code><a href="AnonymousUser.html" title="class in com.netgrif.core.auth.domain.Authority;">AnonymousUser</a></code>, <code><a href="../../ldap/domain/LdapUser.html" title="class in com.netgrif.application.engine.ldap.domain">LdapUser</a></code>, <code><a href="User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a></code></dd>
 </dl>
 <hr>
 <pre>public interface <span class="typeNameLabel">IUser</span></pre>
@@ -156,7 +156,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addAuthority(com.netgrif.application.engine.auth.domain.Authority)">addAuthority</a></span>&#8203;(<a href="Authority.html" title="class in com.netgrif.application.engine.auth.domain">Authority</a>&nbsp;authority)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addAuthority(com.netgrif.core.auth.domain.Authority;)">addAuthority</a></span>&#8203;(<a href="Authority.html" title="class in com.netgrif.core.auth.domain.Authority;">Authority</a>&nbsp;authority)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
@@ -170,7 +170,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i3" class="rowColor">
-<td class="colFirst"><code>java.util.Set&lt;<a href="Authority.html" title="class in com.netgrif.application.engine.auth.domain">Authority</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.Set&lt;<a href="Authority.html" title="class in com.netgrif.core.auth.domain.Authority;">Authority</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAuthorities()">getAuthorities</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -190,7 +190,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i7" class="rowColor">
-<td class="colFirst"><code><a href="IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a></code></td>
+<td class="colFirst"><code><a href="IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getImpersonated()">getImpersonated</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -210,12 +210,12 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i11" class="rowColor">
-<td class="colFirst"><code><a href="IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a></code></td>
+<td class="colFirst"><code><a href="IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getSelfOrImpersonated()">getSelfOrImpersonated</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i12" class="altColor">
-<td class="colFirst"><code><a href="UserState.html" title="enum in com.netgrif.application.engine.auth.domain">UserState</a></code></td>
+<td class="colFirst"><code><a href="UserState.html" title="enum in com.netgrif.core.auth.domain.Authority;">UserState</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getState()">getState</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -256,7 +256,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr id="i20" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setAuthorities(java.util.Set)">setAuthorities</a></span>&#8203;(java.util.Set&lt;<a href="Authority.html" title="class in com.netgrif.application.engine.auth.domain">Authority</a>&gt;&nbsp;authorities)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setAuthorities(java.util.Set)">setAuthorities</a></span>&#8203;(java.util.Set&lt;<a href="Authority.html" title="class in com.netgrif.core.auth.domain.Authority;">Authority</a>&gt;&nbsp;authorities)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i21" class="rowColor">
@@ -266,7 +266,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr id="i22" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setImpersonated(com.netgrif.application.engine.auth.domain.IUser)">setImpersonated</a></span>&#8203;(<a href="IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setImpersonated(com.netgrif.core.auth.domain.IUser)">setImpersonated</a></span>&#8203;(<a href="IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i23" class="rowColor">
@@ -286,7 +286,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr id="i26" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setState(com.netgrif.application.engine.auth.domain.UserState)">setState</a></span>&#8203;(<a href="UserState.html" title="enum in com.netgrif.application.engine.auth.domain">UserState</a>&nbsp;state)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setState(com.netgrif.core.auth.domain.Authority;.UserState)">setState</a></span>&#8203;(<a href="UserState.html" title="enum in com.netgrif.core.auth.domain.Authority;">UserState</a>&nbsp;state)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i27" class="rowColor">
@@ -295,12 +295,12 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i28" class="altColor">
-<td class="colFirst"><code><a href="Author.html" title="class in com.netgrif.application.engine.auth.domain">Author</a></code></td>
+<td class="colFirst"><code><a href="Author.html" title="class in com.netgrif.core.auth.domain.Authority;">Author</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformToAuthor()">transformToAuthor</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i29" class="rowColor">
-<td class="colFirst"><code><a href="LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a></code></td>
+<td class="colFirst"><code><a href="LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformToLoggedUser()">transformToLoggedUser</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -390,7 +390,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <ul class="blockList">
 <li class="blockList">
 <h4>getState</h4>
-<pre class="methodSignature"><a href="UserState.html" title="enum in com.netgrif.application.engine.auth.domain">UserState</a>&nbsp;getState()</pre>
+<pre class="methodSignature"><a href="UserState.html" title="enum in com.netgrif.core.auth.domain.Authority;">UserState</a>&nbsp;getState()</pre>
 </li>
 </ul>
 <a id="getAuthorities()">
@@ -399,7 +399,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <ul class="blockList">
 <li class="blockList">
 <h4>getAuthorities</h4>
-<pre class="methodSignature">java.util.Set&lt;<a href="Authority.html" title="class in com.netgrif.application.engine.auth.domain">Authority</a>&gt;&nbsp;getAuthorities()</pre>
+<pre class="methodSignature">java.util.Set&lt;<a href="Authority.html" title="class in com.netgrif.core.auth.domain.Authority;">Authority</a>&gt;&nbsp;getAuthorities()</pre>
 </li>
 </ul>
 <a id="getProcessRoles()">
@@ -447,13 +447,13 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <pre class="methodSignature">void&nbsp;setSurname&#8203;(java.lang.String&nbsp;surname)</pre>
 </li>
 </ul>
-<a id="setState(com.netgrif.application.engine.auth.domain.UserState)">
+<a id="setState(com.netgrif.core.auth.domain.Authority;.UserState)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>setState</h4>
-<pre class="methodSignature">void&nbsp;setState&#8203;(<a href="UserState.html" title="enum in com.netgrif.application.engine.auth.domain">UserState</a>&nbsp;state)</pre>
+<pre class="methodSignature">void&nbsp;setState&#8203;(<a href="UserState.html" title="enum in com.netgrif.core.auth.domain.Authority;">UserState</a>&nbsp;state)</pre>
 </li>
 </ul>
 <a id="setProcessRoles(java.util.Set)">
@@ -471,7 +471,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <ul class="blockList">
 <li class="blockList">
 <h4>setAuthorities</h4>
-<pre class="methodSignature">void&nbsp;setAuthorities&#8203;(java.util.Set&lt;<a href="Authority.html" title="class in com.netgrif.application.engine.auth.domain">Authority</a>&gt;&nbsp;authorities)</pre>
+<pre class="methodSignature">void&nbsp;setAuthorities&#8203;(java.util.Set&lt;<a href="Authority.html" title="class in com.netgrif.core.auth.domain.Authority;">Authority</a>&gt;&nbsp;authorities)</pre>
 </li>
 </ul>
 <a id="setNextGroups(java.util.Set)">
@@ -501,13 +501,13 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <pre class="methodSignature">void&nbsp;removeGroup&#8203;(java.lang.String&nbsp;groupId)</pre>
 </li>
 </ul>
-<a id="addAuthority(com.netgrif.application.engine.auth.domain.Authority)">
+<a id="addAuthority(com.netgrif.core.auth.domain.Authority;)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>addAuthority</h4>
-<pre class="methodSignature">void&nbsp;addAuthority&#8203;(<a href="Authority.html" title="class in com.netgrif.application.engine.auth.domain">Authority</a>&nbsp;authority)</pre>
+<pre class="methodSignature">void&nbsp;addAuthority&#8203;(<a href="Authority.html" title="class in com.netgrif.core.auth.domain.Authority;">Authority</a>&nbsp;authority)</pre>
 </li>
 </ul>
 <a id="addProcessRole(com.netgrif.application.engine.petrinet.domain.roles.ProcessRole)">
@@ -534,7 +534,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <ul class="blockList">
 <li class="blockList">
 <h4>transformToLoggedUser</h4>
-<pre class="methodSignature"><a href="LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;transformToLoggedUser()</pre>
+<pre class="methodSignature"><a href="LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;transformToLoggedUser()</pre>
 </li>
 </ul>
 <a id="transformToAuthor()">
@@ -543,7 +543,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <ul class="blockList">
 <li class="blockList">
 <h4>transformToAuthor</h4>
-<pre class="methodSignature"><a href="Author.html" title="class in com.netgrif.application.engine.auth.domain">Author</a>&nbsp;transformToAuthor()</pre>
+<pre class="methodSignature"><a href="Author.html" title="class in com.netgrif.core.auth.domain.Authority;">Author</a>&nbsp;transformToAuthor()</pre>
 </li>
 </ul>
 <a id="isActive()">
@@ -555,13 +555,13 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <pre class="methodSignature">boolean&nbsp;isActive()</pre>
 </li>
 </ul>
-<a id="setImpersonated(com.netgrif.application.engine.auth.domain.IUser)">
+<a id="setImpersonated(com.netgrif.core.auth.domain.IUser)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>setImpersonated</h4>
-<pre class="methodSignature">void&nbsp;setImpersonated&#8203;(<a href="IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;user)</pre>
+<pre class="methodSignature">void&nbsp;setImpersonated&#8203;(<a href="IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;user)</pre>
 </li>
 </ul>
 <a id="isImpersonating()">
@@ -579,7 +579,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <ul class="blockList">
 <li class="blockList">
 <h4>getSelfOrImpersonated</h4>
-<pre class="methodSignature"><a href="IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;getSelfOrImpersonated()</pre>
+<pre class="methodSignature"><a href="IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;getSelfOrImpersonated()</pre>
 </li>
 </ul>
 <a id="getImpersonated()">
@@ -588,7 +588,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <ul class="blockListLast">
 <li class="blockList">
 <h4>getImpersonated</h4>
-<pre class="methodSignature"><a href="IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;getImpersonated()</pre>
+<pre class="methodSignature"><a href="IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;getImpersonated()</pre>
 </li>
 </ul>
 </li>

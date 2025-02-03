@@ -1,12 +1,16 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.auth.domain.*;
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.adapter.auth.service.AuthorityService;
+import com.netgrif.application.engine.importer.model.Option;
+import com.netgrif.auth.service.AuthorityServiceImpl;
+import com.netgrif.core.auth.domain.*;
+import com.netgrif.adapter.auth.service.AuthorityService;
+import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
+import com.netgrif.core.auth.domain.enums.UserState;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +19,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -30,8 +35,8 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     @Value("${nae.admin.password}")
     private String superAdminPassword;
 
-    private final IAuthorityService authorityService;
-    private final IUserService userService;
+    private final AuthorityService authorityService;
+    private final UserService userService;
     private final INextGroupService groupService;
     private final IProcessRoleService processRoleService;
 
@@ -48,21 +53,22 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
         Authority adminAuthority = authorityService.getOrCreate(Authority.admin);
         Authority systemAuthority = authorityService.getOrCreate(Authority.systemAdmin);
 
-        IUser superUser = userService.findByEmail(SUPER_ADMIN_EMAIL, false);
-        if (superUser == null) {
+        Optional<IUser> superUser = userService.findUserByUsername(SUPER_ADMIN_EMAIL, null);
+        if (superUser.isEmpty()) {
             User user = new User();
-            user.setName("Admin");
-            user.setSurname("Netgrif");
+            user.setFirstName("Admin");
+            user.setLastName("Netgrif");
             user.setEmail(SUPER_ADMIN_EMAIL);
             user.setPassword(superAdminPassword);
             user.setState(UserState.ACTIVE);
             user.setAuthorities(Set.of(adminAuthority, systemAuthority));
-            user.setProcessRoles(Set.copyOf(processRoleService.findAll()));
-            this.superUser = userService.saveNew(user);
+            //MODULARISATION: refactor to core process roles
+//            user.setProcessRoles(Set.copyOf(processRoleService.findAll()));
+            this.superUser = userService.saveUser(user, null);
             log.info("Super user created");
         } else {
             log.info("Super user detected");
-            this.superUser = superUser;
+            this.superUser = superUser.get();
         }
 
         return this.superUser;
@@ -80,17 +86,18 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     }
 
     public void setAllProcessRoles() {
-        superUser.setProcessRoles(Set.copyOf(processRoleService.findAll()));
-        superUser = userService.save(superUser);
+        //MODULARISATION: refactor to core process roles
+//        superUser.setProcessRoles(Set.copyOf(processRoleService.findAll()));
+        superUser = userService.saveUser(superUser, null);
     }
 
     public void setAllAuthorities() {
         superUser.setAuthorities(Set.copyOf(authorityService.findAll()));
-        superUser = userService.save(superUser);
+        superUser = userService.saveUser(superUser, null);
     }
 
     public LoggedUser getLoggedSuper() {
-        return superUser.transformToLoggedUser();
+        return userService.transformToLoggedUser(superUser);
     }
 
 }

@@ -1,9 +1,11 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.auth.domain.Author;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.core.auth.domain.Author;
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
@@ -30,6 +32,9 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     private PetriNetService petriNetService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private StringToVersionConverter converter;
 
     @Autowired
@@ -51,7 +56,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
      */
     @Override
     public Map<String, I18nString> getNetsByAuthorAsMapOptions(IUser author, Locale locale) {
-        LoggedUser loggedAuthor = author.transformToLoggedUser();
+        LoggedUser loggedAuthor = userService.transformToLoggedUser(author);
         PetriNetSearch requestQuery = new PetriNetSearch();
         Author authorQuery = new Author();
         authorQuery.setEmail(author.getEmail());
@@ -94,7 +99,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
                             && !bannedRoles.getOptions().containsKey(role.getImportId() + ":" + GLOBAL_ROLE))
                     .collect(Collectors.toMap(
                             role -> role.getImportId() + ":" + GLOBAL_ROLE,
-                            role -> new I18nString(role.getName())
+                            role -> role.getName()
                     ));
         }
 

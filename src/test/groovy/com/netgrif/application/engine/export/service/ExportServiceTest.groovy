@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.export.service
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest
 import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
@@ -44,7 +44,7 @@ class ExportServiceTest {
     private ITaskService taskService
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private TestHelper testHelper
@@ -77,7 +77,7 @@ class ExportServiceTest {
     @Order(2)
     void testCaseMongoExport() {
         String exportTask = mainCase.tasks.find { it.transition == "t1" }.task
-        taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
+        taskService.assignTask(userService.findUserByUsername("super@netgrif.com", null).transformToLoggedUser(), exportTask)
         File csvFile = new File("src/test/resources/csv/case_mongo_export.csv")
         assert csvFile.readLines().size() == 11
         String[] headerSplit = csvFile.readLines()[0].split(",")
@@ -92,7 +92,7 @@ class ExportServiceTest {
     void testCaseElasticExport() {
         Thread.sleep(5000)  //Elastic wait
         String exportTask = mainCase.tasks.find { it.transition == "t2" }.task
-        taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
+        taskService.assignTask(userService.findUserByUsername("super@netgrif.com", null).transformToLoggedUser(), exportTask)
         File csvFile = new File("src/test/resources/csv/case_elastic_export.csv")
         assert csvFile.readLines().size() == 11
         String[] headerSplit = csvFile.readLines()[0].split(",")
@@ -106,7 +106,7 @@ class ExportServiceTest {
     @Order(4)
     void testTaskMongoExport() {
         String exportTask = mainCase.tasks.find { it.transition == "t3" }.task
-        taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
+        taskService.assignTask(userService.findUserByUsername("super@netgrif.com", null).transformToLoggedUser(), exportTask)
         File csvFile = new File("src/test/resources/csv/task_mongo_export.csv")
         assert csvFile.readLines().size() == 11
         String[] headerSplit = csvFile.readLines()[0].split(",")
@@ -123,14 +123,14 @@ class ExportServiceTest {
     void testTaskElasticExport() {
         Thread.sleep(10000)  //Elastic wait
         String exportTask = mainCase.tasks.find { it.transition == "t4" }.task
-        taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
+        taskService.assignTask(userService.findUserByUsername("super@netgrif.com", null).transformToLoggedUser(), exportTask)
         Thread.sleep(20000)  //Elastic wait
 
         def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
         def taskRequest = new ElasticTaskSearchRequest()
         taskRequest.process = [new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(processId)] as List
         taskRequest.transitionId = ["t4"] as List
-        actionDelegate.exportTasksToFile([taskRequest],"src/test/resources/csv/task_elastic_export.csv",null, userService.findByEmail("super@netgrif.com", false).transformToLoggedUser())
+        actionDelegate.exportTasksToFile([taskRequest],"src/test/resources/csv/task_elastic_export.csv",null, userService.findUserByUsername("super@netgrif.com", null).transformToLoggedUser())
         File csvFile = new File("src/test/resources/csv/task_elastic_export.csv")
         int pocet = ((taskRepository.count(QTask.task.processId.eq(processId).and(QTask.task.transitionId.eq("t4"))) as int) + 1)
         assert csvFile.readLines().size() == pocet
@@ -139,14 +139,14 @@ class ExportServiceTest {
                 && headerSplit.contains("immediate_number")
                 && !headerSplit.contains("text")
                 && !headerSplit.contains("no_export"))
-        taskService.cancelTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
+        taskService.cancelTask(userService.findUserByUsername("super@netgrif.com", null).transformToLoggedUser(), exportTask)
     }
 
     @Test
     void buildDefaultCsvTaskHeaderTest(){
         def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
         String exportTask = mainCase.tasks.find { it.transition == "t4" }.task
-        taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
+        taskService.assignTask(userService.findUserByUsername("super@netgrif.com", null).transformToLoggedUser(), exportTask)
         List<Task> task = taskRepository.findAll(QTask.task.processId.eq(processId).and(QTask.task.transitionId.eq("t4")))
         Set<String> header = exportService.buildDefaultCsvTaskHeader(task)
         assert header != null
