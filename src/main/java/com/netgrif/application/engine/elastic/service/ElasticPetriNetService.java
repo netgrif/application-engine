@@ -4,7 +4,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticPetriNet;
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.adapter.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -10,7 +10,7 @@
 //import com.netgrif.application.engine.orgstructure.web.requestbodies.LdapGroupRoleAssignRequestBody;
 //import com.netgrif.application.engine.orgstructure.web.requestbodies.LdapGroupSearchBody;
 //import com.netgrif.application.engine.orgstructure.web.responsebodies.LdapGroupResponseBody;
-//import com.netgrif.application.engine.petrinet.domain.PetriNet;
+//import com.netgrif.adapter.petrinet.domain.PetriNet;
 //import com.netgrif.application.engine.petrinet.domain.VersionType;
 //import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 //import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;

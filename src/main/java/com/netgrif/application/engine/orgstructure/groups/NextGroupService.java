@@ -15,10 +15,10 @@ import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExe
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.startup.ImportHelper;
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.adapter.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.workflow.domain.QCase;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.adapter.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -33,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.adapter.petrinet.domain.PetriNet;
 
 import jakarta.mail.MessagingException;
 import java.io.IOException;

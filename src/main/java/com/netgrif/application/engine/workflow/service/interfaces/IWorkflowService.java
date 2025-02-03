@@ -2,10 +2,10 @@ package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.core.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.adapter.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.adapter.workflow.domain.Case;
+import com.netgrif.adapter.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
 import com.querydsl.core.types.Predicate;

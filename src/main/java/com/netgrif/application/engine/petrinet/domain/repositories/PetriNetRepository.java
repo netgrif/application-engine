@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.repositories;
 
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.adapter.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;

@@ -49,7 +49,7 @@
 		<title>Admin</title>
 	</role>
 	<function scope="process" name="removeItemChildCases">
-		{ com.netgrif.application.engine.workflow.domain.Case useCase ->
+		{ com.netgrif.adapter.workflow.domain.Case useCase ->
 
 			def childCaseIds = useCase.dataSet['childItemIds'].value
 			if (childCaseIds == null || childCaseIds.isEmpty()) {

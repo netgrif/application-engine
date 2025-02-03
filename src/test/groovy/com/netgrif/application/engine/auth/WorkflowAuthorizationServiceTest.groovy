@@ -6,14 +6,14 @@ import com.netgrif.core.auth.domain.IUser
 import com.netgrif.core.auth.domain.User
 import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.adapter.auth.service.UserService
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.adapter.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.adapter.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowAuthorizationService

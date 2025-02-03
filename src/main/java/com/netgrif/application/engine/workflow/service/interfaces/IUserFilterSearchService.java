@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.adapter.workflow.domain.Case;
 
 import java.util.List;
 

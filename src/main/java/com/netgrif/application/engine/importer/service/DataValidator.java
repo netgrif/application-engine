@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.importer.service;
 
-import com.netgrif.application.engine.importer.model.Data;
+import com.netgrif.core.importer.model.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

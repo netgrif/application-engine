@@ -4,7 +4,7 @@ import com.netgrif.core.auth.domain.Authority;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.adapter.workflow.domain.Case;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

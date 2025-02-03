@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.importer.service;
 
 
-import com.netgrif.application.engine.importer.model.CaseLogic;
-import com.netgrif.application.engine.importer.model.Logic;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.core.importer.model.CaseLogic;
+import com.netgrif.core.importer.model.Logic;
+import com.netgrif.adapter.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;

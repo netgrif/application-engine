@@ -12,11 +12,11 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePri
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.event.events.workflow.IndexCaseEvent;
-import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
+import com.netgrif.adapter.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.adapter.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

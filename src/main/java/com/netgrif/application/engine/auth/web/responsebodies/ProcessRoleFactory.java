@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.auth.web.responsebodies;
 
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.adapter.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;

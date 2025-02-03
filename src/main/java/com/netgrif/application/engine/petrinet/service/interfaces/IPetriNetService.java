@@ -2,8 +2,8 @@ package com.netgrif.application.engine.petrinet.service.interfaces;
 
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
+import com.netgrif.adapter.petrinet.domain.PetriNet;
+import com.netgrif.adapter.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;

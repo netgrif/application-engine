@@ -2,8 +2,8 @@ package com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcome
 
 import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.adapter.workflow.domain.Case;
+import com.netgrif.adapter.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
 

@@ -9,13 +9,13 @@ import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
-import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.PetriNetSearch
+import com.netgrif.adapter.petrinet.domain.PetriNet
+import com.netgrif.adapter.petrinet.domain.PetriNetSearch
 import com.netgrif.application.engine.petrinet.domain.UriContentType
 import com.netgrif.application.engine.petrinet.domain.UriNode
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService

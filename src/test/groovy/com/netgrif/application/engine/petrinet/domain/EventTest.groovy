@@ -10,7 +10,7 @@ import com.netgrif.application.engine.startup.runner.DefaultRoleRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.startup.runner.SystemUserRunner
-import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.adapter.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository

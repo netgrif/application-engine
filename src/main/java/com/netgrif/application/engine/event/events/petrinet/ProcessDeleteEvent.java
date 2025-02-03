@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.event.events.petrinet;
 
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.adapter.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import lombok.Getter;
 

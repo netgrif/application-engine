@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
+import com.netgrif.adapter.workflow.domain.Case;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
@@ -15,7 +16,7 @@ import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventL
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.core.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.adapter.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.TaskField;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
@@ -33,7 +34,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
-import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
+import com.netgrif.core.workflow.service.InitValueExpressionEvaluator;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
@@ -98,7 +99,7 @@ public class WorkflowService implements IWorkflowService {
     protected UserService userService;
 
     @Autowired
-    protected IInitValueExpressionEvaluator initValueExpressionEvaluator;
+    protected InitValueExpressionEvaluator initValueExpressionEvaluator;
 
     @Autowired
     protected IElasticCaseMappingService caseMappingService;

@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.startup.runner;
 
 import com.netgrif.adapter.auth.service.AuthorityService;
-import com.netgrif.application.engine.importer.model.Option;
+import com.netgrif.core.importer.model.Option;
 import com.netgrif.auth.service.AuthorityServiceImpl;
 import com.netgrif.core.auth.domain.*;
 import com.netgrif.adapter.auth.service.AuthorityService;

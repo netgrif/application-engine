@@ -14,8 +14,8 @@
 //import com.netgrif.application.engine.rules.domain.RuleRepository;
 //import com.netgrif.application.engine.rules.domain.StoredRule;
 //import com.netgrif.application.engine.rules.domain.facts.*;
-//import com.netgrif.application.engine.workflow.domain.Case;
-//import com.netgrif.application.engine.workflow.domain.Task;
+//import com.netgrif.adapter.workflow.domain.Case;
+//import com.netgrif.adapter.workflow.domain.Task;
 //import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 //import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 //import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;

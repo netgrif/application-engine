@@ -5,7 +5,7 @@ import com.netgrif.application.engine.event.events.EventAction;
 import com.netgrif.application.engine.event.events.task.TaskEvent;
 import com.netgrif.application.engine.event.listeners.ContextEditingListener;
 import com.netgrif.application.engine.event.listeners.Listener;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.adapter.workflow.domain.Task;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 

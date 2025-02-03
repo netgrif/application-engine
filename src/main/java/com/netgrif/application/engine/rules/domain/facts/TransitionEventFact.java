@@ -2,7 +2,7 @@
 //
 //import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 //import com.netgrif.application.engine.petrinet.domain.events.EventType;
-//import com.netgrif.application.engine.workflow.domain.Task;
+//import com.netgrif.adapter.workflow.domain.Task;
 //import lombok.Data;
 //import lombok.EqualsAndHashCode;
 //import org.springframework.data.mongodb.core.mapping.Document;

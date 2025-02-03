@@ -195,7 +195,7 @@ implements <a href="interfaces/IPetriNetService.html" title="interface in com.ne
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>protected void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#evaluateRules(com.netgrif.application.engine.petrinet.domain.PetriNet,com.netgrif.application.engine.petrinet.domain.events.EventPhase)">evaluateRules</a></span>&#8203;(<a href="../domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#evaluateRules(com.netgrif.adapter.petrinet.domain.PetriNet,com.netgrif.application.engine.petrinet.domain.events.EventPhase)">evaluateRules</a></span>&#8203;(<a href="../domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net,
              <a href="../domain/events/EventPhase.html" title="enum in com.netgrif.application.engine.petrinet.domain.events">EventPhase</a>&nbsp;phase)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -206,7 +206,7 @@ implements <a href="interfaces/IPetriNetService.html" title="interface in com.ne
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#evictCache(com.netgrif.application.engine.petrinet.domain.PetriNet)">evictCache</a></span>&#8203;(<a href="../domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#evictCache(com.netgrif.adapter.petrinet.domain.PetriNet)">evictCache</a></span>&#8203;(<a href="../domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i5" class="rowColor">
@@ -356,13 +356,13 @@ implements <a href="interfaces/IPetriNetService.html" title="interface in com.ne
 </tr>
 <tr id="i29" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#runActions(java.util.List,com.netgrif.application.engine.petrinet.domain.PetriNet)">runActions</a></span>&#8203;(java.util.List&lt;<a href="../domain/dataset/logic/action/Action.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset.logic.action">Action</a>&gt;&nbsp;actions,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#runActions(java.util.List,com.netgrif.adapter.petrinet.domain.PetriNet)">runActions</a></span>&#8203;(java.util.List&lt;<a href="../domain/dataset/logic/action/Action.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset.logic.action">Action</a>&gt;&nbsp;actions,
           <a href="../domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;petriNet)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i30" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#save(com.netgrif.application.engine.petrinet.domain.PetriNet)">save</a></span>&#8203;(<a href="../domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;petriNet)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#save(com.netgrif.adapter.petrinet.domain.PetriNet)">save</a></span>&#8203;(<a href="../domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;petriNet)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i31" class="rowColor">
@@ -438,7 +438,7 @@ implements <a href="interfaces/IPetriNetService.html" title="interface in com.ne
 </dl>
 </li>
 </ul>
-<a id="evictCache(com.netgrif.application.engine.petrinet.domain.PetriNet)">
+<a id="evictCache(com.netgrif.adapter.petrinet.domain.PetriNet)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -447,7 +447,7 @@ implements <a href="interfaces/IPetriNetService.html" title="interface in com.ne
 <pre class="methodSignature">public&nbsp;void&nbsp;evictCache&#8203;(<a href="../domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IPetriNetService.html#evictCache(com.netgrif.application.engine.petrinet.domain.PetriNet)">evictCache</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IPetriNetService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IPetriNetService</a></code></dd>
+<dd><code><a href="interfaces/IPetriNetService.html#evictCache(com.netgrif.adapter.petrinet.domain.PetriNet)">evictCache</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IPetriNetService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IPetriNetService</a></code></dd>
 </dl>
 </li>
 </ul>
@@ -551,7 +551,7 @@ public&nbsp;<a href="../../workflow/domain/eventoutcomes/petrinetoutcomes/Import
 </dl>
 </li>
 </ul>
-<a id="evaluateRules(com.netgrif.application.engine.petrinet.domain.PetriNet,com.netgrif.application.engine.petrinet.domain.events.EventPhase)">
+<a id="evaluateRules(com.netgrif.adapter.petrinet.domain.PetriNet,com.netgrif.application.engine.petrinet.domain.events.EventPhase)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -561,7 +561,7 @@ public&nbsp;<a href="../../workflow/domain/eventoutcomes/petrinetoutcomes/Import
                              <a href="../domain/events/EventPhase.html" title="enum in com.netgrif.application.engine.petrinet.domain.events">EventPhase</a>&nbsp;phase)</pre>
 </li>
 </ul>
-<a id="save(com.netgrif.application.engine.petrinet.domain.PetriNet)">
+<a id="save(com.netgrif.adapter.petrinet.domain.PetriNet)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -570,7 +570,7 @@ public&nbsp;<a href="../../workflow/domain/eventoutcomes/petrinetoutcomes/Import
 <pre class="methodSignature">public&nbsp;java.util.Optional&lt;<a href="../domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&gt;&nbsp;save&#8203;(<a href="../domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;petriNet)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IPetriNetService.html#save(com.netgrif.application.engine.petrinet.domain.PetriNet)">save</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IPetriNetService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IPetriNetService</a></code></dd>
+<dd><code><a href="interfaces/IPetriNetService.html#save(com.netgrif.adapter.petrinet.domain.PetriNet)">save</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IPetriNetService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IPetriNetService</a></code></dd>
 </dl>
 </li>
 </ul>
@@ -851,7 +851,7 @@ public&nbsp;void&nbsp;deletePetriNet&#8203;(java.lang.String&nbsp;processId,
 </dl>
 </li>
 </ul>
-<a id="runActions(java.util.List,com.netgrif.application.engine.petrinet.domain.PetriNet)">
+<a id="runActions(java.util.List,com.netgrif.adapter.petrinet.domain.PetriNet)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -861,7 +861,7 @@ public&nbsp;void&nbsp;deletePetriNet&#8203;(java.lang.String&nbsp;processId,
                        <a href="../domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;petriNet)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IPetriNetService.html#runActions(java.util.List,com.netgrif.application.engine.petrinet.domain.PetriNet)">runActions</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IPetriNetService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IPetriNetService</a></code></dd>
+<dd><code><a href="interfaces/IPetriNetService.html#runActions(java.util.List,com.netgrif.adapter.petrinet.domain.PetriNet)">runActions</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IPetriNetService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IPetriNetService</a></code></dd>
 </dl>
 </li>
 </ul>

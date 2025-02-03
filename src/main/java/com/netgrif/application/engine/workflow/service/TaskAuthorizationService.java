@@ -4,7 +4,7 @@ import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.petrinet.domain.throwable.IllegalTaskStateException;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.adapter.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskAuthorizationService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import org.springframework.beans.factory.annotation.Autowired;

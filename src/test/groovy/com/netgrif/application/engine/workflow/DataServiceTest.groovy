@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.DataGroup
 import com.netgrif.core.petrinet.domain.I18nString
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.adapter.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.adapter.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService

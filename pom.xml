@@ -747,7 +747,7 @@
                         </goals>
                         <configuration>
                             <!-- The package of your generated sources -->
-                            <packageName>com.netgrif.application.engine.importer.model</packageName>
+                            <packageName>com.netgrif.core.importer.model</packageName>
                             <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
                             <sources>
                                 <source>src/main/resources/petriNets/petriflow_schema.xsd</source>

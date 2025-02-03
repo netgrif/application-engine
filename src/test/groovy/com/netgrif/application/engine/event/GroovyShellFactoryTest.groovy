@@ -5,7 +5,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.core.auth.domain.LoggedUser
 import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.core.petrinet.domain.I18nString
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.adapter.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.QTask

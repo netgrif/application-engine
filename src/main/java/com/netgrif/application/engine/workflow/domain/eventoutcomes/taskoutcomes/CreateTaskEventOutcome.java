@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes;
 
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.adapter.workflow.domain.Case;
+import com.netgrif.adapter.workflow.domain.Task;
 
 public class CreateTaskEventOutcome extends TaskEventOutcome {
 

@@ -1,32 +1,33 @@
 package com.netgrif.application.engine.importer.service;
 
-import com.netgrif.application.engine.importer.model.*;
+import com.netgrif.adapter.petrinet.domain.PetriNet;
+import com.netgrif.core.importer.model.*;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.application.engine.petrinet.domain.Component;
-import com.netgrif.application.engine.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.petrinet.domain.Place;
-import com.netgrif.application.engine.petrinet.domain.Transaction;
-import com.netgrif.application.engine.petrinet.domain.Transition;
-import com.netgrif.application.engine.petrinet.domain.*;
-import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
-import com.netgrif.application.engine.petrinet.domain.arcs.reference.Reference;
-import com.netgrif.application.engine.petrinet.domain.arcs.reference.Type;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.core.petrinet.domain.Component;
+import com.netgrif.core.petrinet.domain.DataGroup;
+import com.netgrif.core.petrinet.domain.Place;
+import com.netgrif.core.petrinet.domain.Transaction;
+import com.netgrif.core.petrinet.domain.Transition;
+import com.netgrif.core.petrinet.domain.*;
+import com.netgrif.core.petrinet.domain.arcs.Arc;
+import com.netgrif.core.petrinet.domain.arcs.reference.Reference;
+import com.netgrif.core.petrinet.domain.arcs.reference.Type;
+import com.netgrif.core.petrinet.domain.dataset.Field;
+import com.netgrif.core.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.core.petrinet.domain.dataset.logic.FieldLayout;
+import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
-import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
-import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
-import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
-import com.netgrif.application.engine.petrinet.domain.events.EventType;
-import com.netgrif.application.engine.petrinet.domain.events.ProcessEventType;
-import com.netgrif.application.engine.petrinet.domain.layout.DataGroupLayout;
-import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
-import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
-import com.netgrif.application.engine.petrinet.domain.policies.DataFocusPolicy;
-import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
+import com.netgrif.core.petrinet.domain.events.CaseEventType;
+import com.netgrif.core.petrinet.domain.events.DataEvent;
+import com.netgrif.core.petrinet.domain.events.DataEventType;
+import com.netgrif.core.petrinet.domain.events.EventType;
+import com.netgrif.core.petrinet.domain.events.ProcessEventType;
+import com.netgrif.core.petrinet.domain.layout.DataGroupLayout;
+import com.netgrif.core.petrinet.domain.layout.TaskLayout;
+import com.netgrif.core.petrinet.domain.policies.AssignPolicy;
+import com.netgrif.core.petrinet.domain.policies.DataFocusPolicy;
+import com.netgrif.core.petrinet.domain.policies.FinishPolicy;
+import com.netgrif.core.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.ArcFactory;
@@ -35,7 +36,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleSe
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.core.workflow.domain.ProcessResourceId;
 import com.netgrif.core.petrinet.domain.I18nString;
-import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
+import com.netgrif.core.workflow.domain.triggers.Trigger;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -78,7 +79,7 @@ public class Importer {
     protected Map<String, I18nString> i18n;
     protected Map<String, Action> actions;
     protected Map<String, Action> actionRefs;
-    protected List<com.netgrif.application.engine.petrinet.domain.Function> functions;
+    protected List<com.netgrif.core.petrinet.domain.Function> functions;
 
     @Autowired
     protected FieldFactory fieldFactory;
@@ -243,8 +244,8 @@ public class Importer {
     }
 
     @Transactional
-    protected void createFunction(com.netgrif.application.engine.importer.model.Function function) {
-        com.netgrif.application.engine.petrinet.domain.Function fun = functionFactory.getFunction(function);
+    protected void createFunction(com.netgrif.core.importer.model.Function function) {
+        com.netgrif.core.petrinet.domain.Function fun = functionFactory.getFunction(function);
 
         net.addFunction(fun);
         functions.add(fun);
@@ -326,7 +327,7 @@ public class Importer {
         Transition transition = getTransition(mapping.getTransitionRef());
         mapping.getRoleRef().forEach(roleRef -> addRoleLogic(transition, roleRef));
         mapping.getDataRef().forEach(dataRef -> addDataLogic(transition, dataRef));
-        for (com.netgrif.application.engine.importer.model.DataGroup dataGroup : mapping.getDataGroup()) {
+        for (com.netgrif.core.importer.model.DataGroup dataGroup : mapping.getDataGroup()) {
             addDataGroup(transition, dataGroup, mapping.getDataGroup().indexOf(dataGroup));
         }
         mapping.getTrigger().forEach(trigger -> addTrigger(transition, trigger));
@@ -341,7 +342,7 @@ public class Importer {
         if (data.getAction() != null) {
             Map<DataEventType, DataEvent> events = getField(fieldId).getEvents();
 
-            List<com.netgrif.application.engine.importer.model.Action> filteredActions = filterActionsByTrigger(data.getAction(), DataEventType.GET);
+            List<com.netgrif.core.importer.model.Action> filteredActions = filterActionsByTrigger(data.getAction(), DataEventType.GET);
             addActionsToEvent(buildActions(filteredActions, fieldId, null), DataEventType.GET, events);
 
             filteredActions = filterActionsByTrigger(data.getAction(), DataEventType.SET);
@@ -349,7 +350,7 @@ public class Importer {
         }
     }
 
-    private List<com.netgrif.application.engine.importer.model.Action> filterActionsByTrigger(List<com.netgrif.application.engine.importer.model.Action> actions, DataEventType trigger) {
+    private List<com.netgrif.core.importer.model.Action> filterActionsByTrigger(List<com.netgrif.core.importer.model.Action> actions, DataEventType trigger) {
         return actions.stream()
                 .filter(action -> action.getTrigger().equalsIgnoreCase(trigger.value))
                 .collect(Collectors.toList());
@@ -391,7 +392,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void resolveTransitionActions(com.netgrif.application.engine.importer.model.Transition trans) {
+    protected void resolveTransitionActions(com.netgrif.core.importer.model.Transition trans) {
         if (trans.getDataRef() != null) {
             resolveDataRefActions(trans.getDataRef(), trans);
         }
@@ -405,7 +406,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void resolveDataRefActions(List<DataRef> dataRef, com.netgrif.application.engine.importer.model.Transition trans) {
+    protected void resolveDataRefActions(List<DataRef> dataRef, com.netgrif.core.importer.model.Transition trans) {
         dataRef.forEach(ref -> {
             String fieldId = getField(ref.getId()).getStringId();
             Map<DataEventType, DataEvent> dataEvents = new HashMap<>();
@@ -452,7 +453,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void createArc(com.netgrif.application.engine.importer.model.Arc importArc) {
+    protected void createArc(com.netgrif.core.importer.model.Arc importArc) {
         Arc arc = arcFactory.getArc(importArc);
         arc.setImportId(importArc.getId());
         arc.setSource(getNode(importArc.getSourceId()));
@@ -488,7 +489,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void createTransition(com.netgrif.application.engine.importer.model.Transition importTransition) throws MissingIconKeyException {
+    protected void createTransition(com.netgrif.core.importer.model.Transition importTransition) throws MissingIconKeyException {
         transitionValidator.checkConflictingAttributes(importTransition, importTransition.getUsersRef(), importTransition.getUserRef(), "usersRef", "userRef");
         transitionValidator.checkDeprecatedAttributes(importTransition);
 
@@ -527,7 +528,7 @@ public class Importer {
         }
 
         if (importTransition.getDataRef() != null) {
-            for (com.netgrif.application.engine.importer.model.DataRef dataRef : importTransition.getDataRef()) {
+            for (com.netgrif.core.importer.model.DataRef dataRef : importTransition.getDataRef()) {
                 addDataWithDefaultGroup(transition, dataRef);
             }
         }
@@ -540,7 +541,7 @@ public class Importer {
             addToTransaction(transition, importTransition.getTransactionRef());
         }
         if (importTransition.getDataGroup() != null) {
-            for (com.netgrif.application.engine.importer.model.DataGroup dataGroup : importTransition.getDataGroup()) {
+            for (com.netgrif.core.importer.model.DataGroup dataGroup : importTransition.getDataGroup()) {
                 addDataGroup(transition, dataGroup, importTransition.getDataGroup().indexOf(dataGroup));
             }
         }
@@ -561,7 +562,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void addAssignedUserPolicy(com.netgrif.application.engine.importer.model.Transition importTransition, Transition transition) {
+    protected void addAssignedUserPolicy(com.netgrif.core.importer.model.Transition importTransition, Transition transition) {
         if (importTransition.getAssignedUser().isCancel() != null) {
             transition.getAssignedUserPolicy().put("cancel", importTransition.getAssignedUser().isCancel());
         }
@@ -571,8 +572,8 @@ public class Importer {
     }
 
     @Transactional
-    protected com.netgrif.application.engine.petrinet.domain.events.Event addEvent(String transitionId, com.netgrif.application.engine.importer.model.Event imported) {
-        com.netgrif.application.engine.petrinet.domain.events.Event event = new com.netgrif.application.engine.petrinet.domain.events.Event();
+    protected com.netgrif.core.petrinet.domain.events.Event addEvent(String transitionId, com.netgrif.core.importer.model.Event imported) {
+        com.netgrif.core.petrinet.domain.events.Event event = new com.netgrif.core.petrinet.domain.events.Event();
         event.setImportId(imported.getId());
         event.setMessage(toI18NString(imported.getMessage()));
         event.setTitle(toI18NString(imported.getTitle()));
@@ -584,11 +585,11 @@ public class Importer {
     }
 
     @Transactional
-    protected com.netgrif.application.engine.petrinet.domain.events.ProcessEvent addProcessEvent(com.netgrif.application.engine.importer.model.ProcessEvent imported) {
-        com.netgrif.application.engine.petrinet.domain.events.ProcessEvent event = new com.netgrif.application.engine.petrinet.domain.events.ProcessEvent();
+    protected com.netgrif.core.petrinet.domain.events.ProcessEvent addProcessEvent(com.netgrif.core.importer.model.ProcessEvent imported) {
+        com.netgrif.core.petrinet.domain.events.ProcessEvent event = new com.netgrif.core.petrinet.domain.events.ProcessEvent();
         event.setMessage(toI18NString(imported.getMessage()));
         event.setImportId(imported.getId());
-        event.setType(ProcessEventType.valueOf(imported.getType().value().toUpperCase()));
+        event.setType(com.netgrif.core.petrinet.domain.events.ProcessEventType.valueOf(imported.getType().value().toUpperCase()));
         event.setPostActions(parsePostActions(null, imported));
         event.setPreActions(parsePreActions(null, imported));
 
@@ -596,8 +597,8 @@ public class Importer {
     }
 
     @Transactional
-    protected com.netgrif.application.engine.petrinet.domain.events.CaseEvent addCaseEvent(com.netgrif.application.engine.importer.model.CaseEvent imported) {
-        com.netgrif.application.engine.petrinet.domain.events.CaseEvent event = new com.netgrif.application.engine.petrinet.domain.events.CaseEvent();
+    protected com.netgrif.core.petrinet.domain.events.CaseEvent addCaseEvent(com.netgrif.core.importer.model.CaseEvent imported) {
+        com.netgrif.core.petrinet.domain.events.CaseEvent event = new com.netgrif.core.petrinet.domain.events.CaseEvent();
         event.setMessage(toI18NString(imported.getMessage()));
         event.setImportId(imported.getId());
         event.setType(CaseEventType.valueOf(imported.getType().value().toUpperCase()));
@@ -607,15 +608,15 @@ public class Importer {
         return event;
     }
 
-    protected List<Action> parsePostActions(String transitionId, com.netgrif.application.engine.importer.model.BaseEvent imported) {
+    protected List<Action> parsePostActions(String transitionId, com.netgrif.core.importer.model.BaseEvent imported) {
         return parsePhaseActions(EventPhaseType.POST, transitionId, imported);
     }
 
-    protected List<Action> parsePreActions(String transitionId, com.netgrif.application.engine.importer.model.BaseEvent imported) {
+    protected List<Action> parsePreActions(String transitionId, com.netgrif.core.importer.model.BaseEvent imported) {
         return parsePhaseActions(EventPhaseType.PRE, transitionId, imported);
     }
 
-    protected List<Action> parsePhaseActions(EventPhaseType phase, String transitionId, com.netgrif.application.engine.importer.model.BaseEvent imported) {
+    protected List<Action> parsePhaseActions(EventPhaseType phase, String transitionId, com.netgrif.core.importer.model.BaseEvent imported) {
         List<Action> actionList = imported.getActions().stream()
                 .filter(actions -> actions.getPhase().equals(phase))
                 .map(actions -> actions.getAction().parallelStream()
@@ -630,7 +631,7 @@ public class Importer {
         return actionList;
     }
 
-    protected List<Action> parsePhaseActions(String fieldId, EventPhaseType phase, DataEventType trigger, String transitionId, com.netgrif.application.engine.importer.model.DataEvent dataEvent) {
+    protected List<Action> parsePhaseActions(String fieldId, EventPhaseType phase, DataEventType trigger, String transitionId, com.netgrif.core.importer.model.DataEvent dataEvent) {
         List<Action> actionList = dataEvent.getActions().stream()
                 .filter(actions -> actions.getPhase().equals(phase))
                 .flatMap(actions -> actions.getAction().stream()
@@ -712,7 +713,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void addDataGroup(Transition transition, com.netgrif.application.engine.importer.model.DataGroup importDataGroup, int index) throws MissingIconKeyException {
+    protected void addDataGroup(Transition transition, com.netgrif.core.importer.model.DataGroup importDataGroup, int index) throws MissingIconKeyException {
         String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
         DataGroup dataGroup = new DataGroup();
 
@@ -793,7 +794,7 @@ public class Importer {
 
             Set<FieldBehavior> behavior = new HashSet<>();
             if (logic.getBehavior() != null) {
-                logic.getBehavior().forEach(b -> behavior.add(FieldBehavior.fromString(b)));
+                logic.getBehavior().forEach(b -> behavior.add(FieldBehavior.fromString(b.name())));
             }
 
             transition.addDataSet(fieldId, behavior, null, null, null);
@@ -844,10 +845,10 @@ public class Importer {
     }
 
     @Transactional
-    protected Map<DataEventType, DataEvent> buildEvents(String fieldId, List<com.netgrif.application.engine.importer.model.DataEvent> events, String transitionId) {
+    protected Map<DataEventType, DataEvent> buildEvents(String fieldId, List<com.netgrif.core.importer.model.DataEvent> events, String transitionId) {
         Map<DataEventType, DataEvent> parsedEvents = new HashMap<>();
 
-        List<com.netgrif.application.engine.importer.model.DataEvent> filteredEvents = events.stream()
+        List<com.netgrif.core.importer.model.DataEvent> filteredEvents = events.stream()
                 .filter(event -> DataEventType.GET.toString().equalsIgnoreCase(event.getType().toString()))
                 .collect(Collectors.toList());
         if (!filteredEvents.isEmpty()) {
@@ -863,8 +864,8 @@ public class Importer {
         return parsedEvents;
     }
 
-    protected com.netgrif.application.engine.petrinet.domain.events.DataEvent parseDataEvent(String fieldId, List<com.netgrif.application.engine.importer.model.DataEvent> events, String transitionId) {
-        com.netgrif.application.engine.petrinet.domain.events.DataEvent dataEvent = new com.netgrif.application.engine.petrinet.domain.events.DataEvent();
+    protected com.netgrif.core.petrinet.domain.events.DataEvent parseDataEvent(String fieldId, List<com.netgrif.core.importer.model.DataEvent> events, String transitionId) {
+        com.netgrif.core.petrinet.domain.events.DataEvent dataEvent = new com.netgrif.core.petrinet.domain.events.DataEvent();
         events.forEach(event -> {
             dataEvent.setType(event.getType().value().equalsIgnoreCase(DataEventType.GET.value) ? DataEventType.GET : DataEventType.SET);
             if (dataEvent.getId() == null) {
@@ -889,31 +890,31 @@ public class Importer {
         return dataEvent;
     }
 
-    protected com.netgrif.application.engine.petrinet.domain.events.DataEvent createDataEvent(Action action) {
-        com.netgrif.application.engine.petrinet.domain.events.DataEvent dataEvent;
+    protected com.netgrif.core.petrinet.domain.events.DataEvent createDataEvent(Action action) {
+        com.netgrif.core.petrinet.domain.events.DataEvent dataEvent;
         if (action.getId() != null) {
-            dataEvent = new com.netgrif.application.engine.petrinet.domain.events.DataEvent(action.getId().toString(), action.getTrigger().toString());
+            dataEvent = new com.netgrif.core.petrinet.domain.events.DataEvent(action.getId().toString(), action.getTrigger().toString());
         } else {
-            dataEvent = new com.netgrif.application.engine.petrinet.domain.events.DataEvent(new ObjectId().toString(), action.getTrigger().toString());
+            dataEvent = new com.netgrif.core.petrinet.domain.events.DataEvent(new ObjectId().toString(), action.getTrigger().toString());
         }
         return dataEvent;
     }
 
     @Transactional
-    protected List<Action> buildActions(List<com.netgrif.application.engine.importer.model.Action> imported, String fieldId, String transitionId) {
+    protected List<Action> buildActions(List<com.netgrif.core.importer.model.Action> imported, String fieldId, String transitionId) {
         return imported.stream()
                 .map(action -> parseAction(fieldId, transitionId, action))
                 .collect(Collectors.toList());
     }
 
-    protected Action parseAction(String transitionId, com.netgrif.application.engine.importer.model.Action action) {
+    protected Action parseAction(String transitionId, com.netgrif.core.importer.model.Action action) {
         if (action.getValue().contains("f.this")) {
             throw new IllegalArgumentException("Event action can not reference field using 'this'");
         }
         return parseAction(null, transitionId, action);
     }
 
-    protected Action parseAction(String fieldId, String transitionId, com.netgrif.application.engine.importer.model.Action importedAction) {
+    protected Action parseAction(String fieldId, String transitionId, com.netgrif.core.importer.model.Action importedAction) {
         if (fieldId != null && importedAction.getTrigger() == null) {
             throw new IllegalArgumentException("Data field action [" + importedAction.getValue() + "] doesn't have trigger");
         }
@@ -927,7 +928,7 @@ public class Importer {
         }
     }
 
-    protected Action createAction(com.netgrif.application.engine.importer.model.Action importedAction) {
+    protected Action createAction(com.netgrif.core.importer.model.Action importedAction) {
         Action action = new Action(importedAction.getTrigger());
         action.setImportId(buildActionId(importedAction.getId()));
         return action;
@@ -946,7 +947,7 @@ public class Importer {
         return this.net.getIdentifier() + "-" + sanitizedImportedId;
     }
 
-    protected void parseIds(String fieldId, String transitionId, com.netgrif.application.engine.importer.model.Action importedAction, Action action) {
+    protected void parseIds(String fieldId, String transitionId, com.netgrif.core.importer.model.Action importedAction, Action action) {
         String definition = importedAction.getValue();
         action.setDefinition(definition);
 
@@ -1023,14 +1024,14 @@ public class Importer {
     }
 
     @Transactional
-    protected void addTrigger(Transition transition, com.netgrif.application.engine.importer.model.Trigger importTrigger) {
+    protected void addTrigger(Transition transition, com.netgrif.core.importer.model.Trigger importTrigger) {
         Trigger trigger = triggerFactory.buildTrigger(importTrigger);
 
         transition.addTrigger(trigger);
     }
 
     @Transactional
-    protected void createPlace(com.netgrif.application.engine.importer.model.Place importPlace) {
+    protected void createPlace(com.netgrif.core.importer.model.Place importPlace) {
         Place place = new Place();
         place.setImportId(importPlace.getId());
         if (importPlace.isStatic() == null) {
@@ -1075,7 +1076,7 @@ public class Importer {
 
     protected ProcessRole initRole(Role importRole) {
         ProcessRole role = new ProcessRole();
-        Map<EventType, com.netgrif.application.engine.petrinet.domain.events.Event> events = createEventsMap(importRole.getEvent());
+        Map<EventType, com.netgrif.core.petrinet.domain.events.Event> events = createEventsMap(importRole.getEvent());
         role.setImportId(importRole.isGlobal() != null && importRole.isGlobal() ? ProcessRole.GLOBAL + importRole.getId() : importRole.getId());
         //MODULARISATION: events to be resolved
 //        role.setEvents(events);
@@ -1094,8 +1095,8 @@ public class Importer {
         return role;
     }
 
-    protected Map<EventType, com.netgrif.application.engine.petrinet.domain.events.Event> createEventsMap(List<com.netgrif.application.engine.importer.model.Event> events) {
-        Map<EventType, com.netgrif.application.engine.petrinet.domain.events.Event> finalEvents = new HashMap<>();
+    protected Map<EventType, com.netgrif.core.petrinet.domain.events.Event> createEventsMap(List<com.netgrif.core.importer.model.Event> events) {
+        Map<EventType, com.netgrif.core.petrinet.domain.events.Event> finalEvents = new HashMap<>();
         events.forEach(event ->
                 finalEvents.put(EventType.valueOf(event.getType().value().toUpperCase()), addEvent(null, event))
         );
@@ -1103,8 +1104,8 @@ public class Importer {
         return finalEvents;
     }
 
-    protected Map<ProcessEventType, com.netgrif.application.engine.petrinet.domain.events.ProcessEvent> createProcessEventsMap(List<com.netgrif.application.engine.importer.model.ProcessEvent> events) {
-        Map<ProcessEventType, com.netgrif.application.engine.petrinet.domain.events.ProcessEvent> finalEvents = new HashMap<>();
+    protected Map<ProcessEventType, com.netgrif.core.petrinet.domain.events.ProcessEvent> createProcessEventsMap(List<com.netgrif.core.importer.model.ProcessEvent> events) {
+        Map<ProcessEventType, com.netgrif.core.petrinet.domain.events.ProcessEvent> finalEvents = new HashMap<>();
         events.forEach(event ->
                 finalEvents.put(ProcessEventType.valueOf(event.getType().value().toUpperCase()), addProcessEvent(event))
         );
@@ -1112,8 +1113,8 @@ public class Importer {
         return finalEvents;
     }
 
-    protected Map<CaseEventType, com.netgrif.application.engine.petrinet.domain.events.CaseEvent> createCaseEventsMap(List<com.netgrif.application.engine.importer.model.CaseEvent> events) {
-        Map<CaseEventType, com.netgrif.application.engine.petrinet.domain.events.CaseEvent> finalEvents = new HashMap<>();
+    protected Map<CaseEventType, com.netgrif.core.petrinet.domain.events.CaseEvent> createCaseEventsMap(List<com.netgrif.core.importer.model.CaseEvent> events) {
+        Map<CaseEventType, com.netgrif.core.petrinet.domain.events.CaseEvent> finalEvents = new HashMap<>();
         events.forEach(event ->
                 finalEvents.put(CaseEventType.valueOf(event.getType().value().toUpperCase()), addCaseEvent(event))
         );
@@ -1122,7 +1123,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void createTransaction(com.netgrif.application.engine.importer.model.Transaction importTransaction) {
+    protected void createTransaction(com.netgrif.core.importer.model.Transaction importTransaction) {
         Transaction transaction = new Transaction();
         transaction.setTitle(toI18NString(importTransaction.getTitle()));
         transaction.setImportId(importTransaction.getId());
@@ -1152,7 +1153,7 @@ public class Importer {
         return string;
     }
 
-    protected void addPredefinedRolesWithDefaultPermissions(com.netgrif.application.engine.importer.model.Transition importTransition, Transition transition) {
+    protected void addPredefinedRolesWithDefaultPermissions(com.netgrif.core.importer.model.Transition importTransition, Transition transition) {
         // Don't add if role or trigger mapping
         for (Mapping mapping : document.getMapping()) {
             if (Objects.equals(mapping.getTransitionRef(), importTransition.getId())
@@ -1219,7 +1220,7 @@ public class Importer {
         return net.getPermissions().containsKey(anonymousRole.getStringId());
     }
 
-    protected AssignPolicy toAssignPolicy(com.netgrif.application.engine.importer.model.AssignPolicy policy) {
+    protected AssignPolicy toAssignPolicy(com.netgrif.core.importer.model.AssignPolicy policy) {
         if (policy == null || policy.value() == null) {
             return AssignPolicy.MANUAL;
         }
@@ -1227,7 +1228,7 @@ public class Importer {
         return AssignPolicy.valueOf(policy.value().toUpperCase());
     }
 
-    protected DataFocusPolicy toDataFocusPolicy(com.netgrif.application.engine.importer.model.DataFocusPolicy policy) {
+    protected DataFocusPolicy toDataFocusPolicy(com.netgrif.core.importer.model.DataFocusPolicy policy) {
         if (policy == null || policy.value() == null) {
             return DataFocusPolicy.MANUAL;
         }
@@ -1235,7 +1236,7 @@ public class Importer {
         return DataFocusPolicy.valueOf(policy.value().toUpperCase());
     }
 
-    protected FinishPolicy toFinishPolicy(com.netgrif.application.engine.importer.model.FinishPolicy policy) {
+    protected FinishPolicy toFinishPolicy(com.netgrif.core.importer.model.FinishPolicy policy) {
         if (policy == null || policy.value() == null) {
             return FinishPolicy.MANUAL;
         }

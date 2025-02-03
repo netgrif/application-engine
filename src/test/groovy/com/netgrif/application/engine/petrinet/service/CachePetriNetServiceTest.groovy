@@ -7,9 +7,9 @@ import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.configuration.properties.CacheProperties
 import com.netgrif.application.engine.ipc.TaskApiTest
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.adapter.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner

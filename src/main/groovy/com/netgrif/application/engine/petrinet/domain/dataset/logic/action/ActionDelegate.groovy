@@ -32,7 +32,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
 import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
@@ -42,10 +42,10 @@ import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.runner.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
-import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.adapter.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.QTask
-import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.adapter.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome

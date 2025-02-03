@@ -3,10 +3,10 @@ package com.netgrif.application.engine.workflow.service;
 import com.netgrif.application.engine.configuration.properties.FieldActionsCacheProperties;
 import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap;
 import com.netgrif.application.engine.event.IGroovyShellFactory;
-import com.netgrif.application.engine.petrinet.domain.Function;
-import com.netgrif.application.engine.petrinet.domain.FunctionScope;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.adapter.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.Function;
+import com.netgrif.core.petrinet.domain.FunctionScope;
+import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.domain.CachedFunction;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
@@ -85,7 +85,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     }
 
     @Override
-    public List<CachedFunction> getCachedFunctions(List<Function> functions) {
+    public List<CachedFunction> getCachedFunctions(List<com.netgrif.core.petrinet.domain.Function> functions) {
         List<CachedFunction> cachedFunctions = new ArrayList<>(functions.size());
         functions.forEach(function -> {
             if (!functionsCache.containsKey(function.getStringId())) {

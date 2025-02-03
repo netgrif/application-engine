@@ -8,7 +8,7 @@ import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.IllegalArgumentWithChangedFieldsException;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.adapter.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
@@ -170,8 +170,8 @@ public abstract class AbstractTaskController {
         return resources;
     }
 
-    public PagedModel<LocalisedTaskResource> searchPublic(LoggedUser loggedUser, Pageable pageable, SingleTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<com.netgrif.application.engine.workflow.domain.Task> assembler, Locale locale) {
-        Page<com.netgrif.application.engine.workflow.domain.Task> tasks = taskService.search(searchBody.getList(), pageable, loggedUser, locale, operation == MergeFilterOperation.AND);
+    public PagedModel<LocalisedTaskResource> searchPublic(LoggedUser loggedUser, Pageable pageable, SingleTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<com.netgrif.adapter.workflow.domain.Task> assembler, Locale locale) {
+        Page<com.netgrif.adapter.workflow.domain.Task> tasks = taskService.search(searchBody.getList(), pageable, loggedUser, locale, operation == MergeFilterOperation.AND);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicTaskController.class)
                 .searchPublic(loggedUser, pageable, searchBody, operation, assembler, locale)).withRel("search");
         PagedModel<LocalisedTaskResource> resources = assembler.toModel(tasks, new TaskResourceAssembler(locale), selfLink);

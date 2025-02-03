@@ -8,7 +8,7 @@ import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.files.StorageResolverService;
 import com.netgrif.core.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.adapter.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;

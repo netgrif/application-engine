@@ -2,16 +2,16 @@ package com.netgrif.application.engine.importer
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.RoleFactory
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.adapter.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.Task
-import com.netgrif.application.engine.workflow.domain.TaskPair
+import com.netgrif.adapter.workflow.domain.Case
+import com.netgrif.adapter.workflow.domain.Task
+import com.netgrif.adapter.workflow.domain.TaskPair
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService

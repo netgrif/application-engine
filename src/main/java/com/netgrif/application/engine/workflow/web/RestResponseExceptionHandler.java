@@ -2,7 +2,7 @@ package com.netgrif.application.engine.workflow.web;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.adapter.workflow.domain.Case;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;

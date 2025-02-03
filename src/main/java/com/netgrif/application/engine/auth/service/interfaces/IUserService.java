@@ -3,7 +3,7 @@
 //import com.netgrif.core.auth.domain.IUser;
 //import com.netgrif.core.auth.domain.IUser;
 //import com.netgrif.core.auth.domain.LoggedUser;
-//import com.netgrif.application.engine.petrinet.domain.PetriNet;
+//import com.netgrif.adapter.petrinet.domain.PetriNet;
 //import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 //import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 //import org.springframework.data.domain.Page;

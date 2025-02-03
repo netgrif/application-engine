@@ -3,7 +3,7 @@ package com.netgrif.application.engine.orgstructure.web;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.Group;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.GroupsResource;
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.adapter.workflow.domain.Case;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

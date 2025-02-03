@@ -202,7 +202,7 @@ public class PublicTaskController extends AbstractTaskController {
 
     @Operation(summary = "Generic task search on Mongo database")
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<com.netgrif.application.engine.workflow.domain.Task> assembler, Locale locale) {
+    public PagedModel<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<com.netgrif.adapter.workflow.domain.Task> assembler, Locale locale) {
         return super.searchPublic(userService.transformToLoggedUser(userService.getLoggedUser()), pageable, searchBody, operation, assembler, locale);
     }
 }

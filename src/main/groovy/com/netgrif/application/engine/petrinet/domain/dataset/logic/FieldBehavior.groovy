@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic
 
-import com.netgrif.application.engine.importer.model.Behavior
+import com.netgrif.core.importer.model.Behavior
 
 enum FieldBehavior {
     REQUIRED("required"),

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
-import com.netgrif.application.engine.petrinet.domain.PetriNetObject;
+import com.netgrif.adapter.petrinet.domain.PetriNetObject;
 import com.netgrif.application.engine.petrinet.domain.Position;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.InhibitorArc;

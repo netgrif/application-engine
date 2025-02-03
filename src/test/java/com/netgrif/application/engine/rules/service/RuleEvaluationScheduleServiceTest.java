@@ -12,7 +12,7 @@
 ////import com.netgrif.application.engine.rules.service.interfaces.IRuleEvaluationScheduleService;
 ////import com.netgrif.application.engine.rules.service.throwable.RuleEvaluationScheduleException;
 //import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
-//import com.netgrif.application.engine.workflow.domain.Case;
+//import com.netgrif.adapter.workflow.domain.Case;
 //import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 //import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 //import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;

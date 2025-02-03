@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes;
 
 import com.netgrif.core.petrinet.domain.I18nString;
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.adapter.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 
 import java.util.List;

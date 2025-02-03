@@ -4,9 +4,9 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.core.auth.domain.Authority;
 import com.netgrif.core.auth.domain.User
 import com.netgrif.core.auth.domain.enums.UserState
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.adapter.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
 import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.runner.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper

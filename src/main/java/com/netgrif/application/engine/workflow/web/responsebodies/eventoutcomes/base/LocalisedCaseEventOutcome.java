@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes.base;
 
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.adapter.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CaseEventOutcome;
 
 import java.util.List;

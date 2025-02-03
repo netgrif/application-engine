@@ -1,13 +1,13 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
+import com.netgrif.adapter.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.workflow.domain.QTask;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.adapter.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import com.querydsl.core.BooleanBuilder;

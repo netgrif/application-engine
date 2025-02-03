@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
 
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.adapter.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.adapter.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.web.TaskController;
 import com.netgrif.application.engine.workflow.web.WorkflowController;
 import org.springframework.hateoas.PagedModel;

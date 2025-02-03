@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
 
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.adapter.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.web.WorkflowController;
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateCaseBody;
 import org.springframework.context.i18n.LocaleContextHolder;

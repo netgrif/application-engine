@@ -13,7 +13,7 @@ import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExe
 import com.netgrif.application.engine.workflow.domain.filter.FilterImportExport;
 import com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList;
 import com.netgrif.core.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.adapter.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;

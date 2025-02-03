@@ -5,9 +5,9 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner
 import com.netgrif.application.engine.petrinet.domain.events.*
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.adapter.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.ProcessResourceId
-import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.adapter.workflow.domain.Task
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

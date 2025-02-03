@@ -2,7 +2,7 @@ package com.netgrif.application.engine.event.evaluators.config;
 
 import com.netgrif.application.engine.event.evaluators.Evaluator;
 import com.netgrif.application.engine.event.events.workflow.CaseEvent;
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.adapter.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;

@@ -6,7 +6,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.adapter.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.IllegalMenuFileException;
 import com.netgrif.application.engine.workflow.domain.menu.MenuEntry;
 

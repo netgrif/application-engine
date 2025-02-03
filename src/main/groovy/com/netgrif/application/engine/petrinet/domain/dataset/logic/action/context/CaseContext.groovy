@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action.context
 
-import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.adapter.workflow.domain.Case
 
 class CaseContext {
 

@@ -2,7 +2,7 @@ package com.netgrif.application.engine.elastic.service;
 
 import com.netgrif.application.engine.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.adapter.workflow.domain.Task;
 import org.springframework.stereotype.Service;
 
 @Service

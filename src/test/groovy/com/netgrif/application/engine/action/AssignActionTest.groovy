@@ -8,7 +8,7 @@ import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.User
 import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.adapter.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository

@@ -3,10 +3,10 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action.dele
 import com.netgrif.core.auth.domain.IUser
 
 import com.netgrif.adapter.auth.service.UserService
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.adapter.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.context.RoleContext
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import org.springframework.beans.factory.annotation.Autowired

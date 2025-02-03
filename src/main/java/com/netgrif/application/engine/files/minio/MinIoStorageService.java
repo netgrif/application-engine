@@ -5,7 +5,7 @@ import com.netgrif.application.engine.files.throwable.BadRequestException;
 import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import com.netgrif.application.engine.files.throwable.StorageException;
 import com.netgrif.application.engine.files.throwable.StorageNotEnabledException;
-import com.netgrif.application.engine.importer.model.Data;
+import com.netgrif.core.importer.model.Data;
 import com.netgrif.application.engine.petrinet.domain.dataset.MinIoStorage;
 import com.netgrif.application.engine.petrinet.domain.dataset.Storage;
 import com.netgrif.application.engine.petrinet.domain.dataset.StorageField;

@@ -5,7 +5,7 @@
 //import com.netgrif.adapter.auth.service.AuthorityService;
 //import com.netgrif.adapter.auth.service.UserService;
 //import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-//import com.netgrif.application.engine.petrinet.domain.PetriNet;
+//import com.netgrif.adapter.petrinet.domain.PetriNet;
 //import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 //import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 //import com.netgrif.application.engine.security.service.ISecurityContextService;

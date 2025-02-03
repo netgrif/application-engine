@@ -69,7 +69,7 @@ com.netgrif.application.engine.impersonation.service.interfaces
 com.netgrif.application.engine.impersonation.web
 com.netgrif.application.engine.impersonation.web.requestbodies
 com.netgrif.application.engine.impersonation.web.responsebodies
-com.netgrif.application.engine.importer.model
+com.netgrif.core.importer.model
 com.netgrif.application.engine.importer.service
 com.netgrif.application.engine.importer.service.throwable
 com.netgrif.application.engine.integration.dashboards.service
