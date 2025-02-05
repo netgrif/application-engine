@@ -126,7 +126,7 @@ dateTimeComparison: (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE DATETIME ;
 booleanComparison: (NOT SPACE?)? op=EQ SPACE BOOLEAN ;
 
 // special attribute rules
-dataValue: DATA '.' fieldId=JAVA_ID '.'VALUE ;
+dataValue: DATA '.' fieldId=JAVA_ID '.' VALUE ;
 dataOptions: DATA '.' fieldId=JAVA_ID '.' OPTIONS ;
 places: PLACES '.' placeId=JAVA_ID '.' MARKING ;
 tasksState: TASKS '.' taskId=JAVA_ID '.' STATE ;

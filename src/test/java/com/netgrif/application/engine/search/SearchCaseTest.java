@@ -4,8 +4,6 @@ import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.User;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
@@ -40,12 +38,6 @@ import static com.netgrif.application.engine.search.SearchUtils.toDateTimeString
 public class SearchCaseTest {
     @Autowired
     private IWorkflowService workflowService;
-
-    @Autowired
-    private IElasticCaseService elasticCaseService;
-
-    @Autowired
-    private IElasticCaseMappingService caseMappingService;
 
     public static final String TEST_TRANSITION_ID = "search_test_t1";
 
@@ -287,7 +279,7 @@ public class SearchCaseTest {
     }
 
     @Test
-    public void testSearchByPlaces() {
+    public void testSearchByPlaces() throws InterruptedException {
         PetriNet net = importPetriNet("search/search_test.xml");
 
         IUser user1 = createUser("Name1", "Surname1", "Email1", "user");
@@ -304,6 +296,8 @@ public class SearchCaseTest {
         String query = String.format("case: processIdentifier eq '%s' AND places.p2.marking eq %s", net.getIdentifier(), 1);
         String queryOther = String.format("case: processIdentifier eq '%s' AND places.p1.marking eq %s", net.getIdentifier(), 1);
         String queryMore = String.format("cases: processIdentifier eq '%s' AND places.p2.marking eq %s", net.getIdentifier(), 1);
+
+        Thread.sleep(3000);
 
         long count = searchService.count(query);
         assert count == 2;

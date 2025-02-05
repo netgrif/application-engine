@@ -468,24 +468,25 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitProcessIdComparison(QueryLangParser.ProcessIdComparisonContext ctx) {
-        StringPath stringPath;
         Token op = ctx.stringComparison().op;
         boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
         switch (type) {
             case CASE:
-                stringPath = QCase.case$.petriNetId;
+                QObjectId qObjectId = QCase.case$.petriNetObjectId;
+                ObjectId objectId = getObjectIdValue(ctx.stringComparison().STRING().getText());
+                setMongoQuery(ctx, buildObjectIdPredicate(qObjectId, op, objectId, not));
                 setElasticQuery(ctx, buildElasticQuery("processId", op, string, not));
                 break;
             case TASK:
-                stringPath = QTask.task.processId;
+                StringPath stringPath = QTask.task.processId;
+                setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
                 break;
             default:
                 throw new IllegalArgumentException("Unknown query type: " + type);
         }
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
     }
 
     @Override
