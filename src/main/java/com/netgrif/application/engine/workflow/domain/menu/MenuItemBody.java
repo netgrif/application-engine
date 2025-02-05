@@ -35,6 +35,7 @@ public class MenuItemBody {
     private boolean useTabIcon = true;
     private boolean useCustomView = false;
     private String customViewSelector;
+    private boolean isAutoSelect = false;
 
     // case view attributes
     private String caseViewSearchType = "fulltext_advanced";
@@ -179,6 +180,7 @@ public class MenuItemBody {
         ArrayList<String> filterIdCaseRefValue = new ArrayList<>();
         if (this.filter != null) {
             filterIdCaseRefValue.add(this.filter.getStringId());
+            putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CONTAINS_FILTER, FieldType.BOOLEAN, true);
         }
         ArrayList<String> parentIdCaseRef = new ArrayList<>();
         if (parentId != null) {
@@ -204,6 +206,7 @@ public class MenuItemBody {
                 this.useCustomView);
         putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CUSTOM_VIEW_SELECTOR, FieldType.TEXT,
                 this.customViewSelector);
+        putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_IS_AUTO_SELECT, FieldType.BOOLEAN, this.isAutoSelect);
 
         // CASE
         putDataSetEntry(dataSet, MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_VIEW_SEARCH_TYPE, FieldType.ENUMERATION_MAP,

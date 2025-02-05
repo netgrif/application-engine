@@ -125,6 +125,24 @@
 			change toBeUpdated options { newOptions }
 		}
 	</function>
+	<function scope="process" name="removeAnyAutoSelectFlagInFolder">
+		{
+			->
+			String query = String.format("processIdentifier:preference_item AND uriNodeId:%s AND dataSet.is_auto_select.booleanValue:true AND NOT stringId:%s",
+					useCase.uriNodeId, useCase.stringId)
+			def itemCase = findCaseElastic(query)
+			if (itemCase == null) {
+				return
+			}
+
+			setData("item_settings", itemCase, [
+				"is_auto_select": [
+					"value": false,
+					"type": "boolean"
+				]
+			])
+		}
+	</function>
 
 	<data type="caseRef">
 		<id>parentId</id>
@@ -470,6 +488,11 @@
 		<id>new_filter_id</id>
 		<title/>
 	</data>
+	<data type="boolean" immediate="true">
+		<id>contains_filter</id>
+		<title/>
+		<init>false</init>
+	</data>
 	<data type="enumeration_map">
 		<id>filter_autocomplete_selection</id>
 		<title name="filter_autocomplete_selection">Select new filter</title>
@@ -511,9 +534,12 @@
 		<action trigger="set">
 			trans: t.item_settings,
 			update_filter: f.update_filter,
+			contains_filter: f.contains_filter,
 			filter_case: f.filter_case,
 			filterAutocomplete: f.filter_autocomplete_selection;
 
+
+			change contains_filter value { filterAutocomplete.value != null &amp;&amp; filterAutocomplete.value != "" }
 			change filter_case value { [filterAutocomplete.value] }
 			change filterAutocomplete value { "" }
 			make update_filter,visible on trans when { true }
@@ -585,6 +611,20 @@
 		<id>custom_view_selector</id>
 		<title name="custom_view_selector">Custom view configuration selector</title>
 		<desc name="custom_view_selector_desc">Example: "demo-tabbed-views"</desc>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>is_auto_select</id>
+		<title name="is_auto_select">View auto selection</title>
+		<desc name="is_auto_select_desc">If selected, the view will be automatically opened</desc>
+		<init>false</init>
+		<action trigger="set">
+			is_auto_select: f.is_auto_select;
+
+			if (!is_auto_select.value)
+				return
+
+			removeAnyAutoSelectFlagInFolder()
+		</action>
 	</data>
 
 	<!-- CASE VIEW CONFIGURATION DATA -->
@@ -1098,6 +1138,8 @@
 		<i18nString name="move_dest_uri_new_node_desc">Uveďte názov uzlu, ktorý chcete pridať</i18nString>
 		<i18nString name="move_dest_uri_desc">Zoznam uzlov reprezentujúce cieľovú URI</i18nString>
 		<i18nString name="move_add_node">Pridať</i18nString>
+		<i18nString name="is_auto_select">Automatické zvolenie zobrazenia</i18nString>
+		<i18nString name="is_auto_select_desc">Po automatickom zvolení sa dané zobrazenie používateľovi otvorí</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="icon_preview">Ikonevorschau</i18nString>
@@ -1176,6 +1218,8 @@
 		<i18nString name="roles_banned_desc">Rollen, für die wird den Menüeintrag ausgeblendet</i18nString>
 		<i18nString name="move_dest_uri_new_node_desc">Nächste URI-Teil angeben</i18nString>
 		<i18nString name="move_dest_uri_desc">Teile der Ziel URI</i18nString>
+		<i18nString name="is_auto_select">Automatische Anzeigeauswahl</i18nString>
+		<i18nString name="is_auto_select_desc">Wenn ausgewählt, wird die Ansicht automatisch geöffnet</i18nString>
 	</i18n>
 
 	<!-- TRANSITIONS -->
@@ -1388,12 +1432,26 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>use_custom_view</id>
+				<id>is_auto_select</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>use_custom_view</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
 					<y>2</y>
 					<rows>1</rows>
 					<cols>1</cols>
@@ -1464,10 +1522,10 @@
 					<behavior>visible</behavior>
 				</logic>
 				<layout>
-					<x>1</x>
+					<x>2</x>
 					<y>2</y>
 					<rows>1</rows>
-					<cols>3</cols>
+					<cols>2</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
@@ -1915,10 +1973,12 @@
 				<actions phase="post">
 					<action>
 						new_filter_id: f.new_filter_id,
+						contains_filter: f.contains_filter,
 						filterTaskRef: f.current_filter_preview,
 						filterCaseRef: f.filter_case;
 
 						change filterCaseRef value { [new_filter_id.value] }
+						change contains_filter value { new_filter_id.value != null &amp;&amp; new_filter_id.value != "" }
 						def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
 						change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
 					</action>
