@@ -1,0 +1,588 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>dashboard_item</id>
+    <initials>DBI</initials>
+    <title>Dashboard item</title>
+    <icon>crop_square</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <transitionRole>false</transitionRole>
+
+    <roleRef>
+        <id>system</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>admin</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>default</id>
+        <caseLogic>
+            <create>false</create>
+            <delete>false</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+
+    <role>
+        <id>system</id>
+        <title>System</title>
+    </role>
+    <role>
+        <id>admin</id>
+        <title>Admin</title>
+    </role>
+
+    <data type="text" immediate="true">
+        <id>item_id</id>
+        <title name="item_id">Dashboard item ID</title>
+        <desc name="item_id_desc">Unique identifier of dashboard item</desc>
+        <event type="set">
+            <id>item_id_set</id>
+            <actions phase="post">
+                <action>
+                    item_id: f.item_id;
+
+                    if (item_id.value == "") {
+                        return
+                    }
+                    def itemWithIdExists = findCasesElastic("processIdentifier:\"dashboard_item\" AND dataSet.item_id.textValue.keyword:\"${item_id.value}\"" as String, org.springframework.data.domain.PageRequest.of(0, 1)).isEmpty()
+                    if (!itemWithIdExists) {
+                        change item_id value { "" }
+                        throw new IllegalArgumentException("Dashboard item with given ID already exists.")
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>preference_items_list</id>
+        <title name="preference_items_list">Existing menu items</title>
+        <desc name="preference_items_list_desc">List of all existing menu items</desc>
+        <component>
+            <name>autocomplete_dynamic</name>
+        </component>
+        <event type="get">
+            <id>preference_items_list_get</id>
+            <actions phase="post">
+                <action>
+                    preference_items_list: f.preference_items_list;
+
+                    def preferenceItemCases = findCasesElastic("processIdentifier:\"preference_item\"" as String, org.springframework.data.domain.PageRequest.of(0, 1000))
+                            .collectEntries { [(it.stringId): it.dataSet["menu_name"].value] }
+                    change preference_items_list options { preferenceItemCases }
+                </action>
+            </actions>
+        </event>
+        <event type="set">
+            <id>preference_items_list_set</id>
+            <actions phase="post">
+                <action>
+                    inherit_name: f.inherit_name,
+                    inherit_icon: f.inherit_icon,
+                    preference_item_taskRef: f.preference_item_taskRef,
+                    filter_divider: f.filter_divider,
+                    preference_items_list: f.preference_items_list,
+                    trans: t.configuration;
+
+                    change inherit_icon value { true }
+                    change inherit_name value { true }
+                    if (preference_items_list.value != null &amp;&amp; org.bson.types.ObjectId.isValid(preference_items_list.value)) {
+                        make [inherit_name, inherit_icon], editable on trans when { true }
+                        make [preference_item_taskRef, filter_divider], visible on trans when { true }
+                        def preferenceItemCase = workflowService.findOne(preference_items_list.value)
+                        change preference_item_taskRef value { [preferenceItemCase.tasks.find { it.transition == "item_settings" }?.task] }
+                    } else {
+                        make [inherit_name, inherit_icon], visible on trans when { true }
+                        make [preference_item_taskRef, filter_divider], hidden on trans when { true }
+                        change preference_item_taskRef value { [] }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>is_internal</id>
+        <title name="is_internal">Internal item</title>
+        <desc name="is_internal_desc">Internal menu item or link to external website URL</desc>
+        <init>true</init>
+        <event type="set">
+            <id>is_internal_set</id>
+            <actions phase="post">
+                <action>
+                    item_name: f.item_name,
+                    item_icon: f.item_icon,
+                    preference_items_list: f.preference_items_list,
+                    external_url: f.external_url,
+                    is_internal: f.is_internal;
+
+                    if (is_internal.value) {
+                        change preference_items_list value { "" }
+                    } else {
+                        change item_icon value { "" }
+                        change item_name value { new com.netgrif.application.engine.petrinet.domain.I18nString("") }
+                        change external_url value { "" }
+                    }
+                </action>
+                <action>
+                    is_internal: f.is_internal,
+                    item_name: f.item_name,
+                    item_icon: f.item_icon,
+                    preference_items_list: f.preference_items_list,
+                    item_icon_preview: f.item_icon_preview,
+                    external_url: f.external_url,
+                    inherit_name: f.inherit_name,
+                    inherit_icon: f.inherit_icon,
+                    preference_item_taskRef: f.preference_item_taskRef,
+                    filter_divider: f.filter_divider,
+                    trans: t.configuration;
+
+                    if (is_internal.value) {
+                        make [preference_items_list], editable on trans when { true }
+                        make [external_url], hidden on trans when { true }
+                    } else {
+                        make [item_icon, item_name, external_url], editable on trans when { true }
+                        make item_icon_preview, visible on trans when { true }
+                        make [inherit_name, inherit_icon, preference_items_list, preference_item_taskRef, filter_divider], hidden on trans when { true }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text" immediate="true">
+        <id>external_url</id>
+        <title name="external_url">External URL</title>
+        <desc name="external_url_desc">Link for external website URL</desc>
+    </data>
+    <data type="text" immediate="true">
+        <id>item_icon</id>
+        <title name="item_icon">Item icon identifier</title>
+        <desc name="item_icon_desc">Material icon identifier. List of icons with identifiers is available online. Icon will be displayed in dashboard.</desc>
+        <action trigger="set">
+            icon: f.this,
+            iconPreview: f.item_icon_preview;
+
+            changeCaseProperty "icon" about { icon.value }
+
+            if (icon.value == "") {
+                change iconPreview value {<![CDATA["""<span></span>"""]]>}
+                return;
+            }
+
+            change iconPreview value {
+				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + icon.value + <![CDATA["""</span>"""]]>
+            }
+        </action>
+    </data>
+    <data type="text">
+        <id>item_icon_preview</id>
+        <title/>
+        <component>
+            <name>htmltextarea</name>
+        </component>
+    </data>
+    <data type="i18n" immediate="true">
+        <id>item_name</id>
+        <title name="item_name">Item name</title>
+        <desc name="item_name_desc">Item name which will be displayed in dashboard</desc>
+    </data>
+    <data type="boolean">
+        <id>inherit_icon</id>
+        <title name="inherit_icon">Inherit icon</title>
+        <desc name="inherit_icon_desc">Check if icon should be inherited from menu item</desc>
+        <init>true</init>
+        <event type="set">
+            <id>inherit_icon_set</id>
+            <actions phase="post">
+                <action>
+                    inherit_icon: f.inherit_icon,
+                    item_icon_preview: f.item_icon_preview,
+                    item_icon: f.item_icon,
+                    preference_items_list: f.preference_items_list,
+                    trans: t.configuration;
+
+                    if (inherit_icon.value) {
+                        make [item_icon, item_icon_preview], visible on trans when { true }
+                        if (preference_items_list.value != null &amp;&amp; org.bson.types.ObjectId.isValid(preference_items_list.value)) {
+                            def preferenceItemCase = workflowService.findOne(preference_items_list.value)
+                            change item_icon value { preferenceItemCase.dataSet["menu_icon"].value }
+                        } else {
+                            change item_icon value { "" }
+                        }
+                    } else {
+                        make item_icon, editable on trans when { true }
+                        make item_icon_preview, visible on trans when { true }
+                        change item_icon value { "" }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="boolean">
+        <id>inherit_name</id>
+        <title name="inherit_name">Inherit name from menu item</title>
+        <desc name="inherit_name_desc">Name should be inherited from menu item</desc>
+        <init>true</init>
+        <event type="set">
+            <id>inherit_name_set</id>
+            <actions phase="post">
+                <action>
+                    inherit_name: f.inherit_name,
+                    item_name: f.item_name,
+                    preference_items_list: f.preference_items_list;
+
+                    if (inherit_name.value) {
+                        if (preference_items_list.value != null &amp;&amp; org.bson.types.ObjectId.isValid(preference_items_list.value)) {
+                            def preferenceItemCase = workflowService.findOne(preference_items_list.value)
+                            change item_name value { preferenceItemCase.dataSet["menu_name"].value }
+                        } else {
+                            change item_name value { new com.netgrif.application.engine.petrinet.domain.I18nString("") }
+                        }
+                    } else {
+                        change item_name value { new com.netgrif.application.engine.petrinet.domain.I18nString("") }
+                    }
+                </action>
+                <action>
+                    inherit_name: f.inherit_name,
+                    item_name: f.item_name,
+                    trans: t.configuration;
+
+                    if (inherit_name.value) {
+                        make item_name, visible on trans when { true }
+                    } else {
+                        make item_name, editable on trans when { true }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="taskRef">
+        <id>preference_item_taskRef</id>
+        <title/>
+    </data>
+    <data type="i18n">
+        <id>filter_divider</id>
+        <title/>
+        <init dynamic="true">
+            new com.netgrif.application.engine.petrinet.domain.I18nString("Menu item data", [sk: "Dáta menu položky", de: "Daten zum Menüpunkt"])
+        </init>
+        <component>
+            <name>divider</name>
+            <property key="fontSize">16</property>
+        </component>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>is_active</id>
+        <title/>
+        <init>false</init>
+    </data>
+
+
+    <!-- I18NS -->
+    <i18n locale="sk">
+        <i18nString name="item_id">ID položky panelu</i18nString>
+        <i18nString name="item_id_desc">Unikátny identifikátor položky panelu</i18nString>
+        <i18nString name="preference_items_list">Existujúce menu položky</i18nString>
+        <i18nString name="preference_items_list_desc">Zoznam všetkých existujúcich menu položiek</i18nString>
+        <i18nString name="is_internal">Interná položka</i18nString>
+        <i18nString name="is_internal_desc">Položka interného menu alebo odkaz na externú webovú adresu URL</i18nString>
+        <i18nString name="external_url">Externá adresa URL</i18nString>
+        <i18nString name="external_url_desc">Odkaz na externú webovú adresu URL</i18nString>
+        <i18nString name="item_icon">Identifikátor ikony položky</i18nString>
+        <i18nString name="item_icon_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online. Ikona sa zobrazí v panely.</i18nString>
+        <i18nString name="item_name">Názov položky</i18nString>
+        <i18nString name="item_name_desc">Názov položky, ktorá sa zobrazí v panely</i18nString>
+        <i18nString name="inherit_icon">Prebrať ikonu</i18nString>
+        <i18nString name="inherit_icon_desc">Ikona by mala byť prebratá z menu položky</i18nString>
+        <i18nString name="inherit_name">Prebrať názov</i18nString>
+        <i18nString name="inherit_name_desc">Názov by mal byť prebratý z menu položky</i18nString>
+        <i18nString name="configuration_label">Konfigurácia položky panelu</i18nString>
+    </i18n>
+    <i18n locale="de">
+        <i18nString name="item_id">Dashboard-Element-ID</i18nString>
+        <i18nString name="item_id_desc">Eindeutiger Bezeichner des Dashboard-Elements</i18nString>
+        <i18nString name="preference_items_list">Vorhandene Menüpunkte</i18nString>
+        <i18nString name="preference_items_list_desc">Liste aller vorhandenen Menüpunkte</i18nString>
+        <i18nString name="is_internal">Interner Posten</i18nString>
+        <i18nString name="is_internal_desc">Interner Menüpunkt oder Link zu externer Website-URL</i18nString>
+        <i18nString name="external_url">Externe URL</i18nString>
+        <i18nString name="external_url_desc">Link für externe Website-URL</i18nString>
+        <i18nString name="item_icon">Bezeichner des Artikelsymbols</i18nString>
+        <i18nString name="item_icon_desc">Kennung der Materialikone. Die Liste der Symbole mit den Bezeichnungen ist online verfügbar. Das Symbol wird im Dashboard angezeigt.</i18nString>
+        <i18nString name="item_name">Name des Gegenstands</i18nString>
+        <i18nString name="item_name_desc">Artikelbezeichnung, die im Dashboard angezeigt wird</i18nString>
+        <i18nString name="inherit_icon">Symbol vererben</i18nString>
+        <i18nString name="inherit_icon_desc">Prüfen, ob das Symbol vom Menüpunkt geerbt werden soll</i18nString>
+        <i18nString name="inherit_name">Name von Menüpunkt vererben</i18nString>
+        <i18nString name="inherit_name_desc">Name sollte vom Menüpunkt geerbt werden</i18nString>
+        <i18nString name="configuration_label">Konfiguration von Dashboard-Elementen</i18nString>
+    </i18n>
+
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>configuration</id>
+        <x>400</x>
+        <y>112</y>
+        <label name="configuration_label">Dashboard item configuration</label>
+        <icon>tune</icon>
+        <assignPolicy>auto</assignPolicy>
+<!--        <roleRef>-->
+<!--            <id>admin</id>-->
+<!--            <logic>-->
+<!--                <perform>true</perform>-->
+<!--                <view>true</view>-->
+<!--                <cancel>true</cancel>-->
+<!--                <assign>true</assign>-->
+<!--            </logic>-->
+<!--        </roleRef>-->
+        <dataGroup>
+            <id>configuration_d1</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>item_id</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>is_internal</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>configuration_internal</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>preference_items_list</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>inherit_name</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>inherit_icon</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>configuration_general</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>item_name</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>item_icon</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>item_icon_preview</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>filter_divider</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>preference_item_taskRef</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>configuration_external</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>external_url</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>configuration_assign</id>
+            <actions phase="post">
+                <action>
+                    is_active: f.is_active;
+
+                    change is_active value { false }
+                </action>
+            </actions>
+        </event>
+        <event type="finish">
+            <id>configuration_finish</id>
+            <actions phase="pre">
+                <action>
+                    item_id: f.item_id,
+                    item_name: f.item_name,
+                    is_internal: f.is_internal,
+                    preference_items_list: f.preference_items_list,
+                    external_url: f.external_url,
+                    is_active: f.is_active;
+
+                    if (item_id.value == null || item_id.value == "") {
+                        throw new IllegalArgumentException("Dashboard item ID cannot be empty.")
+                    }
+                    if (is_internal.value) {
+                        if (preference_items_list.value == null || !org.bson.types.ObjectId.isValid(preference_items_list.value)){
+                            throw new IllegalArgumentException("Internal menu item must be selected.")
+                        }
+                    } else {
+                        if (external_url.value == null || external_url.value == "") {
+                            throw new IllegalArgumentException("External URL cannot be empty.")
+                        }
+                    }
+                    change is_active value { true }
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <place>
+        <id>p1</id>
+        <x>208</x>
+        <y>112</y>
+        <label/>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <arc>
+        <id>a1</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>configuration</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakpoint>
+            <x>304</x>
+            <y>144</y>
+        </breakpoint>
+    </arc>
+    <arc>
+        <id>a2</id>
+        <type>regular</type>
+        <sourceId>configuration</sourceId>
+        <destinationId>p1</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakpoint>
+            <x>304</x>
+            <y>80</y>
+        </breakpoint>
+    </arc>
+</document>

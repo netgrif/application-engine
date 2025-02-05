@@ -1,0 +1,497 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>dashboard_management</id>
+    <initials>DBM</initials>
+    <title>Dashboard management</title>
+    <icon>dashboard</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <transitionRole>false</transitionRole>
+
+    <roleRef>
+        <id>system</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>admin</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>default</id>
+        <caseLogic>
+            <create>false</create>
+            <delete>false</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+
+    <role>
+        <id>system</id>
+        <title>System</title>
+    </role>
+    <role>
+        <id>admin</id>
+        <title>Admin</title>
+    </role>
+
+    <data type="text" immediate="true">
+        <id>dashboard_id</id>
+        <title name="dashboard_id">Dashboard ID</title>
+        <desc name="dashboard_id_desc">Unique identifier of dashboard</desc>
+        <event type="set">
+            <id>dashboard_id_set</id>
+            <actions phase="post">
+                <action>
+                    dashboard_id: f.dashboard_id;
+
+                    if (dashboard_id.value == "") {
+                        return
+                    }
+                    def dashboardWithIdExists = findCasesElastic("processIdentifier:\"dashboard_management\" AND dataSet.dashboard_id.textValue.keyword:\"${dashboard_id.value}\"" as String, org.springframework.data.domain.PageRequest.of(0, 1)).isEmpty()
+                    if (!dashboardWithIdExists) {
+                        change dashboard_id value { "" }
+                        throw new IllegalArgumentException("Dashboard with given ID already exists.")
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text" immediate="true">
+        <id>dashboard_name</id>
+        <title name="dashboard_name">Dashboard name</title>
+        <desc name="dashboard_name_desc">Dashboard name to be displayed in application dashboard</desc>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>dashboard_item_list</id>
+        <title name="dashboard_item_list">Dashboard items</title>
+        <desc name="dashboard_item_list_desc">List of dashboard items to be displayed in application dashboard</desc>
+        <component>
+            <name>list</name>
+        </component>
+    </data>
+    <data type="button">
+        <id>order_down</id>
+        <title/>
+        <placeholder>south</placeholder>
+        <component>
+            <name>icon</name>
+            <property key="stretch">true</property>
+        </component>
+        <event type="set">
+            <id>order_down_set</id>
+            <actions phase="post">
+                <action>
+                    dashboard_item_list: f.dashboard_item_list;
+
+                    if (dashboard_item_list.value == null || dashboard_item_list.value == "") {
+                        return
+                    }
+                    def keys = dashboard_item_list.options.keySet() as List
+                    def currentIndex = keys.indexOf(dashboard_item_list.value)
+                    if (currentIndex == keys.size() - 1) {
+                        return
+                    }
+                    java.util.Collections.swap(keys, currentIndex, currentIndex + 1)
+                    def newOrder = [:]
+                    keys.forEach { newOrder[it] = dashboard_item_list.options[it]}
+                    change dashboard_item_list options { newOrder }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="button">
+        <id>order_up</id>
+        <title/>
+        <placeholder>north</placeholder>
+        <component>
+            <name>icon</name>
+            <property key="stretch">true</property>
+        </component>
+        <event type="set">
+            <id>order_up_set</id>
+            <actions phase="post">
+                <action>
+                    dashboard_item_list: f.dashboard_item_list;
+
+                    if (dashboard_item_list.value == null || dashboard_item_list.value == "") {
+                        return
+                    }
+                    def keys = dashboard_item_list.options.keySet() as List
+                    def currentIndex = keys.indexOf(dashboard_item_list.value)
+                    if (currentIndex == 0) {
+                        return
+                    }
+                    java.util.Collections.swap(keys, currentIndex, currentIndex - 1)
+                    def newOrder = [:]
+                    keys.forEach { newOrder[it] = dashboard_item_list.options[it]}
+                    change dashboard_item_list options { newOrder }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="enumeration_map">
+        <id>existing_menu_items</id>
+        <title name="existing_menu_items">Existing dashboard items</title>
+        <desc name="existing_menu_items_desc">List of all existing dashboard items which can be added to dashboard</desc>
+        <component>
+            <name>autocomplete_dynamic</name>
+        </component>
+        <event type="get">
+            <id>existing_menu_items_get</id>
+            <actions phase="post">
+                <action>
+                    dashboard_item_list: f.dashboard_item_list,
+                    existing_menu_items: f.existing_menu_items;
+
+                    def dashboardItemCases = findCasesElastic("processIdentifier:\"dashboard_item\" AND dataSet.is_active.booleanValue:true" as String, org.springframework.data.domain.PageRequest.of(0, 1000))
+                            .collectEntries { [(it.stringId): it.dataSet["item_name"].value] }
+                    dashboardItemCases.keySet().removeAll(dashboard_item_list.options.keySet())
+                    change existing_menu_items options { dashboardItemCases }
+                </action>
+            </actions>
+        </event>
+        <event type="set">
+            <id>existing_menu_items_set</id>
+            <actions phase="post">
+                <action>
+                    item_divider: f.item_divider,
+                    dashboard_item_taskRef: f.dashboard_item_taskRef,
+                    existing_menu_items: f.existing_menu_items,
+                    trans: t.configuration;
+
+                    if (existing_menu_items.value == null || !org.bson.types.ObjectId.isValid(existing_menu_items.value)) {
+                        change dashboard_item_taskRef value { [] }
+                        make item_divider, hidden on trans when { true }
+                        return
+                    }
+                    def dashboardItemCase = workflowService.findOne(existing_menu_items.value)
+                    make item_divider, visible on trans when { true }
+                    change dashboard_item_taskRef value { [dashboardItemCase.tasks.find { it.transition == "configuration" }?.task] }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="button">
+        <id>add_new_item</id>
+        <title/>
+        <placeholder>Add new item</placeholder>
+        <event type="set">
+            <id>add_new_item_set</id>
+            <actions phase="post">
+                <action>
+                    dashboard_item_list: f.dashboard_item_list,
+                    existing_menu_items: f.existing_menu_items;
+
+                    if (existing_menu_items.value == null || !org.bson.types.ObjectId.isValid(existing_menu_items.value)) {
+                        throw new IllegalArgumentException("No menu item was selected.")
+                    }
+                    def dashboardItemOptions = dashboard_item_list.options
+                    dashboardItemOptions.put(existing_menu_items.value, existing_menu_items.options.get(existing_menu_items.value))
+                    change dashboard_item_list options { dashboardItemOptions }
+
+                    def dashboardItemCases = findCasesElastic("processIdentifier:\"dashboard_item\" AND dataSet.is_active.booleanValue:true" as String, org.springframework.data.domain.PageRequest.of(0, 1000))
+                            .collectEntries { [(it.stringId): it.dataSet["item_name"].value] }
+                    dashboardItemCases.keySet().removeAll(dashboard_item_list.options.keySet())
+                    change existing_menu_items options { dashboardItemCases }
+                    change existing_menu_items value { "" }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="button">
+        <id>remove_new_item</id>
+        <title/>
+        <placeholder>Remove item</placeholder>
+        <event type="set">
+            <id>remove_new_item_set</id>
+            <actions phase="post">
+                <action>
+                    dashboard_item_list: f.dashboard_item_list,
+                    existing_menu_items: f.existing_menu_items;
+
+                    if (dashboard_item_list.value == null || !org.bson.types.ObjectId.isValid(dashboard_item_list.value)) {
+                        throw new IllegalArgumentException("No menu item was selected.")
+                    }
+                    def dashboardItemOptions = dashboard_item_list.options
+                    dashboardItemOptions.keySet().removeAll([dashboard_item_list.value])
+                    change dashboard_item_list options { dashboardItemOptions }
+
+                    def dashboardItemCases = findCasesElastic("processIdentifier:\"dashboard_item\" AND dataSet.is_active.booleanValue:true" as String, org.springframework.data.domain.PageRequest.of(0, 1000))
+                            .collectEntries { [(it.stringId): it.dataSet["item_name"].value] }
+                    dashboardItemCases.keySet().removeAll(dashboard_item_list.options.keySet())
+                    change existing_menu_items options { dashboardItemCases }
+                    change existing_menu_items value { "" }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="taskRef">
+        <id>dashboard_item_taskRef</id>
+        <title/>
+    </data>
+    <data type="boolean">
+        <id>is_active</id>
+        <title/>
+    </data>
+    <data type="i18n">
+        <id>item_divider</id>
+        <title/>
+        <init dynamic="true">
+            new com.netgrif.application.engine.petrinet.domain.I18nString("Dashboard item data", [sk: "Dáta položky panelu", de: "Daten zum Dashboard-Element"])
+        </init>
+        <component>
+            <name>divider</name>
+            <property key="fontSize">18</property>
+        </component>
+    </data>
+
+    <!-- I18NS -->
+    <i18n locale="sk">
+        <i18nString name="dashboard_id">ID panelu</i18nString>
+        <i18nString name="dashboard_id_desc">Unikátny identifikátor panelu</i18nString>
+        <i18nString name="dashboard_name">Názov panelu</i18nString>
+        <i18nString name="dashboard_name_desc">Názov panelu, ktorý bude zobrazený v panely aplikácie</i18nString>
+        <i18nString name="dashboard_item_list">Položky panelu</i18nString>
+        <i18nString name="dashboard_item_list_desc">Zoznam položiek panalu, ktoré budú zobrazené v panely aplikácie</i18nString>
+        <i18nString name="existing_menu_items">Existujúce položky panelu</i18nString>
+        <i18nString name="existing_menu_items_desc">Zoznam všetkých existujúcich položiek panelu, ktoré budú zobrazené v panely aplikácie</i18nString>
+        <i18nString name="configuration_label">Konfigurácia panela</i18nString>
+    </i18n>
+    <i18n locale="de">
+        <i18nString name="dashboard_id">Dashboard-ID</i18nString>
+        <i18nString name="dashboard_id_desc">Eindeutiger Bezeichner des Dashboards</i18nString>
+        <i18nString name="dashboard_name">Name des Dashboards</i18nString>
+        <i18nString name="dashboard_name_desc">Name des Dashboards, der im Dashboard der Anwendung angezeigt werden soll</i18nString>
+        <i18nString name="dashboard_item_list">Dashboard-Elemente</i18nString>
+        <i18nString name="dashboard_item_list_desc">Liste der Dashboard-Elemente, die im Dashboard der Anwendung angezeigt werden sollen</i18nString>
+        <i18nString name="existing_menu_items">Vorhandene Dashboard-Elemente</i18nString>
+        <i18nString name="existing_menu_items_desc">Liste aller vorhandenen Dashboard-Elemente, die dem Dashboard hinzugefügt werden können</i18nString>
+        <i18nString name="configuration_label">Konfiguration des Dashboards</i18nString>
+    </i18n>
+
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>configuration</id>
+        <x>400</x>
+        <y>112</y>
+        <label name="configuration_label">Dashboard configuration</label>
+        <icon>settings</icon>
+        <assignPolicy>auto</assignPolicy>
+<!--        <roleRef>-->
+<!--            <id>admin</id>-->
+<!--            <logic>-->
+<!--                <perform>true</perform>-->
+<!--                <view>true</view>-->
+<!--                <cancel>true</cancel>-->
+<!--                <assign>true</assign>-->
+<!--            </logic>-->
+<!--        </roleRef>-->
+        <dataGroup>
+            <id>configuration_d1</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>dashboard_id</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>dashboard_name</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>dashboard_item_list</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>2</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>order_up</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>order_down</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>remove_new_item</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>existing_menu_items</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>add_new_item</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>item_divider</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>dashboard_item_taskRef</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>5</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>configuration_assign</id>
+            <actions phase="post">
+                <action>
+                    is_active: f.is_active;
+
+                    change is_active value { false }
+                </action>
+            </actions>
+        </event>
+        <event type="finish">
+            <id>configuration_finish</id>
+            <actions phase="pre">
+                <action>
+                    dashboard_id: f.dashboard_id,
+                    dashboard_name: f.dashboard_name,
+                    is_active: f.is_active;
+
+                    if (dashboard_id.value == null || dashboard_id.value == "") {
+                        throw new IllegalArgumentException("Dashboard ID cannot be empty.")
+                    }
+                    change is_active value { true }
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <place>
+        <id>p1</id>
+        <x>208</x>
+        <y>112</y>
+        <label/>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <arc>
+        <id>a1</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>configuration</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakpoint>
+            <x>304</x>
+            <y>144</y>
+        </breakpoint>
+    </arc>
+    <arc>
+        <id>a2</id>
+        <type>regular</type>
+        <sourceId>configuration</sourceId>
+        <destinationId>p1</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakpoint>
+            <x>304</x>
+            <y>80</y>
+        </breakpoint>
+    </arc>
+</document>
