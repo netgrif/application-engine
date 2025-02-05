@@ -1,13 +1,13 @@
 package com.netgrif.application.engine.petrinet.domain.version;
 
-import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.core.petrinet.domain.VersionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
 
-import static com.netgrif.application.engine.petrinet.domain.VersionType.MAJOR;
-import static com.netgrif.application.engine.petrinet.domain.VersionType.MINOR;
+import static com.netgrif.core.petrinet.domain.VersionType.MAJOR;
+import static com.netgrif.core.petrinet.domain.VersionType.MINOR;
 
 @Data
 @AllArgsConstructor

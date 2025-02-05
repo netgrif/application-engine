@@ -2,19 +2,19 @@ package com.netgrif.application.engine.petrinet.service.interfaces;
 
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.adapter.petrinet.domain.PetriNet;
-import com.netgrif.adapter.petrinet.domain.PetriNetSearch;
-import com.netgrif.application.engine.petrinet.domain.Transition;
-import com.netgrif.application.engine.petrinet.domain.VersionType;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.PetriNetSearch;
+import com.netgrif.core.petrinet.domain.Transition;
+import com.netgrif.core.petrinet.domain.VersionType;
+import com.netgrif.core.petrinet.domain.dataset.Field;
+import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
-import com.netgrif.application.engine.petrinet.domain.version.Version;
-import com.netgrif.application.engine.petrinet.web.responsebodies.DataFieldReference;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetImportReference;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
-import com.netgrif.application.engine.petrinet.web.responsebodies.TransitionReference;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.core.petrinet.domain.version.Version;
+import com.netgrif.core.petrinet.web.responsebodies.DataFieldReference;
+import com.netgrif.core.petrinet.web.responsebodies.PetriNetImportReference;
+import com.netgrif.core.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.core.petrinet.web.responsebodies.TransitionReference;
+import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import org.bson.types.ObjectId;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
@@ -32,8 +32,8 @@ public interface IPetriNetService {
     }
 
     static TransitionReference transformToReference(PetriNet net, Transition transition, Locale locale) {
-        List<com.netgrif.application.engine.workflow.web.responsebodies.DataFieldReference> list = new ArrayList<>();
-        transition.getImmediateData().forEach(fieldId -> list.add(new com.netgrif.application.engine.workflow.web.responsebodies.DataFieldReference(net.getDataSet().get(fieldId), locale)));
+        List<com.netgrif.core.workflow.web.responsebodies.DataFieldReference> list = new ArrayList<>();
+        transition.getImmediateData().forEach(fieldId -> list.add(new com.netgrif.core.workflow.web.responsebodies.DataFieldReference(net.getDataSet().get(fieldId), locale)));
         return new TransitionReference(transition.getStringId(), transition.getTitle().getTranslation(locale), net.getStringId(), list);
     }
 

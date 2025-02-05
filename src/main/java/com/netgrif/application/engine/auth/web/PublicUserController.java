@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.auth.web;
 
+import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
@@ -9,8 +10,8 @@ import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssemb
 import com.netgrif.application.engine.settings.domain.Preferences;
 import com.netgrif.application.engine.settings.service.IPreferencesService;
 import com.netgrif.application.engine.settings.web.PreferencesResource;
-import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
-import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAssembler;
+import com.netgrif.core.model.PagedModel;
+import com.netgrif.core.workflow.web.responsebodies.MessageResource;
 import com.netgrif.core.workflow.domain.ProcessResourceId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,10 +22,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -66,7 +64,7 @@ public class PublicUserController {
     @Operation(summary = "Get logged user")
     @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource getLoggedUser(Locale locale) {
-        return new UserResource(userResponseFactory.getUser(userService.getLoggedUser(), locale), "profile");
+        return new UserResource(userResponseFactory.getUser(userService.getLoggedUser(), locale));
     }
 
     @Operation(summary = "Generic user search")
@@ -78,11 +76,11 @@ public class PublicUserController {
                 query.getNegativeRoles().stream().map(ProcessResourceId::new).collect(Collectors.toList()),
                 userService.transformToLoggedUser(userService.getLoggedUser()), pageable);
 
-        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicUserController.class)
-                .search(small, query, pageable, assembler, locale)).withRel("search");
-        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "search"), selfLink);
-        ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
-        return resources;
+//        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicUserController.class)
+//                .search(small, query, pageable, assembler, locale)).withRel("search");
+//        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "search"), selfLink);
+//        ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
+        return PagedModel.of(page.stream().map(u -> new UserResource((User) u)).toList(), new PagedModel.PageMetadata(pageable.getPageNumber(), pageable.getPageSize(), page.getTotalElements()));
     }
 
     @Operation(summary = "Get user's preferences")

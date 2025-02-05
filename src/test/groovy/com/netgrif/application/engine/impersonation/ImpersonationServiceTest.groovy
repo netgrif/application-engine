@@ -11,11 +11,11 @@ import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchReques
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.core.petrinet.domain.I18nString
-import com.netgrif.adapter.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.runner.ImpersonationRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.adapter.workflow.domain.Case
@@ -26,7 +26,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowAuthorizationService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
-import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest
+import com.netgrif.core.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest
 import groovy.json.JsonSlurper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

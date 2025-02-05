@@ -4,7 +4,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.core.petrinet.domain.I18nString
 import com.netgrif.application.engine.validation.domain.ValidationDataInput
 import com.netgrif.application.engine.validation.models.TextFieldValidation
-import com.netgrif.application.engine.workflow.domain.DataField
+import com.netgrif.core.workflow.domain.DataField
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

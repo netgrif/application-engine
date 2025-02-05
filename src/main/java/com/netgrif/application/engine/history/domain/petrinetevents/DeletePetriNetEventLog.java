@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.history.domain.petrinetevents;
 
-import com.netgrif.application.engine.event.events.petrinet.ProcessDeleteEvent;
-import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
-import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
+import com.netgrif.core.event.events.petrinet.ProcessDeleteEvent;
+import com.netgrif.core.petrinet.domain.events.EventPhase;
+import com.netgrif.core.workflow.domain.ProcessResourceId;
 import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;

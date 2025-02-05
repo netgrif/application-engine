@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.validation.domain
 
 import com.netgrif.core.petrinet.domain.I18nString
-import com.netgrif.application.engine.workflow.domain.DataField
+import com.netgrif.core.workflow.domain.DataField
 
 public class ValidationDataInput {
 

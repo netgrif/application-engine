@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.service;
 
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
-import com.netgrif.adapter.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.PetriNet;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.types.ObjectId;

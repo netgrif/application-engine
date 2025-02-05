@@ -2,11 +2,11 @@ package com.netgrif.application.engine.history.service.listener;
 
 import com.netgrif.application.engine.event.dispatchers.CaseDispatcher;
 import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
-import com.netgrif.application.engine.event.events.workflow.CreateCaseEvent;
-import com.netgrif.application.engine.event.events.workflow.DeleteCaseEvent;
+import com.netgrif.core.event.events.workflow.CreateCaseEvent;
+import com.netgrif.core.event.events.workflow.DeleteCaseEvent;
 import com.netgrif.application.engine.event.listeners.Listener;
-import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventLog;
-import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventLog;
+import com.netgrif.core.history.domain.caseevents.CreateCaseEventLog;
+import com.netgrif.core.history.domain.caseevents.DeleteCaseEventLog;
 import com.netgrif.application.engine.history.domain.caseevents.repository.CreateCaseEventLogRepository;
 import com.netgrif.application.engine.history.domain.caseevents.repository.DeleteCaseEventLogRepository;
 import org.springframework.stereotype.Component;

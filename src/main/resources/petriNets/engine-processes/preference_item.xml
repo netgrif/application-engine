@@ -103,7 +103,7 @@
 	<function scope="process" name="updateOptionsBasedOnValue">
 		{
 			com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField toBeUpdated,
-			com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField valueSelector,
+			com.netgrif.core.petrinet.domain.dataset.MultichoiceMapField valueSelector,
 			com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField optionsHolder
 			->
 			def existingOptions = optionsHolder.options

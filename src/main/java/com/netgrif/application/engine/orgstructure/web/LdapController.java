@@ -9,7 +9,7 @@
 //import com.netgrif.application.engine.orgstructure.web.responsebodies.LdapGroupResponseBody;
 //import com.netgrif.application.engine.orgstructure.web.responsebodies.LdapGroupsResource;
 //import com.netgrif.core.petrinet.domain.roles.ProcessRole;
-//import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
+//import com.netgrif.core.workflow.web.responsebodies.MessageResource;
 //import io.swagger.v3.oas.annotations.Operation;
 //import io.swagger.v3.oas.annotations.responses.ApiResponse;
 //import io.swagger.v3.oas.annotations.responses.ApiResponses;

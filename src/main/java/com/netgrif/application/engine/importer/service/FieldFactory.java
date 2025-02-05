@@ -12,7 +12,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.factory.StorageFac
 import com.netgrif.core.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.core.petrinet.domain.dataset.logic.validation.DynamicValidation;
 import com.netgrif.core.petrinet.domain.views.View;
-import com.netgrif.adapter.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.core.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataValidationExpressionEvaluator;
 import lombok.extern.slf4j.Slf4j;

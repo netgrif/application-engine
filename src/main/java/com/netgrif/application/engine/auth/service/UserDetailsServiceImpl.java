@@ -7,7 +7,7 @@ import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.core.auth.domain.User;
 import com.netgrif.core.auth.domain.enums.UserState;
 import com.netgrif.application.engine.auth.service.interfaces.ILoginAttemptService;
-import com.netgrif.application.engine.event.events.user.UserLoginEvent;
+import com.netgrif.core.event.events.user.UserLoginEvent;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

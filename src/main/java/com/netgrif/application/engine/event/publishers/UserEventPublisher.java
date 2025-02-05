@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.event.publishers;
 
-import com.netgrif.application.engine.event.events.Event;
-import com.netgrif.application.engine.event.events.user.UserLoginEvent;
+import com.netgrif.core.event.events.Event;
+import com.netgrif.core.event.events.user.UserLoginEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 

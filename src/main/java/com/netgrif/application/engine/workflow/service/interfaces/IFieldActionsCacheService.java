@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.netgrif.core.petrinet.domain.Function;
-import com.netgrif.adapter.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.workflow.domain.CachedFunction;
 import groovy.lang.Closure;

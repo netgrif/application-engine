@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.elastic.service;
 
-import com.netgrif.application.engine.elastic.domain.ElasticJob;
-import com.netgrif.application.engine.elastic.domain.ElasticTask;
+import com.netgrif.core.elastic.domain.ElasticJob;
+import com.netgrif.core.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.elastic.domain.ElasticTaskJob;
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository;
 import lombok.extern.slf4j.Slf4j;

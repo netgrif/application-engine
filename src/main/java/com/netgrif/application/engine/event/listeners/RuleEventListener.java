@@ -2,11 +2,11 @@
 //
 //import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
 //import com.netgrif.application.engine.event.dispatchers.common.DispatchMethod;
-//import com.netgrif.application.engine.event.events.Event;
+//import com.netgrif.core.event.events.Event;
 //import com.netgrif.application.engine.event.events.EventAction;
 //import com.netgrif.application.engine.event.events.task.TaskEvent;
-//import com.netgrif.adapter.workflow.domain.Case;
-//import com.netgrif.adapter.workflow.domain.Task;
+//import com.netgrif.core.workflow.domain.Case;
+//import com.netgrif.core.workflow.domain.Task;
 //import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 //import com.netgrif.netgrifdrools.rules.domain.facts.TransitionEventFact;
 //import com.netgrif.netgrifdrools.rules.service.interfaces.IRuleEngine;

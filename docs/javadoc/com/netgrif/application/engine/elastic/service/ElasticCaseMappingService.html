@@ -189,7 +189,7 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>protected void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#populateDataSet(com.netgrif.application.engine.elastic.domain.ElasticCase,com.netgrif.adapter.workflow.domain.Case)">populateDataSet</a></span>&#8203;(<a href="../domain/ElasticCase.html" title="class in com.netgrif.application.engine.elastic.domain">ElasticCase</a>&nbsp;transformedCase,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#populateDataSet(com.netgrif.core.elastic.domain.ElasticCase,com.netgrif.adapter.workflow.domain.Case)">populateDataSet</a></span>&#8203;(<a href="../domain/ElasticCase.html" title="class in com.netgrif.application.engine.elastic.domain">ElasticCase</a>&nbsp;transformedCase,
                <a href="../../workflow/domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;useCase)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -200,12 +200,12 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>protected java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformBooleanField(com.netgrif.application.engine.workflow.domain.DataField)">transformBooleanField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;booleanField)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformBooleanField(com.netgrif.core.workflow.domain.DataField)">transformBooleanField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;booleanField)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>protected java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformButtonField(com.netgrif.application.engine.workflow.domain.DataField)">transformButtonField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;buttonField)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformButtonField(com.netgrif.core.workflow.domain.DataField)">transformButtonField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;buttonField)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i5" class="rowColor">
@@ -216,79 +216,79 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>protected java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformDateField(com.netgrif.application.engine.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.DateField)">transformDateField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;dateField,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformDateField(com.netgrif.core.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.DateField)">transformDateField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;dateField,
                   <a href="../../petrinet/domain/dataset/DateField.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">DateField</a>&nbsp;netField)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i7" class="rowColor">
 <td class="colFirst"><code>protected java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformDateTimeField(com.netgrif.application.engine.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField)">transformDateTimeField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;dateTimeField,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformDateTimeField(com.netgrif.core.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField)">transformDateTimeField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;dateTimeField,
                       <a href="../../petrinet/domain/dataset/DateTimeField.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">DateTimeField</a>&nbsp;netField)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>protected java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformEnumerationField(com.netgrif.application.engine.workflow.domain.DataField)">transformEnumerationField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;enumField)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformEnumerationField(com.netgrif.core.workflow.domain.DataField)">transformEnumerationField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;enumField)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i9" class="rowColor">
 <td class="colFirst"><code>protected java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformEnumerationMapField(com.netgrif.application.engine.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField)">transformEnumerationMapField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;enumMap,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformEnumerationMapField(com.netgrif.core.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField)">transformEnumerationMapField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;enumMap,
                             <a href="../../petrinet/domain/dataset/EnumerationMapField.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">EnumerationMapField</a>&nbsp;netField)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i10" class="altColor">
 <td class="colFirst"><code>protected java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformFileField(com.netgrif.application.engine.workflow.domain.DataField)">transformFileField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;fileField)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformFileField(com.netgrif.core.workflow.domain.DataField)">transformFileField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;fileField)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i11" class="rowColor">
 <td class="colFirst"><code>protected java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformFileListField(com.netgrif.application.engine.workflow.domain.DataField)">transformFileListField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;fileListField)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformFileListField(com.netgrif.core.workflow.domain.DataField)">transformFileListField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;fileListField)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i12" class="altColor">
 <td class="colFirst"><code>protected java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformI18nField(com.netgrif.application.engine.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.I18nField)">transformI18nField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;dataField,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformI18nField(com.netgrif.core.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.I18nField)">transformI18nField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;dataField,
                   <a href="../../petrinet/domain/dataset/I18nField.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">I18nField</a>&nbsp;netField)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i13" class="rowColor">
 <td class="colFirst"><code>protected java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformMultichoiceField(com.netgrif.application.engine.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField)">transformMultichoiceField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;multichoiceField,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformMultichoiceField(com.netgrif.core.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField)">transformMultichoiceField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;multichoiceField,
                          <a href="../../petrinet/domain/dataset/MultichoiceField.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">MultichoiceField</a>&nbsp;netField)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i14" class="altColor">
 <td class="colFirst"><code>protected java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformMultichoiceMapField(com.netgrif.application.engine.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField)">transformMultichoiceMapField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;multichoiceMap,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformMultichoiceMapField(com.netgrif.core.workflow.domain.DataField,com.netgrif.core.petrinet.domain.dataset.MultichoiceMapField)">transformMultichoiceMapField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;multichoiceMap,
                             <a href="../../petrinet/domain/dataset/MultichoiceMapField.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">MultichoiceMapField</a>&nbsp;netField)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i15" class="rowColor">
 <td class="colFirst"><code>protected java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformNumberField(com.netgrif.application.engine.workflow.domain.DataField)">transformNumberField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;numberField)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformNumberField(com.netgrif.core.workflow.domain.DataField)">transformNumberField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;numberField)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i16" class="altColor">
 <td class="colFirst"><code>protected java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformOtherFields(com.netgrif.application.engine.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.Field)">transformOtherFields</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;otherField,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformOtherFields(com.netgrif.core.workflow.domain.DataField,com.netgrif.core.petrinet.domain.dataset.Field)">transformOtherFields</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;otherField,
                     <a href="../../petrinet/domain/dataset/Field.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">Field</a>&nbsp;netField)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i17" class="rowColor">
 <td class="colFirst"><code>protected java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformTextField(com.netgrif.application.engine.workflow.domain.DataField)">transformTextField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;textField)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformTextField(com.netgrif.core.workflow.domain.DataField)">transformTextField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;textField)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i18" class="altColor">
 <td class="colFirst"><code>protected java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformUserField(com.netgrif.application.engine.workflow.domain.DataField)">transformUserField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;userField)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformUserField(com.netgrif.core.workflow.domain.DataField)">transformUserField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;userField)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i19" class="rowColor">
 <td class="colFirst"><code>protected java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformUserListField(com.netgrif.application.engine.workflow.domain.DataField)">transformUserListField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;userListField)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformUserListField(com.netgrif.core.workflow.domain.DataField)">transformUserListField</a></span>&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;userListField)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -347,7 +347,7 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
 </dl>
 </li>
 </ul>
-<a id="populateDataSet(com.netgrif.application.engine.elastic.domain.ElasticCase,com.netgrif.adapter.workflow.domain.Case)">
+<a id="populateDataSet(com.netgrif.core.elastic.domain.ElasticCase,com.netgrif.adapter.workflow.domain.Case)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -367,7 +367,7 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
                                                            <a href="../../workflow/domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;useCase)</pre>
 </li>
 </ul>
-<a id="transformMultichoiceMapField(com.netgrif.application.engine.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField)">
+<a id="transformMultichoiceMapField(com.netgrif.core.workflow.domain.DataField,com.netgrif.core.petrinet.domain.dataset.MultichoiceMapField)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -377,7 +377,7 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
                                                                      <a href="../../petrinet/domain/dataset/MultichoiceMapField.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">MultichoiceMapField</a>&nbsp;netField)</pre>
 </li>
 </ul>
-<a id="transformI18nField(com.netgrif.application.engine.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.I18nField)">
+<a id="transformI18nField(com.netgrif.core.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.I18nField)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -387,7 +387,7 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
                                                            <a href="../../petrinet/domain/dataset/I18nField.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">I18nField</a>&nbsp;netField)</pre>
 </li>
 </ul>
-<a id="transformEnumerationMapField(com.netgrif.application.engine.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField)">
+<a id="transformEnumerationMapField(com.netgrif.core.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -397,7 +397,7 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
                                                                      <a href="../../petrinet/domain/dataset/EnumerationMapField.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">EnumerationMapField</a>&nbsp;netField)</pre>
 </li>
 </ul>
-<a id="transformMultichoiceField(com.netgrif.application.engine.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField)">
+<a id="transformMultichoiceField(com.netgrif.core.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -407,7 +407,7 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
                                                                   <a href="../../petrinet/domain/dataset/MultichoiceField.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">MultichoiceField</a>&nbsp;netField)</pre>
 </li>
 </ul>
-<a id="transformEnumerationField(com.netgrif.application.engine.workflow.domain.DataField)">
+<a id="transformEnumerationField(com.netgrif.core.workflow.domain.DataField)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -425,7 +425,7 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
 <pre class="methodSignature">protected&nbsp;java.util.List&lt;java.lang.String&gt;&nbsp;collectTranslations&#8203;(<a href="../../petrinet/domain/I18nString.html" title="class in com.netgrif.application.engine.petrinet.domain">I18nString</a>&nbsp;i18nString)</pre>
 </li>
 </ul>
-<a id="transformNumberField(com.netgrif.application.engine.workflow.domain.DataField)">
+<a id="transformNumberField(com.netgrif.core.workflow.domain.DataField)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -434,7 +434,7 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
 <pre class="methodSignature">protected&nbsp;java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;&nbsp;transformNumberField&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;numberField)</pre>
 </li>
 </ul>
-<a id="transformButtonField(com.netgrif.application.engine.workflow.domain.DataField)">
+<a id="transformButtonField(com.netgrif.core.workflow.domain.DataField)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -443,7 +443,7 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
 <pre class="methodSignature">protected&nbsp;java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;&nbsp;transformButtonField&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;buttonField)</pre>
 </li>
 </ul>
-<a id="transformUserField(com.netgrif.application.engine.workflow.domain.DataField)">
+<a id="transformUserField(com.netgrif.core.workflow.domain.DataField)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -452,7 +452,7 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
 <pre class="methodSignature">protected&nbsp;java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;&nbsp;transformUserField&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;userField)</pre>
 </li>
 </ul>
-<a id="transformUserListField(com.netgrif.application.engine.workflow.domain.DataField)">
+<a id="transformUserListField(com.netgrif.core.workflow.domain.DataField)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -461,7 +461,7 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
 <pre class="methodSignature">protected&nbsp;java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;&nbsp;transformUserListField&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;userListField)</pre>
 </li>
 </ul>
-<a id="transformDateField(com.netgrif.application.engine.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.DateField)">
+<a id="transformDateField(com.netgrif.core.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.DateField)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -471,7 +471,7 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
                                                            <a href="../../petrinet/domain/dataset/DateField.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">DateField</a>&nbsp;netField)</pre>
 </li>
 </ul>
-<a id="transformDateTimeField(com.netgrif.application.engine.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField)">
+<a id="transformDateTimeField(com.netgrif.core.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -481,7 +481,7 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
                                                                <a href="../../petrinet/domain/dataset/DateTimeField.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">DateTimeField</a>&nbsp;netField)</pre>
 </li>
 </ul>
-<a id="transformBooleanField(com.netgrif.application.engine.workflow.domain.DataField)">
+<a id="transformBooleanField(com.netgrif.core.workflow.domain.DataField)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -490,7 +490,7 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
 <pre class="methodSignature">protected&nbsp;java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;&nbsp;transformBooleanField&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;booleanField)</pre>
 </li>
 </ul>
-<a id="transformTextField(com.netgrif.application.engine.workflow.domain.DataField)">
+<a id="transformTextField(com.netgrif.core.workflow.domain.DataField)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -499,7 +499,7 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
 <pre class="methodSignature">protected&nbsp;java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;&nbsp;transformTextField&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;textField)</pre>
 </li>
 </ul>
-<a id="transformFileField(com.netgrif.application.engine.workflow.domain.DataField)">
+<a id="transformFileField(com.netgrif.core.workflow.domain.DataField)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -508,7 +508,7 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
 <pre class="methodSignature">protected&nbsp;java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;&nbsp;transformFileField&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;fileField)</pre>
 </li>
 </ul>
-<a id="transformFileListField(com.netgrif.application.engine.workflow.domain.DataField)">
+<a id="transformFileListField(com.netgrif.core.workflow.domain.DataField)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -517,7 +517,7 @@ implements <a href="interfaces/IElasticCaseMappingService.html" title="interface
 <pre class="methodSignature">protected&nbsp;java.util.Optional&lt;<a href="../domain/DataField.html" title="class in com.netgrif.application.engine.elastic.domain">DataField</a>&gt;&nbsp;transformFileListField&#8203;(<a href="../../workflow/domain/DataField.html" title="class in com.netgrif.application.engine.workflow.domain">DataField</a>&nbsp;fileListField)</pre>
 </li>
 </ul>
-<a id="transformOtherFields(com.netgrif.application.engine.workflow.domain.DataField,com.netgrif.application.engine.petrinet.domain.dataset.Field)">
+<a id="transformOtherFields(com.netgrif.core.workflow.domain.DataField,com.netgrif.core.petrinet.domain.dataset.Field)">
 <!--   -->
 </a>
 <ul class="blockListLast">

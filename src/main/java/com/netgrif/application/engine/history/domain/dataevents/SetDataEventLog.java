@@ -2,11 +2,11 @@ package com.netgrif.application.engine.history.domain.dataevents;
 
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.event.events.data.SetDataEvent;
-import com.netgrif.application.engine.history.domain.taskevents.TaskEventLog;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField;
-import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
-import com.netgrif.adapter.workflow.domain.Case;
-import com.netgrif.adapter.workflow.domain.Task;
+import com.netgrif.core.history.domain.taskevents.TaskEventLog;
+import com.netgrif.core.petrinet.domain.dataset.logic.ChangedField;
+import com.netgrif.core.petrinet.domain.events.EventPhase;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Task;
 import com.querydsl.core.annotations.QueryExclude;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

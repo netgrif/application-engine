@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.roles;
 
+import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.core.workflow.domain.ProcessResourceId;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;

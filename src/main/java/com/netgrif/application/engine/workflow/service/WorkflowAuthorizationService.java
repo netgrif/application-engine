@@ -2,10 +2,10 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.adapter.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.adapter.workflow.domain.Case;
+import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowAuthorizationService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
     private IWorkflowService workflowService;
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private PetriNetService petriNetService;
 
     @Override
     public boolean canCallDelete(LoggedUser user, String caseId) {

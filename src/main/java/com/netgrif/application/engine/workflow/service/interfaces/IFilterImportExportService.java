@@ -2,8 +2,8 @@ package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
+import com.netgrif.core.workflow.domain.filter.FilterImportExportList;
+import com.netgrif.core.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.application.engine.workflow.domain.IllegalFilterFileException;
 
 import java.io.IOException;

@@ -7,11 +7,11 @@ import com.netgrif.core.auth.domain.User
 import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.adapter.auth.service.UserService
-import com.netgrif.adapter.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.adapter.workflow.domain.Case
@@ -170,7 +170,7 @@ class QueryDSLViewPermissionTest {
         sleep(4000)
 
         TaskSearchRequest request = new TaskSearchRequest()
-        request.process = [new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(netWithUserRefs.getStringId())]
+        request.process = [new com.netgrif.core.workflow.web.requestbodies.taskSearch.PetriNet(netWithUserRefs.getStringId())]
         Page<Task> taskPage = taskService.search([request],
                 PageRequest.of(0, 20), testUser.transformToLoggedUser(), LocaleContextHolder.getLocale(), false)
 
@@ -185,7 +185,7 @@ class QueryDSLViewPermissionTest {
         userService.addRole(testUser, posViewRole.getStringId())
 
         TaskSearchRequest request = new TaskSearchRequest()
-        request.process = [new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(netWithUserRefs.getStringId())]
+        request.process = [new com.netgrif.core.workflow.web.requestbodies.taskSearch.PetriNet(netWithUserRefs.getStringId())]
         Page<Task> taskPage = taskService.search([request],
                 PageRequest.of(0, 20), testUser.transformToLoggedUser(), LocaleContextHolder.getLocale(), false)
 

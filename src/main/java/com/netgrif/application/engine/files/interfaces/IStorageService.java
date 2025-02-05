@@ -4,8 +4,8 @@ import com.netgrif.application.engine.files.throwable.BadRequestException;
 import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import com.netgrif.application.engine.files.throwable.StorageException;
 import com.netgrif.core.importer.model.Data;
-import com.netgrif.application.engine.petrinet.domain.dataset.Storage;
-import com.netgrif.application.engine.petrinet.domain.dataset.StorageField;
+import com.netgrif.core.petrinet.domain.dataset.Storage;
+import com.netgrif.core.petrinet.domain.dataset.StorageField;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;

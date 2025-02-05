@@ -1,14 +1,14 @@
 package com.netgrif.application.engine.importer
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.adapter.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.QCase
+import com.netgrif.adapter.workflow.domain.QCase
 import com.netgrif.adapter.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
@@ -33,7 +33,7 @@ class UserListTest {
     private TestHelper testHelper;
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private PetriNetService petriNetService;
 
     @Autowired
     private SuperCreatorRunner superCreator;

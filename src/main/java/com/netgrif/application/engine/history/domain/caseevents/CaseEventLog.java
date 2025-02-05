@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.history.domain.caseevents;
 
 import com.netgrif.application.engine.history.domain.petrinetevents.PetriNetEventLog;
-import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
-import com.netgrif.adapter.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
+import com.netgrif.core.petrinet.domain.events.EventPhase;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.ProcessResourceId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;

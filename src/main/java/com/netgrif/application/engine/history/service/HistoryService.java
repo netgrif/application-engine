@@ -1,16 +1,16 @@
 package com.netgrif.application.engine.history.service;
 
-import com.netgrif.application.engine.history.domain.baseevent.EventLog;
+import com.netgrif.core.history.domain.baseevent.EventLog;
 import com.netgrif.application.engine.history.domain.baseevent.repository.EventLogRepository;
-import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventLog;
-import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventLog;
-import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
-import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
-import com.netgrif.application.engine.history.domain.petrinetevents.DeletePetriNetEventLog;
-import com.netgrif.application.engine.history.domain.petrinetevents.ImportPetriNetEventLog;
-import com.netgrif.application.engine.history.domain.taskevents.AssignTaskEventLog;
-import com.netgrif.application.engine.history.domain.taskevents.CancelTaskEventLog;
-import com.netgrif.application.engine.history.domain.taskevents.FinishTaskEventLog;
+import com.netgrif.core.history.domain.caseevents.CreateCaseEventLog;
+import com.netgrif.core.history.domain.caseevents.DeleteCaseEventLog;
+import com.netgrif.core.history.domain.dataevents.GetDataEventLog;
+import com.netgrif.core.history.domain.dataevents.SetDataEventLog;
+import com.netgrif.core.history.domain.petrinetevents.DeletePetriNetEventLog;
+import com.netgrif.core.history.domain.petrinetevents.ImportPetriNetEventLog;
+import com.netgrif.core.history.domain.taskevents.AssignTaskEventLog;
+import com.netgrif.core.history.domain.taskevents.CancelTaskEventLog;
+import com.netgrif.core.history.domain.taskevents.FinishTaskEventLog;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

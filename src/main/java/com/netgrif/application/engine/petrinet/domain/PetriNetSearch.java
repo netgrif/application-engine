@@ -2,7 +2,7 @@ package com.netgrif.application.engine.petrinet.domain;
 
 import com.netgrif.core.auth.domain.Author;
 import com.netgrif.core.auth.domain.Authority;
-import com.netgrif.application.engine.petrinet.domain.version.Version;
+import com.netgrif.core.petrinet.domain.version.Version;
 import lombok.Getter;
 import lombok.Setter;
 

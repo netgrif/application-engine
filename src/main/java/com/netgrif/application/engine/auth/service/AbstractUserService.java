@@ -5,9 +5,9 @@
 //import com.netgrif.adapter.auth.service.AuthorityService;
 //import com.netgrif.adapter.auth.service.UserService;
 //import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-//import com.netgrif.adapter.petrinet.domain.PetriNet;
+//import com.netgrif.core.petrinet.domain.PetriNet;
 //import com.netgrif.core.petrinet.domain.roles.ProcessRole;
-//import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+//import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 //import com.netgrif.application.engine.security.service.ISecurityContextService;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.data.domain.Page;
@@ -27,7 +27,7 @@
 //    protected IAuthorityService authorityService;
 //
 //    @Autowired
-//    protected IProcessRoleService processRoleService;
+//    protected ProcessRoleService processRoleService;
 //
 //
 //    @Autowired

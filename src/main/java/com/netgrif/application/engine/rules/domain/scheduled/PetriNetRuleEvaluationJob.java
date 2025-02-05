@@ -1,7 +1,7 @@
 //package com.netgrif.application.engine.rules.domain.scheduled;
 //
-//import com.netgrif.adapter.petrinet.domain.PetriNet;
-//import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+//import com.netgrif.core.petrinet.domain.PetriNet;
+//import com.netgrif.adapter.petrinet.service.PetriNetService;
 //import com.netgrif.application.engine.rules.domain.facts.ScheduledRuleFact;
 //import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 //import org.quartz.JobExecutionContext;
@@ -22,7 +22,7 @@
 //    private IRuleEngine ruleEngine;
 //
 //    @Autowired
-//    private IPetriNetService petriNetService;
+//    private PetriNetService petriNetService;
 //
 //    @Override
 //    public void doExecute(JobExecutionContext context) {

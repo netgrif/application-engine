@@ -2,7 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.events;
 
 import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Imported;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
 import lombok.Data;
 
 import java.util.List;

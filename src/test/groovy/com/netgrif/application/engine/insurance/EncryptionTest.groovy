@@ -5,11 +5,11 @@ import com.netgrif.core.auth.domain.Authority
 import com.netgrif.core.auth.domain.LoggedUser
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.core.petrinet.domain.VersionType
+import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.adapter.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.DataField
+import com.netgrif.core.workflow.domain.DataField
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.TaskService

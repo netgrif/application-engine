@@ -12,11 +12,11 @@ import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
 import com.netgrif.application.engine.startup.runner.*
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.adapter.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.QCase
-import com.netgrif.application.engine.workflow.domain.QTask
+import com.netgrif.adapter.workflow.domain.QCase
+import com.netgrif.adapter.workflow.domain.QTask
 import com.netgrif.adapter.workflow.domain.Task
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
-import com.netgrif.application.engine.workflow.domain.menu.MenuAndFilters
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.core.workflow.domain.menu.MenuAndFilters
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.UserFilterSearchService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.history.domain.userevents;
 
-import com.netgrif.application.engine.history.domain.baseevent.EventLog;
+import com.netgrif.core.history.domain.baseevent.EventLog;
 import lombok.Getter;
 
 public class UserEventLog extends EventLog implements IUserEventLog {

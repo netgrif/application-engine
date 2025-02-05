@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.workflow
 
+import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.core.auth.domain.Authority;
 import com.netgrif.core.auth.domain.User
@@ -7,12 +9,9 @@ import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
-import com.netgrif.adapter.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
-import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
-import com.netgrif.application.engine.petrinet.service.ProcessRoleService
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.utils.FullPageRequest
@@ -25,7 +24,8 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import com.netgrif.application.engine.workflow.web.TaskController
 import com.netgrif.application.engine.workflow.web.WorkflowController
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
-import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
+import com.netgrif.core.workflow.web.responsebodies.TaskReference
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -65,7 +65,7 @@ class TaskControllerTest {
     private UserService userService
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private SuperCreatorRunner superCreator

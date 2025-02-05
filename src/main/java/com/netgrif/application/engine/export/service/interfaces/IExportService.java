@@ -4,8 +4,8 @@ import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.application.engine.export.domain.ExportDataConfig;
-import com.netgrif.adapter.workflow.domain.Case;
-import com.netgrif.adapter.workflow.domain.Task;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Task;
 import com.querydsl.core.types.Predicate;
 
 import java.io.File;

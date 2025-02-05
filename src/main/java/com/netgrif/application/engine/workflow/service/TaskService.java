@@ -1,43 +1,44 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
+import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
 import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
-import com.netgrif.application.engine.event.events.task.*;
-import com.netgrif.application.engine.history.domain.taskevents.FinishTaskEventLog;
+import com.netgrif.core.event.events.task.*;
+import com.netgrif.core.history.domain.taskevents.FinishTaskEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
-import com.netgrif.application.engine.petrinet.domain.*;
-import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
-import com.netgrif.application.engine.petrinet.domain.arcs.ArcOrderComparator;
-import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
-import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
-import com.netgrif.application.engine.petrinet.domain.events.EventType;
+import com.netgrif.core.petrinet.domain.*;
+import com.netgrif.core.petrinet.domain.arcs.Arc;
+import com.netgrif.core.petrinet.domain.arcs.ArcOrderComparator;
+import com.netgrif.core.petrinet.domain.arcs.ResetArc;
+import com.netgrif.core.petrinet.domain.dataset.Field;
+import com.netgrif.core.petrinet.domain.dataset.UserFieldValue;
+import com.netgrif.core.petrinet.domain.dataset.UserListFieldValue;
+import com.netgrif.core.petrinet.domain.events.EventPhase;
+import com.netgrif.core.petrinet.domain.events.EventType;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
-import com.netgrif.application.engine.workflow.domain.*;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.*;
+import com.netgrif.core.workflow.domain.*;
+import com.netgrif.core.workflow.domain.eventoutcomes.EventOutcome;
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
+import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.*;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
-import com.netgrif.application.engine.workflow.domain.triggers.TimeTrigger;
-import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
+import com.netgrif.core.workflow.domain.triggers.TimeTrigger;
+import com.netgrif.core.workflow.domain.triggers.Trigger;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
-import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
+import com.netgrif.core.workflow.web.requestbodies.TaskSearchRequest;
+import com.netgrif.core.workflow.web.responsebodies.TaskReference;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,7 +91,7 @@ public class TaskService implements ITaskService {
     protected IDataService dataService;
 
     @Autowired
-    protected IProcessRoleService processRoleService;
+    protected ProcessRoleService processRoleService;
 
     @Autowired
     protected IElasticTaskMappingService taskMappingService;
@@ -807,7 +808,7 @@ public class TaskService implements ITaskService {
     }
 
     private Task createFromTransition(Transition transition, Case useCase) {
-        final Task task = Task.with()
+        final Task task = com.netgrif.adapter.workflow.domain.Task.with()
                 .title(transition.getTitle())
                 .processId(useCase.getPetriNetId())
                 .caseId(useCase.get_id().toString())

@@ -9,7 +9,7 @@
 //import com.netgrif.application.engine.ldap.domain.repository.LdapGroupRoleRepository;
 //import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
 //import com.netgrif.core.petrinet.domain.roles.ProcessRole;
-//import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+//import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 //import lombok.extern.slf4j.Slf4j;
 //import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 //import org.springframework.ldap.core.ContextMapper;
@@ -35,12 +35,12 @@
 //
 //    private final LdapGroupRoleRepository ldapGroupRoleRepository;
 //
-//    private final IProcessRoleService processRoleService;
+//    private final ProcessRoleService processRoleService;
 //
 //    private final NaeLdapProperties ldapProperties;
 //
 //    public LdapGroupRefService(LdapConfiguration ldapConfiguration, LdapGroupRoleRepository ldapGroupRoleRepository,
-//                               IProcessRoleService processRoleService, NaeLdapProperties ldapProperties) {
+//                               ProcessRoleService processRoleService, NaeLdapProperties ldapProperties) {
 //        this.ldapConfiguration = ldapConfiguration;
 //        this.ldapGroupRoleRepository = ldapGroupRoleRepository;
 //        this.processRoleService = processRoleService;

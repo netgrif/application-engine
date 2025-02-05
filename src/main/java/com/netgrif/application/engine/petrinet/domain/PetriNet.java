@@ -2,19 +2,19 @@
 //
 //import com.netgrif.core.auth.domain.Author;
 //import com.netgrif.core.petrinet.domain.I18nString;
-//import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
+//import com.netgrif.core.petrinet.domain.arcs.Arc;
 //import com.netgrif.application.engine.petrinet.domain.arcs.reference.Referencable;
 //import com.netgrif.application.engine.petrinet.domain.arcs.reference.Type;
-//import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-//import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
+//import com.netgrif.core.petrinet.domain.dataset.Field;
+//import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
 //import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
 //import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
-//import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
+//import com.netgrif.core.petrinet.domain.events.CaseEventType;
 //import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
-//import com.netgrif.application.engine.petrinet.domain.events.ProcessEventType;
+//import com.netgrif.core.petrinet.domain.events.ProcessEventType;
 //import com.netgrif.core.petrinet.domain.roles.ProcessRole;
-//import com.netgrif.application.engine.petrinet.domain.version.Version;
-//import com.netgrif.application.engine.workflow.domain.DataField;
+//import com.netgrif.core.petrinet.domain.version.Version;
+//import com.netgrif.core.workflow.domain.DataField;
 //import lombok.Getter;
 //import lombok.Setter;
 //import org.bson.types.ObjectId;

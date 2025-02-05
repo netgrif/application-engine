@@ -9,12 +9,12 @@ import com.netgrif.application.engine.configuration.properties.ImpersonationProp
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
+import com.netgrif.core.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.utils.DateUtils;
-import com.netgrif.adapter.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.DataField;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -49,7 +49,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     protected IWorkflowService workflowService;
 
     @Autowired
-    protected IProcessRoleService processRoleService;
+    protected ProcessRoleService processRoleService;
 
     @Override
     public Page<IUser> getConfiguredImpersonationUsers(String query, LoggedUser impersonator, Pageable pageable) {

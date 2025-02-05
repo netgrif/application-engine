@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.history.domain.dataevents.repository;
 
-import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
+import com.netgrif.core.history.domain.dataevents.SetDataEventLog;
 import org.bson.types.ObjectId;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.data.mongodb.repository.MongoRepository;

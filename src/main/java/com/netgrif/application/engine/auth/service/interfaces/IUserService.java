@@ -3,9 +3,9 @@
 //import com.netgrif.core.auth.domain.IUser;
 //import com.netgrif.core.auth.domain.IUser;
 //import com.netgrif.core.auth.domain.LoggedUser;
-//import com.netgrif.adapter.petrinet.domain.PetriNet;
+//import com.netgrif.core.petrinet.domain.PetriNet;
 //import com.netgrif.core.petrinet.domain.roles.ProcessRole;
-//import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
+//import com.netgrif.core.workflow.domain.ProcessResourceId;
 //import org.springframework.data.domain.Page;
 //import org.springframework.data.domain.Pageable;
 //import org.springframework.security.core.Authentication;

@@ -4,7 +4,7 @@ import com.netgrif.adapter.auth.domain.LoggedUserImpl;
 import com.netgrif.core.auth.domain.Attribute;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.adapter.auth.service.AuthorityService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -31,7 +31,7 @@ import java.util.function.Function;
 public class JwtService implements IJwtService {
     private byte[] secret;
     private final JwtProperties properties;
-    private final IProcessRoleService roleService;
+    private final ProcessRoleService roleService;
     private final AuthorityService authorityService;
 
     @PostConstruct

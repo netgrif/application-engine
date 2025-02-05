@@ -2,7 +2,7 @@ package com.netgrif.application.engine.history.service.listener;
 
 import com.netgrif.application.engine.event.dispatchers.UserDispatcher;
 import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
-import com.netgrif.application.engine.event.events.user.*;
+import com.netgrif.core.event.events.user.*;
 import com.netgrif.application.engine.event.listeners.Listener;
 import org.springframework.stereotype.Component;
 

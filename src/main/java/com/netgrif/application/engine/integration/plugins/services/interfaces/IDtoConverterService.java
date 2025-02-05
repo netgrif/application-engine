@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.integration.plugins.services.interfaces;
 
-import com.netgrif.application.engine.petrinet.domain.DataGroup;
-import com.netgrif.adapter.petrinet.domain.PetriNet;
-import com.netgrif.adapter.workflow.domain.Case;
-import com.netgrif.adapter.workflow.domain.Task;
+import com.netgrif.core.petrinet.domain.DataGroup;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Task;
 //import petrinet.domain.DataGroupDto;
 //import petrinet.domain.PetriNetDto;
 //import workflow.domain.CaseDto;

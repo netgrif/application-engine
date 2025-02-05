@@ -3,11 +3,11 @@ package com.netgrif.application.engine.workflow.service;
 import com.netgrif.application.engine.configuration.properties.FieldActionsCacheProperties;
 import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap;
 import com.netgrif.application.engine.event.IGroovyShellFactory;
-import com.netgrif.adapter.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.core.petrinet.domain.Function;
 import com.netgrif.core.petrinet.domain.FunctionScope;
 import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.adapter.petrinet.service.PetriNetService;
 import com.netgrif.application.engine.workflow.domain.CachedFunction;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import groovy.lang.Closure;
@@ -29,7 +29,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     private final FieldActionsCacheProperties properties;
 
-    private IPetriNetService petriNetService;
+    private PetriNetService petriNetService;
 
     private Map<String, Closure> actionsCache;
     private Map<String, List<CachedFunction>> namespaceFunctionsCache;
@@ -46,7 +46,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Autowired
     @Lazy
-    public void setPetriNetService(IPetriNetService petriNetService) {
+    public void setPetriNetService(PetriNetService petriNetService) {
         this.petriNetService = petriNetService;
     }
 

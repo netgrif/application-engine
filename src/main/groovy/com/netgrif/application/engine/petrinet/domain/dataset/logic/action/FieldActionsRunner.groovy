@@ -37,11 +37,11 @@ abstract class FieldActionsRunner {
 
     private Map<String, Object> actionsCache = new HashMap<>()
 
-    List<EventOutcome> run(com.netgrif.core.importer.model.Action action, Case useCase, Map<String, String> params, List<Function> functions = []) {
+    List<EventOutcome> run(com.netgrif.core.petrinet.domain.dataset.logic.action.Action action, Case useCase, Map<String, String> params, List<Function> functions = []) {
         return run(action, useCase, Optional.empty(), params, functions)
     }
 
-    List<EventOutcome> run(com.netgrif.core.importer.model.Action action, Case useCase, Optional<Task> task, Map<String, String> params, List<Function> functions = []) {
+    List<EventOutcome> run(com.netgrif.core.petrinet.domain.dataset.logic.action.Action action, Case useCase, Optional<Task> task, Map<String, String> params, List<Function> functions = []) {
         if (!actionsCache)
             actionsCache = new HashMap<>()
 

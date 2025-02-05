@@ -7,23 +7,27 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.files.StorageResolverService;
+import com.netgrif.application.engine.workflow.domain.FilterDeserializer;
+import com.netgrif.application.engine.workflow.domain.IllegalMenuFileException;
+import com.netgrif.application.engine.workflow.service.interfaces.IMenuImportExportService;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.core.petrinet.domain.I18nString;
-import com.netgrif.adapter.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.dataset.EnumerationMapField;
+import com.netgrif.core.petrinet.domain.dataset.FileField;
+import com.netgrif.core.petrinet.domain.dataset.FileFieldValue;
+import com.netgrif.core.petrinet.domain.dataset.MultichoiceMapField;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.adapter.petrinet.service.PetriNetService;
 import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.utils.InputStreamToString;
-import com.netgrif.application.engine.workflow.domain.*;
-import com.netgrif.application.engine.workflow.domain.menu.Menu;
-import com.netgrif.application.engine.workflow.domain.menu.MenuAndFilters;
-import com.netgrif.application.engine.workflow.domain.menu.MenuEntry;
-import com.netgrif.application.engine.workflow.domain.menu.MenuEntryRole;
+import com.netgrif.core.workflow.domain.*;
+import com.netgrif.core.workflow.domain.menu.Menu;
+import com.netgrif.core.workflow.domain.menu.MenuAndFilters;
+import com.netgrif.core.workflow.domain.menu.MenuEntry;
+import com.netgrif.core.workflow.domain.menu.MenuEntryRole;
 import com.netgrif.application.engine.workflow.service.interfaces.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +66,7 @@ public class MenuImportExportService implements IMenuImportExportService {
     IWorkflowService workflowService;
 
     @Autowired
-    IPetriNetService petriNetService;
+    PetriNetService petriNetService;
 
     @Autowired
     DefaultFiltersRunner defaultFiltersRunner;

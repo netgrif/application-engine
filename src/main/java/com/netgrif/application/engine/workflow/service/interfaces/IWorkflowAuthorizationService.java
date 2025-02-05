@@ -2,9 +2,9 @@ package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.adapter.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
-import com.netgrif.adapter.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Case;
 
 public interface IWorkflowAuthorizationService {
 

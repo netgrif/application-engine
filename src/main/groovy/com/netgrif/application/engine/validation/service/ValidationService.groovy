@@ -5,7 +5,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService
 import com.netgrif.application.engine.validation.domain.ValidationDataInput
 import com.netgrif.application.engine.validation.models.*
-import com.netgrif.application.engine.workflow.domain.DataField
+import com.netgrif.core.workflow.domain.DataField
 import groovy.util.logging.Slf4j
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.stereotype.Service

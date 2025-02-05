@@ -5,10 +5,10 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.core.auth.domain.LoggedUser
 import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.core.petrinet.domain.I18nString
-import com.netgrif.adapter.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.workflow.domain.QTask
+import com.netgrif.adapter.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -42,7 +42,7 @@ class GroovyShellFactoryTest {
     private ITaskService taskService
 
     @Autowired
-    private IProcessRoleService roleService
+    private ProcessRoleService roleService
 
     @Autowired
     private UserService userService

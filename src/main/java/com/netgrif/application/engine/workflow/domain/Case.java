@@ -4,7 +4,7 @@
 //import com.netgrif.core.auth.domain.Author;
 //import com.netgrif.core.auth.domain.Authority;
 //import com.netgrif.core.petrinet.domain.I18nString;
-//import com.netgrif.adapter.petrinet.domain.PetriNet;
+//import com.netgrif.core.petrinet.domain.PetriNet;
 //import com.netgrif.application.engine.petrinet.domain.dataset.*;
 //import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
 //import com.netgrif.core.workflow.service.InitValueExpressionEvaluator;

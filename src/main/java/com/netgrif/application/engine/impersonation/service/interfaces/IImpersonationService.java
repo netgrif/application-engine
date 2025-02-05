@@ -4,7 +4,7 @@ import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
 import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserHasSessionException;
-import com.netgrif.adapter.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Case;
 
 import java.util.List;
 import java.util.Optional;

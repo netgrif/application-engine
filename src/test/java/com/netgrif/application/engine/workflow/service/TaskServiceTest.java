@@ -8,18 +8,18 @@ import com.netgrif.core.auth.domain.User;
 import com.netgrif.core.auth.domain.enums.UserState;
 import com.netgrif.adapter.auth.service.AuthorityService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.adapter.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.adapter.petrinet.service.PetriNetService;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.startup.runner.SystemUserRunner;
 import com.netgrif.application.engine.startup.runner.UriRunner;
-import com.netgrif.adapter.workflow.domain.Case;
-import com.netgrif.adapter.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Task;
+import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -74,7 +74,7 @@ public class TaskServiceTest {
     private UriRunner uriRunner;
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private PetriNetService petriNetService;
 
     @Autowired
     private SuperCreatorRunner superCreator;

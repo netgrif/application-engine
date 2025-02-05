@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.importer.service;
 
-import com.netgrif.adapter.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.core.importer.model.*;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.core.petrinet.domain.Component;
@@ -31,8 +31,8 @@ import com.netgrif.core.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.ArcFactory;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.core.workflow.domain.ProcessResourceId;
 import com.netgrif.core.petrinet.domain.I18nString;
@@ -88,10 +88,10 @@ public class Importer {
     protected FunctionFactory functionFactory;
 
     @Autowired
-    protected IPetriNetService service;
+    protected PetriNetService service;
 
     @Autowired
-    protected IProcessRoleService processRoleService;
+    protected ProcessRoleService processRoleService;
 
     @Autowired
     protected ArcFactory arcFactory;

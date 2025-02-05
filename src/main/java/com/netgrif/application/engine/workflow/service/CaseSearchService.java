@@ -3,16 +3,16 @@ package com.netgrif.application.engine.workflow.service;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.core.petrinet.domain.I18nString;
-import com.netgrif.adapter.petrinet.domain.PetriNet;
-import com.netgrif.adapter.petrinet.domain.PetriNetSearch;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.PetriNetSearch;
+import com.netgrif.core.petrinet.domain.dataset.FieldType;
+import com.netgrif.core.petrinet.domain.dataset.UserFieldValue;
+import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.core.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.adapter.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
-import com.netgrif.application.engine.workflow.domain.QCase;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.ProcessResourceId;
+import com.netgrif.adapter.workflow.domain.QCase;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Ops;
@@ -20,7 +20,6 @@ import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +51,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     public static final String GROUP = "group";
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private PetriNetService petriNetService;
 
     public Predicate buildQuery(Map<String, Object> requestQuery, LoggedUser user, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
@@ -349,7 +348,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     public Predicate group(Object query, LoggedUser user, Locale locale) {
-        PetriNetSearch processQuery = new PetriNetSearch();
+        PetriNetSearch processQuery = new PetriN();
         if (query instanceof List) {
             processQuery.setGroup((List<String>) query);
         } else if (query instanceof String) {

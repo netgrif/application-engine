@@ -1,6 +1,6 @@
 package com.netgrif.application.engine
 
-import com.netgrif.application.engine.workflow.domain.DataField
+import com.netgrif.core.workflow.domain.DataField
 import groovy.json.JsonSlurper
 import org.springframework.core.convert.converter.Converter
 import org.springframework.stereotype.Component

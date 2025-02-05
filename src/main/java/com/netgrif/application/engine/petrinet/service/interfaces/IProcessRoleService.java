@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.service.interfaces;
 
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.adapter.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 
 import java.util.List;

@@ -2,10 +2,10 @@
 //
 //import com.netgrif.core.petrinet.domain.I18nString;
 //import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField;
-//import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+//import com.netgrif.core.petrinet.domain.dataset.Field;
 //import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
 //import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
-//import com.netgrif.adapter.workflow.domain.Case;
+//import com.netgrif.core.workflow.domain.Case;
 //
 //import java.util.Map;
 //import java.util.Set;

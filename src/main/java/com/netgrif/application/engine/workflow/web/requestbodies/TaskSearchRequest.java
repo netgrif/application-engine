@@ -2,8 +2,8 @@ package com.netgrif.application.engine.workflow.web.requestbodies;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet;
-import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
+import com.netgrif.core.workflow.web.requestbodies.taskSearch.PetriNet;
+import com.netgrif.core.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 

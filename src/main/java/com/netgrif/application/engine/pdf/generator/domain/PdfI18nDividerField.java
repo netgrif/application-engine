@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.pdf.generator.domain;
 
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
-import com.netgrif.application.engine.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
+import com.netgrif.core.petrinet.domain.DataGroup;
+import com.netgrif.core.petrinet.domain.dataset.FieldType;
 
 import java.util.ArrayList;
 import java.util.List;

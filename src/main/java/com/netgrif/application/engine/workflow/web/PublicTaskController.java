@@ -4,13 +4,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
+import com.netgrif.core.model.EntityModel;
+import com.netgrif.core.model.PagedModel;
+import com.netgrif.core.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
-import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest;
-import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskResource;
-import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
+import com.netgrif.core.workflow.web.requestbodies.file.FileFieldRequest;
+import com.netgrif.core.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
+import com.netgrif.core.workflow.web.responsebodies.LocalisedTaskResource;
+import com.netgrif.core.workflow.web.responsebodies.TaskReference;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -19,10 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -202,7 +201,7 @@ public class PublicTaskController extends AbstractTaskController {
 
     @Operation(summary = "Generic task search on Mongo database")
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<com.netgrif.adapter.workflow.domain.Task> assembler, Locale locale) {
-        return super.searchPublic(userService.transformToLoggedUser(userService.getLoggedUser()), pageable, searchBody, operation, assembler, locale);
+    public PagedModel<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Locale locale) {
+        return super.searchPublic(userService.transformToLoggedUser(userService.getLoggedUser()), pageable, searchBody, operation, locale);
     }
 }

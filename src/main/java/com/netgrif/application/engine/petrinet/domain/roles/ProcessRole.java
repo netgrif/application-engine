@@ -2,10 +2,10 @@
 //
 //import com.netgrif.core.petrinet.domain.I18nString;
 //import com.netgrif.application.engine.petrinet.domain.Imported;
-//import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
-//import com.netgrif.application.engine.petrinet.domain.events.Event;
-//import com.netgrif.application.engine.petrinet.domain.events.EventType;
-//import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
+//import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
+//import com.netgrif.core.petrinet.domain.events.Event;
+//import com.netgrif.core.petrinet.domain.events.EventType;
+//import com.netgrif.core.workflow.domain.ProcessResourceId;
 //import lombok.EqualsAndHashCode;
 //import lombok.Getter;
 //import lombok.Setter;

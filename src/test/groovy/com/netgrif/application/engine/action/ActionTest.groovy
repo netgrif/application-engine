@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action
+import com.netgrif.core.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner
 import com.netgrif.application.engine.petrinet.domain.events.*
 import com.netgrif.application.engine.startup.ImportHelper

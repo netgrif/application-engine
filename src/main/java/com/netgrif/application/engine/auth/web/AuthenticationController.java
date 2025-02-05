@@ -16,7 +16,7 @@ import com.netgrif.application.engine.configuration.properties.ServerAuthPropert
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
-import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
+import com.netgrif.core.workflow.web.responsebodies.MessageResource;
 import freemarker.template.TemplateException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -142,7 +142,7 @@ public class AuthenticationController {
     @Operation(summary = "Login to the system", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/login", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource login(Authentication auth, Locale locale) {
-        return new UserResource(userResponseFactory.getUser(userService.findByAuth(auth, null), locale), "profile");
+        return new UserResource(userResponseFactory.getUser(userService.findByAuth(auth, null), locale));
     }
 
     @Operation(summary = "Reset password")

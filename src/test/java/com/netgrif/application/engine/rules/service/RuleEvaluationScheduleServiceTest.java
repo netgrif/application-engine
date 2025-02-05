@@ -3,18 +3,18 @@
 //import com.netgrif.application.engine.TestHelper;
 //import com.netgrif.core.auth.domain.LoggedUser;
 //import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-//import com.netgrif.application.engine.petrinet.domain.VersionType;
+//import com.netgrif.core.petrinet.domain.VersionType;
 //import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
-//import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+//import com.netgrif.adapter.petrinet.service.PetriNetService;
 ////import com.netgrif.application.engine.rules.domain.RuleRepository;
 ////import com.netgrif.application.engine.rules.domain.StoredRule;
 ////import com.netgrif.application.engine.rules.domain.scheduled.ScheduleOutcome;
 ////import com.netgrif.application.engine.rules.service.interfaces.IRuleEvaluationScheduleService;
 ////import com.netgrif.application.engine.rules.service.throwable.RuleEvaluationScheduleException;
 //import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
-//import com.netgrif.adapter.workflow.domain.Case;
-//import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-//import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+//import com.netgrif.core.workflow.domain.Case;
+//import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+//import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 //import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 //import lombok.extern.slf4j.Slf4j;
 //import org.junit.jupiter.api.AfterEach;
@@ -50,7 +50,7 @@
 //    private IWorkflowService workflowService;
 //
 //    @Autowired
-//    private IPetriNetService petriNetService;
+//    private PetriNetService petriNetService;
 //
 //    @Autowired
 //    private SuperCreatorRunner superCreator;

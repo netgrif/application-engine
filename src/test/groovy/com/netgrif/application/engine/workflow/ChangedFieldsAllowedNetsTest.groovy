@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.adapter.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

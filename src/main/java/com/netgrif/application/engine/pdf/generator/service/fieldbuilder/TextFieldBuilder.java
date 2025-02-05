@@ -3,13 +3,13 @@ package com.netgrif.application.engine.pdf.generator.service.fieldbuilder;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfTextField;
-import com.netgrif.application.engine.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
+import com.netgrif.core.petrinet.domain.DataGroup;
+import com.netgrif.core.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
+import com.netgrif.core.petrinet.domain.dataset.UserFieldValue;
+import com.netgrif.core.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.utils.DateUtils;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField;
+import com.netgrif.core.workflow.web.responsebodies.LocalisedField;
 import org.jsoup.Jsoup;
 
 import java.text.NumberFormat;

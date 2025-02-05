@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.event.dispatchers;
 
 import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
-import com.netgrif.application.engine.event.events.data.GetDataEvent;
-import com.netgrif.application.engine.event.events.data.SetDataEvent;
+import com.netgrif.core.event.events.data.GetDataEvent;
+import com.netgrif.core.event.events.data.SetDataEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 

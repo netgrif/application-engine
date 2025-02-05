@@ -351,7 +351,7 @@ implements <a href="interfaces/IElasticTaskService.html" title="interface in com
 </tr>
 <tr id="i11" class="rowColor">
 <td class="colFirst"><code>protected org.elasticsearch.index.query.QueryBuilder</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#caseRequestQuery(com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest)">caseRequestQuery</a></span>&#8203;(<a href="../../workflow/web/requestbodies/taskSearch/TaskSearchCaseRequest.html" title="class in com.netgrif.application.engine.workflow.web.requestbodies.taskSearch">TaskSearchCaseRequest</a>&nbsp;caseRequest)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#caseRequestQuery(com.netgrif.core.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest)">caseRequestQuery</a></span>&#8203;(<a href="../../workflow/web/requestbodies/taskSearch/TaskSearchCaseRequest.html" title="class in com.netgrif.application.engine.workflow.web.requestbodies.taskSearch">TaskSearchCaseRequest</a>&nbsp;caseRequest)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i12" class="altColor">
@@ -371,12 +371,12 @@ implements <a href="interfaces/IElasticTaskService.html" title="interface in com
 </tr>
 <tr id="i14" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#index(com.netgrif.application.engine.elastic.domain.ElasticTask)">index</a></span>&#8203;(<a href="../domain/ElasticTask.html" title="class in com.netgrif.application.engine.elastic.domain">ElasticTask</a>&nbsp;task)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#index(com.netgrif.core.elastic.domain.ElasticTask)">index</a></span>&#8203;(<a href="../domain/ElasticTask.html" title="class in com.netgrif.application.engine.elastic.domain">ElasticTask</a>&nbsp;task)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i15" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#indexNow(com.netgrif.application.engine.elastic.domain.ElasticTask)">indexNow</a></span>&#8203;(<a href="../domain/ElasticTask.html" title="class in com.netgrif.application.engine.elastic.domain">ElasticTask</a>&nbsp;task)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#indexNow(com.netgrif.core.elastic.domain.ElasticTask)">indexNow</a></span>&#8203;(<a href="../domain/ElasticTask.html" title="class in com.netgrif.application.engine.elastic.domain">ElasticTask</a>&nbsp;task)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i16" class="altColor">
@@ -391,7 +391,7 @@ implements <a href="interfaces/IElasticTaskService.html" title="interface in com
 </tr>
 <tr id="i18" class="altColor">
 <td class="colFirst"><code>java.util.concurrent.Future&lt;<a href="../domain/ElasticTask.html" title="class in com.netgrif.application.engine.elastic.domain">ElasticTask</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#scheduleTaskIndexing(com.netgrif.application.engine.elastic.domain.ElasticTask)">scheduleTaskIndexing</a></span>&#8203;(<a href="../domain/ElasticTask.html" title="class in com.netgrif.application.engine.elastic.domain">ElasticTask</a>&nbsp;task)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#scheduleTaskIndexing(com.netgrif.core.elastic.domain.ElasticTask)">scheduleTaskIndexing</a></span>&#8203;(<a href="../domain/ElasticTask.html" title="class in com.netgrif.application.engine.elastic.domain">ElasticTask</a>&nbsp;task)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i19" class="rowColor">
@@ -588,7 +588,7 @@ public&nbsp;void&nbsp;setTaskService&#8203;(<a href="../../workflow/service/inte
 </dl>
 </li>
 </ul>
-<a id="scheduleTaskIndexing(com.netgrif.application.engine.elastic.domain.ElasticTask)">
+<a id="scheduleTaskIndexing(com.netgrif.core.elastic.domain.ElasticTask)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -597,11 +597,11 @@ public&nbsp;void&nbsp;setTaskService&#8203;(<a href="../../workflow/service/inte
 <pre class="methodSignature">public&nbsp;java.util.concurrent.Future&lt;<a href="../domain/ElasticTask.html" title="class in com.netgrif.application.engine.elastic.domain">ElasticTask</a>&gt;&nbsp;scheduleTaskIndexing&#8203;(<a href="../domain/ElasticTask.html" title="class in com.netgrif.application.engine.elastic.domain">ElasticTask</a>&nbsp;task)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IElasticTaskService.html#scheduleTaskIndexing(com.netgrif.application.engine.elastic.domain.ElasticTask)">scheduleTaskIndexing</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IElasticTaskService.html" title="interface in com.netgrif.application.engine.elastic.service.interfaces">IElasticTaskService</a></code></dd>
+<dd><code><a href="interfaces/IElasticTaskService.html#scheduleTaskIndexing(com.netgrif.core.elastic.domain.ElasticTask)">scheduleTaskIndexing</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IElasticTaskService.html" title="interface in com.netgrif.application.engine.elastic.service.interfaces">IElasticTaskService</a></code></dd>
 </dl>
 </li>
 </ul>
-<a id="index(com.netgrif.application.engine.elastic.domain.ElasticTask)">
+<a id="index(com.netgrif.core.elastic.domain.ElasticTask)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -611,11 +611,11 @@ public&nbsp;void&nbsp;setTaskService&#8203;(<a href="../../workflow/service/inte
 public&nbsp;void&nbsp;index&#8203;(<a href="../domain/ElasticTask.html" title="class in com.netgrif.application.engine.elastic.domain">ElasticTask</a>&nbsp;task)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IElasticTaskService.html#index(com.netgrif.application.engine.elastic.domain.ElasticTask)">index</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IElasticTaskService.html" title="interface in com.netgrif.application.engine.elastic.service.interfaces">IElasticTaskService</a></code></dd>
+<dd><code><a href="interfaces/IElasticTaskService.html#index(com.netgrif.core.elastic.domain.ElasticTask)">index</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IElasticTaskService.html" title="interface in com.netgrif.application.engine.elastic.service.interfaces">IElasticTaskService</a></code></dd>
 </dl>
 </li>
 </ul>
-<a id="indexNow(com.netgrif.application.engine.elastic.domain.ElasticTask)">
+<a id="indexNow(com.netgrif.core.elastic.domain.ElasticTask)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -624,7 +624,7 @@ public&nbsp;void&nbsp;index&#8203;(<a href="../domain/ElasticTask.html" title="c
 <pre class="methodSignature">public&nbsp;void&nbsp;indexNow&#8203;(<a href="../domain/ElasticTask.html" title="class in com.netgrif.application.engine.elastic.domain">ElasticTask</a>&nbsp;task)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IElasticTaskService.html#indexNow(com.netgrif.application.engine.elastic.domain.ElasticTask)">indexNow</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IElasticTaskService.html" title="interface in com.netgrif.application.engine.elastic.service.interfaces">IElasticTaskService</a></code></dd>
+<dd><code><a href="interfaces/IElasticTaskService.html#indexNow(com.netgrif.core.elastic.domain.ElasticTask)">indexNow</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IElasticTaskService.html" title="interface in com.netgrif.application.engine.elastic.service.interfaces">IElasticTaskService</a></code></dd>
 </dl>
 </li>
 </ul>
@@ -738,7 +738,7 @@ public&nbsp;void&nbsp;index&#8203;(<a href="../domain/ElasticTask.html" title="c
  }</div>
 </li>
 </ul>
-<a id="caseRequestQuery(com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest)">
+<a id="caseRequestQuery(com.netgrif.core.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest)">
 <!--   -->
 </a>
 <ul class="blockList">

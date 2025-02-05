@@ -2,12 +2,12 @@ package com.netgrif.application.engine.importer
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.RoleFactory
-import com.netgrif.adapter.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
+import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.adapter.workflow.domain.Case
 import com.netgrif.adapter.workflow.domain.Task
@@ -49,7 +49,7 @@ class PredefinedRolesPermissionsTest {
     private ITaskService taskService
 
     @Autowired
-    private IProcessRoleService processRoleService
+    private ProcessRoleService processRoleService
 
     @Autowired
     private RoleFactory roleFactory

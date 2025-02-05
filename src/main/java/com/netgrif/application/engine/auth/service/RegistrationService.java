@@ -11,7 +11,7 @@
 //import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
 //import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 //import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-//import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+//import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 //import lombok.extern.slf4j.Slf4j;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.scheduling.annotation.Scheduled;

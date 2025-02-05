@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.event.dispatchers;
 
 import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
-import com.netgrif.application.engine.event.events.workflow.CreateCaseEvent;
-import com.netgrif.application.engine.event.events.workflow.DeleteCaseEvent;
-import com.netgrif.application.engine.event.events.workflow.IndexCaseEvent;
+import com.netgrif.core.event.events.workflow.CreateCaseEvent;
+import com.netgrif.core.event.events.workflow.DeleteCaseEvent;
+import com.netgrif.core.event.events.workflow.IndexCaseEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 

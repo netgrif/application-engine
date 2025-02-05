@@ -26,16 +26,16 @@ import com.netgrif.application.engine.mail.interfaces.IMailService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.pdf.generator.config.PdfResource
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
-import com.netgrif.application.engine.petrinet.domain.*
-import com.netgrif.application.engine.petrinet.domain.dataset.*
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
-import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
-import com.netgrif.application.engine.petrinet.domain.version.Version
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
+import com.netgrif.core.petrinet.domain.*
+import com.netgrif.core.petrinet.domain.dataset.*
+import com.netgrif.core.petrinet.domain.dataset.logic.ChangedField
+import com.netgrif.core.petrinet.domain.dataset.logic.FieldBehavior
+import com.netgrif.core.petrinet.domain.dataset.logic.validation.DynamicValidation
+import com.netgrif.core.petrinet.domain.dataset.logic.validation.Validation
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
+import com.netgrif.core.petrinet.domain.version.Version
+import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 //import com.netgrif.application.engine.rules.domain.RuleRepository
 import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
@@ -43,22 +43,23 @@ import com.netgrif.application.engine.startup.runner.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.adapter.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.QCase
-import com.netgrif.application.engine.workflow.domain.QTask
+import com.netgrif.adapter.workflow.domain.QCase
+import com.netgrif.adapter.workflow.domain.QTask
 import com.netgrif.adapter.workflow.domain.Task
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
-import com.netgrif.application.engine.workflow.domain.menu.MenuItemBody
-import com.netgrif.application.engine.workflow.domain.menu.MenuItemConstants
+import com.netgrif.core.workflow.domain.eventoutcomes.EventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
+import com.netgrif.core.workflow.domain.menu.MenuItemBody
+import com.netgrif.core.workflow.domain.menu.MenuItemConstants
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.*
-import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
-import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
+import com.netgrif.core.workflow.service.InitValueExpressionEvaluator
+import com.netgrif.core.workflow.web.responsebodies.MessageResource
+import com.netgrif.core.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
 import groovy.transform.NamedVariant
 import org.bson.types.ObjectId
@@ -116,7 +117,7 @@ class ActionDelegate {
     UserService userService
 
     @Autowired
-    IPetriNetService petriNetService
+    PetriNetService petriNetService
 
     @Autowired
     AsyncRunner async
@@ -131,7 +132,7 @@ class ActionDelegate {
     INextGroupService nextGroupService
 
     @Autowired
-    IProcessRoleService processRoleService
+    ProcessRoleService processRoleService
 
     @Autowired
     IRegistrationService registrationService
@@ -146,7 +147,7 @@ class ActionDelegate {
     IDataValidationExpressionEvaluator dataValidationExpressionEvaluator
 
     @Autowired
-    IInitValueExpressionEvaluator initValueExpressionEvaluator
+    InitValueExpressionEvaluator initValueExpressionEvaluator
 
 //    @Autowired
 //    RuleRepository ruleRepository

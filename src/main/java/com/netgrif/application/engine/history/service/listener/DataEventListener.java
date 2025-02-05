@@ -2,11 +2,11 @@ package com.netgrif.application.engine.history.service.listener;
 
 import com.netgrif.application.engine.event.dispatchers.DataDispatcher;
 import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
-import com.netgrif.application.engine.event.events.data.GetDataEvent;
-import com.netgrif.application.engine.event.events.data.SetDataEvent;
+import com.netgrif.core.event.events.data.GetDataEvent;
+import com.netgrif.core.event.events.data.SetDataEvent;
 import com.netgrif.application.engine.event.listeners.Listener;
-import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
-import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
+import com.netgrif.core.history.domain.dataevents.GetDataEventLog;
+import com.netgrif.core.history.domain.dataevents.SetDataEventLog;
 import com.netgrif.application.engine.history.domain.dataevents.repository.GetDataEventLogRepository;
 import com.netgrif.application.engine.history.domain.dataevents.repository.SetDataEventLogRepository;
 import org.springframework.stereotype.Component;

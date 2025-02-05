@@ -4,8 +4,8 @@ import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.event.events.data.GetDataEvent;
 import com.netgrif.core.history.domain.taskevents.TaskEventLog;
 import com.netgrif.core.petrinet.domain.events.EventPhase;
-import com.netgrif.adapter.workflow.domain.Case;
-import com.netgrif.adapter.workflow.domain.Task;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Task;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Document;
 

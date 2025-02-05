@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.startup.runner;
 
 import com.netgrif.core.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.events.Event;
-import com.netgrif.application.engine.petrinet.domain.events.EventType;
+import com.netgrif.core.petrinet.domain.events.Event;
+import com.netgrif.core.petrinet.domain.events.EventType;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;

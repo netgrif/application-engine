@@ -3,8 +3,8 @@ package com.netgrif.application.engine.pdf.generator.service.fieldbuilder;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfMultiChoiceField;
-import com.netgrif.application.engine.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedMultichoiceField;
+import com.netgrif.core.petrinet.domain.DataGroup;
+import com.netgrif.core.workflow.web.responsebodies.LocalisedMultichoiceField;
 
 import java.util.ArrayList;
 import java.util.Collection;

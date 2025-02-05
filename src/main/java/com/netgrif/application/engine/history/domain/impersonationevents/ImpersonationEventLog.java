@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.history.domain.impersonationevents;
 
-import com.netgrif.application.engine.history.domain.baseevent.EventLog;
+import com.netgrif.core.history.domain.baseevent.EventLog;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 

@@ -4,19 +4,19 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
-import com.netgrif.application.engine.elastic.domain.ElasticCase;
+import com.netgrif.core.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
-import com.netgrif.application.engine.event.events.workflow.IndexCaseEvent;
-import com.netgrif.adapter.petrinet.domain.PetriNetSearch;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.core.event.events.workflow.IndexCaseEvent;
+import com.netgrif.core.petrinet.domain.PetriNetSearch;
+import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.core.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.adapter.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     protected final ElasticsearchTemplate template;
     protected final Executor executors;
     protected final ElasticsearchProperties elasticsearchProperties;
-    protected IPetriNetService petriNetService;
+    protected PetriNetService petriNetService;
     protected IWorkflowService workflowService;
     protected IElasticCasePrioritySearch iElasticCasePrioritySearch;
     @Value("${spring.data.elasticsearch.index.case}")
@@ -69,7 +69,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     @Autowired
     @Lazy
-    public void setPetriNetService(IPetriNetService petriNetService) {
+    public void setPetriNetService(PetriNetService petriNetService) {
         this.petriNetService = petriNetService;
     }
 

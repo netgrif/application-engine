@@ -2,7 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.arcs;
 
 import com.netgrif.application.engine.petrinet.domain.Node;
 import com.netgrif.application.engine.petrinet.domain.Place;
-import com.netgrif.application.engine.petrinet.domain.Transition;
+import com.netgrif.core.petrinet.domain.Transition;
 
 /**
  * Special arcs that can only lead from Place to Transition (thus PT).

@@ -10,7 +10,7 @@ import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.PublicViewProperties
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
-import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
+import com.netgrif.core.workflow.web.responsebodies.MessageResource
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test

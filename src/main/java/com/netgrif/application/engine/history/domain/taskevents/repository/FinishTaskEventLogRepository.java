@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.history.domain.taskevents.repository;
 
-import com.netgrif.application.engine.history.domain.taskevents.FinishTaskEventLog;
+import com.netgrif.core.history.domain.taskevents.FinishTaskEventLog;
 import org.bson.types.ObjectId;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.data.mongodb.repository.MongoRepository;

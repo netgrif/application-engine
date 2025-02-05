@@ -1,12 +1,12 @@
 package com.netgrif.application.engine.petrinet.web;
 
 import com.netgrif.adapter.auth.service.UserService;
-import com.netgrif.adapter.petrinet.domain.PetriNet;
-import com.netgrif.adapter.petrinet.domain.PetriNetSearch;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.*;
+import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.adapter.petrinet.service.ProcessRoleService;
+import com.netgrif.core.petrinet.web.responsebodies.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -38,15 +38,15 @@ import static com.netgrif.application.engine.petrinet.web.PetriNetController.dec
 @RequestMapping({"/api/public/petrinet"})
 public class PublicPetriNetController {
 
-    private final IPetriNetService petriNetService;
+    private final PetriNetService petriNetService;
 
-    private final IProcessRoleService roleService;
+    private final ProcessRoleService roleService;
 
     private final UserService userService;
 
     private final StringToVersionConverter converter;
 
-    public PublicPetriNetController(IPetriNetService petriNetService, UserService userService, StringToVersionConverter converter, IProcessRoleService roleService) {
+    public PublicPetriNetController(PetriNetService petriNetService, UserService userService, StringToVersionConverter converter, ProcessRoleService roleService) {
         this.petriNetService = petriNetService;
         this.converter = converter;
         this.userService = userService;
@@ -56,7 +56,7 @@ public class PublicPetriNetController {
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Get process by id")
     public PetriNetReferenceResource getOne(@PathVariable("id") String id, Locale locale) {
-        return new PetriNetReferenceResource(IPetriNetService.transformToReference(this.petriNetService.getPetriNet(decodeUrl(id)), locale));
+        return new PetriNetReferenceResource(PetriNetService.transformToReference(this.petriNetService.getPetriNet(decodeUrl(id)), locale));
     }
 
     @Operation(summary = "Get process by identifier and version")
@@ -71,11 +71,11 @@ public class PublicPetriNetController {
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<PetriNetReferenceResource> searchPetriNets(@RequestBody PetriNetSearch criteria, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
         Page<PetriNetReference> nets = petriNetService.search(criteria, userService.transformToLoggedUser(userService.getLoggedUser()), pageable, locale);
-        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicPetriNetController.class)
-                .searchPetriNets(criteria, pageable, assembler, locale)).withRel("search");
-        PagedModel<PetriNetReferenceResource> resources = assembler.toModel(nets, new PetriNetReferenceResourceAssembler(), selfLink);
-        PetriNetReferenceResourceAssembler.buildLinks(resources);
-        return resources;
+//        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicPetriNetController.class)
+//                .searchPetriNets(criteria, pageable, assembler, locale)).withRel("search");
+//        PagedModel<PetriNetReferenceResource> resources = assembler.toModel(nets, new PetriNetReferenceResourceAssembler(), selfLink);
+//        PetriNetReferenceResourceAssembler.buildLinks(resources);
+        return PagedModel.of(nets.stream().map(PetriNetReferenceResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), nets.getTotalElements()));
     }
 
     @Operation(summary = "Get roles of process")

@@ -3,19 +3,18 @@ package com.netgrif.application.engine.petrinet.service;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.adapter.auth.service.UserService;
-import com.netgrif.application.engine.event.events.user.UserRoleChangeEvent;
+import com.netgrif.core.event.events.user.UserRoleChangeEvent;
 import com.netgrif.core.importer.model.EventPhaseType;
-import com.netgrif.adapter.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.context.RoleContext;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.RoleActionsRunner;
-import com.netgrif.application.engine.petrinet.domain.events.Event;
-import com.netgrif.application.engine.petrinet.domain.events.EventType;
+import com.netgrif.core.petrinet.domain.events.Event;
+import com.netgrif.core.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.adapter.petrinet.service.PetriNetService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.core.workflow.domain.ProcessResourceId;
 import org.bson.types.ObjectId;
@@ -30,7 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
-public class ProcessRoleService implements IProcessRoleService {
+public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.ProcessRoleService {
 
     private static final Logger log = LoggerFactory.getLogger(ProcessRoleService.class);
 
@@ -39,7 +38,7 @@ public class ProcessRoleService implements IProcessRoleService {
     private final PetriNetRepository netRepository;
     private final ApplicationEventPublisher publisher;
     private final RoleActionsRunner roleActionsRunner;
-    private final IPetriNetService petriNetService;
+    private final PetriNetService petriNetService;
     private final ISecurityContextService securityContextService;
 
     private ProcessRole defaultRole;
@@ -48,7 +47,7 @@ public class ProcessRoleService implements IProcessRoleService {
     public ProcessRoleService(ProcessRoleRepository processRoleRepository,
                               PetriNetRepository netRepository,
                               ApplicationEventPublisher publisher, RoleActionsRunner roleActionsRunner,
-                              @Lazy IPetriNetService petriNetService, @Lazy UserService userService, ISecurityContextService securityContextService) {
+                              @Lazy PetriNetService petriNetService, @Lazy UserService userService, ISecurityContextService securityContextService) {
         this.processRoleRepository = processRoleRepository;
         this.netRepository = netRepository;
         this.publisher = publisher;
@@ -56,6 +55,61 @@ public class ProcessRoleService implements IProcessRoleService {
         this.petriNetService = petriNetService;
         this.userService = userService;
         this.securityContextService = securityContextService;
+    }
+
+    @Override
+    public ProcessRole save(ProcessRole processRole) {
+        return null;
+    }
+
+    @Override
+    public List<ProcessRole> getAll() {
+        return List.of();
+    }
+
+    @Override
+    public List<ProcessRole> findAllByNetId(String s) {
+        return List.of();
+    }
+
+    @Override
+    public Optional<ProcessRole> get(ProcessResourceId processResourceId) {
+        return Optional.empty();
+    }
+
+    @Override
+    public void delete(String s) {
+
+    }
+
+    @Override
+    public void deleteAll(Collection<String> collection) {
+
+    }
+
+    @Override
+    public void deleteAll() {
+
+    }
+
+    @Override
+    public ProcessRole getDefaultRole() {
+        return null;
+    }
+
+    @Override
+    public ProcessRole getAnonymousRole() {
+        return null;
+    }
+
+    @Override
+    public Collection<ProcessRole> findAllByIds(Collection<ProcessResourceId> collection) {
+        return List.of();
+    }
+
+    @Override
+    public ProcessRole findById(ProcessResourceId processResourceId) {
+        return null;
     }
 
     @Override
@@ -74,14 +128,14 @@ public class ProcessRoleService implements IProcessRoleService {
     }
 
     @Override
-    public void assignRolesToUser(String userId, Set<String> requestedRolesIds, LoggedUser loggedUser) {
+    public void assignRolesToUser(String userId, Set<ProcessResourceId> requestedRolesIds, LoggedUser loggedUser) {
         assignRolesToUser(userId, requestedRolesIds, loggedUser, new HashMap<>());
     }
 
     @Override
-    public void assignRolesToUser(String userId, Set<String> requestedRolesIds, LoggedUser loggedUser, Map<String, String> params) {
+    public void assignRolesToUser(String userId, Set<ProcessResourceId> requestedRolesIds, LoggedUser loggedUser, Map<String, String> params) {
         IUser user = userService.findById(userId, null);
-        Set<ProcessRole> requestedRoles = this.findByIds(requestedRolesIds);
+        Set<ProcessRole> requestedRoles = this.findByIds(requestedRolesIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet()));
         if (requestedRoles.isEmpty() && !requestedRolesIds.isEmpty())
             throw new IllegalArgumentException("No process roles found.");
         if (requestedRoles.size() != requestedRolesIds.size())
@@ -110,7 +164,7 @@ public class ProcessRoleService implements IProcessRoleService {
         }
         requestedRoles = updateRequestedRoles(user, rolesNewToUser, rolesRemovedFromUser);
 
-        replaceUserRolesAndPublishEvent(requestedRolesIds, user, requestedRoles);
+        replaceUserRolesAndPublishEvent(requestedRolesIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet()), user, requestedRoles);
         if (petriNet != null) {
             runAllPostActions(newRoles, removedRoles, user, petriNet, params);
         }
@@ -322,9 +376,9 @@ public class ProcessRoleService implements IProcessRoleService {
             if (user.getProcessRoles().size() == 0)
                 continue;
 
-            Set<String> newRoles = user.getProcessRoles().stream()
+            Set<ProcessResourceId> newRoles = user.getProcessRoles().stream()
                     .filter(role -> !deletedRoleStringIds.contains(role.getStringId()))
-                    .map(ProcessRole::getStringId)
+                    .map(ProcessRole::get_id)
                     .collect(Collectors.toSet());
             this.assignRolesToUser(user.getStringId(), newRoles, loggedUser);
         }

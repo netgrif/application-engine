@@ -5,8 +5,8 @@ import com.netgrif.core.petrinet.domain.dataset.Field;
 import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.core.petrinet.domain.events.DataEventType;
 import com.netgrif.core.petrinet.domain.events.EventPhase;
-import com.netgrif.adapter.workflow.domain.Case;
-import com.netgrif.adapter.workflow.domain.Task;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Task;
 import com.netgrif.core.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 

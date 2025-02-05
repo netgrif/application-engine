@@ -7,7 +7,7 @@ import com.netgrif.core.auth.domain.*;
 import com.netgrif.adapter.auth.service.AuthorityService;
 import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import com.netgrif.core.auth.domain.enums.UserState;
@@ -38,7 +38,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     private final AuthorityService authorityService;
     private final UserService userService;
     private final INextGroupService groupService;
-    private final IProcessRoleService processRoleService;
+    private final ProcessRoleService processRoleService;
 
     @Getter
     private IUser superUser;

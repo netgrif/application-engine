@@ -8,9 +8,9 @@
 //import com.netgrif.application.engine.event.events.user.UserRegistrationEvent;
 //import com.netgrif.application.engine.orgstructure.groups.config.GroupConfigurationProperties;
 //import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-//import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+//import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 //import com.netgrif.application.engine.startup.runner.SystemUserRunner;
-//import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
+//import com.netgrif.core.workflow.domain.ProcessResourceId;
 //import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService;
 //import com.querydsl.core.types.dsl.BooleanExpression;
 //import org.bson.types.ObjectId;
@@ -34,7 +34,7 @@
 //    protected AuthorityRepository authorityRepository;
 //
 //    @Autowired
-//    protected IProcessRoleService processRoleService;
+//    protected ProcessRoleService processRoleService;
 //
 //    @Autowired
 //    protected ApplicationEventPublisher publisher;

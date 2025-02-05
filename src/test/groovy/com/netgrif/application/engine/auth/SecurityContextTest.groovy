@@ -7,11 +7,11 @@ import com.netgrif.core.auth.domain.PasswordCredential
 import com.netgrif.core.auth.domain.User
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
 import com.netgrif.adapter.auth.service.UserService
-import com.netgrif.adapter.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
+import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.security.service.ISecurityContextService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import org.junit.jupiter.api.BeforeEach
@@ -41,7 +41,7 @@ class SecurityContextTest {
     private ActionDelegate delegate
 
     @Autowired
-    private IProcessRoleService processRoleService
+    private ProcessRoleService processRoleService
 
     @Autowired
     private TestHelper testHelper

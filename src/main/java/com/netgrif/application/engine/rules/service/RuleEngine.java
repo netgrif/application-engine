@@ -1,14 +1,14 @@
 //package com.netgrif.application.engine.rules.service;
 //
-//import com.netgrif.adapter.petrinet.domain.PetriNet;
+//import com.netgrif.core.petrinet.domain.PetriNet;
 //import com.netgrif.application.engine.rules.domain.RuleRepository;
 //import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
 //import com.netgrif.application.engine.rules.domain.facts.NetImportedFact;
 //import com.netgrif.application.engine.rules.domain.facts.ScheduledRuleFact;
 //import com.netgrif.application.engine.rules.domain.facts.TransitionEventFact;
 //import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
-//import com.netgrif.adapter.workflow.domain.Case;
-//import com.netgrif.adapter.workflow.domain.Task;
+//import com.netgrif.core.workflow.domain.Case;
+//import com.netgrif.core.workflow.domain.Task;
 //import lombok.extern.slf4j.Slf4j;
 //import org.kie.api.runtime.KieSession;
 //import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.elastic.domain;
 
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
+import com.netgrif.core.petrinet.domain.dataset.FileFieldValue;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

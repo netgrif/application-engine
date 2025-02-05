@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.history.domain.caseevents;
 
-import com.netgrif.application.engine.event.events.workflow.CreateCaseEvent;
-import com.netgrif.application.engine.event.events.workflow.DeleteCaseEvent;
-import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
-import com.netgrif.adapter.workflow.domain.Case;
+import com.netgrif.core.event.events.workflow.CreateCaseEvent;
+import com.netgrif.core.event.events.workflow.DeleteCaseEvent;
+import com.netgrif.core.petrinet.domain.events.EventPhase;
+import com.netgrif.core.workflow.domain.Case;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Document;
 

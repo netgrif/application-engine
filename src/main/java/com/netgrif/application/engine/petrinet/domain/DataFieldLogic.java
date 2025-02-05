@@ -2,12 +2,12 @@ package com.netgrif.application.engine.petrinet.domain;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
-import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
-import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
+import com.netgrif.core.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.core.petrinet.domain.dataset.logic.FieldLayout;
+import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.core.petrinet.domain.events.DataEvent;
+import com.netgrif.core.petrinet.domain.events.DataEventType;
+import com.netgrif.core.petrinet.domain.events.EventPhase;
 import lombok.Getter;
 import lombok.Setter;
 

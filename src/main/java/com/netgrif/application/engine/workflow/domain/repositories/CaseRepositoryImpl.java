@@ -1,11 +1,11 @@
 package com.netgrif.application.engine.workflow.domain.repositories;
 
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.core.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.Reference;
-import com.netgrif.application.engine.workflow.domain.QCase;
-import com.netgrif.application.engine.workflow.domain.QDataField;
+import com.netgrif.adapter.workflow.domain.QCase;
+import com.netgrif.core.workflow.domain.QDataField;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringExpression;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public abstract class CaseRepositoryImpl implements CaseRepository {
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private PetriNetService petriNetService;
 
     @Override
     public void customize(QuerydslBindings bindings, QCase qCase) {

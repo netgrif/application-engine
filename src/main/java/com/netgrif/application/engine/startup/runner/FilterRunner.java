@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.adapter.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.VersionType;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.VersionType;
+import com.netgrif.adapter.petrinet.service.PetriNetService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
@@ -29,7 +29,7 @@ public class FilterRunner implements ApplicationEngineStartupRunner {
     private static final String IMPORT_FILTER_FILE_NAME = "engine-processes/import_filters.xml";
     private static final String IMPORT_NET_IDENTIFIER = "import_filters";
 
-    private final IPetriNetService petriNetService;
+    private final PetriNetService petriNetService;
     private final ImportHelper helper;
     private final SystemUserRunner systemCreator;
 

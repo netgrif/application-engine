@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.history.domain.taskevents.repository;
 
-import com.netgrif.application.engine.history.domain.taskevents.DelegateTaskEventLog;
+import com.netgrif.core.history.domain.taskevents.DelegateTaskEventLog;
 import org.bson.types.ObjectId;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.data.mongodb.repository.MongoRepository;

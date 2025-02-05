@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes;
 
 import com.netgrif.core.petrinet.domain.I18nString;
-import com.netgrif.adapter.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.workflow.domain.eventoutcomes.EventOutcome;
 import lombok.Data;
 
 import java.util.List;

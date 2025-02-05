@@ -2,12 +2,12 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action
+import com.netgrif.core.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.application.engine.petrinet.domain.Component
-import com.netgrif.application.engine.petrinet.domain.Format
+import com.netgrif.core.petrinet.domain.Format
 import com.netgrif.core.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.Imported
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout
+import com.netgrif.core.petrinet.domain.dataset.logic.FieldLayout
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent

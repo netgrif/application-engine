@@ -6,18 +6,18 @@
 //import com.netgrif.adapter.auth.service.UserService;
 //import com.netgrif.application.engine.configuration.drools.RefreshableKieBase;
 //import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-//import com.netgrif.application.engine.petrinet.domain.VersionType;
+//import com.netgrif.core.petrinet.domain.VersionType;
 //import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 //import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
-//import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+//import com.netgrif.adapter.petrinet.service.PetriNetService;
 //import com.netgrif.application.engine.rules.domain.FactRepository;
 //import com.netgrif.application.engine.rules.domain.RuleRepository;
 //import com.netgrif.application.engine.rules.domain.StoredRule;
 //import com.netgrif.application.engine.rules.domain.facts.*;
-//import com.netgrif.adapter.workflow.domain.Case;
-//import com.netgrif.adapter.workflow.domain.Task;
-//import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-//import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+//import com.netgrif.core.workflow.domain.Case;
+//import com.netgrif.core.workflow.domain.Task;
+//import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+//import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 //import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 //import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 //import lombok.extern.slf4j.Slf4j;
@@ -59,7 +59,7 @@
 //    @Autowired
 //    private ITaskService taskService;
 //    @Autowired
-//    private IPetriNetService petriNetService;
+//    private PetriNetService petriNetService;
 //    @Autowired
 //    private FactRepository factRepository;
 //    @Autowired

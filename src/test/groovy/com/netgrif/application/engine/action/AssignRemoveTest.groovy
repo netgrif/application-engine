@@ -2,9 +2,9 @@ package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.adapter.auth.service.UserService
-import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.adapter.workflow.domain.Case
@@ -32,7 +32,7 @@ class AssignRemoveTest {
     private TestHelper testHelper;
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private PetriNetService petriNetService;
 
     @Autowired
     private SuperCreatorRunner superCreator;

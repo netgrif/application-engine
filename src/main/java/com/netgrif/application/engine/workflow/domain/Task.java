@@ -4,14 +4,14 @@
 //import com.netgrif.core.auth.domain.Actor;
 //import com.netgrif.core.auth.domain.IUser;
 //import com.netgrif.core.petrinet.domain.I18nString;
-//import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-//import com.netgrif.application.engine.petrinet.domain.events.EventType;
+//import com.netgrif.core.petrinet.domain.dataset.Field;
+//import com.netgrif.core.petrinet.domain.events.EventType;
 //import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
 //import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 //import com.netgrif.application.engine.petrinet.domain.policies.DataFocusPolicy;
 //import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
 //import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
-//import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
+//import com.netgrif.core.workflow.domain.triggers.Trigger;
 //import lombok.AllArgsConstructor;
 //import lombok.Builder;
 //import lombok.Getter;

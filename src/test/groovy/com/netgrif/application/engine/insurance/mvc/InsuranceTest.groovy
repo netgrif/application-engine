@@ -7,10 +7,10 @@ import com.netgrif.core.auth.domain.User
 import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
+import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import groovy.json.JsonOutput
@@ -114,7 +114,7 @@ class InsuranceTest {
     private SuperCreatorRunner superCreator
 
     @Autowired
-    private IProcessRoleService processRoleService
+    private ProcessRoleService processRoleService
 
     @Autowired
     private UserService userService

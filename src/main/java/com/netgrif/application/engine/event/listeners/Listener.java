@@ -2,7 +2,7 @@ package com.netgrif.application.engine.event.listeners;
 
 
 import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
-import com.netgrif.application.engine.event.events.Event;
+import com.netgrif.core.event.events.Event;
 import lombok.Getter;
 
 import java.util.EventListener;

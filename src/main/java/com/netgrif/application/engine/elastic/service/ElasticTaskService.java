@@ -5,22 +5,22 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
 import com.google.common.collect.ImmutableList;
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.application.engine.elastic.domain.ElasticJob;
+import com.netgrif.core.elastic.domain.ElasticJob;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
-import com.netgrif.application.engine.elastic.domain.ElasticTask;
+import com.netgrif.core.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.elastic.domain.ElasticTaskJob;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
-import com.netgrif.application.engine.event.events.task.IndexTaskEvent;
-import com.netgrif.adapter.petrinet.domain.PetriNetSearch;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.core.event.events.task.IndexTaskEvent;
+import com.netgrif.core.petrinet.domain.PetriNetSearch;
+import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.core.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.adapter.workflow.domain.Task;
+import com.netgrif.core.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
-import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
-import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet;
-import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
+import com.netgrif.core.workflow.web.requestbodies.TaskSearchRequest;
+import com.netgrif.core.workflow.web.requestbodies.taskSearch.PetriNet;
+import com.netgrif.core.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +64,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     protected ElasticsearchTemplate elasticsearchTemplate;
 
     @Autowired
-    protected IPetriNetService petriNetService;
+    protected PetriNetService petriNetService;
 
     @Autowired
     protected ApplicationEventPublisher publisher;
@@ -104,7 +104,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
 
     @Override
     public void remove(String taskId) {
-        ElasticTask task = new ElasticTask();
+        ElasticTask task = new com.netgrif.adapter.elastic.domain.ElasticTask();
         task.setTaskId(taskId);
         elasticTaskQueueManager.scheduleOperation(new ElasticTaskJob(ElasticJob.REMOVE, task));
     }

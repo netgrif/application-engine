@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.adapter.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.VersionType;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.VersionType;
+import com.netgrif.adapter.petrinet.service.PetriNetService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
@@ -24,7 +24,7 @@ public class ImpersonationRunner implements ApplicationEngineStartupRunner {
     public static final String IMPERSONATION_CONFIG_USER_SELECT_FILE_NAME = "engine-processes/impersonation_users_select.xml";
     public static final String IMPERSONATION_CONFIG_USER_SELECT_PETRI_NET_IDENTIFIER = "impersonation_users_select";
 
-    protected final IPetriNetService petriNetService;
+    protected final PetriNetService petriNetService;
     protected final ImportHelper helper;
     protected final SystemUserRunner systemCreator;
 
