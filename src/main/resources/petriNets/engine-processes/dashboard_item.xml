@@ -86,6 +86,9 @@
             <id>preference_items_list_set</id>
             <actions phase="post">
                 <action>
+                    icon_color: f.icon_color,
+                    font_color: f.font_color,
+                    font_weight: f.font_weight,
                     inherit_name: f.inherit_name,
                     inherit_icon: f.inherit_icon,
                     preference_item_taskRef: f.preference_item_taskRef,
@@ -96,12 +99,12 @@
                     change inherit_icon value { true }
                     change inherit_name value { true }
                     if (preference_items_list.value != null &amp;&amp; org.bson.types.ObjectId.isValid(preference_items_list.value)) {
-                        make [inherit_name, inherit_icon], editable on trans when { true }
+                        make [inherit_name, inherit_icon, icon_color, font_color, font_weight], editable on trans when { true }
                         make [preference_item_taskRef, filter_divider], visible on trans when { true }
                         def preferenceItemCase = workflowService.findOne(preference_items_list.value)
                         change preference_item_taskRef value { [preferenceItemCase.tasks.find { it.transition == "item_settings" }?.task] }
                     } else {
-                        make [inherit_name, inherit_icon], visible on trans when { true }
+                        make [inherit_name, inherit_icon, icon_color, font_color, font_weight], visible on trans when { true }
                         make [preference_item_taskRef, filter_divider], hidden on trans when { true }
                         change preference_item_taskRef value { [] }
                     }
@@ -135,6 +138,8 @@
                     }
                 </action>
                 <action>
+                    font_color: f.font_color,
+                    font_weight: f.font_weight,
                     is_internal: f.is_internal,
                     item_name: f.item_name,
                     item_icon: f.item_icon,
@@ -152,7 +157,7 @@
                         make [preference_items_list], editable on trans when { true }
                         make [external_url], hidden on trans when { true }
                     } else {
-                        make [item_icon, item_name, external_url, external_icon], editable on trans when { true }
+                        make [item_icon, item_name, external_url, external_icon, font_color, font_weight], editable on trans when { true }
                         make item_icon_preview, visible on trans when { true }
                         make [inherit_name, inherit_icon, preference_items_list, preference_item_taskRef, filter_divider], hidden on trans when { true }
                     }
@@ -169,12 +174,56 @@
         <id>external_icon</id>
         <title name="external_icon">Icon from URL</title>
         <desc name="external_icon_desc">Icon will be loaded from external website URL</desc>
+        <event type="set">
+            <id>external_icon_set</id>
+            <actions phase="post">
+                <action>
+                    preference_items_list: f.preference_items_list,
+                    inherit_icon: f.inherit_icon,
+                    external_icon: f.external_icon,
+                    icon_color: f.icon_color,
+                    item_icon: f.item_icon,
+                    is_internal: f.is_internal,
+                    trans: t.configuration;
+
+                    if (!inherit_icon.value  || !is_internal.value) {
+                        change item_icon value { "" }
+                    }
+                    if (external_icon.value) {
+                        make icon_color, visible on trans when { true }
+                    } else if (!(is_internal.value &amp;&amp; (preference_items_list.value == null || !org.bson.types.ObjectId.isValid(preference_items_list.value)))) {
+                        make icon_color, editable on trans when { true }
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text" immediate="true">
+        <id>icon_color</id>
+        <title name="icon_color">Icon color</title>
+        <desc name="icon_color_desc">Icon color of item. Valid CSS property value font-color.</desc>
+        <init>#0790ff</init>
+        <event type="set">
+            <id>icon_color_set</id>
+            <actions phase="post">
+                <action>
+                    icon_color: f.icon_color,
+                    icon: f.item_icon,
+                    iconPreview: f.item_icon_preview;
+
+                    change iconPreview value {
+                        <![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons" style="color:"""]]> + icon_color.value + <![CDATA[""";">"""]]> + icon.value + <![CDATA["""</span>"""]]>
+                    }
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="text" immediate="true">
         <id>item_icon</id>
         <title name="item_icon">Item icon identifier</title>
         <desc name="item_icon_desc">Material icon identifier. List of icons with identifiers is available online. Icon will be displayed in dashboard.</desc>
         <action trigger="set">
+            icon_color: f.icon_color,
             external_icon: f.external_icon,
             icon: f.this,
             iconPreview: f.item_icon_preview;
@@ -188,9 +237,8 @@
                     <![CDATA["""<img src=" """]]> + icon.value + <![CDATA[""" " style="height:60px;width:auto">"""]]>
                 }
             } else {
-                changeCaseProperty "icon" about { icon.value }
                 change iconPreview value {
-                    <![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + icon.value + <![CDATA["""</span>"""]]>
+                    <![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons" style="color:"""]]> + icon_color.value + <![CDATA[""";">"""]]> + icon.value + <![CDATA["""</span>"""]]>
                 }
             }
 
@@ -202,6 +250,18 @@
         <component>
             <name>htmltextarea</name>
         </component>
+    </data>
+    <data type="text" immediate="true">
+        <id>font_color</id>
+        <title name="font_color">Font color</title>
+        <desc name="font_color_desc">Font color of item name. Valid CSS property value font-color.</desc>
+        <init>#0790ff</init>
+    </data>
+    <data type="text" immediate="true">
+        <id>font_weight</id>
+        <title name="font_weight">Font weight</title>
+        <desc name="font_weight_desc">Font weight of item name. Valid CSS property value font-weight.</desc>
+        <init>400</init>
     </data>
     <data type="i18n" immediate="true">
         <id>item_name</id>
@@ -224,6 +284,7 @@
                     preference_items_list: f.preference_items_list,
                     trans: t.configuration;
 
+                    change external_icon value { false }
                     if (inherit_icon.value) {
                         make [item_icon, item_icon_preview, external_icon], visible on trans when { true }
                         if (preference_items_list.value != null &amp;&amp; org.bson.types.ObjectId.isValid(preference_items_list.value)) {
@@ -315,6 +376,12 @@
         <i18nString name="item_icon_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online. Ikona sa zobrazí v panely.</i18nString>
         <i18nString name="external_icon">Ikona z adresy URL</i18nString>
         <i18nString name="external_icon_desc">Ikona bude načítaná z externej URL adresy</i18nString>
+        <i18nString name="icon_color">Farba ikony</i18nString>
+        <i18nString name="icon_color_desc">Farba ikony položky. Valídna CSS hodnota font-color.</i18nString>
+        <i18nString name="font_color">Farba písma</i18nString>
+        <i18nString name="font_color_desc">Farba písma názvu položky. Valídna CSS hodnota font-color.</i18nString>
+        <i18nString name="font_weight">Hrúbka písma</i18nString>
+        <i18nString name="font_weight_desc">Hrúbka písma menu položky. Valídna CSS hodnota font-weight.</i18nString>
         <i18nString name="item_name">Názov položky</i18nString>
         <i18nString name="item_name_desc">Názov položky, ktorá sa zobrazí v panely</i18nString>
         <i18nString name="inherit_icon">Prebrať ikonu</i18nString>
@@ -336,6 +403,12 @@
         <i18nString name="item_icon_desc">Kennung der Materialikone. Die Liste der Symbole mit den Bezeichnungen ist online verfügbar. Das Symbol wird im Dashboard angezeigt.</i18nString>
         <i18nString name="external_icon">Symbol aus URL</i18nString>
         <i18nString name="external_icon_desc">Das Symbol wird von einer externen Website-URL geladen</i18nString>
+        <i18nString name="icon_color">Farbe des Symbols</i18nString>
+        <i18nString name="icon_color_desc">Symbolfarbe des Elements. Gültiger CSS-Eigenschaftswert font-color.</i18nString>
+        <i18nString name="font_color">Schriftfarbe</i18nString>
+        <i18nString name="font_color_desc">Schriftfarbe des Artikelnamens. Gültiger CSS-Eigenschaftswert font-color.</i18nString>
+        <i18nString name="font_weight">Gewicht der Schriftart</i18nString>
+        <i18nString name="font_weight_desc">Schriftstärke des Artikelnamens. Gültiger CSS-Eigenschaftswert font-weight.</i18nString>
         <i18nString name="item_name">Name des Gegenstands</i18nString>
         <i18nString name="item_name_desc">Artikelbezeichnung, die im Dashboard angezeigt wird</i18nString>
         <i18nString name="inherit_icon">Symbol vererben</i18nString>
@@ -461,6 +534,34 @@
                 </layout>
             </dataRef>
             <dataRef>
+                <id>font_color</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>font_weight</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
                 <id>item_icon</id>
                 <logic>
                     <behavior>visible</behavior>
@@ -469,7 +570,7 @@
                     <x>0</x>
                     <y>1</y>
                     <rows>1</rows>
-                    <cols>2</cols>
+                    <cols>1</cols>
                     <template>material</template>
                     <appearance>outline</appearance>
                 </layout>
@@ -480,12 +581,26 @@
                     <behavior>visible</behavior>
                 </logic>
                 <layout>
-                    <x>2</x>
+                    <x>1</x>
                     <y>1</y>
                     <rows>1</rows>
                     <cols>1</cols>
                     <template>material</template>
                     <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>icon_color</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
                 </layout>
             </dataRef>
             <dataRef>

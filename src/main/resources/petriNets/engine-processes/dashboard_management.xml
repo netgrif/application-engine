@@ -99,6 +99,7 @@
             <actions phase="post">
                 <action>
                     dashboard_item_to_preference_item: f.dashboard_item_to_preference_item,
+                    items_order: f.items_order,
                     dashboard_item_list: f.dashboard_item_list;
 
                     if (dashboard_item_list.value == null || dashboard_item_list.value == "") {
@@ -118,6 +119,7 @@
                     keysPreference.forEach { newOrderPreference[it] = dashboard_item_to_preference_item.options[it]}
                     change dashboard_item_list options { newOrderDashboard }
                     change dashboard_item_to_preference_item options { newOrderPreference }
+                    change items_order value { String.join(",", newOrderDashboard.keySet()) }
                 </action>
             </actions>
         </event>
@@ -135,6 +137,7 @@
             <actions phase="post">
                 <action>
                     dashboard_item_to_preference_item: f.dashboard_item_to_preference_item,
+                    items_order: f.items_order,
                     dashboard_item_list: f.dashboard_item_list;
 
                     if (dashboard_item_list.value == null || dashboard_item_list.value == "") {
@@ -154,6 +157,7 @@
                     keysPreference.forEach { newOrderPreference[it] = dashboard_item_to_preference_item.options[it]}
                     change dashboard_item_list options { newOrderDashboard }
                     change dashboard_item_to_preference_item options { newOrderPreference }
+                    change items_order value { String.join(",", newOrderDashboard.keySet()) }
                 </action>
             </actions>
         </event>
@@ -209,6 +213,7 @@
             <actions phase="post">
                 <action>
                     dashboard_item_to_preference_item: f.dashboard_item_to_preference_item,
+                    items_order: f.items_order,
                     dashboard_item_list: f.dashboard_item_list,
                     existing_menu_items: f.existing_menu_items;
 
@@ -218,6 +223,7 @@
                     def dashboardItemOptions = dashboard_item_list.options
                     dashboardItemOptions.put(existing_menu_items.value, existing_menu_items.options.get(existing_menu_items.value))
                     change dashboard_item_list options { dashboardItemOptions }
+                    change items_order value { String.join(",", dashboardItemOptions.keySet()) }
 
                     def dashboardItemCase = workflowService.findOne(existing_menu_items.value)
                     def preferenceItemOptions = dashboard_item_to_preference_item.options
@@ -247,6 +253,7 @@
                 <action>
                     dashboard_item_to_preference_item: f.dashboard_item_to_preference_item,
                     dashboard_item_list: f.dashboard_item_list,
+                    items_order: f.items_order,
                     existing_menu_items: f.existing_menu_items;
 
                     if (dashboard_item_list.value == null || !org.bson.types.ObjectId.isValid(dashboard_item_list.value)) {
@@ -255,6 +262,7 @@
                     def dashboardItemOptions = dashboard_item_list.options
                     dashboardItemOptions.keySet().removeAll([dashboard_item_list.value])
                     change dashboard_item_list options { dashboardItemOptions }
+                    change items_order value { String.join(",", dashboardItemOptions.keySet()) }
 
                     def preferenceItemOptions = dashboard_item_to_preference_item.options
                     preferenceItemOptions.keySet().removeAll([dashboard_item_list.value])
@@ -311,6 +319,10 @@
         <title name="logout_dashboard_toolbar">Logout in dashboard toolbar</title>
         <placeholder name="logout_dashboard_toolbar_desc">Should dashboard toolbar contains logout button</placeholder>
         <init>false</init>
+    </data>
+    <data type="text" immediate="true">
+        <id>items_order</id>
+        <title/>
     </data>
 
     <!-- I18NS -->
