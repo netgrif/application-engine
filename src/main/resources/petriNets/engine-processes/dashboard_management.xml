@@ -26,8 +26,8 @@
     <roleRef>
         <id>default</id>
         <caseLogic>
-            <create>false</create>
-            <delete>false</delete>
+            <create>true</create>
+            <delete>true</delete>
             <view>true</view>
         </caseLogic>
     </roleRef>
@@ -63,10 +63,16 @@
             </actions>
         </event>
     </data>
-    <data type="text" immediate="true">
+    <data type="i18n" immediate="true">
         <id>dashboard_name</id>
         <title name="dashboard_name">Dashboard name</title>
         <desc name="dashboard_name_desc">Dashboard name to be displayed in application dashboard</desc>
+    </data>
+    <data type="text" immediate="true">
+        <id>dashboard_logo</id>
+        <title name="dashboard_logo">Dashboard logo</title>
+        <desc name="dashboard_logo_desc">Dashboard logo to be displayed in application dashboard</desc>
+        <init>assets/img/netgrif_full_white.svg</init>
     </data>
     <data type="enumeration_map" immediate="true">
         <id>dashboard_item_list</id>
@@ -75,6 +81,10 @@
         <component>
             <name>list</name>
         </component>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>dashboard_item_to_preference_item</id>
+        <title/>
     </data>
     <data type="button">
         <id>order_down</id>
@@ -88,20 +98,26 @@
             <id>order_down_set</id>
             <actions phase="post">
                 <action>
+                    dashboard_item_to_preference_item: f.dashboard_item_to_preference_item,
                     dashboard_item_list: f.dashboard_item_list;
 
                     if (dashboard_item_list.value == null || dashboard_item_list.value == "") {
                         return
                     }
-                    def keys = dashboard_item_list.options.keySet() as List
-                    def currentIndex = keys.indexOf(dashboard_item_list.value)
-                    if (currentIndex == keys.size() - 1) {
+                    def keysDashboard = dashboard_item_list.options.keySet() as List
+                    def keysPreference = dashboard_item_to_preference_item.options.keySet() as List
+                    def currentIndex = keysDashboard.indexOf(dashboard_item_list.value)
+                    if (currentIndex == keysDashboard.size() - 1) {
                         return
                     }
-                    java.util.Collections.swap(keys, currentIndex, currentIndex + 1)
-                    def newOrder = [:]
-                    keys.forEach { newOrder[it] = dashboard_item_list.options[it]}
-                    change dashboard_item_list options { newOrder }
+                    java.util.Collections.swap(keysDashboard, currentIndex, currentIndex + 1)
+                    java.util.Collections.swap(keysPreference, currentIndex, currentIndex + 1)
+                    def newOrderDashboard = [:]
+                    def newOrderPreference = [:]
+                    keysDashboard.forEach { newOrderDashboard[it] = dashboard_item_list.options[it]}
+                    keysPreference.forEach { newOrderPreference[it] = dashboard_item_to_preference_item.options[it]}
+                    change dashboard_item_list options { newOrderDashboard }
+                    change dashboard_item_to_preference_item options { newOrderPreference }
                 </action>
             </actions>
         </event>
@@ -118,20 +134,26 @@
             <id>order_up_set</id>
             <actions phase="post">
                 <action>
+                    dashboard_item_to_preference_item: f.dashboard_item_to_preference_item,
                     dashboard_item_list: f.dashboard_item_list;
 
                     if (dashboard_item_list.value == null || dashboard_item_list.value == "") {
                         return
                     }
-                    def keys = dashboard_item_list.options.keySet() as List
-                    def currentIndex = keys.indexOf(dashboard_item_list.value)
+                    def keysDashboard = dashboard_item_list.options.keySet() as List
+                    def keysPreference = dashboard_item_to_preference_item.options.keySet() as List
+                    def currentIndex = keysDashboard.indexOf(dashboard_item_list.value)
                     if (currentIndex == 0) {
                         return
                     }
-                    java.util.Collections.swap(keys, currentIndex, currentIndex - 1)
-                    def newOrder = [:]
-                    keys.forEach { newOrder[it] = dashboard_item_list.options[it]}
-                    change dashboard_item_list options { newOrder }
+                    java.util.Collections.swap(keysDashboard, currentIndex, currentIndex - 1)
+                    java.util.Collections.swap(keysPreference, currentIndex, currentIndex - 1)
+                    def newOrderDashboard = [:]
+                    def newOrderPreference = [:]
+                    keysDashboard.forEach { newOrderDashboard[it] = dashboard_item_list.options[it]}
+                    keysPreference.forEach { newOrderPreference[it] = dashboard_item_to_preference_item.options[it]}
+                    change dashboard_item_list options { newOrderDashboard }
+                    change dashboard_item_to_preference_item options { newOrderPreference }
                 </action>
             </actions>
         </event>
@@ -186,6 +208,7 @@
             <id>add_new_item_set</id>
             <actions phase="post">
                 <action>
+                    dashboard_item_to_preference_item: f.dashboard_item_to_preference_item,
                     dashboard_item_list: f.dashboard_item_list,
                     existing_menu_items: f.existing_menu_items;
 
@@ -195,6 +218,15 @@
                     def dashboardItemOptions = dashboard_item_list.options
                     dashboardItemOptions.put(existing_menu_items.value, existing_menu_items.options.get(existing_menu_items.value))
                     change dashboard_item_list options { dashboardItemOptions }
+
+                    def dashboardItemCase = workflowService.findOne(existing_menu_items.value)
+                    def preferenceItemOptions = dashboard_item_to_preference_item.options
+                    if (dashboardItemCase.dataSet["is_internal"].value) {
+                        preferenceItemOptions.put(existing_menu_items.value, dashboardItemCase.dataSet["preference_items_list"].value)
+                    } else {
+                        preferenceItemOptions.put(existing_menu_items.value, null)
+                    }
+                    change dashboard_item_to_preference_item options { preferenceItemOptions }
 
                     def dashboardItemCases = findCasesElastic("processIdentifier:\"dashboard_item\" AND dataSet.is_active.booleanValue:true" as String, org.springframework.data.domain.PageRequest.of(0, 1000))
                             .collectEntries { [(it.stringId): it.dataSet["item_name"].value] }
@@ -213,6 +245,7 @@
             <id>remove_new_item_set</id>
             <actions phase="post">
                 <action>
+                    dashboard_item_to_preference_item: f.dashboard_item_to_preference_item,
                     dashboard_item_list: f.dashboard_item_list,
                     existing_menu_items: f.existing_menu_items;
 
@@ -222,6 +255,10 @@
                     def dashboardItemOptions = dashboard_item_list.options
                     dashboardItemOptions.keySet().removeAll([dashboard_item_list.value])
                     change dashboard_item_list options { dashboardItemOptions }
+
+                    def preferenceItemOptions = dashboard_item_to_preference_item.options
+                    preferenceItemOptions.keySet().removeAll([dashboard_item_list.value])
+                    change dashboard_item_to_preference_item options { preferenceItemOptions }
 
                     def dashboardItemCases = findCasesElastic("processIdentifier:\"dashboard_item\" AND dataSet.is_active.booleanValue:true" as String, org.springframework.data.domain.PageRequest.of(0, 1000))
                             .collectEntries { [(it.stringId): it.dataSet["item_name"].value] }
@@ -251,6 +288,30 @@
             <property key="fontSize">18</property>
         </component>
     </data>
+    <data type="boolean" immediate="true">
+        <id>simple_dashboard_toolbar</id>
+        <title name="simple_dashboard_toolbar">Simple dashboard toolbar</title>
+        <placeholder name="simple_dashboard_toolbar_desc">Should dashboard toolbar contains menu with options</placeholder>
+        <init>true</init>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>profile_dashboard_toolbar</id>
+        <title name="profile_dashboard_toolbar">Profile in dashboard toolbar</title>
+        <placeholder name="profile_dashboard_toolbar_desc">Should dashboard toolbar contains profile button</placeholder>
+        <init>false</init>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>language_dashboard_toolbar</id>
+        <title name="language_dashboard_toolbar">Language select in dashboard toolbar</title>
+        <placeholder name="language_dashboard_toolbar_desc">Should dashboard toolbar contains menu with language selection</placeholder>
+        <init>false</init>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>logout_dashboard_toolbar</id>
+        <title name="logout_dashboard_toolbar">Logout in dashboard toolbar</title>
+        <placeholder name="logout_dashboard_toolbar_desc">Should dashboard toolbar contains logout button</placeholder>
+        <init>false</init>
+    </data>
 
     <!-- I18NS -->
     <i18n locale="sk">
@@ -258,22 +319,44 @@
         <i18nString name="dashboard_id_desc">Unikátny identifikátor panelu</i18nString>
         <i18nString name="dashboard_name">Názov panelu</i18nString>
         <i18nString name="dashboard_name_desc">Názov panelu, ktorý bude zobrazený v panely aplikácie</i18nString>
+        <i18nString name="dashboard_logo">Logo panelu</i18nString>
+        <i18nString name="dashboard_logo_desc">Logo panelu, ktoré bude zobrazené v panely aplikácie</i18nString>
         <i18nString name="dashboard_item_list">Položky panelu</i18nString>
         <i18nString name="dashboard_item_list_desc">Zoznam položiek panalu, ktoré budú zobrazené v panely aplikácie</i18nString>
         <i18nString name="existing_menu_items">Existujúce položky panelu</i18nString>
         <i18nString name="existing_menu_items_desc">Zoznam všetkých existujúcich položiek panelu, ktoré budú zobrazené v panely aplikácie</i18nString>
         <i18nString name="configuration_label">Konfigurácia panela</i18nString>
+
+        <i18nString name="simple_dashboard_toolbar">Jednoduchý panel nástrojov</i18nString>
+        <i18nString name="simple_dashboard_toolbar_desc">Panel nástrojov by mal obsahovať ponuku s možnosťami</i18nString>
+        <i18nString name="profile_dashboard_toolbar">Profil na paneli nástrojov</i18nString>
+        <i18nString name="profile_dashboard_toolbar_desc">Mal by panel nástrojov obsahovať tlačidlo profilu</i18nString>
+        <i18nString name="language_dashboard_toolbar">Výber jazyka na paneli nástrojov</i18nString>
+        <i18nString name="language_dashboard_toolbar_desc">Mal by panel nástrojov obsahovať menu s výberom jazyka</i18nString>
+        <i18nString name="logout_dashboard_toolbar">Odhlásenie na paneli nástrojov</i18nString>
+        <i18nString name="logout_dashboard_toolbar_desc">Mal by panel nástrojov obsahovať tlačidlo na odhlásenie</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="dashboard_id">Dashboard-ID</i18nString>
         <i18nString name="dashboard_id_desc">Eindeutiger Bezeichner des Dashboards</i18nString>
         <i18nString name="dashboard_name">Name des Dashboards</i18nString>
         <i18nString name="dashboard_name_desc">Name des Dashboards, der im Dashboard der Anwendung angezeigt werden soll</i18nString>
+        <i18nString name="dashboard_logo">Logo für das Armaturenbrett</i18nString>
+        <i18nString name="dashboard_logo_desc">Dashboard-Logo, das im Dashboard der Anwendung angezeigt werden soll</i18nString>
         <i18nString name="dashboard_item_list">Dashboard-Elemente</i18nString>
         <i18nString name="dashboard_item_list_desc">Liste der Dashboard-Elemente, die im Dashboard der Anwendung angezeigt werden sollen</i18nString>
         <i18nString name="existing_menu_items">Vorhandene Dashboard-Elemente</i18nString>
         <i18nString name="existing_menu_items_desc">Liste aller vorhandenen Dashboard-Elemente, die dem Dashboard hinzugefügt werden können</i18nString>
         <i18nString name="configuration_label">Konfiguration des Dashboards</i18nString>
+
+        <i18nString name="simple_dashboard_toolbar">Einfache Dashboard-Symbolleiste</i18nString>
+        <i18nString name="simple_dashboard_toolbar_desc">Die Symbolleiste des Dashboards sollte ein Menü mit Optionen enthalten</i18nString>
+        <i18nString name="profile_dashboard_toolbar">Profil in der Dashboard-Symbolleiste</i18nString>
+        <i18nString name="profile_dashboard_toolbar_desc">Die Symbolleiste des Dashboards sollte eine Profilschaltfläche enthalten</i18nString>
+        <i18nString name="language_dashboard_toolbar">Sprachauswahl in der Dashboard-Symbolleiste</i18nString>
+        <i18nString name="language_dashboard_toolbar_desc">Sollte die Symbolleiste des Dashboards ein Menü mit Sprachauswahl enthalten</i18nString>
+        <i18nString name="logout_dashboard_toolbar">Abmelden in der Dashboard-Symbolleiste</i18nString>
+        <i18nString name="logout_dashboard_toolbar_desc">Die Dashboard-Symbolleiste sollte eine Abmeldeschaltfläche enthalten</i18nString>
     </i18n>
 
     <!-- TRANSITIONS -->
@@ -317,8 +400,8 @@
                     <behavior>editable</behavior>
                 </logic>
                 <layout>
-                    <x>2</x>
-                    <y>0</y>
+                    <x>0</x>
+                    <y>1</y>
                     <rows>1</rows>
                     <cols>2</cols>
                     <template>material</template>
@@ -326,27 +409,27 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>dashboard_item_list</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>1</y>
-                    <rows>2</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>order_up</id>
+                <id>dashboard_logo</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
                 <layout>
                     <x>2</x>
                     <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>simple_dashboard_toolbar</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
                     <rows>1</rows>
                     <cols>1</cols>
                     <template>material</template>
@@ -354,7 +437,21 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>order_down</id>
+                <id>profile_dashboard_toolbar</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>language_dashboard_toolbar</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -368,13 +465,69 @@
                 </layout>
             </dataRef>
             <dataRef>
+                <id>logout_dashboard_toolbar</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>dashboard_item_list</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>2</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>order_up</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>order_down</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
                 <id>remove_new_item</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
                 <layout>
                     <x>3</x>
-                    <y>1</y>
+                    <y>3</y>
                     <rows>1</rows>
                     <cols>1</cols>
                     <template>material</template>
@@ -388,7 +541,7 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>3</y>
+                    <y>5</y>
                     <rows>1</rows>
                     <cols>2</cols>
                     <template>material</template>
@@ -402,7 +555,7 @@
                 </logic>
                 <layout>
                     <x>2</x>
-                    <y>3</y>
+                    <y>5</y>
                     <rows>1</rows>
                     <cols>2</cols>
                     <template>material</template>
@@ -416,7 +569,7 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>4</y>
+                    <y>6</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <template>material</template>
@@ -430,7 +583,7 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>5</y>
+                    <y>7</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <template>material</template>
