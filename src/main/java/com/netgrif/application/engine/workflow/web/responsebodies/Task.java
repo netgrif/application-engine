@@ -76,7 +76,7 @@
 //
 //    private Map<String, String> tags;
 //
-//    public Task(com.netgrif.adapter.workflow.domain.Task task, Locale locale) {
+//    public Task(com.netgrif.core.workflow.domain.Task task, Locale locale) {
 //        this._id = task.getObjectId();
 //        this.caseId = task.getCaseId();
 //        this.transitionId = task.getTransitionId();

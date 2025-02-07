@@ -9,6 +9,6 @@ import org.springframework.stereotype.Service;
 public class ElasticTaskMappingService implements IElasticTaskMappingService {
     @Override
     public ElasticTask transform(Task task) {
-        return new ElasticTask(task);
+        return new com.netgrif.adapter.elastic.domain.ElasticTask(task);
     }
 }

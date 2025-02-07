@@ -3,7 +3,7 @@ package com.netgrif.application.engine.petrinet.service;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.core.petrinet.domain.VersionType;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.adapter.petrinet.service.PetriNetService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
@@ -18,6 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -102,7 +103,7 @@ class ProcessRoleServiceTest {
     @Test
     void shouldFindAllProcessRolesByName() throws IOException, MissingPetriNetMetaDataException {
         petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
-        Set<ProcessRole> roles = processRoleService.findAllByDefaultName("Process role");
+        Collection<ProcessRole> roles = processRoleService.findAllByDefaultName("Process role");
         assertNotNull(roles);
         assertFalse(roles.isEmpty());
         assertEquals(1, roles.size());

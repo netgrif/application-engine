@@ -6,7 +6,7 @@ import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyE
 import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.core.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.adapter.petrinet.service.PetriNetService;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.utils.FullPageRequest;

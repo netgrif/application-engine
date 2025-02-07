@@ -128,7 +128,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="Imported.html" title="class in com.netgrif.application.engine.petrinet.domain">com.netgrif.application.engine.petrinet.domain.Imported</a></li>
 <li>
 <ul class="inheritance">
-<li><a href="PetriNetObject.html" title="class in com.netgrif.application.engine.petrinet.domain">com.netgrif.adapter.petrinet.domain.PetriNetObject</a></li>
+<li><a href="PetriNetObject.html" title="class in com.netgrif.application.engine.petrinet.domain">com.netgrif.core.petrinet.domain.PetriNetObject</a></li>
 <li>
 <ul class="inheritance">
 <li>com.netgrif.core.petrinet.domain.PetriNet</li>
@@ -159,7 +159,7 @@ extends <a href="PetriNetObject.html" title="class in com.netgrif.application.en
 </a>
 <h3>Field Summary</h3>
 <ul class="blockList">
-<li class="blockList"><a id="fields.inherited.from.class.com.netgrif.adapter.petrinet.domain.PetriNetObject">
+<li class="blockList"><a id="fields.inherited.from.class.com.netgrif.core.petrinet.domain.PetriNetObject">
 <!--   -->
 </a>
 <h3>Fields inherited from class&nbsp;com.netgrif.application.engine.petrinet.domain.<a href="PetriNetObject.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNetObject</a></h3>
@@ -212,7 +212,7 @@ extends <a href="PetriNetObject.html" title="class in com.netgrif.application.en
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addArc(com.netgrif.application.engine.petrinet.domain.arcs.Arc)">addArc</a></span>&#8203;(<a href="arcs/Arc.html" title="class in com.netgrif.application.engine.petrinet.domain.arcs">Arc</a>&nbsp;arc)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addArc(com.netgrif.core.petrinet.domain.arcs.Arc)">addArc</a></span>&#8203;(<a href="arcs/Arc.html" title="class in com.netgrif.application.engine.petrinet.domain.arcs">Arc</a>&nbsp;arc)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
@@ -238,12 +238,12 @@ extends <a href="PetriNetObject.html" title="class in com.netgrif.application.en
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addPlace(com.netgrif.application.engine.petrinet.domain.Place)">addPlace</a></span>&#8203;(<a href="Place.html" title="class in com.netgrif.application.engine.petrinet.domain">Place</a>&nbsp;place)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addPlace(com.netgrif.core.petrinet.domain.Place)">addPlace</a></span>&#8203;(<a href="Place.html" title="class in com.netgrif.application.engine.petrinet.domain">Place</a>&nbsp;place)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addRole(com.netgrif.adapter.petrinet.domain.roles.ProcesRole)">addRole</a></span>&#8203;(<a href="roles/ProcessRole.html" title="class in com.netgrif.application.engine.petrinet.domain.roles">ProcessRole</a>&nbsp;role)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addRole(com.netgrif.core.petrinet.domain.roles.ProcessRole)">addRole</a></span>&#8203;(<a href="roles/ProcessRole.html" title="class in com.netgrif.application.engine.petrinet.domain.roles">ProcessRole</a>&nbsp;role)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i7" class="rowColor">
@@ -414,7 +414,7 @@ extends <a href="PetriNetObject.html" title="class in com.netgrif.application.en
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.com.netgrif.adapter.petrinet.domain.PetriNetObject">
+<li class="blockList"><a id="methods.inherited.from.class.com.netgrif.core.petrinet.domain.PetriNetObject">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;com.netgrif.application.engine.petrinet.domain.<a href="PetriNetObject.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNetObject</a></h3>
@@ -469,7 +469,7 @@ extends <a href="PetriNetObject.html" title="class in com.netgrif.application.en
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="addPlace(com.netgrif.application.engine.petrinet.domain.Place)">
+<a id="addPlace(com.netgrif.core.petrinet.domain.Place)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -487,7 +487,7 @@ extends <a href="PetriNetObject.html" title="class in com.netgrif.application.en
 <pre class="methodSignature">public&nbsp;void&nbsp;addTransition&#8203;(<a href="Transition.html" title="class in com.netgrif.application.engine.petrinet.domain">Transition</a>&nbsp;transition)</pre>
 </li>
 </ul>
-<a id="addRole(com.netgrif.adapter.petrinet.domain.roles.ProcesRole)">
+<a id="addRole(com.netgrif.core.petrinet.domain.roles.ProcessRole)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -570,7 +570,7 @@ extends <a href="PetriNetObject.html" title="class in com.netgrif.application.en
 <pre class="methodSignature">public&nbsp;boolean&nbsp;isNotInitialized()</pre>
 </li>
 </ul>
-<a id="addArc(com.netgrif.application.engine.petrinet.domain.arcs.Arc)">
+<a id="addArc(com.netgrif.core.petrinet.domain.arcs.Arc)">
 <!--   -->
 </a>
 <ul class="blockList">

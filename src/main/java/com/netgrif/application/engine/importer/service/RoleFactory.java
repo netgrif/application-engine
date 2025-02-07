@@ -98,7 +98,7 @@ public class RoleFactory {
     }
 
     ProcessRole transitionRole(PetriNet net, Transition transition) {
-        ProcessRole role = new ProcessRole();
+        ProcessRole role = new com.netgrif.adapter.petrinet.domain.roles.ProcessRole();
         role.setName(transition.getImportId());
         role.setImportId(net.getStringId() + "_" + transition.getImportId());
 //        role.setDescription("Default role of transition "+transition.getTitle().getDefaultValue() + " in process "+net.getTitle().getDefaultValue());

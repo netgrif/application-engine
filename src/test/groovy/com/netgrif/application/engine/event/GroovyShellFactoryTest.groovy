@@ -8,7 +8,7 @@ import com.netgrif.core.petrinet.domain.I18nString
 import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.adapter.workflow.domain.QTask
+import com.netgrif.core.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

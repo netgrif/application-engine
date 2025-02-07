@@ -5,7 +5,7 @@ import com.netgrif.core.petrinet.domain.dataset.Field;
 import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.core.workflow.domain.Task;
 import com.netgrif.core.workflow.domain.eventoutcomes.EventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
+import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
 
 import java.util.List;
 

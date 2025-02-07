@@ -2,7 +2,7 @@ package com.netgrif.application.engine.importer.service;
 
 import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.core.importer.model.*;
-import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
+import com.netgrif.core.petrinet.domain.throwable.MissingIconKeyException;
 import com.netgrif.core.petrinet.domain.Component;
 import com.netgrif.core.petrinet.domain.DataGroup;
 import com.netgrif.core.petrinet.domain.Place;
@@ -29,7 +29,7 @@ import com.netgrif.core.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.core.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.core.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.ArcFactory;
 import com.netgrif.adapter.petrinet.service.PetriNetService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
@@ -181,7 +181,7 @@ public class Importer {
 
     @Transactional
     protected Optional<PetriNet> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
-        net = new PetriNet();
+        net = new com.netgrif.adapter.petrinet.domain.PetriNet();
 
         documentValidator.checkConflictingAttributes(document, document.getUsersRef(), document.getUserRef(), "usersRef", "userRef");
         documentValidator.checkDeprecatedAttributes(document);
@@ -1075,7 +1075,7 @@ public class Importer {
     }
 
     protected ProcessRole initRole(Role importRole) {
-        ProcessRole role = new ProcessRole();
+        ProcessRole role = new com.netgrif.adapter.petrinet.domain.roles.ProcessRole();
         Map<EventType, com.netgrif.core.petrinet.domain.events.Event> events = createEventsMap(importRole.getEvent());
         role.setImportId(importRole.isGlobal() != null && importRole.isGlobal() ? ProcessRole.GLOBAL + importRole.getId() : importRole.getId());
         //MODULARISATION: events to be resolved

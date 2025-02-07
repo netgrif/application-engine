@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
-import com.netgrif.application.engine.petrinet.domain.events.DataEventType
+import com.netgrif.core.petrinet.domain.events.DataEventType
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
 import org.bson.types.ObjectId

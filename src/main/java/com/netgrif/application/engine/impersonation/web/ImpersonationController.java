@@ -6,7 +6,7 @@ import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserResourceHelperService;
 import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
-import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
+//import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.impersonation.exceptions.IllegalImpersonationAttemptException;
 import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserHasSessionException;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService;
@@ -51,14 +51,14 @@ public class ImpersonationController {
     @Autowired
     protected IUserResourceHelperService userResourceHelperService;
 
-    @Autowired
-    protected ObjectFactory<UserResourceAssembler> userResourceAssemblerProvider;
+//    @Autowired
+//    protected ObjectFactory<UserResourceAssembler> userResourceAssemblerProvider;
 
-    protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
-        UserResourceAssembler result = userResourceAssemblerProvider.getObject();
-        result.initialize(locale, small, selfRel);
-        return result;
-    }
+//    protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
+//        UserResourceAssembler result = userResourceAssemblerProvider.getObject();
+//        result.initialize(locale, small, selfRel);
+//        return result;
+//    }
 
     @Operation(summary = "Search impersonable users", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)

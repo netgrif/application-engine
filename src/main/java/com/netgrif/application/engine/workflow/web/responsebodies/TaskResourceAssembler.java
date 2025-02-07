@@ -14,7 +14,7 @@
 //    }
 //
 //    @Override
-//    public LocalisedTaskResource toModel(com.netgrif.adapter.workflow.domain.Task task) {
+//    public LocalisedTaskResource toModel(com.netgrif.core.workflow.domain.Task task) {
 //        return new LocalisedTaskResource(new com.netgrif.application.engine.workflow.web.responsebodies.Task(task, locale));
 //    }
 //}

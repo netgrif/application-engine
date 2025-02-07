@@ -14,8 +14,8 @@ import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.core.petrinet.domain.dataset.FieldType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.adapter.petrinet.service.PetriNetService
-import com.netgrif.adapter.workflow.domain.Case
-import com.netgrif.adapter.workflow.domain.Task
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.core.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
@@ -57,7 +57,7 @@ class PdfGeneratorTest {
     private UserService userService
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private PdfResource pdfResource

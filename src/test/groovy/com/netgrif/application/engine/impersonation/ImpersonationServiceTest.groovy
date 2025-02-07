@@ -1,31 +1,28 @@
 package com.netgrif.application.engine.impersonation
 
+import com.netgrif.adapter.auth.service.AuthorityService
+import com.netgrif.adapter.auth.service.UserService
+import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.core.auth.domain.Authority;
-import com.netgrif.core.auth.domain.IUser
-import com.netgrif.core.auth.domain.User
-import com.netgrif.core.auth.domain.enums.UserState
-import com.netgrif.adapter.auth.service.*
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
+import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.runner.ImpersonationRunner
+import com.netgrif.application.engine.workflow.service.interfaces.*
+import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
+import com.netgrif.core.auth.domain.Authority
+import com.netgrif.core.auth.domain.IUser
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.core.petrinet.domain.I18nString
 import com.netgrif.core.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
-import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
-import com.netgrif.adapter.petrinet.service.PetriNetService
-import com.netgrif.application.engine.startup.runner.ImpersonationRunner
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.adapter.workflow.domain.Case
-import com.netgrif.adapter.workflow.domain.Task
-import com.netgrif.application.engine.workflow.service.interfaces.IDataService
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskAuthorizationService
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowAuthorizationService
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
-import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
+import com.netgrif.core.petrinet.domain.dataset.UserFieldValue
+import com.netgrif.core.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.core.workflow.domain.Task
 import com.netgrif.core.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest
 import groovy.json.JsonSlurper
 import org.junit.jupiter.api.BeforeEach
@@ -52,8 +49,8 @@ import java.time.LocalDateTime
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @SpringBootTest
@@ -85,7 +82,7 @@ class ImpersonationServiceTest {
     private ITaskService taskService
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private AuthorityService authorityService

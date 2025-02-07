@@ -15,7 +15,7 @@ import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepos
 import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.adapter.workflow.domain.Case
+import com.netgrif.core.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation
 import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome

@@ -8,17 +8,17 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSer
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.core.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
-import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.core.petrinet.domain.dataset.ChoiceField
+import com.netgrif.core.petrinet.domain.dataset.FileFieldValue
+import com.netgrif.core.petrinet.domain.dataset.FileListFieldValue
+import com.netgrif.core.petrinet.domain.dataset.UserFieldValue
+import com.netgrif.core.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.adapter.workflow.domain.Case
-import com.netgrif.adapter.workflow.domain.QTask
-import com.netgrif.adapter.workflow.domain.Task
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.core.workflow.domain.QTask
+import com.netgrif.core.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -75,7 +75,7 @@ class DataSearchRequestTest {
     private IElasticCaseService searchService
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private SuperCreatorRunner superCreator

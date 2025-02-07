@@ -3,7 +3,7 @@ package com.netgrif.application.engine
 import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.core.elastic.domain.ElasticCase
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
-import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
+import com.netgrif.core.elastic.domain.ElasticPetriNet
 import com.netgrif.core.elastic.domain.ElasticTask
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
 import com.netgrif.application.engine.elastic.service.ElasticIndexService
@@ -78,7 +78,7 @@ class TestHelper {
     private ElasticsearchRunner elasticsearchRunner
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     void truncateDbs() {
         template.db.drop()

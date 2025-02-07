@@ -8,12 +8,12 @@ import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.core.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
-import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
+import com.netgrif.core.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.adapter.workflow.domain.Case
+import com.netgrif.core.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowAuthorizationService
@@ -56,7 +56,7 @@ class WorkflowAuthorizationServiceTest {
     private WebApplicationContext wac
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private SuperCreatorRunner superCreator

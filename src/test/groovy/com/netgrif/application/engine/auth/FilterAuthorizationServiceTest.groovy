@@ -4,7 +4,7 @@
 //import com.netgrif.core.auth.domain.Authority;
 //import com.netgrif.core.auth.domain.User
 //import com.netgrif.core.auth.domain.enums.UserState
-//import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
+//import com.netgrif.core.petrinet.domain.roles.ProcessRole
 //import com.netgrif.application.engine.startup.ImportHelper
 //import com.netgrif.application.engine.workflow.domain.Filter
 //import com.netgrif.application.engine.workflow.domain.repositories.FilterRepository

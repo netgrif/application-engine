@@ -9,11 +9,11 @@ import com.netgrif.application.engine.configuration.properties.CacheProperties
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.core.petrinet.domain.VersionType
-import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
 import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -41,7 +41,7 @@ class CachePetriNetServiceTest {
     private SuperCreatorRunner superCreator
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private UserService userService

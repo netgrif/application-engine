@@ -71,7 +71,7 @@ class AssignActionTest {
     private ProcessRoleRepository processRoleRepository
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private SuperCreatorRunner superCreator

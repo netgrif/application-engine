@@ -10,7 +10,7 @@ import com.netgrif.application.engine.export.configuration.ExportConfiguration;
 import com.netgrif.application.engine.export.domain.ExportDataConfig;
 import com.netgrif.application.engine.export.service.interfaces.IExportService;
 import com.netgrif.core.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.*;
+import com.netgrif.core.petrinet.domain.dataset.*;
 import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.core.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;

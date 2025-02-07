@@ -7,11 +7,11 @@ import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.core.petrinet.domain.PetriNet
-import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.startup.runner.GroupRunner
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.adapter.workflow.domain.Case
-import com.netgrif.adapter.workflow.domain.QCase
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.core.workflow.domain.QCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired

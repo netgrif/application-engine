@@ -43,9 +43,9 @@ class AbstractAuthorizationServiceTest {
 
         // init
         List<ProcessRole> roles = new LinkedList<>();
-        roles.add(new ProcessRole());
-        roles.add(new ProcessRole());
-        roles.add(new ProcessRole());
+        roles.add(new com.netgrif.adapter.petrinet.domain.roles.ProcessRole());
+        roles.add(new com.netgrif.adapter.petrinet.domain.roles.ProcessRole());
+        roles.add(new com.netgrif.adapter.petrinet.domain.roles.ProcessRole());
 
         IUser user = new User();
         user.addProcessRole(roles.get(0));

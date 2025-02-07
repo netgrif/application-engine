@@ -9,9 +9,9 @@ import com.netgrif.application.engine.petrinet.domain.roles.RolePermission
 import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.adapter.workflow.domain.Case
-import com.netgrif.adapter.workflow.domain.Task
-import com.netgrif.adapter.workflow.domain.TaskPair
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.core.workflow.domain.Task
+import com.netgrif.core.workflow.domain.TaskPair
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -37,7 +37,7 @@ class PredefinedRolesPermissionsTest {
     private TestHelper testHelper
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private SuperCreatorRunner superCreator

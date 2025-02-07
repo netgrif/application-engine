@@ -1,6 +1,6 @@
 //package com.netgrif.application.engine.workflow.web.responsebodies;
 //
-//import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+//import com.netgrif.core.petrinet.domain.dataset.TextField;
 //import lombok.Data;
 //
 //import java.util.Locale;

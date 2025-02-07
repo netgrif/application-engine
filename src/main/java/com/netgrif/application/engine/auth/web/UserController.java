@@ -74,17 +74,17 @@ public class UserController {
     @Autowired
     private IUserFactory userResponseFactory;
 
-    @Autowired
-    private ObjectFactory<UserResourceAssembler> userResourceAssemblerFactory;
+//    @Autowired
+//    private ObjectFactory<UserResourceAssembler> userResourceAssemblerFactory;
 
     @Autowired
     private ISecurityContextService securityContextService;
 
-    protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
-        UserResourceAssembler result = userResourceAssemblerFactory.getObject();
-        result.initialize(locale, small, selfRel);
-        return result;
-    }
+//    protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
+//        UserResourceAssembler result = userResourceAssemblerFactory.getObject();
+//        result.initialize(locale, small, selfRel);
+//        return result;
+//    }
 
     @Operation(summary = "Get all users", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)

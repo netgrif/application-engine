@@ -15,7 +15,6 @@ import com.netgrif.core.history.domain.petrinetevents.ImportPetriNetEventLog;
 import com.netgrif.core.history.domain.taskevents.TaskEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.Importer;
-import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 //import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.core.petrinet.domain.PetriNet;
@@ -27,7 +26,8 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Field
 import com.netgrif.core.petrinet.domain.events.EventPhase;
 import com.netgrif.core.petrinet.domain.events.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.core.petrinet.domain.throwable.MissingIconKeyException;
+import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.core.petrinet.domain.version.Version;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
@@ -195,7 +195,7 @@ public class PetriNetService implements com.netgrif.adapter.petrinet.service.Pet
 
     @Override
     @Deprecated
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author, String uriNodeId) throws MissingPetriNetMetaDataException, MissingIconKeyException {
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author, uriNodeId);
     }
 

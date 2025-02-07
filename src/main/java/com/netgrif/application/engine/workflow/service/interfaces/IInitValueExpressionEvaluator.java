@@ -1,10 +1,10 @@
 //package com.netgrif.core.workflow.service.InitValueExpressionEvaluator;
 //
 //import com.netgrif.core.petrinet.domain.I18nString;
-//import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField;
+//import com.netgrif.core.petrinet.domain.dataset.ChoiceField;
 //import com.netgrif.core.petrinet.domain.dataset.Field;
 //import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
-//import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
+//import com.netgrif.core.petrinet.domain.dataset.logic.action.runner.Expression;
 //import com.netgrif.core.workflow.domain.Case;
 //
 //import java.util.Map;

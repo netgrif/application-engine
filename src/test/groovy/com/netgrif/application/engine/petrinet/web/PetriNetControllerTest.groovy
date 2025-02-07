@@ -7,7 +7,7 @@ import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.core.petrinet.domain.VersionType
-import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -52,7 +52,7 @@ class PetriNetControllerTest {
     private WebApplicationContext wac
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private SuperCreatorRunner superCreator

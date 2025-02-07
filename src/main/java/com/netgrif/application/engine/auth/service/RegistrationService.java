@@ -41,7 +41,7 @@
 //    private INextGroupService groupService;
 //
 //    @Autowired
-//    private IProcessRoleService processRole;
+//    private ProcessRoleService processRole;
 //
 //    @Autowired
 //    private ServerAuthProperties serverAuthProperties;

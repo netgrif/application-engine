@@ -14,7 +14,7 @@ import com.netgrif.core.model.EntityModel;
 import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.core.petrinet.domain.PetriNetSearch;
 import com.netgrif.core.petrinet.domain.VersionType;
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.adapter.petrinet.service.PetriNetService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
@@ -117,6 +117,8 @@ public class PetriNetController {
         } catch (IOException e) {
             log.error("Importing Petri net failed: ", e);
             return EventOutcomeWithMessageResource.errorMessage("IO error while importing Petri net");
+        } catch (MissingPetriNetMetaDataException e) {
+            return EventOutcomeWithMessageResource.errorMessage("Missing metadata error while importing Petri net");
         }
     }
 

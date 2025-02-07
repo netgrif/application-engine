@@ -592,16 +592,16 @@ public final class FieldFactory {
         }
     }
 
-    public Field buildFieldWithoutValidation(Case useCase, String fieldId, String transitionId) {
+    public Field<?> buildFieldWithoutValidation(Case useCase, String fieldId, String transitionId) {
         return buildField(useCase, fieldId, false, transitionId);
     }
 
-    public Field buildFieldWithValidation(Case useCase, String fieldId, String transitionId) {
+    public Field<?>  buildFieldWithValidation(Case useCase, String fieldId, String transitionId) {
         return buildField(useCase, fieldId, true, transitionId);
     }
 
-    private Field buildField(Case useCase, String fieldId, boolean withValidation, String transitionId) {
-        Field field = useCase.getPetriNet().getDataSet().get(fieldId);
+    private Field<?>  buildField(Case useCase, String fieldId, boolean withValidation, String transitionId) {
+        Field<?>  field = useCase.getPetriNet().getDataSet().get(fieldId);
 
         resolveDataValues(field, useCase, fieldId);
         resolveComponent(field, useCase, transitionId);
@@ -620,13 +620,13 @@ public final class FieldFactory {
 
     @SuppressWarnings({"all", "rawtypes", "unchecked"})
     private void resolveValidations(Field field, Case useCase) {
-        List<com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation> validations = useCase.getDataField(field.getImportId()).getValidations();
+        List<com.netgrif.core.petrinet.domain.dataset.logic.validation.Validation> validations = useCase.getDataField(field.getImportId()).getValidations();
         if (validations != null) {
             field.setValidations(validations.stream().map(it -> it.clone()).collect(Collectors.toList()));
         }
         if (field.getValidations() == null) return;
 
-        ((List<com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation>) field.getValidations()).stream()
+        ((List<com.netgrif.core.petrinet.domain.dataset.logic.validation.Validation>) field.getValidations()).stream()
                 .filter(it -> it instanceof DynamicValidation).map(it -> (DynamicValidation) it).forEach(valid -> {
                     valid.setCompiledRule(dataValidationExpressionEvaluator.compile(useCase, valid.getExpression()));
                 });

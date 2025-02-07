@@ -8,7 +8,7 @@ import com.netgrif.core.petrinet.domain.Transition;
 import com.netgrif.core.petrinet.domain.VersionType;
 import com.netgrif.core.petrinet.domain.dataset.Field;
 import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.core.petrinet.domain.version.Version;
 import com.netgrif.core.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.core.petrinet.web.responsebodies.PetriNetImportReference;

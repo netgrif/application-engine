@@ -18,7 +18,7 @@ abstract class MigrationOrderedCommandLineRunner implements CommandLineRunner { 
     private MigrationRepository repository
 
     @Autowired
-    private IPetriNetService service
+    private PetriNetService service
 
     @Override
     void run(String... strings) throws Exception {

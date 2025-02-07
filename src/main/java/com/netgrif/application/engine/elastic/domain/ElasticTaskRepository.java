@@ -2,6 +2,7 @@ package com.netgrif.application.engine.elastic.domain;
 
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;
+import com.netgrif.core.elastic.domain.ElasticTask;
 
 import java.util.List;
 

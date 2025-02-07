@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.integration.plugins.config;
 
-import com.netgrif.application.engine.petrinet.domain.dataset.*;
+import com.netgrif.core.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.workflow.web.responsebodies.*;
 import lombok.extern.slf4j.Slf4j;
 //import org.modelmapper.ModelMapper;

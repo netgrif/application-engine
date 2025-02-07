@@ -1,6 +1,6 @@
 //package com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes;
 //
-//import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedFieldContainer;
+//import com.netgrif.core.petrinet.domain.dataset.logic.ChangedFieldContainer;
 //import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 //import com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes.base.LocalisedTaskEventOutcome;
 //

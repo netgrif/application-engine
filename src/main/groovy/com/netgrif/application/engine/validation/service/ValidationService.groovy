@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.validation.service
 
 import com.netgrif.core.petrinet.domain.I18nString
-import com.netgrif.application.engine.petrinet.domain.dataset.*
+import com.netgrif.core.petrinet.domain.dataset.*
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService
 import com.netgrif.application.engine.validation.domain.ValidationDataInput
 import com.netgrif.application.engine.validation.models.*

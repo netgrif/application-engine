@@ -6,7 +6,7 @@ import com.netgrif.adapter.petrinet.service.PetriNetService;
 import com.netgrif.core.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.core.workflow.domain.ProcessResourceId;
-import com.netgrif.adapter.workflow.domain.QTask;
+import com.netgrif.core.workflow.domain.QTask;
 import com.netgrif.core.workflow.domain.Task;
 import com.netgrif.core.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.core.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;

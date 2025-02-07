@@ -32,7 +32,7 @@ public class AnonymousRoleRunner implements ApplicationEngineStartupRunner {
             return;
         }
 
-        ProcessRole anonymousRole = new ProcessRole();
+        ProcessRole anonymousRole = new com.netgrif.adapter.petrinet.domain.roles.ProcessRole();
         anonymousRole.setImportId(ProcessRole.ANONYMOUS_ROLE);
         anonymousRole.setName(new I18nString(ProcessRole.ANONYMOUS_ROLE));
         anonymousRole.setDescription("Anonymous system process role");

@@ -4,7 +4,7 @@
 //import com.netgrif.core.event.events.Event;
 //import com.netgrif.core.petrinet.domain.events.EventPhase;
 //import com.netgrif.core.petrinet.domain.events.EventType;
-//import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
+//import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
 //import lombok.Getter;
 //
 //

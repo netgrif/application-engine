@@ -2,10 +2,10 @@ package com.netgrif.application.engine.petrinet.domain
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.petrinet.domain.arcs.Arc
-import com.netgrif.application.engine.petrinet.domain.arcs.InhibitorArc
-import com.netgrif.application.engine.petrinet.domain.arcs.ReadArc
-import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc
+import com.netgrif.core.petrinet.domain.arcs.Arc
+import com.netgrif.core.petrinet.domain.arcs.InhibitorArc
+import com.netgrif.core.petrinet.domain.arcs.ReadArc
+import com.netgrif.core.petrinet.domain.arcs.ResetArc
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -30,7 +30,7 @@ class PetriNetTest {
     private Importer importer
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private SuperCreatorRunner superCreator

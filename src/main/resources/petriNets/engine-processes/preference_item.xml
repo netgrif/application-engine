@@ -49,7 +49,7 @@
 		<title>Admin</title>
 	</role>
 	<function scope="process" name="removeItemChildCases">
-		{ com.netgrif.adapter.workflow.domain.Case useCase ->
+		{ com.netgrif.core.workflow.domain.Case useCase ->
 
 			def childCaseIds = useCase.dataSet['childItemIds'].value
 			if (childCaseIds == null || childCaseIds.isEmpty()) {
@@ -192,7 +192,7 @@
 			prefixUri = prefixUri.replace("//","/")
 
 			String newUri = prefixUri + uriService.getUriSeparator() + newNodeName.value
-			def newNode = uriService.getOrCreate(newUri, com.netgrif.application.engine.petrinet.domain.UriContentType.CASE)
+			def newNode = uriService.getOrCreate(newUri, com.netgrif.core.petrinet.domain.UriContentType.CASE)
 
 			change selectedUri value { splitUriPath(newNode.uriPath) }
 
@@ -543,7 +543,7 @@
 				return
 			}
 
-			def filterCase = findCase({it._id.eq(new com.netgrif.application.engine.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
+			def filterCase = findCase({it._id.eq(new com.netgrif.core.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
 			change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
 
 			if (filterCase.dataSet["filter_type"].value == "Case") {
@@ -1208,7 +1208,7 @@
 							return
 						}
 
-						def filterCase = findCase({it._id.eq(new com.netgrif.application.engine.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
+						def filterCase = findCase({it._id.eq(new com.netgrif.core.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
 						if (!menu_name.value) {
 							change menu_name value {return filterCase.dataSet["i18n_filter_name"].value}
 						}
@@ -1919,7 +1919,7 @@
 						filterCaseRef: f.filter_case;
 
 						change filterCaseRef value { [new_filter_id.value] }
-						def filterCase = findCase({it._id.eq(new com.netgrif.application.engine.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
+						def filterCase = findCase({it._id.eq(new com.netgrif.core.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
 						change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
 					</action>
 				</actions>

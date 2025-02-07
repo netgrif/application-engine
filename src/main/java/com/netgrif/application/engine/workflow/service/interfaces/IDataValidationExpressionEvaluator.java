@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
+import com.netgrif.core.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.core.workflow.domain.Case;
 
 public interface IDataValidationExpressionEvaluator {

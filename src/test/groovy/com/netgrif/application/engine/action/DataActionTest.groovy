@@ -3,7 +3,7 @@ package com.netgrif.application.engine.action
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.core.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.adapter.workflow.domain.Task
+import com.netgrif.core.workflow.domain.Task
 import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService

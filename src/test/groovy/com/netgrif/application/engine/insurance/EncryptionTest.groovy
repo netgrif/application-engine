@@ -8,7 +8,7 @@ import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.adapter.workflow.domain.Case
+import com.netgrif.core.workflow.domain.Case
 import com.netgrif.core.workflow.domain.DataField
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
@@ -42,7 +42,7 @@ class EncryptionTest {
     private IAuthorityService authorityService
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private SuperCreatorRunner superCreator

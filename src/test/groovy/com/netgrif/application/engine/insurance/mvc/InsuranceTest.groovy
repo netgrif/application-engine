@@ -8,7 +8,7 @@ import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.core.petrinet.domain.VersionType
-import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -108,7 +108,7 @@ class InsuranceTest {
     private ImportHelper importHelper
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private SuperCreatorRunner superCreator

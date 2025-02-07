@@ -15,7 +15,7 @@ import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.mail.EmailType
 import com.netgrif.core.petrinet.domain.VersionType
-import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -66,7 +66,7 @@ class AuthenticationControllerTest {
     private AuthorityService authorityService
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private TestHelper testHelper

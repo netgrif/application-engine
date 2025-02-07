@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.petrinet.service;
 
 import com.netgrif.application.engine.configuration.properties.UriProperties;
-import com.netgrif.application.engine.petrinet.domain.UriContentType;
-import com.netgrif.application.engine.petrinet.domain.UriNode;
+import com.netgrif.core.petrinet.domain.UriContentType;
+import com.netgrif.core.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import lombok.Getter;

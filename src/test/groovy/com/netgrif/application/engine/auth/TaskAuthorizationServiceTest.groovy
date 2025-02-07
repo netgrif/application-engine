@@ -1,25 +1,24 @@
 package com.netgrif.application.engine.auth
 
-import com.netgrif.application.engine.TestHelper
-import com.netgrif.core.auth.domain.Authority
-import com.netgrif.core.auth.domain.IUser
-import com.netgrif.core.auth.domain.User
-import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.adapter.auth.service.UserService
-import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.core.petrinet.domain.PetriNet
-import com.netgrif.core.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
-import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
 import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.adapter.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskAuthorizationService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.core.auth.domain.Authority
+import com.netgrif.core.auth.domain.IUser
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
+import com.netgrif.core.workflow.domain.Case
 import groovy.json.JsonOutput
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -80,7 +79,7 @@ class TaskAuthorizationServiceTest {
     private ImportHelper importHelper
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private ITaskAuthorizationService taskAuthorizationService

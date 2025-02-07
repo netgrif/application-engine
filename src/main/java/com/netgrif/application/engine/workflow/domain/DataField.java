@@ -8,7 +8,7 @@ import com.netgrif.core.petrinet.domain.Component;
 import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Referencable;
 import com.netgrif.core.petrinet.domain.dataset.logic.FieldBehavior;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation;
+import com.netgrif.core.petrinet.domain.dataset.logic.validation.Validation;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Getter;

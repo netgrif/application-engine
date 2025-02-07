@@ -13,7 +13,7 @@ import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.FilterProperties;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.application.engine.workflow.domain.filter.FilterImportExport;
+import com.netgrif.core.workflow.domain.filter.FilterImportExport;
 import com.netgrif.core.workflow.domain.filter.FilterImportExportList;
 import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.core.petrinet.domain.PetriNet;

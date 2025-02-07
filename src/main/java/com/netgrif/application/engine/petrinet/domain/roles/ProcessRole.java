@@ -1,7 +1,7 @@
 //package com.netgrif.application.engine.petrinet.domain.roles;
 //
 //import com.netgrif.core.petrinet.domain.I18nString;
-//import com.netgrif.application.engine.petrinet.domain.Imported;
+//import com.netgrif.core.petrinet.domain.Imported;
 //import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
 //import com.netgrif.core.petrinet.domain.events.Event;
 //import com.netgrif.core.petrinet.domain.events.EventType;

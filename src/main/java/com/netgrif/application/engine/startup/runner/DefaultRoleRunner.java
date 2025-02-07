@@ -34,7 +34,7 @@ public class DefaultRoleRunner implements ApplicationEngineStartupRunner {
             return;
         }
 
-        ProcessRole defaultRole = new ProcessRole();
+        ProcessRole defaultRole = new com.netgrif.adapter.petrinet.domain.roles.ProcessRole();
         defaultRole.setImportId(ProcessRole.DEFAULT_ROLE);
         defaultRole.setName(new I18nString(ProcessRole.DEFAULT_ROLE));
         defaultRole.setDescription("Default system process role");

@@ -334,7 +334,7 @@ public class WorkflowService implements IWorkflowService {
 
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user, Map<String, String> params) {
         LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
-        PetriNet petriNet = new com.netgrif.core.petrinet.domain.PetriNet((com.netgrif.core.petrinet.domain.PetriNet) petriNetService.get(new ObjectId(netId)));
+        PetriNet petriNet = new com.netgrif.adapter.petrinet.domain.PetriNet((com.netgrif.adapter.petrinet.domain.PetriNet) petriNetService.get(new ObjectId(netId)));
 //        int rulesExecuted;
         Case useCase = new com.netgrif.adapter.workflow.domain.Case(petriNet);
         useCase.populateDataSet(initValueExpressionEvaluator, params);
@@ -373,7 +373,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     protected Function<Case, String> resolveDefaultCaseTitle(String netId, Locale locale, Map<String, String> params) {
-        PetriNet petriNet = new com.netgrif.core.petrinet.domain.PetriNet((com.netgrif.core.petrinet.domain.PetriNet) petriNetService.get(new ObjectId(netId)));
+        PetriNet petriNet = new com.netgrif.adapter.petrinet.domain.PetriNet((com.netgrif.adapter.petrinet.domain.PetriNet) petriNetService.get(new ObjectId(netId)));
         Function<Case, String> makeTitle;
         if (petriNet.hasDynamicCaseName()) {
             makeTitle = (u) -> initValueExpressionEvaluator.evaluateCaseName(u, petriNet.getDefaultCaseNameExpression(), params).getTranslation(locale);
@@ -614,7 +614,7 @@ public class WorkflowService implements IWorkflowService {
     private void setPetriNet(Case useCase) {
         PetriNet model = useCase.getPetriNet();
         if (model == null) {
-            model = new com.netgrif.core.petrinet.domain.PetriNet((com.netgrif.core.petrinet.domain.PetriNet) petriNetService.get(new ObjectId(useCase.getPetriNetId())));
+            model = new com.netgrif.adapter.petrinet.domain.PetriNet((com.netgrif.adapter.petrinet.domain.PetriNet) petriNetService.get(new ObjectId(useCase.getPetriNetId())));
             useCase.setPetriNet(model);
         }
         model.initializeTokens(useCase.getActivePlaces());

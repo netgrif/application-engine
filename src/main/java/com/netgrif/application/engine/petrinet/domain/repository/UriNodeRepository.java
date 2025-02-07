@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.repository;
 
-import com.netgrif.application.engine.petrinet.domain.UriNode;
+import com.netgrif.core.petrinet.domain.UriNode;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

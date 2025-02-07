@@ -10,7 +10,7 @@ import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.adapter.workflow.domain.QCase
+import com.netgrif.core.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -60,7 +60,7 @@ class ElasticTaskTest {
     private ReindexingTask reindexingTask
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private SuperCreatorRunner superCreator
@@ -91,7 +91,7 @@ class ElasticTaskTest {
 
     @Test
     void testIndexTask() {
-        ElasticTask task = new ElasticTask()
+        ElasticTask task = new com.netgrif.adapter.elastic.domain.ElasticTask()
         task.setTaskId("TestTask")
         task.setTitle("Test")
         task.setProcessId("Process")
@@ -124,7 +124,7 @@ class ElasticTaskTest {
 
     @Test
     void testRemoveTaskByProcess() throws Exception {
-        ElasticTask task = new ElasticTask()
+        ElasticTask task = new com.netgrif.adapter.elastic.domain.ElasticTask()
         task.setTaskId("TestTask")
         task.setTitle("Test")
         task.setProcessId("Process")
@@ -146,7 +146,7 @@ class ElasticTaskTest {
     @Test
     void reindexTaskAllTest() throws InterruptedException, ExecutionException {
         int pocetOpakovani = 100
-        ElasticTask task = new ElasticTask()
+        ElasticTask task = new com.netgrif.adapter.elastic.domain.ElasticTask()
         task.setTaskId("TestTask")
         task.setTitle("START")
         task.setProcessId("TestProcess")
@@ -158,7 +158,7 @@ class ElasticTaskTest {
             final int index = it
             executorService.submit(() -> {
                 try {
-                    ElasticTask taskParallel = new ElasticTask()
+                    ElasticTask taskParallel = new com.netgrif.adapter.elastic.domain.ElasticTask()
                     taskParallel.setTaskId("TestTask")
                     taskParallel.setTitle("START" + index)
                     taskParallel.setProcessId("TestProcess")
@@ -187,7 +187,7 @@ class ElasticTaskTest {
     @Test
     void reindexTaskTest() throws InterruptedException, ExecutionException {
         int pocetOpakovani = 100
-        ElasticTask task = new ElasticTask()
+        ElasticTask task = new com.netgrif.adapter.elastic.domain.ElasticTask()
         task.setTaskId("TestTask")
         task.setTitle("START")
         task.setStringId("TestTask")
@@ -200,7 +200,7 @@ class ElasticTaskTest {
             final int index = it
             executorService.submit(() -> {
                 try {
-                    ElasticTask taskParallel = new ElasticTask()
+                    ElasticTask taskParallel = new com.netgrif.adapter.elastic.domain.ElasticTask()
                     taskParallel.setTaskId("TestTask")
                     taskParallel.setTitle("START" + index)
                     taskParallel.setStringId("TestTask")
@@ -230,7 +230,7 @@ class ElasticTaskTest {
     @Test
     void reindexTaskParallelTest() throws InterruptedException, ExecutionException {
         int pocetOpakovani = 1000
-        ElasticTask task = new ElasticTask()
+        ElasticTask task = new com.netgrif.adapter.elastic.domain.ElasticTask()
         task.setTaskId("TestTask")
         task.setTitle("START")
         elasticTaskService.index(task)
@@ -242,7 +242,7 @@ class ElasticTaskTest {
             final int index = it
             executorService.submit(() -> {
                 try {
-                    ElasticTask taskParallel = new ElasticTask()
+                    ElasticTask taskParallel = new com.netgrif.adapter.elastic.domain.ElasticTask()
                     taskParallel.setTaskId("TestTask"+ index)
                     taskParallel.setTitle("START")
                     taskParallel.setStringId("TestTask"+index)

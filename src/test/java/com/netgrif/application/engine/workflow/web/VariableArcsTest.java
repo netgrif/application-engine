@@ -22,7 +22,7 @@ import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.startup.runner.SystemUserRunner;
 import com.netgrif.application.engine.startup.runner.DefaultRoleRunner;
 import com.netgrif.core.workflow.domain.Case;
-import com.netgrif.adapter.workflow.domain.QTask;
+import com.netgrif.core.workflow.domain.QTask;
 import com.netgrif.core.workflow.domain.Task;
 import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
@@ -64,7 +64,7 @@ public class VariableArcsTest {
     private ITaskService taskService;
 
     @Autowired
-    private IPetriNetService service;
+    private PetriNetService service;
 
     @Autowired
     private MockService mock;

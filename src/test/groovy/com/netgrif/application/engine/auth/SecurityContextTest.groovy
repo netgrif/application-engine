@@ -50,7 +50,7 @@ class SecurityContextTest {
     private UserService userService
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private SuperCreatorRunner superCreator

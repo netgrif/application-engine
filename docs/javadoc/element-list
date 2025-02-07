@@ -113,7 +113,7 @@ com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 com.netgrif.application.engine.petrinet.domain.dataset.logic.action.context
 com.netgrif.application.engine.petrinet.domain.dataset.logic.action.delegate
 com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner
-com.netgrif.application.engine.petrinet.domain.dataset.logic.validation
+com.netgrif.core.petrinet.domain.dataset.logic.validation
 com.netgrif.application.engine.petrinet.domain.events
 com.netgrif.application.engine.petrinet.domain.layout
 com.netgrif.application.engine.petrinet.domain.policies

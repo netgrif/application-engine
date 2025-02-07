@@ -17,7 +17,7 @@ import java.util.stream.Collectors
 class ActionMigration {
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private UserService userService;

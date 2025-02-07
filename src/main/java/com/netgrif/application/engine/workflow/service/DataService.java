@@ -325,7 +325,7 @@ public class DataService implements IDataService {
 
         List<Field<?>> data = getData(task, useCase).getData();
         Map<String, Field> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
-        List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::clone).collect(Collectors.toList());
+        List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::new).toList();
         for (DataGroup dataGroup : dataGroups) {
             resolveTaskRefOrderOnGrid(dataGroup, dataFieldMap);
             resultDataGroups.add(dataGroup);

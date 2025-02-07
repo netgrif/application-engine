@@ -12,7 +12,7 @@ import com.netgrif.core.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.core.workflow.domain.ProcessResourceId;
-import com.netgrif.adapter.workflow.domain.QCase;
+import com.netgrif.core.workflow.domain.QCase;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Ops;
@@ -348,7 +348,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     public Predicate group(Object query, LoggedUser user, Locale locale) {
-        PetriNetSearch processQuery = new PetriN();
+        PetriNetSearch processQuery = new PetriNetSearch();
         if (query instanceof List) {
             processQuery.setGroup((List<String>) query);
         } else if (query instanceof String) {

@@ -10,8 +10,8 @@ import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.adapter.workflow.domain.Case
-import com.netgrif.adapter.workflow.domain.QTask
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.core.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import org.junit.jupiter.api.BeforeEach
@@ -47,7 +47,7 @@ class TaskApiTest {
     private EventLogRepository eventLogRepository
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private TestHelper testHelper

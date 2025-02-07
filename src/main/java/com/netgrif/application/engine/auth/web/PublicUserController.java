@@ -6,7 +6,7 @@ import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.application.engine.auth.web.responsebodies.IUserFactory;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
-import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
+//import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.settings.domain.Preferences;
 import com.netgrif.application.engine.settings.service.IPreferencesService;
 import com.netgrif.application.engine.settings.web.PreferencesResource;
@@ -43,8 +43,8 @@ public class PublicUserController {
     @Autowired
     private IUserFactory userResponseFactory;
 
-    @Autowired
-    private ObjectFactory<UserResourceAssembler> userResourceAssemblerFactory;
+//    @Autowired
+//    private ObjectFactory<UserResourceAssembler> userResourceAssemblerFactory;
 
     @Autowired
     private UserService userService;
@@ -55,11 +55,11 @@ public class PublicUserController {
     public PublicUserController() {
     }
 
-    protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
-        UserResourceAssembler result = userResourceAssemblerFactory.getObject();
-        result.initialize(locale, small, selfRel);
-        return result;
-    }
+//    protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
+//        UserResourceAssembler result = userResourceAssemblerFactory.getObject();
+//        result.initialize(locale, small, selfRel);
+//        return result;
+//    }
 
     @Operation(summary = "Get logged user")
     @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)

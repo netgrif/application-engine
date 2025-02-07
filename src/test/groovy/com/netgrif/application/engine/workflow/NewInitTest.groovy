@@ -4,11 +4,11 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException
 import com.netgrif.core.petrinet.domain.I18nString
 import com.netgrif.core.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
+import com.netgrif.core.petrinet.domain.dataset.FileListFieldValue
+import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.adapter.workflow.domain.Case
+import com.netgrif.core.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -29,7 +29,7 @@ class NewInitTest {
     private TestHelper testHelper
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private IWorkflowService workflowService

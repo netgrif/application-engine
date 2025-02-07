@@ -4,7 +4,7 @@
 //import com.netgrif.core.auth.domain.LoggedUser;
 //import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 //import com.netgrif.core.petrinet.domain.VersionType;
-//import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+//import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 //import com.netgrif.adapter.petrinet.service.PetriNetService;
 ////import com.netgrif.application.engine.rules.domain.RuleRepository;
 ////import com.netgrif.application.engine.rules.domain.StoredRule;

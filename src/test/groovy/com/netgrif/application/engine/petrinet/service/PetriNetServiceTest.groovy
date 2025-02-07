@@ -6,16 +6,16 @@ import com.netgrif.core.auth.domain.Authority;
 import com.netgrif.core.auth.domain.User
 import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.adapter.auth.service.UserService
-import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
+import com.netgrif.core.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.core.petrinet.domain.PetriNetSearch
-import com.netgrif.application.engine.petrinet.domain.UriContentType
-import com.netgrif.application.engine.petrinet.domain.UriNode
+import com.netgrif.core.petrinet.domain.UriContentType
+import com.netgrif.core.petrinet.domain.UriNode
 import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
-import com.netgrif.adapter.petrinet.domain.roles.ProcesRole
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.adapter.petrinet.service.PetriNetService
@@ -58,7 +58,7 @@ class PetriNetServiceTest {
     private SuperCreatorRunner superCreator
 
     @Autowired
-    private IPetriNetService petriNetService
+    private PetriNetService petriNetService
 
     @Autowired
     private IWorkflowService workflowService
@@ -67,7 +67,7 @@ class PetriNetServiceTest {
     private TaskRepository taskRepository
 
     @Autowired
-    private IProcessRoleService userProcessRoleService
+    private ProcessRoleService userProcessRoleService
 
     @Autowired
     private UserService userService

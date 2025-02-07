@@ -11,12 +11,12 @@ import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.core.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
+import com.netgrif.core.petrinet.domain.dataset.FileListFieldValue
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.utils.FullPageRequest
-import com.netgrif.adapter.workflow.domain.Case
-import com.netgrif.adapter.workflow.domain.Task
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.core.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.TaskSearchService
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService

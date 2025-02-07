@@ -39,7 +39,7 @@
 				return;
 			}
 
-			def parentCase = findCase({it._id.eq(new com.netgrif.application.engine.workflow.domain.ProcessResourceId(parentId.value))});
+			def parentCase = findCase({it._id.eq(new com.netgrif.core.workflow.domain.ProcessResourceId(parentId.value))});
 
 			def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
 
@@ -68,7 +68,7 @@
 				return;
 			}
 
-			def parentCase = findCase({it._id.eq(new com.netgrif.application.engine.workflow.domain.ProcessResourceId(parentId.value))});
+			def parentCase = findCase({it._id.eq(new com.netgrif.core.workflow.domain.ProcessResourceId(parentId.value))});
 
 			def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
 
@@ -98,7 +98,7 @@
 				return;
 			}
 
-			def parentCase = findCase({it._id.eq(new com.netgrif.application.engine.workflow.domain.ProcessResourceId(parentId.value))});
+			def parentCase = findCase({it._id.eq(new com.netgrif.core.workflow.domain.ProcessResourceId(parentId.value))});
 
 
 			def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
@@ -416,7 +416,7 @@
 					entryName: f.entry_name,
 					icon: f.icon_name;
 
-					def filterCase = findCase({it._id.eq(new com.netgrif.application.engine.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
+					def filterCase = findCase({it._id.eq(new com.netgrif.core.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
 
 					change entryDefaultName value {return filterCase.title}
 
@@ -464,7 +464,7 @@
 						filterCaseRef: f.filter_case,
 						entryDefaultName: f.entry_default_name;
 
-						def filterCase = findCase({it._id.eq(new com.netgrif.application.engine.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
+						def filterCase = findCase({it._id.eq(new com.netgrif.core.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
 						filterCase.setTitle(entryDefaultName.value)
 						workflowService.save(filterCase)
 						def filterTask = findTask({ it._id.eq(filterTask.value[0])})
@@ -696,7 +696,7 @@
 						iconIdentifier: f.icon_name,
 						filterCaseId: f.filter_case;
 
-						def filterCase = findCase({it._id.eq(new com.netgrif.application.engine.workflow.domain.ProcessResourceId(filterCaseId.value[0]))})
+						def filterCase = findCase({it._id.eq(new com.netgrif.core.workflow.domain.ProcessResourceId(filterCaseId.value[0]))})
 						filterCase.setIcon(iconIdentifier.value)
 						workflowService.save(filterCase)
 					</action>
@@ -920,7 +920,7 @@
 						icon: f.icon_name;
 
 						change filterCaseRef value { [new_filter_id.value] }
-						def filterCase = findCase({it._id.eq(new com.netgrif.application.engine.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
+						def filterCase = findCase({it._id.eq(new com.netgrif.core.workflow.domain.ProcessResourceId(filterCaseRef.value[0]))})
 
 						change entryDefaultName value {return filterCase.title}
 

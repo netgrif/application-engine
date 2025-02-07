@@ -3,7 +3,7 @@
 //import com.netgrif.application.engine.auth.domain.IUser;
 //import com.netgrif.core.petrinet.domain.events.EventPhase;
 //import com.netgrif.core.petrinet.domain.events.EventType;
-//import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
+//import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
 //
 //public class CreateTaskEvent extends TaskEvent {
 //

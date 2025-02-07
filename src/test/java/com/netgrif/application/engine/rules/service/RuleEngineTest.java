@@ -7,7 +7,7 @@
 //import com.netgrif.application.engine.configuration.drools.RefreshableKieBase;
 //import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 //import com.netgrif.core.petrinet.domain.VersionType;
-//import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+//import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 //import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 //import com.netgrif.adapter.petrinet.service.PetriNetService;
 //import com.netgrif.application.engine.rules.domain.FactRepository;
@@ -90,7 +90,7 @@
 //        StoredRule rule = StoredRule.builder()
 //                .when("$net: PetriNet() $event: NetImportedFact(netId == $net.stringId, eventPhase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.PRE)")
 //                .then("$net.title.defaultValue = \"" + NET_TITLE_PRE + "\"; \n" +
-//                        "$net.dataSet.put(\"" + TEST_FIELD + "\", new com.netgrif.application.engine.petrinet.domain.dataset.TextField()); \n" +
+//                        "$net.dataSet.put(\"" + TEST_FIELD + "\", new com.netgrif.core.petrinet.domain.dataset.TextField()); \n" +
 //                        "factRepository.save($event)")
 //                .identifier("rule1")
 //                .lastUpdate(LocalDateTime.now())

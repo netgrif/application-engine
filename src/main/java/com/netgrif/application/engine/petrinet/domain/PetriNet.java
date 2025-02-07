@@ -7,7 +7,7 @@
 //import com.netgrif.application.engine.petrinet.domain.arcs.reference.Type;
 //import com.netgrif.core.petrinet.domain.dataset.Field;
 //import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
-//import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
+//import com.netgrif.core.petrinet.domain.dataset.logic.action.runner.Expression;
 //import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
 //import com.netgrif.core.petrinet.domain.events.CaseEventType;
 //import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;

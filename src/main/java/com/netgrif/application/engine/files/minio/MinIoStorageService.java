@@ -6,7 +6,7 @@ import com.netgrif.application.engine.files.throwable.ServiceErrorException;
 import com.netgrif.application.engine.files.throwable.StorageException;
 import com.netgrif.application.engine.files.throwable.StorageNotEnabledException;
 import com.netgrif.core.importer.model.Data;
-import com.netgrif.application.engine.petrinet.domain.dataset.MinIoStorage;
+import com.netgrif.core.petrinet.domain.dataset.MinIoStorage;
 import com.netgrif.core.petrinet.domain.dataset.Storage;
 import com.netgrif.core.petrinet.domain.dataset.StorageField;
 import io.minio.GetObjectArgs;

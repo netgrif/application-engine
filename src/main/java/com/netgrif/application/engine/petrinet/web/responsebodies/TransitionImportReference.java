@@ -1,6 +1,6 @@
 //package com.netgrif.application.engine.petrinet.web.responsebodies;
 //
-//import com.netgrif.application.engine.petrinet.domain.Node;
+//import com.netgrif.core.petrinet.domain.Node;
 //import com.netgrif.core.petrinet.domain.Transition;
 //import lombok.Data;
 //

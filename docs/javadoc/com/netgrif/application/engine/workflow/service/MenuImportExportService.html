@@ -207,14 +207,14 @@ implements <a href="interfaces/IMenuImportExportService.html" title="interface i
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>protected <a href="../../petrinet/domain/dataset/FileFieldValue.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">FileFieldValue</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createXML(com.netgrif.core.workflow.domain.menu.MenuAndFilters,java.lang.String,com.netgrif.application.engine.petrinet.domain.dataset.FileField)">createXML</a></span>&#8203;(<a href="../domain/menu/MenuAndFilters.html" title="class in com.netgrif.application.engine.workflow.domain.menu">MenuAndFilters</a>&nbsp;menuAndFilters,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createXML(com.netgrif.core.workflow.domain.menu.MenuAndFilters,java.lang.String,com.netgrif.core.petrinet.domain.dataset.FileField)">createXML</a></span>&#8203;(<a href="../domain/menu/MenuAndFilters.html" title="class in com.netgrif.application.engine.workflow.domain.menu">MenuAndFilters</a>&nbsp;menuAndFilters,
          java.lang.String&nbsp;parentId,
          <a href="../../petrinet/domain/dataset/FileField.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">FileField</a>&nbsp;fileField)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../petrinet/domain/dataset/FileFieldValue.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">FileFieldValue</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#exportMenu(com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField,java.lang.String,com.netgrif.application.engine.petrinet.domain.dataset.FileField)">exportMenu</a></span>&#8203;(<a href="../../petrinet/domain/dataset/EnumerationMapField.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">EnumerationMapField</a>&nbsp;menusForExport,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#exportMenu(com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField,java.lang.String,com.netgrif.core.petrinet.domain.dataset.FileField)">exportMenu</a></span>&#8203;(<a href="../../petrinet/domain/dataset/EnumerationMapField.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">EnumerationMapField</a>&nbsp;menusForExport,
           java.lang.String&nbsp;groupId,
           <a href="../../petrinet/domain/dataset/FileField.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">FileField</a>&nbsp;fileField)</code></th>
 <td class="colLast">
@@ -223,7 +223,7 @@ implements <a href="interfaces/IMenuImportExportService.html" title="interface i
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importMenu(java.util.List,com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue,java.lang.String)">importMenu</a></span>&#8203;(java.util.List&lt;<a href="../domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;menuItemCases,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importMenu(java.util.List,com.netgrif.core.petrinet.domain.dataset.FileFieldValue,java.lang.String)">importMenu</a></span>&#8203;(java.util.List&lt;<a href="../domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&gt;&nbsp;menuItemCases,
           <a href="../../petrinet/domain/dataset/FileFieldValue.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">FileFieldValue</a>&nbsp;ffv,
           java.lang.String&nbsp;parentId)</code></th>
 <td class="colLast">
@@ -232,7 +232,7 @@ implements <a href="interfaces/IMenuImportExportService.html" title="interface i
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>protected <a href="../domain/menu/MenuAndFilters.html" title="class in com.netgrif.application.engine.workflow.domain.menu">MenuAndFilters</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#loadFromXML(com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue)">loadFromXML</a></span>&#8203;(<a href="../../petrinet/domain/dataset/FileFieldValue.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">FileFieldValue</a>&nbsp;ffv)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#loadFromXML(com.netgrif.core.petrinet.domain.dataset.FileFieldValue)">loadFromXML</a></span>&#8203;(<a href="../../petrinet/domain/dataset/FileFieldValue.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">FileFieldValue</a>&nbsp;ffv)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -278,7 +278,7 @@ implements <a href="interfaces/IMenuImportExportService.html" title="interface i
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="exportMenu(com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField,java.lang.String,com.netgrif.application.engine.petrinet.domain.dataset.FileField)">
+<a id="exportMenu(com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField,java.lang.String,com.netgrif.core.petrinet.domain.dataset.FileField)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -293,7 +293,7 @@ implements <a href="interfaces/IMenuImportExportService.html" title="interface i
  and serialize them into xml file on path: storage/filterExport/<userId>/filters.xml</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IMenuImportExportService.html#exportMenu(com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField,java.lang.String,com.netgrif.application.engine.petrinet.domain.dataset.FileField)">exportMenu</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IMenuImportExportService.html" title="interface in com.netgrif.application.engine.workflow.service.interfaces">IMenuImportExportService</a></code></dd>
+<dd><code><a href="interfaces/IMenuImportExportService.html#exportMenu(com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField,java.lang.String,com.netgrif.core.petrinet.domain.dataset.FileField)">exportMenu</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IMenuImportExportService.html" title="interface in com.netgrif.application.engine.workflow.service.interfaces">IMenuImportExportService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>menusForExport</code> - - EnumerationMapField with Ids (delimited by ",") of menu entries as keys
                        and identifier of menu they belong to as value</dd>
@@ -305,7 +305,7 @@ implements <a href="interfaces/IMenuImportExportService.html" title="interface i
 </dl>
 </li>
 </ul>
-<a id="importMenu(java.util.List,com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue,java.lang.String)">
+<a id="importMenu(java.util.List,com.netgrif.core.petrinet.domain.dataset.FileFieldValue,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -327,7 +327,7 @@ implements <a href="interfaces/IMenuImportExportService.html" title="interface i
  for each menu entry by calling method "createMenuItemCase".</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IMenuImportExportService.html#importMenu(java.util.List,com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue,java.lang.String)">importMenu</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IMenuImportExportService.html" title="interface in com.netgrif.application.engine.workflow.service.interfaces">IMenuImportExportService</a></code></dd>
+<dd><code><a href="interfaces/IMenuImportExportService.html#importMenu(java.util.List,com.netgrif.core.petrinet.domain.dataset.FileFieldValue,java.lang.String)">importMenu</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IMenuImportExportService.html" title="interface in com.netgrif.application.engine.workflow.service.interfaces">IMenuImportExportService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>menuItemCases</code> - - list of Preference filter item cases in active group</dd>
 <dd><code>ffv</code> - - file field from active group case containing uploaded xml file.</dd>
@@ -370,7 +370,7 @@ implements <a href="interfaces/IMenuImportExportService.html" title="interface i
 </dl>
 </li>
 </ul>
-<a id="loadFromXML(com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue)">
+<a id="loadFromXML(com.netgrif.core.petrinet.domain.dataset.FileFieldValue)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -387,7 +387,7 @@ protected&nbsp;<a href="../domain/menu/MenuAndFilters.html" title="class in com.
 </dl>
 </li>
 </ul>
-<a id="createXML(com.netgrif.core.workflow.domain.menu.MenuAndFilters,java.lang.String,com.netgrif.application.engine.petrinet.domain.dataset.FileField)">
+<a id="createXML(com.netgrif.core.workflow.domain.menu.MenuAndFilters,java.lang.String,com.netgrif.core.petrinet.domain.dataset.FileField)">
 <!--   -->
 </a>
 <ul class="blockList">

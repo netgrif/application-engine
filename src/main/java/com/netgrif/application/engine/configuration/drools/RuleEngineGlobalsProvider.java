@@ -84,7 +84,7 @@
 //    protected List<String> initializeImports() {
 //        List<String> imports = new ArrayList<>();
 //        globals.forEach(global -> imports.add(asImport(global.fullyQualifiedName())));
-//        imports.add(asImport("com.netgrif.application.engine.petrinet.domain.events.*"));
+//        imports.add(asImport("com.netgrif.core.petrinet.domain.events.*"));
 //        return imports;
 //    }
 //
