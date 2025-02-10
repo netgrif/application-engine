@@ -53,7 +53,9 @@ public class MenuItemService implements IMenuItemService {
         filterCase.setIcon(body.getIcon());
         filterCase = workflowService.save(filterCase);
         ToDataSetOutcome dataSetOutcome = body.toDataSet();
-        return setDataWithExecute(filterCase, DefaultFiltersRunner.AUTO_CREATE_TRANSITION, dataSetOutcome.getDataSet());
+        filterCase = setDataWithExecute(filterCase, DefaultFiltersRunner.AUTO_CREATE_TRANSITION, dataSetOutcome.getDataSet());
+        log.trace("Created filter case [{}][{}]", filterCase.getStringId(), body.getTitle().getDefaultValue());
+        return filterCase;
     }
 
     @Override
@@ -61,11 +63,14 @@ public class MenuItemService implements IMenuItemService {
         filterCase.setIcon(body.getIcon());
         filterCase = workflowService.save(filterCase);
         ToDataSetOutcome dataSetOutcome = body.toDataSet();
-        return setData(filterCase, DefaultFiltersRunner.DETAILS_TRANSITION, dataSetOutcome.getDataSet());
+        filterCase = setData(filterCase, DefaultFiltersRunner.DETAILS_TRANSITION, dataSetOutcome.getDataSet());
+        log.trace("Updated filter case [{}][{}]", filterCase.getStringId(), body.getTitle().getDefaultValue());
+        return filterCase;
     }
 
     @Override
     public Case createMenuItem(MenuItemBody body) throws TransitionNotExecutableException {
+        log.debug("Creation of menu item case with identifier [{}] started.", body.getIdentifier());
         IUser loggedUser = userService.getLoggedOrSystem();
         String sanitizedIdentifier = MenuItemUtils.sanitize(body.getIdentifier());
 
@@ -93,11 +98,14 @@ public class MenuItemService implements IMenuItemService {
             viewCase = createView(body.getView());
         }
         ToDataSetOutcome dataSetOutcome = body.toDataSet(parentItemCase.getStringId(), nodePath, viewCase);
-        return setDataWithExecute(menuItemCase, MenuItemConstants.TRANS_INIT_ID, dataSetOutcome.getDataSet());
+        menuItemCase = setDataWithExecute(menuItemCase, MenuItemConstants.TRANS_INIT_ID, dataSetOutcome.getDataSet());
+        log.debug("Created menu item case [{}] with identifier [{}].", menuItemCase.getStringId(), body.getIdentifier());
+        return menuItemCase;
     }
 
     @Override
     public Case updateMenuItem(Case itemCase, MenuItemBody body) throws TransitionNotExecutableException {
+        log.debug("Update of menu item case with identifier [{}] started.", body.getIdentifier());
         String actualUriNodeId = uriService.findByUri(body.getUri()).getStringId();
         if (!itemCase.getUriNodeId().equals(actualUriNodeId)) {
             itemCase.setUriNodeId(actualUriNodeId);
@@ -107,7 +115,9 @@ public class MenuItemService implements IMenuItemService {
         Case viewCase = findView(itemCase);
         viewCase = handleView(viewCase, body.getView());
         ToDataSetOutcome dataSetOutcome = body.toDataSet(viewCase);
-        return setData(itemCase, MenuItemConstants.TRANS_SYNC_ID, dataSetOutcome.getDataSet());
+        itemCase = setData(itemCase, MenuItemConstants.TRANS_SYNC_ID, dataSetOutcome.getDataSet());
+        log.debug("Updated menu item case [{}] with identifier [{}].", itemCase.getStringId(), body.getIdentifier());
+        return itemCase;
     }
 
     @Override
@@ -124,6 +134,8 @@ public class MenuItemService implements IMenuItemService {
     public Case createOrIgnoreMenuItem(MenuItemBody body) throws TransitionNotExecutableException {
         Case itemCase = findMenuItem(body.getIdentifier());
         if (itemCase != null) {
+            log.debug("Ignored creation or update of menu item case [{}] with identifier [{}].", itemCase.getStringId(),
+                    body.getIdentifier());
             return itemCase;
         } else {
             return createMenuItem(body);
@@ -165,6 +177,7 @@ public class MenuItemService implements IMenuItemService {
 
     @Override
     public void moveItem(Case itemCase, String destUri) throws TransitionNotExecutableException {
+        log.debug("Move of menu item case [{}] started. Destination path [{}]", itemCase.getStringId(), destUri);
         if (MenuItemUtils.isCyclicNodePath(itemCase, destUri)) {
             throw new IllegalArgumentException(String.format("Cyclic path not supported. Destination path: %s", destUri));
         }
@@ -200,10 +213,12 @@ public class MenuItemService implements IMenuItemService {
                 workflowService.save(useCase);
             }
         }
+        log.debug("Moved menu item case [{}]. Destination path was [{}]", itemCase.getStringId(), destUri);
     }
 
     @Override
     public Case duplicateItem(Case originItem, I18nString newTitle, String newIdentifier) throws TransitionNotExecutableException {
+        log.debug("Duplication of menu item case [{}] started.", originItem.getStringId());
         if (newIdentifier == null || newIdentifier.isEmpty()) {
             throw new IllegalArgumentException("View item identifier is null or empty!");
         }
@@ -258,6 +273,8 @@ public class MenuItemService implements IMenuItemService {
             Case parent = workflowService.findOne(parentIdAsList.get(0));
             appendChildCaseIdAndSave(parent, duplicated.getStringId());
         }
+        log.debug("Duplicated menu item case [{}]. New title [{}] and new identifier [{}].", originItem.getStringId(),
+                newTitle.getDefaultValue(), newIdentifier);
         return workflowService.findOne(duplicated.getStringId());
     }
 
@@ -346,7 +363,11 @@ public class MenuItemService implements IMenuItemService {
             }
         }
         ToDataSetOutcome dataSetOutcome = body.toDataSet(associatedViewCase, filterCase);
-        return setDataWithExecute(viewCase, ViewConstants.TRANS_INIT_ID, dataSetOutcome.getDataSet());
+        viewCase = setDataWithExecute(viewCase, ViewConstants.TRANS_INIT_ID, dataSetOutcome.getDataSet());
+
+        log.trace("Created configuration view case [{}] of identifier [{}]", viewCase.getStringId(),
+                body.getViewProcessIdentifier());
+        return viewCase;
     }
 
     protected Case updateView(Case viewCase, ViewBody body) throws TransitionNotExecutableException {
@@ -357,11 +378,16 @@ public class MenuItemService implements IMenuItemService {
         associatedViewCase = handleView(associatedViewCase, body.getAssociatedViewBody());
 
         ToDataSetOutcome outcome = body.toDataSet(associatedViewCase, filterCase);
-        return setData(viewCase, ViewConstants.TRANS_SYNC_ID, outcome.getDataSet());
+        viewCase = setData(viewCase, ViewConstants.TRANS_SYNC_ID, outcome.getDataSet());
+
+        log.trace("Updated configuration view case [{}] of identifier [{}]", viewCase.getStringId(),
+                body.getViewProcessIdentifier());
+        return viewCase;
     }
 
     protected void removeView(Case viewCase) {
         workflowService.deleteCase(viewCase);
+        log.trace("Removed configuration view case [{}].", viewCase.getStringId());
     }
 
     protected Case handleFilter(Case filterCase, FilterBody body) throws TransitionNotExecutableException {
@@ -476,6 +502,7 @@ public class MenuItemService implements IMenuItemService {
         }
         folderCase = setDataWithExecute(folderCase, MenuItemConstants.TRANS_INIT_ID, dataSetOutcome.getDataSet());
 
+        log.trace("Created folder menu item [{}] with identifier [{}]", folderCase.getStringId(), body.getIdentifier());
         return folderCase;
     }
 
