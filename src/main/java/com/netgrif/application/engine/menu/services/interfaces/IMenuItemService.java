@@ -7,6 +7,7 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,7 +29,12 @@ public interface IMenuItemService {
     Case removeChildItemFromParent(String folderId, Case childItem);
 
     /**
-     * todo javadoc
+     * Gets all tabbed or non-tabbed views
+     *
+     * @param isTabbed if true, only tabbed views will be returned
+     *
+     * @return All available views defined in {@link MenuItemView} in consideration of input value. Views are returned as
+     * options for {@link MapOptionsField}
      * */
     default Map<String, I18nString> getAvailableViewsAsOptions(boolean isTabbed) {
         return MenuItemView.findAllByIsTabbed(isTabbed).stream()
@@ -36,7 +42,13 @@ public interface IMenuItemService {
     }
 
     /**
-     * todo javadoc
+     * Gets all tabbed or non-tabbed views
+     *
+     * @param isTabbed if true, only tabbed views will be returned
+     * @param viewIdentifier identifier of view (defined in {@link MenuItemView}), which is parent to returned views
+     *
+     * @return All available views defined in {@link MenuItemView} in consideration of input values. Views are returned as
+     * options for {@link MapOptionsField}
      * */
     default Map<String, I18nString> getAvailableViewsAsOptions(boolean isTabbed, String viewIdentifier) {
         int index = viewIdentifier.lastIndexOf("_configuration");

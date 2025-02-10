@@ -6,6 +6,7 @@ import com.netgrif.application.engine.menu.domain.ToDataSetOutcome;
 import com.netgrif.application.engine.menu.utils.MenuItemUtils;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,33 +25,43 @@ public abstract class ViewBody {
     public abstract ViewBody getAssociatedViewBody();
     public abstract MenuItemView getViewType();
     /**
-     * todo javadoc
+     * Internal method, that must transform data in concrete class and add them into received outcome. Method must return
+     * the updated outcome.
      * */
     protected abstract ToDataSetOutcome toDataSetInternal(ToDataSetOutcome outcome);
 
     /**
-     * todo javadoc
+     * Checks if the view has associated view
+     *
+     * @return true if this view has associated view
      * */
     public boolean hasAssociatedView() {
         return this.getAssociatedViewBody() != null;
     }
 
     /**
-     * todo javadoc
+     * @return returns process identifier for this view
      * */
     public String getViewProcessIdentifier() {
         return getViewType().getIdentifier() + "_configuration";
     }
 
     /**
-     * todo javadoc
+     * Transforms data of this class into {@link ToDataSetOutcome}, which contains prepared data for the {@link IDataService#setData}
+     *
+     * @return {@link ToDataSetOutcome} object containing dataSet
      * */
     public ToDataSetOutcome toDataSet() {
         return toDataSet(null, null);
     };
 
     /**
-     * todo javadoc
+     * Transforms data of this class into {@link ToDataSetOutcome}, which contains prepared data for the {@link IDataService#setData}
+     *
+     * @param associatedViewCase case instance of associated view. If provided, caseRef and taskRef are initialized.
+     * @param filterCase case instance of filter. If provided, caseRef is initialized
+     *
+     * @return {@link ToDataSetOutcome} object containing dataSet
      * */
     public ToDataSetOutcome toDataSet(Case associatedViewCase, Case filterCase) {
         ToDataSetOutcome outcome = new ToDataSetOutcome();

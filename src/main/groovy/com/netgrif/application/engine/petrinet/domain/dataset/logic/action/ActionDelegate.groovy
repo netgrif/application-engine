@@ -2148,14 +2148,18 @@ class ActionDelegate {
     }
 
     /**
-     * Duplicates menu item. It creates new menu_item instance with the same {@link Case#dataSet} as the provided
-     * item instance. The only difference is in title, menu_item_identifier and associations
+     * Duplicates menu item. It creates new menu_item instance with the same dataSet as the provided
+     * item instance. The only difference is in title, menu_item_identifier and associations. Configuration cases are
+     * duplicated as well.
      *
      * @param originItem Menu item instance, which is duplicated
      * @param newTitle Title of menu item, that is displayed in menu and tab. Cannot be empty or null.
      * @param newIdentifier unique menu item identifier
      *
      * @return duplicated {@link Case} instance of menu_item
+     *
+     * @throws IllegalArgumentException if the input data are invalid or the menu item of the new identifier already
+     * exists
      * */
     Case duplicateMenuItem(Case originItem, I18nString newTitle, String newIdentifier) {
         return menuItemService.duplicateItem(originItem, newTitle, newIdentifier)
@@ -2184,7 +2188,9 @@ class ActionDelegate {
     }
 
     /**
-     * todo javadoc
+     * @param node uri node
+     *
+     * @return folder menu item case by provided UriNode
      * */
     Case findFolderCase(UriNode node) {
         return menuItemService.findFolderCase(node)

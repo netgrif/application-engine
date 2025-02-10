@@ -12,21 +12,17 @@ import java.util.*;
 @AllArgsConstructor
 public class ToDataSetOutcome {
     private Map<String, Map<String, Object>> dataSet;
-    /**
-     * todo javadoc
-     * */
-    private ToDataSetOutcome associatedOutcome;
 
     public ToDataSetOutcome() {
         this.dataSet = new HashMap<>();
     }
 
-    public ToDataSetOutcome(Map<String, Map<String, Object>> dataSet) {
-        this.dataSet = dataSet;
-    }
-
     /**
-     * todo javadoc
+     * Puts provided value into {@link #dataSet} according to dataSet rules.
+     *
+     * @param fieldId importId of the field
+     * @param fieldType type of the field
+     * @param fieldValue new value of the field
      * */
     public void putDataSetEntry(String fieldId, FieldType fieldType, @Nullable Object fieldValue) {
         Map<String, Object> fieldMap = new LinkedHashMap<>();
@@ -36,7 +32,11 @@ public class ToDataSetOutcome {
     }
 
     /**
-     * todo javadoc
+     * Puts provided options into {@link #dataSet} according to dataSet rules.
+     *
+     * @param fieldId importId of the field
+     * @param fieldType type of the field
+     * @param options new options of the field
      * */
     public void putDataSetEntryOptions(String fieldId, FieldType fieldType, @Nullable Map<String, I18nString> options) {
         Map<String, Object> fieldMap = new LinkedHashMap<>();

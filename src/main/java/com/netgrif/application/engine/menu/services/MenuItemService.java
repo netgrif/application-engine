@@ -37,7 +37,6 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class MenuItemService implements IMenuItemService {
-    // todo javadoc
     protected final IWorkflowService workflowService;
     protected final ITaskService taskService;
     protected final IDataService dataService;
@@ -46,6 +45,13 @@ public class MenuItemService implements IMenuItemService {
 
     protected static final String DEFAULT_FOLDER_ICON = "folder";
 
+    /**
+     * Creates new filter case
+     *
+     * @param body filter data used for creation
+     *
+     * @return initialized filter case instance with the provided data
+     * */
     @Override
     public Case createFilter(FilterBody body) throws TransitionNotExecutableException {
         IUser loggedUser = userService.getLoggedOrSystem();
@@ -58,6 +64,14 @@ public class MenuItemService implements IMenuItemService {
         return filterCase;
     }
 
+    /**
+     * Updates existing filter case
+     *
+     * @param filterCase filter to be updated
+     * @param body data values used for update
+     *
+     * @return updated filter case instance
+     * */
     @Override
     public Case updateFilter(Case filterCase, FilterBody body) {
         filterCase.setIcon(body.getIcon());
@@ -68,6 +82,16 @@ public class MenuItemService implements IMenuItemService {
         return filterCase;
     }
 
+
+    /**
+     * Creates menu item case and it's configuration cases
+     *
+     * @param body data used for creation
+     *
+     * @return initialized menu item instance with the provided data
+     *
+     * @throws IllegalArgumentException if the provided menu identifier already exists
+     * */
     @Override
     public Case createMenuItem(MenuItemBody body) throws TransitionNotExecutableException {
         log.debug("Creation of menu item case with identifier [{}] started.", body.getIdentifier());
@@ -103,6 +127,14 @@ public class MenuItemService implements IMenuItemService {
         return menuItemCase;
     }
 
+    /**
+     * Updates menu item case and it's configuration cases
+     *
+     * @param itemCase menu item case to be updated
+     * @param body data used for update
+     *
+     * @return updated menu item case (configuration cases are updated, but not returned)
+     * */
     @Override
     public Case updateMenuItem(Case itemCase, MenuItemBody body) throws TransitionNotExecutableException {
         log.debug("Update of menu item case with identifier [{}] started.", body.getIdentifier());
@@ -120,6 +152,14 @@ public class MenuItemService implements IMenuItemService {
         return itemCase;
     }
 
+    /**
+     * Creates or updates menu item. At first menu item is searched by identifier. If found, then menu item will be
+     * updated. If not, menu item will be created
+     *
+     * @param body data used for the update or creation
+     *
+     * @return updated or created menu item case
+     * */
     @Override
     public Case createOrUpdateMenuItem(MenuItemBody body) throws TransitionNotExecutableException {
         Case itemCase = findMenuItem(MenuItemUtils.sanitize(body.getIdentifier()));
@@ -130,6 +170,14 @@ public class MenuItemService implements IMenuItemService {
         }
     }
 
+    /**
+     * Creates or ignore menu item. At first menu item is searched by identifier. If found, then nothing will happen.
+     * If not, menu item will be created
+     *
+     * @param body data used for the creation
+     *
+     * @return ignored or created menu item case
+     * */
     @Override
     public Case createOrIgnoreMenuItem(MenuItemBody body) throws TransitionNotExecutableException {
         Case itemCase = findMenuItem(body.getIdentifier());
@@ -142,6 +190,13 @@ public class MenuItemService implements IMenuItemService {
         }
     }
 
+    /**
+     * Finds menu item by identifier.
+     *
+     * @param identifier identifier of the menu item
+     *
+     * @return Found menu item case. If not found, null will be returned
+     * */
     @Override
     public Case findMenuItem(String identifier) {
         //        return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.menu_item_identifier.textValue.keyword:\"$menuItemIdentifier\"" as String)
@@ -150,6 +205,14 @@ public class MenuItemService implements IMenuItemService {
         return workflowService.searchOne(predicate);
     }
 
+    /**
+     * Finds menu item by uri and name.
+     *
+     * @param uri string id of UriNode where the item exists
+     * @param name name of the menu item
+     *
+     * @return Found menu item case. If not found, null will be returned
+     * */
     @Override
     public Case findMenuItem(String uri, String name) {
         UriNode uriNode = uriService.findByUri(uri);
@@ -160,6 +223,13 @@ public class MenuItemService implements IMenuItemService {
         return workflowService.searchOne(predicate);
     }
 
+    /**
+     * Finds folder case by UriNode
+     *
+     * @param node UriNode, which folder case represents
+     *
+     * @return Found folder menu item case. If not found, null will be returned
+     * */
     @Override
     public Case findFolderCase(UriNode node) {
         // todo elastic problem
@@ -169,12 +239,29 @@ public class MenuItemService implements IMenuItemService {
         return workflowService.searchOne(predicate);
     }
 
+    /**
+     * Checks if the menu item exists
+     *
+     * @param identifier identifier of the menu item
+     *
+     * @return true if the menu item exists
+     * */
     @Override
     public boolean existsMenuItem(String identifier) {
         //        return countCasesElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND dataSet.menu_item_identifier.fulltextValue.keyword:\"$menuItemIdentifier\"") > 0
         return findMenuItem(identifier) != null;
     }
 
+    /**
+     * Changes location of menu item. If non-existing location is provided, the new location is created and then the
+     * item is moved. Cyclic destination path is forbidden (f.e. from <code>"/my_node"</code> to
+     * <code>"/my_node/my_node2"</code>
+     *
+     * @param itemCase Instance of menu_item to be moved
+     * @param destUri destination path where the item will be moved. F.e. <code>"/my_new_node"</code>
+     *
+     * @throws IllegalArgumentException if the path is forbidden
+     * */
     @Override
     public void moveItem(Case itemCase, String destUri) throws TransitionNotExecutableException {
         log.debug("Move of menu item case [{}] started. Destination path [{}]", itemCase.getStringId(), destUri);
@@ -216,6 +303,20 @@ public class MenuItemService implements IMenuItemService {
         log.debug("Moved menu item case [{}]. Destination path was [{}]", itemCase.getStringId(), destUri);
     }
 
+    /**
+     * Duplicates menu item. It creates new menu_item instance with the same dataSet as the provided
+     * item instance. The only difference is in title, menu_item_identifier and associations. Configuration cases are
+     * duplicated as well.
+     *
+     * @param originItem Menu item instance, which is duplicated
+     * @param newTitle Title of menu item, that is displayed in menu and tab. Cannot be empty or null.
+     * @param newIdentifier unique menu item identifier
+     *
+     * @return duplicated {@link Case} instance of menu_item
+     *
+     * @throws IllegalArgumentException if the input data are invalid or the menu item of the new identifier already
+     * exists
+     * */
     @Override
     public Case duplicateItem(Case originItem, I18nString newTitle, String newIdentifier) throws TransitionNotExecutableException {
         log.debug("Duplication of menu item case [{}] started.", originItem.getStringId());
@@ -278,6 +379,14 @@ public class MenuItemService implements IMenuItemService {
         return workflowService.findOne(duplicated.getStringId());
     }
 
+    /**
+     * Removes child menu item from the dataSet of the folder menu item case
+     *
+     * @param folderId menu item identifier of the folder case
+     * @param childItem menu item case of the child item to be removed
+     *
+     * @return updated folder menu item case
+     * */
     @Override
     public Case removeChildItemFromParent(String folderId, Case childItem) {
         Case parentFolder = workflowService.findOne(folderId);

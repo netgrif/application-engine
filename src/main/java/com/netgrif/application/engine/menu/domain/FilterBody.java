@@ -4,6 +4,7 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.startup.DefaultFiltersRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -28,7 +29,11 @@ public class FilterBody {
     }
 
     /**
-     * todo javadoc
+     * Gets default metadata with provided filter type
+     *
+     * @param type type of the filter
+     *
+     * @return metadata containing filter type as map
      * */
     public static Map<String, Object> getDefaultMetadata(String type) {
         Map<String, Object> resultMap = new HashMap<>();
@@ -43,7 +48,9 @@ public class FilterBody {
     }
 
     /**
-     * todo javadoc
+     * Transforms attributes into dataSet for {@link IDataService#setData}
+     *
+     * @return {@link ToDataSetOutcome} object with dataSet
      * */
     public ToDataSetOutcome toDataSet() {
         ToDataSetOutcome outcome = new ToDataSetOutcome();

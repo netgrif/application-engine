@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 
 /**
- * todo javadoc
+ * Here is listed and configured every configuration process available for menu items.
  * */
 @Getter
 public enum MenuItemView {
@@ -21,7 +21,7 @@ public enum MenuItemView {
     private final I18nString name;
     private final String identifier;
     /**
-     * todo javadoc
+     * List of view identifiers of views, that can be associated with the view
      * */
     private final List<String> allowedAssociatedViews;
     private final boolean isTabbed;
@@ -34,7 +34,7 @@ public enum MenuItemView {
     }
 
     /**
-     * todo javadoc
+     * Builds enum value by the view identifier
      * */
     public static MenuItemView fromIdentifier(String identifier) {
         for (MenuItemView view : MenuItemView.values()) {
@@ -46,7 +46,11 @@ public enum MenuItemView {
     }
 
     /**
-     * todo javadoc
+     * Finds all enum values, that are tabbed or non-tabbed
+     *
+     * @param isTabbed if true, only tabbed values will be returned
+     *
+     * @return List of views based on {@link #isTabbed}
      * */
     public static List<MenuItemView> findAllByIsTabbed(boolean isTabbed) {
         return Arrays.stream(MenuItemView.values())
@@ -55,7 +59,12 @@ public enum MenuItemView {
     }
 
     /**
-     * todo javadoc
+     * Finds all enum values, that are tabbed or non-tabbed and are defined in parent view as {@link #allowedAssociatedViews}
+     *
+     * @param isTabbed if true, set of views is reduced to only tabbed views
+     * @param parentIdentifier identifier of the view, that contains returned views in {@link #allowedAssociatedViews}
+     *
+     * @return List of views based on {@link #isTabbed} and {@link #allowedAssociatedViews}
      * */
     public static List<MenuItemView> findAllByIsTabbedAndParentIdentifier(boolean isTabbed, String parentIdentifier) {
         MenuItemView parentView = fromIdentifier(parentIdentifier);

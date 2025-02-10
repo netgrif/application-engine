@@ -5,8 +5,8 @@ import com.netgrif.application.engine.menu.domain.configurations.ViewConstants;
 import com.netgrif.application.engine.menu.utils.MenuItemUtils;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,9 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * todo javadoc
- * Class, that holds configurable attributes of menu item. In case of attribute addition, please update also
- * {@link MenuItemBody#toDataSet(String, String, boolean)} method.
+ * Class, that holds configurable attributes of menu item.
  */
 @Data
 @NoArgsConstructor
@@ -110,36 +108,40 @@ public class MenuItemBody {
     }
 
     /**
-     * todo javadoc
+     * @return true if the menu item contains view
      * */
     public boolean hasView() {
         return this.view != null;
     }
 
     /**
-     * todo javadoc
-     * Transforms attributes into dataSet for {@link ActionDelegate#setData}
+     * Transforms attributes into dataSet for {@link IDataService#setData}
      *
-     * @return created dataSet from attributes
+     * @return {@link ToDataSetOutcome} object with dataSet
      */
     public ToDataSetOutcome toDataSet() {
         return toDataSet(null, null, null);
     }
 
     /**
-     * todo javadoc
+     * Transforms attributes into dataSet for {@link IDataService#setData}
+     *
+     * @param viewCase case instance of view. If provided, caseRef and taskRef are initialized
+     *
+     * @return {@link ToDataSetOutcome} object with dataSet
      */
     public ToDataSetOutcome toDataSet(Case viewCase) {
         return toDataSet(null, null, viewCase);
     }
 
     /**
-     * todo javadoc
-     * Transforms attributes into dataSet for {@link ActionDelegate#setData}
+     * Transforms attributes into dataSet for {@link IDataService#setData}
      *
-     * @param parentId id of parent menu item instance
+     * @param parentId identifier of parent menu item instance
      * @param nodePath uri, that represents the menu item (f.e.: "/myItem1/myItem2")
-     * @return created dataSet from attributes
+     * @param viewCase case instance of view. If provided, caseRef and taskRef are initialized
+     *
+     * @return {@link ToDataSetOutcome} object with dataSet
      */
     public ToDataSetOutcome toDataSet(String parentId, String nodePath, Case viewCase) {
         ToDataSetOutcome outcome = new ToDataSetOutcome();
