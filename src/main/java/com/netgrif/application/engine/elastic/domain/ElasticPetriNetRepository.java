@@ -2,7 +2,7 @@ package com.netgrif.application.engine.elastic.domain;
 
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;
-import com.netgrif.core.elastic.domain.ElasticPetriNet;
+import com.netgrif.adapter.elastic.domain.ElasticPetriNet;
 
 import java.util.List;
 

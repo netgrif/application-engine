@@ -68,11 +68,11 @@
 	</function>
 	<function scope="process" name="updateFilterAutocompleteOptions">
 		{
-			com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
-			com.netgrif.application.engine.petrinet.domain.dataset.TaskField previewTaskRef,
-			com.netgrif.application.engine.petrinet.domain.dataset.CaseField selectedFilterRef,
-			com.netgrif.application.engine.petrinet.domain.dataset.ButtonField updateBtn,
-			com.netgrif.application.engine.petrinet.domain.Transition trans,
+			com.netgrif.core.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
+			com.netgrif.core.petrinet.domain.dataset.TaskField previewTaskRef,
+			com.netgrif.core.petrinet.domain.dataset.CaseField selectedFilterRef,
+			com.netgrif.core.petrinet.domain.dataset.ButtonField updateBtn,
+			com.netgrif.core.petrinet.domain.Transition trans,
 			boolean taskTypeOnly
 			->
 			if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
@@ -102,9 +102,9 @@
 	</function>
 	<function scope="process" name="updateOptionsBasedOnValue">
 		{
-			com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField toBeUpdated,
+			com.netgrif.core.petrinet.domain.dataset.EnumerationMapField toBeUpdated,
 			com.netgrif.core.petrinet.domain.dataset.MultichoiceMapField valueSelector,
-			com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField optionsHolder
+			com.netgrif.core.petrinet.domain.dataset.EnumerationMapField optionsHolder
 			->
 			def existingOptions = optionsHolder.options
 			def selectedValues = valueSelector.value

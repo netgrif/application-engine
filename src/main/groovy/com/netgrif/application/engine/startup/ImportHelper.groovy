@@ -2,6 +2,7 @@ package com.netgrif.application.engine.startup
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.netgrif.adapter.auth.service.AuthorityService
 import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.core.auth.domain.*
@@ -61,7 +62,7 @@ class ImportHelper {
     private CaseRepository caseRepository
 
     @Autowired
-    private IAuthorityService authorityService
+    private AuthorityService authorityService
 
     @Autowired
     private ITaskService taskService

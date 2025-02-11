@@ -44,7 +44,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.core.workflow.domain.Case
 import com.netgrif.adapter.workflow.domain.QCase
-import com.netgrif.core.workflow.domain.QTask
+import com.netgrif.adapter.workflow.domain.QTask
 import com.netgrif.core.workflow.domain.Task
 import com.netgrif.core.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome

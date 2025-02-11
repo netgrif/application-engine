@@ -686,11 +686,12 @@
                             <outputDirectory>target/generated-sources/java</outputDirectory>
                             <processors>
                                 <processor>
-                                    org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor
+                                    com.querydsl.apt.QuerydslAnnotationProcessor
                                 </processor>
                             </processors>
                             <options>
                                 <querydsl.excludedClasses>groovy.lang.MetaClass</querydsl.excludedClasses>
+                                <querydsl.unknownAsEmbeddable>true</querydsl.unknownAsEmbeddable>
                             </options>
                         </configuration>
                     </execution>

@@ -10,7 +10,7 @@ import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.adapter.workflow.domain.QCase;
-import com.netgrif.core.workflow.domain.QTask;
+import com.netgrif.adapter.workflow.domain.QTask;
 import com.netgrif.core.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
