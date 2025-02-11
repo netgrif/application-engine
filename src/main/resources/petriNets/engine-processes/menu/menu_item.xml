@@ -429,7 +429,6 @@
 		</action>
 	</data>
 	<data type="boolean" immediate="true">
-		<!--		todo preklad-->
 		<id>use_tabbed_view</id>
 		<title name="use_tabbed_view">Do you want to use view with tabs?</title>
 	</data>
@@ -472,7 +471,6 @@
 	</data>
 	<data type="enumeration_map" immediate="true">
 		<id>view_configuration_type</id>
-<!--		todo preklad-->
 		<title name="view_configuration_type">Pick view type</title>
 		<options>
 			<init dynamic="true">menuItemService.getAvailableViewsAsOptions(false)</init>
@@ -626,6 +624,9 @@
 		<i18nString name="move_add_node">Pridať</i18nString>
 		<i18nString name="is_auto_select">Automatické zvolenie zobrazenia</i18nString>
 		<i18nString name="is_auto_select_desc">Po automatickom zvolení sa dané zobrazenie používateľovi otvorí</i18nString>
+		<i18nString name="use_tabbed_view">Použiť zobrazenie v taboch?</i18nString>
+		<i18nString name="view_configuration_type">Vybrať zobrazenie</i18nString>
+		<i18nString name="configuration_view">Nastavenie zobrazenia</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="icon_preview">Ikonevorschau</i18nString>
@@ -671,6 +672,9 @@
 		<i18nString name="move_dest_uri_desc">Teile der Ziel URI</i18nString>
 		<i18nString name="is_auto_select">Automatische Anzeigeauswahl</i18nString>
 		<i18nString name="is_auto_select_desc">Wenn ausgewählt, wird die Ansicht automatisch geöffnet</i18nString>
+		<i18nString name="use_tabbed_view">Möchten Sie die Ansicht mit Registerkarten verwenden?</i18nString>
+		<i18nString name="view_configuration_type">Wählen Sie einen Ansichtstyp</i18nString>
+		<i18nString name="configuration_view">Die Ansichtskonfiguration</i18nString>
 	</i18n>
 
 	<!-- TRANSITIONS -->
@@ -940,7 +944,6 @@
 			<id>configuration_view</id>
 			<cols>4</cols>
 			<layout>grid</layout>
-<!--			todo preklad-->
 			<title name="configuration_view">View configuration</title>
 			<dataRef>
 				<id>use_custom_view</id>

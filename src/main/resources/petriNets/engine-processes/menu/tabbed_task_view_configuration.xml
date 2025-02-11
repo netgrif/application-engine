@@ -341,6 +341,7 @@
         <i18nString name="filter_header">Súčasný filter</i18nString>
         <i18nString name="view_header">Zobrazenie úloh</i18nString>
         <i18nString name="item_settings_general">Všeobecné</i18nString>
+        <i18nString name="remove_filter">Vymazať filter</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="filter_autocomplete_selection">Neue Filter auswählen</i18nString>
@@ -366,6 +367,7 @@
         <i18nString name="show_more_menu">"Erweiterte Optionen" Taste bei einzelnen Aufgaben anzeigen</i18nString>
         <i18nString name="item_settings">Menüeintrageinstellungen</i18nString>
         <i18nString name="view_header">Aufgabenansicht</i18nString>
+        <i18nString name="remove_filter">Filter entfernen</i18nString>
     </i18n>
 
     <transition>

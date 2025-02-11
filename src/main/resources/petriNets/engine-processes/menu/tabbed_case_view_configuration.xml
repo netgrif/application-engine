@@ -369,7 +369,6 @@
     </data>
     <data type="enumeration_map" immediate="true">
         <id>view_configuration_type</id>
-        <!--		todo preklad-->
         <title name="view_configuration_type">Pick view type</title>
         <options>
             <init dynamic="true">menuItemService.getAvailableViewsAsOptions(false, useCase.processIdentifier)</init>
@@ -395,7 +394,6 @@
     </data>
 
     <!-- I18NS -->
-//    todo prejst preklady
     <i18n locale="sk">
         <i18nString name="create_case_button_title">Názov tlačidla "Nová inštancia"</i18nString>
         <i18nString name="create_case_button_icon">Identifikátor ikony tlačidla "Nová inštancia"</i18nString>
@@ -426,6 +424,10 @@
         <i18nString name="filter_header">Súčasný filter</i18nString>
         <i18nString name="view_header">Zobrazenie prípadov</i18nString>
         <i18nString name="item_settings_general">Všeobecné</i18nString>
+        <i18nString name="use_case_default_headers">Použiť predvolené hlavičky</i18nString>
+        <i18nString name="view_configuration_type">Vybrať zobrazenie</i18nString>
+        <i18nString name="settings">Nastavenie</i18nString>
+        <i18nString name="associated_view">Asociované zobrazenie</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="create_case_button_title">Schaltflächentitel "Neuer Fall"</i18nString>
@@ -457,6 +459,10 @@
         <i18nString name="show_more_menu">"Erweiterte Optionen" Taste bei einzelnen Fällen anzeigen</i18nString>
         <i18nString name="item_settings">Menüeintrageinstellungen</i18nString>
         <i18nString name="view_header">Fallansicht</i18nString>
+        <i18nString name="use_case_default_headers">Benutzerdefinierte Standardheader verwenden?</i18nString>
+        <i18nString name="view_configuration_type">Wählen Sie einen Ansichtstyp</i18nString>
+        <i18nString name="settings">Einstellungen</i18nString>
+        <i18nString name="associated_view">zugehörige Ansicht</i18nString>
     </i18n>
 
     <transition>
@@ -476,8 +482,7 @@
         <id>settings</id>
         <x>496</x>
         <y>112</y>
-<!--        todo preklad-->
-        <label>Settings</label>
+        <label name="settings">Settings</label>
         <icon>settings</icon>
         <roleRef>
             <id>admin</id>
@@ -836,8 +841,7 @@
             <id>associated_view</id>
             <cols>4</cols>
             <layout>grid</layout>
-<!--            todo preklad-->
-            <title name="associated_view">Next view</title>
+            <title name="associated_view">Associated view</title>
             <dataRef>
                 <id>view_configuration_type</id>
                 <logic>

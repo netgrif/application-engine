@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -13,10 +14,10 @@ import java.util.stream.Collectors;
  * */
 @Getter
 public enum MenuItemView {
-    // todo translations
-    TABBED_CASE_VIEW(new I18nString("Tabbed case view"), "tabbed_case_view",
-            List.of("tabbed_task_view"), true),
-    TABBED_TASK_VIEW(new I18nString("Tabbed task view"), "tabbed_task_view", List.of(), true);
+    TABBED_CASE_VIEW(new I18nString("Tabbed case view", Map.of("sk", "Zobrazenie prípadov v taboch",
+            "de", "Fallansicht mit Registerkarten")), "tabbed_case_view", List.of("tabbed_task_view"), true),
+    TABBED_TASK_VIEW(new I18nString("Tabbed task view", Map.of("sk", "Zobrazenie úloh v taboch",
+            "de", "Aufgabenansicht mit Registerkarten")), "tabbed_task_view", List.of(), true);
 
     private final I18nString name;
     private final String identifier;
