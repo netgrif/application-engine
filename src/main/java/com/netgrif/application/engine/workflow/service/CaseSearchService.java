@@ -12,7 +12,7 @@ import com.netgrif.core.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.core.workflow.domain.ProcessResourceId;
-import com.netgrif.core.workflow.domain.QCase;
+import com.netgrif.adapter.workflow.domain.QCase;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Ops;

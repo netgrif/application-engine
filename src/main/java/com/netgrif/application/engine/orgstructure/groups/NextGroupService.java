@@ -17,7 +17,7 @@ import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.core.workflow.domain.ProcessResourceId;
-import com.netgrif.core.workflow.domain.QCase;
+import com.netgrif.adapter.workflow.domain.QCase;
 import com.netgrif.core.workflow.domain.Task;
 import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;

@@ -12,7 +12,7 @@ import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.startup.runner.*
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.core.workflow.domain.Case
-import com.netgrif.core.workflow.domain.QCase
+import com.netgrif.adapter.workflow.domain.QCase
 import com.netgrif.core.workflow.domain.QTask
 import com.netgrif.core.workflow.domain.Task
 import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome

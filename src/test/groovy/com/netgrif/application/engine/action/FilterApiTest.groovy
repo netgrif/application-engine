@@ -10,7 +10,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.runner.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.core.workflow.domain.Case
-import com.netgrif.core.workflow.domain.QCase
+import com.netgrif.adapter.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.bson.types.ObjectId

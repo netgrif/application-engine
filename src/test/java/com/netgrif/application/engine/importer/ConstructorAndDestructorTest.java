@@ -7,7 +7,7 @@ import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataExcepti
 import com.netgrif.adapter.petrinet.service.PetriNetService;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.core.workflow.domain.Case;
-import com.netgrif.core.workflow.domain.QCase;
+import com.netgrif.adapter.workflow.domain.QCase;
 import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import org.junit.jupiter.api.BeforeEach;
