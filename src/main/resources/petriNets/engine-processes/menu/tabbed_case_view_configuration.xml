@@ -559,11 +559,6 @@
                     <appearance>standard</appearance>
                 </layout>
             </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>current_filter</id>
-            <cols>4</cols>
-            <layout>grid</layout>
             <dataRef>
                 <id>filter_header</id>
                 <logic>
@@ -571,7 +566,7 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>0</y>
+                    <y>2</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <template>material</template>
@@ -585,7 +580,7 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>1</y>
+                    <y>3</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <template>material</template>

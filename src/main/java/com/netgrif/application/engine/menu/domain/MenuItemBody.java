@@ -34,7 +34,6 @@ public class MenuItemBody {
     private String tabIcon;
     private boolean useTabIcon = true;
     private I18nString tabName;
-    private MenuItemView viewType;
     private ViewBody view;
 
     public MenuItemBody(I18nString name, String icon) {
@@ -171,7 +170,7 @@ public class MenuItemBody {
 
         if (viewCase != null) {
             outcome.putDataSetEntry(MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE, FieldType.ENUMERATION_MAP,
-                    this.viewType.getIdentifier());
+                    this.view.getViewType().getIdentifier());
             outcome.putDataSetEntry(MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID, FieldType.CASE_REF,
                     List.of(viewCase.getStringId()));
             String taskId = MenuItemUtils.findTaskIdInCase(viewCase, ViewConstants.TRANS_SETTINGS_ID);

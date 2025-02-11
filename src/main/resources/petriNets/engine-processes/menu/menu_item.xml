@@ -724,9 +724,10 @@
 			</logic>
 		</roleRef>
 		<dataGroup>
-			<id>pre_general</id>
+			<id>general_0</id>
 			<cols>4</cols>
 			<layout>grid</layout>
+			<title name="item_settings_general">General</title>
 			<dataRef>
 				<id>menu_item_identifier</id>
 				<logic>
@@ -755,12 +756,6 @@
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
-		</dataGroup>
-		<dataGroup>
-			<id>general_0</id>
-			<cols>4</cols>
-			<layout>grid</layout>
-			<title name="item_settings_general">General</title>
 			<dataRef>
 				<id>menu_name</id>
 				<logic>
@@ -768,7 +763,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>0</y>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -782,7 +777,7 @@
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>0</y>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<template>material</template>
@@ -796,7 +791,7 @@
 				</logic>
 				<layout>
 					<x>3</x>
-					<y>0</y>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<template>material</template>

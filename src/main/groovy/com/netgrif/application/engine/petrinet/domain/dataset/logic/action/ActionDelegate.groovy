@@ -1728,7 +1728,6 @@ class ActionDelegate {
         body.setUseTabbedView(true)
 
         body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
-        initializeViewType(body)
 
         return menuItemService.createMenuItem(body)
     }
@@ -1758,7 +1757,6 @@ class ActionDelegate {
         body.setUseTabbedView(true)
 
         body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
-        initializeViewType(body)
 
         return menuItemService.createMenuItem(body)
     }
@@ -1789,7 +1787,6 @@ class ActionDelegate {
         body.setUseTabbedView(true)
 
         body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
-        initializeViewType(body)
 
         return menuItemService.createMenuItem(body)
     }
@@ -1819,7 +1816,6 @@ class ActionDelegate {
         body.setUseTabbedView(true)
 
         body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
-        initializeViewType(body)
 
         return menuItemService.createMenuItem(body)
     }
@@ -1858,7 +1854,6 @@ class ActionDelegate {
         body.setUseTabbedView(true)
 
         body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
-        initializeViewType(body)
 
         return menuItemService.createMenuItem(body)
     }
@@ -2096,14 +2091,6 @@ class ActionDelegate {
 
     Case createMenuItem(MenuItemBody body) {
         return menuItemService.createMenuItem(body)
-    }
-
-    protected void initializeViewType(MenuItemBody body) {
-        if (body.view.filterBody.type == "Case") {
-            body.setViewType(MenuItemView.TABBED_CASE_VIEW)
-        } else {
-            body.setViewType(MenuItemView.TABBED_TASK_VIEW)
-        }
     }
 
     protected ViewBody createLegacyMenuItemViews(Case filterCase, List<String> caseDefaultHeaders = null,
@@ -2375,7 +2362,6 @@ class ActionDelegate {
         filterBody.setVisibility(DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE)
 
         body.setView(createLegacyMenuItemViews(filterBody, defaultHeaders))
-        initializeViewType(body)
         return menuItemService.createOrUpdateMenuItem(body)
     }
 
@@ -2405,7 +2391,6 @@ class ActionDelegate {
         body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
         body.setUseTabbedView(true)
         body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
-        initializeViewType(body)
 
         return createOrUpdateMenuItem(body)
     }
@@ -2455,7 +2440,6 @@ class ActionDelegate {
         filterBody.setVisibility(filterVisibility)
         filterBody.setMetadata(filterMetadata as Map<String, Object>)
         body.setView(createLegacyMenuItemViews(filterBody, itemCaseDefaultHeaders, itemTaskDefaultHeaders))
-        initializeViewType(body)
 
         return menuItemService.createOrUpdateMenuItem(body)
     }
@@ -2501,7 +2485,6 @@ class ActionDelegate {
         filterBody.setVisibility(filterVisibility)
         filterBody.setMetadata(filterMetadata as Map<String, Object>)
         body.setView(createLegacyMenuItemViews(filterBody))
-        initializeViewType(body)
 
         return menuItemService.createOrUpdateMenuItem(body)
     }
@@ -2540,7 +2523,6 @@ class ActionDelegate {
         filterBody.setMetadata(filterMetadata as Map<String, Object>)
 
         body.setView(createLegacyMenuItemViews(filterBody))
-        initializeViewType(body)
 
         return menuItemService.createOrIgnoreMenuItem(body)
     }
