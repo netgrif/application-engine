@@ -1,7 +1,9 @@
 package com.netgrif.application.engine.event.dispatchers;
 
 import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
+import com.netgrif.application.engine.event.events.EventChain;
 import com.netgrif.application.engine.event.events.task.*;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -10,14 +12,14 @@ import java.util.Set;
 @Component
 public class TaskDispatcher extends AbstractDispatcher {
 
-    public TaskDispatcher() {
+    public TaskDispatcher(@Qualifier("GlobalEventChain") EventChain globalEventChain) {
         super(Set.of(AssignTaskEvent.class,
                 CancelTaskEvent.class,
                 CreateTaskEvent.class,
                 DelegateTaskEvent.class,
                 FinishTaskEvent.class,
                 IndexTaskEvent.class
-        ));
+        ), globalEventChain);
     }
 
     @EventListener

@@ -1,8 +1,10 @@
 package com.netgrif.application.engine.event.dispatchers;
 
 import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
+import com.netgrif.application.engine.event.events.EventChain;
 import com.netgrif.application.engine.event.events.petrinet.ProcessDeleteEvent;
 import com.netgrif.application.engine.event.events.petrinet.ProcessDeployEvent;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -11,8 +13,8 @@ import java.util.Set;
 @Component
 public class ProcessDispatcher extends AbstractDispatcher {
 
-    public ProcessDispatcher() {
-        super(Set.of(ProcessDeployEvent.class, ProcessDeleteEvent.class));
+    public ProcessDispatcher(@Qualifier("GlobalEventChain") EventChain globalEventChain) {
+        super(Set.of(ProcessDeployEvent.class, ProcessDeleteEvent.class), globalEventChain);
     }
 
     @EventListener

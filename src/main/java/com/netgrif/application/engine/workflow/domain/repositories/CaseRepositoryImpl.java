@@ -5,7 +5,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.Reference;
 import com.netgrif.application.engine.workflow.domain.QCase;
-import com.netgrif.application.engine.workflow.domain.QDataField;
+//import com.netgrif.application.engine.workflow.domain.QDataField;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringExpression;
@@ -45,15 +45,15 @@ public abstract class CaseRepositoryImpl implements CaseRepository {
             return path.equalsIgnoreCase(string);
         });
         bindings.bind(String.class).first((SingleValueBinding<StringPath, String>) StringExpression::equalsIgnoreCase);
-        bindings.bind(qCase.dataSet).first((path, map) ->
-                map.entrySet().stream()
-                        .map(o -> {
-                            QDataField field = qCase.dataSet.get(o.getKey());
-                            if (field == null || o.getValue() == null || o.getValue().getValue() == null)
-                                return Expressions.asBoolean(false);
-                            return field.value.eq(o.getValue().getValue().toString());
-                        })
-                        .reduce(BooleanExpression::and).get());
+//        bindings.bind(qCase.dataSet).first((path, map) ->
+//                map.entrySet().stream()
+//                        .map(o -> {
+//                            QDataField field = qCase.dataSet.get(o.getKey());
+//                            if (field == null || o.getValue() == null || o.getValue().getValue() == null)
+//                                return Expressions.asBoolean(false);
+//                            return field.value.eq(o.getValue().getValue().toString());
+//                        })
+//                        .reduce(BooleanExpression::and).get());
         bindings.bind(qCase.title).first(StringExpression::likeIgnoreCase);
     }
 }

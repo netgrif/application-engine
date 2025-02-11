@@ -1,7 +1,9 @@
 package com.netgrif.application.engine.event.dispatchers;
 
 import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
+import com.netgrif.application.engine.event.events.EventChain;
 import com.netgrif.application.engine.event.events.user.*;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -10,14 +12,14 @@ import java.util.Set;
 @Component
 public class UserDispatcher extends AbstractDispatcher {
 
-    public UserDispatcher() {
+    public UserDispatcher(@Qualifier("GlobalEventChain") EventChain globalEventChain) {
         super(Set.of(UserLoginEvent.class,
                 UserLogoutEvent.class,
                 UserRegistrationEvent.class,
                 UserRoleChangeEvent.class,
                 AdminActionEvent.class,
                 ImpersonationEvent.class
-        ));
+        ), globalEventChain);
     }
 
     @EventListener

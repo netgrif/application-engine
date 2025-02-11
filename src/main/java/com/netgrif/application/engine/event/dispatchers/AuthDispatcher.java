@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.event.dispatchers;
 
 import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
+import com.netgrif.application.engine.event.events.EventChain;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
@@ -10,8 +12,8 @@ import java.util.Set;
 
 @Component
 public class AuthDispatcher extends AbstractDispatcher {
-    protected AuthDispatcher() {
-        super(Set.of(AuthenticationSuccessEvent.class, AuthenticationFailureBadCredentialsEvent.class));
+    protected AuthDispatcher(@Qualifier("GlobalEventChain") EventChain globalEventChain) {
+        super(Set.of(AuthenticationSuccessEvent.class, AuthenticationFailureBadCredentialsEvent.class), globalEventChain);
     }
 
     @EventListener

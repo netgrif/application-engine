@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.event.dispatchers.common;
 
 import com.netgrif.application.engine.event.events.Event;
+import com.netgrif.application.engine.event.events.EventChain;
 import com.netgrif.application.engine.event.listeners.ContextEditingListener;
 import com.netgrif.application.engine.event.listeners.Listener;
 import lombok.Getter;
@@ -20,9 +21,16 @@ public abstract class AbstractDispatcher {
     private final Set<RegisteredListener> registeredListeners;
     @Getter
     private final Set<Class<? extends EventObject>> allowedEvents;
+    @Getter
+    private EventChain globalEventChain;
 
-    protected AbstractDispatcher(Set<Class<? extends EventObject>> allowedEvents) {
+    private int eventCount = 0;
+
+    private final int WIPE_AFTER = 1000;
+
+    protected AbstractDispatcher(Set<Class<? extends EventObject>> allowedEvents, EventChain globalEventChain) {
         this.allowedEvents = allowedEvents;
+        this.globalEventChain = globalEventChain;
         this.registeredListeners = new HashSet<>();
     }
 
@@ -155,11 +163,13 @@ public abstract class AbstractDispatcher {
         List<CompletableFuture<Void>> futures = new ArrayList<>();
         List<RegisteredListener> simpleListeners = registeredListeners.stream().filter(l -> !(l.listener() instanceof ContextEditingListener<?>)).toList();
         List<RegisteredListener> contextEditingListeners = registeredListeners.stream().filter(l -> l.listener() instanceof ContextEditingListener<?>).toList();
+        globalEventChain.add(event, this.getClass());
+        eventCount++;
         for (RegisteredListener registeredListener : simpleListeners) {
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 if (foo.apply(registeredListener)) {
                     log.trace("Sending event {} synchronously", event.getClass().getSimpleName());
-                    registeredListener.listener().onEvent(event, this);
+                    registeredListener.listener().onPreEvent(event, this);
                 }
             });
             futures.add(future);
@@ -170,6 +180,10 @@ public abstract class AbstractDispatcher {
             if (foo.apply(registeredListener)) {
                 updatedEvent = ((ContextEditingListener<E>) registeredListener.listener()).onContextEditingEvent(updatedEvent, this);
             }
+        }
+        if (globalEventChain.hasChild()) {
+            onEventChainFull();
+            this.globalEventChain = globalEventChain.getChild();
         }
     }
 
@@ -183,13 +197,19 @@ public abstract class AbstractDispatcher {
      * @param <E>   Type of event, must be child of {@link EventObject}
      */
     protected <E extends EventObject> void dispatchAsync(E event, Function<RegisteredListener, Boolean> foo) {
+        globalEventChain.add(event, this.getClass());
+        eventCount++;
         for (RegisteredListener registeredListener : registeredListeners) {
             CompletableFuture.runAsync(() -> {
                 if (foo.apply(registeredListener)) {
                     log.trace("Sending event {} asynchronously", event.getClass().getSimpleName());
-                    registeredListener.listener().onAsyncEvent(event, this);
+                    registeredListener.listener().onPreAsyncEvent(event, this);
                 }
             });
+        }
+        if (globalEventChain.hasChild()) {
+            onEventChainFull();
+            this.globalEventChain = globalEventChain.getChild();
         }
     }
 
@@ -199,6 +219,13 @@ public abstract class AbstractDispatcher {
 
     private boolean isRegistrationAllowed(RegisteredListener registeredListener) {
         return allowedEvents.stream().anyMatch(it -> it.equals(registeredListener.eventClass()));
+    }
+
+    private void onEventChainFull() {
+        if (globalEventChain.getLength() == eventCount) {
+            globalEventChain.wipe();
+            eventCount = 0;
+        }
     }
 
 }

@@ -228,7 +228,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
                     log.error("Unrecognized Field type " + entry.getKey());
                 }
             } else {
-                predicates.add(QCase.case$.dataSet.get((String) k).value.eq(v));
+//                predicates.add(QCase.case$.dataSet.get((String) k).value.eq(v));
             }
         });
         BooleanBuilder builder = new BooleanBuilder();
@@ -293,21 +293,21 @@ public class CaseSearchService extends MongoSearchService<Case> {
             net.getImmediateFields().forEach(field -> {
                 try {
                     if (field.getType() == FieldType.TEXT) {
-                        Path<?> path = QCase.case$.dataSet.get(field.getStringId()).value;
-                        Expression<String> constant = Expressions.constant(searchPhrase);
-                        predicates.add(Expressions.predicate(Ops.STRING_CONTAINS_IC, path, constant));
+//                        Path<?> path = QCase.case$.dataSet.get(field.getStringId()).value;
+//                        Expression<String> constant = Expressions.constant(searchPhrase);
+//                        predicates.add(Expressions.predicate(Ops.STRING_CONTAINS_IC, path, constant));
                     } else if (field.getType() == FieldType.NUMBER) {
                         Double value = FieldFactory.parseDouble(searchPhrase);
-                        if (value != null)
-                            predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
+                        if (value != null){}
+//                            predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
                     } else if (field.getType() == FieldType.DATE) {
                         LocalDate value = FieldFactory.parseDate(searchPhrase);
-                        if (value != null)
-                            predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
+                        if (value != null){}
+//                            predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
                     } else if (field.getType() == FieldType.DATETIME) {
                         LocalDateTime value = FieldFactory.parseDateTime(searchPhrase);
-                        if (value != null)
-                            predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
+                        if (value != null){}
+//                            predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
                     } else if (field.getType() == FieldType.ENUMERATION) {
                         Path valuePath = Expressions.simplePath(I18nString.class, QCase.case$.dataSet.get(field.getStringId()), "value");
                         Path defaultValuePath = Expressions.stringPath(valuePath, "defaultValue");

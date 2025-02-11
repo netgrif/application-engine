@@ -2,7 +2,7 @@ package com.netgrif.application.engine.event.listeners;
 
 
 import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
-import com.netgrif.application.engine.event.events.Event;
+import com.netgrif.application.engine.event.events.EventChain;
 import lombok.Getter;
 
 import java.util.EventListener;
@@ -12,8 +12,12 @@ import java.util.Set;
 @Getter
 public abstract class Listener implements EventListener {
 
-    public Listener() {
+    private EventChain eventChain;
 
+    private int eventCount = 0;
+
+    public Listener() {
+        this.eventChain = new EventChain(Set.of(this.getClass()));
     }
     //todo: register global
 
@@ -65,25 +69,66 @@ public abstract class Listener implements EventListener {
     }
 
     /**
+     * TODO
+     *
+     * @param event
+     * @param dispatcher
+     * @param <E>
+     */
+    public <E extends EventObject> void onPreEvent(final E event, AbstractDispatcher dispatcher) {
+        eventChain.add(event, this.getClass());
+        eventCount++;
+        onEvent(event, dispatcher);
+        if (eventChain.hasChild()) {
+            onEventChainFull();
+            this.eventChain = eventChain.getChild();
+        }
+    }
+
+    /**
      * <p>Abstract method for handling synchronous events. This method will be invoked by Dispatcher if the Listener is registered.
      *
-     * @param event      {@link Event} object, final type of the object is determined based on registered events
+     * @param event      {@link EventObject} object, final type of the object is determined based on registered events
      * @param dispatcher {@link AbstractDispatcher} from which the event was dispatched
      * @see AbstractDispatcher#registerListener(Listener, Class, AbstractDispatcher.DispatchMethod)
      */
-    public abstract void onEvent(final EventObject event, AbstractDispatcher dispatcher);
+    public abstract <E extends EventObject> void onEvent(final E event, AbstractDispatcher dispatcher);
+
+
+    /**
+     * TODO
+     *
+     * @param event
+     * @param dispatcher
+     * @param <E>
+     */
+    public <E extends EventObject> void onPreAsyncEvent(final E event, AbstractDispatcher dispatcher) {
+        eventChain.add(event, this.getClass());
+        eventCount++;
+        onAsyncEvent(event, dispatcher);
+        if (eventChain.hasChild()) {
+            onEventChainFull();
+            this.eventChain = eventChain.getChild();
+        }
+    }
 
     /**
      * <p>Abstract method for handling asynchronous events. This method will be invoked by Dispatcher if the Listener is registered.
      *
-     * @param event      {@link Event} object, final type of the object is determined based on registered events
+     * @param event      {@link EventObject} object, final type of the object is determined based on registered events
      * @param dispatcher {@link AbstractDispatcher} from which the event was dispatched
      * @see AbstractDispatcher#registerListener(Listener, Class, AbstractDispatcher.DispatchMethod)
      */
-    public abstract void onAsyncEvent(final EventObject event, AbstractDispatcher dispatcher);
+    public abstract <E extends EventObject> void onAsyncEvent(final E event, AbstractDispatcher dispatcher);
+
+    public void onEventChainFull() {
+        if (eventChain.getLength() == eventCount ) {
+            eventChain.wipe();
+            eventCount = 0;
+        }
+    }
 
     public String getName() {
         return this.getClass().getSimpleName();
     }
-
 }

@@ -251,13 +251,14 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Set<String> getAllCoMembers(IUser user) {
-        Set<String> users = workflowService.searchAll(
-                        groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(user.getStringId())))
-                .map(it -> it.getDataSet().get(GROUP_MEMBERS_FIELD).getOptions().keySet()).stream()
-                .collect(HashSet::new, Set::addAll, Set::addAll);
-        users.remove(user.getStringId());
-        users.remove(userService.getSystem().getStringId());
-        return users;
+//        Set<String> users = workflowService.searchAll(
+//                        groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(user.getStringId())))
+//                .map(it -> it.getDataSet().get(GROUP_MEMBERS_FIELD).getOptions().keySet()).stream()
+//                .collect(HashSet::new, Set::addAll, Set::addAll);
+//        users.remove(user.getStringId());
+//        users.remove(userService.getSystem().getStringId());
+//        return users;
+        return Set.of("test");
     }
 
 
@@ -274,9 +275,10 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Set<String> getAllGroupsOfUser(IUser groupUser) {
-        List<String> groupList = workflowService.searchAll(groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.getStringId())))
-                .map(aCase -> aCase.get_id().toString()).getContent();
-        return new HashSet<>(groupList);
+//        List<String> groupList = workflowService.searchAll(groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.getStringId())))
+//                .map(aCase -> aCase.get_id().toString()).getContent();
+//        return new HashSet<>(groupList);
+        return new HashSet<>();
     }
 
     @Override

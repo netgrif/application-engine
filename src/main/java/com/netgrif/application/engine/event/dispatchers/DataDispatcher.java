@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.event.dispatchers;
 
 import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
+import com.netgrif.application.engine.event.events.EventChain;
 import com.netgrif.application.engine.event.events.data.GetDataEvent;
 import com.netgrif.application.engine.event.events.data.SetDataEvent;
 import org.springframework.context.event.EventListener;
@@ -11,8 +12,8 @@ import java.util.Set;
 @Component
 public class DataDispatcher extends AbstractDispatcher {
 
-    public DataDispatcher() {
-        super(Set.of(GetDataEvent.class, SetDataEvent.class));
+    public DataDispatcher(EventChain globalEventChain) {
+        super(Set.of(GetDataEvent.class, SetDataEvent.class), globalEventChain);
     }
 
     @EventListener
