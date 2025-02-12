@@ -106,6 +106,11 @@ public class MenuItemBody {
         this.tabName = new I18nString(name);
     }
 
+    public void setView(ViewBody viewBody) {
+        this.view = viewBody;
+        this.useTabbedView = viewBody.getViewType().isTabbed();
+    }
+
     /**
      * @return true if the menu item contains view
      * */
