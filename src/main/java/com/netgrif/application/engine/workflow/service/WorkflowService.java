@@ -11,9 +11,6 @@ import com.netgrif.core.event.events.workflow.CaseEvent;
 import com.netgrif.core.event.events.workflow.CreateCaseEvent;
 import com.netgrif.core.event.events.workflow.DeleteCaseEvent;
 import com.netgrif.application.engine.event.services.EvaluationService;
-import com.netgrif.core.history.domain.caseevents.CreateCaseEventLog;
-import com.netgrif.core.history.domain.caseevents.DeleteCaseEventLog;
-import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.core.petrinet.domain.PetriNet;
@@ -107,9 +104,6 @@ public class WorkflowService implements IWorkflowService {
     @Lazy
     @Autowired
     protected IEventService eventService;
-
-    @Autowired
-    protected IHistoryService historyService;
 
     protected IElasticCaseService elasticCaseService;
 
@@ -348,7 +342,7 @@ public class WorkflowService implements IWorkflowService {
         outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty(), params));
         //evaluateRules(new CreateCaseEvent(new CreateCaseEventOutcome(null, outcome.getOutcomes()), EventPhase.PRE));
 
-        historyService.save(new CreateCaseEventLog(useCase, EventPhase.PRE));
+//        historyService.save(new CreateCaseEventLog(useCase, EventPhase.PRE));
         log.info("[" + useCase.getStringId() + "]: Case " + useCase.getTitle() + " created");
 
         useCase.getPetriNet().initializeArcs(useCase.getDataSet());
@@ -365,7 +359,7 @@ public class WorkflowService implements IWorkflowService {
 //            useCase = save(useCase);
 //        }
 
-        historyService.save(new CreateCaseEventLog(useCase, EventPhase.POST));
+//        historyService.save(new CreateCaseEventLog(useCase, EventPhase.POST));
         outcome.setCase(setImmediateDataFields(useCase));
         addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
 //        publisher.publishEvent(new CreateCaseEvent(outcome));
@@ -408,7 +402,7 @@ public class WorkflowService implements IWorkflowService {
     public DeleteCaseEventOutcome deleteCase(Case useCase, Map<String, String> params) {
 
         DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty(), params));
-        historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
+//        historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
         useCase = ((Evaluator<DeleteCaseEvent, Case>) evaluationService.getEvaluator("default")).apply(new DeleteCaseEvent(outcome, EventPhase.PRE));;
         log.info("[" + useCase.getStringId() + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting case " + useCase.getTitle());
 
@@ -418,7 +412,7 @@ public class WorkflowService implements IWorkflowService {
         outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty(), params));
         addMessageToOutcome(useCase.getPetriNet(), CaseEventType.DELETE, outcome);
         ((Evaluator<DeleteCaseEvent, Case>) evaluationService.getEvaluator("noContext")).apply(new DeleteCaseEvent(outcome, EventPhase.POST));
-        historyService.save(new DeleteCaseEventLog(useCase, EventPhase.POST));
+//        historyService.save(new DeleteCaseEventLog(useCase, EventPhase.POST));
 //        publisher.publishEvent(new DeleteCaseEvent(outcome));
         return outcome;
     }

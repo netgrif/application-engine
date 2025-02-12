@@ -101,9 +101,9 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     public void index(ElasticCase useCase) {
         executors.execute(useCase.getStringId(), () -> {
             try {
-                ElasticCase elasticCase = repository.findByStringId(useCase.getStringId());
+                com.netgrif.adapter.elastic.domain.ElasticCase elasticCase = repository.findByStringId(useCase.getStringId());
                 if (elasticCase == null) {
-                    repository.save(useCase);
+                    repository.save((com.netgrif.adapter.elastic.domain.ElasticCase) useCase);
                 } else {
                     elasticCase.update(useCase);
                     repository.save(elasticCase);
@@ -113,7 +113,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             } catch (InvalidDataAccessApiUsageException ignored) {
                 log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" has duplicates, will be reindexed");
                 repository.deleteAllByStringId(useCase.getStringId());
-                repository.save(useCase);
+                repository.save((com.netgrif.adapter.elastic.domain.ElasticCase) useCase);
                 log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
             }
         });

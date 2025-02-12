@@ -1,12 +1,13 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
+import com.netgrif.adapter.auth.service.UserService
+import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.adapter.petrinet.service.ProcessRoleService
+import com.netgrif.adapter.workflow.domain.QCase
+import com.netgrif.adapter.workflow.domain.QTask
 import com.netgrif.application.engine.AsyncRunner
-import com.netgrif.core.auth.domain.Author;
-import com.netgrif.core.auth.domain.IUser
-import com.netgrif.core.auth.domain.LoggedUser
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService
-import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
 import com.netgrif.application.engine.configuration.PublicViewProperties
@@ -18,7 +19,6 @@ import com.netgrif.application.engine.export.configuration.ExportConfiguration
 import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
-import com.netgrif.application.engine.history.service.IHistoryService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
@@ -26,25 +26,28 @@ import com.netgrif.application.engine.mail.interfaces.IMailService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.pdf.generator.config.PdfResource
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
+import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
+import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
+import com.netgrif.application.engine.startup.runner.FilterRunner
+import com.netgrif.application.engine.utils.FullPageRequest
+import com.netgrif.application.engine.workflow.service.FileFieldInputStream
+import com.netgrif.application.engine.workflow.service.TaskService
+import com.netgrif.application.engine.workflow.service.interfaces.*
+import com.netgrif.core.auth.domain.Author
+import com.netgrif.core.auth.domain.IUser
+import com.netgrif.core.auth.domain.LoggedUser
 import com.netgrif.core.petrinet.domain.*
 import com.netgrif.core.petrinet.domain.dataset.*
 import com.netgrif.core.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.core.petrinet.domain.dataset.logic.FieldBehavior
+import com.netgrif.core.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.core.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.core.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.core.petrinet.domain.version.Version
-import com.netgrif.adapter.petrinet.service.PetriNetService
-import com.netgrif.adapter.petrinet.service.ProcessRoleService
-import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
-//import com.netgrif.application.engine.rules.domain.RuleRepository
-import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
-import com.netgrif.application.engine.startup.runner.FilterRunner
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.utils.FullPageRequest
+
 import com.netgrif.core.workflow.domain.Case
-import com.netgrif.adapter.workflow.domain.QCase
-import com.netgrif.adapter.workflow.domain.QTask
 import com.netgrif.core.workflow.domain.Task
 import com.netgrif.core.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
@@ -54,9 +57,6 @@ import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEve
 import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
 import com.netgrif.core.workflow.domain.menu.MenuItemBody
 import com.netgrif.core.workflow.domain.menu.MenuItemConstants
-import com.netgrif.application.engine.workflow.service.FileFieldInputStream
-import com.netgrif.application.engine.workflow.service.TaskService
-import com.netgrif.application.engine.workflow.service.interfaces.*
 import com.netgrif.core.workflow.service.InitValueExpressionEvaluator
 import com.netgrif.core.workflow.web.responsebodies.MessageResource
 import com.netgrif.core.workflow.web.responsebodies.TaskReference
@@ -78,7 +78,6 @@ import org.springframework.data.domain.Pageable
 import java.text.Normalizer
 import java.time.ZoneId
 import java.util.stream.Collectors
-
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -185,8 +184,8 @@ class ActionDelegate {
     @Autowired
     IImpersonationService impersonationService
 
-    @Autowired
-    IHistoryService historyService
+//    @Autowired
+//    IHistoryService historyService
 
     @Autowired
     PublicViewProperties publicViewProperties
@@ -2481,14 +2480,14 @@ class ActionDelegate {
     List<Case> findCasesElastic(String query, Pageable pageable) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
-        List<Case> result = elasticCaseService.search([request], userService.system.transformToLoggedUser(), pageable, LocaleContextHolder.locale, false).content
+        List<Case> result = elasticCaseService.search([request], userService.transformToLoggedUser(userService.getSystem()), pageable, LocaleContextHolder.locale, false).content
         return result
     }
 
     long countCasesElastic(String query) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
-        return elasticCaseService.count([request], userService.system.transformToLoggedUser(), LocaleContextHolder.locale, false)
+        return elasticCaseService.count([request], userService.transformToLoggedUser(userService.getSystem()), LocaleContextHolder.locale, false)
     }
 
     @Deprecated

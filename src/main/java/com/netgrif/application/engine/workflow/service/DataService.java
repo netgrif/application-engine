@@ -16,8 +16,6 @@ import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.files.throwable.StorageException;
 import com.netgrif.core.event.events.data.GetDataEvent;
 import com.netgrif.core.event.events.data.SetDataEvent;
-import com.netgrif.core.history.domain.dataevents.SetDataEventLog;
-import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.core.petrinet.domain.Component;
 import com.netgrif.core.petrinet.domain.*;
@@ -92,8 +90,8 @@ public class DataService implements IDataService {
     @Autowired
     protected IEventService eventService;
 
-    @Autowired
-    protected IHistoryService historyService;
+//    @Autowired
+//    protected IHistoryService historyService;
 
     @Autowired
     protected PetriNetService petriNetService;
@@ -295,10 +293,10 @@ public class DataService implements IDataService {
                 }
                 outcome.addChangedField(fieldId, changedField);
                 workflowService.save(useCase);
-                historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE, Collections.singletonMap(fieldId, changedField), user));
+//                historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE, Collections.singletonMap(fieldId, changedField), user));
                 outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, params));
 
-                historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, null, user));
+//                historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, null, user));
                 applyFieldConnectedChanges(useCase, field);
             }
         });

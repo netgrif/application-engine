@@ -2,15 +2,12 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
-import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.core.event.events.task.*;
-import com.netgrif.core.history.domain.taskevents.FinishTaskEventLog;
-import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.core.petrinet.domain.*;
 import com.netgrif.core.petrinet.domain.arcs.Arc;
 import com.netgrif.core.petrinet.domain.arcs.ArcOrderComparator;
@@ -101,8 +98,8 @@ public class TaskService implements ITaskService {
 
     protected IElasticTaskService elasticTaskService;
 
-    @Autowired
-    protected IHistoryService historyService;
+//    @Autowired
+//    protected IHistoryService historyService;
 
     @Autowired
     protected IValidationService validation;
@@ -824,14 +821,21 @@ public class TaskService implements ITaskService {
                 .dataFocusPolicy(transition.getDataFocusPolicy())
                 .finishPolicy(transition.getFinishPolicy())
                 .assignedUserPolicy(new HashMap<>(transition.getAssignedUserPolicy()))
+                .roles(new HashMap<>())
+                .userRefs(new HashMap<>())
+                .users(new HashMap<>())
+                .viewRoles(new LinkedList<>())
+                .viewUserRefs(new LinkedList<>())
+                .viewUsers(new LinkedList<>())
+                .negativeViewRoles(new LinkedList<>())
+                .negativeViewUsers(new LinkedList<>())
                 .build();
         transition.getEvents().forEach((type, event) -> task.addEventTitle(type, event.getTitle()));
         for (Trigger trigger : transition.getTriggers()) {
             Trigger taskTrigger = trigger.clone();
             task.addTrigger(taskTrigger);
 
-            if (taskTrigger instanceof TimeTrigger) {
-                TimeTrigger timeTrigger = (TimeTrigger) taskTrigger;
+            if (taskTrigger instanceof TimeTrigger timeTrigger) {
                 scheduleTaskExecution(task, timeTrigger.getStartDate(), useCase);
             }
         }

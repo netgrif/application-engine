@@ -1,19 +1,17 @@
 package com.netgrif.application.engine.ipc
 
-import com.netgrif.application.engine.TestHelper
 import com.netgrif.adapter.auth.service.UserService
-import com.netgrif.application.engine.history.domain.baseevent.EventLog
-import com.netgrif.application.engine.history.domain.baseevent.repository.EventLogRepository
-import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.core.petrinet.domain.PetriNet
-import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.adapter.workflow.domain.QTask
+import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.core.workflow.domain.Case
-import com.netgrif.adapter.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.VersionType
+import com.netgrif.core.workflow.domain.Case
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -43,8 +41,8 @@ class TaskApiTest {
     @Autowired
     private UserService userService
 
-    @Autowired
-    private EventLogRepository eventLogRepository
+//    @Autowired
+//    private EventLogRepository eventLogRepository
 
     @Autowired
     private PetriNetService petriNetService
@@ -113,7 +111,7 @@ class TaskApiTest {
         helper.assignTaskToSuper(TASK_EVENTS_TASK, useCase.stringId)
         helper.finishTaskAsSuper(TASK_EVENTS_TASK, useCase.stringId)
 
-        List<EventLog> log = eventLogRepository.findAll()
+//        List<EventLog> log = eventLogRepository.findAll()
 
 //        assert log.findAll {
 //            it instanceof UserTaskEventLog && it.transitionId == "work_task" && it.message.contains("assigned")

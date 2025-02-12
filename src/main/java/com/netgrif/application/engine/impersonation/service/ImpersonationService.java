@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.impersonation.service;
 
-import com.netgrif.adapter.auth.domain.LoggedUserImpl;
 import com.netgrif.core.auth.domain.Authority;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
@@ -8,8 +7,6 @@ import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;
 import com.netgrif.core.event.events.user.ImpersonationEvent;
 import com.netgrif.core.event.events.user.ImpersonationPhase;
-import com.netgrif.application.engine.history.domain.impersonationevents.ImpersonationEndEventLog;
-import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
 import com.netgrif.application.engine.impersonation.domain.repository.ImpersonatorRepository;
 import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserHasSessionException;
@@ -37,9 +34,6 @@ public class ImpersonationService implements IImpersonationService {
 
     @Autowired
     protected UserService userService;
-
-    @Autowired
-    protected IHistoryService historyService;
 
     @Autowired
     protected ApplicationEventPublisher publisher;

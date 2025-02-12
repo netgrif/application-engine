@@ -10,10 +10,6 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNe
 import com.netgrif.core.event.events.Event;
 import com.netgrif.core.event.events.petrinet.ProcessDeleteEvent;
 import com.netgrif.core.event.events.petrinet.ProcessDeployEvent;
-import com.netgrif.core.history.domain.petrinetevents.DeletePetriNetEventLog;
-import com.netgrif.core.history.domain.petrinetevents.ImportPetriNetEventLog;
-import com.netgrif.core.history.domain.taskevents.TaskEventLog;
-import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.Importer;
 //import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
@@ -115,8 +111,8 @@ public class PetriNetService implements com.netgrif.adapter.petrinet.service.Pet
     @Autowired
     protected IEventService eventService;
 
-    @Autowired
-    protected IHistoryService historyService;
+//    @Autowired
+//    protected IHistoryService historyService;
 
     @Autowired
     protected CacheManager cacheManager;
@@ -241,12 +237,12 @@ public class PetriNetService implements com.netgrif.adapter.petrinet.service.Pet
         outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params));
 //        evaluateRules(net, EventPhase.PRE);
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.PRE));
-        historyService.save(new ImportPetriNetEventLog(null, EventPhase.PRE, net.getObjectId()));
+//        historyService.save(new ImportPetriNetEventLog(null, EventPhase.PRE, net.getObjectId()));
         save(net);
         outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), params));
 //        evaluateRules(net, EventPhase.POST);
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.POST));
-        historyService.save(new ImportPetriNetEventLog(null, EventPhase.POST, net.getObjectId()));
+//        historyService.save(new ImportPetriNetEventLog(null, EventPhase.POST, net.getObjectId()));
         addMessageToOutcome(net, ProcessEventType.UPLOAD, outcome);
         outcome.setNet(imported.get());
 //        publisher.publishEvent(new ProcessDeployEvent(outcome));
@@ -365,10 +361,10 @@ public class PetriNetService implements com.netgrif.adapter.petrinet.service.Pet
             arcs.forEach(arc -> pn.getArcs().add(new ArcImportReference(arc)));
         });
         //TODO: HistoryService zmizne
-        pn.getAssignedTasks().addAll(historyService.findAllAssignTaskEventLogsByCaseId(caseId)
-                .stream().map(TaskEventLog::getTransitionId).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
-        pn.getFinishedTasks().addAll(historyService.findAllFinishTaskEventLogsByCaseId(caseId)
-                .stream().map(TaskEventLog::getTransitionId).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
+//        pn.getAssignedTasks().addAll(historyService.findAllAssignTaskEventLogsByCaseId(caseId)
+//                .stream().map(TaskEventLog::getTransitionId).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
+//        pn.getFinishedTasks().addAll(historyService.findAllFinishTaskEventLogsByCaseId(caseId)
+//                .stream().map(TaskEventLog::getTransitionId).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
         return pn;
     }
 
@@ -560,7 +556,7 @@ public class PetriNetService implements com.netgrif.adapter.petrinet.service.Pet
         this.evictCache(petriNet);
         // net functions must be removed from cache after it was deleted from repository
         this.functionCacheService.reloadCachedFunctions(petriNet);
-        historyService.save(new DeletePetriNetEventLog(null, EventPhase.PRE, petriNet.getObjectId()));
+//        historyService.save(new DeletePetriNetEventLog(null, EventPhase.PRE, petriNet.getObjectId()));
         publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.POST));
     }
 
