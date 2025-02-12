@@ -268,6 +268,8 @@ class MenuItemApiTest {
     void testDuplicateMenuItem() {
         String starterUri = "/netgrif/test"
         Case apiCase = createMenuItem(starterUri, "new_menu_item")
+        Thread.sleep(2000)
+
         String itemId = apiCase.dataSet["menu_stringId"].value
         Case origin = workflowService.findOne(itemId)
         Case testFolder = workflowService.findOne((origin.dataSet[MenuItemConstants.FIELD_PARENT_ID].value as ArrayList<String>)[0])

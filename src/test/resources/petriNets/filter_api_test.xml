@@ -117,7 +117,6 @@
 							"defaultSearchCategories": false,
 							"inheritAllowedNets"     : false
 					]
-					awd()
 					createOrUpdateMenuItemAndFilter(uri.value, identifier.value, title.value, query.value, "Case",
 							"private", allowed_nets.value.split(",") as List, icon.value, ["role_2": "filter_api_test"],
 							[:], ["meta-title","meta-title","meta-title"], ["meta-title","meta-title","meta-title"], metadata)

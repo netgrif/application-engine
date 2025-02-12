@@ -3,6 +3,8 @@ package com.netgrif.application.engine.menu.services;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
+import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.menu.domain.FilterBody;
 import com.netgrif.application.engine.menu.domain.MenuItemBody;
 import com.netgrif.application.engine.menu.domain.MenuItemConstants;
@@ -21,14 +23,13 @@ import com.netgrif.application.engine.startup.DefaultFiltersRunner;
 import com.netgrif.application.engine.startup.FilterRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -42,6 +43,7 @@ public class MenuItemService implements IMenuItemService {
     protected final IDataService dataService;
     protected final IUserService userService;
     protected final IUriService uriService;
+    protected final IElasticCaseService elasticCaseService;
 
     protected static final String DEFAULT_FOLDER_ICON = "folder";
 
@@ -199,10 +201,9 @@ public class MenuItemService implements IMenuItemService {
      * */
     @Override
     public Case findMenuItem(String identifier) {
-        //        return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.menu_item_identifier.textValue.keyword:\"$menuItemIdentifier\"" as String)
-        Predicate predicate = QCase.case$.processIdentifier.eq(FilterRunner.MENU_NET_IDENTIFIER)
-                .and(QCase.case$.dataSet.get("menu_item_identifier").value.eq(identifier));
-        return workflowService.searchOne(predicate);
+        String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
+                FilterRunner.MENU_NET_IDENTIFIER, MenuItemConstants.FIELD_IDENTIFIER, identifier);
+        return findCase(FilterRunner.MENU_NET_IDENTIFIER, query);
     }
 
     /**
@@ -216,11 +217,9 @@ public class MenuItemService implements IMenuItemService {
     @Override
     public Case findMenuItem(String uri, String name) {
         UriNode uriNode = uriService.findByUri(uri);
-//        return findCaseElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND title.keyword:\"$name\" AND uriNodeId:\"$uriNode.stringId\"")
-        Predicate predicate = QCase.case$.processIdentifier.eq(FilterRunner.MENU_NET_IDENTIFIER)
-                .and(QCase.case$.title.eq(name))
-                .and(QCase.case$.uriNodeId.eq(uriNode.getStringId()));
-        return workflowService.searchOne(predicate);
+        String query = String.format("processIdentifier:%s AND title.keyword:\"%s\" AND uriNodeId:\"%s\"",
+                FilterRunner.MENU_NET_IDENTIFIER, name, uriNode.getStringId());
+        return findCase(FilterRunner.MENU_NET_IDENTIFIER, query);
     }
 
     /**
@@ -232,11 +231,9 @@ public class MenuItemService implements IMenuItemService {
      * */
     @Override
     public Case findFolderCase(UriNode node) {
-        // todo elastic problem
-//        return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.nodePath.textValue.keyword:\"$node.uriPath\"")
-        Predicate predicate = QCase.case$.processIdentifier.eq(FilterRunner.MENU_NET_IDENTIFIER)
-                .and(QCase.case$.dataSet.get("nodePath").value.eq(node.getUriPath()));
-        return workflowService.searchOne(predicate);
+        String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
+                FilterRunner.MENU_NET_IDENTIFIER, MenuItemConstants.FIELD_NODE_PATH, node.getUriPath());
+        return findCase(FilterRunner.MENU_NET_IDENTIFIER, query);
     }
 
     /**
@@ -248,8 +245,9 @@ public class MenuItemService implements IMenuItemService {
      * */
     @Override
     public boolean existsMenuItem(String identifier) {
-        //        return countCasesElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND dataSet.menu_item_identifier.fulltextValue.keyword:\"$menuItemIdentifier\"") > 0
-        return findMenuItem(identifier) != null;
+        String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
+                FilterRunner.MENU_NET_IDENTIFIER, MenuItemConstants.FIELD_IDENTIFIER, identifier);
+        return countCases(FilterRunner.MENU_NET_IDENTIFIER, query) > 0;
     }
 
     /**
@@ -398,6 +396,26 @@ public class MenuItemService implements IMenuItemService {
         parentFolder.getDataField(MenuItemConstants.FIELD_CHILD_ITEM_IDS).setValue(childIds);
         parentFolder.getDataField(MenuItemConstants.FIELD_HAS_CHILDREN).setValue(MenuItemUtils.hasFolderChildren(parentFolder));
         return workflowService.save(parentFolder);
+    }
+
+    protected Case findCase(String processIdentifier, String query) {
+        CaseSearchRequest request = CaseSearchRequest.builder()
+                .process(Collections.singletonList(new CaseSearchRequest.PetriNet(processIdentifier)))
+                .query(query)
+                .build();
+        Page<Case> resultPage = elasticCaseService.search(List.of(request), userService.getLoggedOrSystem().transformToLoggedUser(),
+                PageRequest.of(0, 1), Locale.getDefault(), false);
+
+        return resultPage.hasContent() ? resultPage.getContent().get(0) : null;
+    }
+
+    protected long countCases(String processIdentifier, String query) {
+        CaseSearchRequest request = CaseSearchRequest.builder()
+                .process(Collections.singletonList(new CaseSearchRequest.PetriNet(processIdentifier)))
+                .query(query)
+                .build();
+        return elasticCaseService.count(List.of(request), userService.getLoggedOrSystem().transformToLoggedUser(),
+                Locale.getDefault(), false);
     }
 
     protected Case duplicateView(Case viewCase) throws TransitionNotExecutableException {
