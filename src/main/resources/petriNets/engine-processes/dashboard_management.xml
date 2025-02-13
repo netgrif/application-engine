@@ -307,6 +307,19 @@
         <title name="profile_dashboard_toolbar">Profile in dashboard toolbar</title>
         <placeholder name="profile_dashboard_toolbar_desc">Should dashboard toolbar contains profile button</placeholder>
         <init>false</init>
+        <event type="set">
+            <id>profile_dashboard_toolbar_set</id>
+            <actions phase="post">
+                <action>
+                    profile_dashboard_toolbar: f.profile_dashboard_toolbar,
+                    profile_url: f.profile_url,
+                    trans: t.configuration;
+
+                    make profile_url, visible on trans when { !profile_dashboard_toolbar.value }
+                    make profile_url, editable on trans when { profile_dashboard_toolbar.value }
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="boolean" immediate="true">
         <id>language_dashboard_toolbar</id>
@@ -319,10 +332,35 @@
         <title name="logout_dashboard_toolbar">Logout in dashboard toolbar</title>
         <placeholder name="logout_dashboard_toolbar_desc">Should dashboard toolbar contains logout button</placeholder>
         <init>false</init>
+        <event type="set">
+            <id>logout_dashboard_toolbar_set</id>
+            <actions phase="post">
+                <action>
+                    logout_dashboard_toolbar: f.logout_dashboard_toolbar,
+                    login_url: f.login_url,
+                    trans: t.configuration;
+
+                    make login_url, visible on trans when { !logout_dashboard_toolbar.value }
+                    make login_url, editable on trans when { logout_dashboard_toolbar.value }
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="text" immediate="true">
         <id>items_order</id>
         <title/>
+    </data>
+    <data type="text" immediate="true">
+        <id>profile_url</id>
+        <title name="profile_url">Profile URL</title>
+        <placeholder name="profile_url_desc">URL address of profile page</placeholder>
+        <init>profile</init>
+    </data>
+    <data type="text" immediate="true">
+        <id>login_url</id>
+        <title name="login_url">Login URL</title>
+        <placeholder name="login_url_desc">URL address of login page</placeholder>
+        <init>login</init>
     </data>
 
     <!-- I18NS -->
@@ -347,6 +385,11 @@
         <i18nString name="language_dashboard_toolbar_desc">Mal by panel nástrojov obsahovať menu s výberom jazyka</i18nString>
         <i18nString name="logout_dashboard_toolbar">Odhlásenie na paneli nástrojov</i18nString>
         <i18nString name="logout_dashboard_toolbar_desc">Mal by panel nástrojov obsahovať tlačidlo na odhlásenie</i18nString>
+
+        <i18nString name="profile_url">URL profilu</i18nString>
+        <i18nString name="profile_url_desc">URL adresa na stránku profilu</i18nString>
+        <i18nString name="login_url">URL prihlásenia</i18nString>
+        <i18nString name="login_url_desc">URL adresa na stránku prihlásenia</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="dashboard_id">Dashboard-ID</i18nString>
@@ -369,6 +412,11 @@
         <i18nString name="language_dashboard_toolbar_desc">Sollte die Symbolleiste des Dashboards ein Menü mit Sprachauswahl enthalten</i18nString>
         <i18nString name="logout_dashboard_toolbar">Abmelden in der Dashboard-Symbolleiste</i18nString>
         <i18nString name="logout_dashboard_toolbar_desc">Die Dashboard-Symbolleiste sollte eine Abmeldeschaltfläche enthalten</i18nString>
+
+        <i18nString name="profile_url">Profil-URL</i18nString>
+        <i18nString name="profile_url_desc">URL-Adresse der Profilseite</i18nString>
+        <i18nString name="login_url">Anmelde-URL</i18nString>
+        <i18nString name="login_url_desc">URL-Adresse der Anmeldeseite</i18nString>
     </i18n>
 
     <!-- TRANSITIONS -->
@@ -491,13 +539,41 @@
                 </layout>
             </dataRef>
             <dataRef>
+                <id>profile_url</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>login_url</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
                 <id>dashboard_item_list</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>3</y>
+                    <y>4</y>
                     <rows>2</rows>
                     <cols>2</cols>
                     <template>material</template>
@@ -511,7 +587,7 @@
                 </logic>
                 <layout>
                     <x>2</x>
-                    <y>3</y>
+                    <y>4</y>
                     <rows>1</rows>
                     <cols>1</cols>
                     <template>material</template>
@@ -525,7 +601,7 @@
                 </logic>
                 <layout>
                     <x>2</x>
-                    <y>4</y>
+                    <y>5</y>
                     <rows>1</rows>
                     <cols>1</cols>
                     <template>material</template>
@@ -539,7 +615,7 @@
                 </logic>
                 <layout>
                     <x>3</x>
-                    <y>3</y>
+                    <y>4</y>
                     <rows>1</rows>
                     <cols>1</cols>
                     <template>material</template>
@@ -553,7 +629,7 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>5</y>
+                    <y>6</y>
                     <rows>1</rows>
                     <cols>2</cols>
                     <template>material</template>
@@ -567,7 +643,7 @@
                 </logic>
                 <layout>
                     <x>2</x>
-                    <y>5</y>
+                    <y>6</y>
                     <rows>1</rows>
                     <cols>2</cols>
                     <template>material</template>
@@ -581,7 +657,7 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>6</y>
+                    <y>7</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <template>material</template>
@@ -595,7 +671,7 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>7</y>
+                    <y>8</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <template>material</template>
