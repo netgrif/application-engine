@@ -5,7 +5,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine</artifactId>
-    <version>6.2.9-SNAPSHOT</version>
+    <version>6.2.10</version>
     <packaging>jar</packaging>
 
     <name>NETGRIF Application Engine</name>
@@ -441,8 +441,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.session</groupId>
-            <artifactId>spring-session</artifactId>
-            <version>2.0.0.M2</version>
+            <artifactId>spring-session-core</artifactId>
         </dependency>
         <dependency>
             <groupId>xmlunit</groupId>
