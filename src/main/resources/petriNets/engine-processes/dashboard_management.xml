@@ -359,8 +359,7 @@
     <data type="text" immediate="true">
         <id>login_url</id>
         <title name="login_url">Login URL</title>
-        <placeholder name="login_url_desc">URL address of login page</placeholder>
-        <init>login</init>
+        <placeholder name="login_url_desc">URL address of login page. Let empty to decide by application.</placeholder>
     </data>
 
     <!-- I18NS -->
@@ -389,7 +388,7 @@
         <i18nString name="profile_url">URL profilu</i18nString>
         <i18nString name="profile_url_desc">URL adresa na stránku profilu</i18nString>
         <i18nString name="login_url">URL prihlásenia</i18nString>
-        <i18nString name="login_url_desc">URL adresa na stránku prihlásenia</i18nString>
+        <i18nString name="login_url_desc">URL adresa na stránku prihlásenia. Nechajte prázdne pre rozhodnutie aplikáciou.</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="dashboard_id">Dashboard-ID</i18nString>
@@ -416,7 +415,7 @@
         <i18nString name="profile_url">Profil-URL</i18nString>
         <i18nString name="profile_url_desc">URL-Adresse der Profilseite</i18nString>
         <i18nString name="login_url">Anmelde-URL</i18nString>
-        <i18nString name="login_url_desc">URL-Adresse der Anmeldeseite</i18nString>
+        <i18nString name="login_url_desc">URL-Adresse der Anmeldeseite. Lassen Sie leer, um durch Anwendung zu entscheiden.</i18nString>
     </i18n>
 
     <!-- TRANSITIONS -->
