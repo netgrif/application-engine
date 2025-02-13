@@ -23,14 +23,6 @@
             <view>true</view>
         </caseLogic>
     </roleRef>
-    <roleRef>
-        <id>default</id>
-        <caseLogic>
-            <create>true</create>
-            <delete>true</delete>
-            <view>true</view>
-        </caseLogic>
-    </roleRef>
 
     <role>
         <id>system</id>
@@ -54,9 +46,8 @@
                     if (item_id.value == "") {
                         return
                     }
-                    def itemWithIdExists = findCasesElastic("processIdentifier:\"dashboard_item\" AND dataSet.item_id.textValue.keyword:\"${item_id.value}\"" as String, org.springframework.data.domain.PageRequest.of(0, 1)).isEmpty()
-                    if (!itemWithIdExists) {
-                        change item_id value { "" }
+                    def itemWithIdExists = findCaseElastic("processIdentifier:\"dashboard_item\" AND dataSet.item_id.textValue.keyword:\"${item_id.value}\"" as String)
+                    if (itemWithIdExists != null) {
                         throw new IllegalArgumentException("Dashboard item with given ID already exists.")
                     }
                 </action>
@@ -76,7 +67,7 @@
                 <action>
                     preference_items_list: f.preference_items_list;
 
-                    def preferenceItemCases = findCasesElastic("processIdentifier:\"preference_item\"" as String, org.springframework.data.domain.PageRequest.of(0, 1000))
+                    def preferenceItemCases = findCasesElastic("processIdentifier:\"preference_item\"" as String)
                             .collectEntries { [(it.stringId): it.dataSet["menu_name"].value] }
                     change preference_items_list options { preferenceItemCases }
                 </action>
@@ -426,15 +417,15 @@
         <label name="configuration_label">Dashboard item configuration</label>
         <icon>tune</icon>
         <assignPolicy>auto</assignPolicy>
-<!--        <roleRef>-->
-<!--            <id>admin</id>-->
-<!--            <logic>-->
-<!--                <perform>true</perform>-->
-<!--                <view>true</view>-->
-<!--                <cancel>true</cancel>-->
-<!--                <assign>true</assign>-->
-<!--            </logic>-->
-<!--        </roleRef>-->
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+                <view>true</view>
+                <cancel>true</cancel>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
         <dataGroup>
             <id>configuration_d1</id>
             <cols>4</cols>
@@ -688,6 +679,10 @@
 
                     if (item_id.value == null || item_id.value == "") {
                         throw new IllegalArgumentException("Dashboard item ID cannot be empty.")
+                    }
+                    def itemWithIdExists = findCaseElastic("processIdentifier:\"dashboard_item\" AND dataSet.item_id.textValue.keyword:\"${item_id.value}\"" as String)
+                    if (itemWithIdExists != null) {
+                        throw new IllegalArgumentException("Dashboard item with given ID already exists.")
                     }
                     if (is_internal.value) {
                         if (preference_items_list.value == null || !org.bson.types.ObjectId.isValid(preference_items_list.value)){

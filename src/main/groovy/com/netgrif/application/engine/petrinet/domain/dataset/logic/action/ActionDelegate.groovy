@@ -2473,6 +2473,15 @@ class ActionDelegate {
     }
 
     /**
+     * search elastic with string query for cases and default page size of 1000 cases
+     * @param query
+     * @return
+     */
+    List<Case> findCasesElastic(String query, int pageSize = 1000) {
+        this.findCasesElastic(query, PageRequest.of(0, pageSize))
+    }
+
+    /**
      * search elastic with string query for cases
      * @param query
      * @return

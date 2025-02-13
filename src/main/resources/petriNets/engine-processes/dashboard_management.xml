@@ -23,14 +23,6 @@
             <view>true</view>
         </caseLogic>
     </roleRef>
-    <roleRef>
-        <id>default</id>
-        <caseLogic>
-            <create>true</create>
-            <delete>true</delete>
-            <view>true</view>
-        </caseLogic>
-    </roleRef>
 
     <role>
         <id>system</id>
@@ -54,9 +46,8 @@
                     if (dashboard_id.value == "") {
                         return
                     }
-                    def dashboardWithIdExists = findCasesElastic("processIdentifier:\"dashboard_management\" AND dataSet.dashboard_id.textValue.keyword:\"${dashboard_id.value}\"" as String, org.springframework.data.domain.PageRequest.of(0, 1)).isEmpty()
-                    if (!dashboardWithIdExists) {
-                        change dashboard_id value { "" }
+                    def dashboardWithIdExists = findCaseElastic("processIdentifier:\"dashboard_management\" AND dataSet.dashboard_id.textValue.keyword:\"${dashboard_id.value}\"" as String)
+                    if (dashboardWithIdExists != null) {
                         throw new IllegalArgumentException("Dashboard with given ID already exists.")
                     }
                 </action>
@@ -176,7 +167,7 @@
                     dashboard_item_list: f.dashboard_item_list,
                     existing_menu_items: f.existing_menu_items;
 
-                    def dashboardItemCases = findCasesElastic("processIdentifier:\"dashboard_item\" AND dataSet.is_active.booleanValue:true" as String, org.springframework.data.domain.PageRequest.of(0, 1000))
+                    def dashboardItemCases = findCasesElastic("processIdentifier:\"dashboard_item\" AND dataSet.is_active.booleanValue:true" as String)
                             .collectEntries { [(it.stringId): it.dataSet["item_name"].value] }
                     dashboardItemCases.keySet().removeAll(dashboard_item_list.options.keySet())
                     change existing_menu_items options { dashboardItemCases }
@@ -234,7 +225,7 @@
                     }
                     change dashboard_item_to_preference_item options { preferenceItemOptions }
 
-                    def dashboardItemCases = findCasesElastic("processIdentifier:\"dashboard_item\" AND dataSet.is_active.booleanValue:true" as String, org.springframework.data.domain.PageRequest.of(0, 1000))
+                    def dashboardItemCases = findCasesElastic("processIdentifier:\"dashboard_item\" AND dataSet.is_active.booleanValue:true" as String)
                             .collectEntries { [(it.stringId): it.dataSet["item_name"].value] }
                     dashboardItemCases.keySet().removeAll(dashboard_item_list.options.keySet())
                     change existing_menu_items options { dashboardItemCases }
@@ -268,7 +259,7 @@
                     preferenceItemOptions.keySet().removeAll([dashboard_item_list.value])
                     change dashboard_item_to_preference_item options { preferenceItemOptions }
 
-                    def dashboardItemCases = findCasesElastic("processIdentifier:\"dashboard_item\" AND dataSet.is_active.booleanValue:true" as String, org.springframework.data.domain.PageRequest.of(0, 1000))
+                    def dashboardItemCases = findCasesElastic("processIdentifier:\"dashboard_item\" AND dataSet.is_active.booleanValue:true" as String)
                             .collectEntries { [(it.stringId): it.dataSet["item_name"].value] }
                     dashboardItemCases.keySet().removeAll(dashboard_item_list.options.keySet())
                     change existing_menu_items options { dashboardItemCases }
@@ -426,15 +417,15 @@
         <label name="configuration_label">Dashboard configuration</label>
         <icon>settings</icon>
         <assignPolicy>auto</assignPolicy>
-<!--        <roleRef>-->
-<!--            <id>admin</id>-->
-<!--            <logic>-->
-<!--                <perform>true</perform>-->
-<!--                <view>true</view>-->
-<!--                <cancel>true</cancel>-->
-<!--                <assign>true</assign>-->
-<!--            </logic>-->
-<!--        </roleRef>-->
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+                <view>true</view>
+                <cancel>true</cancel>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
         <dataGroup>
             <id>configuration_d1</id>
             <cols>4</cols>
@@ -698,6 +689,10 @@
 
                     if (dashboard_id.value == null || dashboard_id.value == "") {
                         throw new IllegalArgumentException("Dashboard ID cannot be empty.")
+                    }
+                    def dashboardWithIdExists = findCaseElastic("processIdentifier:\"dashboard_management\" AND dataSet.dashboard_id.textValue.keyword:\"${dashboard_id.value}\"" as String)
+                    if (dashboardWithIdExists != null) {
+                        throw new IllegalArgumentException("Dashboard with given ID already exists.")
                     }
                     change is_active value { true }
                 </action>
