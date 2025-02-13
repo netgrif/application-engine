@@ -371,7 +371,7 @@
         <id>view_configuration_type</id>
         <title name="view_configuration_type">Pick view type</title>
         <options>
-            <init dynamic="true">menuItemService.getAvailableViewsAsOptions(false, useCase.processIdentifier)</init>
+            <init dynamic="true">menuItemService.getAvailableViewsAsOptions(true, useCase.processIdentifier)</init>
         </options>
         <action trigger="set">
             view_configuration_type: f.view_configuration_type;

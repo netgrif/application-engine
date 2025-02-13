@@ -4,6 +4,7 @@ package com.netgrif.application.engine.menu.domain.configurations;
  * Here are declared general constants of menu item configuration processes.
  */
 public class ViewConstants {
+    public static final String FIELD_CONFIGURATION_TYPE = "view_configuration_type";
     public static final String FIELD_VIEW_CONFIGURATION_ID = "view_configuration_id";
     public static final String FIELD_VIEW_CONFIGURATION_FORM = "view_configuration_form";
     public static final String FIELD_VIEW_CONTAINS_FILTER = "contains_filter";

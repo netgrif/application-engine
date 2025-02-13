@@ -490,6 +490,7 @@
 		<allowedNets>
 			<allowedNet>tabbed_case_view_configuration</allowedNet>
 			<allowedNet>tabbed_task_view_configuration</allowedNet>
+			<allowedNet>tabbed_ticket_view_configuration</allowedNet>
 		</allowedNets>
 	</data>
 	<data type="taskRef">

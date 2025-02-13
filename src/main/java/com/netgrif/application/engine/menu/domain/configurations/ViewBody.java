@@ -67,6 +67,8 @@ public abstract class ViewBody {
         ToDataSetOutcome outcome = new ToDataSetOutcome();
 
         if (associatedViewCase != null) {
+            outcome.putDataSetEntry(ViewConstants.FIELD_CONFIGURATION_TYPE, FieldType.ENUMERATION_MAP,
+                    this.getAssociatedViewBody().getViewType().getIdentifier());
             outcome.putDataSetEntry(ViewConstants.FIELD_VIEW_CONFIGURATION_ID, FieldType.CASE_REF,
                     List.of(associatedViewCase.getStringId()));
             String taskId = MenuItemUtils.findTaskIdInCase(associatedViewCase, ViewConstants.TRANS_SETTINGS_ID);
