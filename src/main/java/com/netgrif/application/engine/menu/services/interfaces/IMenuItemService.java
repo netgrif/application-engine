@@ -32,12 +32,13 @@ public interface IMenuItemService {
      * Gets all tabbed or non-tabbed views
      *
      * @param isTabbed if true, only tabbed views will be returned
+     * @param isPrimary if true, only views accessible directly from the menu_item will be returned
      *
      * @return All available views defined in {@link MenuItemView} in consideration of input value. Views are returned as
      * options for {@link MapOptionsField}
      * */
-    default Map<String, I18nString> getAvailableViewsAsOptions(boolean isTabbed) {
-        return MenuItemView.findAllByIsTabbed(isTabbed).stream()
+    default Map<String, I18nString> getAvailableViewsAsOptions(boolean isTabbed, boolean isPrimary) {
+        return MenuItemView.findAllByIsTabbedAndIsPrimary(isTabbed, isPrimary).stream()
                 .collect(Collectors.toMap(MenuItemView::getIdentifier, MenuItemView::getName));
     }
 

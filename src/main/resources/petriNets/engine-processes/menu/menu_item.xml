@@ -473,14 +473,14 @@
 		<id>view_configuration_type</id>
 		<title name="view_configuration_type">Pick view type</title>
 		<options>
-			<init dynamic="true">menuItemService.getAvailableViewsAsOptions(false)</init>
+			<init dynamic="true">menuItemService.getAvailableViewsAsOptions(false, true)</init>
 		</options>
 		<action trigger="set">
 			use_tabbed_view: f.use_tabbed_view,
 			view_configuration_type: f.view_configuration_type;
 
 			if (view_configuration_type.options == null || view_configuration_type.options.isEmpty()) {
-				change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(use_tabbed_view.value) }
+				change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(use_tabbed_view.value, true) }
 			}
 		</action>
 	</data>
@@ -1021,7 +1021,7 @@
 							manageBehaviorOfTabFields(use_tab_icon.value, use_tabbed_view.value)
 
 							change view_configuration_type value { null }
-							change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(use_tabbed_view.value) }
+							change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(use_tabbed_view.value, true) }
 						</action>
 					</actions>
 				</event>

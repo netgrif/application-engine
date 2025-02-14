@@ -377,7 +377,7 @@
             view_configuration_type: f.view_configuration_type;
 
             if (view_configuration_type.options == null || view_configuration_type.options.isEmpty()) {
-                change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(true) }
+                change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(true, useCase.processIdentifier) }
             }
         </action>
     </data>
