@@ -169,7 +169,6 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
         BoolQueryBuilder query = boolQuery();
 
         buildFullTextQuery(request, query);
-        // TODO: NAE-2039 check group
         boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
         if (resultAlwaysEmpty) {
             return null;
