@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.netgrif.application.engine.search.SearchUtils.toDateTimeString;
+import static com.netgrif.application.engine.search.utils.SearchUtils.toDateTimeString;
 
 @Slf4j
 @SpringBootTest

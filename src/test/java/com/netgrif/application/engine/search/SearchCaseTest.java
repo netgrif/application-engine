@@ -9,6 +9,7 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.search.interfaces.ISearchService;
+import com.netgrif.application.engine.search.utils.SearchUtils;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -29,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.netgrif.application.engine.search.SearchUtils.toDateTimeString;
+import static com.netgrif.application.engine.search.utils.SearchUtils.toDateTimeString;
 
 @Slf4j
 @SpringBootTest

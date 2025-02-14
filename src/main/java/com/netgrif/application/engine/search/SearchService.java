@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.netgrif.application.engine.search.SearchUtils.evaluateQuery;
+import static com.netgrif.application.engine.search.utils.SearchUtils.evaluateQuery;
 
 @Slf4j
 @Service

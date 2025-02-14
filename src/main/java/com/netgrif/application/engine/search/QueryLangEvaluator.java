@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.netgrif.application.engine.search.SearchUtils.*;
+import static com.netgrif.application.engine.search.utils.SearchUtils.*;
 
 public class QueryLangEvaluator extends QueryLangBaseListener {
 

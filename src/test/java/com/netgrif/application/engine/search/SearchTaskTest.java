@@ -7,6 +7,7 @@ import com.netgrif.application.engine.auth.domain.User;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.search.interfaces.ISearchService;
+import com.netgrif.application.engine.search.utils.SearchUtils;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;

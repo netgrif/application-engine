@@ -1,5 +1,9 @@
-package com.netgrif.application.engine.search;
+package com.netgrif.application.engine.search.utils;
 
+import com.netgrif.application.engine.search.QueryLangErrorListener;
+import com.netgrif.application.engine.search.QueryLangEvaluator;
+import com.netgrif.application.engine.search.QueryLangExplainEvaluator;
+import com.netgrif.application.engine.search.antlr4.QueryLangBaseListener;
 import com.netgrif.application.engine.search.antlr4.QueryLangLexer;
 import com.netgrif.application.engine.search.antlr4.QueryLangParser;
 import com.netgrif.application.engine.petrinet.domain.QPetriNet;
@@ -9,6 +13,7 @@ import com.netgrif.application.engine.search.enums.ComparisonType;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.StringPath;
+import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
@@ -18,12 +23,12 @@ import org.bson.types.QObjectId;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class SearchUtils {
 
     public static final Map<ComparisonType, List<Integer>> comparisonOperators = Map.of(
@@ -76,7 +81,19 @@ public class SearchUtils {
         }
     }
 
-    public static QueryLangEvaluator evaluateQuery(String input) {
+    public static QueryLangExplainEvaluator explainQueryInternal(ParseTreeWalker walker, QueryLangParser.QueryContext query, QueryLangErrorListener errorListener) {
+        QueryLangExplainEvaluator evaluator = new QueryLangExplainEvaluator();
+        walker.walk(evaluator, query);
+
+        String treeStringVisualisation = evaluator.getRoot().toString();
+        if (!errorListener.getErrorMessages().isEmpty()) {
+            throw new IllegalArgumentException("\n" + treeStringVisualisation + "\n" + String.join("\n", errorListener.getErrorMessages()));
+        }
+
+        return evaluator;
+    }
+
+    private static QueryLangBaseListener evaluateQueryInternal(String input, boolean onlyExplain) {
         if (input == null || input.isEmpty()) {
             throw new IllegalArgumentException("Query cannot be empty.");
         }
@@ -84,15 +101,30 @@ public class SearchUtils {
         QueryLangLexer lexer = new QueryLangLexer(CharStreams.fromString(input));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         QueryLangParser parser = new QueryLangParser(tokens);
+        QueryLangErrorListener errorListener = new QueryLangErrorListener();
         parser.removeErrorListeners();
-        parser.addErrorListener(new QueryLangErrorListener());
+        parser.addErrorListener(errorListener);
 
+        QueryLangParser.QueryContext query = parser.query();
         ParseTreeWalker walker = new ParseTreeWalker();
-        QueryLangEvaluator evaluator = new QueryLangEvaluator();
 
-        walker.walk(evaluator, parser.query());
+        if (onlyExplain || !errorListener.getErrorMessages().isEmpty()) {
+            return explainQueryInternal(walker, query, errorListener);
+        }
+
+        QueryLangEvaluator evaluator = new QueryLangEvaluator();
+        walker.walk(evaluator, query);
 
         return evaluator;
+    }
+
+    public static QueryLangEvaluator evaluateQuery(String input) {
+        return (QueryLangEvaluator) evaluateQueryInternal(input, false);
+    }
+
+    public static String explainQuery(String input) {
+        QueryLangExplainEvaluator evaluator = (QueryLangExplainEvaluator) evaluateQueryInternal(input, true);
+        return "\n" + evaluator.getRoot().toString();
     }
 
     public static String getStringValue(String queryLangString) {

@@ -23,7 +23,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-import static com.netgrif.application.engine.search.SearchUtils.evaluateQuery;
+import static com.netgrif.application.engine.search.utils.SearchUtils.evaluateQuery;
 
 @Slf4j
 @SpringBootTest
