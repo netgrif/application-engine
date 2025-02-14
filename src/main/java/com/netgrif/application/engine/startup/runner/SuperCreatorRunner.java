@@ -58,6 +58,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
             User user = new User();
             user.setFirstName("Admin");
             user.setLastName("Netgrif");
+            user.setUsername(SUPER_ADMIN_EMAIL);
             user.setEmail(SUPER_ADMIN_EMAIL);
             user.setPassword(superAdminPassword);
             user.setState(UserState.ACTIVE);
