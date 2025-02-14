@@ -330,10 +330,13 @@
                             view_configuration_form: f.view_configuration_form,
                             view_configuration_id: f.view_configuration_id;
 
+                            if (view_configuration_id.value != null &amp;&amp; !view_configuration_id.value.isEmpty()) {
+                                workflowService.deleteCase(view_configuration_id.value[0])
+                            }
+
                             if (view_configuration_type.value == null || view_configuration_type.value == "") {
-                                if (view_configuration_id.value != null &amp;&amp; !view_configuration_id.value.isEmpty()) {
-                                    workflowService.deleteCase(view_configuration_id.value[0])
-                                }
+                                change view_configuration_id value { [] }
+                                change view_configuration_form value { [] }
                                 return
                             }
 
@@ -341,6 +344,7 @@
                             def initTask = assignTask("initialize", configurationCase)
                             finishTask(initTask)
                             change view_configuration_id value { [configurationCase.stringId] }
+                            configurationCase = workflowService.findOne(configurationCase.stringId)
                             change view_configuration_form value { [configurationCase.tasks.find { it.transition == "settings" }.task] }
                         </action>
                     </actions>
