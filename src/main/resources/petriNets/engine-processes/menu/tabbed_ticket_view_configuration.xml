@@ -241,8 +241,7 @@
         <i18nString name="view_configuration_type">Vybrať zobrazenie</i18nString>
         <i18nString name="settings">Nastavenie</i18nString>
         <i18nString name="associated_view">Asociované zobrazenie</i18nString>
-        <!-- todo translate -->
-        <i18nString name="view_header"></i18nString>
+        <i18nString name="view_header">Tiketové zobrazenie</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="filter_autocomplete_selection">Neue Filter auswählen</i18nString>
@@ -252,8 +251,7 @@
         <i18nString name="view_configuration_type">Wählen Sie einen Ansichtstyp</i18nString>
         <i18nString name="settings">Einstellungen</i18nString>
         <i18nString name="associated_view">zugehörige Ansicht</i18nString>
-        <!-- todo translate -->
-        <i18nString name="view_header"></i18nString>
+        <i18nString name="view_header">Ticketansicht</i18nString>
     </i18n>
 
     <transition>

@@ -134,9 +134,8 @@
             boolean containsFilter = filterAutocomplete.value != null &amp;&amp; filterAutocomplete.value != ""
             if (containsFilter) {
                 def filterCase = findCase({it._id.eq(filterAutocomplete.value)})
-                // todo update filterType to your needs
-                if (filterCase.dataSet["filter_type"].value != "Case") {
-                    throw new IllegalArgumentException("Filter is of wrong type. Only filter of Case type allowed.")
+                if (filterCase.dataSet["filter_type"].value != "Task") {
+                    throw new IllegalArgumentException("Filter is of wrong type. Only filter of Task type allowed.")
                 }
             }
 
@@ -195,9 +194,8 @@
         <i18nString name="view_configuration_type">Vybrať zobrazenie</i18nString>
         <i18nString name="settings">Nastavenie</i18nString>
         <i18nString name="associated_view">Asociované zobrazenie</i18nString>
-        <!-- todo translate -->
-        <i18nString name="view_header"></i18nString>
-        <i18nString name="transition_id"></i18nString>
+        <i18nString name="view_header">Zobrazenie jednej úlohy</i18nString>
+        <i18nString name="transition_id">ID prechodu</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="filter_autocomplete_selection">Neue Filter auswählen</i18nString>
@@ -207,9 +205,8 @@
         <i18nString name="view_configuration_type">Wählen Sie einen Ansichtstyp</i18nString>
         <i18nString name="settings">Einstellungen</i18nString>
         <i18nString name="associated_view">zugehörige Ansicht</i18nString>
-        <!-- todo translate -->
-        <i18nString name="view_header"></i18nString>
-        <i18nString name="transition_id"></i18nString>
+        <i18nString name="view_header">Einzelaufgabenansicht</i18nString>
+        <i18nString name="transition_id">Übergangs-ID</i18nString>
     </i18n>
 
     <transition>
