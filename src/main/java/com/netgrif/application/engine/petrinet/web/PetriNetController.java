@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.web;
 
 import com.netgrif.application.engine.AsyncRunner;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
@@ -70,6 +71,9 @@ public class PetriNetController {
 
     @Autowired
     private IPetriNetService service;
+
+    @Autowired
+    private IElasticPetriNetService elasticService;
 
     @Autowired
     private IProcessRoleService roleService;
@@ -192,6 +196,20 @@ public class PetriNetController {
         Page<PetriNetReference> nets = service.search(criteria, user, pageable, locale);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetriNetController.class)
                 .searchPetriNets(criteria, auth, pageable, assembler, locale)).withRel("search");
+        PagedModel<PetriNetReferenceResource> resources = assembler.toModel(nets, new PetriNetReferenceResourceAssembler(), selfLink);
+        PetriNetReferenceResourceAssembler.buildLinks(resources);
+        return resources;
+    }
+
+    @Operation(summary = "Search elastic processes", security = {@SecurityRequirement(name = "BasicAuth")})
+    @PostMapping(value = "/search_elastic", produces = MediaTypes.HAL_JSON_VALUE)
+    public @ResponseBody
+    PagedModel<PetriNetReferenceResource> searchElasticPetriNets(@RequestBody PetriNetSearch criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
+        LoggedUser user = (LoggedUser) auth.getPrincipal();
+        // TODO: add Merge Filters and its operations
+        Page<PetriNetReference> nets = elasticService.search(criteria, user, pageable, locale,false);
+        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetriNetController.class)
+                .searchElasticPetriNets(criteria, auth, pageable, assembler, locale)).withRel("search_elastic");
         PagedModel<PetriNetReferenceResource> resources = assembler.toModel(nets, new PetriNetReferenceResourceAssembler(), selfLink);
         PetriNetReferenceResourceAssembler.buildLinks(resources);
         return resources;
