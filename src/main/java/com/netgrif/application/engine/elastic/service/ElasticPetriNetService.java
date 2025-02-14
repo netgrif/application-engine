@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.elastic.service;
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.configuration.ElasticsearchConfiguration;
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNet;
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository;
 
@@ -15,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
@@ -47,13 +47,13 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
 
     private final ElasticsearchRestTemplate template;
 
-    @Value("${spring.data.elasticsearch.index.petrinet}")
-    protected String netIndex;
+    protected ElasticsearchConfiguration elasticsearchConfiguration;
 
-    public ElasticPetriNetService(ElasticPetriNetRepository repository, Executor executors, ElasticsearchRestTemplate template) {
+    public ElasticPetriNetService(ElasticPetriNetRepository repository, Executor executors, ElasticsearchRestTemplate template, ElasticsearchConfiguration elasticsearchConfiguration) {
         this.repository = repository;
         this.executors = executors;
         this.template = template;
+        this.elasticsearchConfiguration = elasticsearchConfiguration;
     }
 
     @Lazy
@@ -116,6 +116,15 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
         return petriNetService.findAllById(elasticPetriNets.stream().map(ElasticPetriNet::getStringId).collect(Collectors.toList()));
     }
 
+    /**
+     * Method for search of PetriNets in Elastic
+     * @param requests - search body, for now only title working
+     * @param user - logged user
+     * @param pageable - pageable for paging
+     * @param locale - internacionalization
+     * @param isIntersection - property for merging filter, not implemented now, use false
+     * @return Page<PetriNetReference> - page of PetriNetReferences
+     */
     @Override
     public Page<PetriNetReference> search(PetriNetSearch requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
         if (requests == null) {
@@ -127,7 +136,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
         List<PetriNet> netPage;
         long total;
         if (query != null) {
-            SearchHits<ElasticPetriNet> hits = template.search(query, ElasticPetriNet.class, IndexCoordinates.of(netIndex));
+            SearchHits<ElasticPetriNet> hits = template.search(query, ElasticPetriNet.class, IndexCoordinates.of(elasticsearchConfiguration.elasticPetriNetIndex()));
             Page<ElasticPetriNet> indexedNets = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             netPage = petriNetService.findAllById(indexedNets.get().map(ElasticPetriNet::getStringId).collect(Collectors.toList()));
             total = indexedNets.getTotalElements();
@@ -149,7 +158,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
             return null;
         } else if (!isIntersection) {
             singleQueries = singleQueries.stream().filter(Objects::nonNull).collect(Collectors.toList());
-            if (singleQueries.size() == 0) {
+            if (singleQueries.isEmpty()) {
                 // all queries result in an empty set => the entire result is an empty set
                 return null;
             }
@@ -197,7 +206,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
         PetriNetSearch processQuery = new PetriNetSearch();
         processQuery.setGroup(request.getGroup());
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
-        if (groupProcesses.size() == 0)
+        if (groupProcesses.isEmpty())
             return true;
 
         BoolQueryBuilder groupQuery = boolQuery();
