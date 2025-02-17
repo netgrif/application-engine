@@ -103,7 +103,7 @@ public abstract class AbstractUserService implements IUserService {
     @Override
     @Deprecated(since = "6.2.0")
     public IUser removeRole(IUser user, String roleStringId) {
-        return removeRole(user, processRoleService.findByImportId(roleStringId));
+        return removeRole(user, processRoleService.findById(roleStringId));
     }
 
     @Override

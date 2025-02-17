@@ -46,6 +46,11 @@ com.netgrif.application.engine.export.configuration
 com.netgrif.application.engine.export.domain
 com.netgrif.application.engine.export.service
 com.netgrif.application.engine.export.service.interfaces
+com.netgrif.application.engine.files
+com.netgrif.application.engine.files.interfaces
+com.netgrif.application.engine.files.local
+com.netgrif.application.engine.files.minio
+com.netgrif.application.engine.files.throwable
 com.netgrif.application.engine.history.domain.baseevent
 com.netgrif.application.engine.history.domain.baseevent.repository
 com.netgrif.application.engine.history.domain.caseevents
@@ -108,6 +113,7 @@ com.netgrif.application.engine.petrinet.domain
 com.netgrif.application.engine.petrinet.domain.arcs
 com.netgrif.application.engine.petrinet.domain.arcs.reference
 com.netgrif.application.engine.petrinet.domain.dataset
+com.netgrif.application.engine.petrinet.domain.dataset.factory
 com.netgrif.application.engine.petrinet.domain.dataset.logic
 com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 com.netgrif.application.engine.petrinet.domain.dataset.logic.action.context
@@ -128,6 +134,8 @@ com.netgrif.application.engine.petrinet.service.interfaces
 com.netgrif.application.engine.petrinet.web
 com.netgrif.application.engine.petrinet.web.requestbodies
 com.netgrif.application.engine.petrinet.web.responsebodies
+com.netgrif.application.engine.resource.domain
+com.netgrif.application.engine.resource.service
 com.netgrif.application.engine.rules.domain
 com.netgrif.application.engine.rules.domain.facts
 com.netgrif.application.engine.rules.domain.scheduled
@@ -159,6 +167,7 @@ com.netgrif.application.engine.workflow.service
 com.netgrif.application.engine.workflow.service.interfaces
 com.netgrif.application.engine.workflow.web
 com.netgrif.application.engine.workflow.web.requestbodies
+com.netgrif.application.engine.workflow.web.requestbodies.file
 com.netgrif.application.engine.workflow.web.requestbodies.singleaslist
 com.netgrif.application.engine.workflow.web.requestbodies.taskSearch
 com.netgrif.application.engine.workflow.web.responsebodies
