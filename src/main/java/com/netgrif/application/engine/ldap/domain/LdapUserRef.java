@@ -3,6 +3,7 @@ package com.netgrif.application.engine.ldap.domain;
 
 import lombok.Data;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.ldap.odm.annotations.Entry;
 import org.springframework.ldap.odm.annotations.Id;
 
 import javax.naming.Name;
@@ -11,6 +12,10 @@ import java.util.Set;
 
 
 @Data
+@Entry(
+        objectClasses = "${nae.ldap.objectClasses:inetOrgPerson,organizationalPerson,person,top}",
+        base = "${nae.ldap.base:ou=users}"
+)
 @ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapUserRef {
 

@@ -218,6 +218,7 @@ class DataSearchRequestTest {
 
     @Test
     void testDatSearchRequests() {
+        sleep(2000) //Elastic Index
         testCases.each { testCase ->
             CaseSearchRequest request = new CaseSearchRequest()
             request.data = new HashMap<>()
