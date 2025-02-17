@@ -10,6 +10,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,8 +25,8 @@ public class MenuItemBody {
 
     private String menuIcon = "filter_none";
     private I18nString menuName;
-    private Map<String, I18nString> allowedRoles;
-    private Map<String, I18nString> bannedRoles;
+    private Map<String, I18nString> allowedRoles = new HashMap<>();
+    private Map<String, I18nString> bannedRoles = new HashMap<>();
     private boolean useCustomView = false;
     private String customViewSelector;
     private boolean isAutoSelect = false;
