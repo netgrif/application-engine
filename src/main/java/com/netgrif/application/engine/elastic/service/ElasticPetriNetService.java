@@ -192,7 +192,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
 
         String searchText = "*" + request.getTitle() + "*";
         Map<String, Float> fields = new HashMap<>();
-        fields.put("title.defaultValue", 2f);
+        fields.put("title.textValue", 2f);
         fields.put("identifier", 1f);
         QueryBuilder fullTextQuery = queryStringQuery(searchText).fields(fields);
         query.must(fullTextQuery);

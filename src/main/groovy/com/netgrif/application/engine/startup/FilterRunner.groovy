@@ -15,6 +15,12 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
     @Autowired
     private ImportHelper helper
 
+    @Autowired
+    private IPetriNetService petriNetService
+
+    @Autowired
+    private SystemUserRunner systemCreator
+
     private static final String FILTER_FILE_NAME = "engine-processes/filter.xml"
     public static final String FILTER_PETRI_NET_IDENTIFIER = "filter"
 
