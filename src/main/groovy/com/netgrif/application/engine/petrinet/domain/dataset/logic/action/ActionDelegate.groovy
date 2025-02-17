@@ -2326,6 +2326,10 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return taskCase.getPetriNet().getDataSet().get(fieldId)
     }
 
+    String explainQuery(String query) {
+        return searchService.explainQuery(query)
+    }
+
     long count(String query) {
         return searchService.count(query)
     }

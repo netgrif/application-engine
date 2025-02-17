@@ -6,6 +6,7 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSer
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.search.interfaces.ISearchService;
+import com.netgrif.application.engine.search.utils.SearchUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
@@ -66,6 +67,11 @@ public class SearchService implements ISearchService {
                 PageRequest.of(0, DEFAULT_ELASTIC_PAGE_SIZE), LocaleContextHolder.getLocale(),
                 false
         ).getContent();
+    }
+
+    @Override
+    public String explainQuery(String input) {
+        return SearchUtils.explainQuery(input);
     }
 
     @Override

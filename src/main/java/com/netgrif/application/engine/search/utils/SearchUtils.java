@@ -85,9 +85,8 @@ public class SearchUtils {
         QueryLangExplainEvaluator evaluator = new QueryLangExplainEvaluator();
         walker.walk(evaluator, query);
 
-        String treeStringVisualisation = evaluator.getRoot().toString();
         if (!errorListener.getErrorMessages().isEmpty()) {
-            throw new IllegalArgumentException("\n" + treeStringVisualisation + "\n" + String.join("\n", errorListener.getErrorMessages()));
+            throw new IllegalArgumentException("\n" + evaluator.explain() + "\n" + String.join("\n", errorListener.getErrorMessages()));
         }
 
         return evaluator;
@@ -124,7 +123,7 @@ public class SearchUtils {
 
     public static String explainQuery(String input) {
         QueryLangExplainEvaluator evaluator = (QueryLangExplainEvaluator) evaluateQueryInternal(input, true);
-        return "\n" + evaluator.getRoot().toString();
+        return evaluator.explain();
     }
 
     public static String getStringValue(String queryLangString) {

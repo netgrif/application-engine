@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class QueryLangExplainEvaluator extends QueryLangBaseListener {
 
@@ -23,9 +24,29 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
     @Getter
     private QueryType type;
     @Getter
-    private Boolean multiple;
+    private boolean multiple;
+    @Getter
+    private boolean searchWithElastic = false;
+
+    public String explain() {
+        String resource = type != null ? type.name() : "unknown";
+        String quantity = multiple ? "multiple instances" : "single instance";
+        String db = searchWithElastic ? "Elasticsearch" : "MongoDB";
+        String stringTreeVisualisation = root != null ? root.toString() : "Tree visualisation not available.";
+        return "Searching " +
+                quantity +
+                " of resource " +
+                resource +
+                " with " +
+                db +
+                ".\n" +
+                stringTreeVisualisation;
+    }
 
     public void setQueryLangTreeNode(ParseTree node, QueryLangTreeNode queryLangTreeNode) {
+        if (queryLangTreeNode == null) {
+            queryLangTreeNode = new QueryLangTreeNode("error: " + node.getText());
+        }
         this.node.put(node, queryLangTreeNode);
     }
 
@@ -33,10 +54,15 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
         return this.node.get(node);
     }
 
+    private static QueryLangTreeNode createTreeNode(String name, List<QueryLangTreeNode> children, List<QueryLangTreeNode> errors) {
+        List<QueryLangTreeNode> combinedChildren = Stream.concat(children.stream(), errors.stream()).collect(Collectors.toList());
+        return new QueryLangTreeNode(name, combinedChildren);
+    }
+
     private QueryLangTreeNode getErrorFromNode(ParseTree node) {
         if (node instanceof ErrorNodeImpl) {
             String errorMsg = "error: " + ((ErrorNodeImpl) node).symbol.getText();
-            return new QueryLangTreeNode(errorMsg, new ArrayList<>());
+            return new QueryLangTreeNode(errorMsg);
         }
         return null;
     }
@@ -72,13 +98,21 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
             setQueryLangTreeNode(current, getQueryLangTreeNode(children.get(0)));
             return;
         }
+        List<QueryLangTreeNode> errorNodes = getErrorsFromChildren(children);
 
         List<QueryLangTreeNode> childrenNodes = children.stream()
-                .map(this::getQueryLangTreeNode)
+                .map(child -> {
+                    QueryLangTreeNode node = getQueryLangTreeNode(child);
+                    if (node == null) {
+                        errorNodes.addAll(getErrorsRecursive(child));
+                    }
+                    return node;
+                })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        setQueryLangTreeNode(current, new QueryLangTreeNode(nodeName, childrenNodes, getErrorsFromChildren(children)));
+
+        setQueryLangTreeNode(current, createTreeNode(nodeName, childrenNodes, errorNodes));
     }
 
     @Override
@@ -89,7 +123,7 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitProcessQuery(QueryLangParser.ProcessQueryContext ctx) {
-        root = new QueryLangTreeNode("process query", List.of(getQueryLangTreeNode(ctx.processConditions())), getErrorsFromChildren(ctx.children));
+        root = createTreeNode("process query", List.of(getQueryLangTreeNode(ctx.processConditions())), getErrorsFromChildren(ctx.children));
     }
 
     @Override
@@ -100,7 +134,8 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitCaseQuery(QueryLangParser.CaseQueryContext ctx) {
-        root = new QueryLangTreeNode("case query", List.of(getQueryLangTreeNode(ctx.caseConditions())), getErrorsFromChildren(ctx.children));
+        QueryLangTreeNode childTreeNode = getQueryLangTreeNode(ctx.caseConditions());
+        root = createTreeNode("case query", List.of(childTreeNode), getErrorsFromChildren(ctx.children));
     }
 
     @Override
@@ -111,7 +146,7 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitTaskQuery(QueryLangParser.TaskQueryContext ctx) {
-        root = new QueryLangTreeNode("task query", List.of(getQueryLangTreeNode(ctx.taskConditions())), getErrorsFromChildren(ctx.children));
+        root = createTreeNode("task query", List.of(getQueryLangTreeNode(ctx.taskConditions())), getErrorsFromChildren(ctx.children));
     }
 
     @Override
@@ -122,7 +157,7 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitUserQuery(QueryLangParser.UserQueryContext ctx) {
-        root = new QueryLangTreeNode("user query", List.of(getQueryLangTreeNode(ctx.userConditions())), getErrorsFromChildren(ctx.children));
+        root = createTreeNode("user query", List.of(getQueryLangTreeNode(ctx.userConditions())), getErrorsFromChildren(ctx.children));
     }
 
     @Override
@@ -155,12 +190,12 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitProcessConditionGroupParenthesis(QueryLangParser.ProcessConditionGroupParenthesisContext ctx) {
-        setQueryLangTreeNode(ctx, new QueryLangTreeNode("()", List.of(getQueryLangTreeNode(ctx.processConditions())), getErrorsFromChildren(ctx.children)));
+        setQueryLangTreeNode(ctx, createTreeNode("()", List.of(getQueryLangTreeNode(ctx.processConditions())), getErrorsFromChildren(ctx.children)));
     }
 
     @Override
     public void exitCaseConditions(QueryLangParser.CaseConditionsContext ctx) {
-        setQueryLangTreeNode(ctx, new QueryLangTreeNode("", List.of(getQueryLangTreeNode(ctx.caseOrExpression())), getErrorsFromChildren(ctx.children)));
+        setQueryLangTreeNode(ctx, getQueryLangTreeNode(ctx.caseOrExpression()));
     }
 
     @Override
@@ -189,12 +224,12 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitCaseConditionGroupParenthesis(QueryLangParser.CaseConditionGroupParenthesisContext ctx) {
-        setQueryLangTreeNode(ctx, new QueryLangTreeNode("()", List.of(getQueryLangTreeNode(ctx.caseConditions())), getErrorsFromChildren(ctx.children)));
+        setQueryLangTreeNode(ctx, createTreeNode("()", List.of(getQueryLangTreeNode(ctx.caseConditions())), getErrorsFromChildren(ctx.children)));
     }
 
     @Override
     public void exitTaskConditions(QueryLangParser.TaskConditionsContext ctx) {
-        setQueryLangTreeNode(ctx, new QueryLangTreeNode("", List.of(getQueryLangTreeNode(ctx.taskOrExpression())), getErrorsFromChildren(ctx.children)));
+        setQueryLangTreeNode(ctx, getQueryLangTreeNode(ctx.taskOrExpression()));
     }
 
     @Override
@@ -222,12 +257,12 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitTaskConditionGroupParenthesis(QueryLangParser.TaskConditionGroupParenthesisContext ctx) {
-        setQueryLangTreeNode(ctx, new QueryLangTreeNode("()", List.of(getQueryLangTreeNode(ctx.taskConditions())), getErrorsFromChildren(ctx.children)));
+        setQueryLangTreeNode(ctx, createTreeNode("()", List.of(getQueryLangTreeNode(ctx.taskConditions())), getErrorsFromChildren(ctx.children)));
     }
 
     @Override
     public void exitUserConditions(QueryLangParser.UserConditionsContext ctx) {
-        setQueryLangTreeNode(ctx, new QueryLangTreeNode("", List.of(getQueryLangTreeNode(ctx.userOrExpression())), getErrorsFromChildren(ctx.children)));
+        setQueryLangTreeNode(ctx, getQueryLangTreeNode(ctx.userOrExpression()));
     }
 
     @Override
@@ -255,7 +290,7 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
 
     @Override
     public void exitUserConditionGroupParenthesis(QueryLangParser.UserConditionGroupParenthesisContext ctx) {
-        setQueryLangTreeNode(ctx, new QueryLangTreeNode("()", List.of(getQueryLangTreeNode(ctx.userConditions())), getErrorsFromChildren(ctx.children)));
+        setQueryLangTreeNode(ctx, createTreeNode("()", List.of(getQueryLangTreeNode(ctx.userConditions())), getErrorsFromChildren(ctx.children)));
     }
 
     @Override
@@ -280,5 +315,50 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
     public void exitUserCondition(QueryLangParser.UserConditionContext ctx) {
         List<QueryLangTreeNode> errors = getErrorsRecursive(ctx);
         setQueryLangTreeNode(ctx, new QueryLangTreeNode(ctx.getText(), errors));
+    }
+
+    @Override
+    public void exitPlacesComparison(QueryLangParser.PlacesComparisonContext ctx) {
+        searchWithElastic = true;
+    }
+
+    @Override
+    public void exitTasksStateComparison(QueryLangParser.TasksStateComparisonContext ctx) {
+        searchWithElastic = true;
+    }
+
+    @Override
+    public void exitTasksUserIdComparison(QueryLangParser.TasksUserIdComparisonContext ctx) {
+        searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataString(QueryLangParser.DataStringContext ctx) {
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataNumber(QueryLangParser.DataNumberContext ctx) {
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataDate(QueryLangParser.DataDateContext ctx) {
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataDatetime(QueryLangParser.DataDatetimeContext ctx) {
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataBoolean(QueryLangParser.DataBooleanContext ctx) {
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void enterDataOptionsComparison(QueryLangParser.DataOptionsComparisonContext ctx) {
+        this.searchWithElastic = true;
     }
 }

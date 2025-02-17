@@ -16,10 +16,9 @@ public class QueryLangTreeNode {
         this.children = children;
     }
 
-    public QueryLangTreeNode(String name, List<QueryLangTreeNode> children, List<QueryLangTreeNode> errors) {
+    public QueryLangTreeNode(String name) {
         this.name = name;
-        this.children = new ArrayList<>(children);
-        this.children.addAll(errors);
+        this.children = new ArrayList<>();
     }
 
     public String toString() {
