@@ -18,5 +18,4 @@ public class TabbedCaseViewConstants extends ViewConstants {
     public static final String FIELD_HEADERS_DEFAULT_MODE = "headers_default_mode";
     public static final String FIELD_IS_HEADER_MODE_CHANGEABLE = "is_header_mode_changeable";
     public static final String FIELD_USE_CASE_DEFAULT_HEADERS = "use_case_default_headers";
-    public static final String FIELD_CONFIGURATION_TYPE = "view_configuration_type";
 }

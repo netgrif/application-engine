@@ -69,10 +69,6 @@ public class TabbedCaseViewBody extends ViewBody {
                 this.isHeaderModeChangeable);
         outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_USE_CASE_DEFAULT_HEADERS, FieldType.BOOLEAN,
                 this.useDefaultHeaders);
-        if (this.chainedView != null) {
-            outcome.putDataSetEntry(TabbedCaseViewConstants.FIELD_CONFIGURATION_TYPE, FieldType.ENUMERATION_MAP,
-                    this.chainedView.getViewType().getIdentifier());
-        }
 
         return outcome;
     }

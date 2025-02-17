@@ -473,14 +473,14 @@
 		<id>view_configuration_type</id>
 		<title name="view_configuration_type">Pick view type</title>
 		<options>
-			<init dynamic="true">menuItemService.getAvailableViewsAsOptions(false)</init>
+			<init dynamic="true">menuItemService.getAvailableViewsAsOptions(false, true)</init>
 		</options>
 		<action trigger="set">
 			use_tabbed_view: f.use_tabbed_view,
 			view_configuration_type: f.view_configuration_type;
 
 			if (view_configuration_type.options == null || view_configuration_type.options.isEmpty()) {
-				change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(use_tabbed_view.value) }
+				change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(use_tabbed_view.value, true) }
 			}
 		</action>
 	</data>
@@ -490,6 +490,7 @@
 		<allowedNets>
 			<allowedNet>tabbed_case_view_configuration</allowedNet>
 			<allowedNet>tabbed_task_view_configuration</allowedNet>
+			<allowedNet>tabbed_ticket_view_configuration</allowedNet>
 		</allowedNets>
 	</data>
 	<data type="taskRef">
@@ -1020,7 +1021,7 @@
 							manageBehaviorOfTabFields(use_tab_icon.value, use_tabbed_view.value)
 
 							change view_configuration_type value { null }
-							change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(use_tabbed_view.value) }
+							change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(use_tabbed_view.value, true) }
 						</action>
 					</actions>
 				</event>
@@ -1113,16 +1114,20 @@
 							view_configuration_form: f.view_configuration_form,
 							view_configuration_id: f.view_configuration_id;
 
+							if (view_configuration_id.value != null &amp;&amp; !view_configuration_id.value.isEmpty()) {
+								workflowService.deleteCase(view_configuration_id.value[0])
+							}
+
 							if (view_configuration_type.value == null || view_configuration_type.value == "") {
-								if (view_configuration_id.value != null &amp;&amp; !view_configuration_id.value.isEmpty()) {
-									workflowService.deleteCase(view_configuration_id.value[0])
-								}
+								change view_configuration_id value { [] }
+								change view_configuration_form value { [] }
 								return
 							}
 
 							def configurationCase = createCase(view_configuration_type.value + "_configuration")
 							def initTask = assignTask("initialize", configurationCase)
 							finishTask(initTask)
+							configurationCase = workflowService.findOne(configurationCase.stringId)
 							change view_configuration_id value { [configurationCase.stringId] }
 							change view_configuration_form value { [configurationCase.tasks.find { it.transition == "settings" }.task] }
 						</action>

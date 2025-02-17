@@ -1,0 +1,316 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>tabbed_single_task_view_configuration</id>
+    <initials>TST</initials>
+    <title>Tabbed single task view configuration</title>
+    <icon>check_box_outline_blank</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <transitionRole>false</transitionRole>
+    <roleRef>
+        <id>system</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>admin</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>default</id>
+        <caseLogic>
+            <create>false</create>
+            <delete>false</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <role>
+        <id>system</id>
+        <title>System</title>
+    </role>
+    <role>
+        <id>admin</id>
+        <title>Admin</title>
+    </role>
+
+    <function scope="process" name="updateFilterAutocompleteOptions">
+        {
+            com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
+            com.netgrif.application.engine.petrinet.domain.dataset.TaskField previewTaskRef,
+            com.netgrif.application.engine.petrinet.domain.dataset.CaseField selectedFilterRef,
+            com.netgrif.application.engine.petrinet.domain.dataset.ButtonField updateBtn,
+            com.netgrif.application.engine.petrinet.domain.Transition trans
+                ->
+                if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
+                    change previewTaskRef value {
+                        return [findTask({it.caseId.eq(filterAutocomplete.value).and(it.transitionId.eq("view_filter"))}).stringId]
+                    }
+                    make updateBtn,editable on trans when { true }
+                } else {
+                    change filterAutocomplete options {
+                        def findAllPredicate = { filterCase -> !selectedFilterRef.value.contains(filterCase.stringId)
+                                &amp;&amp; filterCase.dataSet["filter_type"].value == "Case" }
+                        return findFilters(filterAutocomplete.value != null ? filterAutocomplete.value : "")
+                                .findAll(findAllPredicate)
+                                .collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
+                    }
+                    change previewTaskRef value { [] }
+                    make updateBtn,visible on trans when { true }
+                }
+        }
+    </function>
+
+    <!-- FILTER configuration data -->
+    <data type="taskRef">
+        <id>selected_filter_preview</id>
+        <title/>
+    </data>
+    <data type="taskRef">
+        <id>current_filter_preview</id>
+        <title/>
+    </data>
+    <data type="i18n">
+        <id>filter_header</id>
+        <title/>
+        <init name="filter_header">Current filter</init>
+        <component>
+            <name>divider</name>
+        </component>
+    </data>
+    <data type="text">
+        <id>new_filter_id</id>
+        <title/>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>contains_filter</id>
+        <title/>
+        <init>false</init>
+    </data>
+    <data type="enumeration_map">
+        <id>filter_autocomplete_selection</id>
+        <title name="filter_autocomplete_selection">Select new filter</title>
+        <component>
+            <name>autocomplete_dynamic</name>
+        </component>
+        <action trigger="set">
+            trans: t.settings,
+            filterAutocomplete: f.this,
+            filter_case: f.filter_case,
+            update_filter: f.update_filter,
+            previewTaskRef: f.selected_filter_preview;
+
+            updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans)
+        </action>
+        <action trigger="get">
+            trans: t.settings,
+            filterAutocomplete: f.this,
+            filter_case: f.filter_case,
+            update_filter: f.update_filter,
+            previewTaskRef: f.selected_filter_preview;
+
+            updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans)
+        </action>
+    </data>
+    <data type="button">
+        <id>update_filter</id>
+        <title/>
+        <placeholder name="update_filter">Update view with selected filter</placeholder>
+        <component>
+            <name>raised</name>
+        </component>
+        <action trigger="set">
+            trans: t.settings,
+            update_filter: f.update_filter,
+            contains_filter: f.contains_filter,
+            filter_case: f.filter_case,
+            filterAutocomplete: f.filter_autocomplete_selection;
+
+            boolean containsFilter = filterAutocomplete.value != null &amp;&amp; filterAutocomplete.value != ""
+            if (containsFilter) {
+                def filterCase = findCase({it._id.eq(filterAutocomplete.value)})
+                if (filterCase.dataSet["filter_type"].value != "Task") {
+                    throw new IllegalArgumentException("Filter is of wrong type. Only filter of Task type allowed.")
+                }
+            }
+
+            change contains_filter value { containsFilter }
+            change filter_case value { [filterAutocomplete.value] }
+            change filterAutocomplete value { "" }
+            make update_filter,visible on trans when { true }
+        </action>
+    </data>
+    <data type="caseRef">
+        <id>filter_case</id>
+        <title/>
+        <action trigger="set">
+            filterTaskRef: f.current_filter_preview,
+            contains_filter: f.contains_filter,
+            filterCaseRef: f.filter_case;
+
+            if (filterCaseRef.value == null || filterCaseRef.value == []) {
+                change filterTaskRef value { [] }
+                change contains_filter value { false }
+                return
+            }
+
+            def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+            change filterTaskRef value {
+                return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]
+            }
+            change contains_filter value { true }
+        </action>
+        <allowedNets>
+            <allowedNet>filter</allowedNet>
+        </allowedNets>
+    </data>
+
+    <!-- VIEW CONFIGURATION DATA -->
+    <data type="i18n">
+        <id>view_header</id>
+        <title/>
+        <init name="view_header">Single task view</init>
+        <component>
+            <name>divider</name>
+        </component>
+    </data>
+    <data type="text">
+        <id>transition_id</id>
+        <title name="transition_id">Transition id</title>
+    </data>
+    <!-- END OF VIEW CONFIGURATION DATA -->
+
+    <!-- I18NS -->
+    <i18n locale="sk">
+        <i18nString name="filter_autocomplete_selection">Zvoľte nový filter</i18nString>
+        <i18nString name="update_filter">Aktualizovať zobrazenie s vybraným filtrom</i18nString>
+        <i18nString name="filter_update_title">Filter</i18nString>
+        <i18nString name="filter_header">Súčasný filter</i18nString>
+        <i18nString name="view_configuration_type">Vybrať zobrazenie</i18nString>
+        <i18nString name="settings">Nastavenie</i18nString>
+        <i18nString name="associated_view">Asociované zobrazenie</i18nString>
+        <i18nString name="view_header">Zobrazenie jednej úlohy</i18nString>
+        <i18nString name="transition_id">ID prechodu</i18nString>
+    </i18n>
+    <i18n locale="de">
+        <i18nString name="filter_autocomplete_selection">Neue Filter auswählen</i18nString>
+        <i18nString name="filter_update_title">Filter</i18nString>
+        <i18nString name="filter_header">Aktueller Filter</i18nString>
+        <i18nString name="update_filter">Aktualisiere die Ansicht mit dem ausgewählten Filter</i18nString>
+        <i18nString name="view_configuration_type">Wählen Sie einen Ansichtstyp</i18nString>
+        <i18nString name="settings">Einstellungen</i18nString>
+        <i18nString name="associated_view">zugehörige Ansicht</i18nString>
+        <i18nString name="view_header">Einzelaufgabenansicht</i18nString>
+        <i18nString name="transition_id">Übergangs-ID</i18nString>
+    </i18n>
+
+    <transition>
+        <id>initialize</id>
+        <x>368</x>
+        <y>208</y>
+        <label>initialize [await sync]</label>
+        <icon>hourglass_empty</icon>
+    </transition>
+    <transition>
+        <id>data_sync</id>
+        <x>368</x>
+        <y>328</y>
+        <label>Data sync</label>
+    </transition>
+    <transition>
+        <id>settings</id>
+        <x>496</x>
+        <y>112</y>
+        <label name="settings">Settings</label>
+        <icon>settings</icon>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+                <view>true</view>
+                <cancel>true</cancel>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>form_title</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>view_header</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>view_dataGroup</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>transition_id</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <place>
+        <id>initialized</id>
+        <x>496</x>
+        <y>208</y>
+        <label>initialized</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>uninitialized</id>
+        <x>240</x>
+        <y>208</y>
+        <label>uninitialized</label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <arc>
+        <id>a1</id>
+        <type>read</type>
+        <sourceId>initialized</sourceId>
+        <destinationId>settings</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a2</id>
+        <type>regular</type>
+        <sourceId>uninitialized</sourceId>
+        <destinationId>initialize</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a3</id>
+        <type>regular</type>
+        <sourceId>initialize</sourceId>
+        <destinationId>initialized</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>
