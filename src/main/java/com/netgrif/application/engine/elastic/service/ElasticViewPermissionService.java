@@ -8,11 +8,13 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
 public abstract class ElasticViewPermissionService {
 
     protected void buildViewPermissionQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder viewPermsExists = boolQuery();
-        BoolQueryBuilder viewPermNotExists = boolQuery();
-        viewPermsExists.should(existsQuery("viewRoles"));
-        viewPermsExists.should(existsQuery("viewUserRefs"));
-        viewPermNotExists.mustNot(viewPermsExists);
+        // Check if viewRoles or viewUserRefs exist
+        BoolQueryBuilder viewPermsExists = boolQuery()
+                .should(existsQuery("viewRoles"))
+                .should(existsQuery("viewUserRefs"));
+        // Condition where these attributes do NOT exist
+        BoolQueryBuilder viewPermNotExists = boolQuery()
+                .mustNot(viewPermsExists);
 
         /* Build positive view role query */
         BoolQueryBuilder positiveViewRole = buildPositiveViewRoleQuery(viewPermNotExists, user);
@@ -38,42 +40,45 @@ public abstract class ElasticViewPermissionService {
         query.filter(permissionQuery);
     }
 
+    /**
+     * Build a positive view role query using termsQuery for efficiency.
+     * This reduces the number of clauses by sending all roles at once.
+     */
     private BoolQueryBuilder buildPositiveViewRoleQuery(BoolQueryBuilder viewPermNotExists, LoggedUser user) {
         BoolQueryBuilder positiveViewRole = boolQuery();
-        BoolQueryBuilder positiveViewRoleQuery = boolQuery();
-        for (String roleId : user.getProcessRoles()) {
-            positiveViewRoleQuery.should(termQuery("viewRoles", roleId));
+        if (!user.getProcessRoles().isEmpty()) {
+            positiveViewRole.should(termsQuery("viewRoles", user.getProcessRoles()));
         }
         positiveViewRole.should(viewPermNotExists);
-        positiveViewRole.should(positiveViewRoleQuery);
         return positiveViewRole;
     }
 
+    /**
+     * Build a negative view role query by excluding negative roles.
+     */
     private BoolQueryBuilder buildNegativeViewRoleQuery(LoggedUser user) {
         BoolQueryBuilder negativeViewRole = boolQuery();
-        BoolQueryBuilder negativeViewRoleQuery = boolQuery();
-        for (String roleId : user.getProcessRoles()) {
-            negativeViewRoleQuery.should(termQuery("negativeViewRoles", roleId));
+        if (!user.getProcessRoles().isEmpty()) {
+            negativeViewRole.mustNot(termsQuery("negativeViewRoles", user.getProcessRoles()));
         }
-        negativeViewRole.mustNot(negativeViewRoleQuery);
         return negativeViewRole;
     }
 
+    /**
+     * Build a positive view user query using filter (as score is not needed).
+     */
     private BoolQueryBuilder buildPositiveViewUser(BoolQueryBuilder viewPermNotExists, LoggedUser user) {
-        BoolQueryBuilder positiveViewUser = boolQuery();
-        BoolQueryBuilder positiveViewUserQuery = boolQuery();
-        positiveViewUserQuery.must(termQuery("viewUsers", user.getId()));
-        positiveViewUser.should(viewPermNotExists);
-        positiveViewUser.should(positiveViewUserQuery);
-        return positiveViewUser;
+        return boolQuery()
+                .should(viewPermNotExists)
+                .filter(termQuery("viewUsers", user.getId()));
     }
 
+    /**
+     * Build a negative view user query to exclude the specified user.
+     */
     private BoolQueryBuilder buildNegativeViewUser(LoggedUser user) {
-        BoolQueryBuilder negativeViewUser = boolQuery();
-        BoolQueryBuilder negativeViewUserQuery = boolQuery();
-        negativeViewUserQuery.should(termQuery("negativeViewUsers", user.getId()));
-        negativeViewUser.mustNot(negativeViewUserQuery);
-        return negativeViewUser;
+        return boolQuery()
+                .mustNot(termQuery("negativeViewUsers", user.getId()));
     }
 
     private BoolQueryBuilder setMinus(BoolQueryBuilder positiveSet, BoolQueryBuilder negativeSet) {
@@ -83,10 +88,13 @@ public abstract class ElasticViewPermissionService {
         return positiveSetMinusNegativeSet;
     }
 
+    /**
+     * Unions two queries using OR with a minimum_should_match of 1.
+     */
     private BoolQueryBuilder union(BoolQueryBuilder setA, BoolQueryBuilder setB) {
-        BoolQueryBuilder unionSet = boolQuery();
-        unionSet.should(setA);
-        unionSet.should(setB);
-        return unionSet;
+        return boolQuery()
+                .should(setA)
+                .should(setB)
+                .minimumShouldMatch(1);
     }
 }

@@ -142,8 +142,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         List<Case> casePage;
         long total;
         if (query != null) {
-            SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class,  IndexCoordinates.of(caseIndex));
-            Page<ElasticCase> indexedCases = (Page)SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
+            SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class, IndexCoordinates.of(caseIndex));
+            Page<ElasticCase> indexedCases = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
             total = indexedCases.getTotalElements();
         } else {
@@ -169,14 +169,16 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     private NativeSearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
-        List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
+        List<BoolQueryBuilder> singleQueries = requests.stream()
+                .map(request -> buildSingleQuery(request, user, locale))
+                .collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
             // one of the queries evaluates to empty set => the entire result is an empty set
             return null;
         } else if (!isIntersection) {
             singleQueries = singleQueries.stream().filter(Objects::nonNull).collect(Collectors.toList());
-            if (singleQueries.size() == 0) {
+            if (singleQueries.isEmpty()) {
                 // all queries result in an empty set => the entire result is an empty set
                 return null;
             }
@@ -209,10 +211,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
         // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch
 
-        if (resultAlwaysEmpty)
-            return null;
-        else
-            return query;
+        return resultAlwaysEmpty ? null : query;
     }
 
     private void buildPetriNetQuery(CaseSearchRequest request, LoggedUser user, BoolQueryBuilder query) {
@@ -220,17 +219,25 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             return;
         }
 
+        Set<String> identifiers = new HashSet<>();
+        Set<String> processIds = new HashSet<>();
+
+        request.process.forEach(p -> {
+            if (p.identifier != null) {
+                identifiers.add(p.identifier);
+            }
+            if (p.processId != null) {
+                processIds.add(p.processId);
+            }
+        });
+
         BoolQueryBuilder petriNetQuery = boolQuery();
-
-        for (CaseSearchRequest.PetriNet process : request.process) {
-            if (process.identifier != null) {
-                petriNetQuery.should(termQuery("processIdentifier", process.identifier));
-            }
-            if (process.processId != null) {
-                petriNetQuery.should(termQuery("processId", process.processId));
-            }
+        if (!identifiers.isEmpty()) {
+            petriNetQuery.should(termsQuery("processIdentifier", identifiers));
         }
-
+        if (!processIds.isEmpty()) {
+            petriNetQuery.should(termsQuery("processId", processIds));
+        }
         query.filter(petriNetQuery);
     }
 
@@ -332,13 +339,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         if (request.role == null || request.role.isEmpty()) {
             return;
         }
-
-        BoolQueryBuilder roleQuery = boolQuery();
-        for (String roleId : request.role) {
-            roleQuery.should(termQuery("enabledRoles", roleId));
-        }
-
-        query.filter(roleQuery);
+        query.filter(termsQuery("enabledRoles", request.role));
     }
 
     /**
@@ -416,20 +417,14 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         if (request.stringId == null || request.stringId.isEmpty()) {
             return;
         }
-
-        BoolQueryBuilder caseIdQuery = boolQuery();
-        request.stringId.forEach(caseId -> caseIdQuery.should(termQuery("stringId", caseId)));
-        query.filter(caseIdQuery);
+        query.filter(termsQuery("stringId", request.stringId));
     }
 
     private void buildUriNodeIdQuery(CaseSearchRequest request, BoolQueryBuilder query) {
         if (request.uriNodeId == null || request.uriNodeId.isEmpty()) {
             return;
         }
-
-        BoolQueryBuilder caseIdQuery = boolQuery();
-        caseIdQuery.should(termQuery("uriNodeId", request.uriNodeId));
-        query.filter(caseIdQuery);
+        query.filter(termQuery("uriNodeId", request.uriNodeId));
     }
 
     /**
@@ -458,14 +453,13 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         Map<String, Object> processQuery = new HashMap<>();
         processQuery.put("group", request.group);
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
-        if (groupProcesses.size() == 0)
+        if (groupProcesses.isEmpty()) {
             return true;
-
-        BoolQueryBuilder groupQuery = boolQuery();
-        groupProcesses.stream().map(PetriNetReference::getIdentifier)
-                .map(netIdentifier -> termQuery("processIdentifier", netIdentifier))
-                .forEach(groupQuery::should);
-        query.filter(groupQuery);
+        }
+        List<String> identifiers = groupProcesses.stream()
+                .map(PetriNetReference::getIdentifier)
+                .collect(Collectors.toList());
+        query.filter(termsQuery("processIdentifier", identifiers));
         return false;
     }
 }
