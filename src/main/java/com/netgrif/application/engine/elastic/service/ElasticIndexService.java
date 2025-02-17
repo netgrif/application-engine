@@ -2,33 +2,18 @@ package com.netgrif.application.engine.elastic.service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netgrif.application.engine.configuration.ElasticsearchConfiguration;
 import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
-import org.elasticsearch.action.admin.indices.open.OpenIndexResponse;
-import org.elasticsearch.action.support.master.AcknowledgedResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.indices.CloseIndexRequest;
-import org.elasticsearch.client.indices.CloseIndexResponse;
-import org.elasticsearch.client.indices.PutIndexTemplateRequest;
-import org.elasticsearch.xcontent.XContentType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Setting;
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.SearchScrollHits;
 import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
-import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -65,7 +50,6 @@ public class ElasticIndexService implements IElasticIndexService {
                 .withObject(source).build(), IndexCoordinates.of(indexName));
     }
 
-
 //    @Override
 //    public boolean bulkIndex(List<?> list, Class<?> clazz, String... placeholders) {
 //        String indexName = getIndexName(clazz, placeholders);
@@ -90,9 +74,9 @@ public class ElasticIndexService implements IElasticIndexService {
             if (!this.indexExists(indexName)) {
                 // https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html
                 HashMap<String, Object> settingMap = new HashMap<>();
-                applySettings(settingMap, clazz);
-                settingMap.put("number_of_shards", getShardsFromClass(clazz));
-                settingMap.put("number_of_replicas", getReplicasFromClass(clazz));
+//                applySettings(settingMap, clazz);
+//                settingMap.put("number_of_shards", getShardsFromClass(clazz));
+//                settingMap.put("number_of_replicas", getReplicasFromClass(clazz));
 
                 Map<String, Object> analysisSettings = prepareAnalysisSettings();
                 if (analysisSettings != null) {
@@ -330,14 +314,14 @@ public class ElasticIndexService implements IElasticIndexService {
 //        return null;
 //    }
 
-    @Override
-    public void clearScrollHits(List<String> scrollIds) {
-        try {
-            elasticsearchTemplate.searchScrollClear(scrollIds);
-        } catch (Exception e) {
-            log.error("clearScrollHits:", e);
-        }
-    }
+//    @Override
+//    public void clearScrollHits(List<String> scrollIds) {
+//        try {
+//            elasticsearchTemplate.searchScrollClear(scrollIds);
+//        } catch (Exception e) {
+//            log.error("clearScrollHits:", e);
+//        }
+//    }
 
     private String getIdFromSource(Object source) {
         if (source == null) {

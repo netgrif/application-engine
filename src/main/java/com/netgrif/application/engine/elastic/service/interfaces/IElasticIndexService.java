@@ -29,5 +29,5 @@ public interface IElasticIndexService {
 
     void applySettings(HashMap<String, Object> settingMap, Class<?> clazz);
 
-    void clearScrollHits(List<String> scrollIds);
+//    void clearScrollHits(List<String> scrollIds);
 }
