@@ -219,14 +219,17 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             return;
         }
 
-        List<String> identifiers = request.process.stream()
-                .filter(p -> p.identifier != null)
-                .map(p -> p.identifier)
-                .collect(Collectors.toList());
-        List<String> processIds = request.process.stream()
-                .filter(p -> p.processId != null)
-                .map(p -> p.processId)
-                .collect(Collectors.toList());
+        Set<String> identifiers = new HashSet<>();
+        Set<String> processIds = new HashSet<>();
+
+        request.process.forEach(p -> {
+            if (p.identifier != null) {
+                identifiers.add(p.identifier);
+            }
+            if (p.processId != null) {
+                processIds.add(p.processId);
+            }
+        });
 
         BoolQueryBuilder petriNetQuery = boolQuery();
         if (!identifiers.isEmpty()) {
@@ -450,8 +453,9 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         Map<String, Object> processQuery = new HashMap<>();
         processQuery.put("group", request.group);
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
-        if (groupProcesses.isEmpty())
+        if (groupProcesses.isEmpty()) {
             return true;
+        }
         List<String> identifiers = groupProcesses.stream()
                 .map(PetriNetReference::getIdentifier)
                 .collect(Collectors.toList());
