@@ -2229,8 +2229,8 @@ class ActionDelegate {
 
     /**
      * search elastic with string query for first occurrence
-     * @param query
-     * @return
+     * @param query string with search conditions
+     * @return one case which match search condition or null
      */
     Case findCaseElastic(String query) {
         def result = findCasesElastic(query, PageRequest.of(0, 1))
@@ -2238,9 +2238,20 @@ class ActionDelegate {
     }
 
     /**
+     * search elastic with string query for cases and default page size of 100 cases
+     * @param query string with search conditions
+     * @param pageSize optional parameter which decides number of returned elements
+     * @return list of cases (default max 100) which match condition
+     */
+    List<Case> findCasesElastic(String query, int pageSize = 100) {
+        this.findCasesElastic(query, PageRequest.of(0, pageSize))
+    }
+
+    /**
      * search elastic with string query for cases
-     * @param query
-     * @return
+     * @param query string with search conditions
+     * @param pageable object which decides page size, page number and order of elements
+     * @return list of cases (size and order depends on pageable object) which match condition
      */
     List<Case> findCasesElastic(String query, Pageable pageable) {
         CaseSearchRequest request = new CaseSearchRequest()
@@ -2249,6 +2260,11 @@ class ActionDelegate {
         return result
     }
 
+    /**
+     * find count of cases which match condition
+     * @param query string with search conditions
+     * @return number of cases which match condition
+     */
     long countCasesElastic(String query) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
