@@ -8,6 +8,8 @@ import java.util.List;
 public interface IMenuItemViewRegistry {
 
     void registerView(MenuItemView view);
+    void unregisterView(String identifier);
+    void unregisterAllViews();
     MenuItemView getViewByIdentifier(String identifier);
     Map<String, MenuItemView> getAllViews();
     List<MenuItemView> getAllByIsTabbedAndIsPrimary(boolean isTabbed, boolean isPrimary);

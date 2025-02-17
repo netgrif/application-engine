@@ -7,8 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -35,6 +37,25 @@ public class MenuItemViewRegistry implements IMenuItemViewRegistry {
         }
         this.views.put(view.getIdentifier(), view);
         log.debug("Registered menu item view [{}] with identifier [{}]", view.getName().getDefaultValue(), view.getIdentifier());
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public void unregisterView(String identifier) {
+        this.views.remove(identifier);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public void unregisterAllViews() {
+        Set<String> viewIds = new HashSet<>(this.views.keySet());
+        for (String viewId : viewIds) {
+            this.views.remove(viewId);
+        }
     }
 
     /**
