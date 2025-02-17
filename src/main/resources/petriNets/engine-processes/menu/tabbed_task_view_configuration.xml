@@ -1,0 +1,718 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>tabbed_task_view_configuration</id>
+    <initials>TTV</initials>
+    <title>Tabbed task view configuration</title>
+    <icon>check_box_outline_blank</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <transitionRole>false</transitionRole>
+    <roleRef>
+        <id>system</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>admin</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>default</id>
+        <caseLogic>
+            <create>false</create>
+            <delete>false</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <role>
+        <id>system</id>
+        <title>System</title>
+    </role>
+    <role>
+        <id>admin</id>
+        <title>Admin</title>
+    </role>
+
+    <function scope="process" name="updateFilterAutocompleteOptions">
+        {
+            com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
+            com.netgrif.application.engine.petrinet.domain.dataset.TaskField previewTaskRef,
+            com.netgrif.application.engine.petrinet.domain.dataset.CaseField selectedFilterRef,
+            com.netgrif.application.engine.petrinet.domain.dataset.ButtonField updateBtn,
+            com.netgrif.application.engine.petrinet.domain.Transition trans
+                ->
+                if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
+                    change previewTaskRef value {
+                        return [findTask({it.caseId.eq(filterAutocomplete.value).and(it.transitionId.eq("view_filter"))}).stringId]
+                    }
+                    make updateBtn,editable on trans when { true }
+                } else {
+                    change filterAutocomplete options {
+                        def findAllPredicate = { filterCase -> !selectedFilterRef.value.contains(filterCase.stringId)
+                                &amp;&amp; filterCase.dataSet["filter_type"].value == "Task" }
+                        def options = findFilters(filterAutocomplete.value != null ? filterAutocomplete.value : "")
+                                .findAll(findAllPredicate)
+                                .collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
+                        return options
+                    }
+                    change previewTaskRef value { [] }
+                    make updateBtn,visible on trans when { true }
+                }
+        }
+    </function>
+    <function scope="process" name="updateOptionsBasedOnValue">
+        {
+            com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField toBeUpdated,
+            com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField valueSelector,
+            com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField optionsHolder
+                ->
+                def existingOptions = optionsHolder.options
+                def selectedValues = valueSelector.value
+                def newOptions = [:]
+
+                if (selectedValues != null) {
+                    existingOptions.each { key, value ->
+                        if (selectedValues.contains(key)) {
+                            newOptions.put(key, value)
+                        }
+                    }
+                }
+
+                if (!newOptions.containsKey(toBeUpdated.value)) {
+                    change toBeUpdated value { null }
+                }
+
+                change toBeUpdated options { newOptions }
+        }
+    </function>
+
+    <!-- FILTER configuration data -->
+    <data type="taskRef">
+        <id>selected_filter_preview</id>
+        <title/>
+    </data>
+    <data type="taskRef">
+        <id>current_filter_preview</id>
+        <title/>
+    </data>
+    <data type="i18n">
+        <id>filter_header</id>
+        <title/>
+        <init name="filter_header">Current filter</init>
+        <component>
+            <name>divider</name>
+        </component>
+    </data>
+    <data type="text">
+        <id>new_filter_id</id>
+        <title/>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>contains_filter</id>
+        <title/>
+        <init>false</init>
+    </data>
+    <data type="enumeration_map">
+        <id>filter_autocomplete_selection</id>
+        <title name="filter_autocomplete_selection">Select new filter</title>
+        <component>
+            <name>autocomplete_dynamic</name>
+        </component>
+        <action trigger="set">
+            trans: t.settings,
+            filterAutocomplete: f.this,
+            filter_case: f.filter_case,
+            update_filter: f.update_filter,
+            previewTaskRef: f.selected_filter_preview;
+
+            updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans)
+        </action>
+        <action trigger="get">
+            trans: t.settings,
+            filterAutocomplete: f.this,
+            filter_case: f.filter_case,
+            update_filter: f.update_filter,
+            previewTaskRef: f.selected_filter_preview;
+
+            updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans)
+        </action>
+    </data>
+    <data type="button">
+        <id>update_filter</id>
+        <title/>
+        <placeholder name="update_filter">Update view with selected filter</placeholder>
+        <component>
+            <name>raised</name>
+        </component>
+        <action trigger="set">
+            trans: t.settings,
+            update_filter: f.update_filter,
+            contains_filter: f.contains_filter,
+            filter_case: f.filter_case,
+            filterAutocomplete: f.filter_autocomplete_selection;
+
+            boolean containsFilter = filterAutocomplete.value != null &amp;&amp; filterAutocomplete.value != ""
+            if (containsFilter) {
+                def filterCase = findCase({it._id.eq(filterAutocomplete.value)})
+                if (filterCase.dataSet["filter_type"].value != "Task") {
+                    throw new IllegalArgumentException("Filter is of wrong type. Only filter of Task type allowed.")
+                }
+            }
+
+            change contains_filter value { containsFilter }
+            change filter_case value { [filterAutocomplete.value] }
+            change filterAutocomplete value { "" }
+            make update_filter,visible on trans when { true }
+        </action>
+    </data>
+    <data type="caseRef">
+        <id>filter_case</id>
+        <title/>
+        <action trigger="set">
+            trans: t.settings,
+            filterHeader: f.filter_header,
+            removeButton: f.remove_filter,
+            contains_filter: f.contains_filter,
+            mergeFilters: f.merge_filters,
+            filterTaskRef: f.current_filter_preview,
+            filterCaseRef: f.filter_case;
+
+            if (filterCaseRef.value == null || filterCaseRef.value == []) {
+                make [mergeFilters, removeButton], hidden on trans when { true }
+                make filterHeader, hidden on trans when { true }
+                change filterTaskRef value { [] }
+                change contains_filter value { false }
+                return
+            }
+
+            def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+            change filterTaskRef value {
+                return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]
+            }
+
+            make [mergeFilters, removeButton], editable on trans when { true }
+            make filterHeader,visible on trans when { true }
+            change contains_filter value { true }
+        </action>
+        <allowedNets>
+            <allowedNet>filter</allowedNet>
+        </allowedNets>
+    </data>
+    <data type="button">
+        <id>remove_filter</id>
+        <title/>
+        <placeholder name="remove_filter">Remove filter</placeholder>
+        <component>
+            <name>raised</name>
+        </component>
+        <action trigger="set">
+            filterCase: f.filter_case;
+
+            change filterCase value { [] }
+        </action>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>merge_filters</id>
+        <title name="merge_filters">Merge with base filter?</title>
+        <init>true</init>
+    </data>
+
+    <!-- TASK VIEW CONFIGURATION DATA -->
+    <data type="i18n">
+        <id>view_header</id>
+        <title/>
+        <init name="view_header">Task view</init>
+        <component>
+            <name>divider</name>
+        </component>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>view_search_type</id>
+        <title name="view_search_type">Search type for task view</title>
+        <options>
+            <option key="hidden" name="hidden">Hidden</option>
+            <option key="fulltext" name="fulltext">Fulltext</option>
+            <option key="fulltext_advanced" name="fulltext_advanced">Fulltext and advanced</option>
+        </options>
+        <init>fulltext_advanced</init>
+    </data>
+    <data type="multichoice_map" immediate="true">
+        <id>headers_mode</id>
+        <title name="headers_mode">Header mode</title>
+        <options>
+            <option key="sort" name="sort">Sort</option>
+            <option key="edit" name="edit">Edit</option>
+        </options>
+        <init>sort,edit</init>
+        <action trigger="set">
+            headersMode: f.headers_mode,
+            defaultMode: f.headers_default_mode,
+            holder: f.headers_options_holder;
+
+            updateOptionsBasedOnValue(defaultMode, headersMode, holder)
+        </action>
+        <action trigger="get">
+            headersMode: f.headers_mode,
+            defaultMode: f.headers_default_mode,
+            holder: f.headers_options_holder;
+
+            updateOptionsBasedOnValue(defaultMode, headersMode, holder)
+        </action>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>headers_default_mode</id>
+        <title name="headers_default_mode">Default header mode</title>
+        <options>
+            <option key="sort" name="sort">Sort</option>
+            <option key="edit" name="edit">Edit</option>
+        </options>
+        <init>sort</init>
+    </data>
+    <data type="enumeration_map">
+        <id>headers_options_holder</id>
+        <title/>
+        <options>
+            <option key="sort" name="sort">Sort</option>
+            <option key="edit" name="edit">Edit</option>
+        </options>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>is_header_mode_changeable</id>
+        <title name="is_header_mode_changeable">Can header mode be changed?</title>
+        <init>true</init>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>allow_header_table_mode</id>
+        <title name="allow_header_table_mode">Allow table mode for headers?</title>
+        <init>true</init>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>use_default_headers</id>
+        <title name="use_default_headers">Use custom default headers?</title>
+        <init>true</init>
+    </data>
+    <data type="text" immediate="true">
+        <id>default_headers</id>
+        <title name="default_headers">Set default headers</title>
+        <desc name="default_headers_desc">Example: "meta-title,meta-user"</desc>
+        <action trigger="set">
+            defaultHeaders: f.this;
+
+            String trimmed = defaultHeaders.value?.replaceAll("\\s","")
+            if (defaultHeaders.value != trimmed) {
+                change defaultHeaders value { trimmed }
+            }
+        </action>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>show_more_menu</id>
+        <title name="show_more_menu">Show more menu for task item?</title>
+        <init>true</init>
+    </data>
+
+    <!-- I18NS -->
+    <i18n locale="sk">
+        <i18nString name="filter_autocomplete_selection">Zvoľte nový filter</i18nString>
+        <i18nString name="update_filter">Aktualizovať zobrazenie s vybraným filtrom</i18nString>
+        <i18nString name="hidden">Skryté</i18nString>
+        <i18nString name="fulltext">Fulltext</i18nString>
+        <i18nString name="fulltext_advanced">Fulltext a rozšírené</i18nString>
+        <i18nString name="sort">Zoraďovanie</i18nString>
+        <i18nString name="search">Vyhľadávanie</i18nString>
+        <i18nString name="edit">Upravovanie</i18nString>
+        <i18nString name="merge_filters">Zjednotiť filter so základným filtrom?</i18nString>
+        <i18nString name="view_search_type">Typ vyhľadávania úloh</i18nString>
+        <i18nString name="headers_mode">Mód hlavičiek</i18nString>
+        <i18nString name="headers_default_mode">Predvolený mód hlavičiek</i18nString>
+        <i18nString name="is_header_mode_changeable">Môže byť mód hlavičiek zmenený?</i18nString>
+        <i18nString name="allow_header_table_mode">Povoliť tabuľkový mód pre hlavičky?</i18nString>
+        <i18nString name="use_default_headers">Použiť vlastné predvolené hlavičky?</i18nString>
+        <i18nString name="default_headers">Predvolené hlavičky</i18nString>
+        <i18nString name="default_headers_desc">Napríklad: "meta-title,meta-user"</i18nString>
+        <i18nString name="show_more_menu">Zobrazovať menu pre úlohovú položku?</i18nString>
+        <i18nString name="item_settings">Nastavenie položky</i18nString>
+        <i18nString name="filter_update_title">Filter</i18nString>
+        <i18nString name="filter_header">Súčasný filter</i18nString>
+        <i18nString name="view_header">Zobrazenie úloh</i18nString>
+        <i18nString name="item_settings_general">Všeobecné</i18nString>
+        <i18nString name="remove_filter">Vymazať filter</i18nString>
+    </i18n>
+    <i18n locale="de">
+        <i18nString name="filter_autocomplete_selection">Neue Filter auswählen</i18nString>
+        <i18nString name="hidden">Versteckt</i18nString>
+        <i18nString name="fulltext">Einfacher Suchmodus</i18nString>
+        <i18nString name="sort">Sortieren</i18nString>
+        <i18nString name="search">Suchen</i18nString>
+        <i18nString name="edit">Bearbeiten</i18nString>
+        <i18nString name="headers_mode">Kopfzeilenmodus</i18nString>
+        <i18nString name="headers_default_mode">Standardkopfzeilenmodus</i18nString>
+        <i18nString name="is_header_mode_changeable">Erlaube Änderung des Kopfzeilenmodus?</i18nString>
+        <i18nString name="allow_header_table_mode">Erlaube Tabellenmodus?</i18nString>
+        <i18nString name="use_default_headers">Eigene Kopfzeilen verwenden?</i18nString>
+        <i18nString name="default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
+        <i18nString name="default_headers_desc">Beispiel: "meta-title,meta-user"</i18nString>
+        <i18nString name="filter_update_title">Filter</i18nString>
+        <i18nString name="filter_header">Aktueller Filter</i18nString>
+        <i18nString name="item_settings_general">Allgemein</i18nString>
+        <i18nString name="update_filter">Aktualisiere die Ansicht mit dem ausgewählten Filter</i18nString>
+        <i18nString name="fulltext_advanced">Einfacher und erweiterter Suchmodus</i18nString>
+        <i18nString name="merge_filters">Mit dem Basisfilter kombinieren?</i18nString>
+        <i18nString name="view_search_type">Suchmodus im Aufgabenansicht</i18nString>
+        <i18nString name="show_more_menu">"Erweiterte Optionen" Taste bei einzelnen Aufgaben anzeigen</i18nString>
+        <i18nString name="item_settings">Menüeintrageinstellungen</i18nString>
+        <i18nString name="view_header">Aufgabenansicht</i18nString>
+        <i18nString name="remove_filter">Filter entfernen</i18nString>
+    </i18n>
+
+    <transition>
+        <id>initialize</id>
+        <x>368</x>
+        <y>208</y>
+        <label>initialize [await sync]</label>
+        <icon>hourglass_empty</icon>
+    </transition>
+    <transition>
+        <id>data_sync</id>
+        <x>368</x>
+        <y>328</y>
+        <label>Data sync</label>
+    </transition>
+    <transition>
+        <id>settings</id>
+        <x>496</x>
+        <y>112</y>
+        <label>Settings</label>
+        <icon>settings</icon>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+                <view>true</view>
+                <cancel>true</cancel>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>form_title</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>view_header</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>filter_update</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <title name="filter_update_title">Filter</title>
+            <dataRef>
+                <id>filter_autocomplete_selection</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>update_filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>selected_filter_preview</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>current_additional_filter</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>filter_header</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>current_filter_preview</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>merge_filters</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>remove_filter</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>standard</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>view_dataGroup</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>view_search_type</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>show_more_menu</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>view_headers</id>
+            <cols>5</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>is_header_mode_changeable</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                    <action trigger="set">
+                        trans: t.this,
+                        isChangeable: f.is_header_mode_changeable,
+                        mode: f.headers_mode,
+                        defaultMode: f.headers_default_mode;
+
+                        make [mode, defaultMode], editable on trans when { isChangeable.value }
+                        make [mode, defaultMode], required on trans when { isChangeable.value }
+
+                        make [mode, defaultMode], hidden on trans when { !isChangeable.value }
+                        make [mode, defaultMode], optional on trans when { !isChangeable.value }
+                    </action>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>allow_header_table_mode</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>headers_mode</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>headers_default_mode</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>4</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>use_default_headers</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        trans: t.this,
+                        use: f.use_default_headers,
+                        headers: f.default_headers;
+
+                        make headers,editable on trans when { use.value }
+                        make headers,visible on trans when { !use.value }
+                    </action>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>default_headers</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <place>
+        <id>initialized</id>
+        <x>496</x>
+        <y>208</y>
+        <label>initialized</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>uninitialized</id>
+        <x>240</x>
+        <y>208</y>
+        <label>uninitialized</label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <arc>
+        <id>a1</id>
+        <type>read</type>
+        <sourceId>initialized</sourceId>
+        <destinationId>settings</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a2</id>
+        <type>regular</type>
+        <sourceId>uninitialized</sourceId>
+        <destinationId>initialize</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a3</id>
+        <type>regular</type>
+        <sourceId>initialize</sourceId>
+        <destinationId>initialized</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>
