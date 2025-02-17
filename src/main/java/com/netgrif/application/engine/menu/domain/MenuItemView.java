@@ -9,8 +9,8 @@ import lombok.NonNull;
 import java.util.List;
 
 @Data
-@Builder
 @AllArgsConstructor
+@Builder(builderMethodName = "with")
 public class MenuItemView {
     @NonNull
     private final I18nString name;

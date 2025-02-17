@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.menu.domain.configurations;
 
-import com.netgrif.application.engine.menu.domain.MenuItemViewOLD;
 import com.netgrif.application.engine.menu.domain.ToDataSetOutcome;
+import com.netgrif.application.engine.startup.MenuItemViewRegistryRunner;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -19,8 +19,8 @@ public class TabbedTicketViewBody extends ViewBody {
     }
 
     @Override
-    public MenuItemViewOLD getViewType() {
-        return MenuItemViewOLD.TABBED_TICKET_VIEW;
+    public String getViewIdentifier() {
+        return MenuItemViewRegistryRunner.TABBED_TICKET_VIEW_ID;
     }
 
     @Override

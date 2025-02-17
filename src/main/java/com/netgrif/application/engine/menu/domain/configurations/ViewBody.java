@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.menu.domain.configurations;
 
 import com.netgrif.application.engine.menu.domain.FilterBody;
-import com.netgrif.application.engine.menu.domain.MenuItemViewOLD;
 import com.netgrif.application.engine.menu.domain.ToDataSetOutcome;
 import com.netgrif.application.engine.menu.utils.MenuItemUtils;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
@@ -23,7 +22,7 @@ public abstract class ViewBody {
     protected FilterBody filterBody;
 
     public abstract ViewBody getAssociatedViewBody();
-    public abstract MenuItemViewOLD getViewType();
+    public abstract String getViewIdentifier();
     /**
      * Internal method, that must transform data in concrete class and add them into received outcome. Method must return
      * the updated outcome.
@@ -43,7 +42,7 @@ public abstract class ViewBody {
      * @return returns process identifier for this view
      * */
     public String getViewProcessIdentifier() {
-        return getViewType().getIdentifier() + "_configuration";
+        return getViewIdentifier() + "_configuration";
     }
 
     /**
@@ -68,7 +67,7 @@ public abstract class ViewBody {
 
         if (associatedViewCase != null) {
             outcome.putDataSetEntry(ViewConstants.FIELD_CONFIGURATION_TYPE, FieldType.ENUMERATION_MAP,
-                    this.getAssociatedViewBody().getViewType().getIdentifier());
+                    this.getAssociatedViewBody().getViewIdentifier());
             outcome.putDataSetEntry(ViewConstants.FIELD_VIEW_CONFIGURATION_ID, FieldType.CASE_REF,
                     List.of(associatedViewCase.getStringId()));
             String taskId = MenuItemUtils.findTaskIdInCase(associatedViewCase, ViewConstants.TRANS_SETTINGS_ID);

@@ -107,11 +107,6 @@ public class MenuItemBody {
         this.tabName = new I18nString(name);
     }
 
-    public void setView(ViewBody viewBody) {
-        this.view = viewBody;
-        this.useTabbedView = viewBody.getViewType().isTabbed();
-    }
-
     /**
      * @return true if the menu item contains view
      * */
@@ -176,7 +171,7 @@ public class MenuItemBody {
 
         if (viewCase != null) {
             outcome.putDataSetEntry(MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE, FieldType.ENUMERATION_MAP,
-                    this.view.getViewType().getIdentifier());
+                    this.view.getViewIdentifier());
             outcome.putDataSetEntry(MenuItemConstants.FIELD_VIEW_CONFIGURATION_ID, FieldType.CASE_REF,
                     List.of(viewCase.getStringId()));
             String taskId = MenuItemUtils.findTaskIdInCase(viewCase, ViewConstants.TRANS_SETTINGS_ID);

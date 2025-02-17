@@ -17,6 +17,7 @@ class RunnerController {
             UriRunner,
             FunctionsCacheRunner,
             FilterRunner,
+            MenuItemViewRegistryRunner,
             GroupRunner,
             DefaultFiltersRunner,
             ImpersonationRunner,

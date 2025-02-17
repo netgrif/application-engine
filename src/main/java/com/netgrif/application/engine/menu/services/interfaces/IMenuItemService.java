@@ -2,15 +2,12 @@ package com.netgrif.application.engine.menu.services.interfaces;
 
 import com.netgrif.application.engine.menu.domain.FilterBody;
 import com.netgrif.application.engine.menu.domain.MenuItemBody;
-import com.netgrif.application.engine.menu.domain.MenuItemViewOLD;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
 
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public interface IMenuItemService {
 
@@ -27,37 +24,6 @@ public interface IMenuItemService {
     void moveItem(Case item, String destUri) throws TransitionNotExecutableException;
     Case duplicateItem(Case originItem, I18nString newTitle, String newIdentifier) throws TransitionNotExecutableException;
     Case removeChildItemFromParent(String folderId, Case childItem);
-
-    /**
-     * Gets all tabbed or non-tabbed views
-     *
-     * @param isTabbed if true, only tabbed views will be returned
-     * @param isPrimary if true, only views accessible directly from the menu_item will be returned
-     *
-     * @return All available views defined in {@link MenuItemViewOLD} in consideration of input value. Views are returned as
-     * options for {@link MapOptionsField}
-     * */
-    default Map<String, I18nString> getAvailableViewsAsOptions(boolean isTabbed, boolean isPrimary) {
-        return MenuItemViewOLD.findAllByIsTabbedAndIsPrimary(isTabbed, isPrimary).stream()
-                .collect(Collectors.toMap(MenuItemViewOLD::getIdentifier, MenuItemViewOLD::getName));
-    }
-
-    /**
-     * Gets all tabbed or non-tabbed views
-     *
-     * @param isTabbed if true, only tabbed views will be returned
-     * @param viewIdentifier identifier of view (defined in {@link MenuItemViewOLD}), which is parent to returned views
-     *
-     * @return All available views defined in {@link MenuItemViewOLD} in consideration of input values. Views are returned as
-     * options for {@link MapOptionsField}
-     * */
-    default Map<String, I18nString> getAvailableViewsAsOptions(boolean isTabbed, String viewIdentifier) {
-        int index = viewIdentifier.lastIndexOf("_configuration");
-        if (index > 0) {
-            viewIdentifier = viewIdentifier.substring(0, index);
-        }
-        return MenuItemViewOLD.findAllByIsTabbedAndParentIdentifier(isTabbed, viewIdentifier).stream()
-                .collect(Collectors.toMap(MenuItemViewOLD::getIdentifier, MenuItemViewOLD::getName));
-    }
-
+    Map<String, I18nString> getAvailableViewsAsOptions(boolean isTabbed, boolean isPrimary);
+    Map<String, I18nString> getAvailableViewsAsOptions(boolean isTabbed, String viewIdentifier);
 }

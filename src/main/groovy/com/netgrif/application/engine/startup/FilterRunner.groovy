@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.menu.domain.MenuItemViewOLD
+import com.netgrif.application.engine.menu.registry.interfaces.IMenuItemViewRegistry
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -20,6 +20,9 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
 
     @Autowired
     private SystemUserRunner systemCreator
+
+    @Autowired
+    private IMenuItemViewRegistry viewRegistry
 
     private static final String FILTER_FILE_NAME = "engine-processes/filter.xml"
     public static final String FILTER_PETRI_NET_IDENTIFIER = "filter"
@@ -51,8 +54,8 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
     }
 
     List<PetriNet> createConfigurationNets() {
-        return MenuItemViewOLD.values().each { view ->
-            String processIdentifier = view.getIdentifier() + "_configuration"
+        return viewRegistry.getAllViews().each { viewEntry ->
+            String processIdentifier = viewEntry.getKey() + "_configuration"
             String filePath = String.format("engine-processes/menu/%s.xml", processIdentifier)
             importProcess(String.format("Petri net for %s", processIdentifier), processIdentifier, filePath)
         }.collect()

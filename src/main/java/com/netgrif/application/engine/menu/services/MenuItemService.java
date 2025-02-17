@@ -2,21 +2,21 @@ package com.netgrif.application.engine.menu.services;
 
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.auth.service.RegistrationService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
-import com.netgrif.application.engine.menu.domain.FilterBody;
-import com.netgrif.application.engine.menu.domain.MenuItemBody;
-import com.netgrif.application.engine.menu.domain.MenuItemConstants;
-import com.netgrif.application.engine.menu.domain.ToDataSetOutcome;
+import com.netgrif.application.engine.menu.domain.*;
 import com.netgrif.application.engine.menu.domain.configurations.ViewBody;
 import com.netgrif.application.engine.menu.domain.configurations.ViewConstants;
+import com.netgrif.application.engine.menu.registry.interfaces.IMenuItemViewRegistry;
 import com.netgrif.application.engine.menu.services.interfaces.IMenuItemService;
 import com.netgrif.application.engine.menu.utils.MenuItemUtils;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.UriContentType;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
+import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.startup.DefaultFiltersRunner;
@@ -27,12 +27,14 @@ import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.netgrif.application.engine.startup.MenuItemViewRegistryRunner;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -44,6 +46,7 @@ public class MenuItemService implements IMenuItemService {
     protected final IUserService userService;
     protected final IUriService uriService;
     protected final IElasticCaseService elasticCaseService;
+    protected final IMenuItemViewRegistry viewRegistry;
 
     protected static final String DEFAULT_FOLDER_ICON = "folder";
 
@@ -121,7 +124,10 @@ public class MenuItemService implements IMenuItemService {
 
         Case viewCase = null;
         if (body.hasView()) {
-            viewCase = createView(body.getView());
+            ViewBody viewBody = body.getView();
+            MenuItemView registeredView = viewRegistry.getViewByIdentifier(viewBody.getViewIdentifier());
+            body.setUseTabbedView(registeredView.isTabbed());
+            viewCase = createView(viewBody);
         }
         ToDataSetOutcome dataSetOutcome = body.toDataSet(parentItemCase.getStringId(), nodePath, viewCase);
         menuItemCase = setDataWithExecute(menuItemCase, MenuItemConstants.TRANS_INIT_ID, dataSetOutcome.getDataSet());
@@ -146,6 +152,11 @@ public class MenuItemService implements IMenuItemService {
             itemCase = workflowService.save(itemCase);
         }
 
+        if (body.hasView()) {
+            ViewBody viewBody = body.getView();
+            MenuItemView registeredView = viewRegistry.getViewByIdentifier(viewBody.getViewIdentifier());
+            body.setUseTabbedView(registeredView.isTabbed());
+        }
         Case viewCase = findView(itemCase);
         viewCase = handleView(viewCase, body.getView());
         ToDataSetOutcome dataSetOutcome = body.toDataSet(viewCase);
@@ -396,6 +407,41 @@ public class MenuItemService implements IMenuItemService {
         parentFolder.getDataField(MenuItemConstants.FIELD_CHILD_ITEM_IDS).setValue(childIds);
         parentFolder.getDataField(MenuItemConstants.FIELD_HAS_CHILDREN).setValue(MenuItemUtils.hasFolderChildren(parentFolder));
         return workflowService.save(parentFolder);
+    }
+
+    /**
+     * Gets all tabbed or non-tabbed views
+     *
+     * @param isTabbed if true, only tabbed views will be returned
+     * @param isPrimary if true, only views accessible directly from the menu_item will be returned
+     *
+     * @return All available views defined in {@link MenuItemViewRegistryRunner} in consideration of input value. Views
+     * are returned as options for {@link MapOptionsField}
+     * */
+    @Override
+    public Map<String, I18nString> getAvailableViewsAsOptions(boolean isTabbed, boolean isPrimary) {
+        return viewRegistry.getAllByIsTabbedAndIsPrimary(isTabbed, isPrimary).stream()
+                .collect(Collectors.toMap(MenuItemView::getIdentifier, MenuItemView::getName));
+    }
+
+    /**
+     * Gets all tabbed or non-tabbed views
+     *
+     * @param isTabbed if true, only tabbed views will be returned
+     * @param viewIdentifier identifier of view (defined in {@link MenuItemViewRegistryRunner}), which is parent to
+     *                       returned views
+     *
+     * @return All available views defined in {@link MenuItemViewRegistryRunner} in consideration of input values. Views
+     * are returned as options for {@link MapOptionsField}
+     * */
+    @Override
+    public Map<String, I18nString> getAvailableViewsAsOptions(boolean isTabbed, String viewIdentifier) {
+        int index = viewIdentifier.lastIndexOf("_configuration");
+        if (index > 0) {
+            viewIdentifier = viewIdentifier.substring(0, index);
+        }
+        return viewRegistry.getAllByIsTabbedAndParentIdentifier(isTabbed, viewIdentifier).stream()
+                .collect(Collectors.toMap(MenuItemView::getIdentifier, MenuItemView::getName));
     }
 
     protected Case findCase(String processIdentifier, String query) {
