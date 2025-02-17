@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.menu.domain.MenuItemView
+import com.netgrif.application.engine.menu.domain.MenuItemViewOLD
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -51,7 +51,7 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
     }
 
     List<PetriNet> createConfigurationNets() {
-        return MenuItemView.values().each { view ->
+        return MenuItemViewOLD.values().each { view ->
             String processIdentifier = view.getIdentifier() + "_configuration"
             String filePath = String.format("engine-processes/menu/%s.xml", processIdentifier)
             importProcess(String.format("Petri net for %s", processIdentifier), processIdentifier, filePath)

@@ -5,7 +5,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.menu.domain.MenuItemConstants
-import com.netgrif.application.engine.menu.domain.MenuItemView
+import com.netgrif.application.engine.menu.domain.MenuItemViewOLD
 import com.netgrif.application.engine.menu.domain.configurations.TabbedCaseViewConstants
 import com.netgrif.application.engine.menu.domain.configurations.TabbedTaskViewConstants
 import com.netgrif.application.engine.menu.utils.MenuItemUtils
@@ -91,7 +91,7 @@ class MenuItemApiTest {
         assert item.dataSet[MenuItemConstants.FIELD_BANNED_ROLES].options.containsKey("role_2:filter_api_test")
         assert item.dataSet[MenuItemConstants.FIELD_ALLOWED_ROLES].options.containsKey("role_1:filter_api_test")
         assert item.dataSet[MenuItemConstants.FIELD_USE_TABBED_VIEW].value == true
-        assert item.dataSet[MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE].value == MenuItemView.TABBED_CASE_VIEW.identifier
+        assert item.dataSet[MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE].value == MenuItemViewOLD.TABBED_CASE_VIEW.identifier
 
         assert filter.dataSet["filter"].filterMetadata["filterType"] == "Case"
         assert filter.dataSet["filter"].allowedNets == ["filter", "menu_item"]
@@ -104,7 +104,7 @@ class MenuItemApiTest {
         assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_VIEW_CONTAINS_FILTER].value == true
         assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_VIEW_FILTER_CASE].value[0] == filter.stringId
         assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_DEFAULT_HEADERS].value == "meta-title,meta-title"
-        assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_CONFIGURATION_TYPE].value == MenuItemView.TABBED_TASK_VIEW.identifier
+        assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_CONFIGURATION_TYPE].value == MenuItemViewOLD.TABBED_TASK_VIEW.identifier
 
         String tabbedTaskViewId = MenuItemUtils.getCaseIdFromCaseRef(tabbedCaseView, TabbedCaseViewConstants.FIELD_VIEW_CONFIGURATION_ID)
         assert tabbedTaskViewId != null
@@ -157,7 +157,7 @@ class MenuItemApiTest {
         assert item.dataSet[MenuItemConstants.FIELD_MENU_NAME].value.toString() == "CHANGED FILTER"
         assert item.dataSet[MenuItemConstants.FIELD_ALLOWED_ROLES].options.entrySet()[0].key.contains("role_2")
         assert item.dataSet[MenuItemConstants.FIELD_USE_TABBED_VIEW].value == true
-        assert item.dataSet[MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE].value == MenuItemView.TABBED_CASE_VIEW.identifier
+        assert item.dataSet[MenuItemConstants.FIELD_VIEW_CONFIGURATION_TYPE].value == MenuItemViewOLD.TABBED_CASE_VIEW.identifier
         assert item.uriNodeId == newUri.stringId
 
         assert filter.dataSet["filter"].allowedNets == ["filter"]
@@ -170,7 +170,7 @@ class MenuItemApiTest {
         assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_VIEW_CONTAINS_FILTER].value == true
         assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_VIEW_FILTER_CASE].value[0] == filter.stringId
         assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_DEFAULT_HEADERS].value == "meta-title,meta-title,meta-title"
-        assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_CONFIGURATION_TYPE].value == MenuItemView.TABBED_TASK_VIEW.identifier
+        assert tabbedCaseView.dataSet[TabbedCaseViewConstants.FIELD_CONFIGURATION_TYPE].value == MenuItemViewOLD.TABBED_TASK_VIEW.identifier
 
         String tabbedTaskViewId = MenuItemUtils.getCaseIdFromCaseRef(tabbedCaseView, TabbedCaseViewConstants.FIELD_VIEW_CONFIGURATION_ID)
         assert tabbedTaskViewId != null && tabbedTaskViewId.equals(tabbedTaskViewIdBeforeChange)

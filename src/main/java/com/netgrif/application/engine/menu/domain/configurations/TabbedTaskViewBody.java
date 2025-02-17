@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.menu.domain.configurations;
 
-import com.netgrif.application.engine.menu.domain.MenuItemView;
+import com.netgrif.application.engine.menu.domain.MenuItemViewOLD;
 import com.netgrif.application.engine.menu.domain.ToDataSetOutcome;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -32,8 +32,8 @@ public class TabbedTaskViewBody extends ViewBody {
     }
 
     @Override
-    public MenuItemView getViewType() {
-        return MenuItemView.TABBED_TASK_VIEW;
+    public MenuItemViewOLD getViewType() {
+        return MenuItemViewOLD.TABBED_TASK_VIEW;
     }
 
     @Override
