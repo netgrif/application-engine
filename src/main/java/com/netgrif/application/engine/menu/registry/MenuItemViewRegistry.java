@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class MenuItemViewRegistry implements IMenuItemViewRegistry {
 
     /**
-     * todo javadoc
+     * Map of registered views in app. Key is view identifier and value is {@link MenuItemView}
      * */
     private final Map<String, MenuItemView> views;
 
@@ -28,7 +28,11 @@ public class MenuItemViewRegistry implements IMenuItemViewRegistry {
     }
 
     /**
-     * todo javadoc
+     * Registers new view. View must be valid.
+     *
+     * @param view valid view to be registered
+     *
+     * @throws DuplicateViewException if the view already exists
      * */
     @Override
     public void registerView(@Validated MenuItemView view) {
@@ -40,7 +44,9 @@ public class MenuItemViewRegistry implements IMenuItemViewRegistry {
     }
 
     /**
-     * todo javadoc
+     * Unregisters view by identifier
+     *
+     * @param identifier view identifier
      * */
     @Override
     public void unregisterView(String identifier) {
@@ -48,7 +54,7 @@ public class MenuItemViewRegistry implements IMenuItemViewRegistry {
     }
 
     /**
-     * todo javadoc
+     * Unregisters all views in app
      * */
     @Override
     public void unregisterAllViews() {
@@ -59,7 +65,11 @@ public class MenuItemViewRegistry implements IMenuItemViewRegistry {
     }
 
     /**
-     * todo javadoc
+     * Gets view by identifier
+     *
+     * @param identifier view identifier
+     *
+     * @return view or null if it isn't registered
      * */
     @Override
     public MenuItemView getViewByIdentifier(String identifier) {
@@ -67,7 +77,9 @@ public class MenuItemViewRegistry implements IMenuItemViewRegistry {
     }
 
     /**
-     * todo javadoc
+     * Gets all registered views
+     *
+     * @return map of registered views
      * */
     @Override
     public Map<String, MenuItemView> getAllViews() {
