@@ -67,7 +67,7 @@
                 <action>
                     preference_items_list: f.preference_items_list;
 
-                    def preferenceItemCases = findCasesElastic("processIdentifier:\"preference_item\"" as String)
+                    def preferenceItemCases = findCasesElastic("processIdentifier:\"menu_item\"" as String)
                             .collectEntries { [(it.stringId): it.dataSet["menu_name"].value] }
                     change preference_items_list options { preferenceItemCases }
                 </action>
