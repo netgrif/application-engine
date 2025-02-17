@@ -26,6 +26,7 @@ import com.netgrif.application.engine.mail.interfaces.IMailService
 import com.netgrif.application.engine.menu.domain.FilterBody
 import com.netgrif.application.engine.menu.domain.MenuItemBody
 import com.netgrif.application.engine.menu.domain.MenuItemConstants
+import com.netgrif.application.engine.menu.domain.MenuItemView
 import com.netgrif.application.engine.menu.domain.configurations.TabbedCaseViewBody
 import com.netgrif.application.engine.menu.domain.configurations.TabbedTaskViewBody
 import com.netgrif.application.engine.menu.domain.configurations.ViewBody

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.menu.domain.configurations;
 
-import com.netgrif.application.engine.menu.domain.MenuItemViewOLD;
+import com.netgrif.application.engine.menu.domain.MenuItemView;
 import com.netgrif.application.engine.menu.domain.ToDataSetOutcome;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import lombok.Data;
@@ -36,8 +36,8 @@ public class TabbedCaseViewBody extends ViewBody {
     }
 
     @Override
-    public MenuItemViewOLD getViewType() {
-        return MenuItemViewOLD.TABBED_CASE_VIEW;
+    public MenuItemView getViewType() {
+        return MenuItemView.TABBED_CASE_VIEW;
     }
 
     @Override
