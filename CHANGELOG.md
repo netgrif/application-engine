@@ -5,7 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.9](https://github.com/netgrif/application-engine/commits/v6.2.9)
+Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.10](https://github.com/netgrif/application-engine/commits/v6.2.10)
+
+## [6.2.10](https://github.com/netgrif/application-engine/releases/tag/v6.2.9) (2024-02-17)
+
+### Fixed
+
+- [NAE-1921] User field value cannot be cleared
+- [NAE-2053] Optimize ElasticCaseService queries to eliminate maxClauseCount error
 
 ## [6.2.9](https://github.com/netgrif/application-engine/releases/tag/v6.2.9) (2023-05-04)
 
