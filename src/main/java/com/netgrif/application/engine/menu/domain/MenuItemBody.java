@@ -109,7 +109,7 @@ public class MenuItemBody {
 
     public void setView(ViewBody viewBody) {
         this.view = viewBody;
-        this.useTabbedView = viewBody.getViewType().isTabbed();
+        this.useTabbedView = viewBody == null || viewBody.getViewType().isTabbed();
     }
 
     /**

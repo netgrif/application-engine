@@ -2406,7 +2406,11 @@ class ActionDelegate {
         body.setAllowedRoles(collectRolesForPreferenceItem(allowedRoles))
         body.setBannedRoles(collectRolesForPreferenceItem(bannedRoles))
         body.setUseTabbedView(true)
-        body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
+        if (filter == null) {
+            body.setView(createLegacyMenuItemViews(new FilterBody(null), caseDefaultHeaders, taskDefaultHeaders))
+        } else {
+            body.setView(createLegacyMenuItemViews(filter, caseDefaultHeaders, taskDefaultHeaders))
+        }
 
         return createOrUpdateMenuItem(body)
     }

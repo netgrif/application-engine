@@ -46,7 +46,7 @@
                     if (item_id.value == "") {
                         return
                     }
-                    def itemWithIdExists = findCaseElastic("processIdentifier:\"dashboard_item\" AND dataSet.item_id.textValue.keyword:\"${item_id.value}\"" as String)
+                    def itemWithIdExists = findCaseElastic("processIdentifier:\"dashboard_item\" AND dataSet.item_id.textValue.keyword:\"${item_id.value}\" AND dataSet.is_active.booleanValue:true" as String)
                     if (itemWithIdExists != null) {
                         throw new IllegalArgumentException("Dashboard item with given ID already exists.")
                     }
@@ -55,26 +55,26 @@
         </event>
     </data>
     <data type="enumeration_map" immediate="true">
-        <id>preference_items_list</id>
-        <title name="preference_items_list">Existing menu items</title>
-        <desc name="preference_items_list_desc">List of all existing menu items</desc>
+        <id>menu_items_list</id>
+        <title name="menu_items_list">Existing menu items</title>
+        <desc name="menu_items_list_desc">List of all existing menu items</desc>
         <component>
             <name>autocomplete_dynamic</name>
         </component>
         <event type="get">
-            <id>preference_items_list_get</id>
+            <id>menu_items_list_get</id>
             <actions phase="post">
                 <action>
-                    preference_items_list: f.preference_items_list;
+                    menu_items_list: f.menu_items_list;
 
-                    def preferenceItemCases = findCasesElastic("processIdentifier:\"menu_item\"" as String)
+                    def menuItemCases = findCasesElastic("processIdentifier:\"menu_item\"" as String)
                             .collectEntries { [(it.stringId): it.dataSet["menu_name"].value] }
-                    change preference_items_list options { preferenceItemCases }
+                    change menu_items_list options { menuItemCases }
                 </action>
             </actions>
         </event>
         <event type="set">
-            <id>preference_items_list_set</id>
+            <id>menu_items_list_set</id>
             <actions phase="post">
                 <action>
                     icon_color: f.icon_color,
@@ -82,22 +82,22 @@
                     font_weight: f.font_weight,
                     inherit_name: f.inherit_name,
                     inherit_icon: f.inherit_icon,
-                    preference_item_taskRef: f.preference_item_taskRef,
+                    menu_item_taskRef: f.menu_item_taskRef,
                     filter_divider: f.filter_divider,
-                    preference_items_list: f.preference_items_list,
+                    menu_items_list: f.menu_items_list,
                     trans: t.configuration;
 
                     change inherit_icon value { true }
                     change inherit_name value { true }
-                    if (preference_items_list.value != null &amp;&amp; org.bson.types.ObjectId.isValid(preference_items_list.value)) {
+                    if (menu_items_list.value != null &amp;&amp; org.bson.types.ObjectId.isValid(menu_items_list.value)) {
                         make [inherit_name, inherit_icon, icon_color, font_color, font_weight], editable on trans when { true }
-                        make [preference_item_taskRef, filter_divider], visible on trans when { true }
-                        def preferenceItemCase = workflowService.findOne(preference_items_list.value)
-                        change preference_item_taskRef value { [preferenceItemCase.tasks.find { it.transition == "item_settings" }?.task] }
+                        make [menu_item_taskRef, filter_divider], visible on trans when { true }
+                        def menuItemCase = workflowService.findOne(menu_items_list.value)
+                        change menu_item_taskRef value { [menuItemCase.tasks.find { it.transition == "item_settings" }?.task] }
                     } else {
                         make [inherit_name, inherit_icon, icon_color, font_color, font_weight], visible on trans when { true }
-                        make [preference_item_taskRef, filter_divider], hidden on trans when { true }
-                        change preference_item_taskRef value { [] }
+                        make [menu_item_taskRef, filter_divider], hidden on trans when { true }
+                        change menu_item_taskRef value { [] }
                     }
                 </action>
             </actions>
@@ -115,13 +115,13 @@
                     item_name: f.item_name,
                     item_icon: f.item_icon,
                     external_icon: f.external_icon,
-                    preference_items_list: f.preference_items_list,
+                    menu_items_list: f.menu_items_list,
                     external_url: f.external_url,
                     is_internal: f.is_internal;
 
                     change external_icon value { false }
                     if (is_internal.value) {
-                        change preference_items_list value { "" }
+                        change menu_items_list value { "" }
                     } else {
                         change item_icon value { "" }
                         change item_name value { new com.netgrif.application.engine.petrinet.domain.I18nString("") }
@@ -135,22 +135,22 @@
                     item_name: f.item_name,
                     item_icon: f.item_icon,
                     external_icon: f.external_icon,
-                    preference_items_list: f.preference_items_list,
+                    menu_items_list: f.menu_items_list,
                     item_icon_preview: f.item_icon_preview,
                     external_url: f.external_url,
                     inherit_name: f.inherit_name,
                     inherit_icon: f.inherit_icon,
-                    preference_item_taskRef: f.preference_item_taskRef,
+                    menu_item_taskRef: f.menu_item_taskRef,
                     filter_divider: f.filter_divider,
                     trans: t.configuration;
 
                     if (is_internal.value) {
-                        make [preference_items_list], editable on trans when { true }
+                        make [menu_items_list], editable on trans when { true }
                         make [external_url], hidden on trans when { true }
                     } else {
                         make [item_icon, item_name, external_url, external_icon, font_color, font_weight], editable on trans when { true }
                         make item_icon_preview, visible on trans when { true }
-                        make [inherit_name, inherit_icon, preference_items_list, preference_item_taskRef, filter_divider], hidden on trans when { true }
+                        make [inherit_name, inherit_icon, menu_items_list, menu_item_taskRef, filter_divider], hidden on trans when { true }
                     }
                 </action>
             </actions>
@@ -169,7 +169,7 @@
             <id>external_icon_set</id>
             <actions phase="post">
                 <action>
-                    preference_items_list: f.preference_items_list,
+                    menu_items_list: f.menu_items_list,
                     inherit_icon: f.inherit_icon,
                     external_icon: f.external_icon,
                     icon_color: f.icon_color,
@@ -182,7 +182,7 @@
                     }
                     if (external_icon.value) {
                         make icon_color, visible on trans when { true }
-                    } else if (!(is_internal.value &amp;&amp; (preference_items_list.value == null || !org.bson.types.ObjectId.isValid(preference_items_list.value)))) {
+                    } else if (!(is_internal.value &amp;&amp; (menu_items_list.value == null || !org.bson.types.ObjectId.isValid(menu_items_list.value)))) {
                         make icon_color, editable on trans when { true }
                     }
                 </action>
@@ -272,15 +272,15 @@
                     item_icon_preview: f.item_icon_preview,
                     external_icon: f.external_icon,
                     item_icon: f.item_icon,
-                    preference_items_list: f.preference_items_list,
+                    menu_items_list: f.menu_items_list,
                     trans: t.configuration;
 
                     change external_icon value { false }
                     if (inherit_icon.value) {
                         make [item_icon, item_icon_preview, external_icon], visible on trans when { true }
-                        if (preference_items_list.value != null &amp;&amp; org.bson.types.ObjectId.isValid(preference_items_list.value)) {
-                            def preferenceItemCase = workflowService.findOne(preference_items_list.value)
-                            change item_icon value { preferenceItemCase.dataSet["menu_icon"].value }
+                        if (menu_items_list.value != null &amp;&amp; org.bson.types.ObjectId.isValid(menu_items_list.value)) {
+                            def menuItemCase = workflowService.findOne(menu_items_list.value)
+                            change item_icon value { menuItemCase.dataSet["menu_icon"].value }
                         } else {
                             change item_icon value { "" }
                         }
@@ -304,12 +304,12 @@
                 <action>
                     inherit_name: f.inherit_name,
                     item_name: f.item_name,
-                    preference_items_list: f.preference_items_list;
+                    menu_items_list: f.menu_items_list;
 
                     if (inherit_name.value) {
-                        if (preference_items_list.value != null &amp;&amp; org.bson.types.ObjectId.isValid(preference_items_list.value)) {
-                            def preferenceItemCase = workflowService.findOne(preference_items_list.value)
-                            change item_name value { preferenceItemCase.dataSet["menu_name"].value }
+                        if (menu_items_list.value != null &amp;&amp; org.bson.types.ObjectId.isValid(menu_items_list.value)) {
+                            def menuItemCase = workflowService.findOne(menu_items_list.value)
+                            change item_name value { menuItemCase.dataSet["menu_name"].value }
                         } else {
                             change item_name value { new com.netgrif.application.engine.petrinet.domain.I18nString("") }
                         }
@@ -332,7 +332,7 @@
         </event>
     </data>
     <data type="taskRef">
-        <id>preference_item_taskRef</id>
+        <id>menu_item_taskRef</id>
         <title/>
     </data>
     <data type="i18n">
@@ -357,8 +357,8 @@
     <i18n locale="sk">
         <i18nString name="item_id">ID položky panelu</i18nString>
         <i18nString name="item_id_desc">Unikátny identifikátor položky panelu</i18nString>
-        <i18nString name="preference_items_list">Existujúce menu položky</i18nString>
-        <i18nString name="preference_items_list_desc">Zoznam všetkých existujúcich menu položiek</i18nString>
+        <i18nString name="menu_items_list">Existujúce menu položky</i18nString>
+        <i18nString name="menu_items_list_desc">Zoznam všetkých existujúcich menu položiek</i18nString>
         <i18nString name="is_internal">Interná položka</i18nString>
         <i18nString name="is_internal_desc">Položka interného menu alebo odkaz na externú webovú adresu URL</i18nString>
         <i18nString name="external_url">Externá adresa URL</i18nString>
@@ -384,8 +384,8 @@
     <i18n locale="de">
         <i18nString name="item_id">Dashboard-Element-ID</i18nString>
         <i18nString name="item_id_desc">Eindeutiger Bezeichner des Dashboard-Elements</i18nString>
-        <i18nString name="preference_items_list">Vorhandene Menüpunkte</i18nString>
-        <i18nString name="preference_items_list_desc">Liste aller vorhandenen Menüpunkte</i18nString>
+        <i18nString name="menu_items_list">Vorhandene Menüpunkte</i18nString>
+        <i18nString name="menu_items_list_desc">Liste aller vorhandenen Menüpunkte</i18nString>
         <i18nString name="is_internal">Interner Posten</i18nString>
         <i18nString name="is_internal_desc">Interner Menüpunkt oder Link zu externer Website-URL</i18nString>
         <i18nString name="external_url">Externe URL</i18nString>
@@ -464,7 +464,7 @@
             <cols>4</cols>
             <layout>grid</layout>
             <dataRef>
-                <id>preference_items_list</id>
+                <id>menu_items_list</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -623,7 +623,7 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>preference_item_taskRef</id>
+                <id>menu_item_taskRef</id>
                 <logic>
                     <behavior>hidden</behavior>
                 </logic>
@@ -673,19 +673,19 @@
                     item_id: f.item_id,
                     item_name: f.item_name,
                     is_internal: f.is_internal,
-                    preference_items_list: f.preference_items_list,
+                    menu_items_list: f.menu_items_list,
                     external_url: f.external_url,
                     is_active: f.is_active;
 
                     if (item_id.value == null || item_id.value == "") {
                         throw new IllegalArgumentException("Dashboard item ID cannot be empty.")
                     }
-                    def itemWithIdExists = findCaseElastic("processIdentifier:\"dashboard_item\" AND dataSet.item_id.textValue.keyword:\"${item_id.value}\"" as String)
+                    def itemWithIdExists = findCaseElastic("processIdentifier:\"dashboard_item\" AND dataSet.item_id.textValue.keyword:\"${item_id.value}\" AND dataSet.is_active.booleanValue:true" as String)
                     if (itemWithIdExists != null) {
                         throw new IllegalArgumentException("Dashboard item with given ID already exists.")
                     }
                     if (is_internal.value) {
-                        if (preference_items_list.value == null || !org.bson.types.ObjectId.isValid(preference_items_list.value)){
+                        if (menu_items_list.value == null || !org.bson.types.ObjectId.isValid(menu_items_list.value)){
                             throw new IllegalArgumentException("Internal menu item must be selected.")
                         }
                     } else {

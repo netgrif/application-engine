@@ -46,7 +46,7 @@
                     if (dashboard_id.value == "") {
                         return
                     }
-                    def dashboardWithIdExists = findCaseElastic("processIdentifier:\"dashboard_management\" AND dataSet.dashboard_id.textValue.keyword:\"${dashboard_id.value}\"" as String)
+                    def dashboardWithIdExists = findCaseElastic("processIdentifier:\"dashboard_management\" AND dataSet.dashboard_id.textValue.keyword:\"${dashboard_id.value}\" AND dataSet.is_active.booleanValue:true" as String)
                     if (dashboardWithIdExists != null) {
                         throw new IllegalArgumentException("Dashboard with given ID already exists.")
                     }
@@ -74,7 +74,7 @@
         </component>
     </data>
     <data type="enumeration_map" immediate="true">
-        <id>dashboard_item_to_preference_item</id>
+        <id>dashboard_item_to_menu_item</id>
         <title/>
     </data>
     <data type="button">
@@ -89,7 +89,7 @@
             <id>order_down_set</id>
             <actions phase="post">
                 <action>
-                    dashboard_item_to_preference_item: f.dashboard_item_to_preference_item,
+                    dashboard_item_to_menu_item: f.dashboard_item_to_menu_item,
                     items_order: f.items_order,
                     dashboard_item_list: f.dashboard_item_list;
 
@@ -97,19 +97,19 @@
                         return
                     }
                     def keysDashboard = dashboard_item_list.options.keySet() as List
-                    def keysPreference = dashboard_item_to_preference_item.options.keySet() as List
+                    def keysMenu = dashboard_item_to_menu_item.options.keySet() as List
                     def currentIndex = keysDashboard.indexOf(dashboard_item_list.value)
                     if (currentIndex == keysDashboard.size() - 1) {
                         return
                     }
                     java.util.Collections.swap(keysDashboard, currentIndex, currentIndex + 1)
-                    java.util.Collections.swap(keysPreference, currentIndex, currentIndex + 1)
+                    java.util.Collections.swap(keysMenu, currentIndex, currentIndex + 1)
                     def newOrderDashboard = [:]
-                    def newOrderPreference = [:]
+                    def newOrderMenu = [:]
                     keysDashboard.forEach { newOrderDashboard[it] = dashboard_item_list.options[it]}
-                    keysPreference.forEach { newOrderPreference[it] = dashboard_item_to_preference_item.options[it]}
+                    keysMenu.forEach { newOrderMenu[it] = dashboard_item_to_menu_item.options[it]}
                     change dashboard_item_list options { newOrderDashboard }
-                    change dashboard_item_to_preference_item options { newOrderPreference }
+                    change dashboard_item_to_menu_item options { newOrderMenu }
                     change items_order value { String.join(",", newOrderDashboard.keySet()) }
                 </action>
             </actions>
@@ -127,7 +127,7 @@
             <id>order_up_set</id>
             <actions phase="post">
                 <action>
-                    dashboard_item_to_preference_item: f.dashboard_item_to_preference_item,
+                    dashboard_item_to_menu_item: f.dashboard_item_to_menu_item,
                     items_order: f.items_order,
                     dashboard_item_list: f.dashboard_item_list;
 
@@ -135,19 +135,19 @@
                         return
                     }
                     def keysDashboard = dashboard_item_list.options.keySet() as List
-                    def keysPreference = dashboard_item_to_preference_item.options.keySet() as List
+                    def keysMenu = dashboard_item_to_menu_item.options.keySet() as List
                     def currentIndex = keysDashboard.indexOf(dashboard_item_list.value)
                     if (currentIndex == 0) {
                         return
                     }
                     java.util.Collections.swap(keysDashboard, currentIndex, currentIndex - 1)
-                    java.util.Collections.swap(keysPreference, currentIndex, currentIndex - 1)
+                    java.util.Collections.swap(keysMenu, currentIndex, currentIndex - 1)
                     def newOrderDashboard = [:]
-                    def newOrderPreference = [:]
+                    def newOrderMenu = [:]
                     keysDashboard.forEach { newOrderDashboard[it] = dashboard_item_list.options[it]}
-                    keysPreference.forEach { newOrderPreference[it] = dashboard_item_to_preference_item.options[it]}
+                    keysMenu.forEach { newOrderMenu[it] = dashboard_item_to_menu_item.options[it]}
                     change dashboard_item_list options { newOrderDashboard }
-                    change dashboard_item_to_preference_item options { newOrderPreference }
+                    change dashboard_item_to_menu_item options { newOrderMenu }
                     change items_order value { String.join(",", newOrderDashboard.keySet()) }
                 </action>
             </actions>
@@ -203,7 +203,7 @@
             <id>add_new_item_set</id>
             <actions phase="post">
                 <action>
-                    dashboard_item_to_preference_item: f.dashboard_item_to_preference_item,
+                    dashboard_item_to_menu_item: f.dashboard_item_to_menu_item,
                     items_order: f.items_order,
                     dashboard_item_list: f.dashboard_item_list,
                     existing_menu_items: f.existing_menu_items;
@@ -217,13 +217,13 @@
                     change items_order value { String.join(",", dashboardItemOptions.keySet()) }
 
                     def dashboardItemCase = workflowService.findOne(existing_menu_items.value)
-                    def preferenceItemOptions = dashboard_item_to_preference_item.options
+                    def menuItemOptions = dashboard_item_to_menu_item.options
                     if (dashboardItemCase.dataSet["is_internal"].value) {
-                        preferenceItemOptions.put(existing_menu_items.value, dashboardItemCase.dataSet["preference_items_list"].value)
+                        menuItemOptions.put(existing_menu_items.value, dashboardItemCase.dataSet["menu_items_list"].value)
                     } else {
-                        preferenceItemOptions.put(existing_menu_items.value, null)
+                        menuItemOptions.put(existing_menu_items.value, null)
                     }
-                    change dashboard_item_to_preference_item options { preferenceItemOptions }
+                    change dashboard_item_to_menu_item options { menuItemOptions }
 
                     def dashboardItemCases = findCasesElastic("processIdentifier:\"dashboard_item\" AND dataSet.is_active.booleanValue:true" as String)
                             .collectEntries { [(it.stringId): it.dataSet["item_name"].value] }
@@ -242,7 +242,7 @@
             <id>remove_new_item_set</id>
             <actions phase="post">
                 <action>
-                    dashboard_item_to_preference_item: f.dashboard_item_to_preference_item,
+                    dashboard_item_to_menu_item: f.dashboard_item_to_menu_item,
                     dashboard_item_list: f.dashboard_item_list,
                     items_order: f.items_order,
                     existing_menu_items: f.existing_menu_items;
@@ -255,9 +255,9 @@
                     change dashboard_item_list options { dashboardItemOptions }
                     change items_order value { String.join(",", dashboardItemOptions.keySet()) }
 
-                    def preferenceItemOptions = dashboard_item_to_preference_item.options
-                    preferenceItemOptions.keySet().removeAll([dashboard_item_list.value])
-                    change dashboard_item_to_preference_item options { preferenceItemOptions }
+                    def menuItemOptions = dashboard_item_to_menu_item.options
+                    menuItemOptions.keySet().removeAll([dashboard_item_list.value])
+                    change dashboard_item_to_menu_item options { menuItemOptions }
 
                     def dashboardItemCases = findCasesElastic("processIdentifier:\"dashboard_item\" AND dataSet.is_active.booleanValue:true" as String)
                             .collectEntries { [(it.stringId): it.dataSet["item_name"].value] }
@@ -690,7 +690,7 @@
                     if (dashboard_id.value == null || dashboard_id.value == "") {
                         throw new IllegalArgumentException("Dashboard ID cannot be empty.")
                     }
-                    def dashboardWithIdExists = findCaseElastic("processIdentifier:\"dashboard_management\" AND dataSet.dashboard_id.textValue.keyword:\"${dashboard_id.value}\"" as String)
+                    def dashboardWithIdExists = findCaseElastic("processIdentifier:\"dashboard_management\" AND dataSet.dashboard_id.textValue.keyword:\"${dashboard_id.value}\" AND dataSet.is_active.booleanValue:true" as String)
                     if (dashboardWithIdExists != null) {
                         throw new IllegalArgumentException("Dashboard with given ID already exists.")
                     }
