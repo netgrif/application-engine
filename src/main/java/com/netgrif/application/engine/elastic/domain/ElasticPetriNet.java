@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.netgrif.application.engine.elastic.domain.I18nField;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
@@ -17,6 +18,8 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 
@@ -40,7 +43,7 @@ public class ElasticPetriNet {
     @Field(type = Keyword)
     private String stringId;
 
-    private I18nString title;
+    private I18nField title;
 
     @Field(type = Keyword)
     private String initials;
@@ -55,7 +58,7 @@ public class ElasticPetriNet {
         this.version = net.getVersion();
         this.uriNodeId = net.getUriNodeId();
         this.stringId = net.getStringId();
-        this.title = net.getTitle();
+        this.title = this.transformToField(net.getTitle());
         this.initials = net.getInitials();
         this.creationDate = net.getCreationDate();
     }
@@ -67,5 +70,12 @@ public class ElasticPetriNet {
         }
         this.title = net.getTitle();
         this.initials = net.getInitials();
+    }
+
+    protected I18nField transformToField(I18nString field) {
+        Set<String> keys =  field.getTranslations().keySet();
+        Set<String> values = new HashSet<>(field.getTranslations().values());
+        values.add(field.getDefaultValue());
+        return new I18nField(keys, values);
     }
 }

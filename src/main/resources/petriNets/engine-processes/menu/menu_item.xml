@@ -1,0 +1,1494 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>menu_item</id>
+	<initials>MNI</initials>
+	<title>Menu Item</title>
+	<icon>check_box_outline_blank</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<roleRef>
+		<id>system</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>admin</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>default</id>
+		<caseLogic>
+			<create>false</create>
+			<delete>false</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<caseEvents>
+		<event type="delete">
+			<id>menu_item_delete</id>
+			<actions phase="pre">
+				<action id="0">
+					removeItemChildCases()
+					removeViewCase()
+				</action>
+			</actions>
+		</event>
+	</caseEvents>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
+	<function scope="process" name="removeItemChildCases">
+		{ ->
+
+			def childCaseIds = useCase.dataSet['childItemIds'].value
+			if (childCaseIds == null || childCaseIds.isEmpty()) {
+				return
+			}
+
+			removeChildItemFromParent(useCase.dataSet['parentId'].value[0], useCase)
+
+			def childCases = workflowService.findAllById(childCaseIds)
+			async.run {
+				childCases.each {
+					workflowService.deleteCase(it)
+				}
+			}
+		}
+	</function>
+	<function scope="process" name="removeViewCase">
+		{ ->
+
+			def viewIdAsList = useCase.dataSet['view_configuration_id'].value
+			if (viewIdAsList == null || viewIdAsList.isEmpty()) {
+				return
+			}
+
+			async.run {
+				workflowService.deleteCase(viewIdAsList[0])
+			}
+		}
+	</function>
+	<function scope="process" name="manageBehaviorOfTabFields">
+		{ boolean useTabIcon, boolean useTabbedView, String transId = "item_settings" ->
+			def settingsTrans = useCase.petriNet.transitions[transId]
+
+			make [useCase.getField("use_tab_icon"), useCase.getField("tab_icon"), useCase.getField("tab_name")],
+				editable on settingsTrans when { useTabbedView &amp;&amp; useTabIcon }
+			make useCase.getField("tab_icon_preview"), visible on settingsTrans when { useTabbedView &amp;&amp; useTabIcon }
+
+			make useCase.getField("use_tab_icon"), editable on settingsTrans when { useTabbedView &amp;&amp; !useTabIcon }
+			make [useCase.getField("tab_icon_preview"), useCase.getField("tab_icon"), useCase.getField("tab_name")],
+				hidden on settingsTrans when { useTabbedView &amp;&amp; !useTabIcon }
+
+			make [useCase.getField("use_tab_icon"), useCase.getField("tab_icon_preview"), useCase.getField("tab_icon"),
+					useCase.getField("tab_name")], hidden on settingsTrans when { !useTabbedView }
+		}
+	</function>
+	<function scope="process" name="removeAnyAutoSelectFlagInFolder">
+		{
+			->
+			String query = String.format("processIdentifier:menu_item AND uriNodeId:%s AND dataSet.is_auto_select.booleanValue:true AND NOT stringId:%s",
+					useCase.uriNodeId, useCase.stringId)
+			def itemCase = findCaseElastic(query)
+			if (itemCase == null) {
+				return
+			}
+
+			setData("item_settings", itemCase, [
+				"is_auto_select": [
+					"value": false,
+					"type": "boolean"
+				]
+			])
+		}
+	</function>
+
+	<data type="caseRef">
+		<id>parentId</id>
+		<title/>
+		<allowedNets>
+			<allowedNet>menu_item</allowedNet>
+		</allowedNets>
+	</data>
+	<data type="text">
+		<id>move_previous_dest_uri</id>
+		<title/>
+	</data>
+	<data type="multichoice_map">
+		<id>move_dest_uri</id>
+		<title name="move_dest_uri">Destination URI</title>
+		<desc name="move_dest_uri_desc">List of nodes representing destination URI</desc>
+		<component>
+			<name>autocomplete</name>
+		</component>
+		<action trigger="get">
+			moveDestUri: f.move_dest_uri;
+
+			String uriNodeId = elasticCaseService.findUriNodeId(useCase)
+			def node = uriService.findById(uriNodeId)
+			updateMultichoiceWithCurrentNode(moveDestUri, node)
+		</action>
+		<action trigger="set">
+			prevDestUri: f.move_previous_dest_uri,
+			moveDestUri: f.move_dest_uri;
+
+			String newUri = moveDestUri.value.join("/")
+			newUri = newUri.replace("//","/")
+
+			String corrected = getCorrectedUri(newUri)
+
+			if (corrected == newUri) {
+				def node = uriService.findByUri(newUri)
+				change moveDestUri options { findOptionsBasedOnSelectedNode(node) }
+			} else {
+				change moveDestUri value { splitUriPath(corrected) }
+			}
+		</action>
+	</data>
+	<data type="text">
+		<id>move_dest_uri_new_node</id>
+		<title name="move_dest_uri_new_node">New node to be added</title>
+		<desc name="move_dest_uri_new_node_desc">Enter new node name</desc>
+	</data>
+	<data type="button">
+		<id>move_add_node</id>
+		<title/>
+		<placeholder name="move_add_node">Add</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<action trigger="set">
+			newNodeName: f.move_dest_uri_new_node,
+			selectedUri: f.move_dest_uri;
+
+			if (newNodeName.value == null || newNodeName.value == "") {
+				return
+			}
+
+			String prefixUri = selectedUri.value.join("/")
+			prefixUri = prefixUri.replace("//","/")
+
+			String newUri = prefixUri + uriService.getUriSeparator() + newNodeName.value
+			def newNode = uriService.getOrCreate(newUri, com.netgrif.application.engine.petrinet.domain.UriContentType.CASE)
+
+			change selectedUri value { splitUriPath(newNode.uriPath) }
+
+			change newNodeName value { null }
+		</action>
+	</data>
+	<data type="i18n">
+		<id>duplicate_new_title</id>
+		<title name="duplicate_new_title">Title of duplicated view</title>
+	</data>
+	<data type="text">
+		<id>duplicate_view_identifier</id>
+		<title name="duplicate_view_identifier">View identifier</title>
+		<desc name="duplicate_view_identifier_desc">Must be unique</desc>
+	</data>
+	<data type="caseRef" immediate="true">
+		<id>childItemIds</id>
+		<title/>
+		<allowedNets>
+			<allowedNet>menu_item</allowedNet>
+		</allowedNets>
+	</data>
+	<data type="taskRef">
+		<id>childItemForms</id>
+		<title/>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>hasChildren</id>
+		<title/>
+	</data>
+	<data type="button">
+		<id>duplicate_reset_childItemIds</id>
+		<title/>
+		<action trigger="set">
+			hasChildren: f.hasChildren,
+			childItemIds: f.childItemIds;
+
+			change childItemIds value { [] }
+			change hasChildren value { false }
+		</action>
+	</data>
+	<data type="text" immediate="true">
+		<id>menu_item_identifier</id>
+		<title name="menu_item_identifier">Menu item identifier</title>
+	</data>
+	<data type="text" immediate="true">
+		<id>nodePath</id>
+		<title name="nodePath">Item URI</title>
+		<event type="set">
+			<id>0</id>
+			<actions phase="post">
+				<action>
+					nodePath: f.nodePath,
+					menu_item_identifier: f.menu_item_identifier;
+
+					change menu_item_identifier value {
+						def idx = nodePath.value.lastIndexOf(uriService.getUriSeparator())
+						return nodePath.value.substring(idx + 1)
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<!-- GENERAL CONFIGURATION DATA -->
+	<data type="text" immediate="true">
+		<id>menu_icon</id>
+		<title name="icon_identifier">Menu icon identifier</title>
+		<desc name="icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
+		<action trigger="set">
+			icon: f.this,
+			iconPreview: f.menu_icon_preview;
+
+			changeCaseProperty "icon" about { icon.value; }
+
+			if (icon.value == "") {
+				change iconPreview value {<![CDATA["""<span></span>"""]]>}
+				return;
+			}
+
+			change iconPreview value {
+				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + icon.value + <![CDATA["""</span>"""]]>
+			}
+		</action>
+	</data>
+	<data type="text">
+		<id>menu_icon_preview</id>
+		<title name="icon_preview">Menu icon preview</title>
+		<component>
+			<name>htmltextarea</name>
+		</component>
+	</data>
+	<data type="enumeration">
+		<id>menu_name_as_visible</id>
+		<title name="name">Name of the item</title>
+		<desc name="name_desc">Is shown in the menu</desc>
+		<component>
+			<name>autocomplete</name>
+		</component>
+	</data>
+	<data type="i18n" immediate="true">
+		<id>menu_name</id>
+		<title name="name">Name of the item</title>
+		<desc name="name_desc">Will be shown in the menu</desc>
+		<action trigger="set">
+			menu_name_as_visible: f.menu_name_as_visible,
+			name: f.menu_name;
+
+			changeCaseProperty "title" about { name.value }
+			change menu_name_as_visible choices { [name.value] }
+			change menu_name_as_visible value { name.value }
+		</action>
+	</data>
+	<data type="button">
+		<id>add_allowed_roles</id>
+		<title/>
+		<placeholder name="allow_roles">Allow view for roles</placeholder>
+		<action trigger="set">
+			allowedRoles: f.allowed_roles,
+			processesAvailable: f.processes_available,
+			rolesAvailable: f.roles_available;
+
+			change allowedRoles options {return configurableMenuService.addSelectedRoles(allowedRoles, processesAvailable, rolesAvailable)}
+
+			change rolesAvailable value {[]}
+			change rolesAvailable options {[:]}
+			change processesAvailable value {null}
+		</action>
+	</data>
+	<data type="button">
+		<id>remove_allowed_roles</id>
+		<title/>
+		<placeholder name="remove_from_allowed_roles">Remove from allowed roles</placeholder>
+		<action trigger="set">
+			allowedRoles: f.allowed_roles,
+			processesAvailable: f.processes_available,
+			rolesAvailable: f.roles_available;
+
+			change allowedRoles options {return configurableMenuService.removeSelectedRoles(allowedRoles)}
+
+			change allowedRoles value {[]}
+			change rolesAvailable value {[]}
+			change rolesAvailable options {[:]}
+			change processesAvailable value {null}
+		</action>
+	</data>
+	<data type="button">
+		<id>add_banned_roles</id>
+		<title/>
+		<placeholder name="ban_roles">Ban view for roles</placeholder>
+		<action trigger="set">
+			bannedRoles: f.banned_roles,
+			processesAvailable: f.processes_available,
+			rolesAvailable: f.roles_available;
+
+			change bannedRoles options {return configurableMenuService.addSelectedRoles(bannedRoles, processesAvailable, rolesAvailable)}
+
+			change rolesAvailable value {[]}
+			change rolesAvailable options {[:]}
+			change processesAvailable value {null}
+		</action>
+	</data>
+	<data type="button">
+		<id>remove_banned_roles</id>
+		<title/>
+		<placeholder name="remove_from_banned_roles">Remove from banned roles</placeholder>
+		<action trigger="set">
+			bannedRoles: f.banned_roles,
+			processesAvailable: f.processes_available,
+			rolesAvailable: f.roles_available;
+
+			change bannedRoles options { return configurableMenuService.removeSelectedRoles(bannedRoles) }
+
+			change bannedRoles value { [] }
+			change rolesAvailable value { [] }
+			change rolesAvailable options { [:] }
+			change processesAvailable value { null }
+		</action>
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>processes_available</id>
+		<title name="available_processes">Your processes</title>
+		<desc name="available_processes_desc">Select a process containing roles you wish to add to allowed or banned roles lists.</desc>
+		<action trigger="get">
+			processes: f.this;
+
+			change processes options { return configurableMenuService.getNetsByAuthorAsMapOptions(loggedUser(), org.springframework.context.i18n.LocaleContextHolder.locale) }
+		</action>
+		<action trigger="set">
+			processes: f.this,
+			allowedRoles: f.allowed_roles,
+			bannedRoles: f.banned_roles,
+			rolesAvailable: f.roles_available;
+
+			if (processes.value != null) {
+				change rolesAvailable options { return configurableMenuService.getAvailableRolesFromNet(processes, allowedRoles, bannedRoles) }
+			} else {
+				change rolesAvailable options { [:] }
+			}
+			change rolesAvailable value { [] }
+		</action>
+	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>roles_available</id>
+		<title name="available_roles">Available roles from selected process</title>
+	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>allowed_roles</id>
+		<title name="roles_allowed">Allowed roles</title>
+		<desc name="roles_allowed_desc">List of roles allowed to view this menu entry.</desc>
+		<options>
+			<init dynamic="true">[:]</init>
+		</options>
+	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>banned_roles</id>
+		<title name="roles_banned">Banned roles</title>
+		<desc name="roles_banned_desc">List of roles not allowed to view this menu entry.</desc>
+		<options>
+			<init dynamic="true">[:]</init>
+		</options>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>use_custom_view</id>
+		<title name="use_custom_view">Use custom view?</title>
+		<init>false</init>
+	</data>
+	<data type="text" immediate="true">
+		<id>custom_view_selector</id>
+		<title name="custom_view_selector">Custom view configuration selector</title>
+		<desc name="custom_view_selector_desc">Example: "demo-tabbed-views"</desc>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>is_auto_select</id>
+		<title name="is_auto_select">View auto selection</title>
+		<desc name="is_auto_select_desc">If selected, the view will be automatically opened</desc>
+		<init>false</init>
+		<action trigger="set">
+			is_auto_select: f.is_auto_select;
+
+			if (!is_auto_select.value)
+				return
+
+			removeAnyAutoSelectFlagInFolder()
+		</action>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>use_tabbed_view</id>
+		<title name="use_tabbed_view">Do you want to use view with tabs?</title>
+	</data>
+
+	<!-- TABBED configuration data -->
+	<data type="text" immediate="true">
+		<id>tab_icon</id>
+		<title name="tab_icon">Tab icon identifier</title>
+		<desc name="tab_icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
+		<action trigger="set">
+			icon: f.this,
+			iconPreview: f.tab_icon_preview;
+
+			if (icon.value == "") {
+				change iconPreview value {<![CDATA["""<span></span>"""]]>}
+				return;
+			}
+
+			change iconPreview value {
+				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + icon.value + <![CDATA["""</span>"""]]>
+			}
+		</action>
+	</data>
+	<data type="text">
+		<id>tab_icon_preview</id>
+		<title>Tab icon preview</title>
+		<component>
+			<name>htmltextarea</name>
+		</component>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>use_tab_icon</id>
+		<title name="display_tab_icon">Display tab icon?</title>
+		<init>true</init>
+	</data>
+	<data type="i18n" immediate="true">
+		<id>tab_name</id>
+		<title name="tab_name">Name of the item</title>
+		<desc name="tab_name_desc">Will be shown in tab</desc>
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>view_configuration_type</id>
+		<title name="view_configuration_type">Pick view type</title>
+		<options>
+			<init dynamic="true">menuItemService.getAvailableViewsAsOptions(false, true)</init>
+		</options>
+		<action trigger="set">
+			use_tabbed_view: f.use_tabbed_view,
+			view_configuration_type: f.view_configuration_type;
+
+			if (view_configuration_type.options == null || view_configuration_type.options.isEmpty()) {
+				change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(use_tabbed_view.value, true) }
+			}
+		</action>
+	</data>
+	<data type="caseRef">
+		<id>view_configuration_id</id>
+		<title/>
+		<allowedNets>
+			<allowedNet>tabbed_case_view_configuration</allowedNet>
+			<allowedNet>tabbed_task_view_configuration</allowedNet>
+			<allowedNet>tabbed_ticket_view_configuration</allowedNet>
+		</allowedNets>
+	</data>
+	<data type="taskRef">
+		<id>view_configuration_form</id>
+		<title/>
+	</data>
+	<data type="button">
+		<id>order_down</id>
+		<title/>
+		<placeholder>south</placeholder>
+		<component>
+			<name>icon</name>
+			<property key="stretch">true</property>
+		</component>
+		<action trigger="set">
+			parentId: f.parentId;
+
+			def parentCase = workflowService.findOne(parentId.value[0])
+			def taskId = useCase.tasks.find { it.transition == "row_for_ordering" }.task
+			def taskRefValue = parentCase.dataSet['childItemForms'].value
+			int taskRefValueSize = taskRefValue.size()
+			def caseRefValue = parentCase.dataSet['childItemIds'].value
+			int caseRefValueSize = caseRefValue.size()
+
+			int idxInTaskRef = taskRefValue.indexOf(taskId)
+			if (idxInTaskRef &lt; taskRefValueSize - 1) {
+				Collections.swap(taskRefValue, idxInTaskRef, idxInTaskRef + 1)
+			}
+
+			int idxInCaseRef = caseRefValue.indexOf(useCase.stringId)
+			if (idxInCaseRef &lt; caseRefValueSize - 1) {
+				Collections.swap(caseRefValue, idxInCaseRef, idxInCaseRef + 1)
+			}
+
+			setData("children_order", parentCase, [
+					"childItemForms" : [
+							"value" : taskRefValue,
+							"type" : "taskRef"
+					],
+					"childItemIds" : [
+							"value" : caseRefValue,
+							"type" : "caseRef"
+					]
+			])
+		</action>
+	</data>
+	<data type="button">
+		<id>order_up</id>
+		<title/>
+		<placeholder>north</placeholder>
+		<component>
+			<name>icon</name>
+			<property key="stretch">true</property>
+		</component>
+		<action trigger="set">
+			parentId: f.parentId;
+
+			def parentCase = workflowService.findOne(parentId.value[0])
+			def taskId = useCase.tasks.find { it.transition == "row_for_ordering" }.task
+			def taskRefValue = parentCase.dataSet['childItemForms'].value
+			def caseRefValue = parentCase.dataSet['childItemIds'].value
+
+			int idxInTaskRef = taskRefValue.indexOf(taskId)
+			if (idxInTaskRef > 0) {
+				Collections.swap(taskRefValue, idxInTaskRef - 1, idxInTaskRef)
+			} else {
+				return
+			}
+
+			int idxInCaseRef = caseRefValue.indexOf(useCase.stringId)
+			if (idxInCaseRef > 0) {
+				Collections.swap(caseRefValue, idxInCaseRef - 1, idxInCaseRef)
+			} else {
+				return
+			}
+
+			setData("children_order", parentCase, [
+					"childItemForms" : [
+							"value" : taskRefValue,
+							"type" : "taskRef"
+					],
+					"childItemIds" : [
+							"value" : caseRefValue,
+							"type" : "caseRef"
+					]
+			])
+		</action>
+	</data>
+
+	<!-- I18NS -->
+	<i18n locale="sk">
+		<i18nString name="icon_preview">Náhľad ikony</i18nString>
+		<i18nString name="icon_identifier">Identifikátor ikony</i18nString>
+		<i18nString name="icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
+		<i18nString name="allow_roles">Pridaj k povoleným roliam</i18nString>
+		<i18nString name="remove_from_allowed_roles">Odstráň z povolených rolí</i18nString>
+		<i18nString name="ban_roles">Pridaj k zakázaným roliam</i18nString>
+		<i18nString name="remove_from_banned_roles">Odstráň zo zakázaných rolí</i18nString>
+		<i18nString name="available_processes">Vaše procesy</i18nString>
+		<i18nString name="available_processes_desc">Vyberte proces obsahujúci roly ktoré chcete pridať do zoznamu povolených alebo zakázaných rolí.</i18nString>
+		<i18nString name="available_roles">Dostupné roly</i18nString>
+		<i18nString name="move_dest_uri">Cieľové URI</i18nString>
+		<i18nString name="duplicate_new_title">Názov duplikovanej položky</i18nString>
+		<i18nString name="duplicate_view_identifier">Identifikátor duplikovanej položky</i18nString>
+		<i18nString name="duplicate_view_identifier_desc">Musí byť jedinečný</i18nString>
+		<i18nString name="name">Názov položky</i18nString>
+		<i18nString name="name_desc">Bude zobrazený v menu</i18nString>
+		<i18nString name="tab_icon">Identifikátor ikony v karte</i18nString>
+		<i18nString name="tab_icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
+		<i18nString name="display_tab_icon">Zobraziť ikonu v karte?</i18nString>
+		<i18nString name="tab_name">Názov položky</i18nString>
+		<i18nString name="tab_name_desc">Bude zobrazený v karte</i18nString>
+		<i18nString name="use_custom_view">Použiť vlastné zobrazenie?</i18nString>
+		<i18nString name="custom_view_selector">Konfiguračný identifikátor vlastného zobrazenia</i18nString>
+		<i18nString name="custom_view_selector_desc">Napríklad: "demo-tabbed-views"</i18nString>
+		<i18nString name="item_settings">Nastavenie položky</i18nString>
+		<i18nString name="roles_management_title">Roly</i18nString>
+		<i18nString name="move_item">Presunúť položku</i18nString>
+		<i18nString name="move_item_finish">Presunúť</i18nString>
+		<i18nString name="duplicate_item">Duplikovať položku</i18nString>
+		<i18nString name="duplicate_item_finish">Duplikovať</i18nString>
+		<i18nString name="roles_allowed">Povolené roly</i18nString>
+		<i18nString name="roles_allowed_desc">Zoznam povolených rolí, ktoré môžu zobraziť túto položku</i18nString>
+		<i18nString name="roles_banned">Zakázané roly</i18nString>
+		<i18nString name="roles_banned_desc">Zoznam zakázaných rolí, ktoré nemôžu zobraziť túto položku</i18nString>
+		<i18nString name="item_settings_general">Všeobecné</i18nString>
+		<i18nString name="menu_item_identifier">Identifikátor položky</i18nString>
+		<i18nString name="nodePath">URI položky</i18nString>
+		<i18nString name="move_dest_uri_new_node">Nový uzol</i18nString>
+		<i18nString name="move_dest_uri_new_node_desc">Uveďte názov uzlu, ktorý chcete pridať</i18nString>
+		<i18nString name="move_dest_uri_desc">Zoznam uzlov reprezentujúce cieľovú URI</i18nString>
+		<i18nString name="move_add_node">Pridať</i18nString>
+		<i18nString name="is_auto_select">Automatické zvolenie zobrazenia</i18nString>
+		<i18nString name="is_auto_select_desc">Po automatickom zvolení sa dané zobrazenie používateľovi otvorí</i18nString>
+		<i18nString name="use_tabbed_view">Použiť zobrazenie v taboch?</i18nString>
+		<i18nString name="view_configuration_type">Vybrať zobrazenie</i18nString>
+		<i18nString name="configuration_view">Nastavenie zobrazenia</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="icon_preview">Ikonevorschau</i18nString>
+		<i18nString name="icon_identifier">Ikone ID</i18nString>
+		<i18nString name="icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
+		<i18nString name="allow_roles">Zu zulässigen Rollen hinzufügen</i18nString>
+		<i18nString name="remove_from_allowed_roles">Aus zulässigen Rollen entfernen</i18nString>
+		<i18nString name="ban_roles">Zu verbotenen Rollen hinzufügen</i18nString>
+		<i18nString name="remove_from_banned_roles">Aus verbotenen Rollen entfernen</i18nString>
+		<i18nString name="available_processes">Ihre Prozesse</i18nString>
+		<i18nString name="available_processes_desc">Wählen Sie einen Prozess mit Rollen aus, die Sie zu Listen mit zulässigen oder verbotenen Rollen hinzufügen möchten.</i18nString>
+		<i18nString name="available_roles">Verfügbare Rollen</i18nString>
+		<i18nString name="tab_icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
+		<i18nString name="custom_view_selector_desc">Beispiel: "demo-tabbed-views"</i18nString>
+		<i18nString name="roles_management_title">Rollen</i18nString>
+		<i18nString name="roles_allowed">Zulässige Rollen</i18nString>
+		<i18nString name="item_settings_general">Allgemein</i18nString>
+		<i18nString name="menu_item_identifier">Identifikationsnummer des Menüeintrages</i18nString>
+		<i18nString name="nodePath">Menüeintrag-URI</i18nString>
+		<i18nString name="move_dest_uri_new_node">Neuer Knoten</i18nString>
+		<i18nString name="move_add_node">Hinzufügen</i18nString>
+		<i18nString name="move_dest_uri">Ziel URI</i18nString>
+		<i18nString name="duplicate_new_title">Titel der kopierten Ansicht</i18nString>
+		<i18nString name="duplicate_view_identifier">Identifikator der kopierten Ansicht</i18nString>
+		<i18nString name="duplicate_view_identifier_desc">Muss einzigartig sein</i18nString>
+		<i18nString name="name">Titel des Eintrages</i18nString>
+		<i18nString name="name_desc">Wird im Menü angezeigt</i18nString>
+		<i18nString name="tab_icon">Ikonen Identifikator der Registerkarte</i18nString>
+		<i18nString name="display_tab_icon">Zeige die Registerkarte Ikone an?</i18nString>
+		<i18nString name="tab_name">Titel der Registerkarte</i18nString>
+		<i18nString name="tab_name_desc">Wird in der Registerkarte angezeigt</i18nString>
+		<i18nString name="use_custom_view">Eigener Ansicht anwenden?</i18nString>
+		<i18nString name="custom_view_selector">Konfigurationsidentifikator der eigenen Ansicht</i18nString>
+		<i18nString name="item_settings">Menüeintrageinstellungen</i18nString>
+		<i18nString name="move_item">Menüeintrag verschieben</i18nString>
+		<i18nString name="move_item_finish">verschieben</i18nString>
+		<i18nString name="duplicate_item">Menüeintrag duplizieren</i18nString>
+		<i18nString name="duplicate_item_finish">duplizieren</i18nString>
+		<i18nString name="roles_allowed_desc">Rollen mit Zugriff auf diesen Menüeintrag</i18nString>
+		<i18nString name="roles_banned">Verbotene Rollen</i18nString>
+		<i18nString name="roles_banned_desc">Rollen, für die wird den Menüeintrag ausgeblendet</i18nString>
+		<i18nString name="move_dest_uri_new_node_desc">Nächste URI-Teil angeben</i18nString>
+		<i18nString name="move_dest_uri_desc">Teile der Ziel URI</i18nString>
+		<i18nString name="is_auto_select">Automatische Anzeigeauswahl</i18nString>
+		<i18nString name="is_auto_select_desc">Wenn ausgewählt, wird die Ansicht automatisch geöffnet</i18nString>
+		<i18nString name="use_tabbed_view">Möchten Sie die Ansicht mit Registerkarten verwenden?</i18nString>
+		<i18nString name="view_configuration_type">Wählen Sie einen Ansichtstyp</i18nString>
+		<i18nString name="configuration_view">Die Ansichtskonfiguration</i18nString>
+	</i18n>
+
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>initialize</id>
+		<x>340</x>
+		<y>220</y>
+		<label>initialize [await sync]</label>
+		<icon>hourglass_empty</icon>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
+	</transition>
+	<transition>
+		<id>data_sync</id>
+		<x>340</x>
+		<y>340</y>
+		<label>Data sync</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+	</transition>
+
+	<transition>
+		<id>item_settings</id>
+		<x>460</x>
+		<y>100</y>
+		<label name="item_settings">Item settings</label>
+		<icon>settings</icon>
+		<assignPolicy>auto</assignPolicy>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>general_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<title name="item_settings_general">General</title>
+			<dataRef>
+				<id>menu_item_identifier</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>nodePath</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>menu_name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>menu_icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>menu_icon_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>is_auto_select</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>roles_management</id>
+			<cols>5</cols>
+			<layout>grid</layout>
+			<title name="roles_management_title">Roles</title>
+			<dataRef>
+				<id>processes_available</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>2</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>roles_available</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>2</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>add_allowed_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>allowed_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>remove_allowed_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>add_banned_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>banned_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>remove_banned_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>configuration_view</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<title name="configuration_view">View configuration</title>
+			<dataRef>
+				<id>use_custom_view</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							trans: t.this,
+							useTabIcon: f.use_tab_icon,
+							use_tabbed_view: f.use_tabbed_view,
+							view_configuration_form: f.view_configuration_form,
+							view_configuration_type: f.view_configuration_type,
+							tabIconPreview: f.tab_icon_preview,
+							tabName: f.tab_name,
+							tabIcon: f.tab_icon,
+							use: f.use_custom_view,
+							selector: f.custom_view_selector;
+
+							if (use.value) {
+								make selector, editable on trans when { true }
+								make [useTabIcon, tabIconPreview, tabName, tabIcon, use_tabbed_view, view_configuration_form,
+										view_configuration_type], hidden on trans when { true }
+								// todo remove configuration or keep it?
+							} else {
+								manageBehaviorOfTabFields(useTabIcon.value, use_tabbed_view.value)
+								make [use_tabbed_view, view_configuration_form, view_configuration_type], editable on trans when { true }
+								make selector, hidden on trans when { true }
+							}
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>custom_view_selector</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>use_tabbed_view</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							use_tabbed_view: f.use_tabbed_view,
+							use_tab_icon: f.use_tab_icon,
+							view_configuration_type: f.view_configuration_type;
+
+							manageBehaviorOfTabFields(use_tab_icon.value, use_tabbed_view.value)
+
+							change view_configuration_type value { null }
+							change view_configuration_type options { menuItemService.getAvailableViewsAsOptions(use_tabbed_view.value, true) }
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>tab_name</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>use_tab_icon</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							use_tabbed_view: f.use_tabbed_view,
+							useIcon: f.use_tab_icon;
+
+							manageBehaviorOfTabFields(useIcon.value, use_tabbed_view.value)
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>tab_icon</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>tab_icon_preview</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>view_configuration_type</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							view_configuration_type: f.view_configuration_type,
+							view_configuration_form: f.view_configuration_form,
+							view_configuration_id: f.view_configuration_id;
+
+							if (view_configuration_id.value != null &amp;&amp; !view_configuration_id.value.isEmpty()) {
+								workflowService.deleteCase(view_configuration_id.value[0])
+							}
+
+							if (view_configuration_type.value == null || view_configuration_type.value == "") {
+								change view_configuration_id value { [] }
+								change view_configuration_form value { [] }
+								return
+							}
+
+							def configurationCase = createCase(view_configuration_type.value + "_configuration")
+							def initTask = assignTask("initialize", configurationCase)
+							finishTask(initTask)
+							configurationCase = workflowService.findOne(configurationCase.stringId)
+							change view_configuration_id value { [configurationCase.stringId] }
+							change view_configuration_form value { [configurationCase.tasks.find { it.transition == "settings" }.task] }
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>view_configuration_form</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+
+	<transition>
+		<id>move_item</id>
+		<x>580</x>
+		<y>100</y>
+		<label name="move_item">Move item</label>
+		<icon>move_down</icon>
+		<assignPolicy>auto</assignPolicy>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>move</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>move_dest_uri</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>move_dest_uri_new_node</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>move_add_node</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>finish</id>
+			<actions phase="pre">
+				<action>
+					dest: f.move_dest_uri;
+
+					if (dest.value == null || dest.value == []) {
+						throw new IllegalArgumentException("URI must not be empty!")
+					}
+
+					String newUri = dest.value.join("/")
+					newUri = newUri.replace("//","/")
+
+					changeMenuItem useCase uri { newUri }
+				</action>
+			</actions>
+			<title name="move_item_finish">Move</title>
+		</event>
+	</transition>
+
+	<transition>
+		<id>duplicate_item</id>
+		<x>580</x>
+		<y>340</y>
+		<label name="duplicate_item">Duplicate item</label>
+		<icon>content_copy</icon>
+		<assignPolicy>auto</assignPolicy>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>duplicate</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>duplicate_new_title</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>duplicate_view_identifier</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>finish</id>
+			<actions phase="pre">
+				<action>
+					identifier: f.duplicate_view_identifier,
+					title: f.duplicate_new_title;
+
+					duplicateMenuItem(useCase, title.value, identifier.value)
+				</action>
+			</actions>
+			<title name="duplicate_item_finish">Duplicate</title>
+		</event>
+	</transition>
+
+	<transition>
+		<id>children_order</id>
+		<x>580</x>
+		<y>220</y>
+		<label>Manage item order</label>
+		<icon>low_priority</icon>
+		<assignPolicy>auto</assignPolicy>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>children_order_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>childItemForms</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="get">
+						forms: f.childItemForms,
+						ids: f.childItemIds;
+
+						def orderedTaskIds = ids.value?.collect { id -> workflowService.findOne(id).tasks.find { it.transition == "row_for_ordering" }.task }
+						change forms value { orderedTaskIds }
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>row_for_ordering</id>
+		<x>741</x>
+		<y>219</y>
+		<label>Row for ordering [referenced]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>row_for_ordering_0</id>
+			<cols>6</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>menu_item_identifier</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>menu_name_as_visible</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>order_down</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>1</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>order_up</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>5</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>1</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>finish</id>
+			<title></title>
+		</event>
+		<event type="delegate">
+			<id>delegate</id>
+			<title></title>
+		</event>
+	</transition>
+
+	<!-- PLACES-->
+	<place>
+		<id>uninitialized</id>
+		<x>220</x>
+		<y>220</y>
+		<label>uninitialized</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>initialized</id>
+		<x>460</x>
+		<y>220</y>
+		<label>initialized</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+
+	<!-- ARCS-->
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>uninitialized</sourceId>
+		<destinationId>initialize</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>read</type>
+		<sourceId>initialized</sourceId>
+		<destinationId>item_settings</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a8</id>
+		<type>regular</type>
+		<sourceId>initialize</sourceId>
+		<destinationId>initialized</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a9</id>
+		<type>read</type>
+		<sourceId>initialized</sourceId>
+		<destinationId>move_item</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a10</id>
+		<type>read</type>
+		<sourceId>initialized</sourceId>
+		<destinationId>duplicate_item</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a13</id>
+		<type>read</type>
+		<sourceId>initialized</sourceId>
+		<destinationId>children_order</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

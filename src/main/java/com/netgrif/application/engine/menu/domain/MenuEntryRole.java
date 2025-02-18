@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.workflow.domain.menu;
+package com.netgrif.application.engine.menu.domain;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.netgrif.application.engine.workflow.domain.AuthorizationType;
