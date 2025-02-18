@@ -7,7 +7,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.core.petrinet.domain.dataset.UserFieldValue
 import com.netgrif.core.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

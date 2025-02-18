@@ -149,7 +149,7 @@ class FileListFieldTest {
         IUser user = userService.findUserByUsername(USER_EMAIL, null)
         assert user != null
 
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), userService.transformToLoggedUser(user))
 
         mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/named")
                 .param("fieldId", FIELD_ID)
@@ -170,10 +170,10 @@ class FileListFieldTest {
 
     private Case uploadTestFile() {
         PetriNet net = getNet()
-        IUser user = userService.findUserByUsername(USER_EMAIL, null)
+        IUser user = userService.findUserByUsername(USER_EMAIL, null).get()
         assert user != null
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getCase()
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", userService.transformToLoggedUser(user)).getCase()
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), userService.transformToLoggedUser(user))
 
         MockMultipartFile file
                 = new MockMultipartFile(

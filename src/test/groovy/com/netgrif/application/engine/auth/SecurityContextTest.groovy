@@ -14,6 +14,7 @@ import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.security.service.ISecurityContextService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
+import com.netgrif.core.workflow.domain.ProcessResourceId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith
@@ -76,7 +77,7 @@ class SecurityContextTest {
 
     @Test
     void addRole() {
-        Set<String> roleIds = net.getRoles().keySet()
+        Set<ProcessResourceId> roleIds = net.getRoles().values().stream().collect() {it -> it._id}
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(user), userService.transformToLoggedUser(user).getPassword(), userService.transformToLoggedUser(user).getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(token)
@@ -84,17 +85,17 @@ class SecurityContextTest {
         // situation 1
         processRoleService.assignRolesToUser(user.getStringId(), roleIds, superCreator.getLoggedSuper())
         def updatedUser = userService.findById(user.getStringId(), null)
-        assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles() != updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
+        assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles().collect {it.stringId} != updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
 
         securityContextService.reloadSecurityContext(userService.transformToLoggedUser(updatedUser))
-        assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles() == updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
+        assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles().collect {it.stringId} as Set == updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
 
         // situation 2
         processRoleService.assignRolesToUser(user.getStringId(), Collections.singleton(roleIds.getAt(0)), superCreator.getLoggedSuper())
         updatedUser = userService.findById(user.getStringId(), null)
-        assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles() != updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
+        assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles().collect {it.stringId} as Set  != updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
 
         securityContextService.forceReloadSecurityContext((LoggedUser) SecurityContextHolder.getContext().authentication.principal)
-        assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles() == updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
+        assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles().collect {it.stringId} as Set  == updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
     }
 }

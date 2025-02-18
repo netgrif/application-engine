@@ -158,7 +158,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
         NativeQuery query = buildQuery(requests, loggedOrImpersonated, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
-            return template.count(query, ElasticCase.class);
+            return template.count(query, com.netgrif.adapter.elastic.domain.ElasticCase.class);
         } else {
             return 0;
         }

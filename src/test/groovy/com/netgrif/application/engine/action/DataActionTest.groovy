@@ -42,7 +42,7 @@ class DataActionTest {
         def $case = importHelper.createCase("Case 1", mainNet.get())
         Task task = taskService.findOne($case.tasks.first().task)
 
-        List<Field> dataGet = dataService.getData($case.tasks.first().task).getData()
+        List<Field<?>> dataGet = dataService.getData($case.tasks.first().task).getData()
         dataGet.first().value == ";get-pre;get-post"
 
         SetDataEventOutcome dataSet = dataService.setData(task.stringId, ImportHelper.populateDataset(

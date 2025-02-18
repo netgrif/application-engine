@@ -130,8 +130,9 @@ class AssignActionTest {
         authentication.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
 
         String roleIdInMainNet = mainNet.getRoles().find { it.value.name.defaultValue == "admin_main" }.key
+        String roleIdInSecondaryNetNet = secondaryNet.getRoles().find { it.value.name.defaultValue == "admin_secondary" }.key
 
-        def content = JsonOutput.toJson([roleIdInMainNet])
+        def content = JsonOutput.toJson([roleIdInMainNet, roleIdInSecondaryNetNet])
         String userId = user.getStringId()
 
         def result = mvc.perform(MockMvcRequestBuilders.post(ROLE_API.replace("{}", userId))

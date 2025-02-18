@@ -12,7 +12,7 @@ import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -60,7 +60,7 @@ class CachePetriNetServiceTest {
     void setup() {
         testHelper.truncateDbs()
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        importHelper.createUser(new User(name: "Customer", surname: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new User(firstName: "Customer", lastName: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
     }

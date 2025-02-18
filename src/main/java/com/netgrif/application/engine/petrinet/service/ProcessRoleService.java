@@ -94,7 +94,7 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
 
     @Override
     public ProcessRole getDefaultRole() {
-        return null;
+        return processRoleRepository.findByImportId(ProcessRole.DEFAULT_ROLE);
     }
 
     @Override
@@ -109,7 +109,7 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
 
     @Override
     public ProcessRole findById(ProcessResourceId processResourceId) {
-        return null;
+        return processRoleRepository.findByCompositeId(processResourceId.getStringId()).orElse(null);
     }
 
     @Override

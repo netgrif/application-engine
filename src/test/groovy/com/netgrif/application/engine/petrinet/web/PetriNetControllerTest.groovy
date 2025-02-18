@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.petrinet.webprocessRolesAndPermissionses
 
+import com.netgrif.adapter.auth.domain.AuthorityImpl
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.core.auth.domain.Authority
 import com.netgrif.core.auth.domain.User
@@ -63,6 +65,9 @@ class PetriNetControllerTest {
     @Autowired
     private TestHelper testHelper
 
+    @Autowired
+    private UserService userService
+
     private PetriNet net
 
     private Authentication userAuth
@@ -88,20 +93,20 @@ class PetriNetControllerTest {
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 
-        def simpleUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        def simpleUser = importHelper.createUser(new User(firstName: "Role", lastName: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
 //                [] as Group[],
                 [] as ProcessRole[])
 
-        userAuth = new UsernamePasswordAuthenticationToken(simpleUser.transformToLoggedUser(), "password",  [auths.get("user")] as List<Authority>)
+        userAuth = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(simpleUser), "password",  [auths.get("user")] as List<AuthorityImpl>)
         userAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        def adminUser = importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
+        def adminUser = importHelper.createUser(new User(firstName: "Admin", lastName: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("admin")] as Authority[],
 //                [] as Group[],
                 [] as ProcessRole[])
 
-        adminAuth = new UsernamePasswordAuthenticationToken(adminUser.transformToLoggedUser(), "password", [auths.get("admin")] as List<Authority>)
+        adminAuth = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(adminUser), "password", [auths.get("admin")] as List<AuthorityImpl>)
         adminAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
     }
 

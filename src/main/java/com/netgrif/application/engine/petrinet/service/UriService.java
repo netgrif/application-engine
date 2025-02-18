@@ -9,6 +9,7 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Service for managing UriNode objects
@@ -37,7 +38,7 @@ public class UriService implements IUriService {
      */
     @Override
     public UriNode save(UriNode uriNode) {
-        return uriNodeRepository.save(uriNode);
+        return uriNodeRepository.save((com.netgrif.adapter.petrinet.domain.UriNode) uriNode);
     }
 
     /**
@@ -48,7 +49,7 @@ public class UriService implements IUriService {
      */
     @Override
     public List<UriNode> findAllByParent(String parentId) {
-        return uriNodeRepository.findAllByParentId(parentId);
+        return uriNodeRepository.findAllByParentId(parentId).stream().map(UriNode.class::cast).toList();
     }
 
     /**
@@ -58,7 +59,7 @@ public class UriService implements IUriService {
      */
     @Override
     public UriNode getRoot() {
-        List<UriNode> nodes = uriNodeRepository.findAllByLevel(FIRST_LEVEL);
+        List<UriNode> nodes = uriNodeRepository.findAllByLevel(FIRST_LEVEL).stream().map(UriNode.class::cast).toList();
         if (nodes.size() != 1) {
             throw new IllegalStateException("Exactly one root uri node must exist!");
         }
@@ -83,7 +84,7 @@ public class UriService implements IUriService {
      */
     @Override
     public List<UriNode> findByLevel(int level) {
-        return uriNodeRepository.findAllByLevel(level);
+        return uriNodeRepository.findAllByLevel(level).stream().map(UriNode.class::cast).collect(Collectors.toList());
     }
 
     /**
@@ -94,7 +95,7 @@ public class UriService implements IUriService {
      */
     @Override
     public UriNode findById(String id) {
-        Optional<UriNode> navNodeOptional = uriNodeRepository.findById(id);
+        Optional<com.netgrif.adapter.petrinet.domain.UriNode> navNodeOptional = uriNodeRepository.findById(id);
         if (navNodeOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find NavNode with id [" + id + "]");
         }
@@ -172,15 +173,15 @@ public class UriService implements IUriService {
 
         oldParent.getChildrenId().remove(oldNodePath);
         newParent.getChildrenId().add(newNodePath);
-        uriNodeRepository.saveAll(List.of(oldParent, newParent, node));
+        uriNodeRepository.saveAll(List.of((com.netgrif.adapter.petrinet.domain.UriNode) oldParent, (com.netgrif.adapter.petrinet.domain.UriNode) newParent, (com.netgrif.adapter.petrinet.domain.UriNode) node));
 
-        List<UriNode> childrenToSave = new ArrayList<>();
+        List<com.netgrif.adapter.petrinet.domain.UriNode> childrenToSave = new ArrayList<>();
         if (!node.getChildrenId().isEmpty()) {
             node = populateDirectRelatives(node);
             childrenToSave.addAll(moveChildrenRecursive(oldNodePath, newNodePath, node.getChildren()));
         }
 
-        uriNodeRepository.saveAll(List.of(oldParent, newParent, node));
+        uriNodeRepository.saveAll(List.of((com.netgrif.adapter.petrinet.domain.UriNode) oldParent, (com.netgrif.adapter.petrinet.domain.UriNode) newParent, (com.netgrif.adapter.petrinet.domain.UriNode) node));
         uriNodeRepository.saveAll(childrenToSave);
         return node;
     }
@@ -189,8 +190,8 @@ public class UriService implements IUriService {
         return dest.startsWith(picked);
     }
 
-    private List<UriNode> moveChildrenRecursive(String oldParentPath, String newParentPath, Set<UriNode> nodes) {
-        List<UriNode> updated = new ArrayList<>();
+    private List<com.netgrif.adapter.petrinet.domain.UriNode> moveChildrenRecursive(String oldParentPath, String newParentPath, Set<UriNode> nodes) {
+        List<com.netgrif.adapter.petrinet.domain.UriNode> updated = new ArrayList<>();
 
         if (nodes == null || nodes.isEmpty()) {
             return new ArrayList<>();
@@ -202,7 +203,7 @@ public class UriService implements IUriService {
             String newPath = newParentPath + diff;
             node.setPath(newPath);
             node.setParentId(newParentPath);
-            updated.add(node);
+            updated.add((com.netgrif.adapter.petrinet.domain.UriNode) node);
 
             node = populateDirectRelatives(node);
 
@@ -244,7 +245,7 @@ public class UriService implements IUriService {
             uriBuilder.append(uriComponents[i]);
             UriNode uriNode = findByUri(uriBuilder.toString());
             if (uriNode == null) {
-                uriNode = new UriNode();
+                uriNode = new com.netgrif.adapter.petrinet.domain.UriNode();
                 uriNode.setName(uriComponents[i]);
                 uriNode.setLevel(i);
                 uriNode.setPath(uriBuilder.toString());
@@ -253,10 +254,10 @@ public class UriService implements IUriService {
             if (i == pathLength - 1 && contentType != null) {
                 uriNode.addContentType(contentType);
             }
-            uriNode = uriNodeRepository.save(uriNode);
+            uriNode = uriNodeRepository.save((com.netgrif.adapter.petrinet.domain.UriNode) uriNode);
             if (parent != null) {
                 parent.getChildrenId().add(uriNode.getStringId());
-                uriNodeRepository.save(parent);
+                uriNodeRepository.save((com.netgrif.adapter.petrinet.domain.UriNode) parent);
             }
             if (i > 0) {
                 uriBuilder.append(uriProperties.getSeparator());

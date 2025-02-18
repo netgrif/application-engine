@@ -21,6 +21,6 @@
 //            throw new UsernameNotFoundException("Ldap has not verified the user " + email + "!");
 //        }
 //
-//        return user.transformToLoggedUser();
+//        return userService.transformToLoggedUser(user);
 //    }
 //}

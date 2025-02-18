@@ -8,7 +8,7 @@ import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.core.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
@@ -58,7 +58,7 @@ class AssignRemoveTest {
         testHelper.truncateDbs();
         def user = userService.system;
 
-        auth = new UsernamePasswordAuthenticationToken(user.transformToLoggedUser(), user)
+        auth = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(user), user)
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
@@ -72,7 +72,7 @@ class AssignRemoveTest {
         def roleCount = userService.system.userProcessRoles.size()
 
         // create
-        Case caze = workflowService.createCase(net.stringId, 'TEST', '', userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+        Case caze = workflowService.createCase(net.stringId, 'TEST', '', userService.transformToLoggedUser(userService.getLoggedOrSystem())).getCase()
         assert userService.system.userProcessRoles.size() == roleCount + 4
 
         // delete

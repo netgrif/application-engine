@@ -94,7 +94,7 @@ class ProcessRoleTest {
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         def processRoles = userProcessRoleRepository.findAllByNetId(netId)
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_VIEW, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_VIEW, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [processRoles.find {
                     it.getStringId() == net.getNet().roles.values().find {
@@ -102,11 +102,11 @@ class ProcessRoleTest {
                     }.stringId
                 }] as ProcessRole[])
 
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_PERFORM, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_PERFORM, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [processRoles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
 
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_BOTH, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_BOTH, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [processRoles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "View" }.stringId },
                  processRoles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])

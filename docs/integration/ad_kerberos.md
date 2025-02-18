@@ -391,7 +391,7 @@ public class ApplicationSpecificLdapUserDetailsMapper extends LdapUserDetailsMap
         } else {
             user = updateUser(user, ctx);
         }
-        return user.transformToLoggedUser();
+        return userService.transformToLoggedUser(user);
     }
 
     protected User createNewUser(DirContextOperations ctx, UserDetails userDetails) {

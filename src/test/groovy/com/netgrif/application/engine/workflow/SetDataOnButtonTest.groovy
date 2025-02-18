@@ -66,7 +66,7 @@ class SetDataOnButtonTest {
     @BeforeEach
     void initNet() {
         testHelper.truncateDbs()
-        net = petriNetService.importPetriNet(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).getNet()
+        net = petriNetService.importPetriNet(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR, userService.transformToLoggedUser(userService.getLoggedOrSystem())).getNet()
         assert net != null
     }
 

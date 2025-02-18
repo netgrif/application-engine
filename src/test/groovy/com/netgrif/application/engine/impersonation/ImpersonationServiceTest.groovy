@@ -36,6 +36,7 @@ import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.session.web.http.SessionRepositoryFilter
@@ -126,25 +127,25 @@ class ImpersonationServiceTest {
         def authorityAnon = authorityService.getOrCreate(Authority.anonymous)
         def authorityAdmin = authorityService.getOrCreate(Authority.admin)
 
-        user1 = helper.createUser(new User(name: "Test", surname: "User", email: "test@netgrif.com", password: "password", state: UserState.ACTIVE),
+        user1 = helper.createUser(new User(firstName: "Test", lastName: "User", email: "test@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority] as Authority[],
                 [] as ProcessRole[])
 
-        auth1 = new UsernamePasswordAuthenticationToken(user1.transformToLoggedUser(), (user1 as User).password, user1.authorities)
+        auth1 = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(user1), (user1 as User).password, user1.authorities as List<GrantedAuthority>)
         auth1.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        user2 = helper.createUser(new User(name: "Test", surname: "User2", email: "test2@netgrif.com", password: "password", state: UserState.ACTIVE),
+        user2 = helper.createUser(new User(firstName: "Test", lastName: "User2", email: "test2@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority, authorityAnon] as Authority[],
                 testNet.roles.values() as ProcessRole[])
 
-        auth2 = new UsernamePasswordAuthenticationToken(user2.transformToLoggedUser(), (user2 as User).password, user2.authorities)
+        auth2 = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(user2), (user2 as User).password, user2.authorities as List<GrantedAuthority>)
         auth2.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        adminUser = helper.createUser(new User(name: "Admin", surname: "User", email: "admin@netgrif.com", password: "password", state: UserState.ACTIVE),
+        adminUser = helper.createUser(new User(firstName: "Admin", lastName: "User", email: "admin@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority, authorityAdmin] as Authority[],
                 testNet.roles.values() as ProcessRole[])
 
-        adminUserAuth = new UsernamePasswordAuthenticationToken(adminUser.transformToLoggedUser(), (adminUser as User).password, adminUser.authorities)
+        adminUserAuth = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(adminUser), (adminUser as User).password, adminUser.authorities as List<GrantedAuthority>)
         adminUserAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
     }
 
@@ -184,7 +185,7 @@ class ImpersonationServiceTest {
         assert impersonatedRoles.size() == 2 && impersonatedRoles.any { it.stringId ==role.stringId }  // default role counts
         assert impersonatedAuths.size() == 1 && impersonatedAuths[0].stringId == auth.stringId
 
-        def transformedUser = userService.loggedUser.transformToLoggedUser()
+        def transformedUser = userService.loggeduserService.transformToLoggedUser(user)
         def transformedUserImpersonated = transformedUser.getSelfOrImpersonated()
         assert transformedUser.isImpersonating()
         assert transformedUserImpersonated.getProcessRoles().size() == 2 && transformedUserImpersonated.getProcessRoles().any { it == role.stringId }  // default role counts
@@ -205,17 +206,17 @@ class ImpersonationServiceTest {
 
         def caseReq = new CaseSearchRequest()
         caseReq.process = [new CaseSearchRequest.PetriNet(testCase.processIdentifier)]
-        def cases = elasticCaseService.search([caseReq], userService.loggedUser.transformToLoggedUser(), PageRequest.of(0, 1), LocaleContextHolder.locale, false)
+        def cases = elasticCaseService.search([caseReq], userService.loggeduserService.transformToLoggedUser(user), PageRequest.of(0, 1), LocaleContextHolder.locale, false)
         assert !cases.content.isEmpty()
 
         def searchReq = new TaskSearchRequest()
         searchReq.transitionId = ["t1"]
         searchReq.useCase = [new TaskSearchCaseRequest(testCase.stringId, null)]
-        def tasks = taskService.search([searchReq], PageRequest.of(0, 1), userService.loggedUser.transformToLoggedUser(), LocaleContextHolder.locale, false)
+        def tasks = taskService.search([searchReq], PageRequest.of(0, 1), userService.loggeduserService.transformToLoggedUser(user), LocaleContextHolder.locale, false)
         assert tasks.content[0].stringId == testTask1.stringId
 
         assert taskAuthorizationService.canCallAssign(userService.loggedUserFromContext, testTask1.stringId)
-        taskService.assignTask(userService.loggedUser.transformToLoggedUser(), testTask1.stringId)
+        taskService.assignTask(userService.loggeduserService.transformToLoggedUser(user), testTask1.stringId)
         testTask1 = reloadTask(testTask1)
         assert testTask1.userId == user2.stringId
 
@@ -223,7 +224,7 @@ class ImpersonationServiceTest {
         assert taskAuthorizationService.canCallSaveFile(userService.loggedUserFromContext, testTask1.stringId)
 
         assert taskAuthorizationService.canCallFinish(userService.loggedUserFromContext, testTask1.stringId)
-        taskService.finishTask(userService.loggedUser.transformToLoggedUser(), testTask1.stringId)
+        taskService.finishTask(userService.loggeduserService.transformToLoggedUser(user), testTask1.stringId)
     }
 
     @Test
@@ -231,7 +232,7 @@ class ImpersonationServiceTest {
         def config = setup()
         sleep(4000) // elastic
 
-        def logged = userService.loggedUser.transformToLoggedUser()
+        def logged = userService.loggeduserService.transformToLoggedUser(user)
         assert impersonationAuthorizationService.canImpersonate(logged, config.stringId)
         assert impersonationAuthorizationService.canImpersonateUser(logged, user2.stringId)
 

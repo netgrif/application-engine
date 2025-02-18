@@ -904,18 +904,18 @@ class ActionDelegate {
     }
 
     Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
-        return workflowService.createCaseByIdentifier(identifier, title, color, author.transformToLoggedUser(), locale, params).getCase()
+        return workflowService.createCaseByIdentifier(identifier, title, color, userService.transformToLoggedUser(author), locale, params).getCase()
     }
 
     Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
-        CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser(), params)
+        CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, userService.transformToLoggedUser(author), params)
         this.outcomes.add(outcome)
         return outcome.getCase()
     }
 
     Task assignTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        AssignTaskEventOutcome outcome = taskService.assignTask(user.transformToLoggedUser(), taskId, params)
+        AssignTaskEventOutcome outcome = taskService.assignTask(userService.transformToLoggedUser(user), taskId, params)
         this.outcomes.add(outcome)
         return outcome.getTask()
     }
@@ -930,7 +930,7 @@ class ActionDelegate {
 
     Task cancelTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        return addTaskOutcomeAndReturnTask(taskService.cancelTask(user.transformToLoggedUser(), taskId, params))
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(userService.transformToLoggedUser(user), taskId, params))
     }
 
     Task cancelTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
@@ -948,7 +948,7 @@ class ActionDelegate {
 
     void finishTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        addTaskOutcomeAndReturnTask(taskService.finishTask(user.transformToLoggedUser(), taskId, params))
+        addTaskOutcomeAndReturnTask(taskService.finishTask(userService.transformToLoggedUser(user), taskId, params))
     }
 
     void finishTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
@@ -1331,7 +1331,7 @@ class ActionDelegate {
     }
 
     void deleteUser(String email) {
-        IUser user = userService.findUserByUsername(email, null)
+        IUser user = userService.findByEmail(email, null)
         if (user == null)
             log.error("Cannot find user with email [" + email + "]")
         deleteUser(user)
@@ -1412,7 +1412,7 @@ class ActionDelegate {
     }
 
     File exportCasesToFile(List<CaseSearchRequest> requests, String pathName, ExportDataConfig config = null,
-                           LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                           LoggedUser user = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
                            int pageSize = exportConfiguration.getMongoPageSize(),
                            Locale locale = LocaleContextHolder.getLocale(),
                            Boolean isIntersection = false) {
@@ -1423,7 +1423,7 @@ class ActionDelegate {
     }
 
     OutputStream exportCases(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config = null,
-                             LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                             LoggedUser user = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
                              int pageSize = exportConfiguration.getMongoPageSize(),
                              Locale locale = LocaleContextHolder.getLocale(),
                              Boolean isIntersection = false) {
@@ -1443,7 +1443,7 @@ class ActionDelegate {
     }
 
     File exportTasksToFile(List<ElasticTaskSearchRequest> requests, String pathName, ExportDataConfig config = null,
-                           LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                           LoggedUser user = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
                            int pageSize = exportConfiguration.getMongoPageSize(),
                            Locale locale = LocaleContextHolder.getLocale(),
                            Boolean isIntersection = false) {
@@ -1454,7 +1454,7 @@ class ActionDelegate {
     }
 
     OutputStream exportTasks(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config = null,
-                             LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                             LoggedUser user = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
                              int pageSize = exportConfiguration.getMongoPageSize(),
                              Locale locale = LocaleContextHolder.getLocale(),
                              Boolean isIntersection = false) {
@@ -1487,7 +1487,7 @@ class ActionDelegate {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Case> findCasesElastic(List<CaseSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Case> findCasesElastic(List<CaseSearchRequest> requests, LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
                                 int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         return elasticCaseService.search(requests, loggedUser, PageRequest.of(page, pageSize), locale, isIntersection)
     }
@@ -1502,7 +1502,7 @@ class ActionDelegate {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Case> findCasesElastic(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Case> findCasesElastic(Map<String, Object> request, LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
                                 int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         List<CaseSearchRequest> requests = Collections.singletonList(new CaseSearchRequest(request))
         return findCasesElastic(requests, loggedUser, page, pageSize, locale, isIntersection)
@@ -1518,7 +1518,7 @@ class ActionDelegate {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Task> findTasks(List<ElasticTaskSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Task> findTasks(List<ElasticTaskSearchRequest> requests, LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
                          int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         return elasticTaskService.search(requests, loggedUser, PageRequest.of(page, pageSize), locale, isIntersection)
     }
@@ -1533,7 +1533,7 @@ class ActionDelegate {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Task> findTasks(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Task> findTasks(Map<String, Object> request, LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
                          int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         List<ElasticTaskSearchRequest> requests = Collections.singletonList(new ElasticTaskSearchRequest(request))
         return findTasks(requests, loggedUser, page, pageSize, locale, isIntersection)

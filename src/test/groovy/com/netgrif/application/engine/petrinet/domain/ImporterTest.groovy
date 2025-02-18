@@ -3,6 +3,7 @@ package com.netgrif.application.engine.petrinet.domain
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.core.petrinet.domain.dataset.ChoiceField
 import com.netgrif.core.petrinet.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository

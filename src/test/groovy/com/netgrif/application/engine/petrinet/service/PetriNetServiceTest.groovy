@@ -22,7 +22,7 @@ import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -96,7 +96,7 @@ class PetriNetServiceTest {
     void setup() {
         testHelper.truncateDbs()
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        importHelper.createUser(new User(name: "Customer", surname: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new User(firstName: "Customer", lastName: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
     }
@@ -174,7 +174,7 @@ class PetriNetServiceTest {
         def user = userService.findUserByUsername(CUSTOMER_USER_MAIL, null)
         assert user != null
         petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        petriNetService.importPetriNet(stream(NET_SEARCH_FILE), VersionType.MAJOR, user.transformToLoggedUser())
+        petriNetService.importPetriNet(stream(NET_SEARCH_FILE), VersionType.MAJOR, userService.transformToLoggedUser(user))
 
         assert petriNetRepository.count() == processCount + 2
 

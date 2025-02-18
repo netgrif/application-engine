@@ -46,10 +46,10 @@ class NextGroupServiceTest {
     void groupTest() {
         testHelper.truncateDbs()
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new User(firstName: "Dummy", lastName: "User", email: DUMMY_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
-        importHelper.createUser(new User(name: "Customer", surname: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new User(firstName: "Customer", lastName: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
 
@@ -80,7 +80,7 @@ class NextGroupServiceTest {
     }
 
     Case createGroup() {
-        return nextGroupService.createGroup("CUSTOM_GROUP_1", userService.findUserByUsername(DUMMY_USER_MAIL, null)).getCase()
+        return nextGroupService.createGroup("CUSTOM_GROUP_1", userService.findUserByUsername(DUMMY_USER_MAIL, null).get()).getCase()
     }
 
     List<Case> findGroup() {
@@ -95,15 +95,15 @@ class NextGroupServiceTest {
     Case addUser() {
         QCase qCase = new QCase("case")
         Case group = nextGroupService.findByPredicate(qCase.title.eq("CUSTOM_GROUP_1")).get(0)
-        nextGroupService.addUser(userService.findUserByUsername(CUSTOMER_USER_MAIL, null), group)
-        nextGroupService.addUser(userService.findUserByUsername("engine@netgrif.com", null), group)
+        nextGroupService.addUser(userService.findUserByUsername(CUSTOMER_USER_MAIL, null).get(), group)
+        nextGroupService.addUser(userService.findUserByUsername("engine@netgrif.com", null).get(), group)
         return group
     }
 
     Case removeUser() {
         QCase qCase = new QCase("case")
         Case group = nextGroupService.findByPredicate(qCase.title.eq("CUSTOM_GROUP_1")).get(0)
-        nextGroupService.removeUser(userService.findUserByUsername(CUSTOMER_USER_MAIL, null), group)
+        nextGroupService.removeUser(userService.findUserByUsername(CUSTOMER_USER_MAIL, null).get(), group)
         return group
     }
 }

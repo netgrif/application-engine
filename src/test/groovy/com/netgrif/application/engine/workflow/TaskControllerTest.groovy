@@ -3,10 +3,11 @@ package com.netgrif.application.engine.workflow
 import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.Authority
+import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.User
 import com.netgrif.core.auth.domain.enums.UserState
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
+import com.netgrif.adapter.auth.service.AuthorityService
 import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.core.petrinet.domain.PetriNet
@@ -77,7 +78,7 @@ class TaskControllerTest {
     private ImportHelper helper
 
     @Autowired
-    private IAuthorityService authorityService
+    private AuthorityService authorityService
 
     @Autowired
     private IWorkflowService workflowService
@@ -96,14 +97,14 @@ class TaskControllerTest {
     @BeforeEach
     void init() {
         testHelper.truncateDbs()
-        userService.saveNew(new User(
-                name: "Dummy",
-                surname: "Netgrif",
+        userService.saveUser(new User(
+                firstName: "Dummy",
+                lastName: "Netgrif",
                 email: DUMMY_USER_MAIL,
                 password: "superAdminPassword",
                 state: UserState.ACTIVE,
                 authorities: [authorityService.getOrCreate(Authority.user)] as Set<Authority>,
-                processRoles: [] as Set<ProcessRole>))
+                processRoles: [] as Set<ProcessRole>), null)
         importNet()
     }
 
@@ -208,7 +209,7 @@ class TaskControllerTest {
                 this.role = role
             }
         }
-        processRoleService.assignRolesToUser(userService.findUserByUsername(DUMMY_USER_MAIL, null).getStringId(), [role._id.toString()] as Set, userService.getLoggedOrSystem().transformToLoggedUser())
+        processRoleService.assignRolesToUser(userService.findUserByUsername(DUMMY_USER_MAIL, null).getStringId(), [role._id.toString()] as Set, userService.transformToLoggedUser(userService.getLoggedOrSystem()))
     }
 
     Page<Task> findTasksByMongo() {

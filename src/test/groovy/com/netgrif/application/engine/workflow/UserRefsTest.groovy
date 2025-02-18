@@ -54,7 +54,7 @@ class UserRefsTest {
     @BeforeEach
     void before() {
         helper.truncateDbs()
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/userrefs_test.xml"), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).getNet()
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/userrefs_test.xml"), VersionType.MAJOR, userService.transformToLoggedUser(userService.getLoggedOrSystem())).getNet()
         assert net
         netId = net.getStringId()
         def userEmails = ["super@netgrif.com", "engine@netgrif.com"]
@@ -62,7 +62,7 @@ class UserRefsTest {
         userIds = new ArrayList<>()
         10.times {
             def _case = importHelper.createCase("$it" as String, it % 2 == 0 ? net : net)
-            String id = userService.findUserByUsername(userEmails[it % 2], null).getStringId()
+            String id = userService.findUserByUsername(userEmails[it % 2], null).get().stringId
             String taskId = (new ArrayList<>(_case.getTasks())).get(0).task
             _case = dataService.setData(taskId, ImportHelper.populateDataset([
                     "user_list_1": [

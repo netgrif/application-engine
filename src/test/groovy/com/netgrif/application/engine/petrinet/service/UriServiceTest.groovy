@@ -84,7 +84,7 @@ class UriServiceTest {
         UriNode root = uriService.getRoot()
         assert root.getParentId() == null
 
-        UriNode root2 = new UriNode()
+        UriNode root2 = new com.netgrif.adapter.petrinet.domain.UriNode()
         root2.setLevel(0)
         uriService.save(root2)
 

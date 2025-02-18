@@ -98,7 +98,7 @@ class DataSearchRequestTest {
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
 
-        def users = userService.findAllUsers(true)
+        def users = userService.findAllUsers(null)
         assert users.size() >= 2
         def testUser1 = users[0]
         def testUser2 = users[1]
@@ -113,7 +113,7 @@ class DataSearchRequestTest {
         _case.dataSet["number"].value = 7.0 as Double
         _case.dataSet["boolean"].value = true
         _case.dataSet["text"].value = "hello world" as String
-        _case.dataSet["user"].value = new UserFieldValue(testUser1.stringId, testUser1.name, testUser1.surname, testUser1.email)
+        _case.dataSet["user"].value = new UserFieldValue(testUser1.stringId, testUser1.firstName, testUser1.lastName, testUser1.email)
         _case.dataSet["date"].value = date
         _case.dataSet["datetime"].value = date.atTime(13, 37)
         _case.dataSet["enumeration"].value = (_case.petriNet.dataSet["enumeration"] as ChoiceField).choices.find({ it.defaultValue == "Alice" })

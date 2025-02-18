@@ -4,7 +4,7 @@ import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.adapter.petrinet.service.PetriNetService
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
@@ -24,7 +24,7 @@ class ActionMigration {
 
     void migrateActions(String petriNetPath) {
         InputStream netStream = new ClassPathResource(petriNetPath).inputStream
-        ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(netStream, VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser())
+        ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(netStream, VersionType.MAJOR, userService.transformToLoggedUser(userService.getLoggedOrSystem()))
         List<PetriNet> oldPetriNets
 
         if(newPetriNet.getNet() != null) {

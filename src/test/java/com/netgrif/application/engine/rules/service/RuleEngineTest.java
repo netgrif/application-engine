@@ -253,7 +253,7 @@
 //        Task task = findTask(caze, TRANS_1);
 //        IUser user = superUser.transformToUser();
 //        taskService.assignTask(task, user);
-//        taskService.delegateTask(user.transformToLoggedUser(), user.getStringId(), task.getStringId());
+//        taskService.delegateTask(userService.transformToLoggedUser(user), user.getStringId(), task.getStringId());
 //        caze = workflowService.findOne(caze.getStringId());
 //
 //        assert caze.getDataSet().get("text_data").getValue().equals(TEXT_VALUE);

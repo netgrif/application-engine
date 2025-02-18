@@ -108,10 +108,10 @@ class FileFieldTest {
     void downloadFileByCase() {
         Case useCase = uploadTestFile()
 
-        IUser user = userService.findUserByUsername(USER_EMAIL, null)
+        IUser user = userService.findUserByUsername(USER_EMAIL, null).get()
         assert user != null
 
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), userService.transformToLoggedUser(user))
 
         mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file")
                 .param("fieldId", FIELD_ID)
@@ -127,13 +127,13 @@ class FileFieldTest {
     void downloadFileByTask() {
         Case useCase = uploadTestFile()
 
-        IUser user = userService.findUserByUsername(USER_EMAIL, null)
+        IUser user = userService.findUserByUsername(USER_EMAIL, null).get()
         assert user != null
 
         def taskPair = useCase.tasks.find { it.transition == "task" }
         assert taskPair != null
 
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), userService.transformToLoggedUser(user))
 
         mockMvc.perform(get("/api/task/" + taskPair.task + "/file")
                 .param("fieldId", FIELD_ID)
@@ -173,10 +173,10 @@ class FileFieldTest {
 
     private Case uploadTestFile() {
         PetriNet net = getNet()
-        IUser user = userService.findUserByUsername(USER_EMAIL, null)
+        IUser user = userService.findUserByUsername(USER_EMAIL, null).get()
         assert user != null
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getCase()
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", userService.transformToLoggedUser(user)).getCase()
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), userService.transformToLoggedUser(user))
 
         MockMultipartFile file
                 = new MockMultipartFile(

@@ -21,11 +21,13 @@ public class DefaultRealmRunner implements ApplicationEngineStartupRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        RealmCreateRequest createRequest = new RealmCreateRequest();
-        createRequest.setName("Default");
-        createRequest.setDescription("Default realm");
-        createRequest.setAdminRealm(false);
-        createRequest.setDefaultRealm(true);
-        realmService.createRealm(createRequest);
+        if (realmService.getDefaultRealm().isEmpty()) {
+            RealmCreateRequest createRequest = new RealmCreateRequest();
+            createRequest.setName("Default");
+            createRequest.setDescription("Default realm");
+            createRequest.setAdminRealm(false);
+            createRequest.setDefaultRealm(true);
+            realmService.createRealm(createRequest);
+        }
     }
 }

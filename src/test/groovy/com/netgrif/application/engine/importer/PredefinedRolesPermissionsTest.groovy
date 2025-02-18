@@ -12,8 +12,8 @@ import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.core.workflow.domain.Case
 import com.netgrif.core.workflow.domain.Task
 import com.netgrif.core.workflow.domain.TaskPair
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach

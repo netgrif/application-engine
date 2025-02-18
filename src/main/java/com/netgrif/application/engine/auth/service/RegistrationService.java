@@ -46,6 +46,8 @@ public class RegistrationService implements IRegistrationService {
 
     @Autowired
     private ServerAuthProperties serverAuthProperties;
+    @Autowired
+    private com.netgrif.application.engine.petrinet.service.ProcessRoleService processRoleService;
 
     @Override
     @Transactional
@@ -134,8 +136,8 @@ public class RegistrationService implements IRegistrationService {
         if (newUser.processRoles != null && !newUser.processRoles.isEmpty()) {
             user.setProcessRoles(new HashSet<>(processRole.findByIds(newUser.processRoles)));
         }
-//        userService.addDefaultRole(user);
-//        user = userRepository.save(user);
+        userService.addRole(user, processRoleService.getDefaultRole().getStringId());
+        user = (User) userService.saveUser(user, null);
 
         if (newUser.groups != null && !newUser.groups.isEmpty()) {
             for (String group : newUser.groups) {

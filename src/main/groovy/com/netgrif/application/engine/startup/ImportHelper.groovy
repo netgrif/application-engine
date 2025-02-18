@@ -6,7 +6,7 @@ import com.netgrif.adapter.auth.service.AuthorityService
 import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.core.auth.domain.*
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
+import com.netgrif.adapter.auth.service.AuthorityService
 import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.core.petrinet.domain.PetriNet
@@ -113,18 +113,18 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getDefault().stringId) {
+    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = userService.transformToLoggedUser(userService.getSystem()), String uriNodeId = uriService.getDefault().stringId) {
         return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author, uriNodeId)
     }
 
-    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getDefault().stringId) {
+    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.transformToLoggedUser(userService.getSystem()), String uriNodeId = uriService.getDefault().stringId) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
         PetriNet petriNet = petriNetService.importPetriNet(netStream, release, author, uriNodeId).getNet()
         log.info("Imported '${petriNet?.title?.defaultValue}' ['${petriNet?.identifier}', ${petriNet?.stringId}]")
         return Optional.of(petriNet)
     }
 
-    Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser()) {
+    Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = userService.transformToLoggedUser(userService.getSystem())) {
         PetriNet petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
         if (!petriNet) {
             return createNet(filename, release, author)
@@ -204,7 +204,7 @@ class ImportHelper {
     }
 
     AssignTaskEventOutcome assignTaskToSuper(String taskTitle, String caseId) {
-        return assignTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
+        return assignTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.transformToLoggedUser(userService.getSystem()))
     }
 
     FinishTaskEventOutcome finishTask(String taskTitle, String caseId, LoggedUser author) {
@@ -212,7 +212,7 @@ class ImportHelper {
     }
 
     FinishTaskEventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
-        return finishTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
+        return finishTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.transformToLoggedUser(userService.getSystem()))
     }
 
     CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, LoggedUser user) {

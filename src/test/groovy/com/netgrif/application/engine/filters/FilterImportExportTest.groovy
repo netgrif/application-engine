@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.filters
 
+import com.netgrif.adapter.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.workflow.domain.IllegalFilterFileException
 import com.netgrif.core.auth.domain.Authority;
@@ -90,6 +91,9 @@ class FilterImportExportTest {
     ITaskService taskService
 
     @Autowired
+    UserService userService
+
+    @Autowired
     private IDataService dataService
 
     private Authentication userAuth
@@ -103,7 +107,7 @@ class FilterImportExportTest {
         this.defaultFiltersRunner.run()
         createTestFilter()
         dummyUser = createDummyUser()
-        userAuth = new UsernamePasswordAuthenticationToken(dummyUser.transformToLoggedUser(), DUMMY_USER_PASSWORD)
+        userAuth = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(dummyUser), DUMMY_USER_PASSWORD)
         SecurityContextHolder.getContext().setAuthentication(userAuth)
 
         Optional<PetriNet> importNet = this.filterRunner.createImportFiltersNet()
@@ -301,7 +305,7 @@ class FilterImportExportTest {
 
     private User createDummyUser() {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        return importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: UserState.ACTIVE),
+        return importHelper.createUser(new User(firstName: "Dummy", lastName: "User", email: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
     }

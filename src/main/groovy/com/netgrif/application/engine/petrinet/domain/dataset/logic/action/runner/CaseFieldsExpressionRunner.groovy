@@ -38,7 +38,7 @@ abstract class CaseFieldsExpressionRunner {
         return run(useCase, fields, expression, params)
     }
 
-    def run(Case useCase, Map<String, String> fields, Expression expression, Map<String, String> params = [:]) {
+    def run(Case useCase, Map<String, String> fields, com.netgrif.core.petrinet.domain.dataset.logic.action.runner.Expression expression, Map<String, String> params = [:]) {
         logger().debug("Expression: $expression")
         def code = getExpressionCode(expression)
         try {
@@ -50,7 +50,7 @@ abstract class CaseFieldsExpressionRunner {
         }
     }
 
-    protected Closure getExpressionCode(Expression expression) {
+    protected Closure getExpressionCode(com.netgrif.core.petrinet.domain.dataset.logic.action.runner.Expression expression) {
         def code
         if (cache.containsKey(expression.stringId)) {
             code = cache.get(expression.stringId)

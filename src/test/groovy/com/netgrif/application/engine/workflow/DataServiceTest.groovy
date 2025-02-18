@@ -12,7 +12,7 @@ import com.netgrif.adapter.petrinet.service.PetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.core.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.core.workflow.web.responsebodies.LocalisedField

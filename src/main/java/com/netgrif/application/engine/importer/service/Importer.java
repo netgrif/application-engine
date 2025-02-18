@@ -1078,14 +1078,11 @@ public class Importer {
         ProcessRole role = new com.netgrif.adapter.petrinet.domain.roles.ProcessRole();
         Map<EventType, com.netgrif.core.petrinet.domain.events.Event> events = createEventsMap(importRole.getEvent());
         role.setImportId(importRole.isGlobal() != null && importRole.isGlobal() ? ProcessRole.GLOBAL + importRole.getId() : importRole.getId());
-        //MODULARISATION: events to be resolved
-//        role.setEvents(events);
+        role.setEvents(events);
         if (importRole.getName() == null) {
-            //MODULARISATION: i18nString to be resolved
-//            role.setName(toI18NString(importRole.getTitle()));
+            role.setName(toI18NString(importRole.getTitle()));
         } else {
-            //MODULARISATION: i18nString to be resolved
-//            role.setName(toI18NString(importRole.getName()));
+            role.setName(toI18NString(importRole.getName()));
         }
         if (importRole.isGlobal() != null && importRole.isGlobal()) {
             role.setGlobal(importRole.isGlobal());

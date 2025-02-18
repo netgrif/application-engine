@@ -54,7 +54,7 @@
 //           user = ldapUserRefService.updateById(dirContextOperations.getDn(), user);
 //        }
 //        assert user != null;
-//        LoggedUser loggedUser = user.transformToLoggedUser();
+//        LoggedUser loggedUser = userService.transformToLoggedUser(user);
 //        if (user instanceof LdapUser && (!((LdapUser) user).getMemberOf().isEmpty())) {
 //                loggedUser.parseProcessRoles(ldapGroupRefService.getProcessRoleByLdapGroup(((LdapUser) user).getMemberOf()));
 //            }

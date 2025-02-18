@@ -8,13 +8,13 @@
     <data type="text" immediate="true">
         <id>text</id>
         <title>Text</title>
-        <init dynamic="true">userService.findByEmail("super@netgrif.com", true).name</init>
+        <init dynamic="true">userService.findByEmail("super@netgrif.com", null).name</init>
     </data>
 
     <data type="number" immediate="true">
         <id>number</id>
         <title>number</title>
-        <init dynamic="true">userService.findByEmail("super@netgrif.com", true).name.length()</init>
+        <init dynamic="true">userService.findByEmail("super@netgrif.com", null).name.length()</init>
     </data>
 
     <data type="date" immediate="true">
@@ -34,7 +34,7 @@
         <title>user</title>
         <init dynamic="true">
             def user = userService.getLoggedOrSystem()
-            return new com.netgrif.core.petrinet.domain.dataset.UserFieldValue(user.getStringId(), user.name, user.surname, user.email)
+            return new com.netgrif.core.petrinet.domain.dataset.UserFieldValue(user.getStringId(), user.firstName, user.lastName, user.email)
         </init>
     </data>
 

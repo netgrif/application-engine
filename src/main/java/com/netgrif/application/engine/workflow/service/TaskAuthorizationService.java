@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
+import com.netgrif.adapter.auth.domain.LoggedUserImpl;
+import com.netgrif.adapter.auth.service.UserService;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
@@ -19,9 +21,12 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     @Autowired
     ITaskService taskService;
 
+    @Autowired
+    UserService userService;
+
     @Override
     public Boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, RolePermission... permissions) {
-        return userHasAtLeastOneRolePermission(loggedUser.transformToUser(), taskService.findById(taskId), permissions);
+        return userHasAtLeastOneRolePermission(userService.findById(loggedUser.getId(), null), taskService.findById(taskId), permissions);
     }
 
     @Override

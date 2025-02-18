@@ -1,10 +1,10 @@
 package com.netgrif.application.engine
 
 import com.netgrif.adapter.auth.service.UserService
-import com.netgrif.core.elastic.domain.ElasticCase
+import com.netgrif.adapter.elastic.domain.ElasticCase
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
-import com.netgrif.core.elastic.domain.ElasticPetriNet
-import com.netgrif.core.elastic.domain.ElasticTask
+import com.netgrif.adapter.elastic.domain.ElasticPetriNet
+import com.netgrif.adapter.elastic.domain.ElasticTask
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
 import com.netgrif.application.engine.elastic.service.ElasticIndexService
 import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository
@@ -80,6 +80,9 @@ class TestHelper {
     @Autowired
     private PetriNetService petriNetService
 
+    @Autowired
+    private DefaultRealmRunner defaultRealmRunner
+
     void truncateDbs() {
         template.db.drop()
         indexService.deleteIndex(ElasticPetriNet.class)
@@ -95,6 +98,7 @@ class TestHelper {
 
         defaultRoleRunner.run()
         elasticsearchRunner.run()
+        defaultRealmRunner.run()
         anonymousRoleRunner.run()
         systemUserRunner.run()
         uriRunner.run()
