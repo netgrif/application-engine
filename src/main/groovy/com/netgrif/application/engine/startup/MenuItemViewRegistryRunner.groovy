@@ -21,10 +21,16 @@ class MenuItemViewRegistryRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... args) throws Exception {
+        registry.unregisterAllViews()
+
+        log.info("Registering menu item views...")
         registerTabbedCaseView()
         registerTabbedTaskView()
         registerTabbedTicketView()
         registerTabbedSingleTaskView()
+
+        int viewCount = registry.getAllViews().size()
+        log.info("Registered {} views.", viewCount)
     }
 
     private void registerTabbedCaseView() {

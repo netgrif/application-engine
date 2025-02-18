@@ -33,7 +33,7 @@ public class MenuItemViewRegistryTest {
     public void testRegisterView() {
         assert viewRegistry.getAllViews().isEmpty();
 
-        MenuItemView view = buildView("test_view", true, true, List.of());
+        MenuItemView view = buildView("tabbed_case_view", true, true, List.of());
         viewRegistry.registerView(view);
         assert viewRegistry.getAllViews().size() == 1;
 
@@ -42,7 +42,7 @@ public class MenuItemViewRegistryTest {
 
     @Test
     public void testUnregisterView() {
-        MenuItemView view = buildView("test_view", true, true, List.of());
+        MenuItemView view = buildView("tabbed_case_view", true, true, List.of());
         viewRegistry.registerView(view);
         assert viewRegistry.getAllViews().size() == 1;
         viewRegistry.unregisterView("test_view");
@@ -51,16 +51,16 @@ public class MenuItemViewRegistryTest {
 
     @Test
     public void testGetViewByIdentifier() {
-        MenuItemView view = buildView("test_view", true, true, List.of());
+        MenuItemView view = buildView("tabbed_case_view", true, true, List.of());
         viewRegistry.registerView(view);
-        assert viewRegistry.getViewByIdentifier("test_view") != null;
+        assert viewRegistry.getViewByIdentifier("tabbed_case_view") != null;
     }
 
     @Test
     public void testGetAllByIsTabbedAndIsPrimary() {
-        MenuItemView view1 = buildView("test_view1", true, true, List.of());
-        MenuItemView view2 = buildView("test_view2", true, false, List.of());
-        MenuItemView view3 = buildView("test_view3", false, true, List.of());
+        MenuItemView view1 = buildView("tabbed_case_view", true, true, List.of());
+        MenuItemView view2 = buildView("tabbed_task_view", true, false, List.of());
+        MenuItemView view3 = buildView("tabbed_ticket_view", false, true, List.of());
         viewRegistry.registerView(view1);
         viewRegistry.registerView(view2);
         viewRegistry.registerView(view3);
@@ -69,13 +69,13 @@ public class MenuItemViewRegistryTest {
 
     @Test
     public void testGetAllByIsTabbedAndParentIdentifier() {
-        MenuItemView view1 = buildView("test_view1", true, true, List.of("test_view2", "test_view3"));
-        MenuItemView view2 = buildView("test_view2", true, true, List.of());
-        MenuItemView view3 = buildView("test_view3", false, true, List.of());
+        MenuItemView view1 = buildView("tabbed_case_view", true, true, List.of("tabbed_task_view", "tabbed_ticket_view"));
+        MenuItemView view2 = buildView("tabbed_task_view", true, true, List.of());
+        MenuItemView view3 = buildView("tabbed_ticket_view", false, true, List.of());
         viewRegistry.registerView(view1);
         viewRegistry.registerView(view2);
         viewRegistry.registerView(view3);
-        assert viewRegistry.getAllByIsTabbedAndParentIdentifier(true, "test_view1").size() == 1;
+        assert viewRegistry.getAllByIsTabbedAndParentIdentifier(true, "tabbed_case_view").size() == 1;
     }
 
     private MenuItemView buildView(String identifier, boolean isTabbed, boolean isPrimary, List<String> associatedViewIds) {
