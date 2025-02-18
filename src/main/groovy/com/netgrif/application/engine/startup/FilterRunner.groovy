@@ -37,7 +37,15 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
         helper.importProcess("Petri net for filters", FILTER_PETRI_NET_IDENTIFIER, FILTER_FILE_NAME)
         createConfigurationNets()
         helper.importProcess("Petri net for filter preferences", MENU_NET_IDENTIFIER, MENU_ITEM_FILE_NAME)
+        createImportFiltersNet()
+        createExportFiltersNet()
+    }
+
+    Optional<PetriNet> createImportFiltersNet() {
         helper.importProcess("Petri net for importing filters", IMPORT_NET_IDENTIFIER, IMPORT_FILTER_FILE_NAME)
+    }
+
+    Optional<PetriNet> createExportFiltersNet() {
         helper.importProcess("Petri net for exporting filters", EXPORT_NET_IDENTIFIER, EXPORT_FILTER_FILE_NAME)
     }
 
