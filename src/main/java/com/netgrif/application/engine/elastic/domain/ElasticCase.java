@@ -132,10 +132,10 @@ public class ElasticCase {
 //        TODO: release/8.0.0
 //        enabledRoles = new HashSet<>(useCase.getEnabledRoles());
 //        viewRoles = new HashSet<>(useCase.getViewRoles());
-//        viewUserRefs = new HashSet<>(useCase.getViewUserRefs());
 //        negativeViewRoles = new HashSet<>(useCase.getNegativeViewRoles());
 //        viewUsers = new HashSet<>(useCase.getViewUsers());
 //        negativeViewUsers = new HashSet<>(useCase.getNegativeViewUsers());
+//        viewUserRefs = new HashSet<>(useCase.getViewUserRefs());
         tags = new HashMap<>(useCase.getProperties());
 
         dataSet = new HashMap<>();

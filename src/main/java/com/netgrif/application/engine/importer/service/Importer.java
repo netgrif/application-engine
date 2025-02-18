@@ -617,6 +617,10 @@ public class Importer {
         if (importRole.getId().equals(ProcessRole.ANONYMOUS_ROLE)) {
             throw new IllegalArgumentException("Role ID '" + ProcessRole.ANONYMOUS_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
         }
+        String importId = importRole.getId();
+        if (processRoleService.existsByImportId(importId)) {
+            return;
+        }
 
         ProcessRole role = new ProcessRole();
         role.setImportId(importRole.getId());
@@ -624,7 +628,7 @@ public class Importer {
         if (importRole.getEvent() != null) {
             importRole.getEvent().forEach(event -> role.addEvent(createEvent(event)));
         }
-        // TODO: release/8.0.0 role
+        result.addRole(role);
     }
 
     protected com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy toAssignPolicy(com.netgrif.application.engine.importer.model.AssignPolicy policy) {

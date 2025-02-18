@@ -90,28 +90,18 @@ public class ProcessRoleService implements IProcessRoleService {
         Set<ProcessRole> rolesNewToUser = getRolesNewToUser(userOldRoles, requestedRoles);
         Set<ProcessRole> rolesRemovedFromUser = getRolesRemovedFromUser(userOldRoles, requestedRoles);
 
-        String idOfPetriNetContainingRole = null;
-        // TODO: release/8.0.0 fix
-//        String idOfPetriNetContainingRole = getPetriNetIdRoleBelongsTo(rolesNewToUser, rolesRemovedFromUser);
-
-        if (idOfPetriNetContainingRole == null) {
-            return;
-        }
-
-        Process petriNet = petriNetService.getPetriNet(idOfPetriNetContainingRole);
-
         Set<String> rolesNewToUserIds = mapUserRolesToIds(rolesNewToUser);
         Set<String> rolesRemovedFromUserIds = mapUserRolesToIds(rolesRemovedFromUser);
 
         Set<ProcessRole> newRoles = this.findByIds(rolesNewToUserIds);
         Set<ProcessRole> removedRoles = this.findByIds(rolesRemovedFromUserIds);
 
-        runAllPreActions(newRoles, removedRoles, user, petriNet, params);
+        runAllPreActions(newRoles, removedRoles, user, params);
         user = userService.findById(userId);
         requestedRoles = updateRequestedRoles(user, rolesNewToUser, rolesRemovedFromUser);
 
         replaceUserRolesAndPublishEvent(requestedRolesIds, user, requestedRoles);
-        runAllPostActions(newRoles, removedRoles, user, petriNet, params);
+        runAllPostActions(newRoles, removedRoles, user, params);
 
         securityContextService.saveToken(userId);
         if (Objects.equals(userId, loggedUser.getId())) {
@@ -154,17 +144,17 @@ public class ProcessRoleService implements IProcessRoleService {
                 .collect(Collectors.toSet());
     }
 
-    private void runAllPreActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles, IUser user, Process petriNet, Map<String, String> params) {
-        runAllSuitableActionsOnRoles(newRoles, EventType.ASSIGN, EventPhaseType.PRE, user, petriNet, params);
-        runAllSuitableActionsOnRoles(removedRoles, EventType.CANCEL, EventPhaseType.PRE, user, petriNet, params);
+    private void runAllPreActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles, IUser user, Map<String, String> params) {
+        runAllSuitableActionsOnRoles(newRoles, EventType.ASSIGN, EventPhaseType.PRE, user, params);
+        runAllSuitableActionsOnRoles(removedRoles, EventType.CANCEL, EventPhaseType.PRE, user, params);
     }
 
-    private void runAllPostActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles, IUser user, Process petriNet, Map<String, String> params) {
-        runAllSuitableActionsOnRoles(newRoles, EventType.ASSIGN, EventPhaseType.POST, user, petriNet, params);
-        runAllSuitableActionsOnRoles(removedRoles, EventType.CANCEL, EventPhaseType.POST, user, petriNet, params);
+    private void runAllPostActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles, IUser user, Map<String, String> params) {
+        runAllSuitableActionsOnRoles(newRoles, EventType.ASSIGN, EventPhaseType.POST, user, params);
+        runAllSuitableActionsOnRoles(removedRoles, EventType.CANCEL, EventPhaseType.POST, user, params);
     }
 
-    private void runAllSuitableActionsOnRoles(Set<ProcessRole> roles, EventType requiredEventType, EventPhaseType requiredPhase, IUser user, Process petriNet, Map<String, String> params) {
+    private void runAllSuitableActionsOnRoles(Set<ProcessRole> roles, EventType requiredEventType, EventPhaseType requiredPhase, IUser user, Map<String, String> params) {
         roles.forEach(role -> {
             runAllSuitableActionsOnOneRole(role.getEvents(), requiredEventType, requiredPhase, params);
         });
@@ -298,6 +288,12 @@ public class ProcessRoleService implements IProcessRoleService {
 
         log.info("[{}]: Deleting all roles of Petri net {} version {}", net.getStringId(), net.getIdentifier(), net.getVersion().toString());
         this.processRoleRepository.deleteAllByIdIn(deletedRoleIds);
+    }
+
+    // TODO: release/8.0.0 cache
+    @Override
+    public boolean existsByImportId(String importId) {
+        return processRoleRepository.existsByImportId(importId);
     }
 
     public void clearCache() {

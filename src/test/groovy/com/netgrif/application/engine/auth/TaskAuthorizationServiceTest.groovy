@@ -317,6 +317,7 @@ class TaskAuthorizationServiceTest {
 
     @Test
     void testCanAssignWithNegRoleAndPosUsersRef() {
+        // TODO: release/8.0.0 fix roles
         ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "assign_pos_role")
         userService.addRole(testUser, positiveRole.getStringId())
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test assign", "", testUser.transformToLoggedUser()).getCase()
@@ -401,5 +402,4 @@ class TaskAuthorizationServiceTest {
         userService.removeRole(testUser, positiveRole.getStringId())
         workflowService.deleteCase(case_.stringId)
     }
-
 }

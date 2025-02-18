@@ -245,7 +245,7 @@ public class PetriNetService implements IPetriNetService {
         evaluateRules(net, EventPhase.POST);
         historyService.save(new ImportPetriNetEventLog(null, EventPhase.POST, net.getObjectId()));
         addMessageToOutcome(net, ProcessEventType.UPLOAD, outcome);
-        outcome.setNet(imported.getProcess());
+        outcome.setNet(net);
         return outcome;
     }
 

@@ -22,6 +22,8 @@ public interface IProcessRoleService {
 
     ProcessRole findByImportId(String importId);
 
+    boolean existsByImportId(String importId);
+
     void assignRolesToUser(String userId, Set<String> roleIds, LoggedUser user);
 
     void assignRolesToUser(String userId, Set<String> roleIds, LoggedUser user, Map<String, String> params);

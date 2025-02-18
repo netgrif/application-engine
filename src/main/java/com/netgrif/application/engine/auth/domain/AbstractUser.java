@@ -25,6 +25,7 @@ public abstract class AbstractUser implements IUser, Serializable {
 
     @Getter
     @Setter
+    // TODO: release/8.0.0 set of role ids
     protected Set<ProcessRole> processRoles;
 
     @Getter

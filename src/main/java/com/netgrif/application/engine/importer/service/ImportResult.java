@@ -13,4 +13,8 @@ public class ImportResult {
     private Process process;
     private UniqueKeyMap<String, ProcessRole> roles = new UniqueKeyMap<>();
     // TODO: release/8.0.0 info, warn, error messages - definovat message a ich preklady
+
+    public void addRole(ProcessRole role) {
+        this.roles.put(role.getImportId(), role);
+    }
 }

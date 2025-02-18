@@ -5,6 +5,7 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Imported;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.Event;
+import com.netgrif.application.engine.utils.UniqueKeyMap;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
@@ -16,16 +17,21 @@ import java.util.*;
 @Data
 @Document
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+// TODO: rename to Role
 public class ProcessRole extends Imported {
 
     public static final String DEFAULT_ROLE = "default";
     public static final String ANONYMOUS_ROLE = "anonymous";
 
+    // TODO: release/8.0.0 indexed import id
     @Id
     private ObjectId id;
+    // TODO: release/8.0.0 rename title
     private I18nString name;
     private I18nString description;
     private Map<EventType, Event> events;
+    // TODO: release/8.0.0 add properties
+    private UniqueKeyMap<String, String> properties;
 
     public ProcessRole(ObjectId id) {
         this.id = id;

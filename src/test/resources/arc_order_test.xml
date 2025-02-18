@@ -5,6 +5,10 @@
     <title>Test</title>
     <defaultRole>false</defaultRole>
     <anonymousRole>false</anonymousRole>
+    <role>
+        <id>rola1</id>
+        <title>Rola 1</title>
+    </role>
     <properties>
         <property key="initials">TST</property>
     </properties>
