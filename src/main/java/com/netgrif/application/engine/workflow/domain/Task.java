@@ -6,6 +6,7 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
+import com.netgrif.application.engine.petrinet.domain.roles.RolePermissions;
 import com.netgrif.application.engine.petrinet.domain.roles.TaskPermission;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import lombok.AllArgsConstructor;
@@ -60,11 +61,8 @@ public class Task implements Serializable {
     @Builder.Default
     private List<Trigger> triggers = new LinkedList<>();
 
-    /**
-     * Role ObjectId : [ RolePermission, true/false ]
-     */
     @Builder.Default
-    private Map<String, Map<TaskPermission, Boolean>> permissions = new HashMap<>();
+    private RolePermissions<TaskPermission> permissions = new RolePermissions<>();
 
     private LocalDateTime lastAssigned;
     private LocalDateTime lastFinished;
@@ -95,11 +93,7 @@ public class Task implements Serializable {
     }
 
     public void addRole(String roleId, Map<TaskPermission, Boolean> permissions) {
-        if (this.permissions.containsKey(roleId) && this.permissions.get(roleId) != null) {
-            this.permissions.get(roleId).putAll(permissions);
-        } else {
-            this.permissions.put(roleId, permissions);
-        }
+        this.permissions.addPermissions(roleId, permissions);
     }
 
     @JsonIgnore
@@ -125,6 +119,7 @@ public class Task implements Serializable {
         return triggers.stream().anyMatch(trigger -> trigger != null && TriggerType.AUTO.equals(trigger.getType()));
     }
 
+    // todo 2058 decide what to do with it
     private void compareExistingUserPermissions(String userId, Map<TaskPermission, Boolean> permissions) {
         // TODO: release/8.0.0 check if possible to reduce duplicated code, possible solution is to have abstraction on permissions map
 //        permissions.forEach((id, perm) -> {

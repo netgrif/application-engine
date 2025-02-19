@@ -6,13 +6,13 @@ import com.netgrif.application.engine.petrinet.domain.PetriNetIdentifier;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
+import com.netgrif.application.engine.petrinet.domain.roles.RolePermissions;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
-import org.apache.tools.ant.taskdefs.Local;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -75,7 +75,7 @@ public class Case implements Serializable {
     @Indexed
     private Map<String, TaskPair> tasks = new HashMap<>();
     @JsonIgnore
-    private Map<String, Map<CasePermission, Boolean>> permissions = new HashMap<>();
+    private RolePermissions<CasePermission> permissions = new RolePermissions<>();
     private Map<String, String> properties = new HashMap<>();
 
     private String uriNodeId;
@@ -94,20 +94,7 @@ public class Case implements Serializable {
         parentPetriNetIdentifiers = new ArrayList<>(petriNet.getParentIdentifiers());
         activePlaces = petriNet.getActivePlaces();
         icon = petriNet.getIcon();
-
-        permissions = petriNet.getPermissions().entrySet().stream()
-                .filter(role -> role.getValue().containsKey(CasePermission.DELETE) || role.getValue().containsKey(CasePermission.VIEW))
-                .map(role -> {
-                    Map<CasePermission, Boolean> permissionMap = new HashMap<>();
-                    if (role.getValue().containsKey(CasePermission.DELETE)) {
-                        permissionMap.put(CasePermission.DELETE, role.getValue().get(CasePermission.DELETE));
-                    }
-                    if (role.getValue().containsKey(CasePermission.VIEW)) {
-                        permissionMap.put(CasePermission.VIEW, role.getValue().get(CasePermission.VIEW));
-                    }
-                    return new AbstractMap.SimpleEntry<>(role.getKey(), permissionMap);
-                })
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+        permissions = new RolePermissions<>(petriNet.getPermissions(), Set.of(CasePermission.CREATE));
     }
 
     public String getStringId() {

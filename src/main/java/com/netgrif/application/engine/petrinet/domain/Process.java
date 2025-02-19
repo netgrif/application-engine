@@ -11,10 +11,11 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
 import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
-import com.netgrif.application.engine.petrinet.domain.roles.Permissions;
+import com.netgrif.application.engine.petrinet.domain.roles.RolePermissions;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 
 @Data
 @Document
+@EqualsAndHashCode(callSuper = true)
 @CompoundIndex(name = "cmp-idx-one", def = "{'identifier': 1, 'version.major': -1, 'version.minor': -1, 'version.patch': -1}")
 public class Process extends ProcessObject {
 
@@ -37,7 +39,7 @@ public class Process extends ProcessObject {
     private String icon;
     private I18nExpression defaultCaseName;
     // TODO: release/8.0.0 - default + anonymous role, roleref
-    private Permissions<CasePermission> permissions;
+    private RolePermissions<CasePermission> permissions;
     private Map<ProcessEventType, ProcessEvent> processEvents;
     private Map<CaseEventType, CaseEvent> caseEvents;
     private List<Function> functions;
@@ -68,7 +70,7 @@ public class Process extends ProcessObject {
         dataSet = new UniqueKeyMap<>();
         processEvents = new HashMap<>();
         caseEvents = new HashMap<>();
-        permissions = new Permissions<>();
+        permissions = new RolePermissions<>();
         functions = new LinkedList<>();
         properties = new UniqueKeyMap<>();
     }
@@ -86,11 +88,7 @@ public class Process extends ProcessObject {
     }
 
     public void addPermission(String actorId, Map<CasePermission, Boolean> permissions) {
-        if (this.permissions.containsKey(actorId) && this.permissions.get(actorId) != null) {
-            this.permissions.get(actorId).putAll(permissions);
-        } else {
-            this.permissions.put(actorId, permissions);
-        }
+        this.permissions.addPermissions(actorId, permissions);
     }
 
     public void addFunction(Function function) {
@@ -304,8 +302,7 @@ public class Process extends ProcessObject {
         clone.initializeArcs();
         clone.setCaseEvents(this.caseEvents == null ? null : this.caseEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
         clone.setProcessEvents(this.processEvents == null ? null : this.processEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
-        // TODO: release/8.0.0
-//        clone.setPermissions(this.permissions == null ? null : this.permissions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new UniqueKeyMap<>(e.getValue()))));
+        clone.setPermissions(new RolePermissions<>(this.permissions));
         this.getFunctions().forEach(clone::addFunction);
         clone.setProperties(new UniqueKeyMap<>(this.properties));
         return clone;

@@ -17,7 +17,6 @@ import java.util.*;
 @Data
 @Document
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-// TODO: rename to Role
 public class Role extends Imported {
 
     public static final String DEFAULT_ROLE = "default";

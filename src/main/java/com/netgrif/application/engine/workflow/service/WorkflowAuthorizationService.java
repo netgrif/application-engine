@@ -39,7 +39,7 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
 
     @Override
     public Boolean userHasAtLeastOneRolePermission(IUser user, Process net, CasePermission... permissions) {
-        Map<CasePermission, Boolean> aggregatePermissions = getAggregateRolePermissions(user, net.getPermissions());
+        Map<CasePermission, Boolean> aggregatePermissions = getAggregateRoleCasePermissions(user, net.getPermissions());
 
         for (CasePermission permission : permissions) {
             if (hasRestrictedPermission(aggregatePermissions.get(permission))) {

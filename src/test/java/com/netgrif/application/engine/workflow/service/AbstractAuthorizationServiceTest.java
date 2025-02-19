@@ -61,7 +61,7 @@ class AbstractAuthorizationServiceTest {
         netPermissions.put(roles.get(2).getStringId(), getInitEntryValue());
 
         // situation 1
-        Map<CasePermission, Boolean> aggregatePermission = mockInstance.getAggregateRolePermissions(user, netPermissions);
+        Map<CasePermission, Boolean> aggregatePermission = mockInstance.getAggregateRoleCasePermissions(user, netPermissions);
 
         assert aggregatePermission.get(CREATE);
         assert aggregatePermission.get(VIEW);
@@ -70,7 +70,7 @@ class AbstractAuthorizationServiceTest {
         // situation 2
         netPermissions.get(roles.get(0).getStringId()).put(CREATE, false);
         netPermissions.get(roles.get(1).getStringId()).put(DELETE, false);
-        aggregatePermission = mockInstance.getAggregateRolePermissions(user, netPermissions);
+        aggregatePermission = mockInstance.getAggregateRoleCasePermissions(user, netPermissions);
 
         // TODO: release/8.0.0 AssertionError
         assert !aggregatePermission.get(CREATE);

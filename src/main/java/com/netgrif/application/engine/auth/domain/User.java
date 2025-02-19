@@ -12,51 +12,43 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 
+@Getter
 @Document
 public class User extends AbstractUser implements RegisteredUser {
 
     public static final String UNKNOWN = "unknown";
 
     @Id
-    @Getter
     protected ObjectId id;
 
     @NotNull
-    @Getter
     @Setter
     @Indexed(unique = true)
     protected String email;
 
-    @Getter
     @Setter
     protected String telNumber;
 
-    @Getter
     @Setter
     protected String avatar;
 
     @JsonIgnore
-    @Getter
     @Setter
     protected String password;
 
     @NotNull
-    @Getter
     @Setter
     @Indexed
     protected String name;
 
     @NotNull
-    @Getter
     @Setter
     @Indexed
     protected String surname;
 
-    @Getter
     @Setter
     protected String token;
 
-    @Getter
     @Setter
     protected LocalDateTime expirationDate;
 
