@@ -20,6 +20,7 @@ public class UserResource extends EntityModel<User> {
                 .getUser(getContent().getId(), null));
         add(selfRel.equalsIgnoreCase("profile") ? getLink.withSelfRel() : getLink.withRel("profile"));
 
+        // todo 2058
         WebMvcLinkBuilder roleLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .assignRolesToUser(getContent().getId(), null, null));
         add(selfRel.equalsIgnoreCase("assignProcessRole") ? roleLink.withSelfRel() : roleLink.withRel("assignProcessRole"));

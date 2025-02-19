@@ -11,7 +11,7 @@ import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -44,7 +44,7 @@ public class RegistrationService implements IRegistrationService {
     private INextGroupService groupService;
 
     @Autowired
-    private IProcessRoleService processRole;
+    private IRoleService roleService;
 
     @Autowired
     private ServerAuthProperties serverAuthProperties;
@@ -132,8 +132,8 @@ public class RegistrationService implements IRegistrationService {
         user.setState(UserState.INVITED);
         userService.addDefaultAuthorities(user);
 
-        if (newUser.processRoles != null && !newUser.processRoles.isEmpty()) {
-            user.setProcessRoles(new HashSet<>(processRole.findByIds(newUser.processRoles)));
+        if (newUser.roles != null && !newUser.roles.isEmpty()) {
+            user.setRoles(new HashSet<>(roleService.findByIds(newUser.roles)));
         }
         userService.addDefaultRole(user);
         user = userRepository.save(user);

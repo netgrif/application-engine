@@ -2,7 +2,7 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.User;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.petrinet.domain.roles.Role;
 import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,14 +46,14 @@ class AbstractAuthorizationServiceTest {
         MockAuthorizationService mockInstance = new MockAuthorizationService();
 
         // init
-        List<ProcessRole> roles = new LinkedList<>();
-        roles.add(new ProcessRole());
-        roles.add(new ProcessRole());
-        roles.add(new ProcessRole());
+        List<Role> roles = new LinkedList<>();
+        roles.add(new Role());
+        roles.add(new Role());
+        roles.add(new Role());
 
         IUser user = new User();
-        user.addProcessRole(roles.get(0));
-        user.addProcessRole(roles.get(1));
+        user.addRole(roles.get(0));
+        user.addRole(roles.get(1));
 
         Map<String, Map<CasePermission, Boolean>> netPermissions = new HashMap<>();
         netPermissions.put(roles.get(0).getStringId(), getInitEntryValue());
@@ -61,7 +61,7 @@ class AbstractAuthorizationServiceTest {
         netPermissions.put(roles.get(2).getStringId(), getInitEntryValue());
 
         // situation 1
-        Map<CasePermission, Boolean> aggregatePermission = mockInstance.getAggregateProcessRolePermissions(user, netPermissions);
+        Map<CasePermission, Boolean> aggregatePermission = mockInstance.getAggregateRolePermissions(user, netPermissions);
 
         assert aggregatePermission.get(CREATE);
         assert aggregatePermission.get(VIEW);
@@ -70,7 +70,7 @@ class AbstractAuthorizationServiceTest {
         // situation 2
         netPermissions.get(roles.get(0).getStringId()).put(CREATE, false);
         netPermissions.get(roles.get(1).getStringId()).put(DELETE, false);
-        aggregatePermission = mockInstance.getAggregateProcessRolePermissions(user, netPermissions);
+        aggregatePermission = mockInstance.getAggregateRolePermissions(user, netPermissions);
 
         // TODO: release/8.0.0 AssertionError
         assert !aggregatePermission.get(CREATE);

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.auth.domain;
 
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.petrinet.domain.roles.Role;
 
 import java.util.Set;
 
@@ -34,9 +34,9 @@ public interface IUser {
 
     void setAuthorities(Set<Authority> authorities);
 
-    Set<ProcessRole> getProcessRoles();
+    Set<Role> getRoles();
 
-    void setProcessRoles(Set<ProcessRole> processRoles);
+    void setRoles(Set<Role> roles);
 
     Set<String> getNextGroups();
 
@@ -48,9 +48,9 @@ public interface IUser {
 
     void addAuthority(Authority authority);
 
-    void addProcessRole(ProcessRole role);
+    void addRole(Role role);
 
-    void removeProcessRole(ProcessRole role);
+    void removeRole(Role role);
 
     LoggedUser transformToLoggedUser();
 

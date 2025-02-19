@@ -1,4 +1,4 @@
 package com.netgrif.application.engine.history.domain.userevents;
 
-public interface IProcessRolesEvent {
+public interface IRolesEvent {
 }

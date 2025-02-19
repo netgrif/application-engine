@@ -12,7 +12,7 @@ import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.petrinet.domain.roles.Role
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -121,7 +121,7 @@ class TaskAuthorizationServiceTest {
         def auths = importHelper.createAuthorities(["user": Authority.user])
         testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [] as ProcessRole[]
+                [] as Role[]
         )
     }
 
@@ -270,7 +270,7 @@ class TaskAuthorizationServiceTest {
 
     @Test
     void testCanAssign() {
-        ProcessRole positiveRole = this.net.getRoles().values().find(v -> v.getImportId() == "assign_pos_role")
+        Role positiveRole = this.net.getRoles().values().find(v -> v.getImportId() == "assign_pos_role")
         userService.addRole(testUser, positiveRole.getStringId())
         Case case_ = workflowService.createCase(net.getStringId(), "Test assign", "", testUser.transformToLoggedUser()).getCase()
         assert taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), case_.getTaskStringId("t1"))
@@ -280,7 +280,7 @@ class TaskAuthorizationServiceTest {
 
     @Test
     void testCanNotAssign() {
-        ProcessRole negativeRole = this.net.getRoles().values().find(v -> v.getImportId() == "assign_neg_role")
+        Role negativeRole = this.net.getRoles().values().find(v -> v.getImportId() == "assign_neg_role")
         userService.addRole(testUser, negativeRole.getStringId())
         Case case_ = workflowService.createCase(net.getStringId(), "Test assign", "", testUser.transformToLoggedUser()).getCase()
         assert !taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), case_.getTaskStringId("t1"))
@@ -318,7 +318,7 @@ class TaskAuthorizationServiceTest {
     @Test
     void testCanAssignWithNegRoleAndPosUsersRef() {
         // TODO: release/8.0.0 fix roles
-        ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "assign_pos_role")
+        Role positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "assign_pos_role")
         userService.addRole(testUser, positiveRole.getStringId())
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test assign", "", testUser.transformToLoggedUser()).getCase()
         String taskId = case_.getTaskStringId("t1")
@@ -334,7 +334,7 @@ class TaskAuthorizationServiceTest {
 
     @Test
     void testCanFinish() {
-        ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "finish_pos_role")
+        Role positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "finish_pos_role")
         userService.addRole(testUser, positiveRole.getStringId())
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", testUser.transformToLoggedUser()).getCase()
 
@@ -347,7 +347,7 @@ class TaskAuthorizationServiceTest {
 
     @Test
     void testCanNotFinish() {
-        ProcessRole negativeRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "finish_neg_role")
+        Role negativeRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "finish_neg_role")
         userService.addRole(testUser, negativeRole.getStringId())
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", testUser.transformToLoggedUser()).getCase()
 
@@ -388,7 +388,7 @@ class TaskAuthorizationServiceTest {
 
     @Test
     void testCanFinishWithNegRoleAndPosUsersRef() {
-        ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "finish_pos_role")
+        Role positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "finish_pos_role")
         userService.addRole(testUser, positiveRole.getStringId())
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", testUser.transformToLoggedUser()).getCase()
         String taskId = case_.getTaskStringId("t1")

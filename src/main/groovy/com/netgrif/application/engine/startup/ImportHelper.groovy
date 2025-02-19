@@ -8,8 +8,8 @@ import com.netgrif.application.engine.petrinet.domain.DataRef
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.service.ProcessRoleService
+import com.netgrif.application.engine.petrinet.domain.roles.Role
+import com.netgrif.application.engine.petrinet.service.RoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.workflow.domain.Case
@@ -67,7 +67,7 @@ class ImportHelper {
     private INextGroupService groupService
 
     @Autowired
-    private ProcessRoleService processRoleService
+    private RoleService roleService
 
     @Autowired
     private IUriService uriService
@@ -107,9 +107,9 @@ class ImportHelper {
         return Optional.of(petriNet)
     }
 
-    IUser createUser(User user, Authority[] authorities, ProcessRole[] roles) {
+    IUser createUser(User user, Authority[] authorities, Role[] roles) {
         authorities.each { user.addAuthority(it) }
-        roles.each { user.addProcessRole(it) }
+        roles.each { user.addRole(it) }
         user.state = UserState.ACTIVE
         user = userService.saveNew(user)
         log.info("User $user.name $user.surname created")

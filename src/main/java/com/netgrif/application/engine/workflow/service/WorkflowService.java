@@ -20,7 +20,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
 import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.security.service.EncryptionService;
@@ -66,7 +66,7 @@ public class WorkflowService implements IWorkflowService {
     protected IPetriNetService petriNetService;
 
     @Autowired
-    protected IProcessRoleService processRoleService;
+    protected IRoleService roleService;
 
     @Autowired
     protected ITaskService taskService;

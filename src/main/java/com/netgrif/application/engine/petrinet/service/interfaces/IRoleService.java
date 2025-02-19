@@ -2,25 +2,25 @@ package com.netgrif.application.engine.petrinet.service.interfaces;
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.petrinet.domain.Process;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.petrinet.domain.roles.Role;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public interface IProcessRoleService {
+public interface IRoleService {
 
-    List<ProcessRole> saveAll(Iterable<ProcessRole> entities);
+    List<Role> saveAll(Iterable<Role> entities);
 
-    Set<ProcessRole> findAllByImportId(String importId);
+    Set<Role> findAllByImportId(String importId);
 
-    Set<ProcessRole> findAllByDefaultName(String name);
+    Set<Role> findAllByDefaultName(String name);
 
-    ProcessRole findById(String id);
+    Role findById(String id);
 
-    Set<ProcessRole> findByIds(Set<String> ids);
+    Set<Role> findByIds(Set<String> ids);
 
-    ProcessRole findByImportId(String importId);
+    Role findByImportId(String importId);
 
     boolean existsByImportId(String importId);
 
@@ -28,13 +28,13 @@ public interface IProcessRoleService {
 
     void assignRolesToUser(String userId, Set<String> roleIds, LoggedUser user, Map<String, String> params);
 
-    List<ProcessRole> findAll();
+    List<Role> findAll();
 
-    List<ProcessRole> findAll(String netId);
+    List<Role> findAll(String netId);
 
-    ProcessRole defaultRole();
+    Role defaultRole();
 
-    ProcessRole anonymousRole();
+    Role anonymousRole();
 
     void deleteRolesOfNet(Process net, LoggedUser loggedUser);
 }

@@ -2,7 +2,7 @@ package com.netgrif.application.engine.auth.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.petrinet.domain.roles.Role;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -32,7 +32,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
 
     @Getter
     @Setter
-    protected Set<String> processRoles;
+    protected Set<String> roles;
 
     @Getter
     @Setter
@@ -44,12 +44,12 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
     public LoggedUser(String id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
         this.id = id;
-        this.processRoles = new HashSet<>();
+        this.roles = new HashSet<>();
         this.groups = new HashSet<>();
     }
 
-    public void parseProcessRoles(Set<ProcessRole> processRoles) {
-        processRoles.forEach(role -> this.processRoles.add(role.getStringId()));
+    public void parseRoles(Set<Role> roles) {
+        roles.forEach(role -> this.roles.add(role.getStringId()));
     }
 
     public boolean isAdmin() {
@@ -70,8 +70,8 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         user.setState(UserState.ACTIVE);
         user.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
         user.setNextGroups(groups.stream().map(String::new).collect(Collectors.toSet()));
-        user.setProcessRoles(processRoles.stream().map(roleId -> {
-            ProcessRole role = new ProcessRole();
+        user.setRoles(roles.stream().map(roleId -> {
+            Role role = new Role();
             role.setStringId(roleId);
             return role;
         }).collect(Collectors.toSet()));
@@ -90,8 +90,8 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         anonym.setState(UserState.ACTIVE);
         anonym.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
         anonym.setNextGroups(groups.stream().map(String::new).collect(Collectors.toSet()));
-        anonym.setProcessRoles(processRoles.stream().map(roleId -> {
-            ProcessRole role = new ProcessRole();
+        anonym.setRoles(roles.stream().map(roleId -> {
+            Role role = new Role();
             role.setStringId(roleId);
             return role;
         }).collect(Collectors.toSet()));
@@ -121,7 +121,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
                 "id=" + id +
                 ", fullName='" + fullName + '\'' +
                 ", groups=" + groups +
-                ", processRoles=" + processRoles +
+                ", roles=" + roles +
                 ", impersonated=" + impersonated +
                 '}';
     }

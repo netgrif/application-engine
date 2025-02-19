@@ -116,9 +116,9 @@ class DataSearchRequestTest {
         def testUser1 = users[0]
         def testUser2 = users[1]
         // saving authorities / roles crashes the workflowService (on case save)
-        testUser1.processRoles = []
+        testUser1.roles = []
         testUser1.authorities = []
-        testUser2.processRoles = []
+        testUser2.roles = []
         testUser2.authorities = []
 
         LocalDate date = LocalDate.of(2020, 7, 25);

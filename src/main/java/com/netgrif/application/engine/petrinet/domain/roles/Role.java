@@ -18,7 +18,7 @@ import java.util.*;
 @Document
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 // TODO: rename to Role
-public class ProcessRole extends Imported {
+public class Role extends Imported {
 
     public static final String DEFAULT_ROLE = "default";
     public static final String ANONYMOUS_ROLE = "anonymous";
@@ -33,16 +33,16 @@ public class ProcessRole extends Imported {
     // TODO: release/8.0.0 add properties
     private UniqueKeyMap<String, String> properties;
 
-    public ProcessRole(ObjectId id) {
+    public Role(ObjectId id) {
         this.id = id;
         this.events = new HashMap<>();
     }
 
-    public ProcessRole() {
+    public Role() {
         this(new ObjectId());
     }
 
-    public ProcessRole(String id) {
+    public Role(String id) {
         this(new ObjectId(id));
     }
 
@@ -100,8 +100,8 @@ public class ProcessRole extends Imported {
     }
 
     @Override
-    public ProcessRole clone() {
-        ProcessRole clone = new ProcessRole();
+    public Role clone() {
+        Role clone = new Role();
         clone.setStringId(this.getStringId());
         clone.setImportId(this.importId);
         clone.setName(this.name == null ? null : this.name.clone());

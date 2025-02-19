@@ -9,7 +9,7 @@ import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
@@ -68,7 +68,7 @@ public class PetriNetController {
     private IPetriNetService service;
 
     @Autowired
-    private IProcessRoleService roleService;
+    private IRoleService roleService;
 
     @Autowired
     private StringToVersionConverter converter;
@@ -144,9 +144,9 @@ public class PetriNetController {
 
     @Operation(summary = "Get roles of process", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{netId}/roles", produces = MediaTypes.HAL_JSON_VALUE)
-    public ProcessRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
+    public RolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
         netId = decodeUrl(netId);
-        return new ProcessRolesResource(roleService.findAll(netId), service.getPetriNet(decodeUrl(netId)).getPermissions(), locale);
+        return new RolesResource(roleService.findAll(netId), service.getPetriNet(decodeUrl(netId)).getPermissions(), locale);
     }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")

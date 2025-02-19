@@ -12,7 +12,7 @@ import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.settings.domain.Preferences;
 import com.netgrif.application.engine.settings.service.IPreferencesService;
@@ -62,7 +62,7 @@ public class UserController {
     private IUserService userService;
 
     @Autowired
-    private IProcessRoleService processRoleService;
+    private IRoleService roleService;
 
     @Autowired
     private IAuthorityService authorityService;
@@ -155,7 +155,7 @@ public class UserController {
     @Operation(summary = "Get all users with specified roles", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/role", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> getAllWithRole(@RequestBody Set<String> roleIds, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Locale locale) {
-        Page<IUser> page = userService.findAllActiveByProcessRoles(roleIds, pageable);
+        Page<IUser> page = userService.findAllActiveByRoles(roleIds, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .getAllWithRole(roleIds, pageable, assembler, locale)).withRel("role");
         PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler("role"), selfLink);
@@ -172,7 +172,7 @@ public class UserController {
     })
     public MessageResource assignRolesToUser(@PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
         try {
-            processRoleService.assignRolesToUser(userId, roleIds, (LoggedUser) auth.getPrincipal());
+            roleService.assignRolesToUser(userId, roleIds, (LoggedUser) auth.getPrincipal());
             log.info("Process roles {} assigned to user {}", roleIds, userId);
             return MessageResource.successMessage("Selected roles assigned to user " + userId);
         } catch (IllegalArgumentException e) {

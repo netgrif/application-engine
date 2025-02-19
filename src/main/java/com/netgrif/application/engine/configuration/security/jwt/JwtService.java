@@ -2,7 +2,7 @@ package com.netgrif.application.engine.configuration.security.jwt;
 
 import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -28,7 +28,7 @@ public class JwtService implements IJwtService {
     private JwtProperties properties;
 
     @Autowired
-    private IProcessRoleService roleService;
+    private IRoleService roleService;
 
     @PostConstruct
     private void resolveSecret() {
@@ -63,7 +63,7 @@ public class JwtService implements IJwtService {
         );
         user.setFullName(userMap.get("fullName").toString());
         user.setAnonymous((boolean) userMap.get("anonymous"));
-        user.setProcessRoles(Collections.singleton(roleService.anonymousRole().getStringId()));
+        user.setRoles(Collections.singleton(roleService.anonymousRole().getStringId()));
         return user;
     }
 

@@ -3,7 +3,7 @@ package com.netgrif.application.engine.impersonation.service.interfaces;
 import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.petrinet.domain.roles.Role;
 import com.netgrif.application.engine.workflow.domain.Case;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +25,7 @@ public interface IImpersonationAuthorizationService {
 
     List<Authority> getAuthorities(List<Case> configs, IUser impersonated);
 
-    List<ProcessRole> getRoles(List<Case> configs, IUser impersonated);
+    List<Role> getRoles(List<Case> configs, IUser impersonated);
 
     Case getConfig(String configId);
 

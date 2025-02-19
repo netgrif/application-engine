@@ -8,7 +8,7 @@ import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.roles.CasePermission
 import com.netgrif.application.engine.petrinet.domain.roles.TaskPermission
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
+import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
@@ -52,7 +52,7 @@ class PredefinedRolesPermissionsTest {
     private ITaskService taskService
 
     @Autowired
-    private IProcessRoleService processRoleService
+    private IRoleService roleService
 
     @Autowired
     private PermissionFactory roleFactory
@@ -116,11 +116,11 @@ class PredefinedRolesPermissionsTest {
     @BeforeEach
     public void before() {
         testHelper.truncateDbs()
-        assert processRoleService.defaultRole() != null
-        DEFAULT_ROLE_ID = processRoleService.defaultRole().stringId
+        assert roleService.defaultRole() != null
+        DEFAULT_ROLE_ID = roleService.defaultRole().stringId
         assert DEFAULT_ROLE_ID != null
-        assert processRoleService.anonymousRole() != null
-        ANONYMOUS_ROLE_ID = processRoleService.anonymousRole().stringId
+        assert roleService.anonymousRole() != null
+        ANONYMOUS_ROLE_ID = roleService.anonymousRole().stringId
         assert ANONYMOUS_ROLE_ID != null
     }
 
@@ -478,6 +478,7 @@ class PredefinedRolesPermissionsTest {
         return new NetCaseTask(net, aCase, task)
     }
 
+    // todo 2058 method name
     private Map<String, Map<CasePermission, Boolean>> transformProcessRolePermissionMap(Map<String, Map<CasePermission, Boolean>> input, String netRoleId) {
         return input.collectEntries { it ->
             [it.key == DEFAULT_ROLE_ID || it.key == ANONYMOUS_ROLE_ID ? it.key : netRoleId, it.value.collectEntries { ti -> [ti.key, ti.value] }]

@@ -9,13 +9,13 @@ import java.util.Collection;
 import java.util.Set;
 
 @Repository
-public interface ProcessRoleRepository extends MongoRepository<ProcessRole, String>, QuerydslPredicateExecutor<ProcessRole> {
+public interface RoleRepository extends MongoRepository<Role, String>, QuerydslPredicateExecutor<Role> {
 
-    Set<ProcessRole> findAllByImportIdIn(Set<String> importIds);
+    Set<Role> findAllByImportIdIn(Set<String> importIds);
 
-    Set<ProcessRole> findAllByName_DefaultValue(String name);
+    Set<Role> findAllByName_DefaultValue(String name);
 
-    Set<ProcessRole> findAllByImportId(String importId);
+    Set<Role> findAllByImportId(String importId);
 
     void deleteAllByIdIn(Collection<ObjectId> ids);
 

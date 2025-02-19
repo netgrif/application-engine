@@ -1,9 +1,6 @@
 package com.netgrif.application.engine.auth.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -103,8 +100,8 @@ public class User extends AbstractUser implements RegisteredUser {
         LoggedUser loggedUser = new LoggedUser(this.getId().toString(), this.getEmail(), this.getPassword(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
         loggedUser.setAnonymous(false);
-        if (!this.getProcessRoles().isEmpty()) {
-            loggedUser.parseProcessRoles(this.getProcessRoles());
+        if (!this.getRoles().isEmpty()) {
+            loggedUser.parseRoles(this.getRoles());
         }
         loggedUser.setGroups(this.getNextGroups());
         if (this.isImpersonating()) {
@@ -132,7 +129,7 @@ public class User extends AbstractUser implements RegisteredUser {
                 ", token='" + token + '\'' +
                 ", expirationDate=" + expirationDate +
                 ", authorities=" + authorities +
-                ", processRoles=" + processRoles +
+                ", roles=" + roles +
                 ", groups=" + nextGroups +
                 '}';
     }

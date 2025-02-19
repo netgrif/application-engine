@@ -11,11 +11,11 @@ import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.application.engine.petrinet.domain.roles.Role
+import com.netgrif.application.engine.petrinet.domain.roles.RoleRepository
 import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
+import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
@@ -62,7 +62,7 @@ class PetriNetServiceTest {
     private TaskRepository taskRepository
 
     @Autowired
-    private IProcessRoleService userProcessRoleService
+    private IRoleService userRoleService
 
     @Autowired
     private IUserService userService
@@ -77,7 +77,7 @@ class PetriNetServiceTest {
     private CaseRepository caseRepository
 
     @Autowired
-    private ProcessRoleRepository processRoleRepository
+    private RoleRepository roleRepository
 
     @Autowired
     private ElasticPetriNetRepository elasticPetriNetRepository
@@ -93,12 +93,12 @@ class PetriNetServiceTest {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         importHelper.createUser(new User(name: "Customer", surname: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [] as ProcessRole[])
+                [] as Role[])
     }
 
     @Test
     void processImportAndDelete() {
-        long processRoleCount = processRoleRepository.count()
+        long roleCount = roleRepository.count()
         long processCount = petriNetRepository.count()
         long taskCount = taskRepository.count()
 
@@ -115,16 +115,16 @@ class PetriNetServiceTest {
 
         assert caseRepository.findAllByProcessIdentifier(testNet.getImportId()).size() == 1
         assert taskRepository.count() == taskCount + 3
-        assert processRoleRepository.count() == processRoleCount + 2
+        assert roleRepository.count() == roleCount + 2
 
         def user = userService.findByEmail(CUSTOMER_USER_MAIL)
         assert user != null
-        assert user.processRoles.size() == 1
+        assert user.roles.size() == 1
 
         userService.addRole(user, testNet.roles.values().collect().get(0).stringId)
         user = userService.findByEmail(CUSTOMER_USER_MAIL)
         assert user != null
-        assert user.processRoles.size() == 2
+        assert user.roles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
 
         petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
@@ -133,10 +133,10 @@ class PetriNetServiceTest {
         assert elasticPetriNetRepository.findByStringId(testNet.stringId) == null
         assert caseRepository.findAllByProcessIdentifier(testNetOptional.getNet().getImportId()).size() == 0
         assert taskRepository.count() == taskCount
-        assert processRoleRepository.count() == processRoleCount
+        assert roleRepository.count() == roleCount
         user = userService.findByEmail(CUSTOMER_USER_MAIL)
         assert user != null
-        assert user.processRoles.size() == 1
+        assert user.roles.size() == 1
 
         boolean exceptionThrown = false
         try {

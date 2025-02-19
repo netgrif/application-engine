@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.importer.service;
 
 import com.netgrif.application.engine.petrinet.domain.Process;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.petrinet.domain.roles.Role;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 public class ImportResult {
 
     private Process process;
-    private UniqueKeyMap<String, ProcessRole> roles = new UniqueKeyMap<>();
+    private UniqueKeyMap<String, Role> roles = new UniqueKeyMap<>();
     // TODO: release/8.0.0 info, warn, error messages - definovat message a ich preklady
 
-    public void addRole(ProcessRole role) {
+    public void addRole(Role role) {
         this.roles.put(role.getImportId(), role);
     }
 }

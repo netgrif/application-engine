@@ -11,7 +11,6 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -87,7 +86,7 @@ class ActionDelegateTest {
         NewUserRequest newUserRequest = new NewUserRequest()
         newUserRequest.setEmail("test@netgrif.com")
         newUserRequest.groups = new HashSet<>()
-        newUserRequest.processRoles = new HashSet<>()
+        newUserRequest.roles = new HashSet<>()
 
         MessageResource messageResource = actionDelegate.inviteUser(newUserRequest)
         assert messageResource.getContent().success

@@ -4,7 +4,7 @@ import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.domain.LoggedUser
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.Process
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.petrinet.domain.roles.Role
 import com.netgrif.application.engine.utils.UniqueKeyMap
 import com.netgrif.application.engine.workflow.domain.QTask
 import org.junit.jupiter.api.BeforeEach
@@ -22,7 +22,7 @@ class GroovyShellFactoryTest extends EngineTest {
     public static final String FILE_NAME = "groovy_shell_test.xml"
 
     private Process net
-    private UniqueKeyMap<String, ProcessRole> roles
+    private UniqueKeyMap<String, Role> roles
 
     @BeforeEach
     @Override
@@ -45,18 +45,18 @@ class GroovyShellFactoryTest extends EngineTest {
         userService.metaClass.groovyShellTestMethod = { String string, I18nString i18nString -> println("groovyShellTestMethod") }
 
         def user = userService.findByEmail(userService.getSystem().getEmail())
-        def processRoleCount = user.processRoles.size()
+        def roleCount = user.roles.size()
         def roles = roleService.findAll()
         def roleId = "newRole_1"
         def role = roles.find {it.importId == roleId}
         assert role != null
         roleService.assignRolesToUser(
                 user.getStringId(),
-                new HashSet<String>([role.stringId] + user.processRoles.collect { it.stringId }),
+                new HashSet<String>([role.stringId] + user.roles.collect { it.stringId }),
                 new LoggedUser("", "a", "", [])
         )
         user = userService.findByEmail(userService.getSystem().getEmail())
-        assert user.processRoles.size() == processRoleCount + 1
+        assert user.roles.size() == roleCount + 1
     }
 
     @Test

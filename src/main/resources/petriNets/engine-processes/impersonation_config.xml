@@ -83,8 +83,8 @@
 		<![CDATA[
 		{ String ownerId ->
 			def user = userService.loggedOrSystem
-			def adminProcessRole = useCase.process.roles.values().find { it.importId == "admin_imp" }
-			if (user.stringId != ownerId && !user.getProcessRoles().any { it.stringId == adminProcessRole.stringId }) {
+			def adminRole = useCase.process.roles.values().find { it.importId == "admin_imp" }
+			if (user.stringId != ownerId && !user.getRoles().any { it.stringId == adminRole.stringId }) {
 				throw new IllegalArgumentException("User is not allowed to manipulate other users' impersonation configurations!")
 			}
 		}
@@ -206,7 +206,7 @@
 					<![CDATA[
 					def impersonatedUser = userService.findById(impersonated.rawValue.id, false)
 					change impersonated_roles options {
-						return impersonatedUser.processRoles.findAll { it.netId }.sort { it.netId }.collectEntries {
+						return impersonatedUser.roles.findAll { it.netId }.sort { it.netId }.collectEntries {
 							def net = petriNetService.get(new org.bson.types.ObjectId(it.netId))
 							return [(it.stringId): ("$it.name ($net.title $net.identifier-$net.version)" as String)]
 						}

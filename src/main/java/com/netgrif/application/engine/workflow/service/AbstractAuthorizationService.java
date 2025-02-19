@@ -19,20 +19,20 @@ public abstract class AbstractAuthorizationService {
         return hasPermission != null && !hasPermission;
     }
 
-    protected Map<CasePermission, Boolean> getAggregateProcessRolePermissions(IUser user, Map<String, Map<CasePermission, Boolean>> permissions) {
+    protected Map<CasePermission, Boolean> getAggregateRolePermissions(IUser user, Map<String, Map<CasePermission, Boolean>> permissions) {
         Map<CasePermission, Boolean> aggregatePermissions = new HashMap<>();
 
-        Set<String> userProcessRoleIDs = user.getSelfOrImpersonated().getProcessRoles().stream().map(role -> role.getId().toString()).collect(Collectors.toSet());
+        Set<String> userRoleIDs = user.getSelfOrImpersonated().getRoles().stream().map(role -> role.getId().toString()).collect(Collectors.toSet());
 
         for (Map.Entry<String, Map<CasePermission, Boolean>> role : permissions.entrySet()) {
-            aggregateProcessRolePermission(userProcessRoleIDs, role, aggregatePermissions);
+            aggregateRolePermission(userRoleIDs, role, aggregatePermissions);
         }
 
         return aggregatePermissions;
     }
 
-    private void aggregateProcessRolePermission(Set<String> userProcessRoleIDs, Map.Entry<String, Map<CasePermission, Boolean>> role, Map<CasePermission, Boolean> aggregatePermissions) {
-        if (!userProcessRoleIDs.contains(role.getKey())) {
+    private void aggregateRolePermission(Set<String> userRoleIDs, Map.Entry<String, Map<CasePermission, Boolean>> role, Map<CasePermission, Boolean> aggregatePermissions) {
+        if (!userRoleIDs.contains(role.getKey())) {
             return;
         }
         for (Map.Entry<CasePermission, Boolean> permission : role.getValue().entrySet()) {
@@ -47,17 +47,17 @@ public abstract class AbstractAuthorizationService {
     protected Map<TaskPermission, Boolean> getAggregateRolePermissions(IUser user, Map<String, Map<TaskPermission, Boolean>> permissions) {
         Map<TaskPermission, Boolean> aggregatePermissions = new HashMap<>();
 
-        Set<String> userProcessRoleIDs = user.getSelfOrImpersonated().getProcessRoles().stream().map(role -> role.getId().toString()).collect(Collectors.toSet());
+        Set<String> userRoleIDs = user.getSelfOrImpersonated().getRoles().stream().map(role -> role.getId().toString()).collect(Collectors.toSet());
 
         for (Map.Entry<String, Map<TaskPermission, Boolean>> role : permissions.entrySet()) {
-            aggregateRolePermission(userProcessRoleIDs, role, aggregatePermissions);
+            aggregateRolePermission(userRoleIDs, role, aggregatePermissions);
         }
 
         return aggregatePermissions;
     }
 
-    private void aggregateRolePermission(Set<String> userProcessRoleIDs, Map.Entry<String, Map<TaskPermission, Boolean>> role, Map<TaskPermission, Boolean> aggregatePermissions) {
-        if (!userProcessRoleIDs.contains(role.getKey())) {
+    private void aggregateRolePermission(Set<String> userRoleIDs, Map.Entry<String, Map<TaskPermission, Boolean>> role, Map<TaskPermission, Boolean> aggregatePermissions) {
+        if (!userRoleIDs.contains(role.getKey())) {
             return;
         }
         for (Map.Entry<TaskPermission, Boolean> permission : role.getValue().entrySet()) {

@@ -5,7 +5,7 @@ import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.UserState;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.petrinet.domain.roles.Role;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -68,8 +68,8 @@ public class LdapLoggedUser extends LoggedUser {
         user.setState(UserState.ACTIVE);
         user.setPassword("n/a");
         user.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
-        user.setProcessRoles(this.getProcessRoles().stream().map(roleId -> {
-            ProcessRole role = new ProcessRole();
+        user.setRoles(this.getRoles().stream().map(roleId -> {
+            Role role = new Role();
             role.setStringId(roleId);
             return role;
         }).collect(Collectors.toSet()));

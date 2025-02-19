@@ -16,7 +16,7 @@ import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.petrinet.domain.roles.Role
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImpersonationRunner
 import com.netgrif.application.engine.startup.ImportHelper
@@ -129,21 +129,21 @@ class ImpersonationServiceTest {
 
         user1 = helper.createUser(new User(name: "Test", surname: "User", email: "test@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority] as Authority[],
-                [] as ProcessRole[])
+                [] as Role[])
 
         auth1 = new UsernamePasswordAuthenticationToken(user1.transformToLoggedUser(), (user1 as User).password, user1.authorities)
         auth1.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
         user2 = helper.createUser(new User(name: "Test", surname: "User2", email: "test2@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority, authorityAnon] as Authority[],
-                testNet.roles.values() as ProcessRole[])
+                testNet.roles.values() as Role[])
 
         auth2 = new UsernamePasswordAuthenticationToken(user2.transformToLoggedUser(), (user2 as User).password, user2.authorities)
         auth2.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
         adminUser = helper.createUser(new User(name: "Admin", surname: "User", email: "admin@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority, authorityAdmin] as Authority[],
-                testNet.roles.values() as ProcessRole[])
+                testNet.roles.values() as Role[])
 
         adminUserAuth = new UsernamePasswordAuthenticationToken(adminUser.transformToLoggedUser(), (adminUser as User).password, adminUser.authorities)
         adminUserAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
@@ -158,7 +158,7 @@ class ImpersonationServiceTest {
         assert userService.loggedUser.isImpersonating()
         assert impersonated.stringId == user2.stringId
         assert impersonated.authorities.collect { it.stringId }.sort() == user2.authorities.collect { it.stringId }.sort()
-        assert impersonated.processRoles.collect { it.stringId }.sort() == user2.processRoles.collect { it.stringId }.sort()
+        assert impersonated.roles.collect { it.stringId }.sort() == user2.roles.collect { it.stringId }.sort()
     }
 
     @Test
@@ -175,12 +175,12 @@ class ImpersonationServiceTest {
 
     @Test
     void testImpersonationRolesAndAuths() {
-        def role = user2.processRoles.find { it.importId == "test_role" }
+        def role = user2.roles.find { it.importId == "test_role" }
         def auth = user2.authorities.find { it.name == Authority.user }
         def config = setup([role.stringId], [auth.stringId, authorityService.getOrCreate(Authority.admin).stringId])
 
         impersonationService.impersonateByConfig(config.stringId)
-        def impersonatedRoles = userService.loggedUser.getImpersonated().getProcessRoles()
+        def impersonatedRoles = userService.loggedUser.getImpersonated().getRoles()
         def impersonatedAuths = userService.loggedUser.getImpersonated().getAuthorities()
         assert impersonatedRoles.size() == 2 && impersonatedRoles.any { it.stringId == role.stringId }
         // default role counts
@@ -189,7 +189,7 @@ class ImpersonationServiceTest {
         def transformedUser = userService.loggedUser.transformToLoggedUser()
         def transformedUserImpersonated = transformedUser.getSelfOrImpersonated()
         assert transformedUser.isImpersonating()
-        assert transformedUserImpersonated.getProcessRoles().size() == 2 && transformedUserImpersonated.getProcessRoles().any { it == role.stringId }
+        assert transformedUserImpersonated.getRoles().size() == 2 && transformedUserImpersonated.getRoles().any { it == role.stringId }
         // default role counts
         assert transformedUserImpersonated.getAuthorities().size() == 1 && (transformedUserImpersonated.getAuthorities()[0] as Authority).stringId == auth.stringId
     }
@@ -307,7 +307,7 @@ class ImpersonationServiceTest {
         caze.dataSet.get("impersonated_email").rawValue = owner.email
         caze.dataSet.get("config_owner").rawValue = new UserListFieldValue([owner])
         caze.dataSet.get("impersonators").rawValue = [impersonator]
-        caze.dataSet.get("impersonated_roles").rawValue = roles ?: user.processRoles.stringId as List
+        caze.dataSet.get("impersonated_roles").rawValue = roles ?: user.roles.stringId as List
         caze.dataSet.get("impersonated_authorities").rawValue = auths ?: user.authorities.stringId as List
         caze.dataSet.get("valid_from").rawValue = LocalDateTime.now().minusDays(1)
 

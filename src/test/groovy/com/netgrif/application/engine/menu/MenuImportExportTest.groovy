@@ -8,7 +8,7 @@ import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.orgstructure.groups.NextGroupService
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.petrinet.domain.roles.Role
 import com.netgrif.application.engine.startup.*
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
@@ -202,7 +202,7 @@ class MenuImportExportTest {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         return importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [] as ProcessRole[])
+                [] as Role[])
     }
 
 

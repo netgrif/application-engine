@@ -14,7 +14,7 @@ import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserH
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationSessionService;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.petrinet.domain.roles.Role;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;
@@ -91,7 +91,7 @@ public class ImpersonationService implements IImpersonationService {
         log.info(loggedUser.getFullName() + " has just impersonated user " + impersonatedLogged.getFullName());
         historyService.save(
                 new ImpersonationStartEventLog(loggedUser.getId(), impersonatedLogged.getId(),
-                        new ArrayList<>(impersonatedLogged.getProcessRoles()),
+                        new ArrayList<>(impersonatedLogged.getRoles()),
                         impersonatedLogged.getAuthorities().stream().map(au -> ((Authority) au).getStringId()).collect(Collectors.toList()))
         );
         return loggedUser;
@@ -154,10 +154,10 @@ public class ImpersonationService implements IImpersonationService {
             return impersonated;
         }
         List<Authority> authorities = impersonationAuthorizationService.getAuthorities(configs, impersonated);
-        List<ProcessRole> roles = impersonationAuthorizationService.getRoles(configs, impersonated);
+        List<Role> roles = impersonationAuthorizationService.getRoles(configs, impersonated);
 
         impersonated.setAuthorities(new HashSet<>(authorities));
-        impersonated.setProcessRoles(new HashSet<>(roles));
+        impersonated.setRoles(new HashSet<>(roles));
 
         return impersonated;
     }

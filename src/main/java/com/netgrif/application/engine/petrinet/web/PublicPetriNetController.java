@@ -4,7 +4,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,13 +39,13 @@ public class PublicPetriNetController {
 
     private final IPetriNetService petriNetService;
 
-    private final IProcessRoleService roleService;
+    private final IRoleService roleService;
 
     private final IUserService userService;
 
     private final StringToVersionConverter converter;
 
-    public PublicPetriNetController(IPetriNetService petriNetService, IUserService userService, StringToVersionConverter converter, IProcessRoleService roleService) {
+    public PublicPetriNetController(IPetriNetService petriNetService, IUserService userService, StringToVersionConverter converter, IRoleService roleService) {
         this.petriNetService = petriNetService;
         this.converter = converter;
         this.userService = userService;
@@ -80,9 +80,9 @@ public class PublicPetriNetController {
     // TODO: release/8.0.0 deprecated
     @Operation(summary = "Get roles of process")
     @GetMapping(value = "/{netId}/roles", produces = MediaTypes.HAL_JSON_VALUE)
-    public ProcessRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
+    public RolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
         netId = decodeUrl(netId);
-        return new ProcessRolesResource(roleService.findAll(netId), petriNetService.getPetriNet(netId).getPermissions(), locale);
+        return new RolesResource(roleService.findAll(netId), petriNetService.getPetriNet(netId).getPermissions(), locale);
     }
 
     @Operation(summary = "Get data fields of transitions")

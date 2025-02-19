@@ -4,8 +4,8 @@ import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
 import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
-import com.netgrif.application.engine.petrinet.service.ProcessRoleService
+import com.netgrif.application.engine.petrinet.domain.roles.RoleRepository
+import com.netgrif.application.engine.petrinet.service.RoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.*
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
@@ -23,9 +23,9 @@ class TestHelper {
     @Autowired
     private UserRepository userRepository
     @Autowired
-    private ProcessRoleRepository roleRepository
+    private RoleRepository roleRepository
     @Autowired
-    private ProcessRoleService roleService
+    private RoleService roleService
     @Autowired
     private SystemUserRunner systemUserRunner
     @Autowired

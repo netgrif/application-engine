@@ -27,7 +27,7 @@ import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupS
 import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.petrinet.domain.roles.Role
 import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
@@ -64,7 +64,6 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 
 import java.text.Normalizer
-import java.time.LocalDate
 import java.util.stream.Collectors
 
 /**
@@ -1048,7 +1047,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         NewUserRequest newUserRequest = new NewUserRequest()
         newUserRequest.email = email
         newUserRequest.groups = new HashSet<>()
-        newUserRequest.processRoles = new HashSet<>()
+        newUserRequest.roles = new HashSet<>()
         return inviteUser(newUserRequest)
     }
 
@@ -1460,7 +1459,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      * @param bannedRoles
      * @return
      */
-    Case createMenuItem(String uri, String identifier, Case filter, String groupName, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], List<String> defaultHeaders = []) {
+    Case createMenuItem(String uri, String identifier, Case filter, String groupName, List<Role> allowedRoles, List<Role> bannedRoles = [], List<String> defaultHeaders = []) {
         return doCreateMenuItem(uri, identifier, filter, nextGroupService.findByName(groupName), collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles), defaultHeaders)
     }
 
@@ -1490,7 +1489,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      * @param group - if null, default group is used
      * @return
      */
-    Case createMenuItem(String uri, String identifier, Case filter, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], Case group = null, List<String> defaultHeaders = []) {
+    Case createMenuItem(String uri, String identifier, Case filter, List<Role> allowedRoles, List<Role> bannedRoles = [], Case group = null, List<String> defaultHeaders = []) {
         return doCreateMenuItem(uri, identifier, filter, group, collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles), defaultHeaders)
     }
 
@@ -1735,7 +1734,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         item = workflowService.findOne(item.stringId)
         def roles = cl()
         MultichoiceMapField dataField = item.dataSet.get(roleFieldId) as MultichoiceMapField
-        if (roles instanceof List<ProcessRole>) {
+        if (roles instanceof List<Role>) {
             dataField.options = collectRolesForPreferenceItem(roles)
         } else if (roles instanceof Map<String, String>) {
             dataField.options = collectRolesForPreferenceItem(roles)
@@ -1979,7 +1978,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return findMenuItem(uri, name)
     }
 
-    private Map<String, I18nString> collectRolesForPreferenceItem(List<ProcessRole> roles) {
+    private Map<String, I18nString> collectRolesForPreferenceItem(List<Role> roles) {
         return roles.collectEntries { role ->
             Process net = petriNetService.get(new ObjectId(role.netId))
             return [(role.importId + ":" + net.identifier), ("$role.name ($net.title)" as String)]
@@ -1993,7 +1992,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
                 temp.put(entry.value, petriNetService.getNewestVersionByIdentifier(entry.value))
             }
             Process net = temp[entry.value]
-            ProcessRole role = net.roles.find { it.value.importId == entry.key }.value
+            Role role = net.roles.find { it.value.importId == entry.key }.value
             return [(role.importId + ":" + net.identifier), ("$role.name ($net.title)" as String)]
         } as Map<String, I18nString>
     }

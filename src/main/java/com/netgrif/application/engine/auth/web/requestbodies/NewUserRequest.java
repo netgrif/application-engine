@@ -9,7 +9,7 @@ public class NewUserRequest {
 
     public String email;
     public Set<String> groups;
-    public Set<String> processRoles;
+    public Set<String> roles;
 
     public NewUserRequest() {
     }

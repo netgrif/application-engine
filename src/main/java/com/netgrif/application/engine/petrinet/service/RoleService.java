@@ -10,11 +10,9 @@ import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.Event;
-import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.petrinet.domain.roles.Role;
+import com.netgrif.application.engine.petrinet.domain.roles.RoleRepository;
+import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -28,45 +26,39 @@ import java.util.stream.StreamSupport;
 
 @Slf4j
 @Service
-public class ProcessRoleService implements IProcessRoleService {
+public class RoleService implements IRoleService {
 
     private final IUserService userService;
-    private final ProcessRoleRepository processRoleRepository;
-    private final PetriNetRepository netRepository;
+    private final RoleRepository roleRepository;
     private final ApplicationEventPublisher publisher;
-    private final IPetriNetService petriNetService;
     private final ISecurityContextService securityContextService;
     private final ActionRunner actionsRunner;
 
-    private ProcessRole defaultRole;
-    private ProcessRole anonymousRole;
+    private Role defaultRole;
+    private Role anonymousRole;
 
-    public ProcessRoleService(
-            ProcessRoleRepository processRoleRepository,
-            PetriNetRepository netRepository,
+    public RoleService(
+            RoleRepository roleRepository,
             ApplicationEventPublisher publisher,
-            @Lazy IPetriNetService petriNetService,
             @Lazy IUserService userService,
             ISecurityContextService securityContextService,
             ActionRunner actionsRunner
     ) {
-        this.processRoleRepository = processRoleRepository;
-        this.netRepository = netRepository;
+        this.roleRepository = roleRepository;
         this.publisher = publisher;
-        this.petriNetService = petriNetService;
         this.userService = userService;
         this.securityContextService = securityContextService;
         this.actionsRunner = actionsRunner;
     }
 
     @Override
-    public List<ProcessRole> saveAll(Iterable<ProcessRole> entities) {
-        return processRoleRepository.saveAll(entities);
+    public List<Role> saveAll(Iterable<Role> entities) {
+        return roleRepository.saveAll(entities);
     }
 
     @Override
-    public Set<ProcessRole> findByIds(Set<String> ids) {
-        return StreamSupport.stream(processRoleRepository.findAllById(ids).spliterator(), false).collect(Collectors.toSet());
+    public Set<Role> findByIds(Set<String> ids) {
+        return StreamSupport.stream(roleRepository.findAllById(ids).spliterator(), false).collect(Collectors.toSet());
     }
 
     @Override
@@ -77,7 +69,7 @@ public class ProcessRoleService implements IProcessRoleService {
     @Override
     public void assignRolesToUser(String userId, Set<String> requestedRolesIds, LoggedUser loggedUser, Map<String, String> params) {
         IUser user = userService.resolveById(userId);
-        Set<ProcessRole> requestedRoles = this.findByIds(requestedRolesIds);
+        Set<Role> requestedRoles = this.findByIds(requestedRolesIds);
         if (requestedRoles.isEmpty() && !requestedRolesIds.isEmpty()) {
             throw new IllegalArgumentException("No process roles found.");
         }
@@ -85,16 +77,16 @@ public class ProcessRoleService implements IProcessRoleService {
             throw new IllegalArgumentException("Not all process roles were found!");
         }
 
-        Set<ProcessRole> userOldRoles = user.getProcessRoles();
+        Set<Role> userOldRoles = user.getRoles();
 
-        Set<ProcessRole> rolesNewToUser = getRolesNewToUser(userOldRoles, requestedRoles);
-        Set<ProcessRole> rolesRemovedFromUser = getRolesRemovedFromUser(userOldRoles, requestedRoles);
+        Set<Role> rolesNewToUser = getRolesNewToUser(userOldRoles, requestedRoles);
+        Set<Role> rolesRemovedFromUser = getRolesRemovedFromUser(userOldRoles, requestedRoles);
 
         Set<String> rolesNewToUserIds = mapUserRolesToIds(rolesNewToUser);
         Set<String> rolesRemovedFromUserIds = mapUserRolesToIds(rolesRemovedFromUser);
 
-        Set<ProcessRole> newRoles = this.findByIds(rolesNewToUserIds);
-        Set<ProcessRole> removedRoles = this.findByIds(rolesRemovedFromUserIds);
+        Set<Role> newRoles = this.findByIds(rolesNewToUserIds);
+        Set<Role> removedRoles = this.findByIds(rolesRemovedFromUserIds);
 
         runAllPreActions(newRoles, removedRoles, user, params);
         user = userService.findById(userId);
@@ -105,56 +97,56 @@ public class ProcessRoleService implements IProcessRoleService {
 
         securityContextService.saveToken(userId);
         if (Objects.equals(userId, loggedUser.getId())) {
-            loggedUser.getProcessRoles().clear();
-            loggedUser.parseProcessRoles(user.getProcessRoles());
+            loggedUser.getRoles().clear();
+            loggedUser.parseRoles(user.getRoles());
             securityContextService.reloadSecurityContext(loggedUser);
         }
     }
 
-    private Set<ProcessRole> updateRequestedRoles(IUser user, Set<ProcessRole> rolesNewToUser, Set<ProcessRole> rolesRemovedFromUser) {
-        Set<ProcessRole> userRolesAfterPreActions = user.getProcessRoles();
+    private Set<Role> updateRequestedRoles(IUser user, Set<Role> rolesNewToUser, Set<Role> rolesRemovedFromUser) {
+        Set<Role> userRolesAfterPreActions = user.getRoles();
         userRolesAfterPreActions.addAll(rolesNewToUser);
         userRolesAfterPreActions.removeAll(rolesRemovedFromUser);
 
         return new HashSet<>(userRolesAfterPreActions);
     }
 
-    private void replaceUserRolesAndPublishEvent(Set<String> requestedRolesIds, IUser user, Set<ProcessRole> requestedRoles) {
+    private void replaceUserRolesAndPublishEvent(Set<String> requestedRolesIds, IUser user, Set<Role> requestedRoles) {
         removeOldAndAssignNewRolesToUser(user, requestedRoles);
         publisher.publishEvent(new UserRoleChangeEvent(user, this.findByIds(requestedRolesIds)));
     }
 
-    private Set<ProcessRole> getRolesNewToUser(Set<ProcessRole> userOldRoles, Set<ProcessRole> newRequestedRoles) {
-        Set<ProcessRole> rolesNewToUser = new HashSet<>(newRequestedRoles);
+    private Set<Role> getRolesNewToUser(Set<Role> userOldRoles, Set<Role> newRequestedRoles) {
+        Set<Role> rolesNewToUser = new HashSet<>(newRequestedRoles);
         rolesNewToUser.removeAll(userOldRoles);
 
         return rolesNewToUser;
     }
 
-    private Set<ProcessRole> getRolesRemovedFromUser(Set<ProcessRole> userOldRoles, Set<ProcessRole> newRequestedRoles) {
-        Set<ProcessRole> rolesRemovedFromUser = new HashSet<>(userOldRoles);
+    private Set<Role> getRolesRemovedFromUser(Set<Role> userOldRoles, Set<Role> newRequestedRoles) {
+        Set<Role> rolesRemovedFromUser = new HashSet<>(userOldRoles);
         rolesRemovedFromUser.removeAll(newRequestedRoles);
 
         return rolesRemovedFromUser;
     }
 
-    private Set<String> mapUserRolesToIds(Collection<ProcessRole> processRoles) {
-        return processRoles.stream()
-                .map(ProcessRole::getStringId)
+    private Set<String> mapUserRolesToIds(Collection<Role> roles) {
+        return roles.stream()
+                .map(Role::getStringId)
                 .collect(Collectors.toSet());
     }
 
-    private void runAllPreActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles, IUser user, Map<String, String> params) {
+    private void runAllPreActions(Set<Role> newRoles, Set<Role> removedRoles, IUser user, Map<String, String> params) {
         runAllSuitableActionsOnRoles(newRoles, EventType.ASSIGN, EventPhaseType.PRE, user, params);
         runAllSuitableActionsOnRoles(removedRoles, EventType.CANCEL, EventPhaseType.PRE, user, params);
     }
 
-    private void runAllPostActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles, IUser user, Map<String, String> params) {
+    private void runAllPostActions(Set<Role> newRoles, Set<Role> removedRoles, IUser user, Map<String, String> params) {
         runAllSuitableActionsOnRoles(newRoles, EventType.ASSIGN, EventPhaseType.POST, user, params);
         runAllSuitableActionsOnRoles(removedRoles, EventType.CANCEL, EventPhaseType.POST, user, params);
     }
 
-    private void runAllSuitableActionsOnRoles(Set<ProcessRole> roles, EventType requiredEventType, EventPhaseType requiredPhase, IUser user, Map<String, String> params) {
+    private void runAllSuitableActionsOnRoles(Set<Role> roles, EventType requiredEventType, EventPhaseType requiredPhase, IUser user, Map<String, String> params) {
         roles.forEach(role -> {
             runAllSuitableActionsOnOneRole(role.getEvents(), requiredEventType, requiredPhase, params);
         });
@@ -189,29 +181,29 @@ public class ProcessRoleService implements IProcessRoleService {
         actions.forEach(action -> actionsRunner.run(action, null, params));
     }
 
-    private void removeOldAndAssignNewRolesToUser(IUser user, Set<ProcessRole> requestedRoles) {
-        user.getProcessRoles().clear();
-        user.getProcessRoles().addAll(requestedRoles);
+    private void removeOldAndAssignNewRolesToUser(IUser user, Set<Role> requestedRoles) {
+        user.getRoles().clear();
+        user.getRoles().addAll(requestedRoles);
 
         userService.save(user);
     }
 
     @Override
-    public List<ProcessRole> findAll() {
-        return processRoleRepository.findAll();
+    public List<Role> findAll() {
+        return roleRepository.findAll();
     }
 
     @Override
-    public List<ProcessRole> findAll(String netId) {
+    public List<Role> findAll(String netId) {
         // TODO: release/8.0.0 fix
         return null;
     }
 
     @Override
-    public ProcessRole defaultRole() {
+    public Role defaultRole() {
         // TODO: release/8.0.0 duplicate code
         if (defaultRole == null) {
-            Set<ProcessRole> roles = processRoleRepository.findAllByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
+            Set<Role> roles = roleRepository.findAllByName_DefaultValue(Role.DEFAULT_ROLE);
             if (roles.isEmpty()) {
                 throw new IllegalStateException("No default process role has been found!");
             }
@@ -224,9 +216,9 @@ public class ProcessRoleService implements IProcessRoleService {
     }
 
     @Override
-    public ProcessRole anonymousRole() {
+    public Role anonymousRole() {
         if (anonymousRole == null) {
-            Set<ProcessRole> roles = processRoleRepository.findAllByImportId(ProcessRole.ANONYMOUS_ROLE);
+            Set<Role> roles = roleRepository.findAllByImportId(Role.ANONYMOUS_ROLE);
             if (roles.isEmpty()) {
                 throw new IllegalStateException("No anonymous process role has been found!");
             }
@@ -241,27 +233,27 @@ public class ProcessRoleService implements IProcessRoleService {
     /**
      * @param importId id from a process of a role
      * @return a process role object
-     * @deprecated use {@link ProcessRoleService#findAllByImportId(String)} instead
+     * @deprecated use {@link RoleService#findAllByImportId(String)} instead
      */
     @Deprecated(forRemoval = true, since = "6.2.0")
     @Override
-    public ProcessRole findByImportId(String importId) {
-        return processRoleRepository.findAllByImportId(importId).stream().findFirst().orElse(null);
+    public Role findByImportId(String importId) {
+        return roleRepository.findAllByImportId(importId).stream().findFirst().orElse(null);
     }
 
     @Override
-    public Set<ProcessRole> findAllByImportId(String importId) {
-        return processRoleRepository.findAllByImportId(importId);
+    public Set<Role> findAllByImportId(String importId) {
+        return roleRepository.findAllByImportId(importId);
     }
 
     @Override
-    public Set<ProcessRole> findAllByDefaultName(String name) {
-        return processRoleRepository.findAllByName_DefaultValue(name);
+    public Set<Role> findAllByDefaultName(String name) {
+        return roleRepository.findAllByName_DefaultValue(name);
     }
 
     @Override
-    public ProcessRole findById(String id) {
-        return processRoleRepository.findById(id).orElse(null);
+    public Role findById(String id) {
+        return roleRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -272,28 +264,28 @@ public class ProcessRoleService implements IProcessRoleService {
         List<ObjectId> deletedRoleIds = null;
         Set<String> deletedRoleStringIds = deletedRoleIds.stream().map(ObjectId::toString).collect(Collectors.toSet());
 
-        List<IUser> usersWithRemovedRoles = this.userService.findAllByProcessRoles(deletedRoleStringIds);
+        List<IUser> usersWithRemovedRoles = this.userService.findAllByRoles(deletedRoleStringIds);
         for (IUser user : usersWithRemovedRoles) {
             log.info("[{}]: Removing deleted roles of Petri net {} version {} from user {} with id {}", net.getStringId(), net.getIdentifier(), net.getVersion().toString(), user.getFullName(), user.getStringId());
-            if (user.getProcessRoles().isEmpty()) {
+            if (user.getRoles().isEmpty()) {
                 continue;
             }
 
-            Set<String> newRoles = user.getProcessRoles().stream()
+            Set<String> newRoles = user.getRoles().stream()
                     .filter(role -> !deletedRoleStringIds.contains(role.getStringId()))
-                    .map(ProcessRole::getStringId)
+                    .map(Role::getStringId)
                     .collect(Collectors.toSet());
             this.assignRolesToUser(user.getStringId(), newRoles, loggedUser);
         }
 
         log.info("[{}]: Deleting all roles of Petri net {} version {}", net.getStringId(), net.getIdentifier(), net.getVersion().toString());
-        this.processRoleRepository.deleteAllByIdIn(deletedRoleIds);
+        this.roleRepository.deleteAllByIdIn(deletedRoleIds);
     }
 
     // TODO: release/8.0.0 cache
     @Override
     public boolean existsByImportId(String importId) {
-        return processRoleRepository.existsByImportId(importId);
+        return roleRepository.existsByImportId(importId);
     }
 
     public void clearCache() {

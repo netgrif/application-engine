@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.auth.domain;
 
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.petrinet.domain.roles.Role;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Transient;
@@ -26,7 +26,7 @@ public abstract class AbstractUser implements IUser, Serializable {
     @Getter
     @Setter
     // TODO: release/8.0.0 set of role ids
-    protected Set<ProcessRole> processRoles;
+    protected Set<Role> roles;
 
     @Getter
     @Setter
@@ -40,7 +40,7 @@ public abstract class AbstractUser implements IUser, Serializable {
     public AbstractUser() {
         authorities = new HashSet<>();
         nextGroups = new HashSet<>();
-        processRoles = new HashSet<>();
+        roles = new HashSet<>();
     }
 
     public void addAuthority(Authority authority) {
@@ -50,14 +50,14 @@ public abstract class AbstractUser implements IUser, Serializable {
         authorities.add(authority);
     }
 
-    public void addProcessRole(ProcessRole role) {
-        if (processRoles.stream().anyMatch(it -> it.getStringId().equals(role.getStringId())))
+    public void addRole(Role role) {
+        if (roles.stream().anyMatch(it -> it.getStringId().equals(role.getStringId())))
             return;
-        processRoles.add(role);
+        roles.add(role);
     }
 
-    public void removeProcessRole(ProcessRole role) {
-        processRoles.remove(role);
+    public void removeRole(Role role) {
+        roles.remove(role);
     }
 
     public void addGroup(String groupId) {

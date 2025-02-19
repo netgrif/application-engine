@@ -82,7 +82,7 @@ public interface IPetriNetService {
 
     List<PetriNetReference> getReferencesByVersion(Version version, LoggedUser user, Locale locale);
 
-    List<PetriNetReference> getReferencesByUsersProcessRoles(LoggedUser user, Locale locale);
+    List<PetriNetReference> getReferencesByUsersRoles(LoggedUser user, Locale locale);
 
     PetriNetReference getReference(String identifier, Version version, LoggedUser user, Locale locale);
 

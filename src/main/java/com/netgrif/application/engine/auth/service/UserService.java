@@ -8,7 +8,7 @@ import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.application.engine.event.events.user.UserRegistrationEvent;
 import com.netgrif.application.engine.orgstructure.groups.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
 import com.netgrif.application.engine.startup.SystemUserRunner;
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -19,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,7 +32,7 @@ public class UserService extends AbstractUserService {
     protected AuthorityRepository authorityRepository;
 
     @Autowired
-    protected IProcessRoleService processRoleService;
+    protected IRoleService roleService;
 
     @Autowired
     protected ApplicationEventPublisher publisher;
@@ -110,11 +109,11 @@ public class UserService extends AbstractUserService {
     }
 
     public void addDefaultRole(User user) {
-        user.addProcessRole(processRoleService.defaultRole());
+        user.addRole(roleService.defaultRole());
     }
 
     public void addAnonymousRole(User user) {
-        user.addProcessRole(processRoleService.anonymousRole());
+        user.addRole(roleService.anonymousRole());
     }
 
     public void addDefaultAuthorities(User user) {
@@ -214,9 +213,9 @@ public class UserService extends AbstractUserService {
         members.add(loggedUser.getSelfOrImpersonated().getId());
         BooleanExpression predicate = buildPredicate(members.stream().map(ObjectId::new).collect(Collectors.toSet()), query);
         if (!(roleIds == null || roleIds.isEmpty())) {
-            predicate = predicate.and(QUser.user.processRoles.any().id.in(roleIds));
+            predicate = predicate.and(QUser.user.roles.any().id.in(roleIds));
         }
-        predicate = predicate.and(QUser.user.processRoles.any().id.in(negateRoleIds).not());
+        predicate = predicate.and(QUser.user.roles.any().id.in(negateRoleIds).not());
         Page<User> users = userRepository.findAll(predicate, pageable);
 
         return changeType(users, pageable);
@@ -236,14 +235,14 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
-    public Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, Pageable pageable) {
-        Page<User> users = userRepository.findDistinctByStateAndProcessRoles_IdIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
+    public Page<IUser> findAllActiveByRoles(Set<String> roleIds, Pageable pageable) {
+        Page<User> users = userRepository.findDistinctByStateAndRoles_IdIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
         return changeType(users, pageable);
     }
 
     @Override
-    public List<IUser> findAllByProcessRoles(Set<String> roleIds) {
-        List<User> users = userRepository.findAllByProcessRoles_IdIn(new ArrayList<>(roleIds));
+    public List<IUser> findAllByRoles(Set<String> roleIds) {
+        List<User> users = userRepository.findAllByRoles_IdIn(new ArrayList<>(roleIds));
         return changeType(users);
     }
 
@@ -286,7 +285,7 @@ public class UserService extends AbstractUserService {
     @Override
     public IUser getSystem() {
         IUser system = userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
-        system.setProcessRoles(new HashSet<>(processRoleService.findAll()));
+        system.setRoles(new HashSet<>(roleService.findAll()));
         return system;
     }
 
@@ -299,7 +298,7 @@ public class UserService extends AbstractUserService {
                 // cannot be simply reloaded from DB, impersonated user holds a subset of roles and authorities.
                 // this reloads the impersonated user's roles as they are not complete (LoggedUser creates incomplete ProcessRole objects)
                 IUser impersonated = loggedUser.getImpersonated().transformToUser();
-                impersonated.setProcessRoles(processRoleService.findByIds(loggedUser.getImpersonated().getProcessRoles()));
+                impersonated.setRoles(roleService.findByIds(loggedUser.getImpersonated().getRoles()));
                 user.setImpersonated(impersonated);
             }
             return user;

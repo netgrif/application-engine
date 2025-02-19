@@ -25,11 +25,11 @@ import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.layout.LayoutContainer;
 import com.netgrif.application.engine.petrinet.domain.layout.LayoutItem;
 import com.netgrif.application.engine.petrinet.domain.layout.LayoutObjectType;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.petrinet.domain.roles.Role;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import lombok.Getter;
@@ -60,8 +60,8 @@ public class Importer {
     protected Process process;
     @Getter
     protected ImportResult result;
-    protected ProcessRole defaultRole;
-    protected ProcessRole anonymousRole;
+    protected Role defaultRole;
+    protected Role anonymousRole;
     protected boolean isDefaultRoleEnabled = false;
     protected boolean isAnonymousRoleEnabled = false;
 
@@ -79,7 +79,7 @@ public class Importer {
     protected IPetriNetService service;
 
     @Autowired
-    protected IProcessRoleService processRoleService;
+    protected IRoleService roleService;
 
     @Autowired
     protected IPetriNetService petriNetService;
@@ -127,8 +127,8 @@ public class Importer {
     }
 
     protected void initialize() {
-        this.defaultRole = processRoleService.defaultRole();
-        this.anonymousRole = processRoleService.anonymousRole();
+        this.defaultRole = roleService.defaultRole();
+        this.anonymousRole = roleService.anonymousRole();
     }
 
     public com.netgrif.application.engine.importer.model.Process unmarshallXml(InputStream xml) throws JAXBException {
@@ -527,7 +527,7 @@ public class Importer {
         addSystemRole(transition, isAnonymousRoleEnabled, anonymousRole);
     }
 
-    protected void addSystemRole(boolean isEnabled, ProcessRole role) {
+    protected void addSystemRole(boolean isEnabled, Role role) {
         if (!isEnabled || process.getPermissions().containsKey(role.getStringId())) {
             return;
         }
@@ -539,7 +539,7 @@ public class Importer {
         process.addPermission(role.getStringId(), permissionFactory.buildProcessPermissions(logic));
     }
 
-    protected void addSystemRole(Transition transition, boolean isEnabled, ProcessRole role) {
+    protected void addSystemRole(Transition transition, boolean isEnabled, Role role) {
         if (!isEnabled || transition.getPermissions().containsKey(role.getStringId())) {
             return;
         }
@@ -554,7 +554,7 @@ public class Importer {
         if (logic == null) {
             return;
         }
-        ProcessRole role = this.findRole(roleRef.getId());
+        Role role = this.findRole(roleRef.getId());
         if (role == null) {
             // TODO: release/8.0.0 warn
             return;
@@ -564,7 +564,7 @@ public class Importer {
 
     protected void createTaskPermissions(Transition transition, com.netgrif.application.engine.importer.model.RoleRef roleRef) {
         com.netgrif.application.engine.importer.model.RoleRefLogic logic = roleRef.getLogic();
-        ProcessRole role = this.findRole(roleRef.getId());
+        Role role = this.findRole(roleRef.getId());
         if (logic == null || role == null) {
             // TODO: release/8.0.0 warn
             return;
@@ -611,18 +611,18 @@ public class Importer {
     }
 
     protected void createRole(com.netgrif.application.engine.importer.model.Role importRole) {
-        if (importRole.getId().equals(ProcessRole.DEFAULT_ROLE)) {
-            throw new IllegalArgumentException("Role ID '" + ProcessRole.DEFAULT_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
+        if (importRole.getId().equals(Role.DEFAULT_ROLE)) {
+            throw new IllegalArgumentException("Role ID '" + Role.DEFAULT_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
         }
-        if (importRole.getId().equals(ProcessRole.ANONYMOUS_ROLE)) {
-            throw new IllegalArgumentException("Role ID '" + ProcessRole.ANONYMOUS_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
+        if (importRole.getId().equals(Role.ANONYMOUS_ROLE)) {
+            throw new IllegalArgumentException("Role ID '" + Role.ANONYMOUS_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
         }
         String importId = importRole.getId();
-        if (processRoleService.existsByImportId(importId)) {
+        if (roleService.existsByImportId(importId)) {
             return;
         }
 
-        ProcessRole role = new ProcessRole();
+        Role role = new Role();
         role.setImportId(importRole.getId());
         role.setName(toI18NString(importRole.getTitle()));
         if (importRole.getEvent() != null) {
@@ -818,7 +818,7 @@ public class Importer {
         return (permission != null && permission);
     }
 
-    protected ProcessRole findRole(String importId) {
-        return result.getRoles().getOrDefault(importId, processRoleService.findByImportId(importId));
+    protected Role findRole(String importId) {
+        return result.getRoles().getOrDefault(importId, roleService.findByImportId(importId));
     }
 }

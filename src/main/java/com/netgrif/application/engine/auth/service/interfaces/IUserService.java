@@ -41,11 +41,11 @@ public interface IUserService {
 
     List<IUser> findAllByIds(Set<String> ids);
 
-    Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, Pageable pageable);
+    Page<IUser> findAllActiveByRoles(Set<String> roleIds, Pageable pageable);
 
     void addDefaultRole(IUser user);
 
-    List<IUser> findAllByProcessRoles(Set<String> roleIds);
+    List<IUser> findAllByRoles(Set<String> roleIds);
 
     void addDefaultAuthorities(IUser user);
 

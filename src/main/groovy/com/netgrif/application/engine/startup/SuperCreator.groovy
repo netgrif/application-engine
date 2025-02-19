@@ -5,8 +5,8 @@ import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
+import com.netgrif.application.engine.petrinet.domain.roles.Role
+import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,7 +29,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     private INextGroupService groupService
 
     @Autowired
-    private IProcessRoleService processRoleService
+    private IRoleService roleService
 
     @Autowired
     private SuperAdminConfiguration configuration
@@ -59,13 +59,13 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
                 password: configuration.password,
                 state: UserState.ACTIVE,
                 authorities: [adminAuthority, systemAuthority] as Set<Authority>,
-                processRoles: processRoleService.findAll() as Set<ProcessRole>))
+                roles: roleService.findAll() as Set<Role>))
         log.info("Super user created")
     }
 
     void setAllToSuperUser() {
         setAllGroups()
-        setAllProcessRoles()
+        setAllRoles()
         setAllAuthorities()
         log.info("Super user updated")
     }
@@ -76,8 +76,8 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
         }
     }
 
-    void setAllProcessRoles() {
-        superUser.setProcessRoles(processRoleService.findAll() as Set<ProcessRole>)
+    void setAllRoles() {
+        superUser.setRoles(roleService.findAll() as Set<Role>)
         superUser = userService.save(superUser) as IUser
     }
 

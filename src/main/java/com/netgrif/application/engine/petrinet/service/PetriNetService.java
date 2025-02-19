@@ -28,7 +28,7 @@ import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepos
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.application.engine.rules.domain.facts.NetImportedFact;
@@ -74,7 +74,7 @@ import static com.netgrif.application.engine.petrinet.service.interfaces.IPetriN
 public class PetriNetService implements IPetriNetService {
 
     @Autowired
-    private IProcessRoleService processRoleService;
+    private IRoleService roleService;
 
     @Autowired
     private PetriNetRepository repository;
@@ -229,7 +229,7 @@ public class PetriNetService implements IPetriNetService {
             net.setVersion(existingNet.getVersion());
             net.incrementVersion(releaseType);
         }
-        processRoleService.saveAll(imported.getRoles().values());
+        roleService.saveAll(imported.getRoles().values());
         net.setAuthorId(author.getId());
         functionCacheService.cachePetriNetFunctions(net);
         // TODO: release/8.0.0
@@ -424,8 +424,8 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNetReference> getReferencesByUsersProcessRoles(LoggedUser user, Locale locale) {
-        Query query = Query.query(getProcessRolesCriteria(user));
+    public List<PetriNetReference> getReferencesByUsersRoles(LoggedUser user, Locale locale) {
+        Query query = Query.query(getRolesCriteria(user));
         return mongoTemplate.find(query, Process.class).stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
     }
 
@@ -477,7 +477,7 @@ public class PetriNetService implements IPetriNetService {
         Query queryTotal = new Query();
 
         if (!user.getSelfOrImpersonated().isAdmin())
-            query.addCriteria(getProcessRolesCriteria(user.getSelfOrImpersonated()));
+            query.addCriteria(getRolesCriteria(user.getSelfOrImpersonated()));
 
         if (criteriaClass.getIdentifier() != null) {
             this.addValueCriteria(query, queryTotal, Criteria.where("identifier").regex(criteriaClass.getIdentifier(), "i"));
@@ -551,11 +551,11 @@ public class PetriNetService implements IPetriNetService {
 
         this.userService.removeRoleOfDeletedPetriNet(process);
         this.workflowService.deleteInstancesOfPetriNet(process);
-        this.processRoleService.deleteRolesOfNet(process, loggedUser);
+        this.roleService.deleteRolesOfNet(process, loggedUser);
         try {
-            ldapGroupService.deleteProcessRoleByPetrinet(process.getStringId());
+            ldapGroupService.deleteRoleByPetriNet(process.getStringId());
         } catch (NullPointerException e) {
-            log.info("LdapGroup and ProcessRole mapping are not activated...");
+            log.info("LdapGroup and Role mapping are not activated...");
         } catch (Exception ex) {
             log.error("LdapGroup", ex);
         }
@@ -569,8 +569,8 @@ public class PetriNetService implements IPetriNetService {
         historyService.save(new DeletePetriNetEventLog(null, EventPhase.PRE, process.getObjectId()));
     }
 
-    private Criteria getProcessRolesCriteria(LoggedUser user) {
-        return new Criteria().orOperator(user.getProcessRoles().stream()
+    private Criteria getRolesCriteria(LoggedUser user) {
+        return new Criteria().orOperator(user.getRoles().stream()
                 .map(role -> Criteria.where("permissions." + role).exists(true)).toArray(Criteria[]::new));
     }
 

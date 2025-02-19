@@ -17,11 +17,11 @@ import com.netgrif.application.engine.petrinet.domain.arcs.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.petrinet.domain.roles.Role;
 import com.netgrif.application.engine.petrinet.domain.throwable.IllegalMarkingException;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.MultiplicityEvaluator;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
 import com.netgrif.application.engine.rules.domain.facts.TransitionEventFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.utils.DateUtils;
@@ -91,7 +91,7 @@ public class TaskService implements ITaskService {
     protected IDataService dataService;
 
     @Autowired
-    protected IProcessRoleService processRoleService;
+    protected IRoleService roleService;
 
     @Autowired
     protected IElasticTaskMappingService taskMappingService;
@@ -575,18 +575,18 @@ public class TaskService implements ITaskService {
         List<Task> tasks;
         LoggedUser loggedOrImpersonated = loggedUser.getSelfOrImpersonated();
 
-        if (loggedOrImpersonated.getProcessRoles().isEmpty()) {
+        if (loggedOrImpersonated.getRoles().isEmpty()) {
             tasks = new ArrayList<>();
             return new PageImpl<>(tasks, pageable, 0L);
         } else {
             StringBuilder queryBuilder = new StringBuilder();
             queryBuilder.append("{$or:[");
-            loggedOrImpersonated.getProcessRoles().forEach(role -> {
+            loggedOrImpersonated.getRoles().forEach(role -> {
                 queryBuilder.append("{\"roles.");
                 queryBuilder.append(role);
                 queryBuilder.append("\":{$exists:true}},");
             });
-            if (!loggedOrImpersonated.getProcessRoles().isEmpty())
+            if (!loggedOrImpersonated.getRoles().isEmpty())
                 queryBuilder.deleteCharAt(queryBuilder.length() - 1);
             else
                 queryBuilder.append("{}");
@@ -771,8 +771,8 @@ public class TaskService implements ITaskService {
                 task.setAssigneeId(userService.getSystem().getStringId());
             }
         }
-        ProcessRole defaultRole = processRoleService.defaultRole();
-        ProcessRole anonymousRole = processRoleService.anonymousRole();
+        Role defaultRole = roleService.defaultRole();
+        Role anonymousRole = roleService.anonymousRole();
         // TODO: NAE-1969 necessary?
 //        for (Map.Entry<String, Map<RolePermission, Boolean>> entry : transition.getRoles().entrySet()) {
 //            if (useCase.getEnabledRoles().contains(entry.getKey())

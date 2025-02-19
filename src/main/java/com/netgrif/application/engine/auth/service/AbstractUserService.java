@@ -6,8 +6,8 @@ import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.application.engine.petrinet.domain.Process;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.petrinet.domain.roles.Role;
+import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,7 +27,7 @@ public abstract class AbstractUserService implements IUserService {
     protected IAuthorityService authorityService;
 
     @Autowired
-    protected IProcessRoleService processRoleService;
+    protected IRoleService roleService;
 
 
     @Autowired
@@ -41,7 +41,7 @@ public abstract class AbstractUserService implements IUserService {
 
     @Override
     public void addDefaultRole(IUser user) {
-        user.addProcessRole(processRoleService.defaultRole());
+        user.addRole(roleService.defaultRole());
     }
 
     @Override
@@ -73,8 +73,8 @@ public abstract class AbstractUserService implements IUserService {
 
     @Override
     public IUser addRole(IUser user, String roleStringId) {
-        ProcessRole role = processRoleService.findById(roleStringId);
-        user.addProcessRole(role);
+        Role role = roleService.findById(roleStringId);
+        user.addRole(role);
         securityContextService.saveToken(user.getStringId());
         securityContextService.reloadSecurityContext(user.transformToLoggedUser());
         return save(user);
@@ -84,16 +84,16 @@ public abstract class AbstractUserService implements IUserService {
      * @param user
      * @param roleStringId
      * @return
-     * @deprecated use {@link AbstractUserService#removeRole(IUser, ProcessRole)} instead
+     * @deprecated use {@link AbstractUserService#removeRole(IUser, Role)} instead
      */
     @Override
     @Deprecated(since = "6.2.0")
     public IUser removeRole(IUser user, String roleStringId) {
-        return removeRole(user, processRoleService.findByImportId(roleStringId));
+        return removeRole(user, roleService.findByImportId(roleStringId));
     }
 
-    protected IUser removeRole(IUser user, ProcessRole role) {
-        user.removeProcessRole(role);
+    protected IUser removeRole(IUser user, Role role) {
+        user.removeRole(role);
         securityContextService.saveToken(user.getStringId());
         securityContextService.reloadSecurityContext(user.transformToLoggedUser());
         return save(user);

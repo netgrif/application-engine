@@ -9,7 +9,7 @@ import com.netgrif.application.engine.configuration.properties.CacheProperties
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.petrinet.domain.roles.Role
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -62,7 +62,7 @@ class CachePetriNetServiceTest {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         importHelper.createUser(new User(name: "Customer", surname: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [] as ProcessRole[])
+                [] as Role[])
     }
 
     @Test

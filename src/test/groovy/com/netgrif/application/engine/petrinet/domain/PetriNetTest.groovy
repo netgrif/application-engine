@@ -6,7 +6,7 @@ import com.netgrif.application.engine.petrinet.domain.arcs.Arc
 import com.netgrif.application.engine.petrinet.domain.arcs.InhibitorArc
 import com.netgrif.application.engine.petrinet.domain.arcs.ReadArc
 import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.application.engine.petrinet.domain.roles.RoleRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference
 import com.netgrif.application.engine.startup.SuperCreator
@@ -37,7 +37,7 @@ class PetriNetTest {
     private SuperCreator superCreator
 
     @Autowired
-    private ProcessRoleRepository processRoleRepository
+    private RoleRepository roleRepository
 
     @Autowired
     private TestHelper testHelper
@@ -55,7 +55,7 @@ class PetriNetTest {
 
     @Test
     void testClone() {
-        int beforeImportNet = processRoleRepository.count()
+        int beforeImportNet = roleRepository.count()
 
         def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
 
@@ -73,7 +73,7 @@ class PetriNetTest {
         assert arcs.any { it instanceof ReadArc }
 
         assert net.roles.size() == 2
-        assert processRoleRepository.count() == beforeImportNet + 2
+        assert roleRepository.count() == beforeImportNet + 2
     }
 
     @Test

@@ -3,8 +3,8 @@ package com.netgrif.application.engine.startup
 import com.netgrif.application.engine.importer.model.EventType
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.events.Event
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.application.engine.petrinet.domain.roles.Role
+import com.netgrif.application.engine.petrinet.domain.roles.RoleRepository
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,21 +18,21 @@ import org.springframework.stereotype.Component
 class DefaultRoleRunner extends AbstractOrderedCommandLineRunner {
 
     @Autowired
-    private ProcessRoleRepository repository
+    private RoleRepository repository
 
     @Override
     void run(String... strings) throws Exception {
         log.info("Creating default process role")
 
-        def role = repository.findAllByName_DefaultValue(ProcessRole.DEFAULT_ROLE)
+        def role = repository.findAllByName_DefaultValue(Role.DEFAULT_ROLE)
         if (role) {
             log.info("Default role already exists")
             return
         }
 
-        ProcessRole defaultRole = new ProcessRole(
-                importId: ProcessRole.DEFAULT_ROLE,
-                name: new I18nString(ProcessRole.DEFAULT_ROLE),
+        Role defaultRole = new Role(
+                importId: Role.DEFAULT_ROLE,
+                name: new I18nString(Role.DEFAULT_ROLE),
                 description: new I18nString("Default system process role"),
                 events: new LinkedHashMap<EventType, Event>()
         )

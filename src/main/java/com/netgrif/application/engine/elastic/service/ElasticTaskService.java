@@ -201,10 +201,10 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     protected void addRolesQueryConstraint(ElasticTaskSearchRequest request, LoggedUser user) {
         if (request.role != null && !request.role.isEmpty()) {
             Set<String> roles = new HashSet<>(request.role);
-            roles.addAll(user.getProcessRoles());
+            roles.addAll(user.getRoles());
             request.role = new ArrayList<>(roles);
         } else {
-            request.role = new ArrayList<>(user.getProcessRoles());
+            request.role = new ArrayList<>(user.getRoles());
         }
     }
 

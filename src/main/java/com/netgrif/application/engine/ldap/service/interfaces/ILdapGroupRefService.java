@@ -3,7 +3,7 @@ package com.netgrif.application.engine.ldap.service.interfaces;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.ldap.domain.LdapGroup;
 import com.netgrif.application.engine.ldap.domain.LdapGroupRef;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.petrinet.domain.roles.Role;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.ldap.query.LdapQuery;
 
@@ -13,20 +13,20 @@ import java.util.Set;
 @ConditionalOnExpression("${nae.ldap.enabled:false}")
 public interface ILdapGroupRefService {
 
-    public List<LdapGroupRef> findAllGroups();
+    List<LdapGroupRef> findAllGroups();
 
-    public List<LdapGroupRef> searchGroups(String searchText);
+    List<LdapGroupRef> searchGroups(String searchText);
 
     List<LdapGroupRef> searchGroups(LdapQuery ldapQuery);
 
-    public List<LdapGroup> getAllLdapGroupRoles();
+    List<LdapGroup> getAllLdapGroupRoles();
 
-    void deleteProcessRoleByPetrinet(String petrinet);
+    void deleteRoleByPetriNet(String petriNet);
 
-    void deleteProcessRole(LdapGroup ldapGroup, String petriNet);
+    void deleteRole(LdapGroup ldapGroup, String petriNet);
 
-    Set<ProcessRole> getProcessRoleByLdapGroup(Set<String> groupDn);
+    Set<Role> getRoleByLdapGroup(Set<String> groupDn);
 
-    public void setRoleToLdapGroup(String groupDn, Set<String> roleIds, LoggedUser loggedUser);
+    void setRoleToLdapGroup(String groupDn, Set<String> roleIds, LoggedUser loggedUser);
 
 }

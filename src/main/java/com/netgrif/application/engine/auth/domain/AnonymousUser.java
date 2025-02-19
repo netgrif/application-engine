@@ -25,8 +25,8 @@ public class AnonymousUser extends User {
         LoggedUser loggedUser = new LoggedUser(this.getId().toString(), this.getEmail(), "n/a", this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
         loggedUser.setAnonymous(true);
-        if (!this.getProcessRoles().isEmpty())
-            loggedUser.parseProcessRoles(this.getProcessRoles());
+        if (!this.getRoles().isEmpty())
+            loggedUser.parseRoles(this.getRoles());
         if (!this.getNextGroups().isEmpty())
             loggedUser.setGroups(this.getNextGroups());
 

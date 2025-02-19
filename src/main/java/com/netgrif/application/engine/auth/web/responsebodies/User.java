@@ -2,7 +2,7 @@ package com.netgrif.application.engine.auth.web.responsebodies;
 
 import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.petrinet.domain.roles.Role;
 import lombok.Data;
 
 import java.util.Set;
@@ -27,7 +27,7 @@ public class User {
     private Set<Authority> authorities;
 
     // process roles are set with the factory
-    private Set<ProcessRole> processRoles;
+    private Set<Role> roles;
 
     private Set<String> nextGroups;
 
@@ -43,7 +43,7 @@ public class User {
     }
 
     /**
-     * This static method doesn't set attributes regarding the ProcessRoles
+     * This static method doesn't set attributes regarding the Roles
      *
      * Use the IUserFactory service to create instances that have these attributes set.
      */
@@ -52,7 +52,7 @@ public class User {
     }
 
     /**
-     * This static method doesn't set attributes regarding the ProcessRoles
+     * This static method doesn't set attributes regarding the Roles
      *
      * Use the IUserFactory service to create instances that have these attributes set.
      */

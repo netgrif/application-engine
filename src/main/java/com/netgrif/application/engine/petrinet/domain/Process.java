@@ -11,6 +11,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
 import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
+import com.netgrif.application.engine.petrinet.domain.roles.Permissions;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
 import lombok.Data;
@@ -36,7 +37,7 @@ public class Process extends ProcessObject {
     private String icon;
     private I18nExpression defaultCaseName;
     // TODO: release/8.0.0 - default + anonymous role, roleref
-    private UniqueKeyMap<String, Map<CasePermission, Boolean>> permissions;
+    private Permissions<CasePermission> permissions;
     private Map<ProcessEventType, ProcessEvent> processEvents;
     private Map<CaseEventType, CaseEvent> caseEvents;
     private List<Function> functions;
@@ -67,7 +68,7 @@ public class Process extends ProcessObject {
         dataSet = new UniqueKeyMap<>();
         processEvents = new HashMap<>();
         caseEvents = new HashMap<>();
-        permissions = new UniqueKeyMap<>();
+        permissions = new Permissions<>();
         functions = new LinkedList<>();
         properties = new UniqueKeyMap<>();
     }

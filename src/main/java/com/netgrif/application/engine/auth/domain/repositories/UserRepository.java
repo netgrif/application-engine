@@ -12,7 +12,6 @@ import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.stereotype.Repository;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -26,9 +25,9 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
 
     List<User> findAllByStateAndExpirationDateBefore(UserState userState, LocalDateTime dateTime);
 
-    Page<User> findDistinctByStateAndProcessRoles_IdIn(UserState state, List<String> roleId, Pageable pageable);
+    Page<User> findDistinctByStateAndRoles_IdIn(UserState state, List<String> roleId, Pageable pageable);
 
-    List<User> findAllByProcessRoles_IdIn(List<String> roleId);
+    List<User> findAllByRoles_IdIn(List<String> roleId);
 
     List<User> removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime);
 

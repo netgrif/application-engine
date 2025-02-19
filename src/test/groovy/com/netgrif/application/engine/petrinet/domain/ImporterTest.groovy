@@ -5,7 +5,7 @@ import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.application.engine.petrinet.domain.roles.RoleRepository
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -43,7 +43,7 @@ class ImporterTest {
     @Autowired
     private SuperCreator superCreator
     @Autowired
-    private ProcessRoleRepository processRoleRepository
+    private RoleRepository roleRepository
     @Autowired
     private TestHelper testHelper
     @Autowired
@@ -86,15 +86,15 @@ class ImporterTest {
 
     @Test
     void importTest() {
-        long beforeImportNet = processRoleRepository.count()
+        long beforeImportNet = roleRepository.count()
         def netOptional = petriNetService.importPetriNet(
                 firstVersionResource.inputStream,
                 VersionType.MAJOR,
                 superCreator.loggedSuper
         )
         assert netOptional.getNet() != null
-        assert processRoleRepository.count() == beforeImportNet + 2
-        long statusImportRole = processRoleRepository.count()
+        assert roleRepository.count() == beforeImportNet + 2
+        long statusImportRole = roleRepository.count()
         def net = netOptional.getNet()
 
         // ASSERT IMPORTED NET
@@ -179,7 +179,7 @@ class ImporterTest {
                 superCreator.loggedSuper
         )
 
-        assert processRoleRepository.count() == statusImportRole + 1
+        assert roleRepository.count() == statusImportRole + 1
         assert netOptional2.getNet() != null
         def net2 = netOptional2.getNet()
 

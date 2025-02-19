@@ -10,8 +10,8 @@ import com.netgrif.application.engine.configuration.properties.SuperAdminConfigu
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.application.engine.petrinet.domain.roles.Role
+import com.netgrif.application.engine.petrinet.domain.roles.RoleRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -72,7 +72,7 @@ class RemoveActionTest {
     private UserRepository userRepository
 
     @Autowired
-    private ProcessRoleRepository processRoleRepository
+    private RoleRepository roleRepository
 
     @Autowired
     private Importer importer
@@ -113,7 +113,7 @@ class RemoveActionTest {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [] as ProcessRole[])
+                [] as Role[])
         auth = new UsernamePasswordAuthenticationToken(configuration.email, configuration.password)
         auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
     }
@@ -137,9 +137,9 @@ class RemoveActionTest {
                 .andExpect(MockMvcResultMatchers.content().string(containsString("Selected roles assigned to user")))
 
         User updatedUser = userRepository.findByEmail(USER_EMAIL)
-        Set<ProcessRole> roles = updatedUser.getProcessRoles()
+        Set<Role> roles = updatedUser.getRoles()
 
-        String managerRoleId = processRoleRepository.findAllByName_DefaultValue("manager")?.first()?.stringId
+        String managerRoleId = roleRepository.findAllByName_DefaultValue("manager")?.first()?.stringId
 
         assert roles.find { it.getStringId() == adminRoleId }
         assert roles.find { it.getStringId() == managerRoleId }
@@ -158,7 +158,7 @@ class RemoveActionTest {
                 .andExpect(MockMvcResultMatchers.content().string(containsString("Selected roles assigned to user")))
 
         updatedUser = userRepository.findByEmail(USER_EMAIL)
-        roles = updatedUser.getProcessRoles()
+        roles = updatedUser.getRoles()
 
         Assert.assertNull(roles.find { it.stringId == adminRoleId })
         Assert.assertNotNull(roles.find { it.stringId == managerRoleId })
