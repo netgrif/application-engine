@@ -59,37 +59,39 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
 
     @Override
     public ProcessRole save(ProcessRole processRole) {
-        return null;
+        return processRoleRepository.save(processRole);
     }
 
     @Override
     public List<ProcessRole> getAll() {
-        return List.of();
+        return processRoleRepository.findAll();
     }
 
     @Override
     public List<ProcessRole> findAllByNetId(String s) {
-        return List.of();
+        return new ArrayList<>(processRoleRepository.findAllByNetId(s));
     }
 
     @Override
     public Optional<ProcessRole> get(ProcessResourceId processResourceId) {
-        return Optional.empty();
+        return processRoleRepository.findByCompositeId(processResourceId.getStringId());
     }
 
     @Override
     public void delete(String s) {
-
+        Optional<ProcessRole> processRole = processRoleRepository.findByCompositeId(s);
+        processRole.ifPresent(processRoleRepository::delete);
     }
 
     @Override
     public void deleteAll(Collection<String> collection) {
-
+        List<ProcessRole> processRoles = processRoleRepository.findAllByCompositeId(collection);
+        processRoleRepository.deleteAll(processRoles);
     }
 
     @Override
     public void deleteAll() {
-
+        processRoleRepository.deleteAll();
     }
 
     @Override
@@ -99,12 +101,12 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
 
     @Override
     public ProcessRole getAnonymousRole() {
-        return null;
+        return processRoleRepository.findByImportId(ProcessRole.ANONYMOUS_ROLE);
     }
 
     @Override
     public Collection<ProcessRole> findAllByIds(Collection<ProcessResourceId> collection) {
-        return List.of();
+        return processRoleRepository.findAllByCompositeId(collection.stream().map(ProcessResourceId::getStringId).collect(Collectors.toList()));
     }
 
     @Override
@@ -124,7 +126,7 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
 
     @Override
     public Set<ProcessRole> findByIds(Set<String> ids) {
-        return StreamSupport.stream(processRoleRepository.findAllById(ids).spliterator(), false).collect(Collectors.toSet());
+        return new HashSet<>(processRoleRepository.findAllById(ids));
     }
 
     @Override
@@ -247,12 +249,11 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
     private void runAllSuitableActionsOnRoles(Set<ProcessRole> roles, EventType requiredEventType, EventPhaseType requiredPhase, IUser user, PetriNet petriNet, Map<String, String> params) {
         roles.forEach(role -> {
             RoleContext roleContext = new RoleContext<>(user, role, petriNet);
-            //MODULARISATION: events to be resolved
-//            runAllSuitableActionsOnOneRole(role.getEvents(), requiredEventType, requiredPhase, roleContext, params);
+            runAllSuitableActionsOnOneRole(role.getEvents(), requiredEventType, requiredPhase, roleContext, params);
         });
     }
 
-    private void runAllSuitableActionsOnOneRole(Map<EventType, Event> eventMap, EventType requiredEventType, EventPhaseType requiredPhase, RoleContext roleContext, Map<String, String> params) {
+    private void runAllSuitableActionsOnOneRole(Map<EventType, Event> eventMap, EventType requiredEventType, EventPhaseType requiredPhase, RoleContext<?> roleContext, Map<String, String> params) {
         if (eventMap == null) {
             return;
         }
@@ -266,7 +267,7 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
         });
     }
 
-    private void runActionsBasedOnPhase(Event event, EventPhaseType requiredPhase, RoleContext roleContext, Map<String, String> params) {
+    private void runActionsBasedOnPhase(Event event, EventPhaseType requiredPhase, RoleContext<?> roleContext, Map<String, String> params) {
         switch (requiredPhase) {
             case PRE:
                 runActions(event.getPreActions(), roleContext, params);
@@ -277,7 +278,7 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
         }
     }
 
-    private void runActions(List<Action> actions, RoleContext roleContext, Map<String, String> params) {
+    private void runActions(List<Action> actions, RoleContext<?> roleContext, Map<String, String> params) {
         actions.forEach(action -> roleActionsRunner.run(action, roleContext, params));
     }
 

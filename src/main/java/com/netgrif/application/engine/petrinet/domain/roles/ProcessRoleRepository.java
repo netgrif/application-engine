@@ -51,6 +51,10 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
         }
     }
 
+    default List<ProcessRole> findAllByCompositeId(Collection<String> compositeId) {
+        return compositeId.stream().map(this::findByCompositeId).map(optional -> optional.orElse(null)).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
     @Query("{ '_id.shortProcessId': ?0, '_id.objectId': ?1 }")
     Optional<ProcessRole> findByNetworkIdAndObjectId(String networkId, ObjectId objectId);
 }

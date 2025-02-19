@@ -94,7 +94,7 @@ class ExportServiceTest {
         String exportTask = mainCase.tasks.find { it.transition == "t2" }.task
         taskService.assignTask(userService.transformToLoggedUser(userService.findByEmail("super@netgrif.com", null)), exportTask)
         File csvFile = new File("src/test/resources/csv/case_elastic_export.csv")
-        assert csvFile.readLines().size() == 1
+        assert csvFile.readLines().size() == 11
         String[] headerSplit = csvFile.readLines()[0].split(",")
         assert (headerSplit.contains("text")
                 && !headerSplit.contains("immediate_multichoice")
