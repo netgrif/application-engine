@@ -239,12 +239,10 @@ public class Importer {
             process.setImportId(importedProcess.getId());
             process.setIdentifier(importedProcess.getId());
         }, "<id>");
-        checkMetaData(importedProcess.getVersion(), () -> {
-            process.setVersion(Version.of(importedProcess.getVersion()));
-        }, "<version>");
-        checkMetaData(importedProcess.getTitle(), () -> {
-            process.setTitle(toI18NString(importedProcess.getTitle()));
-        }, "<title>");
+        checkMetaData(importedProcess.getVersion(), () -> process.setVersion(Version.of(importedProcess.getVersion())),
+                "<version>");
+        checkMetaData(importedProcess.getTitle(), () -> process.setTitle(toI18NString(importedProcess.getTitle())),
+                "<title>");
         // TODO: release/8.0.0 extension from NAE-1973
         process.setIcon(importedProcess.getIcon());
 
@@ -373,7 +371,7 @@ public class Importer {
     protected Place getPlace(String id) {
         Place place = process.getPlace(id);
         if (place == null) {
-            throw new IllegalArgumentException("Place with id [" + id + "] not found.");
+            throw new IllegalArgumentException(String.format("Place with id [%s] not found.", id));
         }
         return place;
     }
@@ -381,7 +379,7 @@ public class Importer {
     protected Transition getTransition(String id) {
         Transition transition = process.getTransition(id);
         if (transition == null) {
-            throw new IllegalArgumentException("Transition with id [" + id + "] not found.");
+            throw new IllegalArgumentException(String.format("Transition with id [%s] not found.", id));
         }
         return transition;
     }
@@ -451,7 +449,7 @@ public class Importer {
         action.setImportId(buildActionId(importedAction.getId()));
         action.setDefinition(importedAction.getValue());
         if (importedAction.getType() != null) {
-            // TODO: release/8.0.0 add atribute "type" to data set actions
+            // TODO: release/8.0.0 add attribute "type" to data set actions
         }
         return action;
     }
@@ -551,25 +549,27 @@ public class Importer {
 
     protected void createProcessPermissions(com.netgrif.application.engine.importer.model.CaseRoleRef roleRef) {
         com.netgrif.application.engine.importer.model.CaseLogic logic = roleRef.getCaseLogic();
-        if (logic == null) {
-            return;
-        }
-        Role role = this.findRole(roleRef.getId());
-        if (role == null) {
-            // TODO: release/8.0.0 warn
-            return;
-        }
-        process.addPermission(role.getStringId(), permissionFactory.buildProcessPermissions(logic));
+        Optional<Role> roleOpt = findRoleOrWarn(logic, roleRef.getId());
+        roleOpt.ifPresent((role) -> process.addPermission(role.getStringId(), permissionFactory.buildProcessPermissions(logic)));
     }
 
     protected void createTaskPermissions(Transition transition, com.netgrif.application.engine.importer.model.RoleRef roleRef) {
         com.netgrif.application.engine.importer.model.RoleRefLogic logic = roleRef.getLogic();
-        Role role = this.findRole(roleRef.getId());
-        if (logic == null || role == null) {
-            // TODO: release/8.0.0 warn
-            return;
+        Optional<Role> roleOpt = findRoleOrWarn(logic, roleRef.getId());
+        roleOpt.ifPresent((role) -> transition.addPermission(role.getStringId(), permissionFactory.buildTaskPermissions(logic)));
+    }
+
+    protected Optional<Role> findRoleOrWarn(Object logic, String roleImportId) {
+        if (logic == null) {
+            log.warn("Referenced role with id [{}] has missing logic", roleImportId);
+            return Optional.empty();
         }
-        transition.addPermission(role.getStringId(), permissionFactory.buildTaskPermissions(logic));
+        Role role = this.findRole(roleImportId);
+        if (role == null) {
+            log.warn("Referenced role with id [{}] was not found in application", roleImportId);
+            return Optional.empty();
+        }
+        return Optional.of(role);
     }
 
     protected boolean hasPositivePermission(com.netgrif.application.engine.importer.model.PermissionRef permissionRef) {
@@ -611,12 +611,6 @@ public class Importer {
     }
 
     protected void createRole(com.netgrif.application.engine.importer.model.Role importRole) {
-        if (importRole.getId().equals(Role.DEFAULT_ROLE)) {
-            throw new IllegalArgumentException("Role ID '" + Role.DEFAULT_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
-        }
-        if (importRole.getId().equals(Role.ANONYMOUS_ROLE)) {
-            throw new IllegalArgumentException("Role ID '" + Role.ANONYMOUS_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
-        }
         String importId = importRole.getId();
         if (roleService.existsByImportId(importId)) {
             return;
@@ -656,7 +650,8 @@ public class Importer {
 
     protected void resolveLayoutContainer(com.netgrif.application.engine.importer.model.Transition importTransition, Transition transition) {
         if (importTransition.getFlex() != null && importTransition.getGrid() != null) {
-            throw new IllegalArgumentException("Found Flex and Grid container together in Transition {" + importTransition.getId() + "}");
+            throw new IllegalArgumentException(String.format("Found Flex and Grid container together in Transition {%s}",
+                    importTransition.getId()));
         }
         if (importTransition.getFlex() != null) {
             transition.setLayoutContainer(getFlexLayoutContainer(importTransition.getFlex(), transition, 0));
@@ -677,7 +672,8 @@ public class Importer {
                 try {
                     resolveFieldProperty(containerPropertyField, layoutContainerProperties, importedFlexContainer.getProperties());
                 } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                    throw new IllegalArgumentException("Unexpected property in Flex Container {" + importedFlexContainer.getId() + "}");
+                    throw new IllegalArgumentException(String.format("Unexpected property in Flex Container {%s}",
+                            importedFlexContainer.getId()));
                 }
             }
         }
@@ -701,7 +697,8 @@ public class Importer {
                 try {
                     resolveFieldProperty(field, layoutProperties, importedGridContainer.getProperties());
                 } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                    throw new IllegalArgumentException("Unexpected property in Grid Container {" + importedGridContainer.getId() + "}");
+                    throw new IllegalArgumentException(String.format("Unexpected property in Grid Container {%s}",
+                            importedGridContainer.getId()));
                 }
             }
         }
@@ -716,7 +713,8 @@ public class Importer {
 
     private LayoutItem getLayoutItem(String containerId, com.netgrif.application.engine.importer.model.LayoutItem importedLayoutItem, Transition transition, int depth) {
         if (BooleanUtils.toInteger(importedLayoutItem.getFlex() != null) + BooleanUtils.toInteger(importedLayoutItem.getGrid() != null) + BooleanUtils.toInteger(importedLayoutItem.getDataRef() != null) > 1) {
-            throw new IllegalArgumentException("Found Flex/Grid/DataRef together in Layout Container {" + containerId + "}");
+            throw new IllegalArgumentException(String.format("Found Flex/Grid/DataRef together in Layout Container {%s}",
+                    containerId));
         }
         LayoutItem layoutItem = new LayoutItem();
         layoutItem.setLayoutType(importedLayoutItem instanceof GridItem ? LayoutObjectType.GRID : LayoutObjectType.FLEX);
@@ -729,7 +727,8 @@ public class Importer {
                 try {
                     resolveFieldProperty(itemPropertyField, layoutItemProperties, itemProperties);
                 } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                    throw new IllegalArgumentException("Unexpected property in Grid Item of Grid Container {" + containerId + "}");
+                    throw new IllegalArgumentException(String.format("Unexpected property in Grid Item of Grid Container {%s}",
+                            containerId));
                 }
             }
         }
@@ -764,12 +763,14 @@ public class Importer {
 
     protected com.netgrif.application.engine.petrinet.domain.DataRef resolveDataRef(com.netgrif.application.engine.importer.model.DataRef importedDataRef, Transition transition) {
         String fieldId = importedDataRef.getId();
-        Field<?> field = process.getField(fieldId).get();
+        Field<?> field = process.getField(fieldId).orElseThrow(() ->
+                new IllegalArgumentException(String.format("Data field with id [%s] doesn't exist. DataRef cannot be resolved.", fieldId)));
         com.netgrif.application.engine.petrinet.domain.DataRef dataRef = new com.netgrif.application.engine.petrinet.domain.DataRef(field);
         if (!transition.getDataSet().containsKey(fieldId)) {
             transition.getDataSet().put(fieldId, dataRef);
         } else {
-            throw new IllegalArgumentException("Field with id [" + fieldId + "] occurs multiple times in transition [" + transition.getStringId() + "]");
+            throw new IllegalArgumentException(String.format("Field with id [%s] occurs multiple times in transition [%s]",
+                    fieldId, transition.getStringId()));
         }
         if (importedDataRef.getEvent() != null) {
             importedDataRef.getEvent().forEach(event -> dataRef.addEvent(createDataEvent(event)));
@@ -796,7 +797,8 @@ public class Importer {
             dataRef.setBehavior(behavior);
             field.setBehavior(transition.getImportId(), behavior);
         } catch (NullPointerException e) {
-            throw new IllegalArgumentException("Wrong dataRef id [" + importedDataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
+            throw new IllegalArgumentException(String.format("Wrong dataRef id [%s] on transition [%s]",
+                    importedDataRef.getId(), transition.getTitle()), e);
         }
     }
 

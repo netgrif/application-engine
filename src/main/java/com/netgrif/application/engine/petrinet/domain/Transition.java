@@ -9,6 +9,7 @@ import com.netgrif.application.engine.petrinet.domain.events.Event;
 import com.netgrif.application.engine.petrinet.domain.layout.LayoutContainer;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
+import com.netgrif.application.engine.petrinet.domain.roles.RolePermissions;
 import com.netgrif.application.engine.petrinet.domain.roles.TaskPermission;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
@@ -29,7 +30,7 @@ public class Transition extends Node {
 
     private String icon;
     private LinkedHashMap<String, DataRef> dataSet;
-    private UniqueKeyMap<String, Map<TaskPermission, Boolean>> permissions;
+    private RolePermissions<TaskPermission> permissions;
     private List<Trigger> triggers;
     private LayoutContainer layoutContainer;
     private AssignPolicy assignPolicy;
@@ -45,7 +46,7 @@ public class Transition extends Node {
         assignPolicy = AssignPolicy.MANUAL;
         finishPolicy = FinishPolicy.MANUAL;
         events = new HashMap<>();
-        permissions = new UniqueKeyMap<>();
+        permissions = new RolePermissions<>();
     }
 
     public void setDataRefBehavior(Field<?> field, DataFieldBehavior behavior) {
@@ -68,12 +69,7 @@ public class Transition extends Node {
     }
 
     public void addPermission(String actorId, Map<TaskPermission, Boolean> permissions) {
-        // TODO: release/8.0.0 refactor pemission into class, addPermission as class function
-        if (this.permissions.containsKey(actorId) && this.permissions.get(actorId) != null) {
-            this.permissions.get(actorId).putAll(permissions);
-        } else {
-            this.permissions.put(actorId, permissions);
-        }
+        this.permissions.addPermissions(actorId, permissions);
     }
 
     // TODO: release/8.0.0
@@ -200,6 +196,7 @@ public class Transition extends Node {
         clone.setEvents(this.events == null ? null : events.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
         clone.setProperties(new UniqueKeyMap<>(this.getProperties()));
         clone.setLayoutContainer(this.layoutContainer == null ? null : this.layoutContainer.clone());
+        clone.setPermissions(new RolePermissions<>(this.permissions));
         return clone;
     }
 }
