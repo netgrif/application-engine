@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.impersonation.service;
 
+import com.netgrif.adapter.auth.domain.AuthorityImpl;
 import com.netgrif.core.auth.domain.Authority;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
@@ -152,7 +153,7 @@ public class ImpersonationService implements IImpersonationService {
 
     @Override
     public IUser applyRolesAndAuthorities(IUser impersonated, String impersonatorId, List<Case> configs) {
-        if ((Boolean) userService.findById(impersonatorId, null).getAttributeValue("admin")) {
+        if ((Boolean) userService.findById(impersonatorId, null).getAuthorities().contains(new AuthorityImpl(Authority.admin))) {
             return impersonated;
         }
         List<Authority> authorities = impersonationAuthorizationService.getAuthorities(configs, impersonated);

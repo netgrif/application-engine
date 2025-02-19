@@ -5,7 +5,7 @@ import com.netgrif.core.workflow.web.responsebodies.eventoutcomes.base.Localised
 
 class LocalisedEventOutcomeFactory {
 
-    private static final String localisedEventOutcomesPackage = "com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes."
+    private static final String localisedEventOutcomesPackage = "com.netgrif.core.workflow.web.responsebodies.eventoutcomes."
 
     static LocalisedEventOutcome from(EventOutcome outcome, Locale locale){
 //        todo test https://github.com/ronmamo/reflections

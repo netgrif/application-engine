@@ -830,6 +830,7 @@ public class TaskService implements ITaskService {
                 .negativeViewRoles(new LinkedList<>())
                 .negativeViewUsers(new LinkedList<>())
                 .triggers(new LinkedList<>())
+                .eventTitles(new HashMap<>())
                 .build();
         transition.getEvents().forEach((type, event) -> task.addEventTitle(type, event.getTitle()));
         for (Trigger trigger : transition.getTriggers()) {

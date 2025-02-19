@@ -100,7 +100,7 @@
         <init>false</init>
         <action trigger="set">
             def user = new com.netgrif.core.auth.domain.User("test@test.com", "password", "test", "test")
-            user.state = com.netgrif.core.auth.domain.Authority;.UserState.ACTIVE
+            user.state = com.netgrif.core.auth.domain.enums.UserState.ACTIVE
             function_res.createUser(user)
         </action>
     </data>
