@@ -182,14 +182,15 @@ class ImpersonationServiceTest {
         impersonationService.impersonateByConfig(config.stringId)
         def impersonatedRoles = userService.loggedUser.getImpersonated().getProcessRoles()
         def impersonatedAuths = userService.loggedUser.getImpersonated().getAuthorities()
-        assert impersonatedRoles.size() == 2 && impersonatedRoles.any { it.stringId ==role.stringId }  // default role counts
+        println impersonatedRoles
+        assert impersonatedRoles.size() == 2 && impersonatedRoles.any { it.stringId == role.stringId }  // default role counts
         assert impersonatedAuths.size() == 1 && impersonatedAuths[0].stringId == auth.stringId
 
         def transformedUser = userService.transformToLoggedUser(userService.loggedUser)
         def transformedUserImpersonated = transformedUser.getSelfOrImpersonated()
         assert transformedUser.isImpersonating()
-        assert transformedUserImpersonated.getProcessRoles().size() == 2 && transformedUserImpersonated.getProcessRoles().any { it == role.stringId }  // default role counts
-        assert transformedUserImpersonated.getAuthorities().size() == 1 && (transformedUserImpersonated.getAuthorities()[0] as Authority).stringId == auth.stringId
+        assert transformedUserImpersonated.getProcessRoles().size() == 2 && transformedUserImpersonated.getProcessRoles().any { it.stringId == role.stringId }  // default role counts
+        assert transformedUserImpersonated.getAuthoritySet().size() == 1 && (transformedUserImpersonated.getAuthoritySet()[0] as Authority).stringId == auth.stringId
     }
 
     @Test
