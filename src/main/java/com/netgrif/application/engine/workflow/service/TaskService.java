@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
+import com.netgrif.adapter.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
@@ -942,7 +943,7 @@ public class TaskService implements ITaskService {
 
     protected IUser getUserFromLoggedUser(LoggedUser loggedUser) {
         IUser user = userService.findById(loggedUser.getId(), null);
-        IUser fromLogged = loggedUser.transformToUser();
+        IUser fromLogged = userService.transformToUser((LoggedUserImpl) loggedUser);
         user.setImpersonated(fromLogged.getImpersonated());
         return user;
     }
