@@ -313,12 +313,28 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
 
     @Override
     public ProcessRole defaultRole() {
-        return getDefaultRole();
+        if (defaultRole == null) {
+            Set<ProcessRole> roles = processRoleRepository.findAllByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
+            if (roles.isEmpty())
+                throw new IllegalStateException("No default process role has been found!");
+            if (roles.size() > 1)
+                throw new IllegalStateException("More than 1 default process role exists!");
+            defaultRole = roles.stream().findFirst().orElse(null);
+        }
+        return defaultRole;
     }
 
     @Override
     public ProcessRole anonymousRole() {
-        return getAnonymousRole();
+        if (anonymousRole == null) {
+            Set<ProcessRole> roles = processRoleRepository.findAllByImportId(ProcessRole.ANONYMOUS_ROLE);
+            if (roles.isEmpty())
+                throw new IllegalStateException("No anonymous process role has been found!");
+            if (roles.size() > 1)
+                throw new IllegalStateException("More than 1 anonymous process role exists!");
+            anonymousRole = roles.stream().findFirst().orElse(null);
+        }
+        return anonymousRole;
     }
 
     /**
