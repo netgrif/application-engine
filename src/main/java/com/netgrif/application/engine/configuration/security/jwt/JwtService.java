@@ -73,6 +73,7 @@ public class JwtService implements IJwtService {
         LoggedUser user = new LoggedUserImpl(
                 userMap.get("id").toString(),
                 userMap.get("username").toString(),
+                userMap.get("password").toString(),
                 Collections.singleton(authorityService.getOrCreate(authority)),
                 Collections.singleton(roleService.anonymousRole())
         );

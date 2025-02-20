@@ -24,7 +24,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.TaskController
 import com.netgrif.application.engine.workflow.web.WorkflowController
-import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
+import com.netgrif.core.workflow.web.requestbodies.TaskSearchRequest
 import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.core.workflow.web.responsebodies.TaskReference
 import org.junit.jupiter.api.BeforeEach
@@ -100,6 +100,7 @@ class TaskControllerTest {
         userService.saveUser(new User(
                 firstName: "Dummy",
                 lastName: "Netgrif",
+                username: DUMMY_USER_MAIL,
                 email: DUMMY_USER_MAIL,
                 password: "superAdminPassword",
                 state: UserState.ACTIVE,
@@ -192,7 +193,7 @@ class TaskControllerTest {
     void setUserListValue() {
         assert task != null
         List<String> userIds = [] as List
-        userIds.add(userService.findUserByUsername(DUMMY_USER_MAIL, null).getStringId())
+        userIds.add(userService.findUserByUsername(DUMMY_USER_MAIL, null).get().getStringId())
         dataService.setData(task.stringId, ImportHelper.populateDataset([
                 "performable_users": [
                         "value": userIds,
@@ -209,13 +210,13 @@ class TaskControllerTest {
                 this.role = role
             }
         }
-        processRoleService.assignRolesToUser(userService.findUserByUsername(DUMMY_USER_MAIL, null).getStringId(), [role._id.toString()] as Set, userService.transformToLoggedUser(userService.getLoggedOrSystem()))
+        processRoleService.assignRolesToUser(userService.findUserByUsername(DUMMY_USER_MAIL, null).get().getStringId(), [role._id] as Set, userService.transformToLoggedUser(userService.getLoggedOrSystem()))
     }
 
     Page<Task> findTasksByMongo() {
         List<TaskSearchRequest> taskSearchRequestList = new ArrayList<>()
         taskSearchRequestList.add(new TaskSearchRequest())
-        Page<Task> tasks = taskService.search(taskSearchRequestList, new FullPageRequest(), userService.findUserByUsername(DUMMY_USER_MAIL, null).transformToLoggedUser(), new Locale("en"), false)
+        Page<Task> tasks = taskService.search(taskSearchRequestList, new FullPageRequest(), userService.transformToLoggedUser(userService.findUserByUsername(DUMMY_USER_MAIL, null).get()), Locale.ENGLISH, false)
         return tasks
     }
 }

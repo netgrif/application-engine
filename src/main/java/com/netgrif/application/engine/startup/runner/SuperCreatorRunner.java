@@ -63,9 +63,8 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
             user.setPassword(superAdminPassword);
             user.setState(UserState.ACTIVE);
             user.setAuthorities(Set.of(adminAuthority, systemAuthority));
-            //MODULARISATION: refactor to core process roles
-//            user.setProcessRoles(Set.copyOf(processRoleService.findAll()));
-            this.superUser = userService.saveUser(user, null);
+            user.setProcessRoles(Set.copyOf(processRoleService.findAll()));
+            this.superUser = userService.createUser(user, null);
             log.info("Super user created");
         } else {
             log.info("Super user detected");
@@ -87,8 +86,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     }
 
     public void setAllProcessRoles() {
-        //MODULARISATION: refactor to core process roles
-//        superUser.setProcessRoles(Set.copyOf(processRoleService.findAll()));
+        superUser.setProcessRoles(Set.copyOf(processRoleService.findAll()));
         superUser = userService.saveUser(superUser, null);
     }
 

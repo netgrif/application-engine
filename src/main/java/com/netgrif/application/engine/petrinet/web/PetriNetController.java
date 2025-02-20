@@ -7,7 +7,7 @@ import com.netgrif.core.petrinet.web.responsebodies.PetriNetReferenceResources;
 import com.netgrif.core.petrinet.web.responsebodies.ProcessRolesResource;
 import com.netgrif.core.petrinet.web.responsebodies.TransitionReferencesResource;
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
+import com.netgrif.core.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.core.model.EntityModel;

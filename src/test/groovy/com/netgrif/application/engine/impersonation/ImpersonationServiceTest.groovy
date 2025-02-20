@@ -11,7 +11,7 @@ import com.netgrif.application.engine.impersonation.service.interfaces.IImperson
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.ImpersonationRunner
 import com.netgrif.application.engine.workflow.service.interfaces.*
-import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
+import com.netgrif.core.workflow.web.requestbodies.TaskSearchRequest
 import com.netgrif.core.auth.domain.Authority
 import com.netgrif.core.auth.domain.IUser
 import com.netgrif.core.auth.domain.User
@@ -127,21 +127,21 @@ class ImpersonationServiceTest {
         def authorityAnon = authorityService.getOrCreate(Authority.anonymous)
         def authorityAdmin = authorityService.getOrCreate(Authority.admin)
 
-        user1 = helper.createUser(new User(firstName: "Test", lastName: "User", email: "test@netgrif.com", password: "password", state: UserState.ACTIVE),
+        user1 = helper.createUser(new User(firstName: "Test", lastName: "User", email: "test@netgrif.com", "username": "test@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority] as Authority[],
                 [] as ProcessRole[])
 
         auth1 = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(user1), (user1 as User).password, user1.authorities as List<GrantedAuthority>)
         auth1.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        user2 = helper.createUser(new User(firstName: "Test", lastName: "User2", email: "test2@netgrif.com", password: "password", state: UserState.ACTIVE),
+        user2 = helper.createUser(new User(firstName: "Test", lastName: "User2", email: "test2@netgrif.com", "username": "test2@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority, authorityAnon] as Authority[],
                 testNet.roles.values() as ProcessRole[])
 
         auth2 = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(user2), (user2 as User).password, user2.authorities as List<GrantedAuthority>)
         auth2.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        adminUser = helper.createUser(new User(firstName: "Admin", lastName: "User", email: "admin@netgrif.com", password: "password", state: UserState.ACTIVE),
+        adminUser = helper.createUser(new User(firstName: "Admin", lastName: "User", email: "admin@netgrif.com", "username": "admin@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority, authorityAdmin] as Authority[],
                 testNet.roles.values() as ProcessRole[])
 
@@ -185,7 +185,7 @@ class ImpersonationServiceTest {
         assert impersonatedRoles.size() == 2 && impersonatedRoles.any { it.stringId ==role.stringId }  // default role counts
         assert impersonatedAuths.size() == 1 && impersonatedAuths[0].stringId == auth.stringId
 
-        def transformedUser = userService.loggeduserService.transformToLoggedUser(user)
+        def transformedUser = userService.transformToLoggedUser(userService.loggedUser)
         def transformedUserImpersonated = transformedUser.getSelfOrImpersonated()
         assert transformedUser.isImpersonating()
         assert transformedUserImpersonated.getProcessRoles().size() == 2 && transformedUserImpersonated.getProcessRoles().any { it == role.stringId }  // default role counts
@@ -206,17 +206,17 @@ class ImpersonationServiceTest {
 
         def caseReq = new CaseSearchRequest()
         caseReq.process = [new CaseSearchRequest.PetriNet(testCase.processIdentifier)]
-        def cases = elasticCaseService.search([caseReq], userService.loggeduserService.transformToLoggedUser(user), PageRequest.of(0, 1), LocaleContextHolder.locale, false)
+        def cases = elasticCaseService.search([caseReq], userService.transformToLoggedUser(userService.loggedUser) , PageRequest.of(0, 1), LocaleContextHolder.locale, false)
         assert !cases.content.isEmpty()
 
         def searchReq = new TaskSearchRequest()
         searchReq.transitionId = ["t1"]
         searchReq.useCase = [new TaskSearchCaseRequest(testCase.stringId, null)]
-        def tasks = taskService.search([searchReq], PageRequest.of(0, 1), userService.loggeduserService.transformToLoggedUser(user), LocaleContextHolder.locale, false)
+        def tasks = taskService.search([searchReq], PageRequest.of(0, 1), userService.transformToLoggedUser(userService.loggedUser) , LocaleContextHolder.locale, false)
         assert tasks.content[0].stringId == testTask1.stringId
 
         assert taskAuthorizationService.canCallAssign(userService.loggedUserFromContext, testTask1.stringId)
-        taskService.assignTask(userService.loggeduserService.transformToLoggedUser(user), testTask1.stringId)
+        taskService.assignTask(userService.transformToLoggedUser(userService.loggedUser) , testTask1.stringId)
         testTask1 = reloadTask(testTask1)
         assert testTask1.userId == user2.stringId
 
@@ -224,7 +224,7 @@ class ImpersonationServiceTest {
         assert taskAuthorizationService.canCallSaveFile(userService.loggedUserFromContext, testTask1.stringId)
 
         assert taskAuthorizationService.canCallFinish(userService.loggedUserFromContext, testTask1.stringId)
-        taskService.finishTask(userService.loggeduserService.transformToLoggedUser(user), testTask1.stringId)
+        taskService.finishTask(userService.transformToLoggedUser(userService.loggedUser) , testTask1.stringId)
     }
 
     @Test
@@ -232,7 +232,7 @@ class ImpersonationServiceTest {
         def config = setup()
         sleep(4000) // elastic
 
-        def logged = userService.loggeduserService.transformToLoggedUser(user)
+        def logged = userService.transformToLoggedUser(userService.loggedUser)
         assert impersonationAuthorizationService.canImpersonate(logged, config.stringId)
         assert impersonationAuthorizationService.canImpersonateUser(logged, user2.stringId)
 
@@ -315,8 +315,8 @@ class ImpersonationServiceTest {
         caze.dataSet["impersonated_authorities"].options = (caze.dataSet["impersonated_authorities"].value as List).collectEntries { [(it): new I18nString(it as String)] } as Map<String, I18nString>
         caze = workflowService.save(caze)
         def initTask = caze.tasks.find { it.transition == "t2" }.task
-        taskService.assignTask(userService.system.transformToLoggedUser(), initTask)
-        taskService.finishTask(userService.system.transformToLoggedUser(), initTask)
+        taskService.assignTask(userService.transformToLoggedUser(userService.system), initTask)
+        taskService.finishTask(userService.transformToLoggedUser(userService.system), initTask)
         return workflowService.findOne(caze.stringId)
     }
 

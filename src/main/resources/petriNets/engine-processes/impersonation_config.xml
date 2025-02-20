@@ -94,7 +94,7 @@
                     config_owner: f.config_owner;
 
 					def user = userService.loggedOrSystem
-					change impersonated value { new com.netgrif.core.petrinet.domain.dataset.UserFieldValue(user.id, user.name, user.surname, user.email) }
+					change impersonated value { new com.netgrif.core.petrinet.domain.dataset.UserFieldValue(user.stringId, user.firstName, user.lastName, user.email) }
 					change impersonated_email value { user.email }
 
 					change config_owner value { new com.netgrif.core.petrinet.domain.dataset.UserListFieldValue([impersonated.value]) }

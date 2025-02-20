@@ -4,7 +4,7 @@ import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.core.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
-import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
+import com.netgrif.core.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.core.model.EntityModel;
 import com.netgrif.core.model.PagedModel;
 import com.netgrif.core.workflow.domain.Case;

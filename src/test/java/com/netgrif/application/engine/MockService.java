@@ -20,6 +20,6 @@ public class MockService {
 
     public LoggedUser mockLoggedUser() {
         Authority authorityUser = authorityService.getOrCreate(Authority.user);
-        return new LoggedUserImpl(new ObjectId().toString(), "super@netgrif.com", Collections.singleton(authorityUser), Collections.emptySet());
+        return new LoggedUserImpl(new ObjectId().toString(), "super@netgrif.com", "password", Collections.singleton(authorityUser), Collections.emptySet());
     }
 }

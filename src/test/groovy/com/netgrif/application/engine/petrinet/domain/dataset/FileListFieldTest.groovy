@@ -146,7 +146,7 @@ class FileListFieldTest {
     void getFileByCaseAndName() {
         Case useCase = uploadTestFile()
 
-        IUser user = userService.findUserByUsername(USER_EMAIL, null)
+        IUser user = userService.findUserByUsername(USER_EMAIL, null).get()
         assert user != null
 
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), userService.transformToLoggedUser(user))

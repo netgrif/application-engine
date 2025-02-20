@@ -176,7 +176,7 @@ class ImportHelper {
         authorities.each { user.addAuthority(it) }
         roles.each { user.addProcessRole(it) }
         user.state = UserState.ACTIVE
-        user = (User) userService.saveUser(user, null)
+        user = (User) userService.createUser(user, null)
         log.info("User $user.firstName $user.lastName created")
         return user
     }

@@ -133,7 +133,7 @@ class FunctionsTest {
             def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.transformToLoggedUser(userService.getLoggedOrSystem())).getNet()
             assert functionTestNet
 
-            Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.transformToLoggedUser(userService.getLoggedOrSystem()))
+            Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.transformToLoggedUser(userService.getLoggedOrSystem())).getCase()
             dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number": ["value": "20", "type": "number"]]))
         })
     }
