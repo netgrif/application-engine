@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.importer.service;
 
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.configuration.LayoutFlexConfiguration;
 import com.netgrif.application.engine.configuration.LayoutGridConfiguration;
 import com.netgrif.application.engine.importer.model.*;
@@ -25,11 +26,10 @@ import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.layout.LayoutContainer;
 import com.netgrif.application.engine.petrinet.domain.layout.LayoutItem;
 import com.netgrif.application.engine.petrinet.domain.layout.LayoutObjectType;
-import com.netgrif.application.engine.petrinet.domain.roles.Role;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
+import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import lombok.Getter;
@@ -60,8 +60,8 @@ public class Importer {
     protected Process process;
     @Getter
     protected ImportResult result;
-    protected Role defaultRole;
-    protected Role anonymousRole;
+    protected ProcessRole defaultProcessRole;
+    protected ProcessRole anonymousProcessRole;
     protected boolean isDefaultRoleEnabled = false;
     protected boolean isAnonymousRoleEnabled = false;
 
@@ -79,7 +79,7 @@ public class Importer {
     protected IPetriNetService service;
 
     @Autowired
-    protected IRoleService roleService;
+    protected IProcessRoleService roleService;
 
     @Autowired
     protected IPetriNetService petriNetService;
@@ -119,7 +119,7 @@ public class Importer {
         try {
             initialize();
             unmarshallXml(xml);
-            return createPetriNet();
+            return createProcess();
         } catch (JAXBException e) {
             log.error("Importing Petri net failed: ", e);
         }
@@ -127,8 +127,8 @@ public class Importer {
     }
 
     protected void initialize() {
-        this.defaultRole = roleService.defaultRole();
-        this.anonymousRole = roleService.anonymousRole();
+        this.defaultProcessRole = roleService.defaultRole();
+        this.anonymousProcessRole = roleService.anonymousRole();
     }
 
     public com.netgrif.application.engine.importer.model.Process unmarshallXml(InputStream xml) throws JAXBException {
@@ -138,8 +138,8 @@ public class Importer {
         return importedProcess;
     }
 
-    protected ImportResult createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
-        initializePetriNet();
+    protected ImportResult createProcess() throws MissingPetriNetMetaDataException, MissingIconKeyException {
+        initializeProcess();
 
         importedProcess.getI18N().forEach(this::addI18N);
 
@@ -170,17 +170,17 @@ public class Importer {
         return this.result;
     }
 
-    protected void initializePetriNet() throws IllegalArgumentException {
+    protected void initializeProcess() throws IllegalArgumentException {
         Extension extension = importedProcess.getExtends();
         if (extension != null) {
-            initializeWithChildPetriNet(extension);
+            initializeWithChildProcess(extension);
         } else {
             process = new Process();
         }
         result.setProcess(process);
     }
 
-    protected void initializeWithChildPetriNet(Extension extension) {
+    protected void initializeWithChildProcess(Extension extension) {
         if (areExtensionAttributesEmpty(extension)) {
             throw new IllegalArgumentException("Parent identifier or version is empty.");
         }
@@ -402,14 +402,10 @@ public class Importer {
         transition.setAssignPolicy(toAssignPolicy(importTransition.getAssignPolicy()));
         transition.setFinishPolicy(toFinishPolicy(importTransition.getFinishPolicy()));
         if (importTransition.getRoleRef() != null) {
-            importTransition.getRoleRef().forEach(roleRef ->
-                    createTaskPermissions(transition, roleRef)
-            );
+            importTransition.getRoleRef().forEach(roleRef -> createTaskPermissions(transition, roleRef));
         }
         if (importTransition.getTrigger() != null) {
-            importTransition.getTrigger().forEach(trigger ->
-                    createTrigger(transition, trigger)
-            );
+            importTransition.getTrigger().forEach(trigger -> createTrigger(transition, trigger));
         }
 
         addPredefinedRolesWithDefaultPermissions(importTransition, transition);
@@ -510,70 +506,98 @@ public class Importer {
     }
 
     protected void addDefaultRole() {
-        addSystemRole(isDefaultRoleEnabled, defaultRole);
+        addSystemRole(isDefaultRoleEnabled, defaultProcessRole);
     }
 
     protected void addDefaultRole(Transition transition) {
-        addSystemRole(transition, isDefaultRoleEnabled, defaultRole);
+        addSystemRole(transition, isDefaultRoleEnabled, defaultProcessRole);
     }
 
     protected void addAnonymousRole() {
-        addSystemRole(isAnonymousRoleEnabled, anonymousRole);
+        addSystemRole(isAnonymousRoleEnabled, anonymousProcessRole);
     }
 
     protected void addAnonymousRole(Transition transition) {
-        addSystemRole(transition, isAnonymousRoleEnabled, anonymousRole);
+        addSystemRole(transition, isAnonymousRoleEnabled, anonymousProcessRole);
     }
 
-    protected void addSystemRole(boolean isEnabled, Role role) {
-        if (!isEnabled || process.getPermissions().containsKey(role.getStringId())) {
+    protected void addSystemRole(boolean isEnabled, ProcessRole processRole) {
+        if (!isEnabled || process.getPermissions().containsKey(processRole.getStringId())) {
             return;
         }
 
-        com.netgrif.application.engine.importer.model.CaseLogic logic = new com.netgrif.application.engine.importer.model.CaseLogic();
-        logic.setCreate(true);
-        logic.setDelete(true); // TODO: release/8.0.0 anonymous can delete
-        logic.setView(true);
-        process.addPermission(role.getStringId(), permissionFactory.buildProcessPermissions(logic));
+        com.netgrif.application.engine.importer.model.CasePermission permissions = new com.netgrif.application.engine.importer.model.CasePermission();
+        permissions.setCreate(true);
+        permissions.setDelete(true); // TODO: release/8.0.0 anonymous can delete
+        permissions.setView(true);
+        process.addPermission(processRole.getStringId(), permissionFactory.buildProcessPermissions(permissions));
     }
 
-    protected void addSystemRole(Transition transition, boolean isEnabled, Role role) {
-        if (!isEnabled || transition.getPermissions().containsKey(role.getStringId())) {
+    protected void addSystemRole(Transition transition, boolean isEnabled, ProcessRole processRole) {
+        if (!isEnabled || transition.getPermissions().containsKey(processRole.getStringId())) {
             return;
         }
 
-        com.netgrif.application.engine.importer.model.RoleRefLogic logic = new com.netgrif.application.engine.importer.model.RoleRefLogic();
-        logic.setPerform(true);
-        transition.addPermission(role.getStringId(), permissionFactory.buildTaskPermissions(logic));
+        com.netgrif.application.engine.importer.model.TaskPermission permissions = new com.netgrif.application.engine.importer.model.TaskPermission();
+        permissions.setPerform(true);
+        transition.addPermission(processRole.getStringId(), permissionFactory.buildTaskPermissions(permissions));
     }
 
     protected void createProcessPermissions(com.netgrif.application.engine.importer.model.CaseRoleRef roleRef) {
-        com.netgrif.application.engine.importer.model.CaseLogic logic = roleRef.getCaseLogic();
-        Optional<Role> roleOpt = findRoleOrWarn(logic, roleRef.getId());
-        roleOpt.ifPresent((role) -> process.addPermission(role.getStringId(), permissionFactory.buildProcessPermissions(logic)));
+        if (roleRef.getType() == RoleType.CASE) {
+            createProcessPermissionsForCaseRole(roleRef);
+            return;
+        }
+        com.netgrif.application.engine.importer.model.CasePermission permissions = roleRef.getPermission();
+        Optional<ProcessRole> roleOpt = findRoleOrWarn(permissions, roleRef.getId());
+        roleOpt.ifPresent((role) -> process.addPermission(role.getStringId(), permissionFactory.buildProcessPermissions(permissions)));
+    }
+
+    protected void createProcessPermissionsForCaseRole(com.netgrif.application.engine.importer.model.CaseRoleRef roleRef) {
+        com.netgrif.application.engine.importer.model.CasePermission permissions = roleRef.getPermission();
+        String userListId = roleRef.getId();
+        if (permissions == null || userListId == null) {
+            log.warn("Case role has missing permissions or user list id");
+            return;
+        }
+        process.addCaseRolePermission(userListId, permissionFactory.buildProcessPermissions(permissions));
     }
 
     protected void createTaskPermissions(Transition transition, com.netgrif.application.engine.importer.model.RoleRef roleRef) {
-        com.netgrif.application.engine.importer.model.RoleRefLogic logic = roleRef.getLogic();
-        Optional<Role> roleOpt = findRoleOrWarn(logic, roleRef.getId());
-        roleOpt.ifPresent((role) -> transition.addPermission(role.getStringId(), permissionFactory.buildTaskPermissions(logic)));
+        if (roleRef.getType() == RoleType.CASE) {
+            createTaskPermissionsForCaseRole(transition, roleRef);
+            return;
+        }
+        com.netgrif.application.engine.importer.model.TaskPermission permissions = roleRef.getPermission();
+        Optional<ProcessRole> roleOpt = findRoleOrWarn(permissions, roleRef.getId());
+        roleOpt.ifPresent((role) -> transition.addPermission(role.getStringId(), permissionFactory.buildTaskPermissions(permissions)));
     }
 
-    protected Optional<Role> findRoleOrWarn(Object logic, String roleImportId) {
-        if (logic == null) {
-            log.warn("Referenced role with id [{}] has missing logic", roleImportId);
+    protected void createTaskPermissionsForCaseRole(Transition transition, com.netgrif.application.engine.importer.model.RoleRef roleRef) {
+        com.netgrif.application.engine.importer.model.TaskPermission permissions = roleRef.getPermission();
+        String userListId = roleRef.getId();
+        if (permissions == null || userListId == null) {
+            log.warn("Case role has missing permissions or user list id on transition [{}]", transition.getImportId());
+            return;
+        }
+        transition.addCaseRolePermission(userListId, permissionFactory.buildTaskPermissions(permissions));
+    }
+
+    protected Optional<ProcessRole> findRoleOrWarn(Object permissions, String roleImportId) {
+        if (permissions == null) {
+            log.warn("Referenced role with id [{}] has missing permissions", roleImportId);
             return Optional.empty();
         }
-        Role role = this.findRole(roleImportId);
-        if (role == null) {
+        ProcessRole processRole = this.findRole(roleImportId);
+        if (processRole == null) {
             log.warn("Referenced role with id [{}] was not found in application", roleImportId);
             return Optional.empty();
         }
-        return Optional.of(role);
+        return Optional.of(processRole);
     }
 
     protected boolean hasPositivePermission(com.netgrif.application.engine.importer.model.PermissionRef permissionRef) {
-        RoleRefLogic logic = permissionRef.getLogic();
+        com.netgrif.application.engine.importer.model.TaskPermission logic = permissionRef.getPermission();
         return isAnyTrue(
                 logic.isPerform(),
                 logic.isView(),
@@ -616,13 +640,13 @@ public class Importer {
             return;
         }
 
-        Role role = new Role();
-        role.setImportId(importRole.getId());
-        role.setName(toI18NString(importRole.getTitle()));
+        ProcessRole processRole = new ProcessRole();
+        processRole.setImportId(importRole.getId());
+        processRole.setTitle(toI18NString(importRole.getTitle()));
         if (importRole.getEvent() != null) {
-            importRole.getEvent().forEach(event -> role.addEvent(createEvent(event)));
+            importRole.getEvent().forEach(event -> processRole.addEvent(createEvent(event)));
         }
-        result.addRole(role);
+        result.addRole(processRole);
     }
 
     protected com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy toAssignPolicy(com.netgrif.application.engine.importer.model.AssignPolicy policy) {
@@ -820,7 +844,7 @@ public class Importer {
         return (permission != null && permission);
     }
 
-    protected Role findRole(String importId) {
+    protected ProcessRole findRole(String importId) {
         return result.getRoles().getOrDefault(importId, roleService.findByImportId(importId));
     }
 }

@@ -2,7 +2,7 @@ package com.netgrif.application.engine.auth.web.responsebodies;
 
 import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.petrinet.domain.roles.Role;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import lombok.Data;
 
 import java.util.Set;
@@ -27,7 +27,7 @@ public class User {
     private Set<Authority> authorities;
 
     // process roles are set with the factory
-    private Set<Role> roles;
+    private Set<ProcessRole> processRoles;
 
     private Set<String> nextGroups;
 

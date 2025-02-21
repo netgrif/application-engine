@@ -4,6 +4,8 @@ import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.history.domain.taskevents.AssignTaskEventLog;
@@ -17,11 +19,10 @@ import com.netgrif.application.engine.petrinet.domain.arcs.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
-import com.netgrif.application.engine.petrinet.domain.roles.Role;
 import com.netgrif.application.engine.petrinet.domain.throwable.IllegalMarkingException;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.MultiplicityEvaluator;
-import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
+import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.rules.domain.facts.TransitionEventFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.utils.DateUtils;
@@ -89,6 +90,9 @@ public class TaskService implements ITaskService {
 
     @Autowired
     protected IDataService dataService;
+
+    @Autowired
+    protected IProcessRoleService processRoleService;
 
     @Autowired
     protected IRoleService roleService;
@@ -703,35 +707,6 @@ public class TaskService implements ITaskService {
         return tasks;
     }
 
-    @Override
-    public void resolveUserRef(Case useCase) {
-        useCase.getTasks().values().forEach(taskPair -> {
-            Optional<Task> taskOptional = taskRepository.findById(taskPair.getTaskStringId());
-            taskOptional.ifPresent(task -> resolveUserRef(task, useCase));
-        });
-    }
-
-    @Override
-    public Task resolveUserRef(Task task, Case useCase) {
-        // TODO: NAE-1969 fix
-//        task.getUsers().clear();
-//        task.getNegativeViewUsers().clear();
-//        task.getUserRefs().forEach((id, permission) -> {
-//            UserListField userListField = (UserListField) useCase.getDataSet().get(id);
-//            if (userListField.getValue() == null) {
-//                return;
-//            }
-//            List<String> userIds = getExistingUsers(userListField.getValue().getValue());
-//            if (userIds != null && userIds.size() != 0 && permission.containsKey(RolePermission.VIEW) && !permission.get(RolePermission.VIEW)) {
-//                task.getNegativeViewUsers().addAll(userIds);
-//            } else if (userIds != null && userIds.size() != 0) {
-//                task.addUsers(new HashSet<>(userIds), permission);
-//            }
-//        });
-//        task.resolveViewUsers();
-        return taskRepository.save(task);
-    }
-
     private List<String> getExistingUsers(UserListFieldValue userListValue) {
         if (userListValue == null) {
             return null;
@@ -771,30 +746,11 @@ public class TaskService implements ITaskService {
                 task.setAssigneeId(userService.getSystem().getStringId());
             }
         }
-        Role defaultRole = roleService.defaultRole();
-        Role anonymousRole = roleService.anonymousRole();
-        // TODO: NAE-1969 necessary?
-//        for (Map.Entry<String, Map<RolePermission, Boolean>> entry : transition.getRoles().entrySet()) {
-//            if (useCase.getEnabledRoles().contains(entry.getKey())
-//                    || defaultRole.getStringId().equals(entry.getKey())
-//                    || anonymousRole.getStringId().equals(entry.getKey())) {
-//                task.addRole(entry.getKey(), entry.getValue());
-//            }
-//        }
-//        transition.getNegativeViewRoles().forEach(task::addNegativeViewRole);
-//
-//        for (Map.Entry<String, Map<RolePermission, Boolean>> entry : transition.getUserRefs().entrySet()) {
-//            task.addUserRef(entry.getKey(), entry.getValue());
-//        }
-//        task.resolveViewRoles();
-//        task.resolveViewUserRefs();
+        task.setPermissions(new AccessPermissions<>(transition.getPermissions()));
+        roleService.resolveCaseRolesOnTask(useCase, task, transition.getCaseRolePermissions(), true);
 
         Task savedTask = save(task);
-
         useCase.addTask(savedTask);
-        // TODO: release/8.0.0 remove?
-        workflowService.resolveUserRef(useCase);
-
         return savedTask;
     }
 

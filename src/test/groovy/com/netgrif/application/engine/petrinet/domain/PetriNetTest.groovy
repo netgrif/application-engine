@@ -6,7 +6,7 @@ import com.netgrif.application.engine.petrinet.domain.arcs.Arc
 import com.netgrif.application.engine.petrinet.domain.arcs.InhibitorArc
 import com.netgrif.application.engine.petrinet.domain.arcs.ReadArc
 import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc
-import com.netgrif.application.engine.petrinet.domain.roles.RoleRepository
+import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference
 import com.netgrif.application.engine.startup.SuperCreator
@@ -37,7 +37,7 @@ class PetriNetTest {
     private SuperCreator superCreator
 
     @Autowired
-    private RoleRepository roleRepository
+    private ProcessRoleRepository roleRepository
 
     @Autowired
     private TestHelper testHelper

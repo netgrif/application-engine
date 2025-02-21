@@ -10,7 +10,7 @@ import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService
+import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.security.service.ISecurityContextService
 import com.netgrif.application.engine.startup.SuperCreator
 import groovy.transform.CompileStatic
@@ -42,7 +42,7 @@ class SecurityContextTest {
     private ActionDelegate delegate
 
     @Autowired
-    private IRoleService roleService
+    private IProcessRoleService roleService
 
     @Autowired
     private TestHelper testHelper

@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain;
 
+import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
 import com.netgrif.application.engine.importer.model.DataEventType;
 import com.netgrif.application.engine.importer.model.EventType;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
@@ -9,8 +10,7 @@ import com.netgrif.application.engine.petrinet.domain.events.Event;
 import com.netgrif.application.engine.petrinet.domain.layout.LayoutContainer;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
-import com.netgrif.application.engine.petrinet.domain.roles.RolePermissions;
-import com.netgrif.application.engine.petrinet.domain.roles.TaskPermission;
+import com.netgrif.application.engine.authorization.domain.permissions.TaskPermission;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import com.netgrif.application.engine.workflow.domain.triggers.AutoTrigger;
@@ -30,7 +30,8 @@ public class Transition extends Node {
 
     private String icon;
     private LinkedHashMap<String, DataRef> dataSet;
-    private RolePermissions<TaskPermission> permissions;
+    private AccessPermissions<TaskPermission> permissions;
+    private AccessPermissions<TaskPermission> caseRolePermissions;
     private List<Trigger> triggers;
     private LayoutContainer layoutContainer;
     private AssignPolicy assignPolicy;
@@ -46,7 +47,8 @@ public class Transition extends Node {
         assignPolicy = AssignPolicy.MANUAL;
         finishPolicy = FinishPolicy.MANUAL;
         events = new HashMap<>();
-        permissions = new RolePermissions<>();
+        permissions = new AccessPermissions<>();
+        caseRolePermissions = new AccessPermissions<>();
     }
 
     public void setDataRefBehavior(Field<?> field, DataFieldBehavior behavior) {
@@ -68,21 +70,17 @@ public class Transition extends Node {
         }
     }
 
-    public void addPermission(String actorId, Map<TaskPermission, Boolean> permissions) {
-        this.permissions.addPermissions(actorId, permissions);
+    public void addPermission(String roleId, Map<TaskPermission, Boolean> permissions) {
+        this.permissions.addPermissions(roleId, permissions);
     }
 
-    // TODO: release/8.0.0
+    // TODO 2058: release/8.0.0
     public void addNegativeViewRole(String roleId) {
 //        negativeViewRoles.add(roleId);
     }
 
-    public void addUserRef(String userRefId, Map<TaskPermission, Boolean> permissions) {
-//        if (userRefs.containsKey(userRefId) && userRefs.get(userRefId) != null) {
-//            userRefs.get(userRefId).putAll(permissions);
-//        } else {
-//            userRefs.put(userRefId, permissions);
-//        }
+    public void addCaseRolePermission(String userRefId, Map<TaskPermission, Boolean> permissions) {
+        this.caseRolePermissions.addPermissions(userRefId, permissions);
     }
 
     public void addTrigger(Trigger trigger) {
@@ -196,7 +194,8 @@ public class Transition extends Node {
         clone.setEvents(this.events == null ? null : events.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
         clone.setProperties(new UniqueKeyMap<>(this.getProperties()));
         clone.setLayoutContainer(this.layoutContainer == null ? null : this.layoutContainer.clone());
-        clone.setPermissions(new RolePermissions<>(this.permissions));
+        clone.setPermissions(new AccessPermissions<>(this.permissions));
+        clone.setCaseRolePermissions(new AccessPermissions<>(this.caseRolePermissions));
         return clone;
     }
 }

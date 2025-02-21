@@ -236,7 +236,6 @@ public class DataService implements IDataService {
         outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, newDataField, params));
         useCase = workflowService.findOne(task.getCaseId());
         historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, DataSet.of(fieldId, newDataField), user));
-        useCase = applyFieldConnectedChanges(useCase, field);
         outcome.setCase(useCase);
 
         return outcome;
@@ -760,15 +759,6 @@ public class DataService implements IDataService {
     public UserFieldValue makeUserFieldValue(String id) {
         IUser user = userService.resolveById(id);
         return new UserFieldValue(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
-    }
-
-    @Override
-    public Case applyFieldConnectedChanges(Case useCase, Field<?> field) {
-        Field<?> caseField = useCase.getDataSet().get(field.getStringId());
-        if (!(caseField instanceof UserListField)) {
-            return useCase;
-        }
-        return workflowService.resolveUserRef(useCase);
     }
 
     // TODO: release/8.0.0 change component properties, parse object node

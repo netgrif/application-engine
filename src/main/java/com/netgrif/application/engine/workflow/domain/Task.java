@@ -1,13 +1,13 @@
 package com.netgrif.application.engine.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
 import com.netgrif.application.engine.importer.model.TriggerType;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
-import com.netgrif.application.engine.petrinet.domain.roles.RolePermissions;
-import com.netgrif.application.engine.petrinet.domain.roles.TaskPermission;
+import com.netgrif.application.engine.authorization.domain.permissions.TaskPermission;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -62,7 +62,7 @@ public class Task implements Serializable {
     private List<Trigger> triggers = new LinkedList<>();
 
     @Builder.Default
-    private RolePermissions<TaskPermission> permissions = new RolePermissions<>();
+    private AccessPermissions<TaskPermission> permissions = new AccessPermissions<>();
 
     private LocalDateTime lastAssigned;
     private LocalDateTime lastFinished;
@@ -92,8 +92,12 @@ public class Task implements Serializable {
         return id.toString();
     }
 
-    public void addRole(String roleId, Map<TaskPermission, Boolean> permissions) {
+    public void addPermissionsForRole(String roleId, Map<TaskPermission, Boolean> permissions) {
         this.permissions.addPermissions(roleId, permissions);
+    }
+
+    public void addPermissionsForRoles(AccessPermissions<TaskPermission> rolesAndPermissions) {
+        this.permissions.addPermissions(rolesAndPermissions);
     }
 
     @JsonIgnore
@@ -127,5 +131,12 @@ public class Task implements Serializable {
 //                users.get(userId).put(id, perm);
 //            }
 //        });
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public boolean hasPermissions() {
+        return this.permissions != null && this.permissions.isEmpty();
     }
 }

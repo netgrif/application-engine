@@ -1,0 +1,40 @@
+package com.netgrif.application.engine.authorization.service.interfaces;
+
+import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
+import com.netgrif.application.engine.petrinet.domain.Process;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+public interface IProcessRoleService {
+
+    List<ProcessRole> saveAll(Iterable<ProcessRole> entities);
+
+    Set<ProcessRole> findAllByImportId(String importId);
+
+    Set<ProcessRole> findAllByDefaultTitle(String name);
+
+    ProcessRole findById(String id);
+
+    Set<ProcessRole> findByIds(Set<String> ids);
+
+    ProcessRole findByImportId(String importId);
+
+    boolean existsByImportId(String importId);
+
+    void assignRolesToUser(String userId, Set<String> roleIds, LoggedUser user);
+
+    void assignRolesToUser(String userId, Set<String> roleIds, LoggedUser user, Map<String, String> params);
+
+    List<ProcessRole> findAll();
+
+    List<ProcessRole> findAll(String netId);
+
+    ProcessRole defaultRole();
+
+    ProcessRole anonymousRole();
+
+    void deleteRolesOfNet(Process net, LoggedUser loggedUser);
+}

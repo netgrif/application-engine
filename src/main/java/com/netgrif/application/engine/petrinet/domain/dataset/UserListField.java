@@ -6,12 +6,11 @@ import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@EqualsAndHashCode(callSuper = true)
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class UserListField extends FieldWithAllowedRoles<UserListFieldValue> {
+
+    private String roleId;
 
     public UserListField() {
         super();

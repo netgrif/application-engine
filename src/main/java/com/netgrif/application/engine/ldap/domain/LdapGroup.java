@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.ldap.domain;
 
-import com.netgrif.application.engine.petrinet.domain.roles.Role;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,6 +28,6 @@ public class LdapGroup {
 
     private String description;
 
-    private Set<Role> processesRoles;
+    private Set<ProcessRole> processesProcessRoles;
 
 }

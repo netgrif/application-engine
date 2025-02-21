@@ -4,7 +4,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService
+import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.Disabled
@@ -31,7 +31,7 @@ class UserServiceTest {
     private IUserService service
 
     @Autowired
-    private IRoleService roleService
+    private IProcessRoleService roleService
 
     @Test
     @Disabled("Create functions or update test")

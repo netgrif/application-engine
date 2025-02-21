@@ -307,7 +307,7 @@
             <xs:element type="xs:string" name="allowedNet" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-    <xs:complexType name="roleRefLogic">
+    <xs:complexType name="taskPermission">
         <xs:sequence>
             <xs:element type="xs:boolean" name="perform" minOccurs="0"/>
             <xs:element type="xs:boolean" name="view" minOccurs="0"/>
@@ -325,7 +325,7 @@
             <xs:element name="immediate" type="xs:boolean" default="false" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
-    <xs:complexType name="caseLogic">
+    <xs:complexType name="casePermission">
         <xs:sequence>
             <xs:element type="xs:boolean" name="create" minOccurs="0"/>
             <xs:element type="xs:boolean" name="delete" minOccurs="0"/>
@@ -340,7 +340,7 @@
     <xs:complexType name="permissionRef">
         <xs:sequence>
             <xs:element type="identifier" name="id"/>
-            <xs:element type="roleRefLogic" name="logic"/>
+            <xs:element type="taskPermission" name="permission"/>
             <xs:element type="properties" name="properties" minOccurs="0">
                 <xs:unique name="permissionRefPropertyUniqueKey">
                     <xs:selector xpath="./property"/>
@@ -348,13 +348,9 @@
                 </xs:unique>
             </xs:element>
         </xs:sequence>
+        <xs:attribute name="type" type="roleType"/>
     </xs:complexType>
     <xs:complexType name="caseRoleRef">
-        <xs:complexContent>
-            <xs:extension base="casePermissionRef"/>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:complexType name="caseUserRef">
         <xs:complexContent>
             <xs:extension base="casePermissionRef"/>
         </xs:complexContent>
@@ -362,9 +358,16 @@
     <xs:complexType name="casePermissionRef">
         <xs:sequence>
             <xs:element type="identifier" name="id"/>
-            <xs:element type="caseLogic" name="caseLogic"/>
+            <xs:element type="casePermission" name="permission"/>
         </xs:sequence>
+        <xs:attribute name="type" type="roleType"/>
     </xs:complexType>
+    <xs:simpleType name="roleType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="case"/>
+            <xs:enumeration value="process"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:simpleType name="behavior">
         <xs:restriction base="xs:string">
             <xs:enumeration value="forbidden"/>

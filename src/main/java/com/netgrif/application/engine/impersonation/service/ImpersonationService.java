@@ -4,6 +4,7 @@ import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;
 import com.netgrif.application.engine.history.domain.impersonationevents.ImpersonationEndEventLog;
 import com.netgrif.application.engine.history.domain.impersonationevents.ImpersonationStartEventLog;
@@ -14,7 +15,6 @@ import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserH
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationSessionService;
-import com.netgrif.application.engine.petrinet.domain.roles.Role;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;
@@ -154,10 +154,11 @@ public class ImpersonationService implements IImpersonationService {
             return impersonated;
         }
         List<Authority> authorities = impersonationAuthorizationService.getAuthorities(configs, impersonated);
-        List<Role> roles = impersonationAuthorizationService.getRoles(configs, impersonated);
+        List<ProcessRole> processRoles = impersonationAuthorizationService.getRoles(configs, impersonated);
 
         impersonated.setAuthorities(new HashSet<>(authorities));
-        impersonated.setRoles(new HashSet<>(roles));
+        // todo 2058
+//        impersonated.setRoles(new HashSet<>(processRoles));
 
         return impersonated;
     }

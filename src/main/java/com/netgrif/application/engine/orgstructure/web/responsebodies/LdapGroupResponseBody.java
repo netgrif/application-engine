@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.orgstructure.web.responsebodies;
 
-import com.netgrif.application.engine.petrinet.domain.roles.Role;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -18,5 +18,5 @@ public class LdapGroupResponseBody {
 
     private String description;
 
-    private Set<Role> roles;
+    private Set<ProcessRole> processRoles;
 }

@@ -5,8 +5,8 @@ import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
-import com.netgrif.application.engine.petrinet.domain.roles.Role
-import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService
+import com.netgrif.application.engine.authorization.domain.ProcessRole
+import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,7 +29,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     private INextGroupService groupService
 
     @Autowired
-    private IRoleService roleService
+    private IProcessRoleService roleService
 
     @Autowired
     private SuperAdminConfiguration configuration
@@ -59,7 +59,8 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
                 password: configuration.password,
                 state: UserState.ACTIVE,
                 authorities: [adminAuthority, systemAuthority] as Set<Authority>,
-                roles: roleService.findAll() as Set<Role>))
+                // todo 2058
+                roles: roleService.findAll() as Set<ProcessRole>))
         log.info("Super user created")
     }
 
@@ -77,7 +78,8 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     }
 
     void setAllRoles() {
-        superUser.setRoles(roleService.findAll() as Set<Role>)
+        // todo 2058
+//        superUser.setRoles(roleService.findAll() as Set<ProcessRole>)
         superUser = userService.save(superUser) as IUser
     }
 

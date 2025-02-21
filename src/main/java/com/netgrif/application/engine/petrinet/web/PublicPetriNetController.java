@@ -4,7 +4,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
+import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,13 +39,13 @@ public class PublicPetriNetController {
 
     private final IPetriNetService petriNetService;
 
-    private final IRoleService roleService;
+    private final IProcessRoleService roleService;
 
     private final IUserService userService;
 
     private final StringToVersionConverter converter;
 
-    public PublicPetriNetController(IPetriNetService petriNetService, IUserService userService, StringToVersionConverter converter, IRoleService roleService) {
+    public PublicPetriNetController(IPetriNetService petriNetService, IUserService userService, StringToVersionConverter converter, IProcessRoleService roleService) {
         this.petriNetService = petriNetService;
         this.converter = converter;
         this.userService = userService;

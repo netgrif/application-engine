@@ -8,8 +8,8 @@ import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.roles.Role
-import com.netgrif.application.engine.petrinet.domain.roles.RoleRepository
+import com.netgrif.application.engine.authorization.domain.ProcessRole
+import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -65,7 +65,7 @@ class AssignActionTest {
     private UserRepository userRepository
 
     @Autowired
-    private RoleRepository roleRepository
+    private ProcessRoleRepository roleRepository
 
     @Autowired
     private IPetriNetService petriNetService
@@ -97,7 +97,7 @@ class AssignActionTest {
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
 //                [org] as Group[],
-                [] as Role[])
+                [] as ProcessRole[])
     }
 
     private void createMainAndSecondaryNet() {
@@ -134,7 +134,7 @@ class AssignActionTest {
                 .andReturn()
 
         User updatedUser = userRepository.findByEmail(USER_EMAIL)
-        Set<Role> roles = updatedUser.getRoles()
+        Set<ProcessRole> roles = updatedUser.getRoles()
 
         String adminMainId = roleRepository.findAllByName_DefaultValue("admin_main")?.first()?.stringId
         String adminSecondaryId = roleRepository.findAllByName_DefaultValue("admin_secondary")?.first()?.stringId

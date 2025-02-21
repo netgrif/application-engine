@@ -12,9 +12,9 @@ import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
 import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
-import com.netgrif.application.engine.petrinet.domain.roles.Role
+import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService
+import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
@@ -271,13 +271,13 @@ class RequestTest {
     private ImportHelper importHelper
     private ObjectMapper objectMapper
     private IPetriNetService petriNetService
-    private IRoleService roleService
+    private IProcessRoleService roleService
     private IUserService userService
     private IWorkflowService workflowService
     private ITaskService taskService
 
     @Autowired
-    RequestTest(WebApplicationContext wac, TestHelper testHelper, SuperCreator superCreator, ImportHelper importHelper, ObjectMapper objectMapper, IPetriNetService petriNetService, IRoleService roleService, IUserService userService, IWorkflowService workflowService, ITaskService taskService) {
+    RequestTest(WebApplicationContext wac, TestHelper testHelper, SuperCreator superCreator, ImportHelper importHelper, ObjectMapper objectMapper, IPetriNetService petriNetService, IProcessRoleService roleService, IUserService userService, IWorkflowService workflowService, ITaskService taskService) {
         this.wac = wac
         this.testHelper = testHelper
         this.superCreator = superCreator
@@ -313,8 +313,8 @@ class RequestTest {
         def processRoles = importHelper.getProcessRolesByImportId(net.getNet(), ["first": "first", "second": "second", "system": "system", "user": "user", "registration": "registration"])
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
-                [processRoles.get("first"), processRoles.get("registration"), processRoles.get("second"), processRoles.get("system"), processRoles.get("user")] as Role[])
-        List<Role> roles = roleService.findAll(netId)
+                [processRoles.get("first"), processRoles.get("registration"), processRoles.get("second"), processRoles.get("system"), processRoles.get("user")] as ProcessRole[])
+        List<ProcessRole> roles = roleService.findAll(netId)
         roleService.assignRolesToUser(userService.findByEmail(USER_EMAIL).stringId, roles.findAll { it.importId in ["1", "2"] }.collect { it.stringId } as Set, userService.getLoggedOrSystem().transformToLoggedUser())
 
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")

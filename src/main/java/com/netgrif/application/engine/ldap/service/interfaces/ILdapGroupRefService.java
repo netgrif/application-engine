@@ -3,7 +3,7 @@ package com.netgrif.application.engine.ldap.service.interfaces;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.ldap.domain.LdapGroup;
 import com.netgrif.application.engine.ldap.domain.LdapGroupRef;
-import com.netgrif.application.engine.petrinet.domain.roles.Role;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.ldap.query.LdapQuery;
 
@@ -25,7 +25,7 @@ public interface ILdapGroupRefService {
 
     void deleteRole(LdapGroup ldapGroup, String petriNet);
 
-    Set<Role> getRoleByLdapGroup(Set<String> groupDn);
+    Set<ProcessRole> getRoleByLdapGroup(Set<String> groupDn);
 
     void setRoleToLdapGroup(String groupDn, Set<String> roleIds, LoggedUser loggedUser);
 

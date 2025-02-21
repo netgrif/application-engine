@@ -26,8 +26,6 @@ public interface IWorkflowService {
 
     Page<Case> getAll(Pageable pageable);
 
-    Case resolveUserRef(Case useCase);
-
     CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale, Map<String, String> params);
 
     CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale);

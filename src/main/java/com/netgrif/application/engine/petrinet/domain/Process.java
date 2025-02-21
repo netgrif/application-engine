@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain;
 
+import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
 import com.netgrif.application.engine.importer.model.CaseEventType;
 import com.netgrif.application.engine.importer.model.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
@@ -10,8 +11,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
 import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
-import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
-import com.netgrif.application.engine.petrinet.domain.roles.RolePermissions;
+import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
 import lombok.Data;
@@ -38,8 +38,9 @@ public class Process extends ProcessObject {
     private I18nString title;
     private String icon;
     private I18nExpression defaultCaseName;
-    // TODO: release/8.0.0 - default + anonymous role, roleref
-    private RolePermissions<CasePermission> permissions;
+    // TODO 2058: release/8.0.0 - default + anonymous role, roleref
+    private AccessPermissions<CasePermission> permissions;
+    private AccessPermissions<CasePermission> caseRolePermissions;
     private Map<ProcessEventType, ProcessEvent> processEvents;
     private Map<CaseEventType, CaseEvent> caseEvents;
     private List<Function> functions;
@@ -70,7 +71,8 @@ public class Process extends ProcessObject {
         dataSet = new UniqueKeyMap<>();
         processEvents = new HashMap<>();
         caseEvents = new HashMap<>();
-        permissions = new RolePermissions<>();
+        permissions = new AccessPermissions<>();
+        caseRolePermissions = new AccessPermissions<>();
         functions = new LinkedList<>();
         properties = new UniqueKeyMap<>();
     }
@@ -89,6 +91,10 @@ public class Process extends ProcessObject {
 
     public void addPermission(String actorId, Map<CasePermission, Boolean> permissions) {
         this.permissions.addPermissions(actorId, permissions);
+    }
+
+    public void addCaseRolePermission(String userListId, Map<CasePermission, Boolean> permissions) {
+        this.caseRolePermissions.addPermissions(userListId, permissions);
     }
 
     public void addFunction(Function function) {
@@ -302,7 +308,8 @@ public class Process extends ProcessObject {
         clone.initializeArcs();
         clone.setCaseEvents(this.caseEvents == null ? null : this.caseEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
         clone.setProcessEvents(this.processEvents == null ? null : this.processEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
-        clone.setPermissions(new RolePermissions<>(this.permissions));
+        clone.setPermissions(new AccessPermissions<>(this.permissions));
+        clone.setCaseRolePermissions(new AccessPermissions<>(this.caseRolePermissions));
         this.getFunctions().forEach(clone::addFunction);
         clone.setProperties(new UniqueKeyMap<>(this.properties));
         return clone;

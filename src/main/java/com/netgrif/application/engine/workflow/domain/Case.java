@@ -2,11 +2,11 @@ package com.netgrif.application.engine.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.auth.domain.Author;
+import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
 import com.netgrif.application.engine.petrinet.domain.PetriNetIdentifier;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
-import com.netgrif.application.engine.petrinet.domain.roles.RolePermissions;
+import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
@@ -75,7 +75,7 @@ public class Case implements Serializable {
     @Indexed
     private Map<String, TaskPair> tasks = new HashMap<>();
     @JsonIgnore
-    private RolePermissions<CasePermission> permissions = new RolePermissions<>();
+    private AccessPermissions<CasePermission> permissions = new AccessPermissions<>();
     private Map<String, String> properties = new HashMap<>();
 
     private String uriNodeId;
@@ -94,11 +94,25 @@ public class Case implements Serializable {
         parentPetriNetIdentifiers = new ArrayList<>(petriNet.getParentIdentifiers());
         activePlaces = petriNet.getActivePlaces();
         icon = petriNet.getIcon();
-        permissions = new RolePermissions<>(petriNet.getPermissions(), Set.of(CasePermission.CREATE));
+        permissions = new AccessPermissions<>(petriNet.getPermissions(), Set.of(CasePermission.CREATE));
     }
 
     public String getStringId() {
         return id.toString();
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public void addPermissionsForRole(String authorizationGroupId, Map<CasePermission, Boolean> permissions) {
+        this.permissions.addPermissions(authorizationGroupId, permissions);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public void addPermissionsForRoles(AccessPermissions<CasePermission> rolesAndPermissions) {
+        this.permissions.addPermissions(rolesAndPermissions);
     }
 
     public void resolveImmediateDataFields() {

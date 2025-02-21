@@ -3,6 +3,7 @@ package com.netgrif.application.engine.configuration.authentication.providers;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.User;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.ldap.domain.LdapGroupRef;
 import com.netgrif.application.engine.ldap.domain.LdapUser;
 import com.netgrif.application.engine.ldap.service.LdapUserService;
@@ -12,7 +13,6 @@ import com.netgrif.application.engine.orgstructure.web.requestbodies.LdapGroupSe
 import com.netgrif.application.engine.orgstructure.web.responsebodies.LdapGroupResponseBody;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
-import com.netgrif.application.engine.petrinet.domain.roles.Role;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.SuperCreator;
 import org.bson.types.ObjectId;
@@ -180,7 +180,7 @@ class NetgrifLdapAuthenticationProviderTest {
         assert net != null;
         // TODO: release/8.0.0 fix
 //        Map<String, ProcessRole> roles = net.getRoles();
-        Map<String, Role> roles = null;
+        Map<String, ProcessRole> roles = null;
         assert roles != null;
 
         List<LdapGroupRef> ldapGroupsTest = ldapGroupRefService.searchGroups("test1");
@@ -193,8 +193,8 @@ class NetgrifLdapAuthenticationProviderTest {
         ldapGroupRefService.setRoleToLdapGroup(ldapGroupsTest.get(0).getDn().toString(), role, superCreator.getLoggedSuper());
         Set<String> group = new HashSet<>();
         group.add(ldapGroupsTest.get(0).getDn().toString());
-        Set<Role> getRole = ldapGroupRefService.getRoleByLdapGroup(group);
-        assert getRole.size() == roles.size();
+        Set<ProcessRole> getProcessRole = ldapGroupRefService.getRoleByLdapGroup(group);
+        assert getProcessRole.size() == roles.size();
     }
 
     @Test
@@ -218,7 +218,7 @@ class NetgrifLdapAuthenticationProviderTest {
         assert net != null;
         // TODO: release/8.0.0 fix
 //        Map<String, ProcessRole> roles = net.getRoles();
-        Map<String, Role> roles = null;
+        Map<String, ProcessRole> roles = null;
         assert roles != null;
 
         List<LdapGroupRef> ldapGroupsTest = ldapGroupRefService.searchGroups("test1");
@@ -232,8 +232,8 @@ class NetgrifLdapAuthenticationProviderTest {
 
         Set<String> group = new HashSet<>();
         group.add(ldapGroupsTest.get(0).getDn().toString());
-        Set<Role> getRole = ldapGroupRefService.getRoleByLdapGroup(group);
-        assert getRole.size() == roles.size();
+        Set<ProcessRole> getProcessRole = ldapGroupRefService.getRoleByLdapGroup(group);
+        assert getProcessRole.size() == roles.size();
 
 
         MvcResult result2 = mvc.perform(get("/api/auth/login")
@@ -269,8 +269,8 @@ class NetgrifLdapAuthenticationProviderTest {
     @Test
     void getRole() {
         Set<String> findDn = Set.of("nothing");
-        Set<Role> roles = ldapGroupRefService.getRoleByLdapGroup(findDn);
-        assert roles.isEmpty();
+        Set<ProcessRole> processRoles = ldapGroupRefService.getRoleByLdapGroup(findDn);
+        assert processRoles.isEmpty();
     }
 
     @Test

@@ -1,47 +1,40 @@
-package com.netgrif.application.engine.petrinet.domain.roles;
+package com.netgrif.application.engine.authorization.domain;
 
 import com.netgrif.application.engine.importer.model.EventType;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.Imported;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.Event;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.*;
 
 @Data
-@Document
+@Document(collection = "role")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
-public class Role extends Imported {
+public class ProcessRole extends Role {
 
     public static final String DEFAULT_ROLE = "default";
     public static final String ANONYMOUS_ROLE = "anonymous";
 
-    // TODO: release/8.0.0 indexed import id
-    @Id
-    private ObjectId id;
-    // TODO: release/8.0.0 rename title
-    private I18nString name;
+    private I18nString title;
     private I18nString description;
     private Map<EventType, Event> events;
-    // TODO: release/8.0.0 add properties
     private UniqueKeyMap<String, String> properties;
 
-    public Role(ObjectId id) {
-        this.id = id;
+    public ProcessRole(ObjectId id) {
+        super(id);
         this.events = new HashMap<>();
     }
 
-    public Role() {
+    public ProcessRole() {
         this(new ObjectId());
     }
 
-    public Role(String id) {
+    public ProcessRole(String id) {
         this(new ObjectId(id));
     }
 
@@ -55,10 +48,10 @@ public class Role extends Imported {
     }
 
     public String getLocalisedName(Locale locale) {
-        if (name == null) {
+        if (title == null) {
             return null;
         }
-        return name.getTranslation(locale);
+        return title.getTranslation(locale);
     }
 
     public List<Action> getPreAssignActions() {
@@ -95,15 +88,15 @@ public class Role extends Imported {
 
     @Override
     public String toString() {
-        return name.getDefaultValue();
+        return title.getDefaultValue();
     }
 
     @Override
-    public Role clone() {
-        Role clone = new Role();
+    public ProcessRole clone() {
+        ProcessRole clone = new ProcessRole();
         clone.setStringId(this.getStringId());
         clone.setImportId(this.importId);
-        clone.setName(this.name == null ? null : this.name.clone());
+        clone.setTitle(this.title == null ? null : this.title.clone());
         clone.setDescription(this.description == null ? null : this.description.clone());
         return clone;
     }

@@ -3,7 +3,7 @@ package com.netgrif.application.engine
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService
+import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -31,7 +31,7 @@ abstract class EngineTest {
     @Autowired
     public ITaskService taskService
     @Autowired
-    public IRoleService roleService
+    public IProcessRoleService roleService
     @Autowired
     public IUserService userService
     @Autowired

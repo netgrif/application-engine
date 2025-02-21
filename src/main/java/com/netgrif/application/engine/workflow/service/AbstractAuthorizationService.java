@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
-import com.netgrif.application.engine.petrinet.domain.roles.TaskPermission;
+import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
+import com.netgrif.application.engine.authorization.domain.permissions.TaskPermission;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,10 +22,11 @@ public abstract class AbstractAuthorizationService {
     protected Map<CasePermission, Boolean> getAggregateRoleCasePermissions(IUser user, Map<String, Map<CasePermission, Boolean>> permissions) {
         Map<CasePermission, Boolean> aggregatePermissions = new HashMap<>();
 
-        Set<String> userRoleIDs = user.getSelfOrImpersonated().getRoles().stream().map(role -> role.getId().toString()).collect(Collectors.toSet());
+        // todo 2058
+//        Set<String> userRoleIDs = user.getSelfOrImpersonated().getRoles().stream().map(role -> role.getId().toString()).collect(Collectors.toSet());
 
         for (Map.Entry<String, Map<CasePermission, Boolean>> role : permissions.entrySet()) {
-            aggregateRoleCasePermission(userRoleIDs, role, aggregatePermissions);
+//            aggregateRoleCasePermission(userRoleIDs, role, aggregatePermissions);
         }
 
         return aggregatePermissions;
@@ -47,10 +48,11 @@ public abstract class AbstractAuthorizationService {
     protected Map<TaskPermission, Boolean> getAggregateRolePermissions(IUser user, Map<String, Map<TaskPermission, Boolean>> permissions) {
         Map<TaskPermission, Boolean> aggregatePermissions = new HashMap<>();
 
-        Set<String> userRoleIDs = user.getSelfOrImpersonated().getRoles().stream().map(role -> role.getId().toString()).collect(Collectors.toSet());
+        // todo 2058
+//        Set<String> userRoleIDs = user.getSelfOrImpersonated().getRoles().stream().map(role -> role.getId().toString()).collect(Collectors.toSet());
 
         for (Map.Entry<String, Map<TaskPermission, Boolean>> role : permissions.entrySet()) {
-            aggregateRolePermission(userRoleIDs, role, aggregatePermissions);
+//            aggregateRolePermission(userRoleIDs, role, aggregatePermissions);
         }
 
         return aggregatePermissions;

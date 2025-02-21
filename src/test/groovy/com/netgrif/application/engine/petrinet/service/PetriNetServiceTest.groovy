@@ -11,11 +11,11 @@ import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
-import com.netgrif.application.engine.petrinet.domain.roles.Role
-import com.netgrif.application.engine.petrinet.domain.roles.RoleRepository
+import com.netgrif.application.engine.authorization.domain.ProcessRole
+import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService
+import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
@@ -62,7 +62,7 @@ class PetriNetServiceTest {
     private TaskRepository taskRepository
 
     @Autowired
-    private IRoleService userRoleService
+    private IProcessRoleService userRoleService
 
     @Autowired
     private IUserService userService
@@ -77,7 +77,7 @@ class PetriNetServiceTest {
     private CaseRepository caseRepository
 
     @Autowired
-    private RoleRepository roleRepository
+    private ProcessRoleRepository roleRepository
 
     @Autowired
     private ElasticPetriNetRepository elasticPetriNetRepository
@@ -93,7 +93,7 @@ class PetriNetServiceTest {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         importHelper.createUser(new User(name: "Customer", surname: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [] as Role[])
+                [] as ProcessRole[])
     }
 
     @Test

@@ -4,6 +4,8 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
+import com.netgrif.application.engine.authorization.domain.ProcessRole
+import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -39,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
-class RoleTest {
+class ProcessRoleTest {
 
     private static final String CASE_CREATE_URL = "/api/workflow/case"
     private static final String TASK_SEARCH_URL = "/api/task/search?sort=priority"
@@ -69,7 +71,7 @@ class RoleTest {
     private IPetriNetService petriNetService;
 
     @Autowired
-    private RoleRepository userRoleRepository
+    private ProcessRoleRepository userRoleRepository
 
     @Autowired
     private SuperCreator superCreator;
@@ -99,16 +101,16 @@ class RoleTest {
                     it.getStringId() == net.getNet().roles.values().find {
                         it.name.defaultValue == "View"
                     }.stringId
-                }] as Role[])
+                }] as ProcessRole[])
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_PERFORM, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [roles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as Role[])
+                [roles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_BOTH, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [roles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "View" }.stringId },
-                 roles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as Role[])
+                 roles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
     }
 
     private String caseId

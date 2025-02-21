@@ -34,7 +34,7 @@ public class UserEventListener {
 
     @EventListener
     public void onUserRoleChangeEvent(UserRoleChangeEvent event) {
-        repository.save(new UserRoleEventLog(event.getUser().getUsername(), event.getRoles()));
+        repository.save(new UserRoleEventLog(event.getUser().getUsername(), event.getProcessRoles()));
     }
 
     @EventListener

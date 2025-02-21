@@ -7,16 +7,16 @@ import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.User;
 import com.netgrif.application.engine.auth.domain.UserState;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
+import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.arcs.ArcCollection;
 import com.netgrif.application.engine.petrinet.domain.dataset.NumberField;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
-import com.netgrif.application.engine.petrinet.domain.roles.Role;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.startup.SystemUserRunner;
@@ -69,7 +69,7 @@ public class VariableArcsTest {
     private MockService mock;
 
     @Autowired
-    private IRoleService roleService;
+    private IProcessRoleService roleService;
 
     @Autowired
     private ImportHelper importHelper;
@@ -114,7 +114,7 @@ public class VariableArcsTest {
         user.setEmail("VariableArcsTest@test.com");
         testUser = importHelper.createUser(user,
                 new Authority[]{authorityService.getOrCreate(Authority.user)},
-                new Role[]{});
+                new ProcessRole[]{});
 
         finishCase = importHelper.createCase("finish case", loaded);
         cancelCase = importHelper.createCase("assign case", loaded);

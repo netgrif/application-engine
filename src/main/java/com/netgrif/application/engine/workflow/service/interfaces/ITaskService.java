@@ -100,10 +100,6 @@ public interface ITaskService {
 
     DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId, Map<String, String> params) throws TransitionNotExecutableException;
 
-    void resolveUserRef(Case useCase);
-
-    Task resolveUserRef(Task task, Case useCase);
-
     void delete(List<Task> tasks, Case useCase);
 
     void delete(List<Task> tasks, String caseId);

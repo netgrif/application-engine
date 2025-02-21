@@ -2,7 +2,7 @@ package com.netgrif.application.engine.auth.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.netgrif.application.engine.petrinet.domain.roles.Role;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -13,32 +13,27 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LoggedUser extends org.springframework.security.core.userdetails.User {
 
-    public static final long serialVersionUID = 3031325636490953409L;
+    private static final long serialVersionUID = 3031325636490953409L;
 
-    @Getter
     @Setter
     protected String id;
 
-    @Getter
     @Setter
     protected String fullName;
 
-    @Getter
     @Setter
     protected Set<String> groups;
 
-    @Getter
     @Setter
     protected Set<String> roles;
 
-    @Getter
     @Setter
     protected boolean anonymous;
 
-    @Getter
     private LoggedUser impersonated;
 
     public LoggedUser(String id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
@@ -48,8 +43,8 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         this.groups = new HashSet<>();
     }
 
-    public void parseRoles(Set<Role> roles) {
-        roles.forEach(role -> this.roles.add(role.getStringId()));
+    public void parseRoles(Set<ProcessRole> processRoles) {
+        processRoles.forEach(role -> this.roles.add(role.getStringId()));
     }
 
     public boolean isAdmin() {
@@ -70,11 +65,12 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         user.setState(UserState.ACTIVE);
         user.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
         user.setNextGroups(groups.stream().map(String::new).collect(Collectors.toSet()));
-        user.setRoles(roles.stream().map(roleId -> {
-            Role role = new Role();
-            role.setStringId(roleId);
-            return role;
-        }).collect(Collectors.toSet()));
+        // todo 2058
+//        user.setRoles(roles.stream().map(roleId -> {
+//            Role role = new Role();
+//            role.setStringId(roleId);
+//            return role;
+//        }).collect(Collectors.toSet()));
         if (this.isImpersonating()) {
             user.setImpersonated(this.getImpersonated().transformToUser());
         }
@@ -90,11 +86,12 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         anonym.setState(UserState.ACTIVE);
         anonym.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
         anonym.setNextGroups(groups.stream().map(String::new).collect(Collectors.toSet()));
-        anonym.setRoles(roles.stream().map(roleId -> {
-            Role role = new Role();
-            role.setStringId(roleId);
-            return role;
-        }).collect(Collectors.toSet()));
+        // todo 2058
+//        anonym.setRoles(roles.stream().map(roleId -> {
+//            Role role = new Role();
+//            role.setStringId(roleId);
+//            return role;
+//        }).collect(Collectors.toSet()));
         return anonym;
     }
 

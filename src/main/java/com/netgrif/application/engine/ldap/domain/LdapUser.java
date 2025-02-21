@@ -62,8 +62,9 @@ public class LdapUser extends User {
     public LoggedUser transformToLoggedUser() {
         LdapLoggedUser loggedUser = new LdapLoggedUser(this.getStringId(), this.getEmail(), this.getPassword(), getDn(), getCommonName(), getMemberOf(), getUid(), getHomeDirectory(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
-        if (!this.getRoles().isEmpty())
-            loggedUser.parseRoles(this.getRoles());
+        // todo 2058
+//        if (!this.getRoles().isEmpty())
+//            loggedUser.parseRoles(this.getRoles());
         loggedUser.setGroups(this.getNextGroups());
         if (this.isImpersonating()) {
             loggedUser.impersonate(this.getImpersonated().transformToLoggedUser());
@@ -79,7 +80,8 @@ public class LdapUser extends User {
         this.setAvatar(user.getAvatar());
         this.setTelNumber(user.getTelNumber());
         this.setNextGroups(user.getNextGroups());
-        this.setRoles(user.getRoles());
+        // todo 2058
+//        this.setRoles(user.getRoles());
         this.setState(user.getState());
     }
 }

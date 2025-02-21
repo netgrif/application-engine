@@ -12,7 +12,7 @@ import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
-import com.netgrif.application.engine.petrinet.domain.roles.Role
+import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -123,13 +123,13 @@ class WorkflowAuthorizationServiceTest {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")]as Authority[],
-                [] as Role[])
+                [] as ProcessRole[])
         testUserAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
         testUserAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
 
         importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("admin")] as Authority[],
-                [] as Role[])
+                [] as ProcessRole[])
         adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
         adminAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
     }
@@ -148,7 +148,7 @@ class WorkflowAuthorizationServiceTest {
                 .contentType(APPLICATION_JSON)
                 .with(authentication(this.testUserAuth)))
                 .andExpect(status().is(403))
-        Role positiveCreateRole = this.net.getRoles().values().find(v -> v.getImportId() == "create_pos_role")
+        ProcessRole positiveCreateRole = this.net.getRoles().values().find(v -> v.getImportId() == "create_pos_role")
         userService.addRole(testUser, positiveCreateRole.getStringId())
 
         // pass with CREATE role permission
@@ -165,7 +165,7 @@ class WorkflowAuthorizationServiceTest {
                 .with(authentication(this.testUserAuth)))
                 .andExpect(status().is(403))
         // pass with DELETE role permission
-        Role positiveDeleteRole = this.net.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
+        ProcessRole positiveDeleteRole = this.net.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
         userService.addRole(testUser, positiveDeleteRole.getStringId())
         mvc.perform(delete(DELETE_CASE_URL + userCaseId1)
                 .with(authentication(this.testUserAuth)))
@@ -198,7 +198,7 @@ class WorkflowAuthorizationServiceTest {
 
     @Test
     void testCanCallCreate() {
-        Role positiveCreateRole = this.net.getRoles().values().find(v -> v.getImportId() == "create_pos_role")
+        ProcessRole positiveCreateRole = this.net.getRoles().values().find(v -> v.getImportId() == "create_pos_role")
         userService.addRole(testUser, positiveCreateRole.getStringId())
         assert workflowAuthorizationService.canCallCreate(testUser.transformToLoggedUser(), net.getStringId())
         userService.removeRole(testUser, positiveCreateRole.getStringId())
@@ -206,7 +206,7 @@ class WorkflowAuthorizationServiceTest {
 
     @Test
     void testCanCallDelete() {
-        Role positiveDeleteRole = this.net.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
+        ProcessRole positiveDeleteRole = this.net.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
         userService.addRole(testUser, positiveDeleteRole.getStringId())
         Case case_ = workflowService.createCase(net.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
         assert workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
@@ -215,7 +215,7 @@ class WorkflowAuthorizationServiceTest {
 
     @Test
     void testCanCallCreateFalse() {
-        Role positiveCreateRole = this.net.getRoles().values().find(v -> v.getImportId() == "create_neg_role")
+        ProcessRole positiveCreateRole = this.net.getRoles().values().find(v -> v.getImportId() == "create_neg_role")
         userService.addRole(testUser, positiveCreateRole.getStringId())
         assert !workflowAuthorizationService.canCallCreate(testUser.transformToLoggedUser(), net.getStringId())
         userService.removeRole(testUser, positiveCreateRole.getStringId())
@@ -223,7 +223,7 @@ class WorkflowAuthorizationServiceTest {
 
     @Test
     void testCanCallDeleteFalse() {
-        Role deleteRole = this.net.getRoles().values().find(v -> v.getImportId() == "delete_neg_role")
+        ProcessRole deleteRole = this.net.getRoles().values().find(v -> v.getImportId() == "delete_neg_role")
         userService.addRole(testUser, deleteRole.getStringId())
         Case case_ = workflowService.createCase(net.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
         assert !workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
@@ -233,8 +233,8 @@ class WorkflowAuthorizationServiceTest {
 
     @Test
     void testCanCallDeleteRoleFalseUserRefTrue() {
-        Role posDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
-        Role negDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "delete_neg_role")
+        ProcessRole posDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
+        ProcessRole negDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "delete_neg_role")
 
         userService.addRole(testUser, posDeleteRole.getStringId())
         userService.addRole(testUser, negDeleteRole.getStringId())
@@ -254,8 +254,8 @@ class WorkflowAuthorizationServiceTest {
 
     @Test
     void testCanCallDeleteRoleFalseUserRefTrueUserRefFalse() {
-        Role posDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
-        Role negDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "delete_neg_role")
+        ProcessRole posDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
+        ProcessRole negDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "delete_neg_role")
 
         userService.addRole(testUser, posDeleteRole.getStringId())
         userService.addRole(testUser, negDeleteRole.getStringId())

@@ -2,8 +2,8 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.User;
-import com.netgrif.application.engine.petrinet.domain.roles.Role;
-import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
+import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static com.netgrif.application.engine.petrinet.domain.roles.CasePermission.*;
+import static com.netgrif.application.engine.authorization.domain.permissions.CasePermission.*;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -46,19 +46,19 @@ class AbstractAuthorizationServiceTest {
         MockAuthorizationService mockInstance = new MockAuthorizationService();
 
         // init
-        List<Role> roles = new LinkedList<>();
-        roles.add(new Role());
-        roles.add(new Role());
-        roles.add(new Role());
+        List<ProcessRole> processRoles = new LinkedList<>();
+        processRoles.add(new ProcessRole());
+        processRoles.add(new ProcessRole());
+        processRoles.add(new ProcessRole());
 
         IUser user = new User();
-        user.addRole(roles.get(0));
-        user.addRole(roles.get(1));
+        user.addRole(processRoles.get(0));
+        user.addRole(processRoles.get(1));
 
         Map<String, Map<CasePermission, Boolean>> netPermissions = new HashMap<>();
-        netPermissions.put(roles.get(0).getStringId(), getInitEntryValue());
-        netPermissions.put(roles.get(1).getStringId(), getInitEntryValue());
-        netPermissions.put(roles.get(2).getStringId(), getInitEntryValue());
+        netPermissions.put(processRoles.get(0).getStringId(), getInitEntryValue());
+        netPermissions.put(processRoles.get(1).getStringId(), getInitEntryValue());
+        netPermissions.put(processRoles.get(2).getStringId(), getInitEntryValue());
 
         // situation 1
         Map<CasePermission, Boolean> aggregatePermission = mockInstance.getAggregateRoleCasePermissions(user, netPermissions);
@@ -68,8 +68,8 @@ class AbstractAuthorizationServiceTest {
         assert aggregatePermission.get(DELETE);
 
         // situation 2
-        netPermissions.get(roles.get(0).getStringId()).put(CREATE, false);
-        netPermissions.get(roles.get(1).getStringId()).put(DELETE, false);
+        netPermissions.get(processRoles.get(0).getStringId()).put(CREATE, false);
+        netPermissions.get(processRoles.get(1).getStringId()).put(DELETE, false);
         aggregatePermission = mockInstance.getAggregateRoleCasePermissions(user, netPermissions);
 
         // TODO: release/8.0.0 AssertionError

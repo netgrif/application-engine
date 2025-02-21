@@ -11,9 +11,9 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.*
-import com.netgrif.application.engine.petrinet.domain.roles.Role
+import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService
+import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
@@ -102,7 +102,7 @@ class InsuranceTest {
     @Autowired
     private SuperCreator superCreator
     @Autowired
-    private IRoleService roleService
+    private IProcessRoleService roleService
     @Autowired
     private IUserService userService
     @Autowired
@@ -128,8 +128,8 @@ class InsuranceTest {
         def processRoles = importHelper.getRolesByImportId(net.getNet(), ["agent": "1", "company": "2"])
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
-                [processRoles.get("agent"), processRoles.get("company")] as Role[])
-        List<Role> roles = roleService.findAll(netId)
+                [processRoles.get("agent"), processRoles.get("company")] as ProcessRole[])
+        List<ProcessRole> roles = roleService.findAll(netId)
         roleService.assignRolesToUser(userService.findByEmail(USER_EMAIL, false).stringId, roles.findAll { it.importId in ["1", "2"] }.collect { it.stringId } as Set, userService.getLoggedOrSystem().transformToLoggedUser())
 
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")

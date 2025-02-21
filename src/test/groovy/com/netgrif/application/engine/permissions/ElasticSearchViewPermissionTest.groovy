@@ -15,7 +15,7 @@ import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
-import com.netgrif.application.engine.petrinet.domain.roles.Role
+import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -95,7 +95,7 @@ class ElasticSearchViewPermissionTest {
         userAuthority = authorityService.getOrCreate(Authority.user)
 
         testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
-                [userAuthority] as Authority[], [] as Role[])
+                [userAuthority] as Authority[], [] as ProcessRole[])
     }
 
     @Test
@@ -113,7 +113,7 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithPosRole() {
         Case case_ = workflowService.createCase(net.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
-        Role posViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_pos_role")
+        ProcessRole posViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_pos_role")
         userService.addRole(testUser, posViewRole.getStringId())
 
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest()
@@ -131,7 +131,7 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithNegRole() {
         Case case_ = workflowService.createCase(net.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
-        Role negViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
+        ProcessRole negViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
         userService.addRole(testUser, negViewRole.getStringId())
 
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest()
@@ -196,7 +196,7 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithNegativeRoleAndPosUserRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
-        Role negViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
+        ProcessRole negViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
         userService.addRole(testUser, negViewRole.getStringId())
         String taskId = case_.getTaskStringId("t1")
         dataService.setData(taskId, new DataSet([

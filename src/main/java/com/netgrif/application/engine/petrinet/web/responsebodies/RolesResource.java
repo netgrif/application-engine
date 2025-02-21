@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
 
-import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
-import com.netgrif.application.engine.petrinet.domain.roles.Role;
+import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import org.springframework.hateoas.EntityModel;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class RolesResource extends EntityModel<RolesAndPermissions> {
         super(content, new ArrayList<>());
     }
 
-    public RolesResource(List<Role> content, Map<String, Map<CasePermission, Boolean>> permissions, Locale locale) {
+    public RolesResource(List<ProcessRole> content, Map<String, Map<CasePermission, Boolean>> permissions, Locale locale) {
         this(new RolesAndPermissions(content, permissions));
     }
 }

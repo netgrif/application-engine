@@ -9,9 +9,9 @@ import com.netgrif.application.engine.auth.service.interfaces.IRegistrationServi
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
+import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,7 +23,6 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -44,7 +43,7 @@ public class RegistrationService implements IRegistrationService {
     private INextGroupService groupService;
 
     @Autowired
-    private IRoleService roleService;
+    private IProcessRoleService roleService;
 
     @Autowired
     private ServerAuthProperties serverAuthProperties;
@@ -133,7 +132,8 @@ public class RegistrationService implements IRegistrationService {
         userService.addDefaultAuthorities(user);
 
         if (newUser.roles != null && !newUser.roles.isEmpty()) {
-            user.setRoles(new HashSet<>(roleService.findByIds(newUser.roles)));
+            // todo 2058
+//            user.setRoles(new HashSet<>(roleService.findByIds(newUser.roles)));
         }
         userService.addDefaultRole(user);
         user = userRepository.save(user);

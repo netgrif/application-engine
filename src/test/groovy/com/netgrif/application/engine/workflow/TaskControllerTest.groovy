@@ -10,9 +10,9 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskSer
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
-import com.netgrif.application.engine.petrinet.domain.roles.Role
+import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService
+import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.utils.FullPageRequest
@@ -58,7 +58,7 @@ class TaskControllerTest {
     private WorkflowController workflowController
 
     @Autowired
-    private IRoleService roleService
+    private IProcessRoleService roleService
 
     @Autowired
     private IDataService dataService
@@ -91,7 +91,7 @@ class TaskControllerTest {
 
     private Case useCase
 
-    private Role role
+    private ProcessRole role
 
     private Task task
 
@@ -105,7 +105,7 @@ class TaskControllerTest {
                 password: "superAdminPassword",
                 state: UserState.ACTIVE,
                 authorities: [authorityService.getOrCreate(Authority.user)] as Set<Authority>,
-                roles: [] as Set<Role>))
+                roles: [] as Set<ProcessRole>))
         importNet()
     }
 
@@ -202,9 +202,9 @@ class TaskControllerTest {
     }
 
     void setUserRole() {
-        List<Role> roles = roleService.findAll(net.stringId)
+        List<ProcessRole> roles = roleService.findAll(net.stringId)
 
-        for (Role role : roles) {
+        for (ProcessRole role : roles) {
             if (role.importId == "process_role") {
                 this.role = role
             }

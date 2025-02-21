@@ -92,9 +92,10 @@ public class User extends AbstractUser implements RegisteredUser {
         LoggedUser loggedUser = new LoggedUser(this.getId().toString(), this.getEmail(), this.getPassword(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
         loggedUser.setAnonymous(false);
-        if (!this.getRoles().isEmpty()) {
-            loggedUser.parseRoles(this.getRoles());
-        }
+        // todo 2058
+//        if (!this.getRoles().isEmpty()) {
+//            loggedUser.parseRoles(this.getRoles());
+//        }
         loggedUser.setGroups(this.getNextGroups());
         if (this.isImpersonating()) {
             loggedUser.impersonate(this.getImpersonated().transformToLoggedUser());
@@ -121,7 +122,7 @@ public class User extends AbstractUser implements RegisteredUser {
                 ", token='" + token + '\'' +
                 ", expirationDate=" + expirationDate +
                 ", authorities=" + authorities +
-                ", roles=" + roles +
+                ", roleAssignments=" + roleAssignments +
                 ", groups=" + nextGroups +
                 '}';
     }

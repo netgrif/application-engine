@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.history.domain.userevents;
 
-import com.netgrif.application.engine.petrinet.domain.roles.Role;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -10,10 +10,10 @@ import java.util.List;
 @Getter
 public class UserRoleEventLog extends UserEventLog implements IRolesEvent {
 
-    private final List<Role> roles;
+    private final List<ProcessRole> processRoles;
 
-    public UserRoleEventLog(String email, Collection<Role> roles) {
+    public UserRoleEventLog(String email, Collection<ProcessRole> processRoles) {
         super(email);
-        this.roles = new ArrayList<>(roles);
+        this.processRoles = new ArrayList<>(processRoles);
     }
 }

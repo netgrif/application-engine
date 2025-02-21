@@ -2,7 +2,7 @@ package com.netgrif.application.engine.configuration.security.jwt;
 
 import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
+import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -28,7 +28,7 @@ public class JwtService implements IJwtService {
     private JwtProperties properties;
 
     @Autowired
-    private IRoleService roleService;
+    private IProcessRoleService roleService;
 
     @PostConstruct
     private void resolveSecret() {

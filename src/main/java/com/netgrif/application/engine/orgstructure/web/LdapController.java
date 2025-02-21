@@ -8,7 +8,7 @@ import com.netgrif.application.engine.orgstructure.web.requestbodies.LdapGroupRo
 import com.netgrif.application.engine.orgstructure.web.requestbodies.LdapGroupSearchBody;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.LdapGroupResponseBody;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.LdapGroupsResource;
-import com.netgrif.application.engine.petrinet.domain.roles.Role;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -62,8 +62,8 @@ public class LdapController {
         List<LdapGroup> groupRoles = service.getAllLdapGroupRoles();
         Set<LdapGroupResponseBody> ldapGroupResponse = groups.stream()
                 .map(group -> {
-                    Set<Role> roleSet = groupRoles.stream().filter(ldapGroup -> ldapGroup.getDn().equals(group.getDn().toString())).map(LdapGroup::getProcessesRoles).flatMap(Collection::stream).collect(Collectors.toSet());
-                    return new LdapGroupResponseBody(group.getDn().toString(), group.getCn(), group.getDescription(), roleSet);
+                    Set<ProcessRole> processRoleSet = groupRoles.stream().filter(ldapGroup -> ldapGroup.getDn().equals(group.getDn().toString())).map(LdapGroup::getProcessesProcessRoles).flatMap(Collection::stream).collect(Collectors.toSet());
+                    return new LdapGroupResponseBody(group.getDn().toString(), group.getCn(), group.getDescription(), processRoleSet);
                 })
                 .collect(Collectors.toCollection(HashSet::new));
         return new LdapGroupsResource(ldapGroupResponse);

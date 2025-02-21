@@ -3,6 +3,7 @@ package com.netgrif.application.engine.workflow.service;
 import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventLog;
@@ -18,9 +19,9 @@ import com.netgrif.application.engine.petrinet.domain.arcs.ReferenceType;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
-import com.netgrif.application.engine.petrinet.domain.roles.CasePermission;
+import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IRoleService;
+import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.security.service.EncryptionService;
@@ -64,6 +65,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     protected IPetriNetService petriNetService;
+
+    @Autowired
+    protected IProcessRoleService processRoleService;
 
     @Autowired
     protected IRoleService roleService;
@@ -179,17 +183,6 @@ public class WorkflowService implements IWorkflowService {
         return page;
     }
 
-    @Override
-    public Case resolveUserRef(Case useCase) {
-//        TODO: release/8.0.0
-//        useCase.getUsers().clear();
-//        useCase.getNegativeViewUsers().clear();
-//        useCase.getUserRefs().forEach((id, permission) -> resolveUserRefPermissions(useCase, id, permission));
-//        useCase.resolveViewUsers();
-        taskService.resolveUserRef(useCase);
-        return save(useCase);
-    }
-
     private void resolveUserRefPermissions(Case useCase, String userListId, Map<CasePermission, Boolean> permission) {
         List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(userListId).getRawValue());
         if (userIds != null && !userIds.isEmpty()) {
@@ -288,6 +281,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.setTitle(makeTitle.apply(useCase));
         useCase = taskService.createTasks(useCase);
         dataSetInitializer.populateDataSet(useCase, params);
+        roleService.resolveCaseRolesOnCase(useCase, useCase.getProcess().getCaseRolePermissions(), false);
         useCase = save(useCase);
         // TODO: release/7.0.0 6.2.5
         // TODO: release/8.0.0 useCase.setUriNodeId(petriNet.getUriNodeId());

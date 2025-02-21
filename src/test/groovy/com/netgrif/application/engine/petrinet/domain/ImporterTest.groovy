@@ -5,7 +5,7 @@ import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
-import com.netgrif.application.engine.petrinet.domain.roles.RoleRepository
+import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -43,7 +43,7 @@ class ImporterTest {
     @Autowired
     private SuperCreator superCreator
     @Autowired
-    private RoleRepository roleRepository
+    private ProcessRoleRepository roleRepository
     @Autowired
     private TestHelper testHelper
     @Autowired

@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.auth.domain;
 
-import com.netgrif.application.engine.petrinet.domain.roles.Role;
+import com.netgrif.application.engine.authorization.domain.RoleAssignment;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Transient;
@@ -10,37 +11,32 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter
 public abstract class AbstractUser implements IUser, Serializable {
 
     private static final long serialVersionUID = 341922197277508726L;
 
     @NotNull
-    @Getter
     @Setter
     protected UserState state;
 
-    @Getter
     @Setter
     protected Set<Authority> authorities;
 
-    @Getter
     @Setter
-    // TODO: release/8.0.0 set of role ids
-    protected Set<Role> roles;
+    protected Set<RoleAssignment> roleAssignments;
 
-    @Getter
     @Setter
     protected Set<String> nextGroups;
 
     @Setter
-    @Getter
     @Transient
     protected IUser impersonated;
 
     public AbstractUser() {
         authorities = new HashSet<>();
         nextGroups = new HashSet<>();
-        roles = new HashSet<>();
+        roleAssignments = new HashSet<>();
     }
 
     public void addAuthority(Authority authority) {
@@ -50,14 +46,16 @@ public abstract class AbstractUser implements IUser, Serializable {
         authorities.add(authority);
     }
 
-    public void addRole(Role role) {
-        if (roles.stream().anyMatch(it -> it.getStringId().equals(role.getStringId())))
-            return;
-        roles.add(role);
+    public void addRole(ProcessRole processRole) {
+        // todo 2058
+//        if (roles.stream().anyMatch(it -> it.getStringId().equals(role.getStringId())))
+//            return;
+//        roles.add(role);
     }
 
-    public void removeRole(Role role) {
-        roles.remove(role);
+    public void removeRole(ProcessRole processRole) {
+        // todo 2058
+//        roles.remove(role);
     }
 
     public void addGroup(String groupId) {

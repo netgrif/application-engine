@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.petrinet.domain.roles;
+package com.netgrif.application.engine.authorization.domain.permissions;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 

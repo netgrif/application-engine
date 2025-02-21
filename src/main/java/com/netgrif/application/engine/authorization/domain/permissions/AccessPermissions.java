@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.petrinet.domain.roles;
+package com.netgrif.application.engine.authorization.domain.permissions;
 
 import com.netgrif.application.engine.utils.UniqueKeyMap;
 import lombok.NoArgsConstructor;
@@ -10,20 +10,20 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor
-public class RolePermissions<T> extends UniqueKeyMap<String, Map<T, Boolean>> {
+public class AccessPermissions<T> extends UniqueKeyMap<String, Map<T, Boolean>> {
 
     /**
      * todo javadoc
      * */
-    public RolePermissions(RolePermissions<T> rolePermissions) {
-        this(rolePermissions, new HashSet<>());
+    public AccessPermissions(AccessPermissions<T> accessPermissions) {
+        this(accessPermissions, new HashSet<>());
     }
 
     /**
      * todo javadoc
      * */
-    public RolePermissions(RolePermissions<T> rolePermissions, Set<T> ignoreTypes) {
-        rolePermissions.forEach((roleId, permissionValues) -> {
+    public AccessPermissions(AccessPermissions<T> accessPermissions, Set<T> ignoreTypes) {
+        accessPermissions.forEach((roleId, permissionValues) -> {
             Map<T, Boolean> clonedPermissionValues;
             if (ignoreTypes.isEmpty()) {
                 clonedPermissionValues = new HashMap<>(permissionValues);
@@ -42,6 +42,7 @@ public class RolePermissions<T> extends UniqueKeyMap<String, Map<T, Boolean>> {
     public void addPermission(String roleId, T permission, Boolean value) {
         Map<T, Boolean> permissionEntry = new HashMap<>();
         permissionEntry.put(permission, value);
+        // permissionEntry must be mutable
         this.addPermissions(roleId, permissionEntry);
     }
 
@@ -54,5 +55,15 @@ public class RolePermissions<T> extends UniqueKeyMap<String, Map<T, Boolean>> {
         } else {
             this.put(roleId, permissions);
         }
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public void addPermissions(AccessPermissions<T> rolesAndPermissions) {
+        if (rolesAndPermissions == null) {
+            return;
+        }
+        rolesAndPermissions.forEach(this::addPermissions);
     }
 }
