@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 
 
@@ -20,6 +22,8 @@ public abstract class AbstractDispatcher {
     private final Set<RegisteredListener> registeredListeners;
     @Getter
     private final Set<Class<? extends EventObject>> allowedEvents;
+
+    private final Executor DEFAULT_EXECUTOR = Executors.newWorkStealingPool();
 
     protected AbstractDispatcher(Set<Class<? extends EventObject>> allowedEvents) {
         this.allowedEvents = allowedEvents;
@@ -116,13 +120,13 @@ public abstract class AbstractDispatcher {
      *
      * @param event Event that the listener is subscribed to
      * @param <E>   Type of event, must be child of {@link EventObject}
-     * @see AbstractDispatcher#dispatch(EventObject, Function)
+     * @see AbstractDispatcher#dispatch(EventObject, Function, Executor)
      * @see RegisteredListener
      */
     protected <E extends EventObject> void dispatch(E event) {
         dispatch(event, (RegisteredListener registeredListener) ->
                 registeredListener.contains(event)
-                        && registeredListener.contains(DispatchMethod.SYNC));
+                        && registeredListener.contains(DispatchMethod.SYNC), DEFAULT_EXECUTOR);
     }
 
     /**
@@ -139,7 +143,7 @@ public abstract class AbstractDispatcher {
     protected <E extends EventObject> void dispatchAsync(E event) {
         dispatchAsync(event, (RegisteredListener registeredListener) ->
                 registeredListener.contains(event)
-                        && registeredListener.contains(DispatchMethod.ASYNC));
+                        && registeredListener.contains(DispatchMethod.ASYNC), DEFAULT_EXECUTOR);
     }
 
     /**
@@ -147,11 +151,13 @@ public abstract class AbstractDispatcher {
      * but wait until all listeners have finished executing the onEvent method.
      * See {@link Listener#onEvent}.</p>
      *
-     * @param event Event that the listener is subscribed to
-     * @param foo   Function to decide to which listener the event should be sent
-     * @param <E>   Type of event, must be child of {@link EventObject}
+     * @param event    Event that the listener is subscribed to
+     * @param foo      Function to decide to which listener the event should be sent
+     * @param executor Executor to use for asynchronous execution
+     * @param <E>      Type of event, must be child of {@link EventObject}
      */
-    protected <E extends EventObject> void dispatch(E event, Function<RegisteredListener, Boolean> foo) {
+    @SuppressWarnings("unchecked")
+    protected <E extends EventObject> void dispatch(E event, Function<RegisteredListener, Boolean> foo, Executor executor) {
         List<CompletableFuture<Void>> futures = new ArrayList<>();
         List<RegisteredListener> simpleListeners = registeredListeners.stream().filter(l -> !(l.listener() instanceof ContextEditingListener<?>)).toList();
         List<RegisteredListener> contextEditingListeners = registeredListeners.stream().filter(l -> l.listener() instanceof ContextEditingListener<?>).toList();
@@ -161,7 +167,7 @@ public abstract class AbstractDispatcher {
                     log.trace("Sending event {} synchronously", event.getClass().getSimpleName());
                     registeredListener.listener().onEvent(event, this);
                 }
-            });
+            }, executor);
             futures.add(future);
         }
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
@@ -178,18 +184,19 @@ public abstract class AbstractDispatcher {
      * and does not wait for the execution of the onAsyncEvent method to complete.
      * See {@link Listener#onAsyncEvent}.</p>
      *
-     * @param event Event that the listener is subscribed to
-     * @param foo   Function to decide to which listener the event should be sent
-     * @param <E>   Type of event, must be child of {@link EventObject}
+     * @param event    Event that the listener is subscribed to
+     * @param foo      Function to decide to which listener the event should be sent
+     * @param executor Executor to use for asynchronous execution
+     * @param <E>      Type of event, must be child of {@link EventObject}
      */
-    protected <E extends EventObject> void dispatchAsync(E event, Function<RegisteredListener, Boolean> foo) {
+    protected <E extends EventObject> void dispatchAsync(E event, Function<RegisteredListener, Boolean> foo, Executor executor) {
         for (RegisteredListener registeredListener : registeredListeners) {
             CompletableFuture.runAsync(() -> {
                 if (foo.apply(registeredListener)) {
                     log.trace("Sending event {} asynchronously", event.getClass().getSimpleName());
                     registeredListener.listener().onAsyncEvent(event, this);
                 }
-            });
+            }, executor);
         }
     }
 

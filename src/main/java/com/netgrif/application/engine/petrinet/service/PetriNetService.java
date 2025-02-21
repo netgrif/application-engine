@@ -10,9 +10,6 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNe
 import com.netgrif.application.engine.event.events.Event;
 import com.netgrif.application.engine.event.events.petrinet.ProcessDeleteEvent;
 import com.netgrif.application.engine.event.events.petrinet.ProcessDeployEvent;
-import com.netgrif.application.engine.history.domain.petrinetevents.DeletePetriNetEventLog;
-import com.netgrif.application.engine.history.domain.petrinetevents.ImportPetriNetEventLog;
-import com.netgrif.application.engine.history.domain.taskevents.TaskEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
@@ -246,15 +243,11 @@ public class PetriNetService implements IPetriNetService {
         outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params));
 //        evaluateRules(net, EventPhase.PRE);
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.PRE));
-        historyService.save(new ImportPetriNetEventLog(null, EventPhase.PRE, net.getObjectId()));
         save(net);
         outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), params));
-//        evaluateRules(net, EventPhase.POST);
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.POST));
-        historyService.save(new ImportPetriNetEventLog(null, EventPhase.POST, net.getObjectId()));
         addMessageToOutcome(net, ProcessEventType.UPLOAD, outcome);
         outcome.setNet(imported.get());
-//        publisher.publishEvent(new ProcessDeployEvent(outcome));
         return outcome;
     }
 
@@ -369,11 +362,11 @@ public class PetriNetService implements IPetriNetService {
         useCase.getPetriNet().getArcs().forEach((key, arcs) -> {
             arcs.forEach(arc -> pn.getArcs().add(new ArcImportReference(arc)));
         });
-        //TODO: HistoryService zmizne
-        pn.getAssignedTasks().addAll(historyService.findAllAssignTaskEventLogsByCaseId(caseId)
-                .stream().map(TaskEventLog::getTransitionId).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
-        pn.getFinishedTasks().addAll(historyService.findAllFinishTaskEventLogsByCaseId(caseId)
-                .stream().map(TaskEventLog::getTransitionId).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
+        //TODO: HistoryService is obsolete
+//        pn.getAssignedTasks().addAll(historyService.findAllAssignTaskEventLogsByCaseId(caseId)
+//                .stream().map(TaskEventLog::getTransitionId).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
+//        pn.getFinishedTasks().addAll(historyService.findAllFinishTaskEventLogsByCaseId(caseId)
+//                .stream().map(TaskEventLog::getTransitionId).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
         return pn;
     }
 
@@ -564,7 +557,6 @@ public class PetriNetService implements IPetriNetService {
         this.evictCache(petriNet);
         // net functions must be removed from cache after it was deleted from repository
         this.functionCacheService.reloadCachedFunctions(petriNet);
-        historyService.save(new DeletePetriNetEventLog(null, EventPhase.PRE, petriNet.getObjectId()));
         publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.POST));
     }
 

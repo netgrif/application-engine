@@ -9,13 +9,11 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.event.events.data.GetDataEvent;
+import com.netgrif.application.engine.event.events.data.SetDataEvent;
 import com.netgrif.application.engine.files.StorageResolverService;
 import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.files.throwable.StorageException;
-import com.netgrif.application.engine.event.events.data.GetDataEvent;
-import com.netgrif.application.engine.event.events.data.SetDataEvent;
-import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
-import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.Component;
@@ -144,7 +142,7 @@ public class DataService implements IDataService {
                 return;
             Field field = useCase.getPetriNet().getField(fieldId).get();
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, params));
-//            historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE, user));
+            publisher.publishEvent(new GetDataEvent(outcome, EventPhase.PRE, user));
 
             if (outcome.getMessage() == null) {
                 Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
@@ -177,7 +175,7 @@ public class DataService implements IDataService {
                 }
             }
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task, params));
-//            historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST, user));
+            publisher.publishEvent(new GetDataEvent(outcome, EventPhase.POST, user));
         });
 
         workflowService.save(useCase);
@@ -294,10 +292,8 @@ public class DataService implements IDataService {
                 }
                 outcome.addChangedField(fieldId, changedField);
                 workflowService.save(useCase);
-                historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE, Collections.singletonMap(fieldId, changedField), user));
+                publisher.publishEvent(new SetDataEvent(outcome, EventPhase.PRE, user));
                 outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, params));
-
-                historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, null, user));
                 applyFieldConnectedChanges(useCase, field);
             }
         });

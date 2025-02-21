@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes;
 
+import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;

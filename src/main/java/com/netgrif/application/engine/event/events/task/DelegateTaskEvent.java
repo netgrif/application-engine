@@ -25,6 +25,11 @@ public class DelegateTaskEvent extends TaskEvent {
         this.delegate = delegate;
     }
 
+    public DelegateTaskEvent(DelegateTaskEventOutcome eventOutcome, EventPhase eventPhase, IUser user, String delegate) {
+        super(eventOutcome,eventPhase, user);
+        this.delegate = delegate;
+    }
+
     @Override
     public String getMessage() {
         return "DelegateTaskEvent: Task [" + taskEventOutcome.getTask().getStringId() + "] delegated";

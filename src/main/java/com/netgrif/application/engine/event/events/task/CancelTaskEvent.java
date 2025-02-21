@@ -16,6 +16,10 @@ public class CancelTaskEvent extends TaskEvent {
         super(eventOutcome, user);
     }
 
+    public CancelTaskEvent(CancelTaskEventOutcome outcome, EventPhase eventPhase, IUser user) {
+        super(outcome, eventPhase, user);
+    }
+
     @Override
     public String getMessage() {
         return "CancelTaskEvent: Task [" + taskEventOutcome.getTask().getStringId() + "] cancelled";

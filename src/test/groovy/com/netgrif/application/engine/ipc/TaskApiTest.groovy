@@ -2,8 +2,6 @@ package com.netgrif.application.engine.ipc
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.history.domain.baseevent.EventLog
-import com.netgrif.application.engine.history.domain.baseevent.repository.EventLogRepository
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -42,9 +40,6 @@ class TaskApiTest {
 
     @Autowired
     private IUserService userService
-
-    @Autowired
-    private EventLogRepository eventLogRepository
 
     @Autowired
     private IPetriNetService petriNetService
@@ -113,17 +108,6 @@ class TaskApiTest {
         helper.assignTaskToSuper(TASK_EVENTS_TASK, useCase.stringId)
         helper.finishTaskAsSuper(TASK_EVENTS_TASK, useCase.stringId)
 
-        List<EventLog> log = eventLogRepository.findAll()
-
-//        assert log.findAll {
-//            it instanceof UserTaskEventLog && it.transitionId == "work_task" && it.message.contains("assigned")
-//        }.size() == 2
-//        assert log.findAll {
-//            it instanceof UserTaskEventLog && it.transitionId == "work_task" && it.message.contains("canceled")
-//        }.size() == 1
-//        assert log.findAll {
-//            it instanceof UserTaskEventLog && it.transitionId == "work_task" && it.message.contains("finished")
-//        }.size() == 1
     }
 
     public static final String LIMITS_NET_FILE = "test_inter_data_actions_static.xml"
