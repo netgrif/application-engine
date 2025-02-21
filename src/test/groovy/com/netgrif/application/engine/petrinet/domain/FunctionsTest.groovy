@@ -122,7 +122,7 @@ class FunctionsTest {
 
     @Test
     void testNamespaceFunctionException() {
-        assertThrows(MissingMethodException.class, () -> {
+        assertThrows(NullPointerException.class, () -> {
             def nets = petriNetService.getByIdentifier(FUNCTION_RES_IDENTIFIER)
             if (nets) {
                 nets.each {

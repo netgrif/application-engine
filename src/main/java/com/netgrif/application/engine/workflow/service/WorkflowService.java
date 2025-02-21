@@ -484,7 +484,7 @@ public class WorkflowService implements IWorkflowService {
         Page<Case> page = search(predicate, PageRequest.of(0, 1));
         if (page.getContent().isEmpty())
             return null;
-        return page.getContent().get(0);
+        return page.getContent().getFirst();
     }
 
     @Override

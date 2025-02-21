@@ -19,6 +19,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -62,8 +63,11 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
             user.setEmail(SUPER_ADMIN_EMAIL);
             user.setPassword(superAdminPassword);
             user.setState(UserState.ACTIVE);
-            user.setAuthorities(Set.of(adminAuthority, systemAuthority));
-            user.setProcessRoles(Set.copyOf(processRoleService.findAll()));
+            user.setAuthorities(new HashSet<>(){{
+                add(adminAuthority);
+                add(systemAuthority);
+            }});
+            user.setProcessRoles(new HashSet<>(processRoleService.findAll()));
             this.superUser = userService.createUser(user, null);
             log.info("Super user created");
         } else {

@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.orgstructure.groups.interfaces;
 
+import com.netgrif.adapter.auth.service.GroupService;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.core.workflow.domain.Case;
@@ -8,7 +9,7 @@ import com.querydsl.core.types.Predicate;
 
 import java.util.*;
 
-public interface INextGroupService {
+public interface INextGroupService extends GroupService {
 
     CreateCaseEventOutcome createDefaultSystemGroup(IUser author);
 

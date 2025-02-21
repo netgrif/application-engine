@@ -18,7 +18,7 @@ import com.netgrif.core.petrinet.domain.dataset.FileField;
 import com.netgrif.core.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.core.petrinet.domain.dataset.MultichoiceMapField;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.core.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.adapter.petrinet.service.PetriNetService;
 import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner;
 import com.netgrif.application.engine.startup.ImportHelper;

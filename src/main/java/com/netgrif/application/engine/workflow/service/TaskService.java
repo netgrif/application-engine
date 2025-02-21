@@ -19,7 +19,7 @@ import com.netgrif.core.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.core.petrinet.domain.events.EventPhase;
 import com.netgrif.core.petrinet.domain.events.EventType;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.core.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;

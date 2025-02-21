@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties(prefix = "nae.group")
-public class GroupConfigurationProperties {
+public class GroupConfigurationProperties implements com.netgrif.core.auth.config.GroupConfigurationProperties {
 
     /**
      * Determines whether user's default groups are enabled and can be created

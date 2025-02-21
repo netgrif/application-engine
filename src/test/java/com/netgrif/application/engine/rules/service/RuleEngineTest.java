@@ -8,7 +8,7 @@
 //import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 //import com.netgrif.core.petrinet.domain.VersionType;
 //import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
-//import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
+//import com.netgrif.core.petrinet.domain.throwable.TransitionNotExecutableException;
 //import com.netgrif.adapter.petrinet.service.PetriNetService;
 //import com.netgrif.application.engine.rules.domain.FactRepository;
 //import com.netgrif.application.engine.rules.domain.RuleRepository;
