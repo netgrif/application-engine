@@ -88,6 +88,7 @@ class UserRefsTest {
 
     @Test
     void testCases() {
+        // TODO: release/8.0.0 fix?
 //        newCases.eachWithIndex { Case entry, int i -> assert entry.users.get(userIds.get(i)) != null }
     }
 }
