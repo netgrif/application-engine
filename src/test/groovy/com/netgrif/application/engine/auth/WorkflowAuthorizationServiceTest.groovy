@@ -240,7 +240,7 @@ class WorkflowAuthorizationServiceTest {
         userService.addRole(testUser, negDeleteRole.getStringId())
 
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
-        String taskId = case_.getTaskStringId("1")
+        String taskId = case_.getTaskStringId("t1")
         case_ = dataService.setData(taskId, new DataSet([
                 "pos_user_list": new UserListField(rawValue: new UserListFieldValue(userValues: [dataService.makeUserFieldValue(testUser.stringId)])),
         ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
@@ -261,7 +261,7 @@ class WorkflowAuthorizationServiceTest {
         userService.addRole(testUser, negDeleteRole.getStringId())
 
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
-        String taskId = case_.getTaskStringId("1")
+        String taskId = case_.getTaskStringId("t1")
         case_ = dataService.setData(taskId, new DataSet([
                 "pos_user_list": new UserListField(rawValue: new UserListFieldValue(userValues: [dataService.makeUserFieldValue(testUser.stringId)])),
                 "neg_user_list": new UserListField(rawValue: new UserListFieldValue(userValues: [dataService.makeUserFieldValue(testUser.stringId)]))
