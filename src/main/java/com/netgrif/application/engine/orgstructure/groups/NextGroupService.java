@@ -107,22 +107,22 @@ public class NextGroupService extends GroupServiceImpl implements INextGroupServ
     }
 
     @Override
-    public CreateCaseEventOutcome createGroup(String title, IUser author) {
-        create(title, title, author);
-        Case userDefaultGroup = findUserDefaultGroup(author);
-        if (userDefaultGroup != null && userDefaultGroup.getTitle().equals(title)) {
+    public CreateCaseEventOutcome createGroup(String identifier, IUser author) {
+        Group userDefaultGroup = getDefaultUserGroup(author);
+        if (userDefaultGroup != null && userDefaultGroup.getIdentifier().equals(identifier)) {
             return null;
         }
+        Group group = create(identifier, identifier, author);
         PetriNet orgGroupNet = petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER);
-        CreateCaseEventOutcome outcome = workflowService.createCase(orgGroupNet.getStringId(), title, "", userService.transformToLoggedUser(author));
+        CreateCaseEventOutcome outcome = workflowService.createCase(orgGroupNet.getStringId(), identifier, "", userService.transformToLoggedUser(author));
 
-        Map<String, Map<String, String>> taskData = getInitialGroupData(author, title, outcome.getCase());
+        Map<String, Map<String, String>> taskData = getInitialGroupData(author, identifier, outcome.getCase());
         Task initTask = getGroupInitTask(outcome.getCase());
         dataService.setData(initTask.getStringId(), ImportHelper.populateDataset(taskData));
 
         try {
-            taskService.assignTask((LoggedUser) userService.transformToLoggedUser(author), initTask.getStringId());
-            taskService.finishTask((LoggedUser) userService.transformToLoggedUser(author), initTask.getStringId());
+            taskService.assignTask(userService.transformToLoggedUser(author), initTask.getStringId());
+            taskService.finishTask(userService.transformToLoggedUser(author), initTask.getStringId());
         } catch (TransitionNotExecutableException e) {
             log.error(e.getMessage());
         }
@@ -131,8 +131,8 @@ public class NextGroupService extends GroupServiceImpl implements INextGroupServ
     }
 
     @Override
-    public Case findGroup(String groupID) {
-        Case result = workflowService.searchOne(groupCase().and(QCase.case$._id.eq(new ProcessResourceId(groupID))));
+    public Case findGroup(String groupId) {
+        Case result = workflowService.searchOne(groupCase().and(QCase.case$._id.eq(new ProcessResourceId(groupId))));
         if (!isGroupCase(result)) {
             return null;
         }
@@ -203,7 +203,7 @@ public class NextGroupService extends GroupServiceImpl implements INextGroupServ
 
     @Override
     public void addUserToDefaultGroup(IUser user) {
-        super.addUserToDefaultGroup(user);
+        super.addUserToDefaultSystemGroup(user);
         addUser(user, findDefaultGroup());
     }
 
@@ -342,10 +342,6 @@ public class NextGroupService extends GroupServiceImpl implements INextGroupServ
 
     protected String getGroupOwnerId(Case groupCase) {
         return groupCase.getAuthor().getId();
-    }
-
-    protected Case findUserDefaultGroup(IUser author) {
-        return workflowService.searchOne(QCase.case$.author.id.eq(author.getStringId()).and(QCase.case$.title.eq(author.getFullName())));
     }
 
     protected Task getGroupInitTask(Case groupCase) {
