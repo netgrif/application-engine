@@ -30,6 +30,7 @@
 		<title/>
 		<component>
 			<name>dashboard</name>
+			<property key="resolve_data">true</property>
 		</component>
 	</data>
 	<i18n locale="sk">
