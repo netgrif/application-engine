@@ -1,10 +1,8 @@
 package com.netgrif.application.engine.orgstructure.groups;
 
 import com.netgrif.auth.config.GroupConfigurationProperties;
-import com.netgrif.auth.service.GroupServiceImpl;
 import com.netgrif.core.auth.domain.Group;
 import com.netgrif.core.auth.domain.IUser;
-import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.core.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.auth.service.UserService;
@@ -48,7 +46,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @Primary
-public class NextGroupService extends GroupServiceImpl implements INextGroupService {
+public class NextGroupService implements INextGroupService {
 
     @Autowired
     protected IWorkflowService workflowService;
@@ -208,7 +206,6 @@ public class NextGroupService extends GroupServiceImpl implements INextGroupServ
 
     @Override
     public void addUserToDefaultGroup(IUser user) {
-        super.addUserToDefaultSystemGroup(user);
         addUser(user, findDefaultGroup());
     }
 
@@ -222,7 +219,6 @@ public class NextGroupService extends GroupServiceImpl implements INextGroupServ
 
     @Override
     public void addUser(IUser user, Case groupCase) {
-        super.addUser(user, groupCase.getTitle());
         Map<String, I18nString> existingUsers = groupCase.getDataField(GROUP_MEMBERS_FIELD).getOptions();
         if (existingUsers == null) {
             existingUsers = new HashMap<>();
@@ -241,7 +237,6 @@ public class NextGroupService extends GroupServiceImpl implements INextGroupServ
 
     @Override
     public void removeUser(IUser user, Case groupCase) {
-        super.removeUser(user, groupCase.getTitle());
         HashSet<String> userIds = new HashSet<>();
         Map<String, I18nString> existingUsers = groupCase.getDataField(GROUP_MEMBERS_FIELD).getOptions();
 
@@ -385,5 +380,72 @@ public class NextGroupService extends GroupServiceImpl implements INextGroupServ
 
     protected String getGroupOwnerEmail(Case groupCase) {
         return groupCase.getAuthor().getEmail();
+    }
+    //*------
+
+
+    @Override
+    public Optional<Group> findByIdentifier(String s) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Group create(IUser iUser) {
+        return null;
+    }
+
+    @Override
+    public Group create(String s, String s1, IUser iUser) {
+        return null;
+    }
+
+    @Override
+    public Group getDefaultUserGroup(IUser iUser) {
+        return null;
+    }
+
+    @Override
+    public void addUserToDefaultSystemGroup(IUser iUser) {
+
+    }
+
+    @Override
+    public Group save(Group group) {
+        return null;
+    }
+
+    @Override
+    public void delete(Group group) {
+
+    }
+
+    @Override
+    public Group findById(String s) {
+        return null;
+    }
+
+    @Override
+    public Group getDefaultSystemGroup() {
+        return null;
+    }
+
+    @Override
+    public void addUser(IUser iUser, Group group) {
+
+    }
+
+    @Override
+    public void removeUser(IUser iUser, String s) {
+
+    }
+
+    @Override
+    public void removeUser(IUser iUser, Group group) {
+
+    }
+
+    @Override
+    public void populateMembers(Group group) {
+
     }
 }

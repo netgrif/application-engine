@@ -1,10 +1,7 @@
 package com.netgrif.application.engine.startup.runner;
 
 import com.netgrif.auth.service.AuthorityService;
-import com.netgrif.core.importer.model.Option;
-import com.netgrif.auth.service.AuthorityServiceImpl;
 import com.netgrif.core.auth.domain.*;
-import com.netgrif.auth.service.AuthorityService;
 import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
