@@ -28,4 +28,6 @@ public interface IElasticIndexService {
     SearchHits<?> search(Query query, Class<?> clazz, String... placeholders);
 
     void applySettings(HashMap<String, Object> settingMap, Class<?> clazz);
+
+//    void clearScrollHits(List<String> scrollIds);
 }

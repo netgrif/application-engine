@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.3](https://github.com/netgrif/application-engine/commits/v6.3.3)
+Full Changelog: [https://github.com/netgrif/application-engine/commits/v7.0.0](https://github.com/netgrif/application-engine/commits/v7.0.0)
 
 ## [7.0.0](https://github.com/netgrif/application-engine/releases/tag/v7.0.0) (2024-11-22)
 
@@ -30,7 +30,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.3](h
 [NAE-1854] Remove deprecated services
 
 
-## [6.4.0](https://github.com/netgrif/application-engine/releases/tag/v6.4.0) (2024-10-22)
+## [6.4.0](https://github.com/netgrif/application-engine/releases/tag/v6.4.0) (2024-12-24)
 
 ### Fixed
 - [NAE-1908] NAE-1906 Improvements
@@ -44,6 +44,9 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.3](h
 - [NAE-1983] Public view file handling
 - [NAE-2007] Vulnerabilities fix
 - [NAE-1952] Fix Loading Issue for Duplicate TaskRef Entries
+- [NAE-2014] Mismatch in PublicTaskController and TaskController endpoint
+- [NAE-2024] Collective bug fix
+- [NAE-1948] Bugs after merge to 6.4.0
 
 ### Added
 - [NAE-1901] Taskref list rendering update
