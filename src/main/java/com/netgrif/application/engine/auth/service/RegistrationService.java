@@ -1,7 +1,5 @@
-//MODULARISATION: to be discussed, how it will be solved
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.core.auth.domain.AbstractUser;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.RegisteredUser;
 import com.netgrif.core.auth.domain.User;
@@ -27,6 +25,7 @@ import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -54,8 +53,8 @@ public class RegistrationService implements IRegistrationService {
     @Scheduled(cron = "0 0 1 * * *")
     public void removeExpiredUsers() {
         log.info("Removing expired unactivated invited users");
-//        List<User> expired = userService.removeAllByStateAndExpirationDateBefore(UserState., LocalDateTime.now());
-//        log.info("Removed " + expired.size() + " unactivated users");
+        List<User> expired = userService.removeAllByStateAndExpirationDateBefore(UserState.INACTIVE, LocalDateTime.now());
+        log.info("Removed " + expired.size() + " unactivated users");
     }
 
     @Override
@@ -63,18 +62,18 @@ public class RegistrationService implements IRegistrationService {
     @Scheduled(cron = "0 0 1 * * *")
     public void resetExpiredToken() {
         log.info("Resetting expired user tokens");
-//        List<User> users = userRepository.findAllByStateAndExpirationDateBefore(UserState.BLOCKED, LocalDateTime.now());
-//        if (users == null || users.isEmpty()) {
-//            log.info("There are none expired tokens. Everything is awesome.");
-//            return;
-//        }
-//
-//        users.forEach(user -> {
-//            user.setToken(null);
-//            user.setExpirationDate(null);
-//        });
-//        users = userRepository.saveAll(users);
-//        log.info("Reset " + users.size() + " expired user tokens");
+        List<User> users = userService.findAllByStateAndExpirationDateBefore(UserState.BLOCKED, LocalDateTime.now());
+        if (users == null || users.isEmpty()) {
+            log.info("There are none expired tokens. Everything is awesome.");
+            return;
+        }
+
+        users.forEach(user -> {
+            user.setToken(null);
+            user.setExpirationDate(null);
+        });
+        users = userService.saveUsers(users.stream().map(u -> (IUser) u).collect(Collectors.toList()));
+        log.info("Reset " + users.size() + " expired user tokens");
     }
 
     @Override
@@ -87,16 +86,15 @@ public class RegistrationService implements IRegistrationService {
 
     @Override
     public boolean verifyToken(String token) {
-//        try {
-//            log.info("Verifying token:" + token);
-//            String[] tokenParts = decodeToken(token);
-//            User user = userRepository.findByEmail(tokenParts[0]);
-//            return user != null && Objects.equals(user.getToken(), tokenParts[1]) && user.getExpirationDate().isAfter(LocalDateTime.now());
-//        } catch (InvalidUserTokenException e) {
-//            log.error(e.getMessage());
-//            return false;
-//        }
-        return true;
+        try {
+            log.info("Verifying token:" + token);
+            String[] tokenParts = decodeToken(token);
+            User user = (User) userService.findByEmail(tokenParts[0], null);
+            return user != null && Objects.equals(user.getToken(), tokenParts[1]) && user.getExpirationDate().isAfter(LocalDateTime.now());
+        } catch (InvalidUserTokenException e) {
+            log.error(e.getMessage());
+            return false;
+        }
     }
 
     @Override

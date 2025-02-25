@@ -126,8 +126,6 @@ public class NextGroupService extends GroupServiceImpl implements INextGroupServ
         } catch (TransitionNotExecutableException e) {
             log.error(e.getMessage());
         }
-        //MODULARISATION: groups to be resolved to user, to make some converter from case
-        //author.addGroup(outcome.getCase().getStringId());
         userService.saveUser(author, null);
         return outcome;
     }
@@ -175,11 +173,14 @@ public class NextGroupService extends GroupServiceImpl implements INextGroupServ
         if (!isGroupCase(groupCase)) {
             return null;
         }
+        Optional<Group> group = findByIdentifier(groupCase.getTitle());
+        if (group.isEmpty()) {
+            throw new IllegalArgumentException("Group with identifier [" + groupCase.getTitle() + "] not found.");
+        }
         Optional<IUser> user = userService.findUserByUsername(email, null);
         if (user.isPresent() && user.get().isActive()) {
             log.info("User [" + user.get().getFullName() + "] has already been registered.");
-            //MODULARISATION: groups to be resolved to user, to make some converter from case
-            //user.addGroup(groupCase.getStringId());
+            addUser(user.get(), group.get());
             userService.saveUser(user.get(), null);
             return addUser(user.get(), existingUsers);
         } else {
@@ -187,8 +188,7 @@ public class NextGroupService extends GroupServiceImpl implements INextGroupServ
             NewUserRequest newUserRequest = new NewUserRequest();
             newUserRequest.email = email;
             RegisteredUser regUser = registrationService.createNewUser(newUserRequest);
-            //MODULARISATION: groups to be resolved to user, to make some converter from case
-            //regUser.addGroup(groupCase.getStringId());
+            addUser(regUser, group.get());
             userService.saveUser(regUser, null);
 
             try {
@@ -224,8 +224,6 @@ public class NextGroupService extends GroupServiceImpl implements INextGroupServ
         }
         groupCase.getDataField(GROUP_MEMBERS_FIELD).setOptions(addUser(user, existingUsers));
         workflowService.save(groupCase);
-        //MODULARISATION: groups to be resolved to user, to make some converter from case
-        //user.addGroup(groupCase.getStringId());
         userService.saveUser(user, null);
         securityContextService.saveToken(user.getStringId());
     }
@@ -260,9 +258,8 @@ public class NextGroupService extends GroupServiceImpl implements INextGroupServ
         });
         userService.findAllByIds(usersToRemove, null).forEach(user -> {
             if (!user.getStringId().equals(authorId)) {
-                //MODULARISATION: groups to be resolved to user, to make some converter from case
-                //user.getNextGroups().remove(groupCase.getStringId());
-                userService.saveUser(user, null);
+                Optional<Group> group = findByIdentifier(groupCase.getTitle());
+                group.ifPresent(value -> removeUser(user, value));
             }
         });
         return existingUsers;

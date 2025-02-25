@@ -36,9 +36,8 @@ public class AnonymousRoleRunner implements ApplicationEngineStartupRunner {
         anonymousRole.setImportId(ProcessRole.ANONYMOUS_ROLE);
         anonymousRole.setName(new I18nString(ProcessRole.ANONYMOUS_ROLE));
         anonymousRole.setDescription("Anonymous system process role");
-        //MODULARISATION: events to be resolved
-//        anonymousRole.setEvents(new LinkedHashMap<EventType, Event>());
-        anonymousRole = repository.save(anonymousRole);
+        anonymousRole.setEvents(new LinkedHashMap<EventType, Event>());
+        repository.save(anonymousRole);
     }
 
 }

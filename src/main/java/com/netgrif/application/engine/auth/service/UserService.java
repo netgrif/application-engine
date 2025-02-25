@@ -178,7 +178,6 @@
 //
 //    @Override
 //    public Page<IUser> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable) {
-//        // TODO: 8/27/18 make all pageable
 //        Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser());
 //        members.add(loggedUser.getSelfOrImpersonated().getId());
 //        Set<ObjectId> objMembers = members.stream().map(ObjectId::new).collect(Collectors.toSet());

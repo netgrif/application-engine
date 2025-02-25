@@ -38,8 +38,7 @@ public class DefaultRoleRunner implements ApplicationEngineStartupRunner {
         defaultRole.setImportId(ProcessRole.DEFAULT_ROLE);
         defaultRole.setName(new I18nString(ProcessRole.DEFAULT_ROLE));
         defaultRole.setDescription("Default system process role");
-        //MODULARISATION: events to be resolved
-//        defaultRole.setEvents(new LinkedHashMap<EventType, Event>());
+        defaultRole.setEvents(new LinkedHashMap<EventType, Event>());
         defaultRole = repository.save(defaultRole);
 
         if (defaultRole == null) {

@@ -100,17 +100,15 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
         } else {
             loggedUser = createAnonymousUser();
         }
-        //MODULARISATION: check if its okay this way
-//        loggedUser.eraseCredentials();
+        loggedUser.setPassword("N/A");
         return loggedUser;
     }
 
     private LoggedUser createAnonymousUser() {
-        String hash = new ObjectId().toString();
         User anonymousUser = new com.netgrif.adapter.auth.domain.User();
         anonymousUser.setState(UserState.ACTIVE);
         anonymousUser = (User) userService.saveUser(anonymousUser, null);
-        return (LoggedUser) userService.transformToLoggedUser(anonymousUser);
+        return userService.transformToLoggedUser(anonymousUser);
     }
 
     private boolean isPublicApi(String path) {

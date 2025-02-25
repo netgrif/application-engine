@@ -59,8 +59,7 @@ public class User {
      */
     public static User createUser(IUser user) {
         User result = new User(user);
-        //MODULARISATION: tel number does not exists on new user
-//        result.setTelNumber(user.getTelNumber());
+        result.setTelNumber(user.getTelNumber());
         result.setAuthorities(user.getAuthorities());
         result.setNextGroups(user.getGroups().stream().map(Group::getStringId).collect(Collectors.toSet()));
         return result;

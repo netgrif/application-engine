@@ -539,24 +539,15 @@ public class PetriNetService implements IPetriNetService {
         PetriNet petriNet = petriNetOptional.get();
         log.info("[" + processId + "]: Initiating deletion of Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
 
-        //MODULARISATION: replace PetriNet packages
-        //this.userService.removeRoleOfDeletedPetriNet(petriNet, null);
-        this.workflowService.deleteInstancesOfPetriNet(petriNet);
-        this.processRoleService.deleteRolesOfNet(petriNet, loggedUser);
-//        try {
-//            ldapGroupService.deleteProcessRoleByPetrinet(petriNet.getStringId());
-//        } catch (NullPointerException e) {
-//            log.info("LdapGroup and ProcessRole mapping are not activated...");
-//        } catch (Exception ex) {
-//            log.error("LdapGroup", ex);
-//        }
-
+        userService.removeRoleOfDeletedPetriNet(petriNet, null);
+        workflowService.deleteInstancesOfPetriNet(petriNet);
+        processRoleService.deleteRolesOfNet(petriNet, loggedUser);
 
         log.info("[" + processId + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
-        this.repository.deleteBy_id(petriNet.getObjectId());
-        this.evictCache(petriNet);
+        repository.deleteBy_id(petriNet.getObjectId());
+        evictCache(petriNet);
         // net functions must be removed from cache after it was deleted from repository
-        this.functionCacheService.reloadCachedFunctions(petriNet);
+        functionCacheService.reloadCachedFunctions(petriNet);
 //        historyService.save(new DeletePetriNetEventLog(null, EventPhase.PRE, petriNet.getObjectId()));
         publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.POST));
     }
