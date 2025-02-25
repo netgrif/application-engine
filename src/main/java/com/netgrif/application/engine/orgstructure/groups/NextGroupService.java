@@ -13,6 +13,7 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSer
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.core.common.ResourceNotFoundException;
 import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.core.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -108,11 +109,15 @@ public class NextGroupService extends GroupServiceImpl implements INextGroupServ
 
     @Override
     public CreateCaseEventOutcome createGroup(String identifier, IUser author) {
-        Group userDefaultGroup = getDefaultUserGroup(author);
-        if (userDefaultGroup != null && userDefaultGroup.getIdentifier().equals(identifier)) {
-            return null;
+        try {
+            Group userDefaultGroup = getDefaultUserGroup(author);
+            if (userDefaultGroup != null && userDefaultGroup.getIdentifier().equals(identifier)) {
+                return null;
+            }
+        } catch (ResourceNotFoundException e) {
+            log.warn(e.getMessage());
         }
-        Group group = create(identifier, identifier, author);
+        create(identifier, identifier, author);
         PetriNet orgGroupNet = petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER);
         CreateCaseEventOutcome outcome = workflowService.createCase(orgGroupNet.getStringId(), identifier, "", userService.transformToLoggedUser(author));
 

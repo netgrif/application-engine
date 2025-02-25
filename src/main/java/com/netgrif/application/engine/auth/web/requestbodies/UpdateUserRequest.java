@@ -3,17 +3,32 @@ package com.netgrif.application.engine.auth.web.requestbodies;
 import com.netgrif.core.auth.domain.*;
 import com.netgrif.core.auth.domain.enums.UserState;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Set;
 
 public class UpdateUserRequest implements IUser, Serializable {
+
     @Serial
     private static final long serialVersionUID = 3681503301565489613L;
+
+    @Getter
+    @Setter
     public String telNumber;
+
+    @Getter
+    @Setter
     public String avatar;
+
+    @Getter
+    @Setter
     public String name;
+
+    @Getter
+    @Setter
     public String surname;
 
     public UpdateUserRequest() {
@@ -72,21 +87,6 @@ public class UpdateUserRequest implements IUser, Serializable {
     @Override
     public String getFullName() {
         return "";
-    }
-
-    @Override
-    public String getName() {
-        return "";
-    }
-
-    @Override
-    public String getAvatar() {
-        return "";
-    }
-
-    @Override
-    public void setAvatar(String s) {
-
     }
 
     @Override
@@ -230,22 +230,27 @@ public class UpdateUserRequest implements IUser, Serializable {
     }
 
     @Override
+    public Set<String> getGroupIds() {
+        return Set.of();
+    }
+
+    @Override
     public Set<Group> getGroups() {
         return Set.of();
     }
 
     @Override
-    public void setGroups(Set<Group> set) {
+    public void setGroupIds(Set<String> set) {
 
     }
 
     @Override
-    public void addGroup(Group group) {
+    public void addGroupId(String s) {
 
     }
 
     @Override
-    public void removeGroup(Group group) {
+    public void removeGroupId(String s) {
 
     }
 
