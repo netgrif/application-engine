@@ -1,14 +1,14 @@
 package com.netgrif.application.engine.workflow
 
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.core.auth.domain.Authority
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.User
 import com.netgrif.core.auth.domain.enums.UserState
-import com.netgrif.adapter.auth.service.AuthorityService
-import com.netgrif.adapter.auth.service.UserService
+import com.netgrif.auth.service.AuthorityService
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.core.petrinet.domain.VersionType
@@ -66,7 +66,7 @@ class TaskControllerTest {
     private UserService userService
 
     @Autowired
-    private PetriNetService petriNetService
+    private IPetriNetService petriNetService
 
     @Autowired
     private SuperCreatorRunner superCreator
@@ -97,7 +97,7 @@ class TaskControllerTest {
     @BeforeEach
     void init() {
         testHelper.truncateDbs()
-        userService.saveUser(new User(
+        userService.saveUser(new com.netgrif.adapter.auth.domain.User(
                 firstName: "Dummy",
                 lastName: "Netgrif",
                 username: DUMMY_USER_MAIL,

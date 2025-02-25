@@ -1,6 +1,6 @@
 package com.netgrif.application.engine
 
-import com.netgrif.adapter.auth.service.UserService
+import com.netgrif.auth.service.UserService
 import com.netgrif.adapter.elastic.domain.ElasticCase
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.adapter.elastic.domain.ElasticPetriNet
@@ -10,7 +10,7 @@ import com.netgrif.application.engine.elastic.service.ElasticIndexService
 import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.runner.*
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
 import org.springframework.beans.factory.annotation.Autowired
@@ -78,7 +78,7 @@ class TestHelper {
     private ElasticsearchRunner elasticsearchRunner
 
     @Autowired
-    private PetriNetService petriNetService
+    private IPetriNetService petriNetService
 
     @Autowired
     private DefaultRealmRunner defaultRealmRunner

@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.startup.runner;
 
 import com.netgrif.core.auth.domain.IUser;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.core.petrinet.domain.PetriNet;
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
@@ -49,7 +49,7 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
     @Value("${nae.create.default.filters:false}")
     private Boolean createDefaultFilters;
 
-    private final PetriNetService petriNetService;
+    private final IPetriNetService petriNetService;
     private final IWorkflowService workflowService;
     private final UserService userService;
     private final ITaskService taskService;

@@ -3,7 +3,7 @@ package com.netgrif.application.engine.workflow.service;
 import com.google.common.collect.Ordering;
 import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.event.evaluators.Evaluator;
@@ -21,7 +21,7 @@ import com.netgrif.core.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.core.petrinet.domain.events.CaseEventType;
 import com.netgrif.core.petrinet.domain.events.EventPhase;
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.security.service.EncryptionService;
 import com.netgrif.application.engine.utils.FullPageRequest;
@@ -69,7 +69,7 @@ public class WorkflowService implements IWorkflowService {
     protected MongoTemplate mongoTemplate;
 
     @Autowired
-    protected PetriNetService petriNetService;
+    protected IPetriNetService petriNetService;
 
     @Autowired
     protected ProcessRoleService processRoleService;

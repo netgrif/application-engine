@@ -7,7 +7,7 @@ import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.core.petrinet.domain.Function;
 import com.netgrif.core.petrinet.domain.FunctionScope;
 import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.domain.CachedFunction;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import groovy.lang.Closure;
@@ -29,7 +29,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     private final FieldActionsCacheProperties properties;
 
-    private PetriNetService petriNetService;
+    private IPetriNetService petriNetService;
 
     private Map<String, Closure> actionsCache;
     private Map<String, List<CachedFunction>> namespaceFunctionsCache;
@@ -46,7 +46,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Autowired
     @Lazy
-    public void setPetriNetService(PetriNetService petriNetService) {
+    public void setPetriNetService(IPetriNetService petriNetService) {
         this.petriNetService = petriNetService;
     }
 

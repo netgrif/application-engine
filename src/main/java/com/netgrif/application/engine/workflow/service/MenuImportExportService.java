@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.files.StorageResolverService;
 import com.netgrif.application.engine.workflow.domain.FilterDeserializer;
 import com.netgrif.application.engine.workflow.domain.IllegalMenuFileException;
@@ -19,7 +19,7 @@ import com.netgrif.core.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.core.petrinet.domain.dataset.MultichoiceMapField;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.core.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.utils.InputStreamToString;
@@ -66,7 +66,7 @@ public class MenuImportExportService implements IMenuImportExportService {
     IWorkflowService workflowService;
 
     @Autowired
-    PetriNetService petriNetService;
+    IPetriNetService petriNetService;
 
     @Autowired
     DefaultFiltersRunner defaultFiltersRunner;

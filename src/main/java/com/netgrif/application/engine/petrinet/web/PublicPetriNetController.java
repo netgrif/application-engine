@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.petrinet.web;
 
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.core.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.core.petrinet.web.responsebodies.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,7 +38,7 @@ import static com.netgrif.application.engine.petrinet.web.PetriNetController.dec
 @RequestMapping({"/api/public/petrinet"})
 public class PublicPetriNetController {
 
-    private final PetriNetService petriNetService;
+    private final IPetriNetService petriNetService;
 
     private final ProcessRoleService roleService;
 
@@ -46,7 +46,7 @@ public class PublicPetriNetController {
 
     private final StringToVersionConverter converter;
 
-    public PublicPetriNetController(PetriNetService petriNetService, UserService userService, StringToVersionConverter converter, ProcessRoleService roleService) {
+    public PublicPetriNetController(IPetriNetService petriNetService, UserService userService, StringToVersionConverter converter, ProcessRoleService roleService) {
         this.petriNetService = petriNetService;
         this.converter = converter;
         this.userService = userService;
@@ -56,7 +56,7 @@ public class PublicPetriNetController {
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Get process by id")
     public PetriNetReferenceResource getOne(@PathVariable("id") String id, Locale locale) {
-        return new PetriNetReferenceResource(PetriNetService.transformToReference(this.petriNetService.getPetriNet(decodeUrl(id)), locale));
+        return new PetriNetReferenceResource(IPetriNetService.transformToReference(this.petriNetService.getPetriNet(decodeUrl(id)), locale));
     }
 
     @Operation(summary = "Get process by identifier and version")

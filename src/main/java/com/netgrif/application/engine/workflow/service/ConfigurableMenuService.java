@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.core.auth.domain.Author;
 import com.netgrif.core.auth.domain.Authority;
 import com.netgrif.core.auth.domain.IUser;
@@ -12,7 +12,7 @@ import com.netgrif.core.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.core.petrinet.domain.dataset.MultichoiceMapField;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.core.petrinet.domain.version.Version;
-import com.netgrif.application.engine.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.core.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
@@ -29,7 +29,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     protected final String GLOBAL_ROLE = "GLOBAL_ROLE";
 
     @Autowired
-    private PetriNetService petriNetService;
+    private IPetriNetService petriNetService;
 
     @Autowired
     private UserService userService;

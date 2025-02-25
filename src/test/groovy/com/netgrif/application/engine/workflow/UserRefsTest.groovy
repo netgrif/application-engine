@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.adapter.auth.service.UserService
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.core.petrinet.domain.VersionType
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.core.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
@@ -25,7 +25,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class UserRefsTest {
 
     @Autowired
-    private PetriNetService petriNetService
+    private IPetriNetService petriNetService
 
     @Autowired
     private ImportHelper importHelper

@@ -2,7 +2,7 @@ package com.netgrif.application.engine.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.core.model.EntityModel;
 import com.netgrif.core.model.PagedModel;
@@ -48,8 +48,10 @@ public class PublicTaskController extends AbstractTaskController {
     private final ITaskService taskService;
     private final IDataService dataService;
 
-    public PublicTaskController(ITaskService taskService, IDataService dataService, UserService userService) {
-        super(taskService, dataService, null);
+    public PublicTaskController(ITaskService taskService,
+                                IDataService dataService,
+                                UserService userService) {
+        super(taskService, dataService, null, userService);
         this.taskService = taskService;
         this.dataService = dataService;
         this.userService = userService;

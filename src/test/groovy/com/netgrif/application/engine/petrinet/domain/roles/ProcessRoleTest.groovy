@@ -1,12 +1,11 @@
 package com.netgrif.application.engine.petrinet.domain.roles
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.core.auth.domain.Authority;
-import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.Authority
 import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.core.petrinet.domain.VersionType
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.core.petrinet.domain.roles.ProcessRole
@@ -67,7 +66,7 @@ class ProcessRoleTest {
     private ImportHelper importHelper
 
     @Autowired
-    private PetriNetService petriNetService;
+    private IPetriNetService petriNetService;
 
     @Autowired
     private ProcessRoleRepository userProcessRoleRepository
@@ -93,8 +92,8 @@ class ProcessRoleTest {
         String netId = net.getNet().getStringId()
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        def processRoles = userProcessRoleRepository.findAllByNetId(netId)
-        importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_VIEW, password: "password", state: UserState.ACTIVE),
+        def processRoles = userProcessRoleRepository.findAllByProcessId(netId)
+        importHelper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_VIEW, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [processRoles.find {
                     it.getStringId() == net.getNet().roles.values().find {
@@ -102,11 +101,11 @@ class ProcessRoleTest {
                     }.stringId
                 }] as ProcessRole[])
 
-        importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_PERFORM, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_PERFORM, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [processRoles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
 
-        importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_BOTH, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Test", lastName: "Integration", email: USER_EMAIL_BOTH, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [processRoles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "View" }.stringId },
                  processRoles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])

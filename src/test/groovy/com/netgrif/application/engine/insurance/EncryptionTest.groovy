@@ -3,10 +3,10 @@ package com.netgrif.application.engine.insurance
 import com.netgrif.adapter.auth.domain.LoggedUserImpl
 import com.netgrif.core.auth.domain.Authority
 import com.netgrif.core.auth.domain.LoggedUser
-import com.netgrif.adapter.auth.service.AuthorityService
+import com.netgrif.auth.service.AuthorityService
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.core.petrinet.domain.VersionType
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.core.workflow.domain.Case
 import com.netgrif.core.workflow.domain.DataField
@@ -42,7 +42,7 @@ class EncryptionTest {
     private AuthorityService authorityService
 
     @Autowired
-    private PetriNetService petriNetService
+    private IPetriNetService petriNetService
 
     @Autowired
     private SuperCreatorRunner superCreator

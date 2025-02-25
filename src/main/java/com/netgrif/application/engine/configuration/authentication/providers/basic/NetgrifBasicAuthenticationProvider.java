@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.configuration.authentication.providers.basic;
 
 
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.User;
 import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;

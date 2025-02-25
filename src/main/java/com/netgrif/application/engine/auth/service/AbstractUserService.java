@@ -2,8 +2,8 @@
 //
 //import com.netgrif.core.auth.domain.Authority;.*;
 //import com.netgrif.core.auth.domain.Authority;.repositories.UserRepository;
-//import com.netgrif.adapter.auth.service.AuthorityService;
-//import com.netgrif.adapter.auth.service.UserService;
+//import com.netgrif.auth.service.AuthorityService;
+//import com.netgrif.auth.service.UserService;
 //import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 //import com.netgrif.core.petrinet.domain.PetriNet;
 //import com.netgrif.core.petrinet.domain.roles.ProcessRole;

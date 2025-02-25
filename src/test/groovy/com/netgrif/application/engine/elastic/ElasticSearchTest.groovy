@@ -8,7 +8,7 @@ import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.core.petrinet.domain.roles.ProcessRole
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -75,7 +75,7 @@ class ElasticSearchTest {
     private IWorkflowService workflowService
 
     @Autowired
-    private PetriNetService petriNetService
+    private IPetriNetService petriNetService
 
     @Autowired
     private ElasticsearchTemplate template
@@ -111,7 +111,7 @@ class ElasticSearchTest {
 //        def org = importHelper.createGroup("Test")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 //        def processRoles = importHelper.getProcessRoles(net.get())
-        def testUser = importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
+        def testUser = importHelper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [net.roles.values().find { it.importId == "process_role" }] as ProcessRole[])
 

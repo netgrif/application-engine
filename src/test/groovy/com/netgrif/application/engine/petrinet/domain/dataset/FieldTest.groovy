@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
-import com.netgrif.adapter.auth.service.UserService
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest

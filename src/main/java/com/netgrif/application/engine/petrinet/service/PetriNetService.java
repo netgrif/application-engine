@@ -2,8 +2,9 @@ package com.netgrif.application.engine.petrinet.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.CacheProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
@@ -66,11 +67,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static com.netgrif.adapter.petrinet.service.PetriNetService.transformToReference;
+import static com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService.transformToReference;
 
 @Slf4j
 @Service
-public class PetriNetService implements com.netgrif.adapter.petrinet.service.PetriNetService {
+public class PetriNetService implements IPetriNetService {
 
     @Autowired
     protected ProcessRoleService processRoleService;

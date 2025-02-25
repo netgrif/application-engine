@@ -1,13 +1,13 @@
 package com.netgrif.application.engine.petrinet.service.interfaces;
 
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.core.petrinet.domain.PetriNetSearch;
 import com.netgrif.core.petrinet.domain.Transition;
 import com.netgrif.core.petrinet.domain.VersionType;
 import com.netgrif.core.petrinet.domain.dataset.Field;
 import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.core.petrinet.domain.throwable.MissingIconKeyException;
 import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.core.petrinet.domain.version.Version;
 import com.netgrif.core.petrinet.web.responsebodies.DataFieldReference;
@@ -40,8 +40,6 @@ public interface IPetriNetService {
     static DataFieldReference transformToReference(PetriNet net, Transition transition, Field field, Locale locale) {
         return new DataFieldReference(field.getStringId(), field.getName().getTranslation(locale), net.getStringId(), transition.getStringId());
     }
-
-    PetriNet clone(ObjectId petriNetId);
 
     @Deprecated
     ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;

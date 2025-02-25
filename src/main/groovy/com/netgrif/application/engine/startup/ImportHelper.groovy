@@ -2,12 +2,12 @@ package com.netgrif.application.engine.startup
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.netgrif.adapter.auth.service.AuthorityService
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.auth.service.AuthorityService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.core.auth.domain.*
-import com.netgrif.adapter.auth.service.AuthorityService
-import com.netgrif.adapter.auth.service.UserService
+import com.netgrif.auth.service.AuthorityService
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.core.petrinet.domain.VersionType
@@ -68,7 +68,7 @@ class ImportHelper {
     private ITaskService taskService
 
     @Autowired
-    private PetriNetService petriNetService
+    private IPetriNetService petriNetService
 
     @Autowired
     private ResourceLoader resourceLoader

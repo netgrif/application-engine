@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.adapter.auth.domain.LoggedUserImpl;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
@@ -54,10 +56,16 @@ public abstract class AbstractTaskController {
 
     private final IElasticTaskService searchService;
 
-    public AbstractTaskController(ITaskService taskService, IDataService dataService, IElasticTaskService searchService) {
+    private final UserService userService;
+
+    public AbstractTaskController(ITaskService taskService,
+                                  IDataService dataService,
+                                  IElasticTaskService searchService,
+                                  UserService userService) {
         this.taskService = taskService;
         this.dataService = dataService;
         this.searchService = searchService;
+        this.userService = userService;
     }
 
 
@@ -142,7 +150,7 @@ public abstract class AbstractTaskController {
     }
 
     public PagedModel<LocalisedTaskResource> getMy(Authentication auth, Pageable pageable, Locale locale) {
-        Page<Task> page = taskService.findByUser(pageable, ((LoggedUser) auth.getPrincipal()).transformToUser());
+        Page<Task> page = taskService.findByUser(pageable, userService.transformToUser(((LoggedUserImpl) auth.getPrincipal())));
 //        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
 //                .getMy(auth, pageable, assembler, locale)).withRel("my");
 //        PagedModel<LocalisedTaskResource> resources = assembler.toModel(page, new TaskResourceAssembler(locale), selfLink);
@@ -151,7 +159,7 @@ public abstract class AbstractTaskController {
     }
 
     public PagedModel<LocalisedTaskResource> getMyFinished(Pageable pageable, Authentication auth, Locale locale) {
-        Page<Task> page = taskService.findByUser(pageable, ((LoggedUser) auth.getPrincipal()).transformToUser());
+        Page<Task> page = taskService.findByUser(pageable, userService.transformToUser(((LoggedUserImpl) auth.getPrincipal())));
 //        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
 //                .getMyFinished(pageable, auth, assembler, locale)).withRel("finished");
 //        PagedModel<LocalisedTaskResource> resources = assembler.toModel(page, new TaskResourceAssembler(locale), selfLink);

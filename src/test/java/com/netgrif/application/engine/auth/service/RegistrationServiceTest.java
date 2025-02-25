@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.auth.service;
 
 
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.core.auth.domain.RegisteredUser;
 import com.netgrif.core.auth.domain.User;

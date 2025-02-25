@@ -2,7 +2,7 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.core.petrinet.domain.PetriNetSearch;
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.core.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.core.workflow.domain.ProcessResourceId;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class TaskSearchService extends MongoSearchService<Task> {
 
     @Autowired
-    private PetriNetService petriNetService;
+    private IPetriNetService petriNetService;
 
     public Predicate buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
         LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();

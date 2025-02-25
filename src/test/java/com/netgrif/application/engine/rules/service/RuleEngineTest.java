@@ -3,13 +3,13 @@
 //import com.netgrif.application.engine.TestHelper;
 //import com.netgrif.core.auth.domain.IUser;
 //import com.netgrif.core.auth.domain.LoggedUser;
-//import com.netgrif.adapter.auth.service.UserService;
+//import com.netgrif.auth.service.UserService;
 //import com.netgrif.application.engine.configuration.drools.RefreshableKieBase;
 //import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 //import com.netgrif.core.petrinet.domain.VersionType;
 //import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 //import com.netgrif.core.petrinet.domain.throwable.TransitionNotExecutableException;
-//import com.netgrif.adapter.petrinet.service.PetriNetService;
+//import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 //import com.netgrif.application.engine.rules.domain.FactRepository;
 //import com.netgrif.application.engine.rules.domain.RuleRepository;
 //import com.netgrif.application.engine.rules.domain.StoredRule;
@@ -59,7 +59,7 @@
 //    @Autowired
 //    private ITaskService taskService;
 //    @Autowired
-//    private PetriNetService petriNetService;
+//    private IPetriNetService petriNetService;
 //    @Autowired
 //    private FactRepository factRepository;
 //    @Autowired

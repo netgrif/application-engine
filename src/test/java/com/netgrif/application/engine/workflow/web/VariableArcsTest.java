@@ -1,13 +1,13 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.MockService;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.core.auth.domain.Authority;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.User;
 import com.netgrif.core.auth.domain.enums.UserState;
-import com.netgrif.adapter.auth.service.AuthorityService;
+import com.netgrif.auth.service.AuthorityService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.core.petrinet.domain.VersionType;
@@ -15,7 +15,7 @@ import com.netgrif.core.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.core.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
@@ -64,7 +64,7 @@ public class VariableArcsTest {
     private ITaskService taskService;
 
     @Autowired
-    private PetriNetService service;
+    private IPetriNetService service;
 
     @Autowired
     private MockService mock;
@@ -113,7 +113,7 @@ public class VariableArcsTest {
         assert outcome.getNet() != null;
         PetriNet net = outcome.getNet();
         this.loaded = service.getPetriNet(net.getStringId());
-        User user = new User();
+        User user = new com.netgrif.adapter.auth.domain.User();
         user.setFirstName("Test");
         user.setLastName("Test");
         user.setPassword("password");

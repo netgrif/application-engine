@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
-import com.netgrif.adapter.auth.service.UserService
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.auth.service.UserService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.adapter.workflow.domain.QCase
 import com.netgrif.adapter.workflow.domain.QTask
@@ -116,7 +116,7 @@ class ActionDelegate {
     UserService userService
 
     @Autowired
-    PetriNetService petriNetService
+    IPetriNetService petriNetService
 
     @Autowired
     AsyncRunner async

@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.petrinet.domain
 
-import com.netgrif.adapter.auth.service.UserService
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
@@ -42,7 +42,7 @@ class ActionRefTest {
     private SuperCreatorRunner superCreator
 
     @Autowired
-    private PetriNetService petriNetService;
+    private IPetriNetService petriNetService;
 
     @Autowired
     private UserService userService

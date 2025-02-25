@@ -1,10 +1,13 @@
 package com.netgrif.application.engine.orgstructure.groups;
 
+import com.netgrif.auth.config.GroupConfigurationProperties;
+import com.netgrif.auth.service.GroupServiceImpl;
+import com.netgrif.core.auth.domain.Group;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.core.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
@@ -12,7 +15,7 @@ import com.netgrif.application.engine.mail.interfaces.IMailService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.core.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.core.workflow.domain.Case;
@@ -30,6 +33,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -42,7 +46,8 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class NextGroupService implements INextGroupService {
+@Primary
+public class NextGroupService extends GroupServiceImpl implements INextGroupService {
 
     @Autowired
     protected IWorkflowService workflowService;
@@ -63,7 +68,7 @@ public class NextGroupService implements INextGroupService {
     protected IRegistrationService registrationService;
 
     @Autowired
-    protected PetriNetService petriNetService;
+    protected IPetriNetService petriNetService;
 
     @Autowired
     protected ITaskService taskService;
@@ -82,6 +87,9 @@ public class NextGroupService implements INextGroupService {
     protected final static String GROUP_MEMBERS_FIELD = "members";
     protected final static String GROUP_AUTHOR_FIELD = "author";
     protected final static String GROUP_TITLE_FIELD = "group_name";
+    @Autowired
+    private GroupConfigurationProperties groupConfigurationProperties;
+
 
     @Override
     public CreateCaseEventOutcome createDefaultSystemGroup(IUser author) {
@@ -89,7 +97,8 @@ public class NextGroupService implements INextGroupService {
             log.info("Default system group has already been created.");
             return null;
         }
-        return createGroup("Default system group", author);
+
+        return createGroup(groupConfigurationProperties.getDefaultGroupIdentifier(), author);
     }
 
     @Override
@@ -99,6 +108,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public CreateCaseEventOutcome createGroup(String title, IUser author) {
+        create(title, title, author);
         Case userDefaultGroup = findUserDefaultGroup(author);
         if (userDefaultGroup != null && userDefaultGroup.getTitle().equals(title)) {
             return null;
@@ -193,6 +203,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public void addUserToDefaultGroup(IUser user) {
+        super.addUserToDefaultGroup(user);
         addUser(user, findDefaultGroup());
     }
 
@@ -206,6 +217,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public void addUser(IUser user, Case groupCase) {
+        super.addUser(user, groupCase.getTitle());
         Map<String, I18nString> existingUsers = groupCase.getDataField(GROUP_MEMBERS_FIELD).getOptions();
         if (existingUsers == null) {
             existingUsers = new HashMap<>();
@@ -226,6 +238,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public void removeUser(IUser user, Case groupCase) {
+        super.removeUser(user, groupCase.getTitle());
         HashSet<String> userIds = new HashSet<>();
         Map<String, I18nString> existingUsers = groupCase.getDataField(GROUP_MEMBERS_FIELD).getOptions();
 

@@ -45,7 +45,7 @@ public class MailSenderServiceTest {
 
     @Test
     public void testSend() throws Exception {
-        User user = new User();
+        User user = new com.netgrif.adapter.auth.domain.User();
         user.setUsername(RECIPIENT);
         user.setEmail(RECIPIENT);
         user.setPassword("");

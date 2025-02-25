@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.export.service;
 
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;

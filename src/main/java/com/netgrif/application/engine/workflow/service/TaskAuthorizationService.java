@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.adapter.auth.domain.LoggedUserImpl;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
@@ -134,7 +134,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
         Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.CANCEL);
         Boolean userPerm = userHasUserListPermission(loggedUser, taskId, RolePermission.CANCEL);
-        return loggedUser.getSelfOrImpersonated().isAdmin() || ((userPerm == null ? (rolePerm != null && rolePerm) : userPerm) && isAssignee(loggedUser, taskId)) && canAssignedCancel(loggedUser.transformToUser(), taskId);
+        return loggedUser.getSelfOrImpersonated().isAdmin() || ((userPerm == null ? (rolePerm != null && rolePerm) : userPerm) && isAssignee(loggedUser, taskId)) && canAssignedCancel(userService.transformToUser((LoggedUserImpl) loggedUser), taskId);
     }
 
     @Override

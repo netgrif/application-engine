@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.auth.web.responsebodies;
 
 import com.netgrif.core.petrinet.domain.PetriNet;
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import java.util.Locale;
 public class ProcessRoleFactory implements IProcessRoleFactory {
 
     @Autowired
-    private PetriNetService petriNetService;
+    private IPetriNetService petriNetService;
 
     @Override
     public ProcessRole getProcessRole(com.netgrif.core.petrinet.domain.roles.ProcessRole role, Locale locale) {
@@ -21,7 +21,7 @@ public class ProcessRoleFactory implements IProcessRoleFactory {
         }*/
         if (!role.isGlobal()) {
             ProcessRole result = new ProcessRole(role, locale);
-            PetriNet net = petriNetService.get(new ObjectId(role.getNetId()));
+            PetriNet net = petriNetService.get(new ObjectId(role.getProcessId()));
             result.setNetStringId(net.getStringId());
             result.setNetImportId(net.getImportId());
             result.setNetVersion(net.getVersion().toString());

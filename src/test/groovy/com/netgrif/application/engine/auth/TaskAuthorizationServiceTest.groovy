@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.auth
 
-import com.netgrif.adapter.auth.service.UserService
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.auth.service.UserService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.startup.ImportHelper
@@ -79,7 +79,7 @@ class TaskAuthorizationServiceTest {
     private ImportHelper importHelper
 
     @Autowired
-    private PetriNetService petriNetService
+    private IPetriNetService petriNetService
 
     @Autowired
     private ITaskAuthorizationService taskAuthorizationService
@@ -166,7 +166,7 @@ class TaskAuthorizationServiceTest {
         this.netWithUserRefs = netWithUserRefs.getNet()
 
         def auths = importHelper.createAuthorities(["user": Authority.user])
-        testUser = importHelper.createUser(new User(firstName: "Role", lastName: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        testUser = importHelper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Role", lastName: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
 //                [org] as Group[],
                 [] as ProcessRole[]

@@ -2,7 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.core.petrinet.domain.VersionType
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.core.petrinet.domain.dataset.EnumerationMapField
@@ -26,7 +26,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class MapFieldTest {
 
     @Autowired
-    private PetriNetService petriNetService
+    private IPetriNetService petriNetService
     @Autowired
     private SuperCreatorRunner superCreator
     @Autowired

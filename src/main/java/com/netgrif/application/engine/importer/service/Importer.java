@@ -31,7 +31,7 @@ import com.netgrif.core.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.ArcFactory;
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.core.workflow.domain.ProcessResourceId;
@@ -88,7 +88,7 @@ public class Importer {
     protected FunctionFactory functionFactory;
 
     @Autowired
-    protected PetriNetService service;
+    protected IPetriNetService service;
 
     @Autowired
     protected ProcessRoleService processRoleService;
@@ -1087,7 +1087,7 @@ public class Importer {
         if (importRole.isGlobal() != null && importRole.isGlobal()) {
             role.setGlobal(importRole.isGlobal());
         } else {
-            role.setNetId(net.getStringId());
+            role.setProcessId(net.getStringId());
         }
         return role;
     }

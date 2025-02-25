@@ -1,19 +1,19 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.adapter.auth.domain.LoggedUserImpl;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.core.auth.domain.Authority;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.core.auth.domain.User;
 import com.netgrif.core.auth.domain.enums.UserState;
-import com.netgrif.adapter.auth.service.AuthorityService;
+import com.netgrif.auth.service.AuthorityService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.core.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.core.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.startup.runner.SystemUserRunner;
 import com.netgrif.application.engine.startup.runner.UriRunner;
@@ -74,7 +74,7 @@ public class TaskServiceTest {
     private UriRunner uriRunner;
 
     @Autowired
-    private PetriNetService petriNetService;
+    private IPetriNetService petriNetService;
 
     @Autowired
     private SuperCreatorRunner superCreator;
@@ -96,7 +96,7 @@ public class TaskServiceTest {
         PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet();
         LoggedUser loggedUser = mockLoggedUser();
         CreateCaseEventOutcome outcome = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);
-        User user = new User();
+        User user = new com.netgrif.adapter.auth.domain.User();
         user.setFirstName("name");
         user.setPassword("password");
         user.setLastName("surname");

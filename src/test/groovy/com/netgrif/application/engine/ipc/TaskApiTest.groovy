@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.ipc
 
-import com.netgrif.adapter.auth.service.UserService
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.auth.service.UserService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.adapter.workflow.domain.QTask
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
@@ -45,7 +45,7 @@ class TaskApiTest {
 //    private EventLogRepository eventLogRepository
 
     @Autowired
-    private PetriNetService petriNetService
+    private IPetriNetService petriNetService
 
     @Autowired
     private TestHelper testHelper

@@ -13,7 +13,7 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSer
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.core.event.events.workflow.IndexCaseEvent;
 import com.netgrif.core.petrinet.domain.PetriNetSearch;
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.core.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.core.workflow.domain.Case;
@@ -55,7 +55,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     protected final ElasticsearchTemplate template;
     protected final Executor executors;
     protected final ElasticsearchProperties elasticsearchProperties;
-    protected PetriNetService petriNetService;
+    protected IPetriNetService petriNetService;
     protected IWorkflowService workflowService;
     protected IElasticCasePrioritySearch iElasticCasePrioritySearch;
     @Value("${spring.data.elasticsearch.index.case}")
@@ -69,7 +69,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     @Autowired
     @Lazy
-    public void setPetriNetService(PetriNetService petriNetService) {
+    public void setPetriNetService(IPetriNetService petriNetService) {
         this.petriNetService = petriNetService;
     }
 

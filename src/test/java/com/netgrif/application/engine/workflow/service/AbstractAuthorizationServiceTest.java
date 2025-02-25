@@ -47,7 +47,7 @@ class AbstractAuthorizationServiceTest {
         roles.add(new com.netgrif.adapter.petrinet.domain.roles.ProcessRole());
         roles.add(new com.netgrif.adapter.petrinet.domain.roles.ProcessRole());
 
-        IUser user = new User();
+        IUser user = new com.netgrif.adapter.auth.domain.User();
         user.addProcessRole(roles.get(0));
         user.addProcessRole(roles.get(1));
 

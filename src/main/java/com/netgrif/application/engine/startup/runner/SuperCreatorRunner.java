@@ -1,11 +1,11 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.adapter.auth.service.AuthorityService;
+import com.netgrif.auth.service.AuthorityService;
 import com.netgrif.core.importer.model.Option;
 import com.netgrif.auth.service.AuthorityServiceImpl;
 import com.netgrif.core.auth.domain.*;
-import com.netgrif.adapter.auth.service.AuthorityService;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.AuthorityService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
@@ -56,7 +56,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
 
         Optional<IUser> superUser = userService.findUserByUsername(SUPER_ADMIN_EMAIL, null);
         if (superUser.isEmpty()) {
-            User user = new User();
+            User user = new com.netgrif.adapter.auth.domain.User();
             user.setFirstName("Admin");
             user.setLastName("Netgrif");
             user.setUsername(SUPER_ADMIN_EMAIL);

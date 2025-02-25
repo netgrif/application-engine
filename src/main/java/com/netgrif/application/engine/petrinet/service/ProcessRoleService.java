@@ -2,7 +2,7 @@ package com.netgrif.application.engine.petrinet.service;
 
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.core.event.events.user.UserRoleChangeEvent;
 import com.netgrif.core.importer.model.EventPhaseType;
 import com.netgrif.core.petrinet.domain.PetriNet;
@@ -14,7 +14,7 @@ import com.netgrif.core.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.core.workflow.domain.ProcessResourceId;
 import org.bson.types.ObjectId;
@@ -38,7 +38,7 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
     private final PetriNetRepository netRepository;
     private final ApplicationEventPublisher publisher;
     private final RoleActionsRunner roleActionsRunner;
-    private final PetriNetService petriNetService;
+    private final IPetriNetService petriNetService;
     private final ISecurityContextService securityContextService;
 
     private ProcessRole defaultRole;
@@ -47,7 +47,7 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
     public ProcessRoleService(ProcessRoleRepository processRoleRepository,
                               PetriNetRepository netRepository,
                               ApplicationEventPublisher publisher, RoleActionsRunner roleActionsRunner,
-                              @Lazy PetriNetService petriNetService, @Lazy UserService userService, ISecurityContextService securityContextService) {
+                              @Lazy IPetriNetService petriNetService, @Lazy UserService userService, ISecurityContextService securityContextService) {
         this.processRoleRepository = processRoleRepository;
         this.netRepository = netRepository;
         this.publisher = publisher;
@@ -69,7 +69,7 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
 
     @Override
     public List<ProcessRole> findAllByNetId(String s) {
-        return new ArrayList<>(processRoleRepository.findAllByNetId(s));
+        return new ArrayList<>(processRoleRepository.findAllByProcessId(s));
     }
 
     @Override
@@ -208,7 +208,7 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
     }
 
     private String getPetriNetIdFromFirstRole(Set<ProcessRole> newRoles) {
-        return newRoles.iterator().next().getNetId();
+        return newRoles.iterator().next().getProcessId();
     }
 
     private void replaceUserRolesAndPublishEvent(Set<String> requestedRolesIds, IUser user, Set<ProcessRole> requestedRoles) {
@@ -367,7 +367,7 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
     @Override
     public void deleteRolesOfNet(PetriNet net, LoggedUser loggedUser) {
         log.info("[" + net.getStringId() + "]: Initiating deletion of all roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
-        List<ProcessResourceId> deletedRoleIds = this.findAll(net.getStringId()).stream().filter(processRole -> processRole.getNetId() != null).map(ProcessRole::get_id).collect(Collectors.toList());
+        List<ProcessResourceId> deletedRoleIds = this.findAll(net.getStringId()).stream().filter(processRole -> processRole.getProcessId() != null).map(ProcessRole::get_id).collect(Collectors.toList());
         Set<String> deletedRoleStringIds = deletedRoleIds.stream().map(ProcessResourceId::toString).collect(Collectors.toSet());
 
         List<IUser> usersWithRemovedRoles = this.userService.findAllByProcessRoles(new HashSet<>(deletedRoleIds), null);

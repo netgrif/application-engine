@@ -7,7 +7,7 @@ import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.core.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
@@ -51,7 +51,7 @@ public class ImporterTest {
     @Autowired
     private IWorkflowService workflowService;
     @Autowired
-    private PetriNetService petriNetService;
+    private IPetriNetService petriNetService;
     @Autowired
     private SuperCreatorRunner superCreator;
 

@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.web;
 
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.core.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.core.model.EntityModel;
 import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;

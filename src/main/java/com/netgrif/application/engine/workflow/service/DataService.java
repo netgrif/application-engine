@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
 import com.netgrif.core.auth.domain.IUser;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.files.StorageResolverService;
 import com.netgrif.application.engine.files.interfaces.IStorageService;
@@ -26,7 +26,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Field
 import com.netgrif.core.petrinet.domain.events.DataEvent;
 import com.netgrif.core.petrinet.domain.events.DataEventType;
 import com.netgrif.core.petrinet.domain.events.EventPhase;
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
 import com.netgrif.core.workflow.domain.*;
 import com.netgrif.core.workflow.domain.eventoutcomes.EventOutcome;
@@ -94,7 +94,7 @@ public class DataService implements IDataService {
 //    protected IHistoryService historyService;
 
     @Autowired
-    protected PetriNetService petriNetService;
+    protected IPetriNetService petriNetService;
 
     @Autowired
     protected IValidationService validation;

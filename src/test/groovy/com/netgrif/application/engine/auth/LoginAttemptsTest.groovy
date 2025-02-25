@@ -5,7 +5,7 @@ import com.netgrif.core.auth.domain.Authority
 import com.netgrif.core.auth.domain.LoggedUser
 import com.netgrif.core.auth.domain.User
 import com.netgrif.core.auth.domain.enums.UserState
-import com.netgrif.adapter.auth.service.UserService
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.configuration.properties.SecurityLimitsProperties
 import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.startup.ImportHelper
@@ -70,7 +70,7 @@ class LoginAttemptsTest {
                 .build()
 
         auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        importHelper.createUser(new User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
+        importHelper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
                 [] as ProcessRole[])
     }

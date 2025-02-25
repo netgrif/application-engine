@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.orgstructure.groups.interfaces;
 
-import com.netgrif.adapter.auth.service.GroupService;
+import com.netgrif.auth.service.GroupService;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.core.workflow.domain.Case;

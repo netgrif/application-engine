@@ -3,7 +3,7 @@ package com.netgrif.application.engine.event
 import com.netgrif.adapter.auth.domain.LoggedUserImpl
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.core.auth.domain.LoggedUser
-import com.netgrif.adapter.auth.service.UserService
+import com.netgrif.auth.service.UserService
 import com.netgrif.core.petrinet.domain.I18nString
 import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.adapter.petrinet.service.ProcessRoleService

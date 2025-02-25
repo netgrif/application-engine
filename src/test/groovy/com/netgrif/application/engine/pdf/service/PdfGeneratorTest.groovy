@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.pdf.service
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.adapter.auth.service.UserService
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.pdf.generator.config.PdfResource
@@ -13,7 +13,7 @@ import com.netgrif.core.petrinet.domain.DataGroup
 import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.core.petrinet.domain.dataset.FieldType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.core.workflow.domain.Case
 import com.netgrif.core.workflow.domain.Task
 import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
@@ -57,7 +57,7 @@ class PdfGeneratorTest {
     private UserService userService
 
     @Autowired
-    private PetriNetService petriNetService
+    private IPetriNetService petriNetService
 
     @Autowired
     private PdfResource pdfResource

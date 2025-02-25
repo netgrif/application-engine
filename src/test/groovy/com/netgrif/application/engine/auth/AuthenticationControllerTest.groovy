@@ -3,8 +3,8 @@ package com.netgrif.application.engine.auth
 import com.icegreen.greenmail.configuration.GreenMailConfiguration
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
-import com.netgrif.adapter.auth.service.AuthorityService
-import com.netgrif.adapter.auth.service.UserService
+import com.netgrif.auth.service.AuthorityService
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.core.auth.domain.Authority
 import com.netgrif.core.auth.domain.IUser;
@@ -16,7 +16,7 @@ import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.mail.EmailType
 import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.core.petrinet.domain.roles.ProcessRole
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import org.jsoup.Jsoup
@@ -66,7 +66,7 @@ class AuthenticationControllerTest {
     private AuthorityService authorityService
 
     @Autowired
-    private PetriNetService petriNetService
+    private IPetriNetService petriNetService
 
     @Autowired
     private TestHelper testHelper

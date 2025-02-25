@@ -5,7 +5,7 @@ import com.netgrif.adapter.auth.domain.LoggedUserImpl;
 import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.core.event.events.task.*;

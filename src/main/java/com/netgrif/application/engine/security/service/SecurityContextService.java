@@ -2,7 +2,7 @@ package com.netgrif.application.engine.security.service;
 
 import com.netgrif.adapter.auth.domain.LoggedUserImpl;
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;

@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.auth
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.adapter.auth.service.UserService
+import com.netgrif.auth.service.UserService
 import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper

@@ -2,7 +2,7 @@
 //
 //import com.netgrif.core.auth.domain.Authority;
 //import com.netgrif.core.auth.domain.Authority;.repositories.AuthorityRepository;
-//import com.netgrif.adapter.auth.service.AuthorityService;
+//import com.netgrif.auth.service.AuthorityService;
 //import org.bson.types.ObjectId;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.stereotype.Service;

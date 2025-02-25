@@ -7,7 +7,7 @@ import com.netgrif.core.auth.domain.RegisteredUser;
 import com.netgrif.core.auth.domain.User;
 import com.netgrif.core.auth.domain.enums.UserState;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
@@ -123,7 +123,7 @@ public class RegistrationService implements IRegistrationService {
             }
             log.info("Renewing old user [" + newUser.email + "]");
         } else {
-            user = new User();
+            user = new com.netgrif.adapter.auth.domain.User();
             user.setEmail(newUser.email);
             log.info("Creating new user [" + newUser.email + "]");
         }

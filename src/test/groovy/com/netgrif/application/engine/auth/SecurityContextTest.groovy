@@ -6,11 +6,11 @@ import com.netgrif.core.auth.domain.LoggedUser
 import com.netgrif.core.auth.domain.PasswordCredential
 import com.netgrif.core.auth.domain.User
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
-import com.netgrif.adapter.auth.service.UserService
+import com.netgrif.auth.service.UserService
 import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.security.service.ISecurityContextService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -51,7 +51,7 @@ class SecurityContextTest {
     private UserService userService
 
     @Autowired
-    private PetriNetService petriNetService
+    private IPetriNetService petriNetService
 
     @Autowired
     private SuperCreatorRunner superCreator
@@ -64,7 +64,7 @@ class SecurityContextTest {
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
-        user = new User()
+        user = new com.netgrif.adapter.auth.domain.User()
         user.setUsername('test@email.com')
         user.setEmail('test@email.com')
         user.addCredential(new PasswordCredential('password', 0, true))

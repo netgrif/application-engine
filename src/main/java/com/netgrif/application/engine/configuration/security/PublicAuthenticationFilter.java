@@ -2,8 +2,8 @@ package com.netgrif.application.engine.configuration.security;
 
 import com.netgrif.adapter.auth.domain.AuthorityImpl;
 import com.netgrif.core.auth.domain.*;
-import com.netgrif.adapter.auth.service.AuthorityService;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.AuthorityService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import com.netgrif.core.auth.domain.enums.UserState;
 import jakarta.servlet.FilterChain;
@@ -107,7 +107,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
 
     private LoggedUser createAnonymousUser() {
         String hash = new ObjectId().toString();
-        User anonymousUser = new User();
+        User anonymousUser = new com.netgrif.adapter.auth.domain.User();
         anonymousUser.setState(UserState.ACTIVE);
         anonymousUser = (User) userService.saveUser(anonymousUser, null);
         return (LoggedUser) userService.transformToLoggedUser(anonymousUser);

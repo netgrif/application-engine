@@ -2,7 +2,7 @@ package com.netgrif.application.engine.elastic
 
 import com.netgrif.application.engine.MockService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.adapter.auth.service.UserService
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
@@ -13,7 +13,7 @@ import com.netgrif.core.petrinet.domain.dataset.FileFieldValue
 import com.netgrif.core.petrinet.domain.dataset.FileListFieldValue
 import com.netgrif.core.petrinet.domain.dataset.UserFieldValue
 import com.netgrif.core.petrinet.domain.dataset.UserListFieldValue
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.core.workflow.domain.Case
@@ -75,7 +75,7 @@ class DataSearchRequestTest {
     private IElasticCaseService searchService
 
     @Autowired
-    private PetriNetService petriNetService
+    private IPetriNetService petriNetService
 
     @Autowired
     private SuperCreatorRunner superCreator

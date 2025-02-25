@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FunctionsCacheRunner implements ApplicationEngineStartupRunner {
 
-    private final PetriNetService petriNetService;
+    private final IPetriNetService petriNetService;
     private final IFieldActionsCacheService cacheService;
 
     @Override

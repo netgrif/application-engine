@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.core.auth.domain.User;
 import com.netgrif.core.auth.domain.enums.UserState;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
@@ -39,7 +39,7 @@ public class TokenServiceTest {
 
     @Test
     public void removeExpired() throws Exception {
-        User expired = new User();
+        User expired = new com.netgrif.adapter.auth.domain.User();
         expired.setUsername("test1@test.com");
         expired.setEmail("test1@test.com");
         expired.setPassword("password");
@@ -48,7 +48,7 @@ public class TokenServiceTest {
         expired.setState(UserState.INACTIVE);
         userService.saveUser(expired, null);
 
-        User expired2 = new User();
+        User expired2 = new com.netgrif.adapter.auth.domain.User();
         expired2.setUsername("test2@test.com");
         expired2.setEmail("test2@test.com");
         expired2.setPassword("password");
@@ -63,7 +63,7 @@ public class TokenServiceTest {
 
     @Test
     public void authorizeToken() throws Exception {
-        User expired = new User();
+        User expired = new com.netgrif.adapter.auth.domain.User();
         expired.setToken("token3");
         expired.setUsername("test3@test.com");
         expired.setEmail("test3@test.com");

@@ -16,7 +16,7 @@ import com.netgrif.core.petrinet.domain.PetriNetSearch;
 import com.netgrif.core.petrinet.domain.VersionType;
 import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.core.petrinet.web.responsebodies.*;
@@ -71,7 +71,7 @@ public class PetriNetController {
     private FileStorageConfiguration fileStorageConfiguration;
 
     @Autowired
-    private PetriNetService service;
+    private IPetriNetService service;
 
     @Autowired
     private ProcessRoleService roleService;
@@ -140,7 +140,7 @@ public class PetriNetController {
     @Operation(summary = "Get process by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public PetriNetReferenceResource getOne(@PathVariable("id") String id, Authentication auth, Locale locale) {
-        return new PetriNetReferenceResource(PetriNetService.transformToReference(service.getPetriNet(decodeUrl(id)), locale));
+        return new PetriNetReferenceResource(IPetriNetService.transformToReference(service.getPetriNet(decodeUrl(id)), locale));
     }
 
     @Operation(summary = "Get process by identifier and version", security = {@SecurityRequirement(name = "BasicAuth")})

@@ -1,11 +1,11 @@
 package com.netgrif.application.engine.petrinet.domain
 
-import com.netgrif.adapter.auth.service.UserService
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.runner.DefaultRoleRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -70,7 +70,7 @@ class EventTest {
     private SystemUserRunner userRunner
 
     @Autowired
-    private PetriNetService petriNetService;
+    private IPetriNetService petriNetService;
     @Autowired
     private TestHelper testHelper
 

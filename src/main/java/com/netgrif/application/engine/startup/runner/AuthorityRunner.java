@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.startup.runner;
 
 import com.netgrif.core.auth.domain.Authority;
-import com.netgrif.adapter.auth.service.AuthorityService;
+import com.netgrif.auth.service.AuthorityService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.RequiredArgsConstructor;

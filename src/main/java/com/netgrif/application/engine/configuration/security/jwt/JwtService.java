@@ -3,7 +3,7 @@ package com.netgrif.application.engine.configuration.security.jwt;
 import com.netgrif.adapter.auth.domain.LoggedUserImpl;
 import com.netgrif.core.auth.domain.Attribute;
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.adapter.auth.service.AuthorityService;
+import com.netgrif.auth.service.AuthorityService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

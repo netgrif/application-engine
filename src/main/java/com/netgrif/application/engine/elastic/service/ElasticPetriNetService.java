@@ -5,7 +5,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
 import com.netgrif.core.petrinet.domain.PetriNet;
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -23,7 +23,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
 
     private final Executor executors;
 
-    private PetriNetService petriNetService;
+    private IPetriNetService petriNetService;
 
     public ElasticPetriNetService(ElasticPetriNetRepository repository, Executor executors) {
         this.repository = repository;
@@ -32,7 +32,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
 
     @Lazy
     @Autowired
-    public void setPetriNetService(PetriNetService petriNetService) {
+    public void setPetriNetService(IPetriNetService petriNetService) {
         this.petriNetService = petriNetService;
     }
 

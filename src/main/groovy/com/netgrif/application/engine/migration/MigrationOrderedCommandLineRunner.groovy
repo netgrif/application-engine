@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.migration
 
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,7 +18,7 @@ abstract class MigrationOrderedCommandLineRunner implements CommandLineRunner { 
     private MigrationRepository repository
 
     @Autowired
-    private PetriNetService service
+    private IPetriNetService service
 
     @Override
     void run(String... strings) throws Exception {

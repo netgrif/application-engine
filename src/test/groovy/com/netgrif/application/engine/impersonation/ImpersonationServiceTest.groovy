@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.impersonation
 
-import com.netgrif.adapter.auth.service.AuthorityService
-import com.netgrif.adapter.auth.service.UserService
-import com.netgrif.adapter.petrinet.service.PetriNetService
+import com.netgrif.auth.service.AuthorityService
+import com.netgrif.auth.service.UserService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
@@ -83,7 +83,7 @@ class ImpersonationServiceTest {
     private ITaskService taskService
 
     @Autowired
-    private PetriNetService petriNetService
+    private IPetriNetService petriNetService
 
     @Autowired
     private AuthorityService authorityService
@@ -127,21 +127,21 @@ class ImpersonationServiceTest {
         def authorityAnon = authorityService.getOrCreate(Authority.anonymous)
         def authorityAdmin = authorityService.getOrCreate(Authority.admin)
 
-        user1 = helper.createUser(new User(firstName: "Test", lastName: "User", email: "test@netgrif.com", "username": "test@netgrif.com", password: "password", state: UserState.ACTIVE),
+        user1 = helper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Test", lastName: "User", email: "test@netgrif.com", "username": "test@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority] as Authority[],
                 [] as ProcessRole[])
 
         auth1 = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(user1), (user1 as User).password, user1.authorities as List<GrantedAuthority>)
         auth1.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        user2 = helper.createUser(new User(firstName: "Test", lastName: "User2", email: "test2@netgrif.com", "username": "test2@netgrif.com", password: "password", state: UserState.ACTIVE),
+        user2 = helper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Test", lastName: "User2", email: "test2@netgrif.com", "username": "test2@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority, authorityAnon] as Authority[],
                 testNet.roles.values() as ProcessRole[])
 
         auth2 = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(user2), (user2 as User).password, user2.authorities as List<GrantedAuthority>)
         auth2.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        adminUser = helper.createUser(new User(firstName: "Admin", lastName: "User", email: "admin@netgrif.com", "username": "admin@netgrif.com", password: "password", state: UserState.ACTIVE),
+        adminUser = helper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Admin", lastName: "User", email: "admin@netgrif.com", "username": "admin@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority, authorityAdmin] as Authority[],
                 testNet.roles.values() as ProcessRole[])
 

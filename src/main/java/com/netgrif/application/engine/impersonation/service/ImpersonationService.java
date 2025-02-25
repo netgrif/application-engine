@@ -4,7 +4,7 @@ import com.netgrif.adapter.auth.domain.AuthorityImpl;
 import com.netgrif.core.auth.domain.Authority;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;
 import com.netgrif.core.event.events.user.ImpersonationEvent;
 import com.netgrif.core.event.events.user.ImpersonationPhase;

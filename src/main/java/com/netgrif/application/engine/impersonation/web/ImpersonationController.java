@@ -4,7 +4,7 @@ import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserResourceHelperService;
-import com.netgrif.adapter.auth.service.UserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 //import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.impersonation.exceptions.IllegalImpersonationAttemptException;

@@ -13,7 +13,7 @@
 //import com.netgrif.core.petrinet.domain.PetriNet;
 //import com.netgrif.core.petrinet.domain.VersionType;
 //import com.netgrif.core.petrinet.domain.roles.ProcessRole;
-//import com.netgrif.adapter.petrinet.service.PetriNetService;
+//import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 //import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 //import org.bson.types.ObjectId;
 //import org.json.JSONArray;
@@ -60,7 +60,7 @@
 //    private SuperCreatorRunner superCreator;
 //
 //    @Autowired
-//    private PetriNetService petriNetService;
+//    private IPetriNetService petriNetService;
 //    @Autowired
 //    private TestHelper testHelper;
 //

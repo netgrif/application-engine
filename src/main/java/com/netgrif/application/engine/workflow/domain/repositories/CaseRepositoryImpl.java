@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.domain.repositories;
 
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.adapter.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.core.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.core.petrinet.web.responsebodies.Reference;
 import com.netgrif.adapter.workflow.domain.QCase;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public abstract class CaseRepositoryImpl implements CaseRepository {
 
     @Autowired
-    private PetriNetService petriNetService;
+    private IPetriNetService petriNetService;
 
     @Override
     public void customize(QuerydslBindings bindings, QCase qCase) {

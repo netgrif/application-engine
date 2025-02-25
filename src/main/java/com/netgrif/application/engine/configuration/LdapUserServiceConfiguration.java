@@ -1,7 +1,7 @@
 //package com.netgrif.application.engine.configuration;
 //
 //import com.netgrif.application.engine.auth.service.LdapUserDetailsService;
-//import com.netgrif.adapter.auth.service.UserService;
+//import com.netgrif.auth.service.UserService;
 //import com.netgrif.application.engine.ldap.service.LdapUserService;
 //import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 //import org.springframework.context.annotation.Bean;

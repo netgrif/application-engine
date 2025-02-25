@@ -5,7 +5,7 @@
 //import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 //import com.netgrif.core.petrinet.domain.VersionType;
 //import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
-//import com.netgrif.adapter.petrinet.service.PetriNetService;
+//import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 ////import com.netgrif.application.engine.rules.domain.RuleRepository;
 ////import com.netgrif.application.engine.rules.domain.StoredRule;
 ////import com.netgrif.application.engine.rules.domain.scheduled.ScheduleOutcome;
@@ -50,7 +50,7 @@
 //    private IWorkflowService workflowService;
 //
 //    @Autowired
-//    private PetriNetService petriNetService;
+//    private IPetriNetService petriNetService;
 //
 //    @Autowired
 //    private SuperCreatorRunner superCreator;

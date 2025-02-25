@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
@@ -50,8 +51,11 @@ public class TaskController extends AbstractTaskController {
 
     public static final Logger log = LoggerFactory.getLogger(TaskController.class);
 
-    public TaskController(ITaskService taskService, IDataService dataService, IElasticTaskService searchService) {
-        super(taskService, dataService, searchService);
+    public TaskController(ITaskService taskService,
+                          IDataService dataService,
+                          IElasticTaskService searchService,
+                          UserService userService) {
+        super(taskService, dataService, searchService, userService);
     }
 
     @Override
