@@ -1,10 +1,10 @@
 // todo NAE-1997: generate this with plugin
 grammar QueryLang;
 
-query: resource=(PROCESS | PROCESSES) delimeter processConditions EOF # processQuery
-     | resource=(CASE | CASES) delimeter caseConditions EOF # caseQuery
-     | resource=(TASK | TASKS) delimeter taskConditions EOF # taskQuery
-     | resource=(USER | USERS) delimeter userConditions EOF # userQuery
+query: resource=(PROCESS | PROCESSES) delimeter processConditions (paging)? (processSorting)? EOF # processQuery
+     | resource=(CASE | CASES) delimeter caseConditions (paging)? (caseSorting)? EOF # caseQuery
+     | resource=(TASK | TASKS) delimeter taskConditions (paging)? (taskSorting)? EOF # taskQuery
+     | resource=(USER | USERS) delimeter userConditions (paging)? (userSorting)? EOF # userQuery
      ;
 
 processConditions: processOrExpression ;
@@ -43,6 +43,55 @@ userCondition: userComparisons SPACE? ;
 delimeter: WHERE_DELIMETER | COLON_DELIMETER ;
 WHERE_DELIMETER: SPACE W H E R E SPACE ;
 COLON_DELIMETER: SPACE? ':' SPACE ;
+
+// paging
+paging: PAGE SPACE pageNum=INT (SPACE SIZE SPACE pageSize=INT)? SPACE?;
+
+// sorting
+processSorting: SORT_BY SPACE processAttributeOrdering (',' SPACE? processAttributeOrdering)* SPACE?;
+processAttributeOrdering: processAttribute (SPACE ordering=(ASC | DESC))? ;
+processAttribute: ID
+                | IDENTIFIER
+                | VERSION
+                | TITLE
+                | CREATION_DATE
+                ;
+
+caseSorting: SORT_BY SPACE caseAttributeOrdering (',' SPACE? caseAttributeOrdering)* SPACE?;
+caseAttributeOrdering: caseAttribute (SPACE ordering=(ASC | DESC))? ;
+caseAttribute: ID
+             | PROCESS_ID
+             | PROCESS_IDENTIFIER
+             | TITLE
+             | CREATION_DATE
+             | AUTHOR
+             | places
+             | tasksUserId
+             | tasksState
+             | dataValue
+             | dataOptions
+             ;
+
+taskSorting: SORT_BY SPACE taskAttributeOrdering (',' SPACE? taskAttributeOrdering)* SPACE?;
+taskAttributeOrdering: taskAttribute (SPACE ordering=(ASC | DESC))? ;
+taskAttribute: ID
+             | TRANSITION_ID
+             | TITLE
+             | STATE
+             | USER_ID
+             | CASE_ID
+             | PROCESS_ID
+             | LAST_ASSIGN
+             | LAST_FINISH
+             ;
+
+userSorting: SORT_BY SPACE userAttributeOrdering (',' SPACE? userAttributeOrdering)* SPACE?;
+userAttributeOrdering: userAttribute (SPACE ordering=(ASC | DESC))? ;
+userAttribute: ID
+             | NAME
+             | SURNAME
+             | EMAIL
+             ;
 
 // resource comparisons
 processComparisons: idComparison
@@ -120,7 +169,7 @@ tasksUserIdComparison: tasksUserId SPACE stringComparison ;
 // basic comparisons
 objectIdComparison: (NOT SPACE?)? op=EQ SPACE STRING ;
 stringComparison: (NOT SPACE?)? op=(EQ | CONTAINS) SPACE STRING ;
-numberComparison: (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE NUMBER ;
+numberComparison: (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE number=(INT | DOUBLE) ;
 dateComparison: (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE DATE ;
 dateTimeComparison: (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE DATETIME ;
 booleanComparison: (NOT SPACE?)? op=EQ SPACE BOOLEAN ;
@@ -180,10 +229,20 @@ MARKING: M A R K I N G ;
 ENABLED: E N A B L E D ;
 DISABLED: D I S A B L E D ;
 
+// paging
+PAGE: P A G E ;
+SIZE: S I Z E ;
+
+// sorting
+SORT_BY: S O R T SPACE B Y ;
+ASC: A S C ;
+DESC: D E S C ;
+
 // basic types
 LIST: '[' SPACE? ((STRING | NUMBER) SPACE? (',' SPACE? (STRING | NUMBER) SPACE? )* )? SPACE? ']' ;
 STRING: '\'' (~('\'' | '\r' | '\n'))* '\'' ; // todo NAE-1997: escape???
-NUMBER: DIGIT+ ('.' DIGIT+)? ;
+INT: DIGIT+ ;
+DOUBLE: DIGIT+ '.' DIGIT+ ;
 DATETIME: DATE 'T' ([01] DIGIT | '2' [0-3]) ':' [0-5] DIGIT ':' [0-5] DIGIT ('.' DIGIT+)? ; // 2020-03-03T20:00:00.055 // todo NAE-1997: format
 DATE: DIGIT DIGIT DIGIT DIGIT '-' ('0' [1-9] | '1' [0-2]) '-' ('0' [1-9] | [12] DIGIT | '3' [01]) ; // 2020-03-03 // todo NAE-1997: format
 BOOLEAN: T R U E | F A L S E ;

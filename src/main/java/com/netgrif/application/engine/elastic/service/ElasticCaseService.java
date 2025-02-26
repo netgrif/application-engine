@@ -156,6 +156,22 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         }
     }
 
+    // todo NAE-1997: implement exists -> now it only supports exists by id, we need exists + query
+//    @Override
+//    public boolean exists(List<CaseSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
+//        if (requests == null) {
+//            throw new IllegalArgumentException("Request can not be null!");
+//        }
+//
+//        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+//        NativeSearchQuery query = buildQuery(requests, loggedOrImpersonated, new FullPageRequest(), locale, isIntersection);
+//        if (query != null) {
+//            return template.exists(query, ElasticCase.class);
+//        } else {
+//            return false;
+//        }
+//    }
+
     public String findUriNodeId(Case aCase) {
         if (aCase == null) {
             return null;

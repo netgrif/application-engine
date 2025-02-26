@@ -2337,4 +2337,8 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     def search(String query) {
         return searchService.search(query)
     }
+
+    boolean exists(String query) {
+        return searchService.exists(query)
+    }
 }

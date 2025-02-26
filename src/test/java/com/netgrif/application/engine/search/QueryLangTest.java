@@ -16,14 +16,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.netgrif.application.engine.search.utils.SearchUtils.evaluateQuery;
+import static com.netgrif.application.engine.search.utils.SearchUtils.explainQuery;
 
 @Slf4j
 @SpringBootTest
@@ -198,13 +202,10 @@ public class QueryLangTest {
         compareMongoQueries(mongoDbUtils, actual, expected);
 
         // processId comparison
-        actual = evaluateQuery("case: processId eq 'test'").getFullMongoQuery();
-        expected = QCase.case$.petriNetId.eq("test");
+        actual = evaluateQuery(String.format("case: processId eq '%s'", GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QCase.case$.petriNetObjectId.eq(GENERIC_OBJECT_ID);
 
         compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("case: processId contains 'test'").getFullMongoQuery();
-        expected = QCase.case$.petriNetId.contains("test");
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -776,12 +777,8 @@ public class QueryLangTest {
         assert expected.equals(actual);
 
         // processId comparison
-        actual = evaluateQuery("case: processId eq 'test'").getFullElasticQuery();
-        expected = "processId:test";
-        assert expected.equals(actual);
-
-        actual = evaluateQuery("case: processId contains 'test'").getFullElasticQuery();
-        expected = "processId:*test*";
+        actual = evaluateQuery(String.format("case: processId eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("processId:%s", GENERIC_OBJECT_ID);
         assert expected.equals(actual);
 
         // processIdentifier comparison
@@ -1141,6 +1138,435 @@ public class QueryLangTest {
         // nested parenthesis comparison
         actual = evaluateQuery(String.format("user: id eq '%s' and (email eq 'test' or (email eq 'test1' and name eq 'test'))", GENERIC_OBJECT_ID)).getFullElasticQuery();
         assert actual == null;
+    }
+
+    @Test
+    public void testPagingQuery() {
+        // default
+        Pageable pageable = evaluateQuery("cases: processIdentifier eq 'test'").getPageable();
+        assert pageable.getPageNumber() == 0;
+        assert pageable.getPageSize() == 20;
+
+        // page number only
+        pageable = evaluateQuery("cases: processIdentifier eq 'test' page 2").getPageable();
+        assert pageable.getPageNumber() == 2;
+        assert pageable.getPageSize() == 20;
+
+        // page number and page size
+        pageable = evaluateQuery("cases: processIdentifier eq 'test' page 2 size 4").getPageable();
+        assert pageable.getPageNumber() == 2;
+        assert pageable.getPageSize() == 4;
+    }
+
+    @Test
+    public void testProcessSortingQuery() {
+        // default (no sort)
+        Pageable actual = evaluateQuery("processes: identifier eq 'test'").getPageable();
+        assert !actual.getSort().isSorted();
+
+        // default ordering asc
+        actual = evaluateQuery("processes: identifier eq 'test' sort by id").getPageable();
+        assert actual.getSort().isSorted();
+        List<Sort.Order> orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("id");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+
+        // set ordering
+        actual = evaluateQuery("processes: identifier eq 'test' sort by id desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("id");
+        assert orders.get(0).getDirection() == Sort.Direction.DESC;
+
+        actual = evaluateQuery("processes: identifier eq 'test' sort by identifier desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("identifier");
+        assert orders.get(0).getDirection() == Sort.Direction.DESC;
+
+        actual = evaluateQuery("processes: identifier eq 'test' sort by title asc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("title.defaultValue");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+        actual = evaluateQuery("processes: identifier eq 'test' sort by version asc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("version");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+        actual = evaluateQuery("processes: identifier eq 'test' sort by creationDate asc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("creationDate");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+        // complex set ordering
+        actual = evaluateQuery("processes: identifier eq 'test' sort by id asc, title desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 2;
+        assert orders.get(0).getProperty().equals("id");
+        assert orders.get(0).getDirection().equals(Sort.Direction.ASC);
+        assert orders.get(1).getProperty().equals("title.defaultValue");
+        assert orders.get(1).getDirection().equals(Sort.Direction.DESC);
+
+        // complex default ordering
+        actual = evaluateQuery("processes: identifier eq 'test' sort by id asc, title").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 2;
+        assert orders.get(0).getProperty().equals("id");
+        assert orders.get(0).getDirection().equals(Sort.Direction.ASC);
+        assert orders.get(1).getProperty().equals("title.defaultValue");
+        assert orders.get(1).getDirection().equals(Sort.Direction.ASC);
+    }
+
+    @Test
+    public void testCaseSortingMongoDbQuery() {
+        // default (no sort)
+        Pageable actual = evaluateQuery("cases: processIdentifier eq 'test'").getPageable();
+        assert !actual.getSort().isSorted();
+
+        // default ordering asc
+        actual = evaluateQuery("cases: processIdentifier eq 'test' sort by id").getPageable();
+        assert actual.getSort().isSorted();
+        List<Sort.Order> orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("id");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+
+        // set ordering
+        actual = evaluateQuery("cases: processIdentifier eq 'test' sort by id desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("id");
+        assert orders.get(0).getDirection() == Sort.Direction.DESC;
+
+        actual = evaluateQuery("cases: processIdentifier eq 'test' sort by processIdentifier desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("processIdentifier");
+        assert orders.get(0).getDirection() == Sort.Direction.DESC;
+
+        actual = evaluateQuery("cases: processIdentifier eq 'test' sort by title asc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("title");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+        actual = evaluateQuery("cases: processIdentifier eq 'test' sort by processId asc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("petriNetObjectId");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+        actual = evaluateQuery("cases: processIdentifier eq 'test' sort by creationDate asc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("creationDate");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+
+        actual = evaluateQuery("cases: processIdentifier eq 'test' sort by author desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("author.id");
+        assert orders.get(0).getDirection() == Sort.Direction.DESC;
+
+        // complex set ordering
+        actual = evaluateQuery("cases: processIdentifier eq 'test' sort by id asc, title desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 2;
+        assert orders.get(0).getProperty().equals("id");
+        assert orders.get(0).getDirection().equals(Sort.Direction.ASC);
+        assert orders.get(1).getProperty().equals("title");
+        assert orders.get(1).getDirection().equals(Sort.Direction.DESC);
+
+        // complex default ordering
+        actual = evaluateQuery("cases: processIdentifier eq 'test' sort by id asc, title").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 2;
+        assert orders.get(0).getProperty().equals("id");
+        assert orders.get(0).getDirection().equals(Sort.Direction.ASC);
+        assert orders.get(1).getProperty().equals("title");
+        assert orders.get(1).getDirection().equals(Sort.Direction.ASC);
+    }
+
+    @Test
+    public void testCaseSortingElasticQuery() {
+        // default (no sort)
+        Pageable actual = evaluateQuery("cases: data.field1.value eq 'test'").getPageable();
+        assert !actual.getSort().isSorted();
+
+        // default ordering asc
+        actual = evaluateQuery("cases: data.field1.value eq 'test' sort by id").getPageable();
+        assert actual.getSort().isSorted();
+        List<Sort.Order> orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("stringId.keyword");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+
+        // set ordering
+        actual = evaluateQuery("cases: data.field1.value eq 'test' sort by id desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("stringId.keyword");
+        assert orders.get(0).getDirection() == Sort.Direction.DESC;
+
+        actual = evaluateQuery("cases: data.field1.value eq 'test' sort by processIdentifier desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("processIdentifier.keyword");
+        assert orders.get(0).getDirection() == Sort.Direction.DESC;
+
+        actual = evaluateQuery("cases: data.field1.value eq 'test' sort by title asc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("title.keyword");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+        actual = evaluateQuery("cases: data.field1.value eq 'test' sort by processId asc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("processId.keyword");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+        actual = evaluateQuery("cases: data.field1.value eq 'test' sort by creationDate asc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("creationDateSortable");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+        actual = evaluateQuery("cases: data.field1.value eq 'test' sort by author desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("author.keyword");
+        assert orders.get(0).getDirection() == Sort.Direction.DESC;
+
+        actual = evaluateQuery("cases: data.field1.value eq 'test' sort by places.p1.marking desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("places.p1.marking");
+        assert orders.get(0).getDirection() == Sort.Direction.DESC;
+
+        actual = evaluateQuery("cases: data.field1.value eq 'test' sort by tasks.t1.state desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("tasks.t1.state.keyword");
+        assert orders.get(0).getDirection() == Sort.Direction.DESC;
+
+        actual = evaluateQuery("cases: data.field1.value eq 'test' sort by tasks.t1.userId desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("tasks.t1.userId.keyword");
+        assert orders.get(0).getDirection() == Sort.Direction.DESC;
+
+        // complex set ordering
+        actual = evaluateQuery("cases: data.field1.value eq 'test' sort by id asc, title desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 2;
+        assert orders.get(0).getProperty().equals("stringId.keyword");
+        assert orders.get(0).getDirection().equals(Sort.Direction.ASC);
+        assert orders.get(1).getProperty().equals("title.keyword");
+        assert orders.get(1).getDirection().equals(Sort.Direction.DESC);
+
+        // complex default ordering
+        actual = evaluateQuery("cases: data.field1.value eq 'test' sort by id asc, title").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 2;
+        assert orders.get(0).getProperty().equals("stringId.keyword");
+        assert orders.get(0).getDirection().equals(Sort.Direction.ASC);
+        assert orders.get(1).getProperty().equals("title.keyword");
+        assert orders.get(1).getDirection().equals(Sort.Direction.ASC);
+    }
+
+    @Test
+    public void testTaskSortingQuery() {
+        // default (no sort)
+        Pageable actual = evaluateQuery("tasks: title eq 'test'").getPageable();
+        assert !actual.getSort().isSorted();
+
+        // default ordering asc
+        actual = evaluateQuery("tasks: title eq 'test' sort by id").getPageable();
+        assert actual.getSort().isSorted();
+        List<Sort.Order> orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("id");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+
+        // set ordering
+        actual = evaluateQuery("tasks: title eq 'test' sort by id desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("id");
+        assert orders.get(0).getDirection() == Sort.Direction.DESC;
+
+        actual = evaluateQuery("tasks: title eq 'test' sort by transitionId desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("transitionId");
+        assert orders.get(0).getDirection() == Sort.Direction.DESC;
+
+        actual = evaluateQuery("tasks: title eq 'test' sort by title asc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("title.defaultValue");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+        actual = evaluateQuery("tasks: title eq 'test' sort by processId asc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("processId");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+        actual = evaluateQuery("tasks: title eq 'test' sort by caseId asc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("caseId");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+        actual = evaluateQuery("tasks: title eq 'test' sort by userId asc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("userId");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+        actual = evaluateQuery("tasks: title eq 'test' sort by lastAssign asc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("lastAssigned");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+
+        actual = evaluateQuery("tasks: title eq 'test' sort by lastFinish desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("lastFinished");
+        assert orders.get(0).getDirection() == Sort.Direction.DESC;
+
+        // complex set ordering
+        actual = evaluateQuery("tasks: title eq 'test' sort by id asc, title desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 2;
+        assert orders.get(0).getProperty().equals("id");
+        assert orders.get(0).getDirection().equals(Sort.Direction.ASC);
+        assert orders.get(1).getProperty().equals("title.defaultValue");
+        assert orders.get(1).getDirection().equals(Sort.Direction.DESC);
+
+        // complex default ordering
+        actual = evaluateQuery("tasks: title eq 'test' sort by id asc, title").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 2;
+        assert orders.get(0).getProperty().equals("id");
+        assert orders.get(0).getDirection().equals(Sort.Direction.ASC);
+        assert orders.get(1).getProperty().equals("title.defaultValue");
+        assert orders.get(1).getDirection().equals(Sort.Direction.ASC);
+    }
+
+    @Test
+    public void testUserSortingQuery() {
+        // default (no sort)
+        Pageable actual = evaluateQuery("users: name eq 'test'").getPageable();
+        assert !actual.getSort().isSorted();
+
+        // default ordering asc
+        actual = evaluateQuery("users: name eq 'test' sort by id").getPageable();
+        assert actual.getSort().isSorted();
+        List<Sort.Order> orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("id");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+
+        // set ordering
+        actual = evaluateQuery("users: name eq 'test' sort by id desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("id");
+        assert orders.get(0).getDirection() == Sort.Direction.DESC;
+
+        actual = evaluateQuery("users: name eq 'test' sort by name desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("name");
+        assert orders.get(0).getDirection() == Sort.Direction.DESC;
+
+        actual = evaluateQuery("users: name eq 'test' sort by surname asc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("surname");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+        actual = evaluateQuery("users: name eq 'test' sort by email asc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 1;
+        assert orders.get(0).getProperty().equals("email");
+        assert orders.get(0).getDirection() == Sort.Direction.ASC;
+
+        // complex set ordering
+        actual = evaluateQuery("users: name eq 'test' sort by id asc, name desc").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 2;
+        assert orders.get(0).getProperty().equals("id");
+        assert orders.get(0).getDirection().equals(Sort.Direction.ASC);
+        assert orders.get(1).getProperty().equals("name");
+        assert orders.get(1).getDirection().equals(Sort.Direction.DESC);
+
+        // complex default ordering
+        actual = evaluateQuery("users: name eq 'test' sort by id asc, name").getPageable();
+        assert actual.getSort().isSorted();
+        orders = actual.getSort().toList();
+        assert orders.size() == 2;
+        assert orders.get(0).getProperty().equals("id");
+        assert orders.get(0).getDirection().equals(Sort.Direction.ASC);
+        assert orders.get(1).getProperty().equals("name");
+        assert orders.get(1).getDirection().equals(Sort.Direction.ASC);
     }
 
     @Test

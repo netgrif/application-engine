@@ -8,12 +8,15 @@ import lombok.Getter;
 import org.antlr.v4.runtime.tree.ErrorNodeImpl;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
+import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.netgrif.application.engine.search.utils.SearchUtils.*;
 
 public class QueryLangExplainEvaluator extends QueryLangBaseListener {
 
@@ -28,19 +31,30 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
     @Getter
     private boolean searchWithElastic = false;
 
+    private int pageNumber = 0;
+    private int pageSize = 20;
+    private final List<String> sortOrders = new ArrayList<>();
+
     public String explain() {
-        String resource = type != null ? type.name() : "unknown";
-        String quantity = multiple ? "multiple instances" : "single instance";
-        String db = searchWithElastic ? "Elasticsearch" : "MongoDB";
-        String stringTreeVisualisation = root != null ? root.toString() : "Tree visualisation not available.";
-        return "Searching " +
-                quantity +
-                " of resource " +
-                resource +
-                " with " +
-                db +
-                ".\n" +
-                stringTreeVisualisation;
+        StringBuilder result = new StringBuilder("Searching ");
+
+        result.append(multiple ? "multiple instances" : "single instance")
+                .append(" of resource ")
+                .append(type != null ? type.name() : "invalid type")
+                .append(" with ")
+                .append(searchWithElastic ? "Elasticsearch" : "MongoDB")
+                .append(".\n")
+                .append("page number: ").append(pageNumber)
+                .append(", page size: ").append(pageSize)
+                .append("\n");
+
+        if (!sortOrders.isEmpty()) {
+            result.append("sort by ").append(String.join(";", sortOrders)).append("\n");
+        }
+
+        result.append(root != null ? root.toString() : "Tree visualisation not available.");
+
+        return result.toString();
     }
 
     public void setQueryLangTreeNode(ParseTree node, QueryLangTreeNode queryLangTreeNode) {
@@ -360,5 +374,78 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
     @Override
     public void enterDataOptionsComparison(QueryLangParser.DataOptionsComparisonContext ctx) {
         this.searchWithElastic = true;
+    }
+
+
+    @Override
+    public void exitPaging(QueryLangParser.PagingContext ctx) {
+        pageNumber = Integer.parseInt(ctx.pageNum.getText());
+
+        if (ctx.pageSize != null) {
+            pageSize = Integer.parseInt(ctx.pageSize.getText());
+        }
+    }
+
+    @Override
+    public void exitCaseSorting(QueryLangParser.CaseSortingContext ctx) {
+        ctx.caseAttributeOrdering().forEach(attrOrd -> {
+            Sort.Direction dir = attrOrd.ordering != null ? Sort.Direction.fromString(attrOrd.ordering.getText()) : Sort.Direction.ASC;
+            String prop;
+            if (searchWithElastic) {
+                // todo NAE-1997: sorting by data value, options
+                if (attrOrd.caseAttribute().places() != null) {
+                    prop = "places." + attrOrd.caseAttribute().places().placeId.getText() + ".marking";
+                } else if (attrOrd.caseAttribute().tasksState() != null) {
+                    prop = "tasks." + attrOrd.caseAttribute().tasksState().taskId.getText() + ".state.keyword";
+                } else if (attrOrd.caseAttribute().tasksUserId() != null) {
+                    prop = "tasks." + attrOrd.caseAttribute().tasksUserId().taskId.getText() + ".userId.keyword";
+                } else {
+                    prop = caseAttrToSortPropElasticMapping.get(attrOrd.caseAttribute().getText().toLowerCase());
+                }
+            } else {
+                prop = caseAttrToSortPropMapping.get(attrOrd.caseAttribute().getText().toLowerCase());
+            }
+
+            if (prop == null) {
+                sortOrders.add("Invalid attribute: " + attrOrd.caseAttribute().getText());
+            }
+            sortOrders.add("attribute: " + prop + ", ordering: " + dir);
+        });
+    }
+
+    @Override
+    public void exitProcessSorting(QueryLangParser.ProcessSortingContext ctx) {
+        ctx.processAttributeOrdering().forEach(attrOrd -> {
+            Sort.Direction dir = attrOrd.ordering != null ? Sort.Direction.fromString(attrOrd.ordering.getText()) : Sort.Direction.ASC;
+            String prop = processAttrToSortPropMapping.get(attrOrd.processAttribute().getText().toLowerCase());
+            if (prop == null) {
+                sortOrders.add("Invalid attribute: " + attrOrd.processAttribute().getText());
+            }
+            sortOrders.add("attribute: " + prop + ", ordering: " + dir);
+        });
+    }
+
+    @Override
+    public void exitTaskSorting(QueryLangParser.TaskSortingContext ctx) {
+        ctx.taskAttributeOrdering().forEach(attrOrd -> {
+            Sort.Direction dir = attrOrd.ordering != null ? Sort.Direction.fromString(attrOrd.ordering.getText()) : Sort.Direction.ASC;
+            String prop = taskAttrToSortPropMapping.get(attrOrd.taskAttribute().getText().toLowerCase());
+            if (prop == null) {
+                sortOrders.add("Invalid attribute: " + attrOrd.taskAttribute().getText());
+            }
+            sortOrders.add("attribute: " + prop + ", ordering: " + dir);
+        });
+    }
+
+    @Override
+    public void exitUserSorting(QueryLangParser.UserSortingContext ctx) {
+        ctx.userAttributeOrdering().forEach(attrOrd -> {
+            Sort.Direction dir = attrOrd.ordering != null ? Sort.Direction.fromString(attrOrd.ordering.getText()) : Sort.Direction.ASC;
+            String prop = userAttrToSortPropMapping.get(attrOrd.userAttribute().getText().toLowerCase());
+            if (prop == null) {
+                sortOrders.add("Invalid attribute: " + attrOrd.userAttribute().getText());
+            }
+            sortOrders.add("attribute: " + prop + ", ordering: " + dir);
+        });
     }
 }

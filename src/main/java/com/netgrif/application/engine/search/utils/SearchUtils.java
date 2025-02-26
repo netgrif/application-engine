@@ -41,6 +41,51 @@ public class SearchUtils {
             ComparisonType.OPTIONS, List.of(QueryLangParser.EQ, QueryLangParser.CONTAINS)
     );
 
+    public static final Map<String, String> processAttrToSortPropMapping = Map.of(
+            "id", "id",
+            "identifier", "identifier",
+            "version", "version",
+            "title", "title.defaultValue",
+            "creationdate", "creationDate"
+    );
+
+    public static final Map<String, String> caseAttrToSortPropMapping = Map.of(
+            "id", "id",
+            "processidentifier", "processIdentifier",
+            "processid", "petriNetObjectId",
+            "title", "title",
+            "creationdate", "creationDate",
+            "author", "author.id"
+    );
+
+    public static final Map<String, String> caseAttrToSortPropElasticMapping = Map.of(
+            "id", "stringId.keyword",
+            "processidentifier", "processIdentifier.keyword",
+            "processid", "processId.keyword",
+            "title", "title.keyword",
+            "creationdate", "creationDateSortable",
+            "author", "author.keyword"
+    );
+
+    public static final Map<String, String> taskAttrToSortPropMapping = Map.of(
+            "id", "id",
+            "transitionid", "transitionId",
+            "title", "title.defaultValue",
+            "state", "state",
+            "userid", "userId",
+            "caseid", "caseId",
+            "processid", "processId",
+            "lastassign", "lastAssigned",
+            "lastfinish", "lastFinished"
+    );
+
+    public static final Map<String, String> userAttrToSortPropMapping = Map.of(
+            "id", "id",
+            "name", "name",
+            "surname", "surname",
+            "email", "email"
+    );
+
     public static String toDateString(LocalDate localDate) {
         return localDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
     }

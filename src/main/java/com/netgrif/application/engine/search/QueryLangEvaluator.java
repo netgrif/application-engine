@@ -20,11 +20,13 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.bson.types.ObjectId;
 import org.bson.types.QObjectId;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.netgrif.application.engine.search.utils.SearchUtils.*;
@@ -45,6 +47,12 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     private Predicate fullMongoQuery;
     @Getter
     private String fullElasticQuery;
+    @Getter
+    private Pageable pageable;
+
+    private int pageNumber = 0;
+    private int pageSize = 20;
+    private final List<Sort.Order> sortOrders = new ArrayList<>();
 
     public void setElasticQuery(ParseTree node, String query) {
         elasticQuery.put(node, query);
@@ -136,6 +144,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         processBasicExpression(ctx.processConditions(), ctx);
         fullMongoQuery = getMongoQuery(ctx);
         fullElasticQuery = getElasticQuery(ctx);
+        pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
     }
 
     @Override
@@ -149,6 +158,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         processBasicExpression(ctx.caseConditions(), ctx);
         fullMongoQuery = getMongoQuery(ctx);
         fullElasticQuery = getElasticQuery(ctx);
+        pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
     }
 
     @Override
@@ -162,6 +172,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         processBasicExpression(ctx.taskConditions(), ctx);
         fullMongoQuery = getMongoQuery(ctx);
         fullElasticQuery = getElasticQuery(ctx);
+        pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
     }
 
     @Override
@@ -175,6 +186,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         processBasicExpression(ctx.userConditions(), ctx);
         fullMongoQuery = getMongoQuery(ctx);
         fullElasticQuery = getElasticQuery(ctx);
+        pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders));
     }
 
     @Override
@@ -642,7 +654,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         Token op = ctx.numberComparison().op;
         checkOp(ComparisonType.NUMBER, op);
         boolean not = ctx.numberComparison().NOT() != null;
-        String number = ctx.numberComparison().NUMBER().getText();
+        String number = ctx.numberComparison().number.getText();
 
         setMongoQuery(ctx, null);
         setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".numberValue", op, number, not));
@@ -707,7 +719,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         Token op = ctx.numberComparison().op;
         checkOp(ComparisonType.NUMBER, op);
         boolean not = ctx.numberComparison().NOT() != null;
-        String numberValue = ctx.numberComparison().NUMBER().getText();
+        String numberValue = ctx.numberComparison().number.getText();
 
         setMongoQuery(ctx, null);
         setElasticQuery(ctx, buildElasticQuery("places." + placeId + ".marking", op, numberValue, not));
@@ -738,5 +750,77 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         setMongoQuery(ctx, null);
         setElasticQuery(ctx, buildElasticQuery("tasks." + taskId + ".userId", op, string, not));
         this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitPaging(QueryLangParser.PagingContext ctx) {
+        pageNumber = Integer.parseInt(ctx.pageNum.getText());
+
+        if (ctx.pageSize != null) {
+            pageSize = Integer.parseInt(ctx.pageSize.getText());
+        }
+    }
+
+    @Override
+    public void exitCaseSorting(QueryLangParser.CaseSortingContext ctx) {
+        ctx.caseAttributeOrdering().forEach(attrOrd -> {
+            Sort.Direction dir = attrOrd.ordering != null ? Sort.Direction.fromString(attrOrd.ordering.getText()) : Sort.Direction.ASC;
+            String prop;
+            if (searchWithElastic) {
+                // todo NAE-1997: sorting by data value, options
+                if (attrOrd.caseAttribute().places() != null) {
+                    prop = "places." + attrOrd.caseAttribute().places().placeId.getText() + ".marking";
+                } else if (attrOrd.caseAttribute().tasksState() != null) {
+                    prop = "tasks." + attrOrd.caseAttribute().tasksState().taskId.getText() + ".state.keyword";
+                } else if (attrOrd.caseAttribute().tasksUserId() != null) {
+                    prop = "tasks." + attrOrd.caseAttribute().tasksUserId().taskId.getText() + ".userId.keyword";
+                } else {
+                    prop = caseAttrToSortPropElasticMapping.get(attrOrd.caseAttribute().getText().toLowerCase());
+                }
+            } else {
+                prop = caseAttrToSortPropMapping.get(attrOrd.caseAttribute().getText().toLowerCase());
+            }
+
+            if (prop == null) {
+                return;
+            }
+            sortOrders.add(new Sort.Order(dir, prop));
+        });
+    }
+
+    @Override
+    public void exitProcessSorting(QueryLangParser.ProcessSortingContext ctx) {
+        ctx.processAttributeOrdering().forEach(attrOrd -> {
+            Sort.Direction dir = attrOrd.ordering != null ? Sort.Direction.fromString(attrOrd.ordering.getText()) : Sort.Direction.ASC;
+            String prop = processAttrToSortPropMapping.get(attrOrd.processAttribute().getText().toLowerCase());
+            if (prop == null) {
+                return;
+            }
+            sortOrders.add(new Sort.Order(dir, prop));
+        });
+    }
+
+    @Override
+    public void exitTaskSorting(QueryLangParser.TaskSortingContext ctx) {
+        ctx.taskAttributeOrdering().forEach(attrOrd -> {
+            Sort.Direction dir = attrOrd.ordering != null ? Sort.Direction.fromString(attrOrd.ordering.getText()) : Sort.Direction.ASC;
+            String prop = taskAttrToSortPropMapping.get(attrOrd.taskAttribute().getText().toLowerCase());
+            if (prop == null) {
+                return;
+            }
+            sortOrders.add(new Sort.Order(dir, prop));
+        });
+    }
+
+    @Override
+    public void exitUserSorting(QueryLangParser.UserSortingContext ctx) {
+        ctx.userAttributeOrdering().forEach(attrOrd -> {
+            Sort.Direction dir = attrOrd.ordering != null ? Sort.Direction.fromString(attrOrd.ordering.getText()) : Sort.Direction.ASC;
+            String prop = userAttrToSortPropMapping.get(attrOrd.userAttribute().getText().toLowerCase());
+            if (prop == null) {
+                return;
+            }
+            sortOrders.add(new Sort.Order(dir, prop));
+        });
     }
 }

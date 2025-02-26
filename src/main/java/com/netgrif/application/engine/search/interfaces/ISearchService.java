@@ -6,4 +6,6 @@ public interface ISearchService {
     Object search(String query);
 
     Long count(String query);
+
+    boolean exists(String query);
 }
