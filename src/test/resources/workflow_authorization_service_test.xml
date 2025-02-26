@@ -1,74 +1,94 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>wst</id>
-    <initials>WST</initials>
+    <version>1.0.0</version>
     <title>WorkflowAuthorizationService test</title>
-    <roleRef>
-        <id>delete_pos_role</id>
-        <caseLogic>
-            <delete>true</delete>
-        </caseLogic>
-    </roleRef>
-    <roleRef>
-        <id>create_pos_role</id>
-        <caseLogic>
-            <create>true</create>
-        </caseLogic>
-    </roleRef>
-    <roleRef>
-        <id>delete_neg_role</id>
-        <caseLogic>
-            <delete>false</delete>
-        </caseLogic>
-    </roleRef>
+    <defaultRole>false</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">WST</property>
+    </properties>
     <roleRef>
         <id>create_neg_role</id>
-        <caseLogic>
+        <permission>
             <create>false</create>
-        </caseLogic>
+        </permission>
+    </roleRef>
+    <roleRef>
+        <id>create_pos_role</id>
+        <permission>
+            <create>true</create>
+        </permission>
+    </roleRef>
+    <roleRef>
+        <id>delete_neg_role</id>
+        <permission>
+            <delete>false</delete>
+        </permission>
+    </roleRef>
+    <roleRef>
+        <id>delete_pos_role</id>
+        <permission>
+            <delete>true</delete>
+        </permission>
     </roleRef>
     <role>
-        <id>delete_pos_role</id>
-        <name>delete role</name>
+        <id>create_neg_role</id>
+        <title>create role</title>
     </role>
     <role>
         <id>create_pos_role</id>
-        <name>create role</name>
+        <title>create role</title>
     </role>
     <role>
         <id>delete_neg_role</id>
-        <name>delete role</name>
+        <title>delete role</title>
     </role>
     <role>
-        <id>create_neg_role</id>
-        <name>create role</name>
+        <id>delete_pos_role</id>
+        <title>delete role</title>
     </role>
+    <data type="file">
+        <id>file</id>
+        <title>File</title>
+    </data>
     <data type="text">
         <id>text</id>
         <title>Text</title>
         <init>text</init>
     </data>
-    <data type="file">
-        <id>file</id>
-        <title>File</title>
-    </data>
     <transition>
-        <id>1</id>
+        <id>t1</id>
         <x>1</x>
         <y>1</y>
-        <label>Transition</label>
-        <dataRef>
-            <id>text</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>file</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
+        <title>Transition</title>
+        <flex>
+            <id>t1_flex</id>
+            <item>
+                <dataRef>
+                    <id>text</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>file</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
-</document>
+</process>

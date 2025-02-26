@@ -1,67 +1,74 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>wst_usersRef</id>
-    <initials>WSU</initials>
+    <version>1.0.0</version>
     <title>WorkflowAuthorizationService test</title>
+    <defaultRole>false</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">WSU</property>
+    </properties>
     <roleRef>
-        <id>delete_pos_role</id>
-        <caseLogic>
-            <delete>true</delete>
-        </caseLogic>
+        <id>create_neg_role</id>
+        <permission>
+            <create>false</create>
+        </permission>
     </roleRef>
     <roleRef>
         <id>create_pos_role</id>
-        <caseLogic>
+        <permission>
             <create>true</create>
-        </caseLogic>
+        </permission>
     </roleRef>
     <roleRef>
         <id>delete_neg_role</id>
-        <caseLogic>
+        <permission>
             <delete>false</delete>
-        </caseLogic>
+        </permission>
     </roleRef>
     <roleRef>
-        <id>create_neg_role</id>
-        <caseLogic>
-            <create>false</create>
-        </caseLogic>
+        <id>delete_pos_role</id>
+        <permission>
+            <delete>true</delete>
+        </permission>
     </roleRef>
     <userRef>
         <id>neg_user_list</id>
-        <caseLogic>
+        <permission>
             <delete>false</delete>
-        </caseLogic>
+        </permission>
     </userRef>
     <userRef>
         <id>pos_user_list</id>
-        <caseLogic>
+        <permission>
             <delete>true</delete>
-        </caseLogic>
+        </permission>
     </userRef>
     <role>
-        <id>delete_pos_role</id>
-        <name>delete role</name>
+        <id>create_neg_role</id>
+        <title>create role</title>
     </role>
     <role>
         <id>create_pos_role</id>
-        <name>create role</name>
+        <title>create role</title>
     </role>
     <role>
         <id>delete_neg_role</id>
-        <name>delete role</name>
+        <title>delete role</title>
     </role>
     <role>
-        <id>create_neg_role</id>
-        <name>create role</name>
+        <id>delete_pos_role</id>
+        <title>delete role</title>
     </role>
-    <data type="userList">
-        <id>pos_user_list</id>
-        <title/>
+    <data type="file">
+        <id>file</id>
+        <title>File</title>
     </data>
     <data type="userList">
         <id>neg_user_list</id>
+        <title/>
+    </data>
+    <data type="userList">
+        <id>pos_user_list</id>
         <title/>
     </data>
     <data type="text">
@@ -69,26 +76,39 @@
         <title>Text</title>
         <init>text</init>
     </data>
-    <data type="file">
-        <id>file</id>
-        <title>File</title>
-    </data>
     <transition>
-        <id>1</id>
+        <id>t1</id>
         <x>1</x>
         <y>1</y>
-        <label>Transition</label>
-        <dataRef>
-            <id>text</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>file</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
+        <title>Transition</title>
+        <flex>
+            <id>t1_flex</id>
+            <item>
+                <dataRef>
+                    <id>text</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>file</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
-</document>
+</process>

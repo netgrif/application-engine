@@ -1,37 +1,39 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>testing_model</id>
-    <initials>TSM</initials>
+    <version>1.0.0</version>
     <title>Testing Model</title>
     <defaultRole>false</defaultRole>
-    <transitionRole>false</transitionRole>
-    <!-- TRANSACTIONS -->
-    <!-- ROLES -->
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TSM</property>
+    </properties>
+    <userRef>
+        <id>user_list_1</id>
+        <permission>
+            <view>true</view>
+        </permission>
+    </userRef>
+    <processEvents/>
+    <caseEvents/>
     <role>
-        <id>tester</id>
-        <title>Testing Role</title>
+        <id>admin</id>
+        <title>Admin Role</title>
     </role>
     <role>
         <id>enabledTester</id>
         <title>Enabled Testing Role</title>
     </role>
     <role>
-        <id>admin</id>
-        <title>Admin Role</title>
+        <id>tester</id>
+        <title>Testing Role</title>
     </role>
-
-    <usersRef>
-        <id>user_list_1</id>
-        <caseLogic>
-            <view>true</view>
-        </caseLogic>
-    </usersRef>
-
-    <!-- PROCESS USER REFS -->
-    <!-- DATA -->
     <data type="button">
         <id>assign</id>
         <title>Assign to user ref</title>
+    </data>
+    <data type="text">
+        <id>email</id>
+        <title>Email</title>
     </data>
     <data type="button">
         <id>remove</id>
@@ -45,98 +47,107 @@
         <id>user_list_2</id>
         <title>User list 2</title>
     </data>
-    <data type="text">
-        <id>email</id>
-        <title>Email</title>
-    </data>
-    <!-- I18NS -->
-    <!-- TRANSITIONS -->
     <transition>
         <id>t1</id>
         <x>380</x>
         <y>260</y>
-        <layout>
-            <offset>0</offset>
-        </layout>
-        <label>Initialization</label>
+        <title>Initialization</title>
+        <flex>
+            <id>t1_flex</id>
+            <item>
+                <dataRef>
+                    <id>email</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>assign</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                    <event type="set">
+                        <id>assign</id>
+                        <actions phase="pre">
+                            <action id="action_0">
+								<![CDATA[
+                                change user_list_1 value { [userService.findByEmail(email.value, true).id] }
+                                ]]>
+							</action>
+                        </actions>
+                    </event>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>remove</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                    <event type="set">
+                        <id>remove</id>
+                        <actions phase="pre">
+                            <action id="action_1">
+								<![CDATA[
+                                change user_list_1 value { [] }
+                                ]]>
+							</action>
+                        </actions>
+                    </event>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
         <roleRef>
             <id>enabledTester</id>
-            <logic>
+            <permission>
+                <view>true</view>
                 <perform>true</perform>
-                <view>true</view>
-            </logic>
+            </permission>
         </roleRef>
-        <usersRef>
+        <roleRef>
             <id>user_list_1</id>
-            <logic>
+            <permission>
                 <view>true</view>
-            </logic>
-        </usersRef>
-        <dataRef>
-            <id>email</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>assign</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-            <event type="set">
-                <id>assign</id>
-                <actions phase="pre">
-                    <action>
-                        userList: f.user_list_1,
-                        email: f.email;
-                        change userList value { [userService.findByEmail(email.value, true).id] }
-                    </action>
-                </actions>
-            </event>
-        </dataRef>
-        <dataRef>
-            <id>remove</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-            <event type="set">
-                <id>remove</id>
-                <actions phase="pre">
-                    <action>
-                        userList: f.user_list_1;
-                        change userList value { [] }
-                    </action>
-                </actions>
-            </event>
-        </dataRef>
+            </permission>
+        </roleRef>
     </transition>
     <transition>
         <id>t2</id>
         <x>620</x>
         <y>260</y>
-        <layout>
-            <offset>0</offset>
-        </layout>
-        <label>Finishing</label>
+        <title>Finishing</title>
     </transition>
-    <!-- PLACES -->
     <place>
         <id>p1</id>
         <x>260</x>
         <y>260</y>
-        <label>#init</label>
+        <title>#init</title>
         <tokens>1</tokens>
-        <static>false</static>
     </place>
     <place>
         <id>p2</id>
         <x>500</x>
         <y>260</y>
-        <label>After initialization state</label>
+        <title>After initialization state</title>
         <tokens>0</tokens>
-        <static>false</static>
     </place>
-    <!-- ARCS -->
     <arc>
         <id>a1</id>
         <type>regular</type>
@@ -164,6 +175,9 @@
         <sourceId>t2</sourceId>
         <destinationId>p1</destinationId>
         <multiplicity>1</multiplicity>
-        <breakPoint><x>460</x><y>140</y></breakPoint>
+        <breakpoint>
+            <x>460</x>
+            <y>140</y>
+        </breakpoint>
     </arc>
-</document>
+</process>

@@ -10,10 +10,10 @@
     </properties>
     <roleRef>
         <id>users_1</id>
-        <caseLogic>
+        <permission>
             <create>false</create>
             <delete>true</delete>
-        </caseLogic>
+        </permission>
     </roleRef>
     <processEvents>
         <event type="upload">
@@ -65,9 +65,9 @@
         <title>Title</title>
         <roleRef>
             <id>users_1</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
 </process>
