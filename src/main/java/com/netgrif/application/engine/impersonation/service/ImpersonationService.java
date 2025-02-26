@@ -4,10 +4,9 @@ import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.authorization.domain.ProcessRole;
+import com.netgrif.application.engine.authorization.domain.Role;
 import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;
 import com.netgrif.application.engine.history.domain.impersonationevents.ImpersonationEndEventLog;
-import com.netgrif.application.engine.history.domain.impersonationevents.ImpersonationStartEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
 import com.netgrif.application.engine.impersonation.domain.repository.ImpersonatorRepository;
@@ -89,11 +88,12 @@ public class ImpersonationService implements IImpersonationService {
         securityContextService.saveToken(loggedUser.getId());
         securityContextService.reloadSecurityContext(loggedUser);
         log.info(loggedUser.getFullName() + " has just impersonated user " + impersonatedLogged.getFullName());
-        historyService.save(
-                new ImpersonationStartEventLog(loggedUser.getId(), impersonatedLogged.getId(),
-                        new ArrayList<>(impersonatedLogged.getRoles()),
-                        impersonatedLogged.getAuthorities().stream().map(au -> ((Authority) au).getStringId()).collect(Collectors.toList()))
-        );
+        // todo 2058
+//        historyService.save(
+//                new ImpersonationStartEventLog(loggedUser.getId(), impersonatedLogged.getId(),
+//                        new ArrayList<>(impersonatedLogged.getRoles()),
+//                        impersonatedLogged.getAuthorities().stream().map(au -> ((Authority) au).getStringId()).collect(Collectors.toList()))
+//        );
         return loggedUser;
     }
 
@@ -154,11 +154,11 @@ public class ImpersonationService implements IImpersonationService {
             return impersonated;
         }
         List<Authority> authorities = impersonationAuthorizationService.getAuthorities(configs, impersonated);
-        List<ProcessRole> processRoles = impersonationAuthorizationService.getRoles(configs, impersonated);
+        List<Role> roles = impersonationAuthorizationService.getRoles(configs, impersonated);
 
         impersonated.setAuthorities(new HashSet<>(authorities));
         // todo 2058
-//        impersonated.setRoles(new HashSet<>(processRoles));
+//        impersonated.setRoles(new HashSet<>(roles));
 
         return impersonated;
     }

@@ -1,8 +1,5 @@
 package com.netgrif.application.engine.auth.domain;
 
-import com.netgrif.application.engine.authorization.domain.RoleAssignment;
-import com.netgrif.application.engine.authorization.domain.ProcessRole;
-
 import java.util.Set;
 
 public interface IUser {
@@ -35,10 +32,6 @@ public interface IUser {
 
     void setAuthorities(Set<Authority> authorities);
 
-    Set<RoleAssignment> getRoleAssignments();
-
-    void setRoleAssignments(Set<RoleAssignment> roleAssignments);
-
     Set<String> getNextGroups();
 
     void setNextGroups(Set<String> nextGroups);
@@ -48,10 +41,6 @@ public interface IUser {
     void removeGroup(String groupId);
 
     void addAuthority(Authority authority);
-
-    void addRole(ProcessRole processRole);
-
-    void removeRole(ProcessRole processRole);
 
     LoggedUser transformToLoggedUser();
 

@@ -46,7 +46,7 @@ public class UserDetailsContextMapperImpl implements UserDetailsContextMapper {
         if (user == null) {
             LdapUserRef ldapUserOptional = ldapUserRefService.findById(dirContextOperations.getDn());
             if (ldapUserOptional == null) {
-                log.warn("Unknown user [" + username + "] tried to log in");
+                log.warn("Unknown user [{}] tried to log in", username);
                 return null;
             }
             user = ldapUserRefService.createUser(ldapUserOptional);
@@ -56,7 +56,8 @@ public class UserDetailsContextMapperImpl implements UserDetailsContextMapper {
         assert user != null;
         LoggedUser loggedUser = user.transformToLoggedUser();
         if (user instanceof LdapUser && (!((LdapUser) user).getMemberOf().isEmpty())) {
-                loggedUser.parseRoles(ldapGroupRefService.getRoleByLdapGroup(((LdapUser) user).getMemberOf()));
+            // todo 2058
+//                loggedUser.addRoleAssignments(ldapGroupRefService.getRoleByLdapGroup(((LdapUser) user).getMemberOf()));
             }
         return loggedUser;
     }

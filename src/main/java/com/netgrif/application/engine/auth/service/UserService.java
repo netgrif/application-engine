@@ -5,7 +5,10 @@ import com.netgrif.application.engine.auth.domain.repositories.AuthorityReposito
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
-import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.authorization.domain.Role;
+import com.netgrif.application.engine.authorization.domain.RoleAssignment;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.event.events.user.UserRegistrationEvent;
 import com.netgrif.application.engine.orgstructure.groups.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
@@ -32,7 +35,10 @@ public class UserService extends AbstractUserService {
     protected AuthorityRepository authorityRepository;
 
     @Autowired
-    protected IProcessRoleService roleService;
+    protected IRoleService roleService;
+
+    @Autowired
+    protected IRoleAssignmentService roleAssignmentService;
 
     @Autowired
     protected ApplicationEventPublisher publisher;
@@ -49,21 +55,16 @@ public class UserService extends AbstractUserService {
     @Autowired
     private IFilterImportExportService filterImportExportService;
 
-    // TODO: release/8.0.0 cleanup, remove boolean params
+    // TODO: release/8.0.0 cleanup
 
     @Override
     public IUser saveNewAndAuthenticate(IUser user) {
-        return saveNew(user, true);
+        return saveNew(user);
     }
 
     @Override
     public IUser saveNew(IUser user) {
-        return saveNew(user, false);
-    }
-
-    private IUser saveNew(IUser user, boolean ignored) {
         registrationService.encodeUserPassword((RegisteredUser) user);
-        addDefaultRole(user);
         addDefaultAuthorities(user);
 
         User savedUser = userRepository.save((User) user);
@@ -83,10 +84,13 @@ public class UserService extends AbstractUserService {
 
     @Override
     public AnonymousUser saveNewAnonymous(AnonymousUser user) {
-        addAnonymousRole(user);
         addAnonymousAuthorities(user);
+        user = userRepository.save(user);
 
-        return userRepository.save(user);
+        Role anonymousRole = roleService.findAnonymousRole();
+        roleService.assignRolesToUser(user.getStringId(), Set.of(anonymousRole.getStringId()));
+
+        return user;
     }
 
     @Override
@@ -106,14 +110,6 @@ public class UserService extends AbstractUserService {
         }
         dbUser = userRepository.save(dbUser);
         return dbUser;
-    }
-
-    public void addDefaultRole(User user) {
-        user.addRole(roleService.defaultRole());
-    }
-
-    public void addAnonymousRole(User user) {
-        user.addRole(roleService.anonymousRole());
     }
 
     public void addDefaultAuthorities(User user) {
@@ -235,16 +231,17 @@ public class UserService extends AbstractUserService {
         return predicate;
     }
 
+    /**
+     * todo javadoc
+     * */
     @Override
     public Page<IUser> findAllActiveByRoles(Set<String> roleIds, Pageable pageable) {
-        Page<User> users = userRepository.findDistinctByStateAndRoles_IdIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
+        List<RoleAssignment> assignments = roleAssignmentService.findAllByRoleIdIn(roleIds);
+        Set<ObjectId> userIds = assignments.stream()
+                .map(assignment -> new ObjectId(assignment.getUserId()))
+                .collect(Collectors.toSet());
+        Page<User> users = userRepository.findAllByIdIn(userIds, pageable);
         return changeType(users, pageable);
-    }
-
-    @Override
-    public List<IUser> findAllByRoles(Set<String> roleIds) {
-        List<User> users = userRepository.findAllByRoles_IdIn(new ArrayList<>(roleIds));
-        return changeType(users);
     }
 
     @Override
@@ -322,42 +319,13 @@ public class UserService extends AbstractUserService {
         return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-//    @Override
-//    public IUser addRole(IUser user, String roleStringId) {
-//        ProcessRole role = processRoleService.findById(roleStringId);
-//        user.addProcessRole(role);
-//        return userRepository.save(user);
-//    }
-//
-//    @Override
-//    public IUser removeRole(IUser user, String roleStringId) {
-//        ProcessRole role = processRoleService.findByImportId(roleStringId);
-//        user.removeProcessRole(role);
-//        return userRepository.save(user);
-//    }
-
     @Override
     public void deleteUser(IUser user) {
         User dbUser = (User) user;
         if (userRepository.findById(dbUser.getStringId()).isEmpty()) {
             throw new IllegalArgumentException("Could not find user with id [" + dbUser.getId() + "]");
         }
+        // todo 2058 delete role assignments
         userRepository.delete(dbUser);
-    }
-
-
-/*    private User loadProcessRoles(User user) {
-        if (user == null)
-            return null;
-        user.setProcessRoles(processRoleRepository.findAllById(user.getUserProcessRoles()
-                .stream().map(UserProcessRole::getRoleId).collect(Collectors.toList())));
-        return user;
-    }*/
-
-    private User loadGroups(User user) {
-        if (user == null)
-            return null;
-        user.setNextGroups(this.groupService.getAllGroupsOfUser(user));
-        return user;
     }
 }

@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CaseRoleAssignmentRepository extends MongoRepository<CaseRoleAssignment, String>, QuerydslPredicateExecutor<CaseRoleAssignment> {
+    Iterable<CaseRoleAssignment> removeAllByCaseId(String caseId);
 }

@@ -89,7 +89,7 @@
         <xs:sequence>
             <xs:element type="identifier" name="id"/>
             <xs:element type="i18nStringType" name="title"/>
-            <xs:element type="event" name="event" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="roleEvent" name="event" maxOccurs="unbounded" minOccurs="0"/>
             <xs:element type="properties" name="properties" minOccurs="0">
                 <xs:unique name="rolePropertyUniqueKey">
                     <xs:selector xpath="./property"/>
@@ -490,6 +490,16 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:complexType name="roleEvent">
+        <xs:complexContent>
+            <xs:extension base="baseEvent">
+                <xs:sequence>
+                    <xs:element type="i18nStringType" name="title" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute name="type" use="required" type="roleEventType"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:simpleType name="eventType">
         <xs:restriction base="xs:string">
             <xs:enumeration value="assign"/>
@@ -518,6 +528,12 @@
             <xs:enumeration value="delete"/>
             <xs:enumeration value="activate"/>
             <xs:enumeration value="deactivate"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="roleEventType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="assign"/>
+            <xs:enumeration value="remove"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="eventPhaseType">

@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.auth.domain.User;
 import com.netgrif.application.engine.auth.domain.UserState;
@@ -9,7 +8,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IRegistrationServi
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
-import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +42,7 @@ public class RegistrationService implements IRegistrationService {
     private INextGroupService groupService;
 
     @Autowired
-    private IProcessRoleService roleService;
+    private IRoleService roleService;
 
     @Autowired
     private ServerAuthProperties serverAuthProperties;
@@ -120,10 +119,10 @@ public class RegistrationService implements IRegistrationService {
             if (user.isActive()) {
                 return null;
             }
-            log.info("Renewing old user [" + newUser.email + "]");
+            log.info("Renewing old user [{}]", newUser.email);
         } else {
             user = new User(newUser.email, null, User.UNKNOWN, User.UNKNOWN);
-            log.info("Creating new user [" + newUser.email + "]");
+            log.info("Creating new user [{}]", newUser.email);
         }
         user.setToken(generateTokenKey());
         user.setPassword("");
@@ -131,16 +130,15 @@ public class RegistrationService implements IRegistrationService {
         user.setState(UserState.INVITED);
         userService.addDefaultAuthorities(user);
 
+        user = userRepository.save(user);
         if (newUser.roles != null && !newUser.roles.isEmpty()) {
-            // todo 2058
-//            user.setRoles(new HashSet<>(roleService.findByIds(newUser.roles)));
+            roleService.assignRolesToUser(user.getStringId(), newUser.roles);
         }
         userService.addDefaultRole(user);
-        user = userRepository.save(user);
 
         if (newUser.groups != null && !newUser.groups.isEmpty()) {
             for (String group : newUser.groups) {
-                groupService.addUser((IUser) user, group);
+                groupService.addUser(user, group);
             }
         }
 

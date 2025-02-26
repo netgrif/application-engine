@@ -2,7 +2,7 @@ package com.netgrif.application.engine.auth.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.netgrif.application.engine.authorization.domain.ProcessRole;
+import com.netgrif.application.engine.authorization.domain.RoleAssignment;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -29,7 +29,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
     protected Set<String> groups;
 
     @Setter
-    protected Set<String> roles;
+    protected Set<String> roleAssignments;
 
     @Setter
     protected boolean anonymous;
@@ -39,12 +39,15 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
     public LoggedUser(String id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
         this.id = id;
-        this.roles = new HashSet<>();
+        this.roleAssignments = new HashSet<>();
         this.groups = new HashSet<>();
     }
 
-    public void parseRoles(Set<ProcessRole> processRoles) {
-        processRoles.forEach(role -> this.roles.add(role.getStringId()));
+    public void addRoleAssignments(Set<RoleAssignment> roleAssignments) {
+        Set<String> roleAssignmentIds = roleAssignments.stream()
+                .map(RoleAssignment::getStringId)
+                .collect(Collectors.toSet());
+        this.roleAssignments.addAll(roleAssignmentIds);
     }
 
     public boolean isAdmin() {
@@ -118,7 +121,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
                 "id=" + id +
                 ", fullName='" + fullName + '\'' +
                 ", groups=" + groups +
-                ", roles=" + roles +
+                ", rolesAssignments=" + roleAssignments +
                 ", impersonated=" + impersonated +
                 '}';
     }

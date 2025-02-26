@@ -78,14 +78,14 @@ class ProcessRoleServiceTest {
         ProcessRole processRole = roleService.defaultRole();
         assertNotNull(processRole);
         assertEquals(ProcessRole.DEFAULT_ROLE, processRole.getImportId());
-        assertEquals(ProcessRole.DEFAULT_ROLE, processRole.getTitle().getDefaultValue());
+        assertEquals(ProcessRole.DEFAULT_ROLE, processRole.getTitleAsString().getDefaultValue());
     }
 
     @Test
     void shouldGetAnonymousRole() {
         ProcessRole processRole = roleService.anonymousRole();
         assertNotNull(processRole);
-        assertEquals(ProcessRole.ANONYMOUS_ROLE, processRole.getTitle().getDefaultValue());
+        assertEquals(ProcessRole.ANONYMOUS_ROLE, processRole.getTitleAsString().getDefaultValue());
         assertEquals(ProcessRole.ANONYMOUS_ROLE, processRole.getImportId());
     }
 

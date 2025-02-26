@@ -45,8 +45,6 @@ public interface IUserService {
 
     void addDefaultRole(IUser user);
 
-    List<IUser> findAllByRoles(Set<String> roleIds);
-
     void addDefaultAuthorities(IUser user);
 
     IUser assignAuthority(String userId, String authorityId);
@@ -61,13 +59,7 @@ public interface IUserService {
 
     LoggedUser getLoggedUserFromContext();
 
-    IUser addRole(IUser user, String roleStringId);
-
     Page<IUser> searchAllCoMembers(String query, LoggedUser principal, Pageable pageable);
-
-    IUser removeRole(IUser user, String roleStringId);
-
-    void removeRoleOfDeletedPetriNet(Process net);
 
     void deleteUser(IUser user);
 

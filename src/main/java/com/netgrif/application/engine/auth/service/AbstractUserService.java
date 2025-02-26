@@ -4,11 +4,9 @@ import com.netgrif.application.engine.auth.domain.*;
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.authorization.domain.ProcessRole;
-import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.authorization.domain.Role;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.petrinet.domain.Process;
-import com.netgrif.application.engine.security.service.ISecurityContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -17,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.netgrif.application.engine.startup.SystemUserRunner.*;
@@ -27,8 +26,7 @@ public abstract class AbstractUserService implements IUserService {
     protected IAuthorityService authorityService;
 
     @Autowired
-    protected IProcessRoleService roleService;
-
+    protected IRoleService roleService;
 
     @Autowired
     protected INextGroupService groupService;
@@ -36,12 +34,13 @@ public abstract class AbstractUserService implements IUserService {
     @Autowired
     protected UserRepository repository;
 
-    @Autowired
-    private ISecurityContextService securityContextService;
-
+    /**
+     * todo javadoc
+     * */
     @Override
     public void addDefaultRole(IUser user) {
-        user.addRole(roleService.defaultRole());
+        Role defaultRole = roleService.findDefaultRole();
+        roleService.assignRolesToUser(user.getStringId(), Set.of(defaultRole.getStringId()));
     }
 
     @Override
@@ -69,43 +68,6 @@ public abstract class AbstractUserService implements IUserService {
             getLoggedUser().transformToLoggedUser();
         }
         return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
-
-    @Override
-    public IUser addRole(IUser user, String roleStringId) {
-        ProcessRole processRole = roleService.findById(roleStringId);
-        user.addRole(processRole);
-        securityContextService.saveToken(user.getStringId());
-        securityContextService.reloadSecurityContext(user.transformToLoggedUser());
-        return save(user);
-    }
-
-    /**
-     * @param user
-     * @param roleStringId
-     * @return
-     * @deprecated use {@link AbstractUserService#removeRole(IUser, ProcessRole)} instead
-     */
-    @Override
-    @Deprecated(since = "6.2.0")
-    public IUser removeRole(IUser user, String roleStringId) {
-        return removeRole(user, roleService.findByImportId(roleStringId));
-    }
-
-    protected IUser removeRole(IUser user, ProcessRole processRole) {
-        user.removeRole(processRole);
-        securityContextService.saveToken(user.getStringId());
-        securityContextService.reloadSecurityContext(user.transformToLoggedUser());
-        return save(user);
-    }
-
-    @Override
-    public void removeRoleOfDeletedPetriNet(Process net) {
-        // TODO: release/8.0.0 delete
-//        List<IUser> users = findAllByProcessRoles(net.getRoles().keySet());
-//        users.forEach(u -> {
-//            net.getRoles().forEach((k, role) -> removeRole(u, role));
-//        });
     }
 
     @Override

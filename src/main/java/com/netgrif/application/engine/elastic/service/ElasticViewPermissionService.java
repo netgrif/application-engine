@@ -41,9 +41,10 @@ public abstract class ElasticViewPermissionService {
     private BoolQueryBuilder buildPositiveViewRoleQuery(BoolQueryBuilder viewPermNotExists, LoggedUser user) {
         BoolQueryBuilder positiveViewRole = boolQuery();
         BoolQueryBuilder positiveViewRoleQuery = boolQuery();
-        for (String roleId : user.getRoles()) {
-            positiveViewRoleQuery.should(termQuery("viewRoles", roleId));
-        }
+        // todo 2058
+//        for (String roleId : user.getRoles()) {
+//            positiveViewRoleQuery.should(termQuery("viewRoles", roleId));
+//        }
         positiveViewRole.should(viewPermNotExists);
         positiveViewRole.should(positiveViewRoleQuery);
         return positiveViewRole;
@@ -52,9 +53,10 @@ public abstract class ElasticViewPermissionService {
     private BoolQueryBuilder buildNegativeViewRoleQuery(LoggedUser user) {
         BoolQueryBuilder negativeViewRole = boolQuery();
         BoolQueryBuilder negativeViewRoleQuery = boolQuery();
-        for (String roleId : user.getRoles()) {
-            negativeViewRoleQuery.should(termQuery("negativeViewRoles", roleId));
-        }
+        // todo 2058
+//        for (String roleId : user.getRoles()) {
+//            negativeViewRoleQuery.should(termQuery("negativeViewRoles", roleId));
+//        }
         negativeViewRole.mustNot(negativeViewRoleQuery);
         return negativeViewRole;
     }

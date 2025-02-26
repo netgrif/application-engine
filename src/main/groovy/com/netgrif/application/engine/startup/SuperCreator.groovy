@@ -3,15 +3,16 @@ package com.netgrif.application.engine.startup
 import com.netgrif.application.engine.auth.domain.*
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
-import com.netgrif.application.engine.authorization.domain.ProcessRole
-import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
+
+import java.util.stream.Collectors
 
 @Slf4j
 @ConditionalOnProperty(value = "admin.create-super", matchIfMissing = true)
@@ -29,7 +30,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     private INextGroupService groupService
 
     @Autowired
-    private IProcessRoleService roleService
+    private IRoleService roleService
 
     @Autowired
     private SuperAdminConfiguration configuration
@@ -58,9 +59,10 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
                 email: configuration.email,
                 password: configuration.password,
                 state: UserState.ACTIVE,
-                authorities: [adminAuthority, systemAuthority] as Set<Authority>,
-                // todo 2058
-                roles: roleService.findAll() as Set<ProcessRole>))
+                authorities: [adminAuthority, systemAuthority] as Set<Authority>))
+
+        Set<String> allRoleIds = roleService.findAll().stream().map { it.stringId }.collect(Collectors.toSet())
+        roleService.assignRolesToUser(this.superUser.stringId, allRoleIds)
         log.info("Super user created")
     }
 
@@ -78,9 +80,8 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     }
 
     void setAllRoles() {
-        // todo 2058
-//        superUser.setRoles(roleService.findAll() as Set<ProcessRole>)
-        superUser = userService.save(superUser) as IUser
+        Set<String> allRoleIds = roleService.findAll().stream().map { it.stringId }.collect(Collectors.toSet())
+        roleService.assignRolesToUser(this.superUser.stringId, allRoleIds)
     }
 
     void setAllAuthorities() {

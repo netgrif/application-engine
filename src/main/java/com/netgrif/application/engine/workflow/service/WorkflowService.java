@@ -21,7 +21,6 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.security.service.EncryptionService;
@@ -65,9 +64,6 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     protected IPetriNetService petriNetService;
-
-    @Autowired
-    protected IProcessRoleService processRoleService;
 
     @Autowired
     protected IRoleService roleService;
@@ -352,6 +348,7 @@ public class WorkflowService implements IWorkflowService {
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
         log.info("[{}]: User [{}] is deleting case {}", useCase.getStringId(), userService.getLoggedOrSystem().getStringId(), useCase.getTitle());
 
+        roleService.removeAllByCase(useCase.getStringId());
         taskService.deleteTasksByCase(useCase.getStringId());
         repository.delete(useCase);
 

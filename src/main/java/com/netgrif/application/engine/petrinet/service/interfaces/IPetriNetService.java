@@ -104,7 +104,7 @@ public interface IPetriNetService {
 
     List<Process> get(List<String> petriNetIds);
 
-    void deletePetriNet(String id, LoggedUser loggedUser);
+    void deletePetriNet(String id);
 
     void runActions(List<Action> actions, Process petriNet);
 
