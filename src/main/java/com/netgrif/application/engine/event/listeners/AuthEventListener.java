@@ -2,8 +2,8 @@ package com.netgrif.application.engine.event.listeners;
 
 import com.netgrif.application.engine.auth.service.interfaces.ILoginAttemptService;
 import com.netgrif.application.engine.event.dispatchers.AuthDispatcher;
-import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.netgrif.core.event.dispatchers.common.AbstractDispatcher;
+import com.netgrif.core.event.listeners.Listener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;

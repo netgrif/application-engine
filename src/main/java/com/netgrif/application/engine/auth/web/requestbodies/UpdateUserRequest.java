@@ -10,25 +10,19 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Set;
 
+@Setter
+@Getter
 public class UpdateUserRequest implements IUser, Serializable {
 
     @Serial
     private static final long serialVersionUID = 3681503301565489613L;
 
-    @Getter
-    @Setter
     public String telNumber;
 
-    @Getter
-    @Setter
     public String avatar;
 
-    @Getter
-    @Setter
     public String name;
 
-    @Getter
-    @Setter
     public String surname;
 
     public UpdateUserRequest() {
@@ -97,6 +91,11 @@ public class UpdateUserRequest implements IUser, Serializable {
     @Override
     public void setState(UserState userState) {
 
+    }
+
+    @Override
+    public LoggedUser transformToLoggedUser() {
+        return null;
     }
 
     @Override

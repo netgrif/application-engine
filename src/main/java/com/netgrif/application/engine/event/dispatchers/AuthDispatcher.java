@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.event.dispatchers;
 
-import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
+import com.netgrif.core.event.dispatchers.common.AbstractDispatcher;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;

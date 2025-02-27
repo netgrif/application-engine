@@ -9,11 +9,11 @@ import org.springframework.context.ApplicationEventPublisher;
 /**
  * Publisher for NAE Event system.
  * */
+@Setter
+@Getter
 @Slf4j
 public abstract class NaeEventPublisher {
 
-    @Getter
-    @Setter
     private ApplicationEventPublisher applicationEventPublisher;
 
     protected NaeEventPublisher() {

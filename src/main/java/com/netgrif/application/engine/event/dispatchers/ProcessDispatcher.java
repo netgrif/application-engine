@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.event.dispatchers;
 
-import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
+import com.netgrif.core.event.dispatchers.common.AbstractDispatcher;
 import com.netgrif.core.event.events.petrinet.ProcessDeleteEvent;
 import com.netgrif.core.event.events.petrinet.ProcessDeployEvent;
 import org.springframework.context.event.EventListener;
