@@ -1,14 +1,14 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action.delegate
 
-import com.netgrif.application.engine.auth.domain.IUser
+import com.netgrif.core.auth.domain.IUser
 
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action
+import com.netgrif.auth.service.UserService
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.context.RoleContext
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
+import com.netgrif.adapter.petrinet.service.ProcessRoleService
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -17,13 +17,13 @@ import org.springframework.stereotype.Component
 class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
 
     @Autowired
-    IUserService userService
+    UserService userService
 
     @Autowired
     IPetriNetService petriNetService
 
     @Autowired
-    IProcessRoleService processRoleService
+    ProcessRoleService processRoleService
 
     Action action
     ProcessRole processRole
@@ -89,6 +89,6 @@ class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
         ProcessRole role = processRoleService.findById(roleId)
 
         user.getProcessRoles().remove(role)
-        return userService.save(user)
+        return userService.saveUser(user, null)
     }
 }

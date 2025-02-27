@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.auth.web.responsebodies;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Locale;
@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class UserFactory implements IUserFactory {
 
     @Autowired
-    private IProcessRoleService processRoleService;
+    private ProcessRoleService processRoleService;
 
     @Autowired
     private IProcessRoleFactory processRoleFactory;

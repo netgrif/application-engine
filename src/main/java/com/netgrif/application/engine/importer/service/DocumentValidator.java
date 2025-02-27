@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.importer.service;
 
-import com.netgrif.application.engine.importer.model.Document;
+import com.netgrif.core.importer.model.Document;
 import com.netgrif.application.engine.importer.service.throwable.BeatingAttributesException;
 import org.springframework.stereotype.Component;
 

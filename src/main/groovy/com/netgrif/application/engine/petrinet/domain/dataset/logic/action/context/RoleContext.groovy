@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action.context
 
-import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
 
 class RoleContext<T> extends ActionContext {
 

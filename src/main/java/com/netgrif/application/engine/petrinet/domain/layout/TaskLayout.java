@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.layout;
 
-import com.netgrif.application.engine.importer.model.Transition;
+import com.netgrif.core.importer.model.Transition;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

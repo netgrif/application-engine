@@ -1,17 +1,17 @@
 package com.netgrif.application.engine.orgstructure.groups
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
-import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.startup.runner.GroupRunner
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.QCase
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.adapter.workflow.domain.QCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -46,10 +46,10 @@ class NextGroupServiceTest {
     void groupTest() {
         testHelper.truncateDbs()
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Dummy", lastName: "User", email: DUMMY_USER_MAIL, username: DUMMY_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
-        importHelper.createUser(new User(name: "Customer", surname: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Customer", lastName: "User", email: CUSTOMER_USER_MAIL, username: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
 
@@ -80,7 +80,7 @@ class NextGroupServiceTest {
     }
 
     Case createGroup() {
-        return nextGroupService.createGroup("CUSTOM_GROUP_1", userService.findByEmail(DUMMY_USER_MAIL, false)).getCase()
+        return nextGroupService.createGroup("CUSTOM_GROUP_1", userService.findUserByUsername(DUMMY_USER_MAIL, null).get()).getCase()
     }
 
     List<Case> findGroup() {
@@ -95,15 +95,15 @@ class NextGroupServiceTest {
     Case addUser() {
         QCase qCase = new QCase("case")
         Case group = nextGroupService.findByPredicate(qCase.title.eq("CUSTOM_GROUP_1")).get(0)
-        nextGroupService.addUser(userService.findByEmail(CUSTOMER_USER_MAIL, false), group)
-        nextGroupService.addUser(userService.findByEmail("engine@netgrif.com", false), group)
+        nextGroupService.addUser(userService.findUserByUsername(CUSTOMER_USER_MAIL, null).get(), group)
+        nextGroupService.addUser(userService.findUserByUsername("engine@netgrif.com", null).get(), group)
         return group
     }
 
     Case removeUser() {
         QCase qCase = new QCase("case")
         Case group = nextGroupService.findByPredicate(qCase.title.eq("CUSTOM_GROUP_1")).get(0)
-        nextGroupService.removeUser(userService.findByEmail(CUSTOMER_USER_MAIL, false), group)
+        nextGroupService.removeUser(userService.findUserByUsername(CUSTOMER_USER_MAIL, null).get(), group)
         return group
     }
 }

@@ -1,14 +1,14 @@
 package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
+import com.netgrif.auth.service.UserService
+import com.netgrif.core.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
@@ -47,7 +47,7 @@ class AssignRemoveTest {
     private CaseRepository caseRepository;
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     private static final String USER_EMAIL = "test@test.com"
 
@@ -58,7 +58,7 @@ class AssignRemoveTest {
         testHelper.truncateDbs();
         def user = userService.system;
 
-        auth = new UsernamePasswordAuthenticationToken(user.transformToLoggedUser(), user)
+        auth = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(user), user)
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
@@ -72,7 +72,7 @@ class AssignRemoveTest {
         def roleCount = userService.system.userProcessRoles.size()
 
         // create
-        Case caze = workflowService.createCase(net.stringId, 'TEST', '', userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+        Case caze = workflowService.createCase(net.stringId, 'TEST', '', userService.transformToLoggedUser(userService.getLoggedOrSystem())).getCase()
         assert userService.system.userProcessRoles.size() == roleCount + 4
 
         // delete

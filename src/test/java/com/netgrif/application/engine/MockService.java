@@ -1,8 +1,9 @@
 package com.netgrif.application.engine;
 
-import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
+import com.netgrif.adapter.auth.domain.LoggedUserImpl;
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.auth.service.AuthorityService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -15,10 +16,10 @@ import java.util.Collections;
 public class MockService {
 
     @Autowired
-    private IAuthorityService authorityService;
+    private AuthorityService authorityService;
 
     public LoggedUser mockLoggedUser() {
         Authority authorityUser = authorityService.getOrCreate(Authority.user);
-        return new LoggedUser(new ObjectId().toString(), "super@netgrif.com", "password", Collections.singleton(authorityUser));
+        return new LoggedUserImpl(new ObjectId().toString(), "super@netgrif.com", "password", Collections.singleton(authorityUser), Collections.emptySet());
     }
 }

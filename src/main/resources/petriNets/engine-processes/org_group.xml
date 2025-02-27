@@ -14,7 +14,7 @@
 	<!-- FUNCTIONS -->
 	<function scope="process" name="updateAvailableEntries">
 		{
-			com.netgrif.application.engine.workflow.domain.Case useCase ->
+			com.netgrif.core.workflow.domain.Case useCase ->
 
 			def cases = findCasesElastic(
 							"processIdentifier:\"preference_filter_item\" AND dataSet.parentId.textValue.keyword:\"$useCase.stringId\"" as String,

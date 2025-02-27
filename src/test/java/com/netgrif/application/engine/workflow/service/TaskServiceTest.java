@@ -1,24 +1,25 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.domain.User;
-import com.netgrif.application.engine.auth.domain.UserState;
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository;
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
+import com.netgrif.adapter.auth.domain.LoggedUserImpl;
+import com.netgrif.auth.service.UserService;
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.User;
+import com.netgrif.core.auth.domain.enums.UserState;
+import com.netgrif.auth.service.AuthorityService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
-import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.core.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.startup.runner.SystemUserRunner;
 import com.netgrif.application.engine.startup.runner.UriRunner;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Task;
+import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -61,10 +62,10 @@ public class TaskServiceTest {
     private MongoTemplate mongoTemplate;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
-    private IAuthorityService authorityService;
+    private AuthorityService authorityService;
 
     @Autowired
     private SystemUserRunner userRunner;
@@ -95,13 +96,13 @@ public class TaskServiceTest {
         PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet();
         LoggedUser loggedUser = mockLoggedUser();
         CreateCaseEventOutcome outcome = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);
-        User user = new User();
-        user.setName("name");
+        User user = new com.netgrif.adapter.auth.domain.User();
+        user.setFirstName("name");
         user.setPassword("password");
-        user.setSurname("surname");
+        user.setLastName("surname");
         user.setEmail("email@email.com");
         user.setState(UserState.ACTIVE);
-        user = userRepository.save(user);
+        user = (User) userService.saveUser(user, null);
 
         assert outcome.getCase().getConsumedTokens().size() == 0;
         assert outcome.getCase().getActivePlaces().size() == 1;
@@ -111,14 +112,14 @@ public class TaskServiceTest {
 
         assert task != null;
 
-        service.assignTask(user.transformToLoggedUser(), task.getStringId());
+        service.assignTask(userService.transformToLoggedUser(user), task.getStringId());
         Case useCase = caseRepository.findById(outcome.getCase().getStringId()).get();
 
         assert useCase.getConsumedTokens().size() == 1;
         assert useCase.getConsumedTokens().values().contains(5);
         assert useCase.getActivePlaces().size() == 0;
 
-        service.cancelTask(user.transformToLoggedUser(), task.getStringId());
+        service.cancelTask(userService.transformToLoggedUser(user), task.getStringId());
         useCase = caseRepository.findById(useCase.getStringId()).get();
 
         assert useCase.getConsumedTokens().size() == 0;
@@ -128,6 +129,6 @@ public class TaskServiceTest {
 
     public LoggedUser mockLoggedUser() {
         Authority authorityUser = authorityService.getOrCreate(Authority.user);
-        return new LoggedUser(new ObjectId().toString(), "super@netgrif.com", "password", Collections.singleton(authorityUser));
+        return new LoggedUserImpl(new ObjectId().toString(), "super@netgrif.com", "password", Collections.singleton(authorityUser), Collections.emptySet());
     }
 }

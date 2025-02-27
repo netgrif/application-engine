@@ -2,17 +2,14 @@ package com.netgrif.application.engine.elastic.service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netgrif.application.engine.configuration.ElasticsearchConfiguration;
 import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Setting;
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.document.Document;
@@ -24,9 +21,7 @@ import org.springframework.util.Assert;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -55,7 +50,6 @@ public class ElasticIndexService implements IElasticIndexService {
                 .withObject(source).build(), IndexCoordinates.of(indexName));
     }
 
-
 //    @Override
 //    public boolean bulkIndex(List<?> list, Class<?> clazz, String... placeholders) {
 //        String indexName = getIndexName(clazz, placeholders);
@@ -80,9 +74,9 @@ public class ElasticIndexService implements IElasticIndexService {
             if (!this.indexExists(indexName)) {
                 // https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html
                 HashMap<String, Object> settingMap = new HashMap<>();
-                applySettings(settingMap, clazz);
-                settingMap.put("number_of_shards", getShardsFromClass(clazz));
-                settingMap.put("number_of_replicas", getReplicasFromClass(clazz));
+//                applySettings(settingMap, clazz);
+//                settingMap.put("number_of_shards", getShardsFromClass(clazz));
+//                settingMap.put("number_of_replicas", getReplicasFromClass(clazz));
 
                 Map<String, Object> analysisSettings = prepareAnalysisSettings();
                 if (analysisSettings != null) {
@@ -175,6 +169,44 @@ public class ElasticIndexService implements IElasticIndexService {
         }
         return false;
     }
+
+//    @Override
+//    public boolean openIndex(Class<?> clazz, String... placeholders) {
+//        try {
+//            String indexName = getIndexName(clazz, placeholders);
+//            OpenIndexRequest request = new OpenIndexRequest(indexName);
+//            OpenIndexResponse execute = elasticsearchTemplate.execute(client -> client.indices().open(request, RequestOptions.DEFAULT));
+//            boolean acknowledged = execute.isAcknowledged();
+//            if (acknowledged) {
+//                log.info("Open index {} success", indexName);
+//            } else {
+//                log.info("Open index {} fail", indexName);
+//            }
+//            return acknowledged;
+//        } catch (Exception e) {
+//            log.error("DeleteIndex:", e);
+//            return false;
+//        }
+//    }
+//
+//    @Override
+//    public boolean closeIndex(Class<?> clazz, String... placeholders) {
+//        try {
+//            String indexName = getIndexName(clazz, placeholders);
+//            CloseIndexRequest request = new CloseIndexRequest(indexName);
+//            CloseIndexResponse execute = elasticsearchTemplate.execute(client -> client.indices().close(request, RequestOptions.DEFAULT));
+//            boolean acknowledged = execute.isAcknowledged();
+//            if (acknowledged) {
+//                log.info("Close index {} success", indexName);
+//            } else {
+//                log.info("Close index {} fail", indexName);
+//            }
+//            return acknowledged;
+//        } catch (Exception e) {
+//            log.error("deleteIndex:", e);
+//            return false;
+//        }
+//    }
 
 //    @Override
 //    public boolean openIndex(Class<?> clazz, String... placeholders) {
@@ -277,9 +309,18 @@ public class ElasticIndexService implements IElasticIndexService {
 //        try {
 //            return elasticsearchTemplate.searchScrollContinue(scrollId, 60000, clazz, IndexCoordinates.of(indexName));
 //        } catch (Exception e) {
-//            log.error("scrollFirst:", e);
+//            log.error("scroll:", e);
 //        }
 //        return null;
+//    }
+
+//    @Override
+//    public void clearScrollHits(List<String> scrollIds) {
+//        try {
+//            elasticsearchTemplate.searchScrollClear(scrollIds);
+//        } catch (Exception e) {
+//            log.error("clearScrollHits:", e);
+//        }
 //    }
 
     private String getIdFromSource(Object source) {

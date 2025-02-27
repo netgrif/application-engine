@@ -2,39 +2,35 @@ package com.netgrif.application.engine.petrinet.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.CacheProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
-import com.netgrif.application.engine.event.events.Event;
-import com.netgrif.application.engine.event.events.petrinet.ProcessDeleteEvent;
-import com.netgrif.application.engine.event.events.petrinet.ProcessDeployEvent;
-import com.netgrif.application.engine.history.service.IHistoryService;
+import com.netgrif.core.event.events.Event;
+import com.netgrif.core.event.events.petrinet.ProcessDeleteEvent;
+import com.netgrif.core.event.events.petrinet.ProcessDeployEvent;
 import com.netgrif.application.engine.importer.service.Importer;
-import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
-import com.netgrif.application.engine.petrinet.domain.Transition;
-import com.netgrif.application.engine.petrinet.domain.VersionType;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.PetriNetSearch;
+import com.netgrif.core.petrinet.domain.Transition;
+import com.netgrif.core.petrinet.domain.VersionType;
+import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
-import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
-import com.netgrif.application.engine.petrinet.domain.events.ProcessEventType;
+import com.netgrif.core.petrinet.domain.events.EventPhase;
+import com.netgrif.core.petrinet.domain.events.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
-import com.netgrif.application.engine.petrinet.domain.version.Version;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.core.petrinet.domain.throwable.MissingIconKeyException;
+import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.core.petrinet.domain.version.Version;
+import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.*;
-//import com.netgrif.application.engine.rules.domain.facts.NetImportedFact;
-//import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.core.petrinet.web.responsebodies.*;
+import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -75,7 +71,7 @@ import static com.netgrif.application.engine.petrinet.service.interfaces.IPetriN
 public class PetriNetService implements IPetriNetService {
 
     @Autowired
-    protected IProcessRoleService processRoleService;
+    protected ProcessRoleService processRoleService;
 
     @Autowired
     protected PetriNetRepository repository;
@@ -101,20 +97,20 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     protected FieldActionsRunner actionsRunner;
 
-    @Autowired(required = false)
-    protected ILdapGroupRefService ldapGroupService;
+//    @Autowired(required = false)
+//    protected ILdapGroupRefService ldapGroupService;
 
     @Autowired
     protected IFieldActionsCacheService functionCacheService;
 
     @Autowired
-    protected IUserService userService;
+    protected UserService userService;
 
     @Autowired
     protected IEventService eventService;
 
-    @Autowired
-    protected IHistoryService historyService;
+//    @Autowired
+//    protected IHistoryService historyService;
 
     @Autowired
     protected CacheManager cacheManager;
@@ -123,7 +119,7 @@ public class PetriNetService implements IPetriNetService {
     protected CacheProperties cacheProperties;
 
     @Resource
-    protected IPetriNetService self;
+    protected PetriNetService self;
 
     @Autowired
     protected IElasticPetriNetMappingService petriNetMappingService;
@@ -184,10 +180,6 @@ public class PetriNetService implements IPetriNetService {
         return self.get(petriNetIds.stream().map(ObjectId::new).collect(Collectors.toList()));
     }
 
-    @Override
-    public PetriNet clone(ObjectId petriNetId) {
-        return self.get(petriNetId).clone();
-    }
 
     @Override
     @Deprecated
@@ -241,12 +233,10 @@ public class PetriNetService implements IPetriNetService {
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully and saved in a folder: " + savedPath.toString());
 
         outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty(), params));
-//        evaluateRules(net, EventPhase.PRE);
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.PRE));
         save(net);
         outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty(), params));
         publisher.publishEvent(new ProcessDeployEvent(outcome, EventPhase.POST));
-        addMessageToOutcome(net, ProcessEventType.UPLOAD, outcome);
         outcome.setNet(imported.get());
         return outcome;
     }
@@ -362,11 +352,6 @@ public class PetriNetService implements IPetriNetService {
         useCase.getPetriNet().getArcs().forEach((key, arcs) -> {
             arcs.forEach(arc -> pn.getArcs().add(new ArcImportReference(arc)));
         });
-        //TODO: HistoryService is obsolete
-//        pn.getAssignedTasks().addAll(historyService.findAllAssignTaskEventLogsByCaseId(caseId)
-//                .stream().map(TaskEventLog::getTransitionId).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
-//        pn.getFinishedTasks().addAll(historyService.findAllFinishTaskEventLogsByCaseId(caseId)
-//                .stream().map(TaskEventLog::getTransitionId).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
         return pn;
     }
 
@@ -540,23 +525,14 @@ public class PetriNetService implements IPetriNetService {
         PetriNet petriNet = petriNetOptional.get();
         log.info("[" + processId + "]: Initiating deletion of Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
 
-        this.userService.removeRoleOfDeletedPetriNet(petriNet);
-        this.workflowService.deleteInstancesOfPetriNet(petriNet);
-        this.processRoleService.deleteRolesOfNet(petriNet, loggedUser);
-        try {
-            ldapGroupService.deleteProcessRoleByPetrinet(petriNet.getStringId());
-        } catch (NullPointerException e) {
-            log.info("LdapGroup and ProcessRole mapping are not activated...");
-        } catch (Exception ex) {
-            log.error("LdapGroup", ex);
-        }
-
+        userService.removeRoleOfDeletedPetriNet(petriNet, null);
+        workflowService.deleteInstancesOfPetriNet(petriNet);
+        processRoleService.deleteRolesOfNet(petriNet, loggedUser);
 
         log.info("[" + processId + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
-        this.repository.deleteBy_id(petriNet.getObjectId());
-        this.evictCache(petriNet);
-        // net functions must be removed from cache after it was deleted from repository
-        this.functionCacheService.reloadCachedFunctions(petriNet);
+        repository.deleteBy_id(petriNet.getObjectId());
+        evictCache(petriNet);
+        functionCacheService.reloadCachedFunctions(petriNet);
         publisher.publishEvent(new ProcessDeleteEvent(petriNet, EventPhase.POST));
     }
 

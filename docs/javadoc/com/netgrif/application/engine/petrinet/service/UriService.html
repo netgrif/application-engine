@@ -221,7 +221,7 @@ implements <a href="interfaces/IUriService.html" title="interface in com.netgrif
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code><a href="../domain/UriNode.html" title="class in com.netgrif.application.engine.petrinet.domain">UriNode</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getOrCreate(com.netgrif.application.engine.petrinet.domain.PetriNet,com.netgrif.application.engine.petrinet.domain.UriContentType)">getOrCreate</a></span>&#8203;(<a href="../domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;petriNet,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getOrCreate(com.netgrif.core.petrinet.domain.PetriNet,com.netgrif.core.petrinet.domain.UriContentType)">getOrCreate</a></span>&#8203;(<a href="../domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;petriNet,
            <a href="../domain/UriContentType.html" title="enum in com.netgrif.application.engine.petrinet.domain">UriContentType</a>&nbsp;contentType)</code></th>
 <td class="colLast">
 <div class="block">Creates new UriNode from PetriNet identifier, or retrieves existing one</div>
@@ -229,7 +229,7 @@ implements <a href="interfaces/IUriService.html" title="interface in com.netgrif
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../domain/UriNode.html" title="class in com.netgrif.application.engine.petrinet.domain">UriNode</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getOrCreate(java.lang.String,com.netgrif.application.engine.petrinet.domain.UriContentType)">getOrCreate</a></span>&#8203;(java.lang.String&nbsp;uri,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getOrCreate(java.lang.String,com.netgrif.core.petrinet.domain.UriContentType)">getOrCreate</a></span>&#8203;(java.lang.String&nbsp;uri,
            <a href="../domain/UriContentType.html" title="enum in com.netgrif.application.engine.petrinet.domain">UriContentType</a>&nbsp;contentType)</code></th>
 <td class="colLast">
 <div class="block">Creates new UriNode from URI path, or retrieves existing one</div>
@@ -244,7 +244,7 @@ implements <a href="interfaces/IUriService.html" title="interface in com.netgrif
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="../domain/UriNode.html" title="class in com.netgrif.application.engine.petrinet.domain">UriNode</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#move(com.netgrif.application.engine.petrinet.domain.UriNode,java.lang.String)">move</a></span>&#8203;(<a href="../domain/UriNode.html" title="class in com.netgrif.application.engine.petrinet.domain">UriNode</a>&nbsp;node,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#move(com.netgrif.core.petrinet.domain.UriNode,java.lang.String)">move</a></span>&#8203;(<a href="../domain/UriNode.html" title="class in com.netgrif.application.engine.petrinet.domain">UriNode</a>&nbsp;node,
     java.lang.String&nbsp;destUri)</code></th>
 <td class="colLast">
 <div class="block">Moves UriNode to other destination</div>
@@ -260,14 +260,14 @@ implements <a href="interfaces/IUriService.html" title="interface in com.netgrif
 </tr>
 <tr id="i10" class="altColor">
 <td class="colFirst"><code><a href="../domain/UriNode.html" title="class in com.netgrif.application.engine.petrinet.domain">UriNode</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#populateDirectRelatives(com.netgrif.application.engine.petrinet.domain.UriNode)">populateDirectRelatives</a></span>&#8203;(<a href="../domain/UriNode.html" title="class in com.netgrif.application.engine.petrinet.domain">UriNode</a>&nbsp;uriNode)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#populateDirectRelatives(com.netgrif.core.petrinet.domain.UriNode)">populateDirectRelatives</a></span>&#8203;(<a href="../domain/UriNode.html" title="class in com.netgrif.application.engine.petrinet.domain">UriNode</a>&nbsp;uriNode)</code></th>
 <td class="colLast">
 <div class="block">Collects direct relatives (parent and children) of input UriNode and returns filled object</div>
 </td>
 </tr>
 <tr id="i11" class="rowColor">
 <td class="colFirst"><code><a href="../domain/UriNode.html" title="class in com.netgrif.application.engine.petrinet.domain">UriNode</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#save(com.netgrif.application.engine.petrinet.domain.UriNode)">save</a></span>&#8203;(<a href="../domain/UriNode.html" title="class in com.netgrif.application.engine.petrinet.domain">UriNode</a>&nbsp;uriNode)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#save(com.netgrif.core.petrinet.domain.UriNode)">save</a></span>&#8203;(<a href="../domain/UriNode.html" title="class in com.netgrif.application.engine.petrinet.domain">UriNode</a>&nbsp;uriNode)</code></th>
 <td class="colLast">
 <div class="block">Saves UriNode object to database</div>
 </td>
@@ -316,7 +316,7 @@ implements <a href="interfaces/IUriService.html" title="interface in com.netgrif
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="save(com.netgrif.application.engine.petrinet.domain.UriNode)">
+<a id="save(com.netgrif.core.petrinet.domain.UriNode)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -326,7 +326,7 @@ implements <a href="interfaces/IUriService.html" title="interface in com.netgrif
 <div class="block">Saves UriNode object to database</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IUriService.html#save(com.netgrif.application.engine.petrinet.domain.UriNode)">save</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IUriService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IUriService</a></code></dd>
+<dd><code><a href="interfaces/IUriService.html#save(com.netgrif.core.petrinet.domain.UriNode)">save</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IUriService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IUriService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>uriNode</code> - to be saved</dd>
 </dl>
@@ -420,7 +420,7 @@ implements <a href="interfaces/IUriService.html" title="interface in com.netgrif
 </dl>
 </li>
 </ul>
-<a id="populateDirectRelatives(com.netgrif.application.engine.petrinet.domain.UriNode)">
+<a id="populateDirectRelatives(com.netgrif.core.petrinet.domain.UriNode)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -430,7 +430,7 @@ implements <a href="interfaces/IUriService.html" title="interface in com.netgrif
 <div class="block">Collects direct relatives (parent and children) of input UriNode and returns filled object</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IUriService.html#populateDirectRelatives(com.netgrif.application.engine.petrinet.domain.UriNode)">populateDirectRelatives</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IUriService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IUriService</a></code></dd>
+<dd><code><a href="interfaces/IUriService.html#populateDirectRelatives(com.netgrif.core.petrinet.domain.UriNode)">populateDirectRelatives</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IUriService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IUriService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>uriNode</code> - to be filled with relatives</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -458,7 +458,7 @@ implements <a href="interfaces/IUriService.html" title="interface in com.netgrif
 </dl>
 </li>
 </ul>
-<a id="move(com.netgrif.application.engine.petrinet.domain.UriNode,java.lang.String)">
+<a id="move(com.netgrif.core.petrinet.domain.UriNode,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -469,7 +469,7 @@ implements <a href="interfaces/IUriService.html" title="interface in com.netgrif
 <div class="block">Moves UriNode to other destination</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IUriService.html#move(com.netgrif.application.engine.petrinet.domain.UriNode,java.lang.String)">move</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IUriService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IUriService</a></code></dd>
+<dd><code><a href="interfaces/IUriService.html#move(com.netgrif.core.petrinet.domain.UriNode,java.lang.String)">move</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IUriService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IUriService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>node</code> - to be moved</dd>
 <dd><code>destUri</code> - the destination URI</dd>
@@ -478,7 +478,7 @@ implements <a href="interfaces/IUriService.html" title="interface in com.netgrif
 </dl>
 </li>
 </ul>
-<a id="getOrCreate(com.netgrif.application.engine.petrinet.domain.PetriNet,com.netgrif.application.engine.petrinet.domain.UriContentType)">
+<a id="getOrCreate(com.netgrif.core.petrinet.domain.PetriNet,com.netgrif.core.petrinet.domain.UriContentType)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -489,7 +489,7 @@ implements <a href="interfaces/IUriService.html" title="interface in com.netgrif
 <div class="block">Creates new UriNode from PetriNet identifier, or retrieves existing one</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IUriService.html#getOrCreate(com.netgrif.application.engine.petrinet.domain.PetriNet,com.netgrif.application.engine.petrinet.domain.UriContentType)">getOrCreate</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IUriService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IUriService</a></code></dd>
+<dd><code><a href="interfaces/IUriService.html#getOrCreate(com.netgrif.core.petrinet.domain.PetriNet,com.netgrif.core.petrinet.domain.UriContentType)">getOrCreate</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IUriService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IUriService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>petriNet</code> - to be used for creating UriNode</dd>
 <dd><code>contentType</code> - to decide the content type of UriNode</dd>
@@ -498,7 +498,7 @@ implements <a href="interfaces/IUriService.html" title="interface in com.netgrif
 </dl>
 </li>
 </ul>
-<a id="getOrCreate(java.lang.String,com.netgrif.application.engine.petrinet.domain.UriContentType)">
+<a id="getOrCreate(java.lang.String,com.netgrif.core.petrinet.domain.UriContentType)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -509,7 +509,7 @@ implements <a href="interfaces/IUriService.html" title="interface in com.netgrif
 <div class="block">Creates new UriNode from URI path, or retrieves existing one</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IUriService.html#getOrCreate(java.lang.String,com.netgrif.application.engine.petrinet.domain.UriContentType)">getOrCreate</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IUriService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IUriService</a></code></dd>
+<dd><code><a href="interfaces/IUriService.html#getOrCreate(java.lang.String,com.netgrif.core.petrinet.domain.UriContentType)">getOrCreate</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IUriService.html" title="interface in com.netgrif.application.engine.petrinet.service.interfaces">IUriService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>uri</code> - to be used for creating UriNode</dd>
 <dd><code>contentType</code> - to decide the content type of UriNode</dd>

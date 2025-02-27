@@ -2038,7 +2038,7 @@
             change number validations { "odd" }
             } else {
             change number validations { new
-            com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation('''inrange
+            com.netgrif.core.petrinet.domain.dataset.logic.validation.Validation('''inrange
             ${min.value as Integer},${max.value as Integer}''', true) }
             }
         </action>
@@ -2056,7 +2056,7 @@
             change text validations { "email" }
             } else {
             change text validations { new
-            com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation('''log.info("running");maxLength
+            com.netgrif.core.petrinet.domain.dataset.logic.validation.Validation('''log.info("running");maxLength
             ${max.value as Integer}''', true) }
             }
         </action>

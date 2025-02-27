@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserResourceHelperService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.responsebodies.IUserFactory;
 import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
@@ -21,7 +21,7 @@ public class UserResourceHelperService implements IUserResourceHelperService {
     public static final Logger log = LoggerFactory.getLogger(UserResourceHelperService.class);
 
     @Autowired
-    private IUserService userService;
+    private UserService userService;
 
     @Autowired
     private IUserFactory userFactory;
@@ -31,11 +31,11 @@ public class UserResourceHelperService implements IUserResourceHelperService {
 
     @Override
     public UserResource getResource(LoggedUser loggedUser, Locale locale, boolean small) {
-        IUser user = userService.findById(loggedUser.getId(), small);
+        IUser user = userService.findById(loggedUser.getId(), null);
         User result = loggedUser.isImpersonating() ?
                 getLocalisedUser(user, getImpersonated(loggedUser, small), locale) :
                 getLocalisedUser(user, locale);
-        return new UserResource(result, "profile");
+        return new UserResource(result);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class UserResourceHelperService implements IUserResourceHelperService {
     }
 
     protected IUser getImpersonated(LoggedUser loggedUser, boolean small) {
-        IUser impersonated = userService.findById(loggedUser.getImpersonated().getId(), small);
+        IUser impersonated = userService.findById(loggedUser.getImpersonated().getId(), null);
         return impersonationService.reloadImpersonatedUserRoles(impersonated, loggedUser.getId());
     }
 }

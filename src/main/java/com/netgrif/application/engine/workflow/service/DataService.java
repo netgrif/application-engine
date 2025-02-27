@@ -7,37 +7,39 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.event.events.data.GetDataEvent;
-import com.netgrif.application.engine.event.events.data.SetDataEvent;
+import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.auth.service.UserService;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.files.StorageResolverService;
 import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.files.throwable.StorageException;
+import com.netgrif.core.event.events.data.GetDataEvent;
+import com.netgrif.core.event.events.data.SetDataEvent;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.FieldFactory;
-import com.netgrif.application.engine.petrinet.domain.Component;
-import com.netgrif.application.engine.petrinet.domain.*;
-import com.netgrif.application.engine.petrinet.domain.dataset.*;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.core.petrinet.domain.Component;
+import com.netgrif.core.petrinet.domain.*;
+import com.netgrif.core.petrinet.domain.dataset.*;
+import com.netgrif.core.petrinet.domain.dataset.logic.ChangedField;
+import com.netgrif.core.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
-import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
-import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
-import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
+import com.netgrif.core.petrinet.domain.events.DataEvent;
+import com.netgrif.core.petrinet.domain.events.DataEventType;
+import com.netgrif.core.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
-import com.netgrif.application.engine.workflow.domain.*;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
+import com.netgrif.core.workflow.domain.*;
+import com.netgrif.core.workflow.domain.eventoutcomes.EventOutcome;
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import com.netgrif.application.engine.workflow.web.responsebodies.DataFieldsResource;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField;
+import com.netgrif.core.workflow.web.responsebodies.DataFieldsResource;
+import com.netgrif.core.workflow.web.responsebodies.LocalisedField;
 import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -78,7 +80,7 @@ public class DataService implements IDataService {
     protected IWorkflowService workflowService;
 
     @Autowired
-    protected IUserService userService;
+    protected UserService userService;
 
     @Autowired
     protected FieldFactory fieldFactory;
@@ -132,9 +134,9 @@ public class DataService implements IDataService {
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
         Set<String> fieldsIds = transition.getDataSet().keySet();
-        List<Field> dataSetFields = new ArrayList<>();
+        List<Field<?>> dataSetFields = new ArrayList<>();
         if (task.getUserId() != null) {
-            task.setUser(userService.findById(task.getUserId(), false));
+            task.setUser(userService.findById(task.getUserId(), null));
         }
         GetDataEventOutcome outcome = new GetDataEventOutcome(useCase, task);
         fieldsIds.forEach(fieldId -> {
@@ -226,7 +228,7 @@ public class DataService implements IDataService {
         log.info("[" + useCase.getStringId() + "]: Setting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
 
         if (task.getUserId() != null) {
-            task.setUser(userService.findById(task.getUserId(), false));
+            task.setUser(userService.findById(task.getUserId(), null));
         }
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
         values.fields().forEachRemaining(entry -> {
@@ -318,15 +320,15 @@ public class DataService implements IDataService {
         log.info("Getting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level);
         List<DataGroup> resultDataGroups = new ArrayList<>();
 
-        List<Field> data = getData(task, useCase).getData();
+        List<Field<?>> data = getData(task, useCase).getData();
         Map<String, Field> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
-        List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::clone).collect(Collectors.toList());
+        List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::new).toList();
         for (DataGroup dataGroup : dataGroups) {
             resolveTaskRefOrderOnGrid(dataGroup, dataFieldMap);
             resultDataGroups.add(dataGroup);
             log.debug("Setting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level + " " + dataGroup.getImportId());
 
-            List<Field> resources = new LinkedList<>();
+            List<Field<?>> resources = new LinkedList<>();
             for (String dataFieldId : dataGroup.getData()) {
                 Field field = net.getDataSet().get(dataFieldId);
                 if (dataFieldMap.containsKey(dataFieldId)) {
@@ -740,16 +742,16 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public List<Field> getImmediateFields(Task task) {
+    public List<Field<?>> getImmediateFields(Task task) {
         Case useCase = workflowService.findOne(task.getCaseId());
-        List<Field> fields = task.getImmediateDataFields().stream().map(id -> fieldFactory.buildFieldWithoutValidation(useCase, id, task.getTransitionId())).collect(Collectors.toList());
+        List<Field<?>> fields = task.getImmediateDataFields().stream().map(id -> fieldFactory.buildFieldWithoutValidation(useCase, id, task.getTransitionId())).collect(Collectors.toList());
         LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
         return fields;
     }
 
     @Override
     public UserFieldValue makeUserFieldValue(String id) {
-        IUser user = userService.resolveById(id, true);
+        IUser user = userService.findById(id, null);
         return new UserFieldValue(user);
     }
 
@@ -1053,7 +1055,7 @@ public class DataService implements IDataService {
         }
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(I18nString.class, new I18nStringDeserializer());
+        module.addDeserializer(I18nString.class, new com.netgrif.core.petrinet.domain.I18nStringDeserializer());
         mapper.registerModule(module);
         Map<String, I18nString> optionsMapped = mapper.convertValue(optionsNode, new TypeReference<Map<String, I18nString>>() {
         });

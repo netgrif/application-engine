@@ -1,16 +1,18 @@
 package com.netgrif.application.engine.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
+import com.netgrif.core.model.EntityModel;
+import com.netgrif.core.model.PagedModel;
+import com.netgrif.core.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
-import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest;
-import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskResource;
-import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
+import com.netgrif.core.workflow.web.requestbodies.file.FileFieldRequest;
+import com.netgrif.core.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
+import com.netgrif.core.workflow.web.responsebodies.LocalisedTaskResource;
+import com.netgrif.core.workflow.web.responsebodies.TaskReference;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -19,10 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,12 +44,14 @@ import java.util.Locale;
 @RequestMapping({"/api/public/task"})
 public class PublicTaskController extends AbstractTaskController {
 
-    final IUserService userService;
+    final UserService userService;
     private final ITaskService taskService;
     private final IDataService dataService;
 
-    public PublicTaskController(ITaskService taskService, IDataService dataService, IUserService userService) {
-        super(taskService, dataService, null);
+    public PublicTaskController(ITaskService taskService,
+                                IDataService dataService,
+                                UserService userService) {
+        super(taskService, dataService, null, userService);
         this.taskService = taskService;
         this.dataService = dataService;
         this.userService = userService;
@@ -74,7 +75,7 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> assign(@PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = userService.getAnonymousLogged();
+        LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedUser());
         return super.assign(loggedUser, taskId, locale);
     }
 
@@ -89,7 +90,7 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> finish(@PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = userService.getAnonymousLogged();
+        LoggedUser loggedUser = (LoggedUser) userService.transformToLoggedUser(userService.getLoggedUser());
         return super.finish(loggedUser, taskId, locale);
     }
 
@@ -104,7 +105,7 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> cancel(@PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = userService.getAnonymousLogged();
+        LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedUser());
         return super.cancel(loggedUser, taskId, locale);
     }
 
@@ -202,7 +203,7 @@ public class PublicTaskController extends AbstractTaskController {
 
     @Operation(summary = "Generic task search on Mongo database")
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<com.netgrif.application.engine.workflow.domain.Task> assembler, Locale locale) {
-        return super.searchPublic(userService.getAnonymousLogged(), pageable, searchBody, operation, assembler, locale);
+    public PagedModel<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Locale locale) {
+        return super.searchPublic(userService.transformToLoggedUser(userService.getLoggedUser()), pageable, searchBody, operation, locale);
     }
 }

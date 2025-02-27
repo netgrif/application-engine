@@ -1,18 +1,20 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.auth.domain.Author;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
-import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
-import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
+import com.netgrif.auth.service.UserService;
+import com.netgrif.core.auth.domain.Author;
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.core.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.PetriNetSearch;
+import com.netgrif.core.petrinet.domain.dataset.EnumerationMapField;
+import com.netgrif.core.petrinet.domain.dataset.MultichoiceMapField;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
-import com.netgrif.application.engine.petrinet.domain.version.Version;
-import com.netgrif.application.engine.petrinet.service.PetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.core.petrinet.domain.version.Version;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.adapter.petrinet.service.ProcessRoleService;
+import com.netgrif.core.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.service.interfaces.IConfigurableMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +29,16 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     protected final String GLOBAL_ROLE = "GLOBAL_ROLE";
 
     @Autowired
-    private PetriNetService petriNetService;
+    private IPetriNetService petriNetService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private StringToVersionConverter converter;
 
     @Autowired
-    private IProcessRoleService processRoleService;
+    private ProcessRoleService processRoleService;
 
     /**
      * Constructs a map that can be used as a value for any {@link com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField}.
@@ -51,7 +56,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
      */
     @Override
     public Map<String, I18nString> getNetsByAuthorAsMapOptions(IUser author, Locale locale) {
-        LoggedUser loggedAuthor = author.transformToLoggedUser();
+        LoggedUser loggedAuthor = userService.transformToLoggedUser(author);
         PetriNetSearch requestQuery = new PetriNetSearch();
         Author authorQuery = new Author();
         authorQuery.setEmail(author.getEmail());
@@ -94,7 +99,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
                             && !bannedRoles.getOptions().containsKey(role.getImportId() + ":" + GLOBAL_ROLE))
                     .collect(Collectors.toMap(
                             role -> role.getImportId() + ":" + GLOBAL_ROLE,
-                            role -> new I18nString(role.getName())
+                            role -> role.getName()
                     ));
         }
 

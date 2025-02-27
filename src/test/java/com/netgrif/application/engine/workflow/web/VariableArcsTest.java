@@ -1,33 +1,34 @@
 package com.netgrif.application.engine.workflow.web;
 
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.MockService;
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.User;
-import com.netgrif.application.engine.auth.domain.UserState;
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.User;
+import com.netgrif.core.auth.domain.enums.UserState;
+import com.netgrif.auth.service.AuthorityService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.VersionType;
-import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.VersionType;
+import com.netgrif.core.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.core.petrinet.domain.roles.ProcessRole;
+import com.netgrif.core.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.startup.runner.SystemUserRunner;
 import com.netgrif.application.engine.startup.runner.DefaultRoleRunner;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.QTask;
-import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.adapter.workflow.domain.QTask;
+import com.netgrif.core.workflow.domain.Task;
+import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
+import com.netgrif.core.workflow.web.responsebodies.TaskReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,13 +73,16 @@ public class VariableArcsTest {
     private DefaultRoleRunner defaultRoleRunner;
 
     @Autowired
-    private IProcessRoleService processRoleService;
+    private ProcessRoleService processRoleService;
 
     @Autowired
     private ImportHelper importHelper;
 
     @Autowired
-    private IAuthorityService authorityService;
+    private AuthorityService authorityService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private SystemUserRunner userRunner;
@@ -109,9 +113,9 @@ public class VariableArcsTest {
         assert outcome.getNet() != null;
         PetriNet net = outcome.getNet();
         this.loaded = service.getPetriNet(net.getStringId());
-        User user = new User();
-        user.setName("Test");
-        user.setSurname("Test");
+        User user = new com.netgrif.adapter.auth.domain.User();
+        user.setFirstName("Test");
+        user.setLastName("Test");
         user.setPassword("password");
         user.setState(UserState.ACTIVE);
         user.setEmail("VariableArcsTest@test.com");
@@ -258,7 +262,7 @@ public class VariableArcsTest {
             if (task.getTitle().getDefaultValue().contains("ref")) {
                 QTask qTask = new QTask("task");
                 Task addTokensTask = taskService.searchOne(qTask.transitionId.eq("add_tokens").and(qTask.caseId.eq(cancelCase.getStringId())));
-                taskService.assignTask(testUser.transformToLoggedUser(), addTokensTask.getStringId());
+                taskService.assignTask(userService.transformToLoggedUser(testUser), addTokensTask.getStringId());
                 taskService.finishTask(addTokensTask, testUser);
             }
             int tokensAfterCancel = 0;
@@ -282,7 +286,7 @@ public class VariableArcsTest {
             if (task.getTitle().getDefaultValue().contains("ref")) {
                 QTask qTask = new QTask("task");
                 Task removeTokensTask = taskService.searchOne(qTask.transitionId.eq("remove_tokens").and(qTask.caseId.eq(cancelCase.getStringId())));
-                taskService.assignTask(testUser.transformToLoggedUser(), removeTokensTask.getStringId());
+                taskService.assignTask(userService.transformToLoggedUser(testUser), removeTokensTask.getStringId());
                 taskService.finishTask(removeTokensTask, testUser);
                 tasksAfterPlaceRefReset = taskService.findAllByCase(cancelCase.getStringId(), LocaleContextHolder.getLocale());
             }

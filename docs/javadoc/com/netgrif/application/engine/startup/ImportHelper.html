@@ -232,9 +232,9 @@ implements groovy.lang.GroovyObject</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="../workflow/domain/eventoutcomes/taskoutcomes/AssignTaskEventOutcome.html" title="class in com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes">AssignTaskEventOutcome</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#assignTask(java.lang.String,java.lang.String,com.netgrif.application.engine.auth.domain.LoggedUser)">assignTask</a></span>&#8203;(java.lang.String&nbsp;taskTitle,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#assignTask(java.lang.String,java.lang.String,com.netgrif.core.auth.domain.Authority;.LoggedUser)">assignTask</a></span>&#8203;(java.lang.String&nbsp;taskTitle,
           java.lang.String&nbsp;caseId,
-          <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;author)</code></th>
+          <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;author)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
@@ -245,9 +245,9 @@ implements groovy.lang.GroovyObject</pre>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../workflow/domain/eventoutcomes/taskoutcomes/CancelTaskEventOutcome.html" title="class in com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes">CancelTaskEventOutcome</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#cancelTask(java.lang.String,java.lang.String,com.netgrif.application.engine.auth.domain.LoggedUser)">cancelTask</a></span>&#8203;(java.lang.String&nbsp;taskTitle,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#cancelTask(java.lang.String,java.lang.String,com.netgrif.core.auth.domain.Authority;.LoggedUser)">cancelTask</a></span>&#8203;(java.lang.String&nbsp;taskTitle,
           java.lang.String&nbsp;caseId,
-          <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user)</code></th>
+          <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i3" class="rowColor">
@@ -257,40 +257,40 @@ implements groovy.lang.GroovyObject</pre>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code>java.util.Map&lt;java.lang.String,&#8203;<a href="../auth/domain/Authority.html" title="class in com.netgrif.application.engine.auth.domain">Authority</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.Map&lt;java.lang.String,&#8203;<a href="../auth/domain/Authority.html" title="class in com.netgrif.core.auth.domain.Authority;">Authority</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createAuthorities(java.util.Map)">createAuthorities</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;authorities)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i5" class="rowColor">
-<td class="colFirst"><code><a href="../auth/domain/Authority.html" title="class in com.netgrif.application.engine.auth.domain">Authority</a></code></td>
+<td class="colFirst"><code><a href="../auth/domain/Authority.html" title="class in com.netgrif.core.auth.domain.Authority;">Authority</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createAuthority(java.lang.String)">createAuthority</a></span>&#8203;(java.lang.String&nbsp;name)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../workflow/domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createCase(java.lang.String,com.netgrif.application.engine.petrinet.domain.PetriNet)">createCase</a></span>&#8203;(java.lang.String&nbsp;title,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createCase(java.lang.String,com.netgrif.core.petrinet.domain.PetriNet)">createCase</a></span>&#8203;(java.lang.String&nbsp;title,
           <a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="../workflow/domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createCase(java.lang.String,com.netgrif.application.engine.petrinet.domain.PetriNet,com.netgrif.application.engine.auth.domain.LoggedUser)">createCase</a></span>&#8203;(java.lang.String&nbsp;title,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createCase(java.lang.String,com.netgrif.core.petrinet.domain.PetriNet,com.netgrif.core.auth.domain.Authority;.LoggedUser)">createCase</a></span>&#8203;(java.lang.String&nbsp;title,
           <a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net,
-          <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user)</code></th>
+          <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="../workflow/domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createCaseAsSuper(java.lang.String,com.netgrif.application.engine.petrinet.domain.PetriNet)">createCaseAsSuper</a></span>&#8203;(java.lang.String&nbsp;title,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createCaseAsSuper(java.lang.String,com.netgrif.core.petrinet.domain.PetriNet)">createCaseAsSuper</a></span>&#8203;(java.lang.String&nbsp;title,
                  <a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i9" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createCaseFilter(java.lang.String,java.lang.String,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,com.netgrif.application.engine.auth.domain.LoggedUser)">createCaseFilter</a></span>&#8203;(java.lang.String&nbsp;title,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createCaseFilter(java.lang.String,java.lang.String,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,com.netgrif.core.auth.domain.Authority;.LoggedUser)">createCaseFilter</a></span>&#8203;(java.lang.String&nbsp;title,
                 java.lang.String&nbsp;query,
                 <a href="../workflow/domain/MergeFilterOperation.html" title="enum in com.netgrif.application.engine.workflow.domain">MergeFilterOperation</a>&nbsp;operation,
-                <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user)</code></th>
+                <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i10" class="altColor">
@@ -300,15 +300,15 @@ implements groovy.lang.GroovyObject</pre>
 </tr>
 <tr id="i11" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createNet(java.lang.String,com.netgrif.application.engine.petrinet.domain.VersionType)">createNet</a></span>&#8203;(java.lang.String&nbsp;fileName,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createNet(java.lang.String,com.netgrif.core.petrinet.domain.VersionType)">createNet</a></span>&#8203;(java.lang.String&nbsp;fileName,
          <a href="../petrinet/domain/VersionType.html" title="enum in com.netgrif.application.engine.petrinet.domain">VersionType</a>&nbsp;release)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i12" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createNet(java.lang.String,com.netgrif.application.engine.petrinet.domain.VersionType,com.netgrif.application.engine.auth.domain.LoggedUser)">createNet</a></span>&#8203;(java.lang.String&nbsp;fileName,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createNet(java.lang.String,com.netgrif.core.petrinet.domain.VersionType,com.netgrif.core.auth.domain.Authority;.LoggedUser)">createNet</a></span>&#8203;(java.lang.String&nbsp;fileName,
          <a href="../petrinet/domain/VersionType.html" title="enum in com.netgrif.application.engine.petrinet.domain">VersionType</a>&nbsp;release,
-         <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;author)</code></th>
+         <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;author)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i13" class="rowColor">
@@ -319,23 +319,23 @@ implements groovy.lang.GroovyObject</pre>
 </tr>
 <tr id="i14" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createNet(java.lang.String,java.lang.String,com.netgrif.application.engine.auth.domain.LoggedUser)">createNet</a></span>&#8203;(java.lang.String&nbsp;fileName,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createNet(java.lang.String,java.lang.String,com.netgrif.core.auth.domain.Authority;.LoggedUser)">createNet</a></span>&#8203;(java.lang.String&nbsp;fileName,
          java.lang.String&nbsp;release,
-         <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;author)</code></th>
+         <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;author)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i15" class="rowColor">
-<td class="colFirst"><code><a href="../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createUser(com.netgrif.application.engine.auth.domain.User,com.netgrif.application.engine.auth.domain.Authority%5B%5D,com.netgrif.application.engine.petrinet.domain.roles.ProcessRole...)">createUser</a></span>&#8203;(<a href="../auth/domain/User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&nbsp;user,
-          <a href="../auth/domain/Authority.html" title="class in com.netgrif.application.engine.auth.domain">Authority</a>[]&nbsp;authorities,
+<td class="colFirst"><code><a href="../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createUser(com.netgrif.core.auth.domain.User,com.netgrif.core.auth.domain.Authority;%5B%5D,com.netgrif.core.petrinet.domain.roles.ProcessRole...)">createUser</a></span>&#8203;(<a href="../auth/domain/User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&nbsp;user,
+          <a href="../auth/domain/Authority.html" title="class in com.netgrif.core.auth.domain.Authority;">Authority</a>[]&nbsp;authorities,
           <a href="../petrinet/domain/roles/ProcessRole.html" title="class in com.netgrif.application.engine.petrinet.domain.roles">ProcessRole</a>...&nbsp;roles)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i16" class="altColor">
 <td class="colFirst"><code><a href="../workflow/domain/eventoutcomes/taskoutcomes/FinishTaskEventOutcome.html" title="class in com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes">FinishTaskEventOutcome</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#finishTask(java.lang.String,java.lang.String,com.netgrif.application.engine.auth.domain.LoggedUser)">finishTask</a></span>&#8203;(java.lang.String&nbsp;taskTitle,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#finishTask(java.lang.String,java.lang.String,com.netgrif.core.auth.domain.Authority;.LoggedUser)">finishTask</a></span>&#8203;(java.lang.String&nbsp;taskTitle,
           java.lang.String&nbsp;caseId,
-          <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;author)</code></th>
+          <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;author)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i17" class="rowColor">
@@ -356,18 +356,18 @@ implements groovy.lang.GroovyObject</pre>
 </tr>
 <tr id="i20" class="altColor">
 <td class="colFirst"><code><a href="../petrinet/domain/roles/ProcessRole.html" title="class in com.netgrif.application.engine.petrinet.domain.roles">ProcessRole</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getProcessRoleByImportId(com.netgrif.application.engine.petrinet.domain.PetriNet,java.lang.String)">getProcessRoleByImportId</a></span>&#8203;(<a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getProcessRoleByImportId(com.netgrif.core.petrinet.domain.PetriNet,java.lang.String)">getProcessRoleByImportId</a></span>&#8203;(<a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net,
                         java.lang.String&nbsp;roleId)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i21" class="rowColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,&#8203;<a href="../petrinet/domain/roles/ProcessRole.html" title="class in com.netgrif.application.engine.petrinet.domain.roles">ProcessRole</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getProcessRoles(com.netgrif.application.engine.petrinet.domain.PetriNet)">getProcessRoles</a></span>&#8203;(<a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getProcessRoles(com.netgrif.core.petrinet.domain.PetriNet)">getProcessRoles</a></span>&#8203;(<a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i22" class="altColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,&#8203;<a href="../petrinet/domain/roles/ProcessRole.html" title="class in com.netgrif.application.engine.petrinet.domain.roles">ProcessRole</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getProcessRolesByImportId(com.netgrif.application.engine.petrinet.domain.PetriNet,java.util.Map)">getProcessRolesByImportId</a></span>&#8203;(<a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getProcessRolesByImportId(com.netgrif.core.petrinet.domain.PetriNet,java.util.Map)">getProcessRolesByImportId</a></span>&#8203;(<a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net,
                          java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;importId)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -419,17 +419,17 @@ implements groovy.lang.GroovyObject</pre>
 </tr>
 <tr id="i31" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#upsertNet(java.lang.String,java.lang.String,com.netgrif.application.engine.petrinet.domain.VersionType)">upsertNet</a></span>&#8203;(java.lang.String&nbsp;filename,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#upsertNet(java.lang.String,java.lang.String,com.netgrif.core.petrinet.domain.VersionType)">upsertNet</a></span>&#8203;(java.lang.String&nbsp;filename,
          java.lang.String&nbsp;identifier,
          <a href="../petrinet/domain/VersionType.html" title="enum in com.netgrif.application.engine.petrinet.domain">VersionType</a>&nbsp;release)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i32" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#upsertNet(java.lang.String,java.lang.String,com.netgrif.application.engine.petrinet.domain.VersionType,com.netgrif.application.engine.auth.domain.LoggedUser)">upsertNet</a></span>&#8203;(java.lang.String&nbsp;filename,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#upsertNet(java.lang.String,java.lang.String,com.netgrif.core.petrinet.domain.VersionType,com.netgrif.core.auth.domain.Authority;.LoggedUser)">upsertNet</a></span>&#8203;(java.lang.String&nbsp;filename,
          java.lang.String&nbsp;identifier,
          <a href="../petrinet/domain/VersionType.html" title="enum in com.netgrif.application.engine.petrinet.domain">VersionType</a>&nbsp;release,
-         <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;author)</code></th>
+         <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;author)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -580,7 +580,7 @@ implements groovy.lang.GroovyObject</pre>
                                               java.lang.String&nbsp;release)</pre>
 </li>
 </ul>
-<a id="createNet(java.lang.String,com.netgrif.application.engine.petrinet.domain.VersionType)">
+<a id="createNet(java.lang.String,com.netgrif.core.petrinet.domain.VersionType)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -599,7 +599,7 @@ implements groovy.lang.GroovyObject</pre>
 <pre class="methodSignature">public&nbsp;java.util.Optional&lt;<a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&gt;&nbsp;createNet&#8203;(java.lang.String&nbsp;fileName)</pre>
 </li>
 </ul>
-<a id="upsertNet(java.lang.String,java.lang.String,com.netgrif.application.engine.petrinet.domain.VersionType)">
+<a id="upsertNet(java.lang.String,java.lang.String,com.netgrif.core.petrinet.domain.VersionType)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -652,7 +652,7 @@ implements groovy.lang.GroovyObject</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>createAuthorities</h4>
-<pre class="methodSignature">public&nbsp;java.util.Map&lt;java.lang.String,&#8203;<a href="../auth/domain/Authority.html" title="class in com.netgrif.application.engine.auth.domain">Authority</a>&gt;&nbsp;createAuthorities&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;authorities)</pre>
+<pre class="methodSignature">public&nbsp;java.util.Map&lt;java.lang.String,&#8203;<a href="../auth/domain/Authority.html" title="class in com.netgrif.core.auth.domain.Authority;">Authority</a>&gt;&nbsp;createAuthorities&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;authorities)</pre>
 </li>
 </ul>
 <a id="createAuthority(java.lang.String)">
@@ -661,10 +661,10 @@ implements groovy.lang.GroovyObject</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>createAuthority</h4>
-<pre class="methodSignature">public&nbsp;<a href="../auth/domain/Authority.html" title="class in com.netgrif.application.engine.auth.domain">Authority</a>&nbsp;createAuthority&#8203;(java.lang.String&nbsp;name)</pre>
+<pre class="methodSignature">public&nbsp;<a href="../auth/domain/Authority.html" title="class in com.netgrif.core.auth.domain.Authority;">Authority</a>&nbsp;createAuthority&#8203;(java.lang.String&nbsp;name)</pre>
 </li>
 </ul>
-<a id="createNet(java.lang.String,java.lang.String,com.netgrif.application.engine.auth.domain.LoggedUser)">
+<a id="createNet(java.lang.String,java.lang.String,com.netgrif.core.auth.domain.Authority;.LoggedUser)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -672,10 +672,10 @@ implements groovy.lang.GroovyObject</pre>
 <h4>createNet</h4>
 <pre class="methodSignature">public&nbsp;java.util.Optional&lt;<a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&gt;&nbsp;createNet&#8203;(java.lang.String&nbsp;fileName,
                                               java.lang.String&nbsp;release,
-                                              <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;author)</pre>
+                                              <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;author)</pre>
 </li>
 </ul>
-<a id="createNet(java.lang.String,com.netgrif.application.engine.petrinet.domain.VersionType,com.netgrif.application.engine.auth.domain.LoggedUser)">
+<a id="createNet(java.lang.String,com.netgrif.core.petrinet.domain.VersionType,com.netgrif.core.auth.domain.Authority;.LoggedUser)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -683,10 +683,10 @@ implements groovy.lang.GroovyObject</pre>
 <h4>createNet</h4>
 <pre class="methodSignature">public&nbsp;java.util.Optional&lt;<a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&gt;&nbsp;createNet&#8203;(java.lang.String&nbsp;fileName,
                                               <a href="../petrinet/domain/VersionType.html" title="enum in com.netgrif.application.engine.petrinet.domain">VersionType</a>&nbsp;release,
-                                              <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;author)</pre>
+                                              <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;author)</pre>
 </li>
 </ul>
-<a id="upsertNet(java.lang.String,java.lang.String,com.netgrif.application.engine.petrinet.domain.VersionType,com.netgrif.application.engine.auth.domain.LoggedUser)">
+<a id="upsertNet(java.lang.String,java.lang.String,com.netgrif.core.petrinet.domain.VersionType,com.netgrif.core.auth.domain.Authority;.LoggedUser)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -695,10 +695,10 @@ implements groovy.lang.GroovyObject</pre>
 <pre class="methodSignature">public&nbsp;java.util.Optional&lt;<a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&gt;&nbsp;upsertNet&#8203;(java.lang.String&nbsp;filename,
                                               java.lang.String&nbsp;identifier,
                                               <a href="../petrinet/domain/VersionType.html" title="enum in com.netgrif.application.engine.petrinet.domain">VersionType</a>&nbsp;release,
-                                              <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;author)</pre>
+                                              <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;author)</pre>
 </li>
 </ul>
-<a id="getProcessRoleByImportId(com.netgrif.application.engine.petrinet.domain.PetriNet,java.lang.String)">
+<a id="getProcessRoleByImportId(com.netgrif.core.petrinet.domain.PetriNet,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -708,7 +708,7 @@ implements groovy.lang.GroovyObject</pre>
                                             java.lang.String&nbsp;roleId)</pre>
 </li>
 </ul>
-<a id="getProcessRolesByImportId(com.netgrif.application.engine.petrinet.domain.PetriNet,java.util.Map)">
+<a id="getProcessRolesByImportId(com.netgrif.core.petrinet.domain.PetriNet,java.util.Map)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -718,7 +718,7 @@ implements groovy.lang.GroovyObject</pre>
                                                                                    java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;importId)</pre>
 </li>
 </ul>
-<a id="getProcessRoles(com.netgrif.application.engine.petrinet.domain.PetriNet)">
+<a id="getProcessRoles(com.netgrif.core.petrinet.domain.PetriNet)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -727,18 +727,18 @@ implements groovy.lang.GroovyObject</pre>
 <pre class="methodSignature">public&nbsp;java.util.Map&lt;java.lang.String,&#8203;<a href="../petrinet/domain/roles/ProcessRole.html" title="class in com.netgrif.application.engine.petrinet.domain.roles">ProcessRole</a>&gt;&nbsp;getProcessRoles&#8203;(<a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net)</pre>
 </li>
 </ul>
-<a id="createUser(com.netgrif.application.engine.auth.domain.User,com.netgrif.application.engine.auth.domain.Authority[],com.netgrif.application.engine.petrinet.domain.roles.ProcessRole...)">
+<a id="createUser(com.netgrif.core.auth.domain.User,com.netgrif.core.auth.domain.Authority;[],com.netgrif.core.petrinet.domain.roles.ProcessRole...)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>createUser</h4>
-<pre class="methodSignature">public&nbsp;<a href="../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;createUser&#8203;(<a href="../auth/domain/User.html" title="class in com.netgrif.application.engine.auth.domain">User</a>&nbsp;user,
-                        <a href="../auth/domain/Authority.html" title="class in com.netgrif.application.engine.auth.domain">Authority</a>[]&nbsp;authorities,
+<pre class="methodSignature">public&nbsp;<a href="../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;createUser&#8203;(<a href="../auth/domain/User.html" title="class in com.netgrif.core.auth.domain.Authority;">User</a>&nbsp;user,
+                        <a href="../auth/domain/Authority.html" title="class in com.netgrif.core.auth.domain.Authority;">Authority</a>[]&nbsp;authorities,
                         <a href="../petrinet/domain/roles/ProcessRole.html" title="class in com.netgrif.application.engine.petrinet.domain.roles">ProcessRole</a>...&nbsp;roles)</pre>
 </li>
 </ul>
-<a id="createCase(java.lang.String,com.netgrif.application.engine.petrinet.domain.PetriNet,com.netgrif.application.engine.auth.domain.LoggedUser)">
+<a id="createCase(java.lang.String,com.netgrif.core.petrinet.domain.PetriNet,com.netgrif.core.auth.domain.Authority;.LoggedUser)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -746,10 +746,10 @@ implements groovy.lang.GroovyObject</pre>
 <h4>createCase</h4>
 <pre class="methodSignature">public&nbsp;<a href="../workflow/domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;createCase&#8203;(java.lang.String&nbsp;title,
                        <a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net,
-                       <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user)</pre>
+                       <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user)</pre>
 </li>
 </ul>
-<a id="createCase(java.lang.String,com.netgrif.application.engine.petrinet.domain.PetriNet)">
+<a id="createCase(java.lang.String,com.netgrif.core.petrinet.domain.PetriNet)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -759,7 +759,7 @@ implements groovy.lang.GroovyObject</pre>
                        <a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net)</pre>
 </li>
 </ul>
-<a id="createCaseAsSuper(java.lang.String,com.netgrif.application.engine.petrinet.domain.PetriNet)">
+<a id="createCaseAsSuper(java.lang.String,com.netgrif.core.petrinet.domain.PetriNet)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -769,7 +769,7 @@ implements groovy.lang.GroovyObject</pre>
                               <a href="../petrinet/domain/PetriNet.html" title="class in com.netgrif.application.engine.petrinet.domain">PetriNet</a>&nbsp;net)</pre>
 </li>
 </ul>
-<a id="createCaseFilter(java.lang.String,java.lang.String,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,com.netgrif.application.engine.auth.domain.LoggedUser)">
+<a id="createCaseFilter(java.lang.String,java.lang.String,com.netgrif.application.engine.workflow.domain.MergeFilterOperation,com.netgrif.core.auth.domain.Authority;.LoggedUser)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -778,10 +778,10 @@ implements groovy.lang.GroovyObject</pre>
 <pre class="methodSignature">public&nbsp;boolean&nbsp;createCaseFilter&#8203;(java.lang.String&nbsp;title,
                                 java.lang.String&nbsp;query,
                                 <a href="../workflow/domain/MergeFilterOperation.html" title="enum in com.netgrif.application.engine.workflow.domain">MergeFilterOperation</a>&nbsp;operation,
-                                <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user)</pre>
+                                <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user)</pre>
 </li>
 </ul>
-<a id="assignTask(java.lang.String,java.lang.String,com.netgrif.application.engine.auth.domain.LoggedUser)">
+<a id="assignTask(java.lang.String,java.lang.String,com.netgrif.core.auth.domain.Authority;.LoggedUser)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -789,7 +789,7 @@ implements groovy.lang.GroovyObject</pre>
 <h4>assignTask</h4>
 <pre class="methodSignature">public&nbsp;<a href="../workflow/domain/eventoutcomes/taskoutcomes/AssignTaskEventOutcome.html" title="class in com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes">AssignTaskEventOutcome</a>&nbsp;assignTask&#8203;(java.lang.String&nbsp;taskTitle,
                                          java.lang.String&nbsp;caseId,
-                                         <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;author)</pre>
+                                         <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;author)</pre>
 </li>
 </ul>
 <a id="assignTaskToSuper(java.lang.String,java.lang.String)">
@@ -802,7 +802,7 @@ implements groovy.lang.GroovyObject</pre>
                                                 java.lang.String&nbsp;caseId)</pre>
 </li>
 </ul>
-<a id="finishTask(java.lang.String,java.lang.String,com.netgrif.application.engine.auth.domain.LoggedUser)">
+<a id="finishTask(java.lang.String,java.lang.String,com.netgrif.core.auth.domain.Authority;.LoggedUser)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -810,7 +810,7 @@ implements groovy.lang.GroovyObject</pre>
 <h4>finishTask</h4>
 <pre class="methodSignature">public&nbsp;<a href="../workflow/domain/eventoutcomes/taskoutcomes/FinishTaskEventOutcome.html" title="class in com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes">FinishTaskEventOutcome</a>&nbsp;finishTask&#8203;(java.lang.String&nbsp;taskTitle,
                                          java.lang.String&nbsp;caseId,
-                                         <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;author)</pre>
+                                         <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;author)</pre>
 </li>
 </ul>
 <a id="finishTaskAsSuper(java.lang.String,java.lang.String)">
@@ -823,7 +823,7 @@ implements groovy.lang.GroovyObject</pre>
                                                 java.lang.String&nbsp;caseId)</pre>
 </li>
 </ul>
-<a id="cancelTask(java.lang.String,java.lang.String,com.netgrif.application.engine.auth.domain.LoggedUser)">
+<a id="cancelTask(java.lang.String,java.lang.String,com.netgrif.core.auth.domain.Authority;.LoggedUser)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -831,7 +831,7 @@ implements groovy.lang.GroovyObject</pre>
 <h4>cancelTask</h4>
 <pre class="methodSignature">public&nbsp;<a href="../workflow/domain/eventoutcomes/taskoutcomes/CancelTaskEventOutcome.html" title="class in com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes">CancelTaskEventOutcome</a>&nbsp;cancelTask&#8203;(java.lang.String&nbsp;taskTitle,
                                          java.lang.String&nbsp;caseId,
-                                         <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;user)</pre>
+                                         <a href="../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;user)</pre>
 </li>
 </ul>
 <a id="cancelTaskAsSuper(java.lang.String,java.lang.String)">

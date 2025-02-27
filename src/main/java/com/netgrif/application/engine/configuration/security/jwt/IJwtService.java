@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.configuration.security.jwt;
 
-import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.LoggedUser;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Map;

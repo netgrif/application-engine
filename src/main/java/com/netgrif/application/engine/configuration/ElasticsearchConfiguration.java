@@ -1,18 +1,10 @@
 package com.netgrif.application.engine.configuration;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import co.elastic.clients.transport.ElasticsearchTransport;
-import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.netgrif.application.engine.configuration.properties.UriProperties;
 import com.netgrif.application.engine.workflow.service.CaseEventHandler;
-import org.elasticsearch.client.RestClient;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 @Configuration
@@ -99,10 +91,18 @@ public class ElasticsearchConfiguration extends org.springframework.data.elastic
                 .build();
     }
 
-    @Bean
-    @Primary
-    public ElasticsearchOperations elasticsearchOperations(ElasticsearchConverter elasticsearchConverter, ElasticsearchClient elasticsearchClient) {
-        return super.elasticsearchOperations(elasticsearchConverter, elasticsearchClient);
-    }
+//    @Bean
+//    @Primary
+//    public ElasticsearchOperations elasticsearchOperations(ElasticsearchConverter elasticsearchConverter, ElasticsearchClient elasticsearchClient) {
+//        ElasticsearchOperations elasticsearchOperations = super.elasticsearchOperations(elasticsearchConverter, elasticsearchClient);
+//        IndexOperations indexOperations = elasticsearchOperations.indexOps(EventLog.class);
+//        elasticsearchClient.indices().
+//        CreateIndexRequest createIndexRequest = CreateIndexRequest.of(b -> b
+//                .index("event_log").m
+//        );
+//        CreateIndexResponse response = elasticsearchClient.indices().create(createIndexRequest);
+//    }
+//        return elasticsearchOperations;
+//    }
 
 }

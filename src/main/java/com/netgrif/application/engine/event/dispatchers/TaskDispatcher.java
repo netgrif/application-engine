@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.event.dispatchers;
 
 import com.netgrif.application.engine.event.dispatchers.common.AbstractDispatcher;
-import com.netgrif.application.engine.event.events.task.*;
+import com.netgrif.core.event.events.task.*;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 

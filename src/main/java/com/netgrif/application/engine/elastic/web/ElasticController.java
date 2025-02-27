@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.elastic.web;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.ReindexingTask;
 import com.netgrif.application.engine.workflow.service.CaseSearchService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
+import com.netgrif.core.workflow.web.responsebodies.MessageResource;
 import com.querydsl.core.types.Predicate;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

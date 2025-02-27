@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.domain.repositories;
 
-import com.netgrif.application.engine.workflow.domain.QTask;
+import com.netgrif.adapter.workflow.domain.QTask;
 import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.core.types.dsl.StringPath;
 import org.springframework.data.querydsl.binding.QuerydslBindings;

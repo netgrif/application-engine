@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.domain.eventoutcomes;
 
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FrontAction;
+import com.netgrif.core.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.dataset.logic.FrontAction;
 import lombok.Data;
 
 import java.io.Serializable;

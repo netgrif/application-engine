@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.elastic.service.interfaces;
 
-import com.netgrif.application.engine.elastic.domain.ElasticPetriNet;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.core.elastic.domain.ElasticPetriNet;
+import com.netgrif.core.petrinet.domain.PetriNet;
 import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;

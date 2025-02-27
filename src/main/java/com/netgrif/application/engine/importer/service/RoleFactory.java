@@ -1,11 +1,11 @@
 package com.netgrif.application.engine.importer.service;
 
 
-import com.netgrif.application.engine.importer.model.CaseLogic;
-import com.netgrif.application.engine.importer.model.Logic;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.Transition;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.core.importer.model.CaseLogic;
+import com.netgrif.core.importer.model.Logic;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.Transition;
+import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
@@ -98,7 +98,7 @@ public class RoleFactory {
     }
 
     ProcessRole transitionRole(PetriNet net, Transition transition) {
-        ProcessRole role = new ProcessRole();
+        ProcessRole role = new com.netgrif.adapter.petrinet.domain.roles.ProcessRole();
         role.setName(transition.getImportId());
         role.setImportId(net.getStringId() + "_" + transition.getImportId());
 //        role.setDescription("Default role of transition "+transition.getTitle().getDefaultValue() + " in process "+net.getTitle().getDefaultValue());

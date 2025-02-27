@@ -1,17 +1,18 @@
 package com.netgrif.application.engine.impersonation.web;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.auth.web.responsebodies.User;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserResourceHelperService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
-import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
+//import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.impersonation.exceptions.IllegalImpersonationAttemptException;
 import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserHasSessionException;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import com.netgrif.application.engine.impersonation.web.requestbodies.SearchRequest;
-import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAssembler;
+import com.netgrif.core.model.PagedModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,10 +22,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -48,36 +46,36 @@ public class ImpersonationController {
     protected IImpersonationAuthorizationService impersonationAuthorizationService;
 
     @Autowired
-    protected IUserService userService;
+    protected UserService userService;
 
     @Autowired
     protected IUserResourceHelperService userResourceHelperService;
 
-    @Autowired
-    protected ObjectFactory<UserResourceAssembler> userResourceAssemblerProvider;
+//    @Autowired
+//    protected ObjectFactory<UserResourceAssembler> userResourceAssemblerProvider;
 
-    protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
-        UserResourceAssembler result = userResourceAssemblerProvider.getObject();
-        result.initialize(locale, small, selfRel);
-        return result;
-    }
+//    protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
+//        UserResourceAssembler result = userResourceAssemblerProvider.getObject();
+//        result.initialize(locale, small, selfRel);
+//        return result;
+//    }
 
     @Operation(summary = "Search impersonable users", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> getImpersonationUserOptions(@RequestBody SearchRequest request, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         Page<IUser> page = impersonationAuthorizationService.getConfiguredImpersonationUsers(request.getQuery(), loggedUser, pageable);
-        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ImpersonationController.class)
-                .getImpersonationUserOptions(request, pageable, assembler, auth, locale)).withRel("all");
-        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, false, "all"), selfLink);
-        ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
-        return resources;
+//        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ImpersonationController.class)
+//                .getImpersonationUserOptions(request, pageable, assembler, auth, locale)).withRel("all");
+//        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, false, "all"), selfLink);
+//        ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
+        return PagedModel.of(page.stream().map(u -> new UserResource((User) u)).toList(), new PagedModel.PageMetadata(pageable.getPageNumber(), pageable.getPageSize(), page.getTotalElements()));
     }
 
     @Operation(summary = "Impersonate user through a specific configuration", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping("/config/{id}")
     public UserResource impersonateByConfig(@PathVariable("id") String configId, Locale locale) throws IllegalImpersonationAttemptException, ImpersonatedUserHasSessionException {
-        LoggedUser loggedUser = userService.getLoggedUser().transformToLoggedUser();
+        LoggedUser loggedUser =  userService.transformToLoggedUser(userService.getLoggedUser());
         if (!impersonationAuthorizationService.canImpersonate(loggedUser, configId)) {
             throw new IllegalImpersonationAttemptException(loggedUser, configId);
         }
@@ -88,7 +86,7 @@ public class ImpersonationController {
     @Operation(summary = "Impersonate user directly by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping("/user/{id}")
     public UserResource impersonateUser(@PathVariable("id") String userId, Locale locale) throws IllegalImpersonationAttemptException, ImpersonatedUserHasSessionException {
-        LoggedUser loggedUser = userService.getLoggedUser().transformToLoggedUser();
+        LoggedUser loggedUser =  userService.transformToLoggedUser(userService.getLoggedUser());
         if (!impersonationAuthorizationService.canImpersonateUser(loggedUser, userId)) {
             throw new IllegalImpersonationAttemptException(loggedUser, userId);
         }

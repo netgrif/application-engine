@@ -1,17 +1,16 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.RegisteredUser;
-import com.netgrif.application.engine.auth.domain.User;
-import com.netgrif.application.engine.auth.domain.UserState;
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.RegisteredUser;
+import com.netgrif.core.auth.domain.User;
+import com.netgrif.core.auth.domain.enums.UserState;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,6 +25,7 @@ import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -35,26 +35,25 @@ public class RegistrationService implements IRegistrationService {
     protected BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private IUserService userService;
+    private UserService userService;
 
     @Autowired
     private INextGroupService groupService;
 
     @Autowired
-    private IProcessRoleService processRole;
+    private ProcessRoleService processRole;
 
     @Autowired
     private ServerAuthProperties serverAuthProperties;
+    @Autowired
+    private com.netgrif.application.engine.petrinet.service.ProcessRoleService processRoleService;
 
     @Override
     @Transactional
     @Scheduled(cron = "0 0 1 * * *")
     public void removeExpiredUsers() {
         log.info("Removing expired unactivated invited users");
-        List<User> expired = userRepository.removeAllByStateAndExpirationDateBefore(UserState.INVITED, LocalDateTime.now());
+        List<User> expired = userService.removeAllByStateAndExpirationDateBefore(UserState.INACTIVE, LocalDateTime.now());
         log.info("Removed " + expired.size() + " unactivated users");
     }
 
@@ -63,7 +62,7 @@ public class RegistrationService implements IRegistrationService {
     @Scheduled(cron = "0 0 1 * * *")
     public void resetExpiredToken() {
         log.info("Resetting expired user tokens");
-        List<User> users = userRepository.findAllByStateAndExpirationDateBefore(UserState.BLOCKED, LocalDateTime.now());
+        List<User> users = userService.findAllByStateAndExpirationDateBefore(UserState.BLOCKED, LocalDateTime.now());
         if (users == null || users.isEmpty()) {
             log.info("There are none expired tokens. Everything is awesome.");
             return;
@@ -73,7 +72,7 @@ public class RegistrationService implements IRegistrationService {
             user.setToken(null);
             user.setExpirationDate(null);
         });
-        users = userRepository.saveAll(users);
+        users = userService.saveUsers(users.stream().map(u -> (IUser) u).collect(Collectors.toList()));
         log.info("Reset " + users.size() + " expired user tokens");
     }
 
@@ -81,7 +80,7 @@ public class RegistrationService implements IRegistrationService {
     public void changePassword(RegisteredUser user, String newPassword) {
         user.setPassword(newPassword);
         encodeUserPassword(user);
-        userService.save(user);
+        userService.saveUser(user, null);
         log.info("Changed password for user " + user.getEmail() + ".");
     }
 
@@ -90,7 +89,7 @@ public class RegistrationService implements IRegistrationService {
         try {
             log.info("Verifying token:" + token);
             String[] tokenParts = decodeToken(token);
-            User user = userRepository.findByEmail(tokenParts[0]);
+            User user = (User) userService.findByEmail(tokenParts[0], null);
             return user != null && Objects.equals(user.getToken(), tokenParts[1]) && user.getExpirationDate().isAfter(LocalDateTime.now());
         } catch (InvalidUserTokenException e) {
             log.error(e.getMessage());
@@ -115,28 +114,28 @@ public class RegistrationService implements IRegistrationService {
     @Override
     @Transactional
     public User createNewUser(NewUserRequest newUser) {
-        User user;
-        if (userRepository.existsByEmail(newUser.email)) {
-            user = userRepository.findByEmail(newUser.email);
+        User user = (User) userService.findByEmail(newUser.email, null);
+        if (user != null) {
             if (user.isActive()) {
                 return null;
             }
             log.info("Renewing old user [" + newUser.email + "]");
         } else {
-            user = new User(newUser.email, null, User.UNKNOWN, User.UNKNOWN);
+            user = new com.netgrif.adapter.auth.domain.User();
+            user.setEmail(newUser.email);
             log.info("Creating new user [" + newUser.email + "]");
         }
         user.setToken(generateTokenKey());
         user.setPassword("");
         user.setExpirationDate(generateExpirationDate());
-        user.setState(UserState.INVITED);
+        user.setState(UserState.INACTIVE);
         userService.addDefaultAuthorities(user);
 
         if (newUser.processRoles != null && !newUser.processRoles.isEmpty()) {
             user.setProcessRoles(new HashSet<>(processRole.findByIds(newUser.processRoles)));
         }
-        userService.addDefaultRole(user);
-        user = userRepository.save(user);
+        userService.addRole(user, processRoleService.getDefaultRole().getStringId());
+        user = (User) userService.saveUser(user, null);
 
         if (newUser.groups != null && !newUser.groups.isEmpty()) {
             for (String group : newUser.groups) {
@@ -144,33 +143,33 @@ public class RegistrationService implements IRegistrationService {
             }
         }
 
-        return userRepository.save(user);
+        return user;
     }
 
     @Override
     public RegisteredUser registerUser(RegistrationRequest registrationRequest) throws InvalidUserTokenException {
         String email = decodeToken(registrationRequest.token)[0];
         log.info("Registering user " + email);
-        RegisteredUser user = userRepository.findByEmail(email);
+        RegisteredUser user = (RegisteredUser) userService.findByEmail(email, null);
         if (user == null) {
             return null;
         }
 
-        user.setName(registrationRequest.name);
-        user.setSurname(registrationRequest.surname);
+        user.setFirstName(registrationRequest.name);
+        user.setLastName(registrationRequest.surname);
         user.setPassword(registrationRequest.password);
 
         user.setToken(null);
         user.setExpirationDate(null);
         user.setState(UserState.ACTIVE);
 
-        return (RegisteredUser) userService.saveNewAndAuthenticate(user);
+        return (RegisteredUser) userService.saveNewAndAuthenticate(user, null);
     }
 
     @Override
     public RegisteredUser resetPassword(String email) {
         log.info("Resetting password of " + email);
-        User user = userRepository.findByEmail(email);
+        User user = (User) userService.findByEmail(email, null);
         if (user == null || !user.isActive()) {
             String state = user == null ? "Non-existing" : "Inactive";
             log.info(state + " user [" + email + "] tried to reset his password");
@@ -181,13 +180,13 @@ public class RegistrationService implements IRegistrationService {
         user.setPassword(null);
         user.setToken(generateTokenKey());
         user.setExpirationDate(generateExpirationDate());
-        return (RegisteredUser) userService.save(user);
+        return (RegisteredUser) userService.saveUser(user, null);
     }
 
     @Override
     public RegisteredUser recover(String email, String newPassword) {
         log.info("Recovering user " + email);
-        User user = userRepository.findByEmail(email);
+        User user = (User) userService.findByEmail(email, null);
         if (user == null) {
             return null;
         }
@@ -197,7 +196,7 @@ public class RegistrationService implements IRegistrationService {
         user.setToken(null);
         user.setExpirationDate(null);
 
-        return (RegisteredUser) userService.save(user);
+        return (RegisteredUser) userService.saveUser(user, null);
     }
 
     @Override

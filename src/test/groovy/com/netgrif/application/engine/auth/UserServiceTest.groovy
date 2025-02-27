@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.auth
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
+import com.netgrif.auth.service.UserService
+import com.netgrif.core.petrinet.domain.VersionType
+import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -25,10 +25,10 @@ class UserServiceTest {
     private ImportHelper importHelper
 
     @Autowired
-    private IUserService service
+    private UserService service
 
     @Autowired
-    private IProcessRoleService roleService
+    private ProcessRoleService roleService
 
     @Test
     @Disabled("Create functions or update test")

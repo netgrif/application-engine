@@ -2,7 +2,9 @@ package com.netgrif.application.engine.elastic.service;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.ExistsQuery;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.core.petrinet.domain.roles.ProcessRole;
+
 import static org.springframework.data.elasticsearch.client.elc.Queries.termQuery;
 
 public abstract class ElasticViewPermissionService {
@@ -42,8 +44,8 @@ public abstract class ElasticViewPermissionService {
     private BoolQuery buildPositiveViewRoleQuery(BoolQuery viewPermNotExists, LoggedUser user) {
         BoolQuery.Builder positiveViewRole = new BoolQuery.Builder();
         BoolQuery.Builder positiveViewRoleQuery = new BoolQuery.Builder();
-        for (String roleId : user.getProcessRoles()) {
-            positiveViewRoleQuery.should(termQuery("viewRoles", roleId)._toQuery());
+        for (ProcessRole role : user.getProcessRoles()) {
+            positiveViewRoleQuery.should(termQuery("viewRoles", role.getStringId())._toQuery());
         }
         positiveViewRole.should(viewPermNotExists._toQuery());
         positiveViewRole.should(positiveViewRoleQuery.build()._toQuery());
@@ -53,8 +55,8 @@ public abstract class ElasticViewPermissionService {
     private BoolQuery buildNegativeViewRoleQuery(LoggedUser user) {
         BoolQuery.Builder negativeViewRole = new BoolQuery.Builder();
         BoolQuery.Builder negativeViewRoleQuery = new BoolQuery.Builder();
-        for (String roleId : user.getProcessRoles()) {
-            negativeViewRoleQuery.should(termQuery("negativeViewRoles", roleId)._toQuery());
+        for (ProcessRole role : user.getProcessRoles()) {
+            negativeViewRoleQuery.should(termQuery("negativeViewRoles", role.getStringId())._toQuery());
         }
         negativeViewRole.mustNot(negativeViewRoleQuery.build()._toQuery());
         return negativeViewRole.build();

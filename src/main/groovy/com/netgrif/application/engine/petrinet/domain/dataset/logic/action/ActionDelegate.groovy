@@ -1,12 +1,13 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
+import com.netgrif.auth.service.UserService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.adapter.petrinet.service.ProcessRoleService
+import com.netgrif.adapter.workflow.domain.QCase
+import com.netgrif.adapter.workflow.domain.QTask
 import com.netgrif.application.engine.AsyncRunner
-import com.netgrif.application.engine.auth.domain.Author
-import com.netgrif.application.engine.auth.domain.IUser
-import com.netgrif.application.engine.auth.domain.LoggedUser
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
 import com.netgrif.application.engine.configuration.PublicViewProperties
@@ -18,7 +19,6 @@ import com.netgrif.application.engine.export.configuration.ExportConfiguration
 import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
-import com.netgrif.application.engine.history.service.IHistoryService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
@@ -26,40 +26,40 @@ import com.netgrif.application.engine.mail.interfaces.IMailService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.pdf.generator.config.PdfResource
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
-import com.netgrif.application.engine.petrinet.domain.*
-import com.netgrif.application.engine.petrinet.domain.dataset.*
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.domain.version.Version
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
-//import com.netgrif.application.engine.rules.domain.RuleRepository
+import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.runner.FilterRunner
-import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
-import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.ProcessResourceId
-import com.netgrif.application.engine.workflow.domain.QCase
-import com.netgrif.application.engine.workflow.domain.QTask
-import com.netgrif.application.engine.workflow.domain.Task
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
-import com.netgrif.application.engine.workflow.domain.menu.MenuItemBody
-import com.netgrif.application.engine.workflow.domain.menu.MenuItemConstants
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.*
-import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
-import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
+import com.netgrif.core.auth.domain.Author
+import com.netgrif.core.auth.domain.IUser
+import com.netgrif.core.auth.domain.LoggedUser
+import com.netgrif.core.petrinet.domain.*
+import com.netgrif.core.petrinet.domain.dataset.*
+import com.netgrif.core.petrinet.domain.dataset.logic.ChangedField
+import com.netgrif.core.petrinet.domain.dataset.logic.FieldBehavior
+import com.netgrif.core.petrinet.domain.dataset.logic.action.Action
+import com.netgrif.core.petrinet.domain.dataset.logic.validation.DynamicValidation
+import com.netgrif.core.petrinet.domain.dataset.logic.validation.Validation
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
+import com.netgrif.core.petrinet.domain.version.Version
+
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.core.workflow.domain.Task
+import com.netgrif.core.workflow.domain.eventoutcomes.EventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
+import com.netgrif.core.workflow.domain.menu.MenuItemBody
+import com.netgrif.core.workflow.domain.menu.MenuItemConstants
+import com.netgrif.core.workflow.service.InitValueExpressionEvaluator
+import com.netgrif.core.workflow.web.responsebodies.MessageResource
+import com.netgrif.core.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
 import groovy.transform.NamedVariant
 import org.bson.types.ObjectId
@@ -78,7 +78,6 @@ import org.springframework.data.domain.Pageable
 import java.text.Normalizer
 import java.time.ZoneId
 import java.util.stream.Collectors
-
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -114,7 +113,7 @@ class ActionDelegate {
     IWorkflowService workflowService
 
     @Autowired
-    IUserService userService
+    UserService userService
 
     @Autowired
     IPetriNetService petriNetService
@@ -132,7 +131,7 @@ class ActionDelegate {
     INextGroupService nextGroupService
 
     @Autowired
-    IProcessRoleService processRoleService
+    ProcessRoleService processRoleService
 
     @Autowired
     IRegistrationService registrationService
@@ -147,7 +146,7 @@ class ActionDelegate {
     IDataValidationExpressionEvaluator dataValidationExpressionEvaluator
 
     @Autowired
-    IInitValueExpressionEvaluator initValueExpressionEvaluator
+    InitValueExpressionEvaluator initValueExpressionEvaluator
 
 //    @Autowired
 //    RuleRepository ruleRepository
@@ -185,8 +184,8 @@ class ActionDelegate {
     @Autowired
     IImpersonationService impersonationService
 
-    @Autowired
-    IHistoryService historyService
+//    @Autowired
+//    IHistoryService historyService
 
     @Autowired
     PublicViewProperties publicViewProperties
@@ -758,7 +757,7 @@ class ActionDelegate {
             }
             if (field instanceof UserListField && (value instanceof String[] || value instanceof List)) {
                 LinkedHashSet<UserFieldValue> users = new LinkedHashSet<>()
-                value.each { id -> users.add(new UserFieldValue(userService.findById(id as String, false))) }
+                value.each { id -> users.add(new UserFieldValue(userService.findById(id as String, null))) }
                 value = new UserListFieldValue(users)
             }
 //            if (field instanceof TaskField && targetTask.isPresent()) {
@@ -905,18 +904,18 @@ class ActionDelegate {
     }
 
     Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
-        return workflowService.createCaseByIdentifier(identifier, title, color, author.transformToLoggedUser(), locale, params).getCase()
+        return workflowService.createCaseByIdentifier(identifier, title, color, userService.transformToLoggedUser(author), locale, params).getCase()
     }
 
     Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
-        CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser(), params)
+        CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, userService.transformToLoggedUser(author), params)
         this.outcomes.add(outcome)
         return outcome.getCase()
     }
 
     Task assignTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        AssignTaskEventOutcome outcome = taskService.assignTask(user.transformToLoggedUser(), taskId, params)
+        AssignTaskEventOutcome outcome = taskService.assignTask(userService.transformToLoggedUser(user), taskId, params)
         this.outcomes.add(outcome)
         return outcome.getTask()
     }
@@ -931,7 +930,7 @@ class ActionDelegate {
 
     Task cancelTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        return addTaskOutcomeAndReturnTask(taskService.cancelTask(user.transformToLoggedUser(), taskId, params))
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(userService.transformToLoggedUser(user), taskId, params))
     }
 
     Task cancelTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
@@ -949,7 +948,7 @@ class ActionDelegate {
 
     void finishTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        addTaskOutcomeAndReturnTask(taskService.finishTask(user.transformToLoggedUser(), taskId, params))
+        addTaskOutcomeAndReturnTask(taskService.finishTask(userService.transformToLoggedUser(user), taskId, params))
     }
 
     void finishTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
@@ -1289,12 +1288,12 @@ class ActionDelegate {
     }
 
     def changeUserByEmail(String email, String attribute, def cl) {
-        IUser user = userService.findByEmail(email, false)
+        IUser user = userService.findUserByUsername(email, null)
         changeUser(user, attribute, cl)
     }
 
     def changeUser(String id, String attribute, def cl) {
-        IUser user = userService.findById(id, false)
+        IUser user = userService.findById(id, null)
         changeUser(user, attribute, cl)
     }
 
@@ -1310,7 +1309,7 @@ class ActionDelegate {
         }
 
         user[attribute] = cl() as String
-        userService.save(user)
+        userService.saveUser(user, null)
     }
 
     MessageResource inviteUser(String email) {
@@ -1332,7 +1331,7 @@ class ActionDelegate {
     }
 
     void deleteUser(String email) {
-        IUser user = userService.findByEmail(email, false)
+        IUser user = userService.findByEmail(email, null)
         if (user == null)
             log.error("Cannot find user with email [" + email + "]")
         deleteUser(user)
@@ -1352,7 +1351,7 @@ class ActionDelegate {
     }
 
     IUser findUserByEmail(String email) {
-        IUser user = userService.findByEmail(email, false)
+        IUser user = userService.findUserByUsername(email, null)
         if (user == null) {
             log.error("Cannot find user with email [" + email + "]")
             return null
@@ -1362,7 +1361,7 @@ class ActionDelegate {
     }
 
     IUser findUserById(String id) {
-        IUser user = userService.findById(id, false)
+        IUser user = userService.findById(id, null)
         if (user == null) {
             log.error("Cannot find user with id [" + id + "]")
             return null
@@ -1413,7 +1412,7 @@ class ActionDelegate {
     }
 
     File exportCasesToFile(List<CaseSearchRequest> requests, String pathName, ExportDataConfig config = null,
-                           LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                           LoggedUser user = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
                            int pageSize = exportConfiguration.getMongoPageSize(),
                            Locale locale = LocaleContextHolder.getLocale(),
                            Boolean isIntersection = false) {
@@ -1424,7 +1423,7 @@ class ActionDelegate {
     }
 
     OutputStream exportCases(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config = null,
-                             LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                             LoggedUser user = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
                              int pageSize = exportConfiguration.getMongoPageSize(),
                              Locale locale = LocaleContextHolder.getLocale(),
                              Boolean isIntersection = false) {
@@ -1444,7 +1443,7 @@ class ActionDelegate {
     }
 
     File exportTasksToFile(List<ElasticTaskSearchRequest> requests, String pathName, ExportDataConfig config = null,
-                           LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                           LoggedUser user = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
                            int pageSize = exportConfiguration.getMongoPageSize(),
                            Locale locale = LocaleContextHolder.getLocale(),
                            Boolean isIntersection = false) {
@@ -1455,7 +1454,7 @@ class ActionDelegate {
     }
 
     OutputStream exportTasks(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config = null,
-                             LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                             LoggedUser user = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
                              int pageSize = exportConfiguration.getMongoPageSize(),
                              Locale locale = LocaleContextHolder.getLocale(),
                              Boolean isIntersection = false) {
@@ -1488,7 +1487,7 @@ class ActionDelegate {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Case> findCasesElastic(List<CaseSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Case> findCasesElastic(List<CaseSearchRequest> requests, LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
                                 int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         return elasticCaseService.search(requests, loggedUser, PageRequest.of(page, pageSize), locale, isIntersection)
     }
@@ -1503,7 +1502,7 @@ class ActionDelegate {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Case> findCasesElastic(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Case> findCasesElastic(Map<String, Object> request, LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
                                 int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         List<CaseSearchRequest> requests = Collections.singletonList(new CaseSearchRequest(request))
         return findCasesElastic(requests, loggedUser, page, pageSize, locale, isIntersection)
@@ -1519,7 +1518,7 @@ class ActionDelegate {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Task> findTasks(List<ElasticTaskSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Task> findTasks(List<ElasticTaskSearchRequest> requests, LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
                          int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         return elasticTaskService.search(requests, loggedUser, PageRequest.of(page, pageSize), locale, isIntersection)
     }
@@ -1534,7 +1533,7 @@ class ActionDelegate {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Task> findTasks(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Task> findTasks(Map<String, Object> request, LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedOrSystem()),
                          int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         List<ElasticTaskSearchRequest> requests = Collections.singletonList(new ElasticTaskSearchRequest(request))
         return findTasks(requests, loggedUser, page, pageSize, locale, isIntersection)
@@ -2481,14 +2480,14 @@ class ActionDelegate {
     List<Case> findCasesElastic(String query, Pageable pageable) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
-        List<Case> result = elasticCaseService.search([request], userService.system.transformToLoggedUser(), pageable, LocaleContextHolder.locale, false).content
+        List<Case> result = elasticCaseService.search([request], userService.transformToLoggedUser(userService.getSystem()), pageable, LocaleContextHolder.locale, false).content
         return result
     }
 
     long countCasesElastic(String query) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
-        return elasticCaseService.count([request], userService.system.transformToLoggedUser(), LocaleContextHolder.locale, false)
+        return elasticCaseService.count([request], userService.transformToLoggedUser(userService.getSystem()), LocaleContextHolder.locale, false)
     }
 
     @Deprecated

@@ -1,43 +1,36 @@
 package com.netgrif.application.engine.auth.web;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.auth.web.responsebodies.*;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.throwable.UnauthorisedRequestException;
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
+import com.netgrif.auth.service.AuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserResourceHelperService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
-import com.netgrif.application.engine.auth.web.responsebodies.AuthoritiesResources;
-import com.netgrif.application.engine.auth.web.responsebodies.IUserFactory;
-import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
-import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.settings.domain.Preferences;
 import com.netgrif.application.engine.settings.service.IPreferencesService;
 import com.netgrif.application.engine.settings.web.PreferencesResource;
-import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
-import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
-import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAssembler;
+import com.netgrif.core.model.PagedModel;
+import com.netgrif.core.workflow.domain.ProcessResourceId;
+import com.netgrif.core.workflow.web.responsebodies.MessageResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -61,16 +54,16 @@ import java.util.stream.Collectors;
 public class UserController {
 
     @Autowired
-    private IUserService userService;
+    private UserService userService;
 
     @Autowired
     private IUserResourceHelperService userResourceHelperService;
 
     @Autowired
-    private IProcessRoleService processRoleService;
+    private ProcessRoleService processRoleService;
 
     @Autowired
-    private IAuthorityService authorityService;
+    private AuthorityService authorityService;
 
     @Autowired
     private IPreferencesService preferencesService;
@@ -81,46 +74,46 @@ public class UserController {
     @Autowired
     private IUserFactory userResponseFactory;
 
-    @Autowired
-    private ObjectFactory<UserResourceAssembler> userResourceAssemblerFactory;
+//    @Autowired
+//    private ObjectFactory<UserResourceAssembler> userResourceAssemblerFactory;
 
     @Autowired
     private ISecurityContextService securityContextService;
 
-    protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
-        UserResourceAssembler result = userResourceAssemblerFactory.getObject();
-        result.initialize(locale, small, selfRel);
-        return result;
-    }
+//    protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
+//        UserResourceAssembler result = userResourceAssemblerFactory.getObject();
+//        result.initialize(locale, small, selfRel);
+//        return result;
+//    }
 
     @Operation(summary = "Get all users", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> getAll(@RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
-        small = small != null && small;
-        Page<IUser> page = userService.findAllCoMembers((LoggedUser) auth.getPrincipal(), small, pageable);
-        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
-                .getAll(small, pageable, assembler, auth, locale)).withRel("all");
-        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "all"), selfLink);
-        ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
-        return resources;
+//        small = small != null && small;
+        Page<IUser> page = userService.findAllCoMembers((LoggedUser) auth.getPrincipal(), pageable);
+//        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
+//                .getAll(small, pageable, assembler, auth, locale)).withRel("all");
+//        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "all"), selfLink);
+//        ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
+        return PagedModel.of(page.stream().map(u -> new UserResource((User) u)).toList(), new PagedModel.PageMetadata(pageable.getPageNumber(), pageable.getPageSize(), page.getTotalElements()));
     }
 
 
     @Operation(summary = "Generic user search", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> search(@RequestParam(value = "small", required = false) Boolean small, @RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
-        small = small == null ? false : small;
+//        small = small == null ? false : small;
         List<ProcessResourceId> roles = query.getRoles() == null ? null : query.getRoles().stream().map(ProcessResourceId::new).collect(Collectors.toList());
         List<ProcessResourceId> negativeRoles = query.getNegativeRoles() == null ? null : query.getNegativeRoles().stream().map(ProcessResourceId::new).collect(Collectors.toList());
         Page<IUser> page = userService.searchAllCoMembers(query.getFulltext(),
                 roles,
                 negativeRoles,
-                (LoggedUser) auth.getPrincipal(), small, pageable);
-        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
-                .search(small, query, pageable, assembler, auth, locale)).withRel("search");
-        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "search"), selfLink);
-        ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
-        return resources;
+                (LoggedUser) auth.getPrincipal(), pageable);
+//        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
+//                .search(small, query, pageable, assembler, auth, locale)).withRel("search");
+//        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "search"), selfLink);
+//        ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
+        return PagedModel.of(page.stream().map(u -> new UserResource((User) u)).toList(), new PagedModel.PageMetadata(pageable.getPageNumber(), pageable.getPageSize(), page.getTotalElements()));
     }
 
     @Operation(summary = "Get user by id", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -133,8 +126,8 @@ public class UserController {
             log.info("User " + actualUser.getUsername() + " trying to get another user with ID " + userId);
             throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
         }
-        IUser user = userService.resolveById(userId, small);
-        return new UserResource(small ? userResponseFactory.getSmallUser(user) : userResponseFactory.getUser(user, locale), "profile");
+        IUser user = userService.findById(userId, null);
+        return new UserResource(small ? userResponseFactory.getSmallUser(user) : userResponseFactory.getUser(user, locale));
     }
 
     @Operation(summary = "Get logged user", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -150,30 +143,32 @@ public class UserController {
         if (!serverAuthProperties.isEnableProfileEdit()) return null;
 
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        IUser user = userService.resolveById(userId, false);
+        IUser user = userService.findById(userId, null);
         if (user == null || (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to modify profile of " + user.transformToLoggedUser().getUsername());
+            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to modify profile of " + userService.transformToLoggedUser(user).getUsername());
 
         user = userService.update(user, updates);
         securityContextService.saveToken(userId);
         if (Objects.equals(loggedUser.getId(), userId)) {
-            loggedUser.setFullName(user.getFullName());
+            loggedUser.setFirstName(user.getFirstName());
+            loggedUser.setLastName(user.getLastName());
             securityContextService.reloadSecurityContext(loggedUser);
         }
         log.info("Updating user " + user.getEmail() + " with data " + updates.toString());
-        return new UserResource(userResponseFactory.getUser(user, locale), "profile");
+        return new UserResource(userResponseFactory.getUser(user, locale));
     }
 
     @Operation(summary = "Get all users with specified roles", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/role", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> getAllWithRole(@RequestBody Set<String> roleIds, @RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Locale locale) {
-        small = small == null ? false : small;
-        Page<IUser> page = userService.findAllActiveByProcessRoles(roleIds, small, pageable);
-        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
-                .getAllWithRole(roleIds, small, pageable, assembler, locale)).withRel("role");
-        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "role"), selfLink);
-        ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
-        return resources;
+//        small = small == null ? false : small;
+        Set<ProcessResourceId> roleResourceIds = roleIds == null ? null : roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet());
+        Page<IUser> page = userService.findAllActiveByProcessRoles(roleResourceIds, pageable, null);
+//        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
+//                .getAllWithRole(roleIds, small, pageable, assembler, locale)).withRel("role");
+//        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "role"), selfLink);
+//        ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
+        return PagedModel.of(page.stream().map(u -> new UserResource((User) u)).toList(), new PagedModel.PageMetadata(pageable.getPageNumber(), pageable.getPageSize(), page.getTotalElements()));
     }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
@@ -185,7 +180,7 @@ public class UserController {
     })
     public MessageResource assignRolesToUser(@PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
         try {
-            processRoleService.assignRolesToUser(userId, roleIds, (LoggedUser) auth.getPrincipal());
+            processRoleService.assignRolesToUser(userId, roleIds.stream().map(ProcessResourceId::new).collect(Collectors.toSet()), (LoggedUser) auth.getPrincipal());
             log.info("Process roles " + roleIds + " assigned to user " + userId);
             return MessageResource.successMessage("Selected roles assigned to user " + userId);
         } catch (IllegalArgumentException e) {
@@ -217,7 +212,7 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public MessageResource assignAuthorityToUser(@PathVariable("id") String userId, @RequestBody String authorityId) {
-        userService.assignAuthority(userId, authorityId);
+        userService.assignAuthority(userId, null, authorityId);
         return MessageResource.successMessage("Authority " + authorityId + " assigned to user " + userId);
     }
 

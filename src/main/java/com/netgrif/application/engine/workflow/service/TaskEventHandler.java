@@ -2,7 +2,7 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.core.workflow.domain.Task;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;

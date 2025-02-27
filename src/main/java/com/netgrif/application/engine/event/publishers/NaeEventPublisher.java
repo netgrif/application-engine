@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.event.publishers;
 
-import com.netgrif.application.engine.event.events.Event;
+import com.netgrif.core.event.events.Event;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;

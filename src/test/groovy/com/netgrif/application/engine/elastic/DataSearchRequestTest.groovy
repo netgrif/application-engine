@@ -2,26 +2,23 @@ package com.netgrif.application.engine.elastic
 
 import com.netgrif.application.engine.MockService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.elastic.domain.ElasticCase
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
-import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
-import com.netgrif.application.engine.elastic.domain.ElasticTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
-import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
-import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.core.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.dataset.ChoiceField
+import com.netgrif.core.petrinet.domain.dataset.FileFieldValue
+import com.netgrif.core.petrinet.domain.dataset.FileListFieldValue
+import com.netgrif.core.petrinet.domain.dataset.UserFieldValue
+import com.netgrif.core.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.QTask
-import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.adapter.workflow.domain.QTask
+import com.netgrif.core.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -69,7 +66,7 @@ class DataSearchRequestTest {
     private IWorkflowService workflowService
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private MockService mockService
@@ -101,7 +98,7 @@ class DataSearchRequestTest {
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
 
-        def users = userService.findAll(true)
+        def users = userService.findAllUsers(null)
         assert users.size() >= 2
         def testUser1 = users[0]
         def testUser2 = users[1]
@@ -116,7 +113,7 @@ class DataSearchRequestTest {
         _case.dataSet["number"].value = 7.0 as Double
         _case.dataSet["boolean"].value = true
         _case.dataSet["text"].value = "hello world" as String
-        _case.dataSet["user"].value = new UserFieldValue(testUser1.stringId, testUser1.name, testUser1.surname, testUser1.email)
+        _case.dataSet["user"].value = new UserFieldValue(testUser1.stringId, testUser1.firstName, testUser1.lastName, testUser1.email)
         _case.dataSet["date"].value = date
         _case.dataSet["datetime"].value = date.atTime(13, 37)
         _case.dataSet["enumeration"].value = (_case.petriNet.dataSet["enumeration"] as ChoiceField).choices.find({ it.defaultValue == "Alice" })
@@ -146,10 +143,10 @@ class DataSearchRequestTest {
                 new AbstractMap.SimpleEntry<String, String>("boolean.booleanValue" as String, "true" as String),
                 new AbstractMap.SimpleEntry<String, String>("text" as String, "hello world" as String),
                 new AbstractMap.SimpleEntry<String, String>("text.textValue.keyword" as String, "hello world" as String),
-                new AbstractMap.SimpleEntry<String, String>("user" as String, "${testUser1.fullName} ${testUser1.email}" as String),
+                new AbstractMap.SimpleEntry<String, String>("user" as String, "${testUser1.name} ${testUser1.email}" as String),
                 new AbstractMap.SimpleEntry<String, String>("user.emailValue.keyword" as String, "${testUser1.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("user.fullNameValue.keyword" as String, "${testUser1.fullName}" as String),
-                new AbstractMap.SimpleEntry<String, String>("user.userIdValue" as String, "${testUser1.getId()}" as String),
+                new AbstractMap.SimpleEntry<String, String>("user.fullNameValue.keyword" as String, "${testUser1.name}" as String),
+                new AbstractMap.SimpleEntry<String, String>("user.userIdValue" as String, "${testUser1.getStringId()}" as String),
                 new AbstractMap.SimpleEntry<String, String>("date.timestampValue" as String, "${Timestamp.valueOf(LocalDateTime.of(date, LocalTime.NOON)).getTime()}" as String),
                 new AbstractMap.SimpleEntry<String, String>("datetime.timestampValue" as String, "${Timestamp.valueOf(date.atTime(13, 37)).getTime()}" as String),
                 new AbstractMap.SimpleEntry<String, String>("enumeration" as String, "Alice" as String),
@@ -188,14 +185,14 @@ class DataSearchRequestTest {
                 new AbstractMap.SimpleEntry<String, String>("fileList.fileNameValue.keyword" as String, "multifile2" as String),
                 new AbstractMap.SimpleEntry<String, String>("fileList.fileExtensionValue.keyword" as String, "txt" as String),
                 new AbstractMap.SimpleEntry<String, String>("fileList.fileExtensionValue.keyword" as String, "pdf" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList" as String, "${testUser1.fullName} ${testUser1.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList" as String, "${testUser2.fullName} ${testUser2.email}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList" as String, "${testUser1.name} ${testUser1.email}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList" as String, "${testUser2.name} ${testUser2.email}" as String),
                 new AbstractMap.SimpleEntry<String, String>("userList.emailValue.keyword" as String, "${testUser1.email}" as String),
                 new AbstractMap.SimpleEntry<String, String>("userList.emailValue.keyword" as String, "${testUser2.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList.fullNameValue.keyword" as String, "${testUser1.fullName}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList.fullNameValue.keyword" as String, "${testUser2.fullName}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList.userIdValue" as String, "${testUser1.getId()}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList.userIdValue" as String, "${testUser2.getId()}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.fullNameValue.keyword" as String, "${testUser1.name}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.fullNameValue.keyword" as String, "${testUser2.name}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.userIdValue" as String, "${testUser1.getStringId()}" as String),
+                new AbstractMap.SimpleEntry<String, String>("userList.userIdValue" as String, "${testUser2.getStringId()}" as String),
                 new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed" as String, "Eve" as String),
                 new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed" as String, "Eva" as String),
                 new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed.textValue.keyword" as String, "Eve" as String),
@@ -218,6 +215,7 @@ class DataSearchRequestTest {
 
     @Test
     void testDatSearchRequests() {
+        sleep(2000) //Elastic Index
         testCases.each { testCase ->
             CaseSearchRequest request = new CaseSearchRequest()
             request.data = new HashMap<>()

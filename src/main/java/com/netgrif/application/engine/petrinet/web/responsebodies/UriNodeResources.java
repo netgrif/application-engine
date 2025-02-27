@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
-import com.netgrif.application.engine.petrinet.domain.UriNode;
+import com.netgrif.core.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.web.UriController;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;

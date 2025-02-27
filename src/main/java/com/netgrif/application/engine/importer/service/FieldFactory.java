@@ -2,18 +2,18 @@ package com.netgrif.application.engine.importer.service;
 
 import com.netgrif.application.engine.files.IStorageResolverService;
 import com.netgrif.application.engine.files.minio.MinIoProperties;
-import com.netgrif.application.engine.importer.model.*;
+import com.netgrif.core.importer.model.*;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.application.engine.petrinet.domain.Component;
-import com.netgrif.application.engine.petrinet.domain.Format;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.*;
+import com.netgrif.core.petrinet.domain.Component;
+import com.netgrif.core.petrinet.domain.Format;
+import com.netgrif.core.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.factory.StorageFactory;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation;
-import com.netgrif.application.engine.petrinet.domain.views.View;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.DataField;
+import com.netgrif.core.petrinet.domain.dataset.logic.action.runner.Expression;
+import com.netgrif.core.petrinet.domain.dataset.logic.validation.DynamicValidation;
+import com.netgrif.core.petrinet.domain.views.View;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataValidationExpressionEvaluator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -280,8 +280,8 @@ public final class FieldFactory {
             }
         }
         if (data.getValidations() != null) {
-            List<com.netgrif.application.engine.importer.model.Validation> list = data.getValidations().getValidation();
-            for (com.netgrif.application.engine.importer.model.Validation item : list) {
+            List<com.netgrif.core.importer.model.Validation> list = data.getValidations().getValidation();
+            for (com.netgrif.core.importer.model.Validation item : list) {
                 field.addValidation(makeValidation(item.getExpression().getValue(), importer.toI18NString(item.getMessage()), item.getExpression().isDynamic()));
             }
         }
@@ -318,8 +318,8 @@ public final class FieldFactory {
         return field;
     }
 
-    private com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation makeValidation(String rule, I18nString message, boolean dynamic) {
-        return dynamic ? new DynamicValidation(rule, message) : new com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation(rule, message);
+    private com.netgrif.core.petrinet.domain.dataset.logic.validation.Validation makeValidation(String rule, I18nString message, boolean dynamic) {
+        return dynamic ? new DynamicValidation(rule, message) : new com.netgrif.core.petrinet.domain.dataset.logic.validation.Validation(rule, message);
     }
 
     private TaskField buildTaskField(Data data, List<Transition> transitions) {
@@ -592,16 +592,16 @@ public final class FieldFactory {
         }
     }
 
-    public Field buildFieldWithoutValidation(Case useCase, String fieldId, String transitionId) {
+    public Field<?> buildFieldWithoutValidation(Case useCase, String fieldId, String transitionId) {
         return buildField(useCase, fieldId, false, transitionId);
     }
 
-    public Field buildFieldWithValidation(Case useCase, String fieldId, String transitionId) {
+    public Field<?>  buildFieldWithValidation(Case useCase, String fieldId, String transitionId) {
         return buildField(useCase, fieldId, true, transitionId);
     }
 
-    private Field buildField(Case useCase, String fieldId, boolean withValidation, String transitionId) {
-        Field field = useCase.getPetriNet().getDataSet().get(fieldId);
+    private Field<?>  buildField(Case useCase, String fieldId, boolean withValidation, String transitionId) {
+        Field<?>  field = useCase.getPetriNet().getDataSet().get(fieldId);
 
         resolveDataValues(field, useCase, fieldId);
         resolveComponent(field, useCase, transitionId);
@@ -620,13 +620,13 @@ public final class FieldFactory {
 
     @SuppressWarnings({"all", "rawtypes", "unchecked"})
     private void resolveValidations(Field field, Case useCase) {
-        List<com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation> validations = useCase.getDataField(field.getImportId()).getValidations();
+        List<com.netgrif.core.petrinet.domain.dataset.logic.validation.Validation> validations = useCase.getDataField(field.getImportId()).getValidations();
         if (validations != null) {
             field.setValidations(validations.stream().map(it -> it.clone()).collect(Collectors.toList()));
         }
         if (field.getValidations() == null) return;
 
-        ((List<com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation>) field.getValidations()).stream()
+        ((List<com.netgrif.core.petrinet.domain.dataset.logic.validation.Validation>) field.getValidations()).stream()
                 .filter(it -> it instanceof DynamicValidation).map(it -> (DynamicValidation) it).forEach(valid -> {
                     valid.setCompiledRule(dataValidationExpressionEvaluator.compile(useCase, valid.getExpression()));
                 });

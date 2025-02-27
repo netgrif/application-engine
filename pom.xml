@@ -128,6 +128,11 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>com.netgrif</groupId>
+            <artifactId>nae-ce-user</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
         <!-- Actuator -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -681,11 +686,12 @@
                             <outputDirectory>target/generated-sources/java</outputDirectory>
                             <processors>
                                 <processor>
-                                    org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor
+                                    com.querydsl.apt.QuerydslAnnotationProcessor
                                 </processor>
                             </processors>
                             <options>
                                 <querydsl.excludedClasses>groovy.lang.MetaClass</querydsl.excludedClasses>
+                                <querydsl.unknownAsEmbeddable>true</querydsl.unknownAsEmbeddable>
                             </options>
                         </configuration>
                     </execution>
@@ -742,7 +748,7 @@
                         </goals>
                         <configuration>
                             <!-- The package of your generated sources -->
-                            <packageName>com.netgrif.application.engine.importer.model</packageName>
+                            <packageName>com.netgrif.core.importer.model</packageName>
                             <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
                             <sources>
                                 <source>src/main/resources/petriNets/petriflow_schema.xsd</source>

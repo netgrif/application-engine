@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.web;
 
 import com.netgrif.application.engine.petrinet.domain.throwable.IllegalTaskStateException;
-import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
+import com.netgrif.core.workflow.web.responsebodies.MessageResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
