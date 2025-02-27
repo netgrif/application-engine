@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.elastic.service;
 
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNet;
-import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository;
+import com.netgrif.application.engine.elastic.domain.repoitories.ElasticPetriNetRepository;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
 import com.netgrif.application.engine.petrinet.domain.Process;

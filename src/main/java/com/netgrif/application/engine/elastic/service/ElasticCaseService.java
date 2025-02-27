@@ -3,7 +3,7 @@ package com.netgrif.application.engine.elastic.service;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
-import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
+import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;

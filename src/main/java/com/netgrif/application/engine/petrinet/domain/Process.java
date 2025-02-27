@@ -39,7 +39,7 @@ public class Process extends ProcessObject {
     private String icon;
     private I18nExpression defaultCaseName;
     // TODO 2058: release/8.0.0 - default + anonymous role, roleref
-    private AccessPermissions<CasePermission> permissions;
+    private AccessPermissions<CasePermission> processRolePermissions;
     private AccessPermissions<CasePermission> caseRolePermissions;
     private Map<ProcessEventType, ProcessEvent> processEvents;
     private Map<CaseEventType, CaseEvent> caseEvents;
@@ -71,7 +71,7 @@ public class Process extends ProcessObject {
         dataSet = new UniqueKeyMap<>();
         processEvents = new HashMap<>();
         caseEvents = new HashMap<>();
-        permissions = new AccessPermissions<>();
+        processRolePermissions = new AccessPermissions<>();
         caseRolePermissions = new AccessPermissions<>();
         functions = new LinkedList<>();
         properties = new UniqueKeyMap<>();
@@ -89,8 +89,8 @@ public class Process extends ProcessObject {
         this.transitions.put(transition.getStringId(), transition);
     }
 
-    public void addPermission(String actorId, Map<CasePermission, Boolean> permissions) {
-        this.permissions.addPermissions(actorId, permissions);
+    public void addProcessRolePermission(String actorId, Map<CasePermission, Boolean> permissions) {
+        this.processRolePermissions.addPermissions(actorId, permissions);
     }
 
     public void addCaseRolePermission(String userListId, Map<CasePermission, Boolean> permissions) {
@@ -308,7 +308,7 @@ public class Process extends ProcessObject {
         clone.initializeArcs();
         clone.setCaseEvents(this.caseEvents == null ? null : this.caseEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
         clone.setProcessEvents(this.processEvents == null ? null : this.processEvents.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
-        clone.setPermissions(new AccessPermissions<>(this.permissions));
+        clone.setProcessRolePermissions(new AccessPermissions<>(this.processRolePermissions));
         clone.setCaseRolePermissions(new AccessPermissions<>(this.caseRolePermissions));
         this.getFunctions().forEach(clone::addFunction);
         clone.setProperties(new UniqueKeyMap<>(this.properties));

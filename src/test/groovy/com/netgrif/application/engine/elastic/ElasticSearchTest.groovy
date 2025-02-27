@@ -5,7 +5,7 @@ import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
+import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepository
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField
 import com.netgrif.application.engine.authorization.domain.ProcessRole

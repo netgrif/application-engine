@@ -32,6 +32,9 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
     protected Set<String> roleAssignments;
 
     @Setter
+    protected Set<String> roles;
+
+    @Setter
     protected boolean anonymous;
 
     private LoggedUser impersonated;
@@ -44,6 +47,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
     }
 
     public void addRoleAssignments(Set<RoleAssignment> roleAssignments) {
+        // todo 2058 also initialize this.roles?
         Set<String> roleAssignmentIds = roleAssignments.stream()
                 .map(RoleAssignment::getStringId)
                 .collect(Collectors.toSet());

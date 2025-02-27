@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.elastic.service;
 
-import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
+import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;

@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.elastic.service;
 
 
+import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
 import com.netgrif.application.engine.elastic.domain.DataField;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
@@ -8,6 +9,7 @@ import com.netgrif.application.engine.elastic.service.transform.ElasticDataField
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.elastic.ElasticMappingUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,7 +33,10 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     @Override
     public ElasticCase transform(Case useCase) {
         ElasticCase transformedCase = new ElasticCase(useCase);
+
+        this.populatePermissions(transformedCase, useCase);
         this.populateDataSet(transformedCase, useCase);
+
         return transformedCase;
     }
 
@@ -56,5 +61,21 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return Optional.empty();
         }
         return Optional.ofNullable(transformer.transform(caseField, netField));
+    }
+
+    protected void populatePermissions(ElasticCase transformedCase, Case useCase) {
+        transformedCase.setViewProcessRoles(ElasticMappingUtils.filterRoleIdsByPermissionType(
+                useCase.getProcessRolePermissions(), CasePermission.VIEW));
+        transformedCase.setPositiveViewProcessRoles(ElasticMappingUtils.filterRoleIdsByPermissionValue(
+                useCase.getProcessRolePermissions(), CasePermission.VIEW, true));
+        transformedCase.setNegativeViewProcessRoles(ElasticMappingUtils.filterRoleIdsByPermissionValue(
+                useCase.getProcessRolePermissions(), CasePermission.VIEW, false));
+
+        transformedCase.setViewCaseRoles(ElasticMappingUtils.filterRoleIdsByPermissionType(
+                useCase.getCaseRolePermissions(), CasePermission.VIEW));
+        transformedCase.setPositiveViewCaseRoles(ElasticMappingUtils.filterRoleIdsByPermissionValue(
+                useCase.getCaseRolePermissions(), CasePermission.VIEW, true));
+        transformedCase.setNegativeViewCaseRoles(ElasticMappingUtils.filterRoleIdsByPermissionValue(
+                useCase.getCaseRolePermissions(), CasePermission.VIEW, false));
     }
 }

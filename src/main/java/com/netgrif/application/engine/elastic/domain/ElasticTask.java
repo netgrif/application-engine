@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.netgrif.application.engine.workflow.domain.State;
 import com.netgrif.application.engine.workflow.domain.Task;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +17,6 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,6 +47,9 @@ public class ElasticTask {
     private String transitionId;
 
     @Field(type = Keyword)
+    private State state;
+
+    @Field(type = Keyword)
     private String title; //TODO: i18n
 
     @Field(type = Keyword)
@@ -70,25 +73,22 @@ public class ElasticTask {
     private LocalDateTime startDate;
 
     @Field(type = Keyword)
-    private String transactionId;
+    private Set<String> viewProcessRoles;
 
     @Field(type = Keyword)
-    private Set<String> roles;
+    private Set<String> viewCaseRoles;
 
     @Field(type = Keyword)
-    private Set<String> viewUserRefs;
+    private Set<String> positiveViewProcessRoles;
 
     @Field(type = Keyword)
-    private Set<String> viewRoles;
+    private Set<String> negativeViewProcessRoles;
 
     @Field(type = Keyword)
-    private Set<String> negativeViewRoles;
+    private Set<String> positiveViewCaseRoles;
 
     @Field(type = Keyword)
-    private Set<String> viewUsers;
-
-    @Field(type = Keyword)
-    private Set<String> negativeViewUsers;
+    private Set<String> negativeViewCaseRoles;
 
     @Field(type = Keyword)
     private String icon;
@@ -102,7 +102,7 @@ public class ElasticTask {
     @Field(type = Keyword)
     private String finishPolicy;
 
-    private Map<String, String> tags;
+    private Map<String, String> properties;
 
     public ElasticTask(Task task) {
         this.stringId = task.getStringId();
@@ -112,6 +112,7 @@ public class ElasticTask {
         this.transitionId = task.getTransitionId();
         this.title = task.getTitle().getDefaultValue();
         this.titleSortable = title;
+        this.state = task.getState();
 //        TODO: release/8.0.0
 //        this.caseTitle = task.getCaseTitle();
         this.caseTitleSortable = this.caseTitle;
@@ -119,29 +120,24 @@ public class ElasticTask {
 //            this.priority = task.getPriority();
 //        this.userId = task.getUserId();
         this.startDate = task.getLastAssigned();
-        this.roles = task.getPermissions().keySet();
-//        this.viewRoles = new HashSet<>(task.getViewRoles());
-//        this.viewUserRefs = new HashSet<>(task.getViewUserRefs());
-//        this.negativeViewRoles = new HashSet<>(task.getNegativeViewRoles());
-//        this.viewUsers = new HashSet<>(task.getViewUsers());
-//        this.negativeViewUsers = new HashSet<>(task.getNegativeViewUsers());
-        this.tags = new HashMap<>(task.getProperties());
+        this.properties = new HashMap<>(task.getProperties());
     }
 
     public void update(ElasticTask task) {
         this.title = task.getTitle();
         this.titleSortable = title;
+        this.state = task.getState();
         this.caseTitle = task.getCaseTitle();
         this.caseTitleSortable = this.caseTitle;
         this.priority = task.getPriority();
         this.userId = task.getUserId();
         this.startDate = task.getStartDate();
-        this.roles = task.getRoles();
-        this.viewRoles = task.getViewRoles();
-        this.viewUserRefs = task.getViewUserRefs();
-        this.negativeViewRoles = task.getNegativeViewRoles();
-        this.viewUsers = task.getViewUsers();
-        this.negativeViewUsers = task.getNegativeViewUsers();
-        this.tags = task.getTags();
+        this.viewProcessRoles = task.getViewProcessRoles();
+        this.positiveViewProcessRoles = task.getPositiveViewProcessRoles();
+        this.viewCaseRoles = task.getViewCaseRoles();
+        this.negativeViewProcessRoles = task.getNegativeViewProcessRoles();
+        this.positiveViewCaseRoles = task.getPositiveViewCaseRoles();
+        this.negativeViewCaseRoles = task.getNegativeViewCaseRoles();
+        this.properties = task.getProperties();
     }
 }

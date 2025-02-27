@@ -75,7 +75,8 @@ public class Case implements Serializable {
     @Indexed
     private Map<String, TaskPair> tasks = new HashMap<>();
     @JsonIgnore
-    private AccessPermissions<CasePermission> permissions = new AccessPermissions<>();
+    private AccessPermissions<CasePermission> processRolePermissions = new AccessPermissions<>();
+    private AccessPermissions<CasePermission> caseRolePermissions = new AccessPermissions<>();
     private Map<String, String> properties = new HashMap<>();
 
     private String uriNodeId;
@@ -94,7 +95,8 @@ public class Case implements Serializable {
         parentPetriNetIdentifiers = new ArrayList<>(petriNet.getParentIdentifiers());
         activePlaces = petriNet.getActivePlaces();
         icon = petriNet.getIcon();
-        permissions = new AccessPermissions<>(petriNet.getPermissions(), Set.of(CasePermission.CREATE));
+        processRolePermissions = new AccessPermissions<>(petriNet.getProcessRolePermissions(), Set.of(CasePermission.CREATE));
+        caseRolePermissions = new AccessPermissions<>();
     }
 
     public String getStringId() {
@@ -104,15 +106,29 @@ public class Case implements Serializable {
     /**
      * todo javadoc
      * */
-    public void addPermissionsForRole(String authorizationGroupId, Map<CasePermission, Boolean> permissions) {
-        this.permissions.addPermissions(authorizationGroupId, permissions);
+    public void addProcessRolePermissions(String roleId, Map<CasePermission, Boolean> permissions) {
+        this.processRolePermissions.addPermissions(roleId, permissions);
     }
 
     /**
      * todo javadoc
      * */
-    public void addPermissionsForRoles(AccessPermissions<CasePermission> rolesAndPermissions) {
-        this.permissions.addPermissions(rolesAndPermissions);
+    public void addProcessRolePermissions(AccessPermissions<CasePermission> rolesAndPermissions) {
+        this.processRolePermissions.addPermissions(rolesAndPermissions);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public void addCaseRolePermissions(String roleId, Map<CasePermission, Boolean> permissions) {
+        this.caseRolePermissions.addPermissions(roleId, permissions);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public void addCaseRolePermissions(AccessPermissions<CasePermission> rolesAndPermissions) {
+        this.caseRolePermissions.addPermissions(rolesAndPermissions);
     }
 
     public void resolveImmediateDataFields() {
