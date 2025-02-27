@@ -9,6 +9,9 @@ import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
+import com.netgrif.application.engine.authorization.domain.ProcessRole
+import com.netgrif.application.engine.authorization.domain.Role
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.configuration.PublicViewProperties
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
@@ -27,8 +30,6 @@ import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupS
 import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
-import com.netgrif.application.engine.authorization.domain.ProcessRole
-import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.rules.domain.RuleRepository
@@ -177,6 +178,9 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     @Autowired
     IValidationService validationService
+
+    @Autowired
+    IRoleService roleService
 
     FrontendActionOutcome Frontend
 
@@ -810,46 +814,34 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         refs.find { it.transitionId == transitionId }.stringId
     }
 
-    IUser assignRole(String roleMongoId, IUser user = userService.loggedUser) {
-        IUser actualUser = userService.addRole(user, roleMongoId)
-        return actualUser
+    /**
+     * todo javadoc
+     * */
+    Role assignRole(String roleId, String userId = userService.loggedUser.stringId , Map<String, String> params = this.params) {
+        List<Role> roleAsList = assignRoles([roleId] as Set, userId, params)
+        return roleAsList.isEmpty() ? null : roleAsList[0]
     }
 
-    IUser assignRole(String roleId, String netId, IUser user = userService.loggedUser) {
-        List<Process> nets = petriNetService.getByIdentifier(netId)
-        nets.forEach({ net -> user = assignRole(roleId, net, user) })
-        return user
+    /**
+     * todo javadoc
+     * */
+    List<Role> assignRoles(Set<String> roleIds, String userId = userService.loggedUser.stringId, Map<String, String> params = this.params) {
+        return roleService.assignRolesToUser(userId, roleIds, params)
     }
 
-    IUser assignRole(String roleId, Process net, IUser user = userService.loggedUser) {
-        IUser actualUser = userService.addRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
-        return actualUser
+    /**
+     * todo javadoc
+     * */
+    Role removeRole(String roleId, String userId = userService.loggedUser.stringId, Map<String, String> params = this.params) {
+        List<Role> roleAsList = removeRoles([roleId] as Set, userId, params)
+        return roleAsList.isEmpty() ? null : roleAsList[0]
     }
 
-    IUser assignRole(String roleId, String netId, Version version, IUser user = userService.loggedUser) {
-        Process net = petriNetService.getPetriNet(netId, version)
-        return assignRole(roleId, net, user)
-    }
-
-    IUser removeRole(String roleMongoId, IUser user = userService.loggedUser) {
-        IUser actualUser = userService.removeRole(user, roleMongoId)
-        return actualUser
-    }
-
-    IUser removeRole(String roleId, String netId, IUser user = userService.loggedUser) {
-        List<Process> nets = petriNetService.getByIdentifier(netId)
-        nets.forEach({ net -> user = removeRole(roleId, net, user) })
-        return user
-    }
-
-    IUser removeRole(String roleId, Process net, IUser user = userService.loggedUser) {
-        IUser actualUser = userService.removeRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
-        return actualUser
-    }
-
-    IUser removeRole(String roleId, String netId, Version version, IUser user = userService.loggedUser) {
-        Process net = petriNetService.getPetriNet(netId, version)
-        return removeRole(roleId, net, user)
+    /**
+     * todo javadoc
+     * */
+    List<Role> removeRoles(Set<String> roleIds, String userId = userService.loggedUser.stringId, Map<String, String> params = this.params) {
+        return roleService.removeRolesFromUser(userId, roleIds, params)
     }
 
     // TODO: release/8.0.0 merge check, params x dataset
