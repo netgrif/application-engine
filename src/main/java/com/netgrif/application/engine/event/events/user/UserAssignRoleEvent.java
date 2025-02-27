@@ -2,31 +2,31 @@ package com.netgrif.application.engine.event.events.user;
 
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.authorization.domain.ProcessRole;
+import com.netgrif.application.engine.authorization.domain.Role;
 import lombok.Getter;
 
 import java.util.Collection;
 
-public class UserRoleChangeEvent extends UserEvent {
+@Getter
+public class UserAssignRoleEvent extends UserEvent {
 
-    @Getter
-    protected final Collection<ProcessRole> processRoles;
+    protected final Collection<Role> roles;
 
-    public UserRoleChangeEvent(LoggedUser user, Collection<ProcessRole> processRoles) {
+    public UserAssignRoleEvent(LoggedUser user, Collection<Role> roles) {
         super(user);
-        this.processRoles = processRoles;
+        this.roles = roles;
     }
 
-    public UserRoleChangeEvent(IUser user, Collection<ProcessRole> processRoles) {
+    public UserAssignRoleEvent(IUser user, Collection<Role> roles) {
         super(user.transformToLoggedUser());
-        this.processRoles = processRoles;
+        this.roles = roles;
     }
 
     @Override
     public String getMessage() {
         StringBuilder sb = new StringBuilder("Roles ");
-        processRoles.forEach(role -> {
-            sb.append(role.getTitle());
+        roles.forEach(role -> {
+            sb.append(role.getTitleAsString());
             sb.append(",");
         });
         sb.append(" assigned to user ");

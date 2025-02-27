@@ -1,13 +1,14 @@
 package com.netgrif.application.engine.petrinet.web;
 
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -28,6 +29,7 @@ import static com.netgrif.application.engine.petrinet.web.PetriNetController.dec
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @ConditionalOnProperty(
         value = "nae.public.petrinet.web.enabled",
         havingValue = "true",
@@ -38,19 +40,8 @@ import static com.netgrif.application.engine.petrinet.web.PetriNetController.dec
 public class PublicPetriNetController {
 
     private final IPetriNetService petriNetService;
-
-    private final IProcessRoleService roleService;
-
     private final IUserService userService;
-
     private final StringToVersionConverter converter;
-
-    public PublicPetriNetController(IPetriNetService petriNetService, IUserService userService, StringToVersionConverter converter, IProcessRoleService roleService) {
-        this.petriNetService = petriNetService;
-        this.converter = converter;
-        this.userService = userService;
-        this.roleService = roleService;
-    }
 
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Get process by id")
@@ -75,14 +66,6 @@ public class PublicPetriNetController {
         PagedModel<PetriNetReferenceResource> resources = assembler.toModel(nets, new PetriNetReferenceResourceAssembler(), selfLink);
         PetriNetReferenceResourceAssembler.buildLinks(resources);
         return resources;
-    }
-
-    // TODO: release/8.0.0 deprecated
-    @Operation(summary = "Get roles of process")
-    @GetMapping(value = "/{netId}/roles", produces = MediaTypes.HAL_JSON_VALUE)
-    public RolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
-        netId = decodeUrl(netId);
-        return new RolesResource(roleService.findAll(netId), petriNetService.getPetriNet(netId).getPermissions(), locale);
     }
 
     @Operation(summary = "Get data fields of transitions")

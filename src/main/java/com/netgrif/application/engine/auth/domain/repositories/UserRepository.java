@@ -13,6 +13,7 @@ import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -25,13 +26,11 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
 
     List<User> findAllByStateAndExpirationDateBefore(UserState userState, LocalDateTime dateTime);
 
-    Page<User> findDistinctByStateAndRoles_IdIn(UserState state, List<String> roleId, Pageable pageable);
-
-    List<User> findAllByRoles_IdIn(List<String> roleId);
-
     List<User> removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime);
 
     List<User> findAllByIdIn(Set<ObjectId> ids);
+
+    Page<User> findAllByIdIn(Collection<ObjectId> ids, Pageable pageable);
 
     boolean existsByEmail(String email);
 

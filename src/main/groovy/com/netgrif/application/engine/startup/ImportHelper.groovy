@@ -3,13 +3,14 @@ package com.netgrif.application.engine.startup
 import com.netgrif.application.engine.auth.domain.*
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.DataRef
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.authorization.domain.ProcessRole
-import com.netgrif.application.engine.authorization.service.ProcessRoleService
+
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.workflow.domain.Case
@@ -67,7 +68,7 @@ class ImportHelper {
     private INextGroupService groupService
 
     @Autowired
-    private ProcessRoleService roleService
+    private IRoleService roleService
 
     @Autowired
     private IUriService uriService
@@ -109,9 +110,9 @@ class ImportHelper {
 
     IUser createUser(User user, Authority[] authorities, ProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
-        roles.each { user.addRole(it) }
         user.state = UserState.ACTIVE
         user = userService.saveNew(user)
+        roleService.assignRolesToUser(user.stringId, roles as Set<String>)
         log.info("User $user.name $user.surname created")
         return user
     }

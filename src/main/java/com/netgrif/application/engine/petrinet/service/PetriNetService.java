@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.properties.CacheProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
@@ -74,7 +74,7 @@ import static com.netgrif.application.engine.petrinet.service.interfaces.IPetriN
 public class PetriNetService implements IPetriNetService {
 
     @Autowired
-    private IProcessRoleService roleService;
+    private IRoleService roleService;
 
     @Autowired
     private PetriNetRepository repository;
@@ -425,8 +425,10 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public List<PetriNetReference> getReferencesByUsersRoles(LoggedUser user, Locale locale) {
-        Query query = Query.query(getRolesCriteria(user));
-        return mongoTemplate.find(query, Process.class).stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
+        // todo 2058
+//        Query query = Query.query(getRolesCriteria(user));
+//        return mongoTemplate.find(query, Process.class).stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
+        return new ArrayList<>();
     }
 
     @Override
@@ -476,8 +478,9 @@ public class PetriNetService implements IPetriNetService {
         Query query = new Query();
         Query queryTotal = new Query();
 
-        if (!user.getSelfOrImpersonated().isAdmin())
-            query.addCriteria(getRolesCriteria(user.getSelfOrImpersonated()));
+        // todo 2058
+//        if (!user.getSelfOrImpersonated().isAdmin())
+//            query.addCriteria(getRolesCriteria(user.getSelfOrImpersonated()));
 
         if (criteriaClass.getIdentifier() != null) {
             this.addValueCriteria(query, queryTotal, Criteria.where("identifier").regex(criteriaClass.getIdentifier(), "i"));
@@ -531,7 +534,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     @Transactional
-    public void deletePetriNet(String processId, LoggedUser loggedUser) {
+    public void deletePetriNet(String processId) {
         Optional<Process> petriNetOptional = repository.findById(processId);
         if (petriNetOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find process with id [" + processId + "]");
@@ -541,17 +544,15 @@ public class PetriNetService implements IPetriNetService {
         List<Process> childPetriNets = repository.findAllChildrenByParentId(petriNet.getObjectId());
 
         for (Process childPetriNet : childPetriNets) {
-            deletePetriNet(childPetriNet, loggedUser);
+            deletePetriNet(childPetriNet);
         }
-        deletePetriNet(petriNet, loggedUser);
+        deletePetriNet(petriNet);
     }
 
-    private void deletePetriNet(Process process, LoggedUser loggedUser) {
+    private void deletePetriNet(Process process) {
         log.info("[{}]: Initiating deletion of Petri net {} version {}", process.getStringId(), process.getIdentifier(), process.getVersion().toString());
 
-        this.userService.removeRoleOfDeletedPetriNet(process);
         this.workflowService.deleteInstancesOfPetriNet(process);
-        this.roleService.deleteRolesOfNet(process, loggedUser);
         try {
             ldapGroupService.deleteRoleByPetriNet(process.getStringId());
         } catch (NullPointerException e) {
@@ -567,11 +568,6 @@ public class PetriNetService implements IPetriNetService {
         // net functions must be removed from cache after it was deleted from repository
         this.functionCacheService.reloadCachedFunctions(process);
         historyService.save(new DeletePetriNetEventLog(null, EventPhase.PRE, process.getObjectId()));
-    }
-
-    private Criteria getRolesCriteria(LoggedUser user) {
-        return new Criteria().orOperator(user.getRoles().stream()
-                .map(role -> Criteria.where("permissions." + role).exists(true)).toArray(Criteria[]::new));
     }
 
     @Override

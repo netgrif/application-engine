@@ -22,7 +22,6 @@ import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.domain.throwable.IllegalMarkingException;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.MultiplicityEvaluator;
-import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.rules.domain.facts.TransitionEventFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.utils.DateUtils;
@@ -50,11 +49,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
@@ -90,9 +87,6 @@ public class TaskService implements ITaskService {
 
     @Autowired
     protected IDataService dataService;
-
-    @Autowired
-    protected IProcessRoleService processRoleService;
 
     @Autowired
     protected IRoleService roleService;
@@ -579,28 +573,30 @@ public class TaskService implements ITaskService {
         List<Task> tasks;
         LoggedUser loggedOrImpersonated = loggedUser.getSelfOrImpersonated();
 
-        if (loggedOrImpersonated.getRoles().isEmpty()) {
-            tasks = new ArrayList<>();
-            return new PageImpl<>(tasks, pageable, 0L);
-        } else {
-            StringBuilder queryBuilder = new StringBuilder();
-            queryBuilder.append("{$or:[");
-            loggedOrImpersonated.getRoles().forEach(role -> {
-                queryBuilder.append("{\"roles.");
-                queryBuilder.append(role);
-                queryBuilder.append("\":{$exists:true}},");
-            });
-            if (!loggedOrImpersonated.getRoles().isEmpty())
-                queryBuilder.deleteCharAt(queryBuilder.length() - 1);
-            else
-                queryBuilder.append("{}");
-            queryBuilder.append("]}");
-            BasicQuery query = new BasicQuery(queryBuilder.toString());
-            query = (BasicQuery) query.with(pageable);
-            tasks = mongoTemplate.find(query, Task.class);
-            return loadUsers(new PageImpl<>(tasks, pageable,
-                    mongoTemplate.count(new BasicQuery(queryBuilder.toString(), "{id:1}"), Task.class)));
-        }
+        // todo 2058
+//        if (loggedOrImpersonated.getRoles().isEmpty()) {
+//            tasks = new ArrayList<>();
+//            return new PageImpl<>(tasks, pageable, 0L);
+//        } else {
+//            StringBuilder queryBuilder = new StringBuilder();
+//            queryBuilder.append("{$or:[");
+//            loggedOrImpersonated.getRoles().forEach(role -> {
+//                queryBuilder.append("{\"roles.");
+//                queryBuilder.append(role);
+//                queryBuilder.append("\":{$exists:true}},");
+//            });
+//            if (!loggedOrImpersonated.getRoles().isEmpty())
+//                queryBuilder.deleteCharAt(queryBuilder.length() - 1);
+//            else
+//                queryBuilder.append("{}");
+//            queryBuilder.append("]}");
+//            BasicQuery query = new BasicQuery(queryBuilder.toString());
+//            query = (BasicQuery) query.with(pageable);
+//            tasks = mongoTemplate.find(query, Task.class);
+//            return loadUsers(new PageImpl<>(tasks, pageable,
+//                    mongoTemplate.count(new BasicQuery(queryBuilder.toString(), "{id:1}"), Task.class)));
+//        }
+        return Page.empty();
     }
 
     @Override

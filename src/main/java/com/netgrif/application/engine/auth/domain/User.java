@@ -122,7 +122,6 @@ public class User extends AbstractUser implements RegisteredUser {
                 ", token='" + token + '\'' +
                 ", expirationDate=" + expirationDate +
                 ", authorities=" + authorities +
-                ", roleAssignments=" + roleAssignments +
                 ", groups=" + nextGroups +
                 '}';
     }

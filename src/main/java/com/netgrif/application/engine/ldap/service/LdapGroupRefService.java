@@ -2,7 +2,8 @@ package com.netgrif.application.engine.ldap.service;
 
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.authorization.domain.Role;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.ldap.LdapConfiguration;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import com.netgrif.application.engine.ldap.domain.LdapGroup;
@@ -35,12 +36,12 @@ public class LdapGroupRefService implements ILdapGroupRefService {
 
     private final LdapGroupRoleRepository ldapGroupRoleRepository;
 
-    private final IProcessRoleService roleService;
+    private final IRoleService roleService;
 
     private final NaeLdapProperties ldapProperties;
 
     public LdapGroupRefService(LdapConfiguration ldapConfiguration, LdapGroupRoleRepository ldapGroupRoleRepository,
-                               IProcessRoleService roleService, NaeLdapProperties ldapProperties) {
+                               IRoleService roleService, NaeLdapProperties ldapProperties) {
         this.ldapConfiguration = ldapConfiguration;
         this.ldapGroupRoleRepository = ldapGroupRoleRepository;
         this.roleService = roleService;
@@ -106,7 +107,7 @@ public class LdapGroupRefService implements ILdapGroupRefService {
 
     @Override
     public void setRoleToLdapGroup(String groupDn, Set<String> requestedRolesIds, LoggedUser loggedUser) {
-        Set<ProcessRole> requestedProcessRoles = roleService.findByIds(requestedRolesIds);
+        List<Role> requestedProcessRoles = roleService.findAllById(requestedRolesIds);
         if (requestedProcessRoles.isEmpty() && !requestedRolesIds.isEmpty())
             throw new IllegalArgumentException("No process roles found.");
         if (requestedProcessRoles.size() != requestedRolesIds.size())
@@ -116,10 +117,12 @@ public class LdapGroupRefService implements ILdapGroupRefService {
         if (ldapGroup == null) {
             LdapGroup newLdapGroup = new LdapGroup();
             newLdapGroup.setDn(groupDn);
-            newLdapGroup.setProcessesProcessRoles(requestedProcessRoles);
+            // todo 2058
+//            newLdapGroup.setProcessesProcessRoles(requestedProcessRoles);
             ldapGroupRoleRepository.save(newLdapGroup);
         } else {
-            ldapGroup.setProcessesProcessRoles(requestedProcessRoles);
+            // todo 2058
+//            ldapGroup.setProcessesProcessRoles(requestedProcessRoles);
             ldapGroupRoleRepository.save(ldapGroup);
         }
 

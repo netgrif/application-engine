@@ -12,7 +12,6 @@ import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
-import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.settings.domain.Preferences;
 import com.netgrif.application.engine.settings.service.IPreferencesService;
@@ -24,9 +23,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -56,28 +55,15 @@ import java.util.stream.Collectors;
         matchIfMissing = true
 )
 @Tag(name = "User")
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    private IUserService userService;
-
-    @Autowired
-    private IProcessRoleService roleService;
-
-    @Autowired
-    private IAuthorityService authorityService;
-
-    @Autowired
-    private IPreferencesService preferencesService;
-
-    @Autowired
-    private ServerAuthProperties serverAuthProperties;
-
-    @Autowired
-    private Provider<UserResourceAssembler> userResourceAssemblerProvider;
-
-    @Autowired
-    private ISecurityContextService securityContextService;
+    private final IUserService userService;
+    private final IAuthorityService authorityService;
+    private final IPreferencesService preferencesService;
+    private final ServerAuthProperties serverAuthProperties;
+    private final Provider<UserResourceAssembler> userResourceAssemblerProvider;
+    private final ISecurityContextService securityContextService;
 
     protected UserResourceAssembler getUserResourceAssembler(String selfRel) {
         UserResourceAssembler result = userResourceAssemblerProvider.get();
@@ -161,24 +147,6 @@ public class UserController {
         PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler("role"), selfLink);
         ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
         return resources;
-    }
-
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
-    @Operation(summary = "Assign role to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "BasicAuth")})
-    @PostMapping(value = "/{id}/role/assign", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
-    })
-    public MessageResource assignRolesToUser(@PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
-        try {
-            roleService.assignRolesToUser(userId, roleIds, (LoggedUser) auth.getPrincipal());
-            log.info("Process roles {} assigned to user {}", roleIds, userId);
-            return MessageResource.successMessage("Selected roles assigned to user " + userId);
-        } catch (IllegalArgumentException e) {
-            log.error(e.getMessage());
-            return MessageResource.errorMessage("Assigning roles to user " + userId + " has failed!");
-        }
     }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")

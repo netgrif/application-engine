@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.importer.model.EventType
-import com.netgrif.application.engine.petrinet.domain.I18nString
-import com.netgrif.application.engine.petrinet.domain.events.Event
 import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository
+import com.netgrif.application.engine.importer.model.RoleEventType
+import com.netgrif.application.engine.petrinet.domain.I18nString
+import com.netgrif.application.engine.petrinet.domain.events.RoleEvent
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,7 +32,7 @@ class AnonymousRoleRunner extends AbstractOrderedCommandLineRunner {
                 importId: ProcessRole.ANONYMOUS_ROLE,
                 title: new I18nString(ProcessRole.ANONYMOUS_ROLE),
                 description: new I18nString("Anonymous system process role"),
-                events: new LinkedHashMap<EventType, Event>()
+                events: new LinkedHashMap<RoleEventType, RoleEvent>()
         )
         anonymousRole = repository.save(anonymousRole)
 

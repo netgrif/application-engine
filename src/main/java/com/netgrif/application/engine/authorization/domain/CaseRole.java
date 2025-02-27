@@ -1,10 +1,13 @@
 package com.netgrif.application.engine.authorization.domain;
 
+import com.netgrif.application.engine.authorization.service.factory.CaseRoleAssignmentFactory;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.HashMap;
 
 @Data
 @Document(collection = "role")
@@ -13,17 +16,24 @@ public class CaseRole extends Role {
     @Indexed
     private String caseId;
 
+    public CaseRole(String importId, String caseId) {
+        this(new ObjectId(), importId, caseId);
+    }
+
     public CaseRole(ObjectId id, String importId, String caseId) {
         super(id);
         this.importId = importId;
         this.caseId = caseId;
+        this.events = new HashMap<>(); // case role has no events for now, can be changed in future releases
     }
 
-    public CaseRole(String importId, String caseId) {
-        super(new ObjectId());
-        this.importId = importId;
-        this.caseId = caseId;
+    @Override
+    public Class<?> getAssignmentFactoryClass() {
+        return CaseRoleAssignmentFactory.class;
     }
 
-    // todo 2058 copy constructor
+    @Override
+    public String getTitleAsString() {
+        return caseId + "-" + importId;
+    }
 }

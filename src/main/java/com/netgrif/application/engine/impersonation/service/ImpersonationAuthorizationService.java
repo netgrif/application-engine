@@ -5,7 +5,8 @@ import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.authorization.domain.Role;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
@@ -14,7 +15,6 @@ import com.netgrif.application.engine.petrinet.domain.dataset.BooleanField;
 import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
-import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -50,7 +50,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     protected IWorkflowService workflowService;
 
     @Autowired
-    protected IProcessRoleService roleService;
+    protected IRoleService roleService;
 
     @Override
     public Page<IUser> getConfiguredImpersonationUsers(String query, LoggedUser impersonator, Pageable pageable) {
@@ -103,14 +103,14 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     }
 
     @Override
-    public List<ProcessRole> getRoles(List<Case> configs, IUser impersonated) {
-        List<ProcessRole> impersonatedProcessRoles = new ArrayList<>();
-        impersonatedProcessRoles.add(roleService.defaultRole());
+    public List<Role> getRoles(List<Case> configs, IUser impersonated) {
+        List<Role> impersonatedProcessRoles = new ArrayList<>();
+        impersonatedProcessRoles.add(roleService.findDefaultRole());
         if (configs.isEmpty()) {
             return impersonatedProcessRoles;
         }
         Set<String> roleIds = extractSetFromField(configs, "impersonated_roles");
-        impersonatedProcessRoles.addAll((roleService.findByIds(roleIds)).stream()
+        impersonatedProcessRoles.addAll((roleService.findAllById(roleIds)).stream()
                 // todo 2058
 //                .filter(configRole -> impersonated.getRoles().stream().anyMatch(userRole -> userRole.getStringId().equals(configRole.getStringId())))
                 .collect(Collectors.toList()));

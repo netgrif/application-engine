@@ -2,6 +2,7 @@ package com.netgrif.application.engine.auth.web.responsebodies;
 
 
 import com.netgrif.application.engine.auth.web.UserController;
+import com.netgrif.application.engine.authorization.web.RBACController;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
@@ -20,9 +21,8 @@ public class UserResource extends EntityModel<User> {
                 .getUser(getContent().getId(), null));
         add(selfRel.equalsIgnoreCase("profile") ? getLink.withSelfRel() : getLink.withRel("profile"));
 
-        // todo 2058
-        WebMvcLinkBuilder roleLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
-                .assignRolesToUser(getContent().getId(), null, null));
+        WebMvcLinkBuilder roleLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(RBACController.class)
+                .assignRolesToUser(getContent().getId(), null));
         add(selfRel.equalsIgnoreCase("assignProcessRole") ? roleLink.withSelfRel() : roleLink.withRel("assignProcessRole"));
 
         WebMvcLinkBuilder authorityLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)

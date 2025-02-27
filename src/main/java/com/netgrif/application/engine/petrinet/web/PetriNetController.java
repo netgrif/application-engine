@@ -9,7 +9,6 @@ import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
@@ -66,9 +65,6 @@ public class PetriNetController {
 
     @Autowired
     private IPetriNetService service;
-
-    @Autowired
-    private IProcessRoleService roleService;
 
     @Autowired
     private StringToVersionConverter converter;
@@ -142,13 +138,6 @@ public class PetriNetController {
         return new DataFieldReferencesResource(service.getDataFieldReferences(referenceBody, locale));
     }
 
-    @Operation(summary = "Get roles of process", security = {@SecurityRequirement(name = "BasicAuth")})
-    @GetMapping(value = "/{netId}/roles", produces = MediaTypes.HAL_JSON_VALUE)
-    public RolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
-        netId = decodeUrl(netId);
-        return new RolesResource(roleService.findAll(netId), service.getPetriNet(decodeUrl(netId)).getPermissions(), locale);
-    }
-
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Download process model", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{netId}/file", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
@@ -189,8 +178,7 @@ public class PetriNetController {
             log.error("Deleting Petri net [{}] failed: could not decode process ID from URL", processId);
             return MessageResource.errorMessage("Deleting Petri net " + processId + " failed!");
         }
-        LoggedUser user = (LoggedUser) auth.getPrincipal();
-        asyncRunner.execute(() -> this.service.deletePetriNet(decodedProcessId, user));
+        asyncRunner.execute(() -> this.service.deletePetriNet(decodedProcessId));
         return MessageResource.successMessage("Petri net " + decodedProcessId + " is being deleted");
     }
 

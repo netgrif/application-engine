@@ -12,6 +12,8 @@ import java.util.Map;
 
 public class RolesResource extends EntityModel<RolesAndPermissions> {
 
+    // todo 2058 needed? and also RolesAndPermissions
+
     public RolesResource(RolesAndPermissions content) {
         super(content, new ArrayList<>());
     }

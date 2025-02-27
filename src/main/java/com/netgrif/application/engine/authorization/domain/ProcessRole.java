@@ -1,9 +1,10 @@
 package com.netgrif.application.engine.authorization.domain;
 
+import com.netgrif.application.engine.authorization.service.factory.ProcessRoleAssignmentFactory;
 import com.netgrif.application.engine.importer.model.EventType;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.application.engine.petrinet.domain.events.Event;
+import com.netgrif.application.engine.petrinet.domain.events.RoleEvent;
 import com.netgrif.application.engine.utils.UniqueKeyMap;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,8 +23,17 @@ public class ProcessRole extends Role {
 
     private I18nString title;
     private I18nString description;
-    private Map<EventType, Event> events;
     private UniqueKeyMap<String, String> properties;
+
+    @Override
+    public Class<?> getAssignmentFactoryClass() {
+        return ProcessRoleAssignmentFactory.class;
+    }
+
+    @Override
+    public String getTitleAsString() {
+        return this.title != null ? this.title.getDefaultValue() : this.importId;
+    }
 
     public ProcessRole(ObjectId id) {
         super(id);
@@ -82,7 +92,7 @@ public class ProcessRole extends Role {
         return new LinkedList<>();
     }
 
-    public void addEvent(Event event) {
+    public void addEvent(RoleEvent event) {
         this.events.put(event.getType(), event);
     }
 

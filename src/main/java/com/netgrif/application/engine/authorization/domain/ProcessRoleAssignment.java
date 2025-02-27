@@ -5,13 +5,13 @@ import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Document(collection = "assignment")
+@Document(collection = "roleAssignment")
 @EqualsAndHashCode(callSuper = true)
 public class ProcessRoleAssignment extends RoleAssignment {
     private Session session;
 
     public ProcessRoleAssignment() {
-        this.session = Session.forever();
+        this(Session.forever());
     }
 
     public ProcessRoleAssignment(Session session) {

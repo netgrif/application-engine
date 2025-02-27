@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Document(collection = "assignment")
+@Document(collection = "roleAssignment")
 @EqualsAndHashCode(callSuper = true)
 public class CaseRoleAssignment extends RoleAssignment {
     @Indexed

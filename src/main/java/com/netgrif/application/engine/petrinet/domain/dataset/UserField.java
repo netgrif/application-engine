@@ -12,6 +12,8 @@ import java.util.Set;
 @Data
 public class UserField extends FieldWithAllowedRoles<UserFieldValue> {
 
+    private String roleId;
+
     public UserField() {
         this(new HashSet<>());
     }
@@ -29,6 +31,7 @@ public class UserField extends FieldWithAllowedRoles<UserFieldValue> {
     @Override
     public UserField clone() {
         UserField clone = new UserField();
+        clone.setRoleId(roleId);
         super.clone(clone);
         return clone;
     }

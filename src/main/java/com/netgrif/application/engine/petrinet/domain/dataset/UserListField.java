@@ -25,6 +25,7 @@ public class UserListField extends FieldWithAllowedRoles<UserListFieldValue> {
     @Override
     public UserListField clone() {
         UserListField clone = new UserListField();
+        clone.setRoleId(roleId);
         super.clone(clone);
         return clone;
     }
