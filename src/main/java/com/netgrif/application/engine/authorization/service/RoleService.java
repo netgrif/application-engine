@@ -168,7 +168,7 @@ public class RoleService implements IRoleService {
     @Override
     public void resolveCaseRolesOnCase(Case useCase, AccessPermissions<CasePermission> caseRolePermissions,
                                        boolean saveUseCase) {
-        useCase.addPermissionsForRoles(createRolesAndBuildPermissions(useCase, caseRolePermissions, saveUseCase));
+        useCase.addCaseRolePermissions(createRolesAndBuildPermissions(useCase, caseRolePermissions, saveUseCase));
     }
 
     /**
@@ -177,7 +177,7 @@ public class RoleService implements IRoleService {
     @Override
     public void resolveCaseRolesOnTask(Case useCase, Task task, AccessPermissions<TaskPermission> caseRolePermissions,
                                        boolean saveUseCase) {
-        task.addPermissionsForRoles(createRolesAndBuildPermissions(useCase, caseRolePermissions, saveUseCase));
+        task.addCaseRolePermissions(createRolesAndBuildPermissions(useCase, caseRolePermissions, saveUseCase));
     }
 
     /**
@@ -287,6 +287,8 @@ public class RoleService implements IRoleService {
                 throw new IllegalStateException(String.format("Case role [%s} in process [%s] references non existing dataField in case [%s]",
                         userListId, useCase.getPetriNetId(), useCase.getStringId()));
             }
+            rolesToSave.add(caseRole);
+            resultPermissions.put(caseRole.getStringId(), new HashMap<>(permissions));
         });
 
         if (!userRefPermissions.isEmpty() && saveUseCase) {

@@ -7,7 +7,7 @@ import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
-import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository
+import com.netgrif.application.engine.elastic.domain.repoitories.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository

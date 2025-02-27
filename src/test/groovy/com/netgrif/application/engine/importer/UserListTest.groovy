@@ -8,7 +8,6 @@ import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.Case
@@ -76,7 +75,7 @@ class UserListTest {
         ] as Map<String, Field<?>>), superCreator.getLoggedSuper())
 
 //        TODO: release/8.0.0
-        assert taskService.findById(task.stringId).permissions.get(superCreator.getSuperUser().getStringId())
-        assert caseRepository.findById(caseOpt.get().stringId).get().permissions.get(superCreator.getSuperUser().getStringId())
+        assert taskService.findById(task.stringId).processRolePermissions.get(superCreator.getSuperUser().getStringId())
+        assert caseRepository.findById(caseOpt.get().stringId).get().processRolePermissions.get(superCreator.getSuperUser().getStringId())
     }
 }

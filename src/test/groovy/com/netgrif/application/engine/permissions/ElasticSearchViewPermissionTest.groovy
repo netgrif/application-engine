@@ -139,7 +139,7 @@ class ElasticSearchViewPermissionTest {
         Page<Case> casePage = elasticCaseService.search([caseSearchRequest] as List, testUser.transformToLoggedUser(), PageRequest.of(0, 20), LocaleContextHolder.getLocale(), false)
 
         // TODO: releas/8.0.0 negative view role
-        assert casePage.getContent().size() == 0 && case_.permissions.keySet().contains(negViewRole.stringId)
+        assert casePage.getContent().size() == 0 && case_.processRolePermissions.keySet().contains(negViewRole.stringId)
         userService.removeRole(testUser, negViewRole.getStringId())
         workflowService.deleteCase(case_.getStringId())
     }
@@ -171,7 +171,7 @@ class ElasticSearchViewPermissionTest {
         Page<Case> casePage = elasticCaseService.search([caseSearchRequest] as List, testUser.transformToLoggedUser(), PageRequest.of(0, 20), LocaleContextHolder.getLocale(), false)
 
         // TODO: release/8.0.0 user view
-        assert casePage.getContent().size() == 1 && casePage.getContent()[0].stringId == case_.stringId && case_.permissions.keySet().contains(testUser.getStringId())
+        assert casePage.getContent().size() == 1 && casePage.getContent()[0].stringId == case_.stringId && case_.processRolePermissions.keySet().contains(testUser.getStringId())
         workflowService.deleteCase(case_.getStringId())
     }
 
@@ -189,7 +189,7 @@ class ElasticSearchViewPermissionTest {
         caseSearchRequest.process = [new CaseSearchRequest.PetriNet(netWithUserRefs.getIdentifier())] as List
         Page<Case> casePage = elasticCaseService.search([caseSearchRequest] as List, testUser.transformToLoggedUser(), PageRequest.of(0, 20), LocaleContextHolder.getLocale(), false)
         // TODO: release/8.0.0 negative view user
-        assert casePage.getContent().size() == 0 && case_.permissions.keySet().contains(testUser.getStringId())
+        assert casePage.getContent().size() == 0 && case_.processRolePermissions.keySet().contains(testUser.getStringId())
         workflowService.deleteCase(case_.getStringId())
     }
 
@@ -210,7 +210,7 @@ class ElasticSearchViewPermissionTest {
         Page<Case> casePage = elasticCaseService.search([caseSearchRequest] as List, testUser.transformToLoggedUser(), PageRequest.of(0, 20), LocaleContextHolder.getLocale(), false)
 
         // TODO: release/8.0.0 view user
-        assert casePage.getContent().size() == 1 && case_.permissions.containsKey(testUser.stringId)
+        assert casePage.getContent().size() == 1 && case_.processRolePermissions.containsKey(testUser.stringId)
         userService.removeRole(testUser, negViewRole.getStringId())
         workflowService.deleteCase(case_.getStringId())
     }

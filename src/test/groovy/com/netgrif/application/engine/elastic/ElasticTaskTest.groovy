@@ -3,7 +3,7 @@ package com.netgrif.application.engine.elastic
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.elastic.domain.ElasticTask
-import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
+import com.netgrif.application.engine.elastic.domain.repoitories.ElasticTaskRepository
 import com.netgrif.application.engine.elastic.service.ReindexingTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.petrinet.domain.VersionType

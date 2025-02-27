@@ -62,7 +62,10 @@ public class Task implements Serializable {
     private List<Trigger> triggers = new LinkedList<>();
 
     @Builder.Default
-    private AccessPermissions<TaskPermission> permissions = new AccessPermissions<>();
+    private AccessPermissions<TaskPermission> processRolePermissions = new AccessPermissions<>();
+
+    @Builder.Default
+    private AccessPermissions<TaskPermission> caseRolePermissions = new AccessPermissions<>();
 
     private LocalDateTime lastAssigned;
     private LocalDateTime lastFinished;
@@ -92,12 +95,20 @@ public class Task implements Serializable {
         return id.toString();
     }
 
-    public void addPermissionsForRole(String roleId, Map<TaskPermission, Boolean> permissions) {
-        this.permissions.addPermissions(roleId, permissions);
+    public void addProcessRolePermissions(String roleId, Map<TaskPermission, Boolean> permissions) {
+        this.processRolePermissions.addPermissions(roleId, permissions);
     }
 
-    public void addPermissionsForRoles(AccessPermissions<TaskPermission> rolesAndPermissions) {
-        this.permissions.addPermissions(rolesAndPermissions);
+    public void addProcessRolePermissions(AccessPermissions<TaskPermission> rolesAndPermissions) {
+        this.processRolePermissions.addPermissions(rolesAndPermissions);
+    }
+
+    public void addCaseRolePermissions(String roleId, Map<TaskPermission, Boolean> permissions) {
+        this.caseRolePermissions.addPermissions(roleId, permissions);
+    }
+
+    public void addCaseRolePermissions(AccessPermissions<TaskPermission> rolesAndPermissions) {
+        this.caseRolePermissions.addPermissions(rolesAndPermissions);
     }
 
     @JsonIgnore
@@ -137,6 +148,6 @@ public class Task implements Serializable {
      * todo javadoc
      * */
     public boolean hasPermissions() {
-        return this.permissions != null && this.permissions.isEmpty();
+        return this.processRolePermissions != null && this.processRolePermissions.isEmpty();
     }
 }

@@ -33,7 +33,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
             return null;
         }
 
-        Map<TaskPermission, Boolean> aggregatePermissions = getAggregateRolePermissions(user, task.getPermissions());
+        Map<TaskPermission, Boolean> aggregatePermissions = getAggregateRolePermissions(user, task.getProcessRolePermissions());
 
         for (TaskPermission permission : permissions) {
             if (hasRestrictedPermission(aggregatePermissions.get(permission))) {

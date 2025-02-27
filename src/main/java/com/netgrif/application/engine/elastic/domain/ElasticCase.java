@@ -19,7 +19,6 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -84,31 +83,31 @@ public class ElasticCase {
     private Set<String> taskMongoIds;
 
     @Field(type = Keyword)
-    private Set<String> enabledRoles;
+    private Set<String> viewProcessRoles;
 
     @Field(type = Keyword)
-    private Set<String> viewRoles;
+    private Set<String> positiveViewProcessRoles;
 
     @Field(type = Keyword)
-    private Set<String> viewUserRefs;
+    private Set<String> negativeViewProcessRoles;
 
     @Field(type = Keyword)
-    private Set<String> negativeViewRoles;
+    private Set<String> viewCaseRoles;
 
-    private Set<String> viewUsers;
+    private Set<String> positiveViewCaseRoles;
 
     @Field(type = Keyword)
-    private Set<String> negativeViewUsers;
+    private Set<String> negativeViewCaseRoles;
 
     private Map<String, String> tags;
 
     /**
      * Data that is stored in the elasticsearch database.
      *
-     * Note that the dataSet attribute is NOT set when the object is created and must be set later.
+     * Note that the dataSet and permissions attributes are NOT set when the object is created and must be set later.
      *
-     * The {@link com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService IElasticCaseMappingService} can be used to create
-     * instances of this class from Case objects, that have the dataset populated.
+     * The {@link com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService IElasticCaseMappingService}
+     * can be used to create instances of this class from Case objects, that have the dataset populated.
      *
      * @param useCase the data object that should be turned into elasticsearch data object
      */
@@ -129,13 +128,6 @@ public class ElasticCase {
         authorEmail = useCase.getAuthor().getEmail();
         taskIds = useCase.getTasks().keySet();
         taskMongoIds = useCase.getTasks().values().stream().map(TaskPair::getTaskStringId).collect(Collectors.toSet());
-//        TODO: release/8.0.0
-//        enabledRoles = new HashSet<>(useCase.getEnabledRoles());
-//        viewRoles = new HashSet<>(useCase.getViewRoles());
-//        negativeViewRoles = new HashSet<>(useCase.getNegativeViewRoles());
-//        viewUsers = new HashSet<>(useCase.getViewUsers());
-//        negativeViewUsers = new HashSet<>(useCase.getNegativeViewUsers());
-//        viewUserRefs = new HashSet<>(useCase.getViewUserRefs());
         tags = new HashMap<>(useCase.getProperties());
 
         dataSet = new HashMap<>();
@@ -150,12 +142,12 @@ public class ElasticCase {
         title = useCase.getTitle();
         taskIds = useCase.getTaskIds();
         taskMongoIds = useCase.getTaskMongoIds();
-        enabledRoles = useCase.getEnabledRoles();
-        viewRoles = useCase.getViewRoles();
-        viewUserRefs = useCase.getViewUserRefs();
-        negativeViewRoles = useCase.getNegativeViewRoles();
-        viewUsers = useCase.getViewUsers();
-        negativeViewUsers = useCase.getNegativeViewUsers();
+        viewProcessRoles = useCase.getViewProcessRoles();
+        positiveViewProcessRoles = useCase.getPositiveViewProcessRoles();
+        viewCaseRoles = useCase.getViewCaseRoles();
+        negativeViewProcessRoles = useCase.getNegativeViewProcessRoles();
+        positiveViewCaseRoles = useCase.getPositiveViewCaseRoles();
+        negativeViewCaseRoles = useCase.getNegativeViewCaseRoles();
         tags = useCase.getTags();
 
         dataSet = useCase.getDataSet();

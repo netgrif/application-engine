@@ -9,6 +9,9 @@ public enum TaskPermission {
     FINISH,
     VIEW,
     REASSIGN,
+    /**
+     * A permission to view task, that is disabled
+     * */
     VIEW_DISABLED;
 
     @JsonValue

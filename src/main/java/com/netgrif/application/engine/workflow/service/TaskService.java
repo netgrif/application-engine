@@ -742,7 +742,7 @@ public class TaskService implements ITaskService {
                 task.setAssigneeId(userService.getSystem().getStringId());
             }
         }
-        task.setPermissions(new AccessPermissions<>(transition.getPermissions()));
+        task.setProcessRolePermissions(new AccessPermissions<>(transition.getProcessRolePermissions()));
         roleService.resolveCaseRolesOnTask(useCase, task, transition.getCaseRolePermissions(), true);
 
         Task savedTask = save(task);

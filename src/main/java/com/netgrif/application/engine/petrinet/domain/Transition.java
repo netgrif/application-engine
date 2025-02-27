@@ -30,7 +30,7 @@ public class Transition extends Node {
 
     private String icon;
     private LinkedHashMap<String, DataRef> dataSet;
-    private AccessPermissions<TaskPermission> permissions;
+    private AccessPermissions<TaskPermission> processRolePermissions;
     private AccessPermissions<TaskPermission> caseRolePermissions;
     private List<Trigger> triggers;
     private LayoutContainer layoutContainer;
@@ -47,7 +47,7 @@ public class Transition extends Node {
         assignPolicy = AssignPolicy.MANUAL;
         finishPolicy = FinishPolicy.MANUAL;
         events = new HashMap<>();
-        permissions = new AccessPermissions<>();
+        processRolePermissions = new AccessPermissions<>();
         caseRolePermissions = new AccessPermissions<>();
     }
 
@@ -70,13 +70,8 @@ public class Transition extends Node {
         }
     }
 
-    public void addPermission(String roleId, Map<TaskPermission, Boolean> permissions) {
-        this.permissions.addPermissions(roleId, permissions);
-    }
-
-    // TODO 2058: release/8.0.0
-    public void addNegativeViewRole(String roleId) {
-//        negativeViewRoles.add(roleId);
+    public void addProcessRolePermission(String roleId, Map<TaskPermission, Boolean> permissions) {
+        this.processRolePermissions.addPermissions(roleId, permissions);
     }
 
     public void addCaseRolePermission(String userRefId, Map<TaskPermission, Boolean> permissions) {
@@ -194,7 +189,7 @@ public class Transition extends Node {
         clone.setEvents(this.events == null ? null : events.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
         clone.setProperties(new UniqueKeyMap<>(this.getProperties()));
         clone.setLayoutContainer(this.layoutContainer == null ? null : this.layoutContainer.clone());
-        clone.setPermissions(new AccessPermissions<>(this.permissions));
+        clone.setProcessRolePermissions(new AccessPermissions<>(this.processRolePermissions));
         clone.setCaseRolePermissions(new AccessPermissions<>(this.caseRolePermissions));
         return clone;
     }

@@ -1,5 +1,6 @@
-package com.netgrif.application.engine.elastic.domain;
+package com.netgrif.application.engine.elastic.domain.repoitories;
 
+import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;
 

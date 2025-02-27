@@ -498,7 +498,7 @@ public class Importer {
 
     protected void addPredefinedRolesWithDefaultPermissions() {
         // only if no positive role associations and no positive user ref associations
-        if (process.getPermissions().values().stream().anyMatch(perms -> perms.containsValue(true))) {
+        if (process.getProcessRolePermissions().values().stream().anyMatch(perms -> perms.containsValue(true))) {
             return;
         }
         addDefaultRole();
@@ -532,7 +532,7 @@ public class Importer {
     }
 
     protected void addSystemRole(boolean isEnabled, Role role) {
-        if (!isEnabled || process.getPermissions().containsKey(role.getStringId())) {
+        if (!isEnabled || process.getProcessRolePermissions().containsKey(role.getStringId())) {
             return;
         }
 
@@ -540,17 +540,17 @@ public class Importer {
         permissions.setCreate(true);
         permissions.setDelete(true); // TODO: release/8.0.0 anonymous can delete
         permissions.setView(true);
-        process.addPermission(role.getStringId(), permissionFactory.buildProcessPermissions(permissions));
+        process.addProcessRolePermission(role.getStringId(), permissionFactory.buildProcessPermissions(permissions));
     }
 
     protected void addSystemRole(Transition transition, boolean isEnabled, Role role) {
-        if (!isEnabled || transition.getPermissions().containsKey(role.getStringId())) {
+        if (!isEnabled || transition.getProcessRolePermissions().containsKey(role.getStringId())) {
             return;
         }
 
         com.netgrif.application.engine.importer.model.TaskPermission permissions = new com.netgrif.application.engine.importer.model.TaskPermission();
         permissions.setPerform(true);
-        transition.addPermission(role.getStringId(), permissionFactory.buildTaskPermissions(permissions));
+        transition.addProcessRolePermission(role.getStringId(), permissionFactory.buildTaskPermissions(permissions));
     }
 
     protected void createProcessPermissions(com.netgrif.application.engine.importer.model.CaseRoleRef roleRef) {
@@ -560,7 +560,7 @@ public class Importer {
         }
         com.netgrif.application.engine.importer.model.CasePermission permissions = roleRef.getPermission();
         Optional<Role> roleOpt = findRoleOrWarn(permissions, roleRef.getId());
-        roleOpt.ifPresent((role) -> process.addPermission(role.getStringId(), permissionFactory.buildProcessPermissions(permissions)));
+        roleOpt.ifPresent((role) -> process.addProcessRolePermission(role.getStringId(), permissionFactory.buildProcessPermissions(permissions)));
     }
 
     protected void createProcessPermissionsForCaseRole(com.netgrif.application.engine.importer.model.CaseRoleRef roleRef) {
@@ -580,7 +580,7 @@ public class Importer {
         }
         com.netgrif.application.engine.importer.model.TaskPermission permissions = roleRef.getPermission();
         Optional<Role> roleOpt = findRoleOrWarn(permissions, roleRef.getId());
-        roleOpt.ifPresent((role) -> transition.addPermission(role.getStringId(), permissionFactory.buildTaskPermissions(permissions)));
+        roleOpt.ifPresent((role) -> transition.addProcessRolePermission(role.getStringId(), permissionFactory.buildTaskPermissions(permissions)));
     }
 
     protected void createTaskPermissionsForCaseRole(Transition transition, com.netgrif.application.engine.importer.model.RoleRef roleRef) {

@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.configuration;
 
 import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
-import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
-import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository;
+import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepository;
+import com.netgrif.application.engine.elastic.domain.repoitories.ElasticTaskRepository;
 import com.netgrif.application.engine.elastic.service.ElasticCaseService;
 import com.netgrif.application.engine.elastic.service.ElasticTaskService;
 import com.netgrif.application.engine.elastic.service.executors.Executor;

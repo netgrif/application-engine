@@ -3,6 +3,7 @@ package com.netgrif.application.engine.elastic.service;
 import com.google.common.collect.ImmutableMap;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.domain.*;
+import com.netgrif.application.engine.elastic.domain.repoitories.ElasticTaskRepository;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
