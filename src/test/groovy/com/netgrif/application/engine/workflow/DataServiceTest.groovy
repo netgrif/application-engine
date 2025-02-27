@@ -47,6 +47,7 @@ class DataServiceTest {
     private Process setDataNet
     private Process net
 
+    // TODO: release/8.0.0
 //    @BeforeEach
 //    void beforeAll() {
 //        testHelper.truncateDbs()
