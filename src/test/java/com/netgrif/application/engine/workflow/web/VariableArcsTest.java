@@ -2,11 +2,11 @@ package com.netgrif.application.engine.workflow.web;
 
 import com.netgrif.application.engine.MockService;
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.User;
-import com.netgrif.application.engine.auth.domain.UserState;
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
+import com.netgrif.application.engine.authentication.domain.Authority;
+import com.netgrif.application.engine.authentication.domain.IUser;
+import com.netgrif.application.engine.authentication.domain.User;
+import com.netgrif.application.engine.authentication.domain.UserState;
+import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;

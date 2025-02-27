@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.event
 
 import com.netgrif.application.engine.EngineTest
-import com.netgrif.application.engine.auth.domain.LoggedUser
+import com.netgrif.application.engine.authentication.domain.LoggedUser
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.authorization.domain.ProcessRole

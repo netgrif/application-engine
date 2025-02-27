@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.configuration.authentication.providers.ldap;
 
-import com.netgrif.application.engine.auth.service.interfaces.ILdapUserRefService;
+import com.netgrif.application.engine.authentication.service.interfaces.ILdapUserRefService;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import com.netgrif.application.engine.ldap.service.LdapUserService;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;

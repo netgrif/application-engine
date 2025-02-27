@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.configuration.authentication.providers;
 
-import com.netgrif.application.engine.auth.service.interfaces.ILoginAttemptService;
+import com.netgrif.application.engine.authentication.service.interfaces.ILoginAttemptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationProvider;

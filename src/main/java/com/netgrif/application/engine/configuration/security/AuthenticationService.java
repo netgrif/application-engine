@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.configuration.security;
 
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.LoggedUser;
 import com.netgrif.application.engine.configuration.security.interfaces.IAuthenticationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import lombok.Data;

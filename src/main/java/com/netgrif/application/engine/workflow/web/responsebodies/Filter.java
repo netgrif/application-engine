@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
-import com.netgrif.application.engine.auth.domain.Author;
+import com.netgrif.application.engine.authentication.domain.Author;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import lombok.Data;
 

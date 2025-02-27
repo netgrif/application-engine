@@ -16,13 +16,13 @@
     </function>
     <function scope="namespace" name="createUser">
         <![CDATA[
-		{  com.netgrif.application.engine.auth.domain.User user ->
-		    if (user != null) {
-		        registrationService.encodeUserPassword(user)
-		        userService.save(user)
-		    }
-		}
-		]]>
+        { com.netgrif.application.engine.authentication.domain.User user ->
+            if (user != null) {
+                registrationService.encodeUserPassword(user)
+                userService.save(user)
+            }
+        }
+        ]]>
     </function>
     <data type="number">
         <id>number</id>

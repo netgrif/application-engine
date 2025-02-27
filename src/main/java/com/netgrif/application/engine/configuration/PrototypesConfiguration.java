@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
-import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
+import com.netgrif.application.engine.authentication.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ExpressionDelegate;

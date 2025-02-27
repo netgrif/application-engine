@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.menu
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.authentication.domain.Authority
+import com.netgrif.application.engine.authentication.domain.User
+import com.netgrif.application.engine.authentication.domain.UserState
+import com.netgrif.application.engine.authentication.service.UserService
 import com.netgrif.application.engine.orgstructure.groups.NextGroupService
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue

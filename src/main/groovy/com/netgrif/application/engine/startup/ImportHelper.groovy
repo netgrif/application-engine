@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.auth.domain.*
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.authentication.domain.*
+import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService
+import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.DataRef

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.impersonation.exceptions;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.LoggedUser;
 import lombok.Getter;
 
 public class ImpersonatedUserHasSessionException extends Exception {

@@ -2,13 +2,13 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.AsyncRunner
-import com.netgrif.application.engine.auth.domain.Author
-import com.netgrif.application.engine.auth.domain.IUser
-import com.netgrif.application.engine.auth.domain.LoggedUser
-import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
-import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
+import com.netgrif.application.engine.authentication.domain.Author
+import com.netgrif.application.engine.authentication.domain.IUser
+import com.netgrif.application.engine.authentication.domain.LoggedUser
+import com.netgrif.application.engine.authentication.service.UserDetailsServiceImpl
+import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService
+import com.netgrif.application.engine.authentication.service.interfaces.IUserService
+import com.netgrif.application.engine.authentication.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.authorization.domain.Role
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
