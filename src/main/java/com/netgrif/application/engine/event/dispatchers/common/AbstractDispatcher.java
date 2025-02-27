@@ -23,7 +23,7 @@ public abstract class AbstractDispatcher {
     @Getter
     private final Set<Class<? extends EventObject>> allowedEvents;
 
-    private final Executor DEFAULT_EXECUTOR = Executors.newWorkStealingPool();
+    private final Executor DEFAULT_EXECUTOR = Executors.newCachedThreadPool();
 
     protected AbstractDispatcher(Set<Class<? extends EventObject>> allowedEvents) {
         this.allowedEvents = allowedEvents;
