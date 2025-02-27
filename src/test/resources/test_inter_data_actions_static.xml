@@ -1,88 +1,114 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-    <id>test_inter_data_actions_static.xml</id>
-    <initials>TST</initials>
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>test_inter_data_actions_static</id>
+    <version>1.0.0</version>
     <title>Test</title>
     <defaultRole>true</defaultRole>
-    <data type="number">
-        <id>limit</id>
-        <title>Limit</title>
-        <init>1000000</init>
-        <action trigger="set">
-            <!--@formatter:off-->
-            limit: f.limit;
-            execute "dynamic_edit_available" with ([
-            "2": [
-            value: limit.value,
-            type: "number",
-            ],
-            ] as Map)
-            <!--@formatter:on-->
-        </action>
-    </data>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TST</property>
+    </properties>
+    <processEvents/>
+    <caseEvents/>
     <data type="number">
         <id>delta_limit</id>
         <title>Delta limit</title>
     </data>
+    <data type="number">
+        <id>limit</id>
+        <title>Limit</title>
+        <init>1000000</init>
+        <event type="set">
+            <id>limit_set</id>
+            <actions phase="post">
+                <action id="action_1">
+					<![CDATA[
+                    execute "dynamic_edit_available" with ([
+                            "data2": [
+                                    value: limit.value,
+                                    type: "number",
+                            ],
+                    ] as Map)
+                    ]]>
+				</action>
+            </actions>
+        </event>
+    </data>
     <transition>
-        <id>2</id>
+        <id>t2</id>
         <x>300</x>
         <y>220</y>
-        <label>T1</label>
-        <dataGroup>
-            <id>1</id>
-            <title>Limits</title>
-            <dataRef>
-                <id>limit</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
+        <title>T1</title>
+        <flex>
+            <id>t2_flex</id>
+            <item>
+                <dataRef>
+                    <id>limit</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
     <transition>
         <id>static_edit_limits</id>
         <x>100</x>
         <y>100</y>
-        <label>Edit limits</label>
-        <dataRef>
-            <id>delta_limit</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-                <action trigger="set">
-                    <!--@formatter:off-->
-                    limit: f.limit,
-                    delta: f.delta_limit;
-                    change limit about {
-                    limit.value - delta.value;
-                    }
-                    <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
+        <title>Edit limits</title>
+        <flex>
+            <id>static_edit_limits_flex</id>
+            <item>
+                <dataRef>
+                    <id>delta_limit</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                        <required>true</required>
+                    </logic>
+                    <event type="set">
+                        <id>delta_limit_id</id>
+                        <actions phase="post">
+                            <action id="action_2">
+								<![CDATA[
+                                change limit about {
+                                    limit.value - delta_limit.value;
+                                }
+                                ]]>
+							</action>
+                        </actions>
+                    </event>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
     <place>
-        <id>1</id>
+        <id>p1</id>
         <x>180</x>
         <y>220</y>
-        <label>IN</label>
+        <title>IN</title>
         <tokens>1</tokens>
-        <static>false</static>
     </place>
     <arc>
-        <id>3</id>
+        <id>a3</id>
         <type>regular</type>
-        <sourceId>1</sourceId>
-        <destinationId>2</destinationId>
+        <sourceId>p1</sourceId>
+        <destinationId>t2</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>4</id>
+        <id>a4</id>
         <type>regular</type>
-        <sourceId>2</sourceId>
-        <destinationId>1</destinationId>
+        <sourceId>t2</sourceId>
+        <destinationId>p1</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
-</document>
+</process>

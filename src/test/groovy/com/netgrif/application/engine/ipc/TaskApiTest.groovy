@@ -154,9 +154,10 @@ class TaskApiTest {
         Case leasing1 = helper.createCase("Leasing 1", leasingNet)
         Case leasing2 = helper.createCase("Leasing 2", leasingNet)
 
+        // TODO: release/8.0.0
         helper.assignTaskToSuper(LEASING_NET_TASK_EDIT_COST, leasing1.stringId)
         helper.setTaskData(LEASING_NET_TASK_EDIT_COST, leasing1.stringId, [
-                "1": [
+                "data1": [
                         value: 30_000 as Double,
                         type : helper.FIELD_NUMBER
                 ]
@@ -176,15 +177,15 @@ class TaskApiTest {
 
 //@formatter:off
         assert limits.dataSet.get("limit").rawValue as Double == 970_000 as Double
-        assert leasing1.dataSet.get("2").rawValue as Double == 970_000 as Double
-        assert leasing1.dataSet.get("1").rawValue as Double == 30_000 as Double
-        assert leasing2.dataSet.get("2").rawValue as Double == 970_000 as Double
-        assert leasing2.dataSet.get("1").rawValue as Double == 0 as Double
+        assert leasing1.dataSet.get("data2").rawValue as Double == 970_000 as Double
+        assert leasing1.dataSet.get("data1").rawValue as Double == 30_000 as Double
+        assert leasing2.dataSet.get("data2").rawValue as Double == 970_000 as Double
+        assert leasing2.dataSet.get("data1").rawValue as Double == 0 as Double
 //@formatter:on
 
         helper.assignTaskToSuper(LEASING_NET_TASK_EDIT_COST, leasing2.stringId)
         helper.setTaskData(LEASING_NET_TASK_EDIT_COST, leasing2.stringId, [
-                "1": [
+                "data1": [
                         value: 20_000 as Double,
                         type : helper.FIELD_NUMBER
                 ]
@@ -203,10 +204,10 @@ class TaskApiTest {
         leasing2 = leasing2Opt.get()
 
         assert limits.dataSet.get("limit").rawValue as Double == 950_000 as Double
-        assert leasing1.dataSet.get("2").rawValue as Double == 950_000 as Double
-        assert leasing1.dataSet.get("1").rawValue as Double == 30_000 as Double
-        assert leasing2.dataSet.get("2").rawValue as Double == 950_000 as Double
-        assert leasing2.dataSet.get("1").rawValue as Double == 20_000 as Double
+        assert leasing1.dataSet.get("data2").rawValue as Double == 950_000 as Double
+        assert leasing1.dataSet.get("data1").rawValue as Double == 30_000 as Double
+        assert leasing2.dataSet.get("data2").rawValue as Double == 950_000 as Double
+        assert leasing2.dataSet.get("data1").rawValue as Double == 20_000 as Double
     }
 
     public static final String TASK_BULK_NET_FILE = "ipc_bulk.xml"
