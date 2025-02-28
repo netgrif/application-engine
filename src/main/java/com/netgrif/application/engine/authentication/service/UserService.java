@@ -256,10 +256,10 @@ public class UserService extends AbstractUserService {
         Optional<Authority> authority = authorityRepository.findById(authorityId);
 
         if (user.isEmpty()) {
-            throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
+            throw new IllegalArgumentException(String.format("Could not find user with id [%s]", userId));
         }
         if (authority.isEmpty()) {
-            throw new IllegalArgumentException("Could not find authority with id [" + authorityId + "]");
+            throw new IllegalArgumentException(String.format("Could not find authority with id [%s]", authorityId));
         }
 
         user.get().addAuthority(authority.get());
