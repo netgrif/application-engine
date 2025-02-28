@@ -323,9 +323,9 @@ public class UserService extends AbstractUserService {
     public void deleteUser(IUser user) {
         User dbUser = (User) user;
         if (userRepository.findById(dbUser.getStringId()).isEmpty()) {
-            throw new IllegalArgumentException("Could not find user with id [" + dbUser.getId() + "]");
+            throw new IllegalArgumentException(String.format("Could not find user with id [%s]", dbUser.getId()));
         }
-        // todo 2058 delete role assignments
+        roleAssignmentService.removeAssignmentsByUser(user.getStringId());
         userRepository.delete(dbUser);
     }
 }
