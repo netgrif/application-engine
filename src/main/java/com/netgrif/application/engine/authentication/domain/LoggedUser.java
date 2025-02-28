@@ -28,10 +28,8 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
     @Setter
     protected Set<String> groups;
 
-    @Setter
     protected Set<String> roleAssignments;
 
-    @Setter
     protected Set<String> roles;
 
     @Setter
@@ -47,12 +45,20 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         this.groups = new HashSet<>();
     }
 
-    public void addRoleAssignments(Set<RoleAssignment> roleAssignments) {
-        // todo 2058 also initialize this.roles?
-        Set<String> roleAssignmentIds = roleAssignments.stream()
-                .map(RoleAssignment::getStringId)
-                .collect(Collectors.toSet());
-        this.roleAssignments.addAll(roleAssignmentIds);
+    /**
+     * todo javadoc
+     * */
+    public void setRoleAssignments(Set<RoleAssignment> roleAssignments) {
+        Set<String> roleIds = new HashSet<>();
+        Set<String> roleAssignmentIds = new HashSet<>();
+
+        roleAssignments.forEach(assignment -> {
+            roleIds.add(assignment.getRoleId());
+            roleAssignmentIds.add(assignment.getStringId());
+        });
+
+        this.roleAssignments = roleAssignmentIds;
+        this.roles = roleIds;
     }
 
     public boolean isAdmin() {
@@ -63,8 +69,12 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         return getUsername();
     }
 
+    /**
+     * todo javadoc
+     * */
     public IUser transformToUser() {
         User user = new User(new ObjectId(this.id));
+
         user.setEmail(getUsername());
         String[] names = this.fullName.split(" ");
         user.setName(names[0]);
@@ -73,20 +83,19 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         user.setState(UserState.ACTIVE);
         user.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
         user.setNextGroups(groups.stream().map(String::new).collect(Collectors.toSet()));
-        // todo 2058 must be in service
-//        user.setRoles(roles.stream().map(roleId -> {
-//            Role role = new Role();
-//            role.setStringId(roleId);
-//            return role;
-//        }).collect(Collectors.toSet()));
         if (this.isImpersonating()) {
             user.setImpersonated(this.getImpersonated().transformToUser());
         }
+
         return user;
     }
 
+    /**
+     * todo javadoc
+     * */
     public AnonymousUser transformToAnonymousUser() {
         AnonymousUser anonym = new AnonymousUser(new ObjectId(this.id));
+
         anonym.setEmail(getUsername());
         anonym.setName("Anonymous");
         anonym.setSurname("User");
@@ -94,13 +103,21 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         anonym.setState(UserState.ACTIVE);
         anonym.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
         anonym.setNextGroups(groups.stream().map(String::new).collect(Collectors.toSet()));
-        // todo 2058
-//        anonym.setRoles(roles.stream().map(roleId -> {
-//            Role role = new Role();
-//            role.setStringId(roleId);
-//            return role;
-//        }).collect(Collectors.toSet()));
+
         return anonym;
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public Author transformToAuthor() {
+        Author author = new Author();
+
+        author.setId(this.id);
+        author.setEmail(getUsername());
+        author.setFullName(this.fullName);
+
+        return author;
     }
 
     public void impersonate(LoggedUser toImpersonate) {
@@ -127,16 +144,8 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
                 ", fullName='" + fullName + '\'' +
                 ", groups=" + groups +
                 ", rolesAssignments=" + roleAssignments +
+                ", roles=" + roles +
                 ", impersonated=" + impersonated +
                 '}';
-    }
-
-    public Author transformToAuthor() {
-        Author author = new Author();
-        author.setId(this.id);
-        author.setEmail(getUsername());
-        author.setFullName(this.fullName);
-
-        return author;
     }
 }
