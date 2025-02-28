@@ -102,7 +102,15 @@ public class RoleService implements IRoleService {
      * todo javadoc
      * */
     @Override
-    public Set<ProcessRole> findProcessRolesByDefaultTitle(String title) {
+    public List<ProcessRole> findAllProcessRoles() {
+        return processRoleRepository.findAll();
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public List<ProcessRole> findProcessRolesByDefaultTitle(String title) {
         return processRoleRepository.findAllByTitle_DefaultValue(title);
     }
 
@@ -267,7 +275,7 @@ public class RoleService implements IRoleService {
     }
 
     private ProcessRole findSystemRoleByImportId(String importId) {
-        Set<ProcessRole> processRoles = processRoleRepository.findAllByImportId(ProcessRole.DEFAULT_ROLE);
+        List<ProcessRole> processRoles = processRoleRepository.findAllByImportId(ProcessRole.DEFAULT_ROLE);
         if (processRoles.isEmpty()) {
             throw new IllegalStateException(String.format("No %s process role has been found!", importId));
         }

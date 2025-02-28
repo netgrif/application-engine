@@ -5,6 +5,7 @@ import com.netgrif.application.engine.authentication.domain.repositories.Authori
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository;
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.authentication.web.requestbodies.UpdateUserRequest;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.domain.Role;
 import com.netgrif.application.engine.authorization.domain.RoleAssignment;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
@@ -283,8 +284,9 @@ public class UserService extends AbstractUserService {
     @Override
     public IUser getSystem() {
         IUser system = userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
-        // todo 2058
-//        system.setRoles(new HashSet<>(roleService.findAll()));
+        List<ProcessRole> roles = roleService.findAllProcessRoles();
+        Set<String> roleIds = roles.stream().map(ProcessRole::getStringId).collect(Collectors.toSet());
+        roleService.assignRolesToUser(system.getStringId(), roleIds);
         return system;
     }
 

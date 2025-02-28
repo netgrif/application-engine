@@ -7,16 +7,17 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @Repository
 public interface ProcessRoleRepository extends MongoRepository<ProcessRole, String>, QuerydslPredicateExecutor<ProcessRole> {
 
-    Set<ProcessRole> findAllByImportIdIn(Set<String> importIds);
+    List<ProcessRole> findAllByImportIdIn(Set<String> importIds);
 
-    Set<ProcessRole> findAllByTitle_DefaultValue(String title);
+    List<ProcessRole> findAllByTitle_DefaultValue(String title);
 
-    Set<ProcessRole> findAllByImportId(String importId);
+    List<ProcessRole> findAllByImportId(String importId);
 
     void deleteAllByIdIn(Collection<ObjectId> ids);
 

@@ -92,7 +92,7 @@ class ProcessRoleServiceTest {
     @Test
     void shouldFindAllRolesByName() throws IOException, MissingPetriNetMetaDataException {
         petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
-        Set<ProcessRole> processRoles = roleService.findProcessRolesByDefaultTitle("Process role");
+        List<ProcessRole> processRoles = roleService.findProcessRolesByDefaultTitle("Process role");
         assertNotNull(processRoles);
         assertFalse(processRoles.isEmpty());
         assertEquals(1, processRoles.size());
