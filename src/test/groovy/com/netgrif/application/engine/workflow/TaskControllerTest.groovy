@@ -6,13 +6,14 @@ import com.netgrif.application.engine.authentication.domain.User
 import com.netgrif.application.engine.authentication.domain.UserState
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
+import com.netgrif.application.engine.authorization.domain.Role
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
 import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.utils.FullPageRequest
@@ -58,7 +59,7 @@ class TaskControllerTest {
     private WorkflowController workflowController
 
     @Autowired
-    private IProcessRoleService roleService
+    private IRoleService roleService
 
     @Autowired
     private IDataService dataService
@@ -91,7 +92,7 @@ class TaskControllerTest {
 
     private Case useCase
 
-    private ProcessRole role
+    private Role role
 
     private Task task
 
@@ -104,8 +105,9 @@ class TaskControllerTest {
                 email: DUMMY_USER_MAIL,
                 password: "superAdminPassword",
                 state: UserState.ACTIVE,
-                authorities: [authorityService.getOrCreate(Authority.user)] as Set<Authority>,
-                roles: [] as Set<ProcessRole>))
+                authorities: [authorityService.getOrCreate(Authority.user)] as Set<Authority>))
+                // todo 2058
+//                roles: [] as Set<ProcessRole>))
         importNet()
     }
 
@@ -202,14 +204,14 @@ class TaskControllerTest {
     }
 
     void setUserRole() {
-        List<ProcessRole> roles = roleService.findAll(net.stringId)
+        List<Role> roles = roleService.findAll()
 
-        for (ProcessRole role : roles) {
+        for (Role role : roles) {
             if (role.importId == "process_role") {
                 this.role = role
             }
         }
-        roleService.assignRolesToUser(userService.findByEmail(DUMMY_USER_MAIL).getStringId(), [role.id.toString()] as Set, userService.getLoggedOrSystem().transformToLoggedUser())
+        roleService.assignRolesToUser(userService.findByEmail(DUMMY_USER_MAIL).getStringId(), [role.id.toString()] as Set)
     }
 
     Page<Task> findTasksByMongo() {

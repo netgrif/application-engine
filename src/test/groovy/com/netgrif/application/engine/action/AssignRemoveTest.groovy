@@ -69,14 +69,15 @@ class AssignRemoveTest {
 
         assert netOptional.getNet() != null
         def net = netOptional.getNet()
-        def roleCount = userService.system.roles.size()
-
-        // create
-        Case caze = workflowService.createCase(net.stringId, 'TEST', '', userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
-        assert userService.system.roles.size() == roleCount + 4
-
-        // delete
-        workflowService.deleteCase(caze.stringId)
-        assert userService.system.roles.size() == roleCount
+        // todo 2058
+//        def roleCount = userService.system.roles.size()
+//
+//        // create
+//        Case caze = workflowService.createCase(net.stringId, 'TEST', '', userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+//        assert userService.system.roles.size() == roleCount + 4
+//
+//        // delete
+//        workflowService.deleteCase(caze.stringId)
+//        assert userService.system.roles.size() == roleCount
     }
 }

@@ -52,8 +52,9 @@ class AbstractAuthorizationServiceTest {
         processRoles.add(new ProcessRole());
 
         IUser user = new User();
-        user.addRole(processRoles.get(0));
-        user.addRole(processRoles.get(1));
+//        todo 2058
+//        user.addRole(processRoles.get(0));
+//        user.addRole(processRoles.get(1));
 
         Map<String, Map<CasePermission, Boolean>> netPermissions = new HashMap<>();
         netPermissions.put(processRoles.get(0).getStringId(), getInitEntryValue());

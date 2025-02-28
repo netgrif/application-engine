@@ -102,8 +102,8 @@ class FunctionsTest {
         assert user
 
         userService.deleteUser(user)
-        petriNetService.deletePetriNet(functionResNet.stringId, userService.getLoggedOrSystem().transformToLoggedUser())
-        petriNetService.deletePetriNet(functionTestNet.stringId, userService.getLoggedOrSystem().transformToLoggedUser())
+        petriNetService.deletePetriNet(functionResNet.stringId)
+        petriNetService.deletePetriNet(functionTestNet.stringId)
     }
 
     @Test
@@ -122,7 +122,7 @@ class FunctionsTest {
         def fieldBehavior = field.behaviors
         assert fieldBehavior.get("1").behavior == EDITABLE
 
-        petriNetService.deletePetriNet(functionTestNet.stringId, userService.getLoggedOrSystem().transformToLoggedUser())
+        petriNetService.deletePetriNet(functionTestNet.stringId)
     }
 
     @Test
@@ -134,7 +134,7 @@ class FunctionsTest {
             def nets = petriNetService.getByIdentifier(FUNCTION_RES_IDENTIFIER)
             if (nets) {
                 nets.each {
-                    petriNetService.deletePetriNet(it.getStringId(), userService.getLoggedOrSystem().transformToLoggedUser())
+                    petriNetService.deletePetriNet(it.getStringId())
                 }
             }
 
@@ -152,7 +152,7 @@ class FunctionsTest {
             def nets = petriNetService.getByIdentifier(FUNCTION_TEST_IDENTIFIER)
             if (nets) {
                 nets.each {
-                    petriNetService.deletePetriNet(it.getStringId(), userService.getLoggedOrSystem().transformToLoggedUser())
+                    petriNetService.deletePetriNet(it.getStringId())
                 }
             }
 

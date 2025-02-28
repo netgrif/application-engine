@@ -14,7 +14,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
@@ -271,13 +271,13 @@ class RequestTest {
     private ImportHelper importHelper
     private ObjectMapper objectMapper
     private IPetriNetService petriNetService
-    private IProcessRoleService roleService
+    private IRoleService roleService
     private IUserService userService
     private IWorkflowService workflowService
     private ITaskService taskService
 
     @Autowired
-    RequestTest(WebApplicationContext wac, TestHelper testHelper, SuperCreator superCreator, ImportHelper importHelper, ObjectMapper objectMapper, IPetriNetService petriNetService, IProcessRoleService roleService, IUserService userService, IWorkflowService workflowService, ITaskService taskService) {
+    RequestTest(WebApplicationContext wac, TestHelper testHelper, SuperCreator superCreator, ImportHelper importHelper, ObjectMapper objectMapper, IPetriNetService petriNetService, IRoleService roleService, IUserService userService, IWorkflowService workflowService, ITaskService taskService) {
         this.wac = wac
         this.testHelper = testHelper
         this.superCreator = superCreator
