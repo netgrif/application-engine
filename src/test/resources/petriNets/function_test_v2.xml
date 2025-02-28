@@ -99,7 +99,12 @@
         <title>Boolean</title>
         <init>false</init>
         <action trigger="set">
-            def user = new com.netgrif.core.auth.domain.User("test@test.com", "password", "test", "test")
+            def user = new com.netgrif.adapter.auth.domain.User()
+            user.username = "test@test.com"
+            user.email = "test@test.com"
+            user.password = "password"
+            user.firstName = "test"
+            user.lastName = "test"
             user.state = com.netgrif.core.auth.domain.enums.UserState.ACTIVE
             function_res.createUser(user)
         </action>

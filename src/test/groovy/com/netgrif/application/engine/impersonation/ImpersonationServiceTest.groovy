@@ -182,7 +182,6 @@ class ImpersonationServiceTest {
         impersonationService.impersonateByConfig(config.stringId)
         def impersonatedRoles = userService.loggedUser.getImpersonated().getProcessRoles()
         def impersonatedAuths = userService.loggedUser.getImpersonated().getAuthorities()
-        println impersonatedRoles
         assert impersonatedRoles.size() == 2 && impersonatedRoles.any { it.stringId == role.stringId }  // default role counts
         assert impersonatedAuths.size() == 1 && impersonatedAuths[0].stringId == auth.stringId
 
