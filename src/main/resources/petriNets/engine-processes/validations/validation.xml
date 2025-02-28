@@ -10,19 +10,19 @@
 	</properties>
 	<roleRef>
 		<id>admin</id>
-		<caseLogic>
+		<permission>
 			<create>false</create>
 			<delete>false</delete>
 			<view>true</view>
-		</caseLogic>
+		</permission>
 	</roleRef>
 	<roleRef>
 		<id>system</id>
-		<caseLogic>
+		<permission>
 			<create>true</create>
 			<delete>true</delete>
 			<view>true</view>
-		</caseLogic>
+		</permission>
 	</roleRef>
 	<role>
 		<id>admin</id>
@@ -116,9 +116,9 @@
 		<title id="activate">Activate</title>
 		<roleRef>
 			<id>admin</id>
-			<logic>
+			<permission>
 				<perform>true</perform>
-			</logic>
+			</permission>
 		</roleRef>
 		<event type="finish">
 			<id>onFinish_activate</id>
@@ -150,9 +150,9 @@
 		<title id="deactivate">Deactivate</title>
 		<roleRef>
 			<id>admin</id>
-			<logic>
+			<permission>
 				<perform>true</perform>
-			</logic>
+			</permission>
 		</roleRef>
 		<event type="finish">
 			<id>onFinish_deactivate</id>

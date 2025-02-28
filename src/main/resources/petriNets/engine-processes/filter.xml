@@ -16,7 +16,7 @@
             <actions phase="post">
                 <action id="action_0">
 					<![CDATA[
-                    change filter_case_id value {return useCase.stringId};
+                    change filter_case_id value {return useCase.stringId}
                     ]]>
 				</action>
             </actions>
@@ -132,12 +132,12 @@
                 <action id="action_1">
 					<![CDATA[
                     if (origin_view_id.rawValue == "") {
-                        return;
+                        return
                     }
                     // the same regex is used in the frontend FilterExtractionService. Please keep them in sync
                     def match = origin_view_id.rawValue =~ "^.*?(-\\d+)?\$"
                     match.matches()
-                    def trimmed_id;
+                    def trimmed_id
                     if (match.start(1) == -1) {
                         trimmed_id = origin_view_id.rawValue
                     } else {
@@ -315,9 +315,9 @@
         <title/>
         <roleRef>
             <id>system</id>
-            <logic>
+            <permission>
                 <view>true</view>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -327,9 +327,9 @@
         <title>View filter</title>
         <roleRef>
             <id>system</id>
-            <logic>
+            <permission>
                 <view>true</view>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <place>

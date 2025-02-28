@@ -10,27 +10,27 @@
     </properties>
     <roleRef>
         <id>admin</id>
-        <caseLogic>
+        <permission>
             <create>true</create>
             <delete>true</delete>
             <view>true</view>
-        </caseLogic>
+        </permission>
     </roleRef>
     <roleRef>
         <id>defaultRole</id>
-        <caseLogic>
+        <permission>
             <create>false</create>
             <delete>false</delete>
             <view>true</view>
-        </caseLogic>
+        </permission>
     </roleRef>
     <roleRef>
         <id>system</id>
-        <caseLogic>
+        <permission>
             <create>true</create>
             <delete>true</delete>
             <view>true</view>
-        </caseLogic>
+        </permission>
     </roleRef>
     <processEvents/>
     <caseEvents>
@@ -137,6 +137,7 @@
         <title/>
         <placeholder id="allow_roles">Allow view for roles</placeholder>
         <event type="set">
+            <id>add_allowed_roles_set</id>
             <actions phase="post">
                 <action id="action_8">
 					<![CDATA[
@@ -154,6 +155,7 @@
         <title/>
         <placeholder id="ban_roles">Ban view for roles</placeholder>
         <event type="set">
+            <id>add_banned_roles_set</id>
             <actions phase="post">
                 <action id="action_10">
 					<![CDATA[
@@ -173,6 +175,7 @@
             <id>autocomplete_dynamic</id>
         </component>
         <event type="set">
+            <id>additional_filter_autocomplete_selection_set</id>
             <actions phase="post">
                 <action id="action_23">
 					<![CDATA[
@@ -182,6 +185,7 @@
             </actions>
         </event>
         <event type="get">
+            <id>additional_filter_autocomplete_selection_get</id>
             <actions phase="pre">
                 <action id="action_24">
 					<![CDATA[
@@ -195,6 +199,7 @@
         <id>additional_filter_case</id>
         <title/>
         <event type="set">
+            <id>additional_filter_case_set</id>
             <actions phase="post">
                 <action id="action_27">
 					<![CDATA[
@@ -238,6 +243,7 @@
         <title id="case_banned_nets_in_creation">Banned processes for creation</title>
         <desc id="case_banned_nets_in_creation_desc">Write down process identifiers separated by comma. Example: mynet1,mynet2</desc>
         <event type="set">
+            <id>case_banned_nets_in_creation_set</id>
             <actions phase="post">
                 <action id="action_19">
 					<![CDATA[
@@ -255,6 +261,7 @@
         <title id="default_headers">Set default headers</title>
         <desc id="default_headers_desc">Example: "meta-title,meta-visualId"</desc>
         <event type="set">
+            <id>case_default_headers_set</id>
             <actions phase="post">
                 <action id="action_22">
 					<![CDATA[
@@ -287,6 +294,7 @@
         </options>
         <init>sort,edit,search</init>
         <event type="set">
+            <id>case_headers_mode_set</id>
             <actions phase="post">
                 <action id="action_20">
 					<![CDATA[
@@ -296,6 +304,7 @@
             </actions>
         </event>
         <event type="get">
+            <id>case_headers_mode_get</id>
             <actions phase="pre">
                 <action id="action_21">
 					<![CDATA[
@@ -368,6 +377,7 @@
         <title id="create_case_button_icon">"New case" button icon identifier</title>
         <init>add</init>
         <event type="set">
+            <id>create_case_button_icon_set</id>
             <actions phase="post">
                 <action id="action_18">
 					<![CDATA[
@@ -416,6 +426,7 @@
         <id>duplicate_reset_childItemIds</id>
         <title/>
         <event type="set">
+            <id>duplicate_reset_childItemIds_set</id>
             <actions phase="post">
                 <action id="action_3">
 					<![CDATA[
@@ -438,6 +449,7 @@
             <id>autocomplete_dynamic</id>
         </component>
         <event type="set">
+            <id>filter_autocomplete_selection_set</id>
             <actions phase="post">
                 <action id="action_14">
 					<![CDATA[
@@ -448,6 +460,7 @@
             </actions>
         </event>
         <event type="get">
+            <id>filter_autocomplete_selection_get</id>
             <actions phase="pre">
                 <action id="action_15">
 					<![CDATA[
@@ -462,6 +475,7 @@
         <id>filter_case</id>
         <title/>
         <event type="set">
+            <id>filter_case_set</id>
             <actions phase="post">
                 <action id="action_17">
 					<![CDATA[
@@ -517,6 +531,7 @@
         <title id="icon_identifier">Menu icon identifier</title>
         <desc id="icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
         <event type="set">
+            <id>menu_icon_set</id>
             <actions phase="post">
                 <action id="action_5">
 					<![CDATA[
@@ -549,6 +564,7 @@
         <title id="name">Name of the item</title>
         <desc id="name_desc">Will be shown in the menu</desc>
         <event type="set">
+            <id>menu_name_set</id>
             <actions phase="post">
                 <action id="action_6">
 					<![CDATA[
@@ -581,6 +597,7 @@
             <id>raised</id>
         </component>
         <event type="set">
+            <id>move_add_node_set</id>
             <actions phase="post">
                 <action id="action_2">
 					<![CDATA[
@@ -606,6 +623,7 @@
             <id>autocomplete</id>
         </component>
         <event type="get">
+            <id>move_dest_uri_get</id>
             <actions phase="pre">
                 <action id="action_0">
 					<![CDATA[
@@ -617,6 +635,7 @@
             </actions>
         </event>
         <event type="set">
+            <id>move_dest_uri_set</id>
             <actions phase="post">
                 <action id="action_1">
 					<![CDATA[
@@ -651,7 +670,7 @@
         <id>nodePath</id>
         <title id="nodePath">Item URI</title>
         <event type="set">
-            <id>0</id>
+            <id>nodePath_set</id>
             <actions phase="post">
                 <action id="action_4">
 					<![CDATA[
@@ -675,6 +694,7 @@
             </properties>
         </component>
         <event type="set">
+            <id>order_down_set</id>
             <actions phase="post">
                 <action id="action_31">
 					<![CDATA[
@@ -718,6 +738,7 @@
             </properties>
         </component>
         <event type="set">
+            <id>order_up_set</id>
             <actions phase="post">
                 <action id="action_32">
 					<![CDATA[
@@ -764,6 +785,7 @@
         <title id="available_processes">Your processes</title>
         <desc id="available_processes_desc">Select a process containing roles you wish to add to allowed or banned roles lists.</desc>
         <event type="get">
+            <id>processes_available_get</id>
             <actions phase="pre">
                 <action id="action_12">
 					<![CDATA[
@@ -773,6 +795,7 @@
             </actions>
         </event>
         <event type="set">
+            <id>processes_available_set</id>
             <actions phase="post">
                 <action id="action_13">
 					<![CDATA[
@@ -795,6 +818,7 @@
             <id>raised</id>
         </component>
         <event type="set">
+            <id>remove_additional_filter_set</id>
             <actions phase="post">
                 <action id="action_26">
 					<![CDATA[
@@ -809,6 +833,7 @@
         <title/>
         <placeholder id="remove_from_allowed_roles">Remove from allowed roles</placeholder>
         <event type="set">
+            <id>remove_allowed_roles_set</id>
             <actions phase="post">
                 <action id="action_9">
 					<![CDATA[
@@ -827,6 +852,7 @@
         <title/>
         <placeholder id="remove_from_banned_roles">Remove from banned roles</placeholder>
         <event type="set">
+            <id>remove_banned_roles_set</id>
             <actions phase="post">
                 <action id="action_11">
 					<![CDATA[
@@ -862,6 +888,7 @@
         <title id="tab_icon">Tab icon identifier</title>
         <desc id="tab_icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
         <event type="set">
+            <id>tab_icon_set</id>
             <actions phase="post">
                 <action id="action_7">
 					<![CDATA[
@@ -899,6 +926,7 @@
         <title id="task_default_headers">Set default headers</title>
         <desc id="task_default_headers_desc">Example: "meta-title,meta-user"</desc>
         <event type="set">
+            <id>task_default_headers_set</id>
             <actions phase="post">
                 <action id="action_30">
 					<![CDATA[
@@ -929,6 +957,7 @@
         </options>
         <init>sort,edit</init>
         <event type="set">
+            <id>task_headers_mode_set</id>
             <actions phase="post">
                 <action id="action_28">
 					<![CDATA[
@@ -938,6 +967,7 @@
             </actions>
         </event>
         <event type="get">
+            <id>task_headers_mode_get</id>
             <actions phase="pre">
                 <action id="action_29">
 					<![CDATA[
@@ -996,6 +1026,7 @@
             <id>raised</id>
         </component>
         <event type="set">
+            <id>update_additional_filter_set</id>
             <actions phase="post">
                 <action id="action_25">
 					<![CDATA[
@@ -1015,6 +1046,7 @@
             <id>raised</id>
         </component>
         <event type="set">
+            <id>update_filter_set</id>
             <actions phase="post">
                 <action id="action_16">
 					<![CDATA[
@@ -1207,6 +1239,12 @@
         <x>340</x>
         <y>100</y>
         <title>Case view settings [referenced]</title>
+        <roleRef>
+            <id>system</id>
+            <permission>
+                <perform>true</perform>
+            </permission>
+        </roleRef>
         <flex>
             <id>case_view_settings_flex</id>
             <item>
@@ -1324,6 +1362,7 @@
                         <required>true</required>
                     </logic>
                     <event type="set">
+                        <id>case_is_header_mode_changeable_set</id>
                         <actions phase="post">
                             <action id="action_39">
 								<![CDATA[
@@ -1395,6 +1434,7 @@
                         <behavior>editable</behavior>
                     </logic>
                     <event type="set">
+                        <id>use_case_default_headers_set</id>
                         <actions phase="post">
                             <action id="action_40">
 								<![CDATA[
@@ -1425,18 +1465,18 @@
                 </properties>
             </item>
         </flex>
-        <roleRef>
-            <id>system</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
     </transition>
     <transition>
         <id>change_filter</id>
         <x>460</x>
         <y>340</y>
         <title>[Change filter]</title>
+        <roleRef>
+            <id>system</id>
+            <permission>
+                <perform>true</perform>
+            </permission>
+        </roleRef>
         <flex>
             <id>change_filter_flex</id>
             <item>
@@ -1466,12 +1506,6 @@
                 </properties>
             </item>
         </flex>
-        <roleRef>
-            <id>system</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
     </transition>
     <transition>
         <id>children_order</id>
@@ -1480,6 +1514,15 @@
         <title>Manage item order</title>
         <icon>low_priority</icon>
         <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>admin</id>
+            <permission>
+                <perform>true</perform>
+                <view>true</view>
+                <assign>true</assign>
+                <cancel>true</cancel>
+            </permission>
+        </roleRef>
         <flex>
             <id>children_order_flex</id>
             <item>
@@ -1489,6 +1532,7 @@
                         <behavior>editable</behavior>
                     </logic>
                     <event type="get">
+                        <id>childItemForms_get</id>
                         <actions phase="pre">
                             <action id="action_43">
 								<![CDATA[
@@ -1506,15 +1550,6 @@
                 </properties>
             </item>
         </flex>
-        <roleRef>
-            <id>admin</id>
-            <logic>
-                <view>true</view>
-                <cancel>true</cancel>
-                <assign>true</assign>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
     </transition>
     <transition>
         <id>duplicate_item</id>
@@ -1523,6 +1558,15 @@
         <title id="duplicate_item">Duplicate item</title>
         <icon>content_copy</icon>
         <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>admin</id>
+            <permission>
+                <perform>true</perform>
+                <view>true</view>
+                <assign>true</assign>
+                <cancel>true</cancel>
+            </permission>
+        </roleRef>
         <flex>
             <id>duplicate_item_flex</id>
             <item>
@@ -1554,18 +1598,8 @@
                 </properties>
             </item>
         </flex>
-        <roleRef>
-            <id>admin</id>
-            <logic>
-                <view>true</view>
-                <cancel>true</cancel>
-                <assign>true</assign>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
         <event type="finish">
             <id>finish</id>
-            <title id="duplicate_item_finish">Duplicate</title>
             <actions phase="pre">
                 <action id="action_37">
 					<![CDATA[
@@ -1573,6 +1607,7 @@
                     ]]>
 				</action>
             </actions>
+            <title id="duplicate_item_finish">Duplicate</title>
         </event>
     </transition>
     <transition>
@@ -1581,6 +1616,15 @@
         <y>220</y>
         <title>initialize [await sync]</title>
         <icon>hourglass_empty</icon>
+        <roleRef>
+            <id>admin</id>
+            <permission>
+                <perform>true</perform>
+                <view>true</view>
+                <assign>true</assign>
+                <cancel>true</cancel>
+            </permission>
+        </roleRef>
         <flex>
             <id>initialize_flex</id>
             <item>
@@ -1590,6 +1634,7 @@
                         <behavior>forbidden</behavior>
                     </logic>
                     <event type="set">
+                        <id>filter_case_set</id>
                         <actions phase="post">
                             <action id="action_33">
 								<![CDATA[
@@ -1612,15 +1657,6 @@
                 </properties>
             </item>
         </flex>
-        <roleRef>
-            <id>admin</id>
-            <logic>
-                <view>true</view>
-                <cancel>true</cancel>
-                <assign>true</assign>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
     </transition>
     <transition>
         <id>item_settings</id>
@@ -1629,6 +1665,15 @@
         <title id="item_settings">Item settings</title>
         <icon>settings</icon>
         <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>admin</id>
+            <permission>
+                <perform>true</perform>
+                <view>true</view>
+                <assign>true</assign>
+                <cancel>true</cancel>
+            </permission>
+        </roleRef>
         <flex>
             <id>item_settings_flex</id>
             <item>
@@ -1716,7 +1761,7 @@
                         <behavior>editable</behavior>
                     </logic>
                     <event type="set">
-                        <id>0</id>
+                        <id>use_tab_icon_set</id>
                         <actions phase="post">
                             <action id="action_34">
 								<![CDATA[
@@ -1768,7 +1813,7 @@
                         <behavior>editable</behavior>
                     </logic>
                     <event type="set">
-                        <id>0</id>
+                        <id>use_custom_view_set</id>
                         <actions phase="post">
                             <action id="action_35">
 								<![CDATA[
@@ -2046,15 +2091,6 @@
                 </properties>
             </item>
         </flex>
-        <roleRef>
-            <id>admin</id>
-            <logic>
-                <view>true</view>
-                <cancel>true</cancel>
-                <assign>true</assign>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
     </transition>
     <transition>
         <id>move_item</id>
@@ -2063,6 +2099,15 @@
         <title id="move_item">Move item</title>
         <icon>move_down</icon>
         <assignPolicy>auto</assignPolicy>
+        <roleRef>
+            <id>admin</id>
+            <permission>
+                <perform>true</perform>
+                <view>true</view>
+                <assign>true</assign>
+                <cancel>true</cancel>
+            </permission>
+        </roleRef>
         <flex>
             <id>move_item_flex</id>
             <item>
@@ -2106,18 +2151,8 @@
                 </properties>
             </item>
         </flex>
-        <roleRef>
-            <id>admin</id>
-            <logic>
-                <view>true</view>
-                <cancel>true</cancel>
-                <assign>true</assign>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
         <event type="finish">
             <id>finish</id>
-            <title id="move_item_finish">Move</title>
             <actions phase="pre">
                 <action id="action_36">
 					<![CDATA[
@@ -2130,6 +2165,7 @@
                     ]]>
 				</action>
             </actions>
+            <title id="move_item_finish">Move</title>
         </event>
     </transition>
     <transition>
@@ -2137,6 +2173,15 @@
         <x>741</x>
         <y>219</y>
         <title>Row for ordering [referenced]</title>
+        <roleRef>
+            <id>system</id>
+            <permission>
+                <perform>true</perform>
+                <view>true</view>
+                <assign>true</assign>
+                <cancel>true</cancel>
+            </permission>
+        </roleRef>
         <flex>
             <id>row_for_ordering_flex</id>
             <item>
@@ -2192,21 +2237,18 @@
                 </properties>
             </item>
         </flex>
-        <roleRef>
-            <id>system</id>
-            <logic>
-                <view>true</view>
-                <cancel>true</cancel>
-                <assign>true</assign>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
     </transition>
     <transition>
         <id>task_view_settings</id>
         <x>340</x>
         <y>340</y>
         <title>Task view settings [referenced]</title>
+        <roleRef>
+            <id>system</id>
+            <permission>
+                <perform>true</perform>
+            </permission>
+        </roleRef>
         <flex>
             <id>task_view_settings_flex</id>
             <item>
@@ -2245,6 +2287,7 @@
                         <required>true</required>
                     </logic>
                     <event type="set">
+                        <id>task_is_header_mode_changeable_set</id>
                         <actions phase="post">
                             <action id="action_41">
 								<![CDATA[
@@ -2316,6 +2359,7 @@
                         <behavior>editable</behavior>
                     </logic>
                     <event type="set">
+                        <id>use_task_default_headers_set</id>
                         <actions phase="post">
                             <action id="action_42">
 								<![CDATA[
@@ -2437,12 +2481,6 @@
                 </properties>
             </item>
         </flex>
-        <roleRef>
-            <id>system</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
     </transition>
     <place>
         <id>initialized</id>

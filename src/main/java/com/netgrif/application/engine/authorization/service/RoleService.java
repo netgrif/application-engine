@@ -26,10 +26,12 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 import com.netgrif.application.engine.petrinet.domain.events.RoleEvent;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.service.WorkflowService;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -43,15 +45,20 @@ public class RoleService implements IRoleService {
     private final RoleRepository repository;
     private final ProcessRoleRepository processRoleRepository;
     private final CaseRoleRepository caseRoleRepository;
-    private final WorkflowService workflowService;
-    private final IRoleService roleService;
     private final IRoleAssignmentService roleAssignmentService;
     private final IUserService userService;
     private final ActionRunner actionRunner;
     private final ApplicationEventPublisher eventPublisher;
+    private IWorkflowService workflowService;
 
     private ProcessRole defaultProcessRole;
     private ProcessRole anonymousProcessRole;
+
+    @Lazy
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
 
     /**
      * todo javadoc
@@ -195,7 +202,7 @@ public class RoleService implements IRoleService {
     public List<Role> assignRolesToUser(String userId, Set<String> roleIds, Map<String, String> params) {
         IUser user = userService.findById(userId);
 
-        List<Role> roles = roleService.findAllById(roleIds);
+        List<Role> roles = findAllById(roleIds);
         if (roles.isEmpty() && !roleIds.isEmpty()) {
             throw new IllegalArgumentException("No roles found.");
         }
@@ -229,7 +236,7 @@ public class RoleService implements IRoleService {
      * */
     @Override
     public List<Role> removeRolesFromUser(String userId, Set<String> roleIds, Map<String, String> params) {
-        List<Role> roles = roleService.findAllById(roleIds);
+        List<Role> roles = findAllById(roleIds);
         if (roles.isEmpty() && !roleIds.isEmpty()) {
             throw new IllegalArgumentException("No roles found.");
         }

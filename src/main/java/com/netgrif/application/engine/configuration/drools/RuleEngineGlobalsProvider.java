@@ -67,7 +67,7 @@ public class RuleEngineGlobalsProvider implements IRuleEngineGlobalsProvider {
     protected List<RuleEngineGlobal> initializeGlobals() {
         List<RuleEngineGlobal> globals = new ArrayList<>();
         globals.add(engineGlobal("com.netgrif.application.engine.workflow.service.interfaces", "ITaskService", "taskService", taskService));
-        globals.add(engineGlobal("com.netgrif.application.engine.auth.service.interfaces", "IUserService", "userService", userService));
+        globals.add(engineGlobal("com.netgrif.application.engine.authentication.service.interfaces", "IUserService", "userService", userService));
         globals.add(engineGlobal("com.netgrif.application.engine.elastic.service.interfaces", "IElasticCaseService", "elasticCaseService", elasticCaseService));
         globals.add(engineGlobal("com.netgrif.application.engine.elastic.service.interfaces", "IElasticTaskService", "elasticTaskService", elasticTaskService));
         globals.add(engineGlobal("com.netgrif.application.engine.rules.domain", "FactRepository", "factRepository", factRepository));

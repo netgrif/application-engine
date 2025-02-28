@@ -17,14 +17,19 @@
         <title id="upload_file">Upload filter file</title>
         <placeholder id="upload_file_placeholder">Insert file containing filters</placeholder>
         <desc id="upload_file_desc">Insert xml file that contains filters</desc>
-        <action trigger="set">
-            importedFilters: f.imported_filters;
+        <event type="set">
+            <id>upload_file_set</id>
+            <actions phase="post">
+                <action>
+                    importedFilters: f.imported_filters;
 
-            taskService.findAllById(importedFilters.value).forEach({filterTask ->
-                workflowService.deleteCase(filterTask.caseId)
-            })
-            change importedFilters value { return [] }
-        </action>
+                    taskService.findAllById(importedFilters.value).forEach({filterTask ->
+                        workflowService.deleteCase(filterTask.caseId)
+                    })
+                    change importedFilters value { return [] }
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="button">
         <id>import_file</id>
@@ -38,11 +43,16 @@
     <data type="taskRef">
         <id>imported_filters</id>
         <title/>
-        <action trigger="get">
-            importedFilters: f.imported_filters;
+        <event type="set">
+            <id>imported_filters_set</id>
+            <actions phase="post">
+                <action>
+                    importedFilters: f.imported_filters;
 
-            filterImportExportService.changeFilterField(importedFilters.value)
-        </action>
+                    filterImportExportService.changeFilterField(importedFilters.value)
+                </action>
+            </actions>
+        </event>
     </data>
 
 
