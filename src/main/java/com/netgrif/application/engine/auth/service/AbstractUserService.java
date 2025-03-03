@@ -4,7 +4,7 @@
 //import com.netgrif.core.auth.domain.Authority;.repositories.UserRepository;
 //import com.netgrif.auth.service.AuthorityService;
 //import com.netgrif.auth.service.UserService;
-//import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+//import com.netgrif.auth.service.GroupService;
 //import com.netgrif.core.petrinet.domain.PetriNet;
 //import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 //import com.netgrif.adapter.petrinet.service.ProcessRoleService;
@@ -31,7 +31,7 @@
 //
 //
 //    @Autowired
-//    protected INextGroupService groupService;
+//    protected GroupService groupService;
 //
 //    @Autowired
 //    protected UserRepository repository;

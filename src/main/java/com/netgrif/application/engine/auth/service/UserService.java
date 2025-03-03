@@ -7,7 +7,7 @@
 //import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
 //import com.netgrif.application.engine.event.events.user.UserRegistrationEvent;
 //import com.netgrif.application.engine.orgstructure.groups.config.GroupConfigurationProperties;
-//import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+//import com.netgrif.auth.service.GroupService;
 //import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 //import com.netgrif.application.engine.startup.runner.SystemUserRunner;
 //import com.netgrif.core.workflow.domain.ProcessResourceId;
@@ -40,7 +40,7 @@
 //    protected ApplicationEventPublisher publisher;
 //
 //    @Autowired
-//    protected INextGroupService groupService;
+//    protected GroupService groupService;
 //
 //    @Autowired
 //    protected IRegistrationService registrationService;

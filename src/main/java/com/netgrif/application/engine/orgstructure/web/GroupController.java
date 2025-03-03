@@ -1,9 +1,8 @@
 package com.netgrif.application.engine.orgstructure.web;
 
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.auth.service.GroupService;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.Group;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.GroupsResource;
-import com.netgrif.core.workflow.domain.Case;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,9 +29,9 @@ import java.util.stream.Collectors;
 @Tag(name = "Group")
 public class GroupController {
 
-    private final INextGroupService service;
+    private final GroupService service;
 
-    public GroupController(INextGroupService service) {
+    public GroupController(GroupService service) {
         this.service = service;
     }
 
@@ -47,9 +45,9 @@ public class GroupController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public GroupsResource getAllGroups() {
-        List<Case> groups = service.findAllGroups();
+        Set<com.netgrif.core.auth.domain.Group> groups = service.findAll();
         Set<Group> groupResponse = groups.stream()
-                .map(aCase -> new Group(aCase.getStringId(), aCase.getTitle()))
+                .map(g -> new Group(g.getStringId(), g.getDisplayName()))
                 .collect(Collectors.toCollection(HashSet::new));
         return new GroupsResource(groupResponse);
     }

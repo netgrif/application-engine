@@ -2,10 +2,10 @@ package com.netgrif.application.engine.action
 
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.auth.service.GroupService
 import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.core.petrinet.domain.I18nString
 import com.netgrif.core.petrinet.domain.UriContentType
 import com.netgrif.core.petrinet.domain.UriNode
@@ -60,7 +60,7 @@ class MenuItemApiTest {
     private IUriService uriService
 
     @Autowired
-    private INextGroupService nextGroupService
+    private GroupService groupService
 
     @Autowired
     private IElasticCaseService elasticCaseService

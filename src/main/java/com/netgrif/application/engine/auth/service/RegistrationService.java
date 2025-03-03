@@ -9,7 +9,7 @@ import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.auth.service.GroupService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,7 +35,7 @@ public class RegistrationService implements IRegistrationService {
     private UserService userService;
 
     @Autowired
-    private INextGroupService groupService;
+    private GroupService groupService;
 
     @Autowired
     private ProcessRoleService processRole;
@@ -46,15 +43,14 @@ public class RegistrationService implements IRegistrationService {
     @Autowired
     private ServerAuthProperties serverAuthProperties;
     @Autowired
-    private com.netgrif.application.engine.petrinet.service.ProcessRoleService processRoleService;
+    private ProcessRoleService processRoleService;
 
     @Override
     @Transactional
     @Scheduled(cron = "0 0 1 * * *")
     public void removeExpiredUsers() {
         log.info("Removing expired unactivated invited users");
-        List<User> expired = userService.removeAllByStateAndExpirationDateBefore(UserState.INACTIVE, LocalDateTime.now());
-        log.info("Removed " + expired.size() + " unactivated users");
+        userService.removeAllByStateAndExpirationDateBefore(UserState.INACTIVE, LocalDateTime.now(),null);
     }
 
     @Override
@@ -62,7 +58,7 @@ public class RegistrationService implements IRegistrationService {
     @Scheduled(cron = "0 0 1 * * *")
     public void resetExpiredToken() {
         log.info("Resetting expired user tokens");
-        List<User> users = userService.findAllByStateAndExpirationDateBefore(UserState.BLOCKED, LocalDateTime.now());
+        List<User> users = userService.findAllByStateAndExpirationDateBefore(UserState.BLOCKED, LocalDateTime.now(), null);
         if (users == null || users.isEmpty()) {
             log.info("There are none expired tokens. Everything is awesome.");
             return;

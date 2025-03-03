@@ -132,7 +132,7 @@ class MenuImportExportTest {
     @Test
     @Disabled("Fix IllegalArgument")
     void testMenuImportExport() {
-        userAuth = new UsernamePasswordAuthenticationToken(dummyuserService.transformToLoggedUser(user), DUMMY_USER_PASSWORD)
+        userAuth = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(dummyUser), DUMMY_USER_PASSWORD)
         SecurityContextHolder.getContext().setAuthentication(userAuth)
 
         def testNet = importHelper.createNet(TEST_NET)

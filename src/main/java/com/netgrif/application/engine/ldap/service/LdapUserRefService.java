@@ -12,7 +12,7 @@
 //import com.netgrif.application.engine.ldap.domain.repository.LdapUserRefRepository;
 //import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
 //import com.netgrif.application.engine.orgstructure.groups.config.GroupConfigurationProperties;
-//import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+//import com.netgrif.auth.service.GroupService;
 //import lombok.extern.slf4j.Slf4j;
 //import org.apache.commons.lang3.RandomStringUtils;
 //import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +49,7 @@
 //    private LdapUserService ldapUserService;
 //
 //    @Autowired
-//    private INextGroupService groupService;
+//    private GroupService groupService;
 //
 //    @Autowired
 //    private ApplicationEventPublisher publisher;

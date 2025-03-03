@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
+import com.netgrif.auth.service.GroupService
 import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
@@ -23,7 +24,6 @@ import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
 import com.netgrif.application.engine.mail.interfaces.IMailService
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.pdf.generator.config.PdfResource
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
@@ -128,7 +128,7 @@ class ActionDelegate {
     IMailService mailService
 
     @Autowired
-    INextGroupService nextGroupService
+    GroupService groupService
 
     @Autowired
     ProcessRoleService processRoleService

@@ -2,36 +2,36 @@ package com.netgrif.application.engine.startup
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.netgrif.auth.service.AuthorityService
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
-import com.netgrif.core.auth.domain.*
+import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
+import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.auth.service.AuthorityService
+import com.netgrif.auth.service.GroupService
 import com.netgrif.auth.service.UserService
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
+import com.netgrif.core.auth.domain.Authority
+import com.netgrif.core.auth.domain.IUser
+import com.netgrif.core.auth.domain.LoggedUser
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.core.petrinet.domain.dataset.Field
-import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.core.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
-import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.core.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.MergeFilterOperation
 import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
 import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome
 import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
-import com.netgrif.application.engine.workflow.service.interfaces.IDataService
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 
 //import com.netgrif.application.engine.workflow.service.interfaces.IFilterService
 
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
-import com.netgrif.application.engine.workflow.web.requestbodies.CreateFilterBody
 import com.netgrif.core.workflow.web.responsebodies.TaskReference
-import com.netgrif.core.auth.domain.enums.UserState
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -86,7 +86,7 @@ class ImportHelper {
     private IWorkflowService workflowService
 
     @Autowired
-    private INextGroupService groupService
+    private GroupService groupService
 
     @Autowired
     private ProcessRoleService processRoleService

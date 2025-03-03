@@ -2,7 +2,7 @@ package com.netgrif.application.engine.startup.runner;
 
 import com.netgrif.auth.config.GroupConfigurationProperties;
 import com.netgrif.auth.service.UserService;
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.auth.service.GroupService;
 import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.core.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -30,7 +30,7 @@ public class GroupRunner implements ApplicationEngineStartupRunner {
     private static final String GROUP_PETRINET_IDENTIFIER = "org_group";
 
     private final ImportHelper helper;
-    private final INextGroupService nextGroupService;
+    private final GroupService groupService;
     private final UserService userService;
     private final SystemUserRunner systemCreator;
     private final IPetriNetService petriNetService;
@@ -53,7 +53,7 @@ public class GroupRunner implements ApplicationEngineStartupRunner {
             return groupNet;
         }
         if (groupProperties.isSystemEnabled())
-            nextGroupService.createDefaultSystemGroup(userService.getLoggedOrSystem());
+            groupService.create(userService.getLoggedOrSystem());
         return groupNet;
     }
 

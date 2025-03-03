@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.auth
 
+import com.netgrif.adapter.auth.domain.mapper.LoggedUserMapper
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.startup.ImportHelper
@@ -17,6 +18,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
@@ -75,27 +78,57 @@ class UserServiceTest {
     void testAssignRole() {
         user = createUser()
         assert user.getProcessRoles().size() == 1
-        processRoleService.assignRolesToUser(user.getStringId(), Set.of(dummyRole.get_id()), userService.transformToLoggedUser(userService.getLoggedOrSystem()))
-        user = userService.findById(user.getStringId(), null)
+        user = userService.addRole(user, dummyRole.get_id())
         assert user.getProcessRoles().size() == 2 && user.getProcessRoles().stream().anyMatch {it.stringId == dummyRole.stringId}
 
     }
 
     @Test
-    void testRemoveAssignRole() {
+    void testRemoveAllByStateAndExpirationDateBefore() {
         user = createUser()
         user.setState(UserState.INACTIVE)
+        ((User) user).setExpirationDate(LocalDateTime.now())
         userService.saveUser(user, null)
 
-        assert user.getProcessRoles().size() == 1
-        processRoleService.assignRolesToUser(user.getStringId(), Set.of(dummyRole.get_id()), userService.transformToLoggedUser(userService.getLoggedOrSystem()))
-        user = userService.findById(user.getStringId(), null)
-        assert user.getProcessRoles().size() == 2 && user.getProcessRoles().stream().anyMatch {it.stringId == dummyRole.stringId}
-
-        userService.removeAllByStateAndExpirationDateBefore(UserState.INACTIVE, LocalDateTime.now(), Set.of(null))
+        userService.removeAllByStateAndExpirationDateBefore(UserState.INACTIVE, LocalDateTime.now(), null)
         assertThrows(IllegalArgumentException.class, () -> {
             userService.findById(user.stringId, null)
         })
+    }
+
+    @Test
+    void findAllByProcessRoles__idIn() {
+        user = createUser()
+
+        assert user.getProcessRoles().size() == 1
+        user = userService.addRole(user, dummyRole.get_id())
+        assert user.getProcessRoles().size() == 2 && user.getProcessRoles().stream().anyMatch {it.stringId == dummyRole.stringId}
+
+        List<IUser> userList = userService.findAllByProcessRoles(Set.of(dummyRole.get_id()), null)
+        assert userList.size() == 1 && userList.getFirst().stringId == user.stringId
+    }
+
+    @Test
+    void findAllByStateAndExpirationDateBefore() {
+        user = createUser()
+        user.setState(UserState.INACTIVE)
+        ((User) user).setExpirationDate(LocalDateTime.now())
+        userService.saveUser(user, null)
+
+        List<IUser> userList = userService.findAllByStateAndExpirationDateBefore(UserState.INACTIVE, LocalDateTime.now(), null)
+        assert userList.size() == 1 && userList.getFirst().stringId == user.stringId
+    }
+
+    @Test
+    void findAllByIdInAndState() {
+        user = createUser()
+        user.setState(UserState.ACTIVE)
+        ((User) user).setExpirationDate(LocalDateTime.now())
+        userService.saveUser(user, null)
+
+        Page<IUser> userPage = userService.findAllCoMembers(LoggedUserMapper.toLoggedUser(user as User), Pageable.ofSize(10))
+        assert userPage.getContent().size() == 1 && userPage.getContent().getFirst().stringId == user.stringId
+
     }
 
     private IUser createUser() {
@@ -103,8 +136,8 @@ class UserServiceTest {
         User user = null
         if (userOptional.isEmpty()) {
             user = new com.netgrif.adapter.auth.domain.User()
-            user.setFirstName("Admin")
-            user.setLastName("Netgrif")
+            user.setFirstName("Dummy")
+            user.setLastName("User")
             user.setUsername("dummy@netgrif.com")
             user.setEmail("dummy@netgrif.com")
             user.setPassword("password")

@@ -3,16 +3,19 @@ package com.netgrif.application.engine.petrinet.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.core.auth.domain.Group;
+import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.CacheProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
+import com.netgrif.core.auth.domain.User;
 import com.netgrif.core.event.events.Event;
 import com.netgrif.core.event.events.petrinet.ProcessDeleteEvent;
 import com.netgrif.core.event.events.petrinet.ProcessDeployEvent;
 import com.netgrif.application.engine.importer.service.Importer;
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.auth.service.GroupService;
 import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.core.petrinet.domain.PetriNetSearch;
 import com.netgrif.core.petrinet.domain.Transition;
@@ -89,7 +92,7 @@ public class PetriNetService implements IPetriNetService {
     protected IWorkflowService workflowService;
 
     @Autowired
-    protected INextGroupService groupService;
+    protected GroupService groupService;
 
     @Autowired
     protected ObjectFactory<Importer> importerObjectFactory;
@@ -478,9 +481,11 @@ public class PetriNetService implements IPetriNetService {
         }
         if (criteriaClass.getGroup() != null) {
             if (criteriaClass.getGroup().size() == 1) {
-                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").is(this.groupService.getGroupOwnerEmail(criteriaClass.getGroup().get(0))));
+                IUser owner = userService.findById(this.groupService.findById(criteriaClass.getGroup().getFirst()).getOwnerId(), null);
+                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").is(owner.getEmail()));
             } else {
-                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(this.groupService.getGroupsOwnerEmails(criteriaClass.getGroup())));
+                List<IUser> owners = userService.findAllByIds(this.groupService.findAllByIds(new HashSet<>(criteriaClass.getGroup())).stream().map(Group::getOwnerId).collect(Collectors.toSet()), null);
+                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(owners.stream().map(IUser::getEmail).collect(Collectors.toSet())));
             }
         }
         if (criteriaClass.getVersion() != null) {

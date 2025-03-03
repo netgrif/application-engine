@@ -3,7 +3,7 @@ package com.netgrif.application.engine.startup.runner;
 import com.netgrif.auth.service.AuthorityService;
 import com.netgrif.core.auth.domain.*;
 import com.netgrif.auth.service.UserService;
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.auth.service.GroupService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
@@ -35,7 +35,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
 
     private final AuthorityService authorityService;
     private final UserService userService;
-    private final INextGroupService groupService;
+    private final GroupService groupService;
     private final ProcessRoleService processRoleService;
 
     @Getter
@@ -83,7 +83,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     }
 
     public void setAllGroups() {
-        groupService.findAllGroups().forEach(caze -> groupService.addUser(getSuperUser(), caze));
+        groupService.findAll().forEach(g -> groupService.addUser(getSuperUser(), g));
     }
 
     public void setAllProcessRoles() {
