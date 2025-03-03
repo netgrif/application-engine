@@ -1,50 +1,64 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>test</id>
-    <initials>TST</initials>
+    <version>1.0.0</version>
     <title>Test</title>
+    <defaultRole>false</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TST</property>
+    </properties>
+    <processEvents/>
+    <caseEvents/>
     <role>
-        <id>1</id>
-        <name>View</name>
+        <id>role1</id>
+        <title>View</title>
     </role>
     <role>
-        <id>2</id>
-        <name>Perform</name>
+        <id>role2</id>
+        <title>Perform</title>
     </role>
     <data type="text">
-        <id>1</id>
+        <id>data1</id>
         <title>Name</title>
     </data>
-    <!---->
     <transition>
-        <id>1</id>
+        <id>t1</id>
         <x>300</x>
         <y>100</y>
-        <label>Perform</label>
+        <title>Perform</title>
         <roleRef>
-            <id>2</id>
-            <logic>
+            <id>role2</id>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
-        <dataRef>
-            <id>1</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
+        <flex>
+            <id>t1_flex</id>
+            <item>
+                <dataRef>
+                    <id>data1</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
     <transition>
-        <id>2</id>
+        <id>t2</id>
         <x>300</x>
         <y>180</y>
-        <label>View</label>
+        <title>View</title>
         <roleRef>
-            <id>1</id>
-            <logic>
+            <id>role1</id>
+            <permission>
                 <view>true</view>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
-</document>
+</process>
