@@ -22,62 +22,62 @@
         <init>VALUE</init>
     </data>
     <transition>
-        <id>2</id>
+        <id>t2</id>
         <x>340</x>
         <y>180</y>
         <title>Task 1</title>
     </transition>
     <transition>
-        <id>4</id>
+        <id>t4</id>
         <x>500</x>
         <y>180</y>
         <title>Task 2</title>
     </transition>
     <place>
-        <id>1</id>
+        <id>p1</id>
         <x>220</x>
         <y>180</y>
         <title>init</title>
         <tokens>1</tokens>
     </place>
     <place>
-        <id>3</id>
+        <id>p3</id>
         <x>420</x>
         <y>180</y>
         <tokens>0</tokens>
     </place>
     <place>
-        <id>5</id>
+        <id>p5</id>
         <x>620</x>
         <y>180</y>
         <tokens>0</tokens>
     </place>
     <arc>
-        <id>6</id>
+        <id>a6</id>
         <type>regular</type>
-        <sourceId>1</sourceId>
-        <destinationId>2</destinationId>
+        <sourceId>p1</sourceId>
+        <destinationId>t2</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>7</id>
+        <id>a7</id>
         <type>regular</type>
-        <sourceId>2</sourceId>
-        <destinationId>3</destinationId>
+        <sourceId>t2</sourceId>
+        <destinationId>p3</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>8</id>
+        <id>a8</id>
         <type>regular</type>
-        <sourceId>3</sourceId>
-        <destinationId>4</destinationId>
+        <sourceId>p3</sourceId>
+        <destinationId>t4</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>9</id>
+        <id>a9</id>
         <type>regular</type>
-        <sourceId>4</sourceId>
-        <destinationId>5</destinationId>
+        <sourceId>t4</sourceId>
+        <destinationId>p5</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </process>
