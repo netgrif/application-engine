@@ -101,10 +101,12 @@ public class NextGroupService extends GroupServiceImpl {
         } catch (ResourceNotFoundException e) {
             log.warn(e.getMessage());
         }
+        Group group = super.create(identifier, identifier, author);
         PetriNet orgGroupNet = petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER);
         CreateCaseEventOutcome outcome = workflowService.createCase(orgGroupNet.getStringId(), identifier, "", userService.transformToLoggedUser(author));
+        outcome.getCase().getDataField("group_id").setValue(group.getStringId());
 
-        Map<String, Map<String, String>> taskData = getInitialGroupData(author, identifier, outcome.getCase());
+        Map<String, Map<String, String>> taskData = getInitialGroupData(author, title, outcome.getCase());
         Task initTask = getGroupInitTask(outcome.getCase());
         dataService.setData(initTask.getStringId(), ImportHelper.populateDataset(taskData));
 
@@ -115,7 +117,7 @@ public class NextGroupService extends GroupServiceImpl {
             log.error(e.getMessage());
         }
         userService.saveUser(author, null);
-        return create(identifier, identifier, author);
+        return group;
     }
 //
 //    @Override

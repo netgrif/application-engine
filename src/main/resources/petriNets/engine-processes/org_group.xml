@@ -7,29 +7,6 @@
 	<icon>home</icon>
 	<defaultRole>true</defaultRole>
 	<transitionRole>false</transitionRole>
-	<caseEvents>
-		<event type="create">
-			<id>init_group</id>
-			<actions phase="post">
-				<action>
-					id: f.group_id,
-					author: f.author;
-					def groupCase = workflowService.searchOne(com.netgrif.adapter.workflow.domain.QCase.case$.processIdentifier.eq("org_group").and(com.netgrif.adapter.workflow.domain.QCase.case$.title.eq(useCase.title)))
-					if (groupCase != null) {
-						async {
-							Thread.sleep(5000)
-							workflowService.deleteCase(useCase.stringId)
-						}
-						throw new IllegalArgumentException("Group with title [" + useCase.title + "] already exists")
-					}
-
-				   	def group =	groupService.create(useCase.title, useCase.title, useCase.author)
-					change id value { group.stringId }
-					change author value { new com.netgrif.core.petrinet.domain.dataset.UserFieldValue(userService.transformToUser(useCase.author)) }
-				</action>
-			</actions>
-		</event>
-	</caseEvents>
 	<!-- TRANSACTIONS -->
 	<!-- ROLES -->
 	<!-- PROCESS ROLE REFS -->
