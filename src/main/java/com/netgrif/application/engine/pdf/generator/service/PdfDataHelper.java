@@ -12,7 +12,7 @@ import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.adapter.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
-import com.netgrif.core.workflow.web.responsebodies.*;
+import com.netgrif.application.engine.workflow.web.responsebodies.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -116,7 +116,7 @@ public class PdfDataHelper implements IPdfDataHelper {
     }
 
     private void generateFromDataGroup(DataGroup dataGroup) {
-        Collection<LocalisedField> fields = dataGroup.getFields().getContent();
+        Collection<LocalisedField> fields = (Collection<LocalisedField>) dataGroup.getFields().getContent();
         if (dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals("grid")) {
             fields = fields.stream().sorted(Comparator.<LocalisedField, Integer>comparing(f -> f.getLayout().getY()).thenComparing(f -> f.getLayout().getX())).collect(Collectors.toList());
         }

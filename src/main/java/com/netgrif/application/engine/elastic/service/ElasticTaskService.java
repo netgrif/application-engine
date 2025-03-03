@@ -14,13 +14,13 @@ import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearc
 import com.netgrif.core.event.events.task.IndexTaskEvent;
 import com.netgrif.core.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.core.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.core.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
-import com.netgrif.core.workflow.web.requestbodies.TaskSearchRequest;
-import com.netgrif.core.workflow.web.requestbodies.taskSearch.PetriNet;
-import com.netgrif.core.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
+import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
+import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet;
+import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

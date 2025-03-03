@@ -28,7 +28,7 @@ import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEve
 import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import com.netgrif.core.workflow.web.responsebodies.TaskReference;
+import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

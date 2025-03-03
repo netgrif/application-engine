@@ -3,6 +3,7 @@ package com.netgrif.application.engine.petrinet.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.petrinet.web.responsebodies.ArcImportReference;
 import com.netgrif.core.auth.domain.Group;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
@@ -30,7 +31,7 @@ import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataExcepti
 import com.netgrif.core.petrinet.domain.version.Version;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
-import com.netgrif.core.petrinet.web.responsebodies.*;
+import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;

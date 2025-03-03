@@ -4,7 +4,7 @@ import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.core.petrinet.domain.DataGroup;
 import com.netgrif.core.petrinet.domain.dataset.logic.FieldLayout;
-import com.netgrif.core.workflow.web.responsebodies.LocalisedField;
+import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField;
 import lombok.Getter;
 
 import java.util.ArrayList;

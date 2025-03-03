@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.configuration;
 
 //import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
+import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.pdf.generator.service.PdfDataHelper;
 import com.netgrif.application.engine.pdf.generator.service.PdfDrawer;
@@ -55,9 +56,9 @@ public class PrototypesConfiguration {
         return new PdfDrawer();
     }
 
-//    @Bean("userResourceAssembler")
-//    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-//    public UserResourceAssembler userResourceAssembler() {
-//        return new UserResourceAssembler();
-//    }
+    @Bean("userResourceAssembler")
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public UserResourceAssembler userResourceAssembler() {
+        return new UserResourceAssembler();
+    }
 }

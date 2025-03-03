@@ -4,8 +4,8 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.RoleFactory
 import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.core.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission
-import com.netgrif.application.engine.petrinet.domain.roles.RolePermission
+import com.netgrif.core.petrinet.domain.roles.ProcessRolePermission
+import com.netgrif.core.petrinet.domain.roles.RolePermission
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner

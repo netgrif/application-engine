@@ -14,7 +14,7 @@ import com.netgrif.application.engine.petrinet.domain.version.StringToVersionCon
 import com.netgrif.core.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
-import com.netgrif.core.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.service.interfaces.IConfigurableMenuService;
 import org.springframework.beans.factory.annotation.Autowired;

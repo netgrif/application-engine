@@ -31,7 +31,7 @@ import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEve
 
 //import com.netgrif.application.engine.workflow.service.interfaces.IFilterService
 
-import com.netgrif.core.workflow.web.responsebodies.TaskReference
+import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired

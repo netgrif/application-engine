@@ -21,7 +21,7 @@ import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEve
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
-import com.netgrif.core.workflow.web.responsebodies.TaskReference
+import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test

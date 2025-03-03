@@ -14,7 +14,7 @@ import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchReques
 import com.netgrif.core.event.events.workflow.IndexCaseEvent;
 import com.netgrif.core.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.core.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;

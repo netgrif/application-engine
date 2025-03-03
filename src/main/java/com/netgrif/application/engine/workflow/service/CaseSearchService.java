@@ -8,7 +8,7 @@ import com.netgrif.core.petrinet.domain.PetriNetSearch;
 import com.netgrif.core.petrinet.domain.dataset.FieldType;
 import com.netgrif.core.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.core.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.core.workflow.domain.ProcessResourceId;

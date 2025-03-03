@@ -5,7 +5,7 @@ import com.netgrif.auth.service.UserService;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.core.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
+import com.netgrif.core.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowAuthorizationService;

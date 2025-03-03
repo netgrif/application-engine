@@ -1,18 +1,18 @@
 package com.netgrif.application.engine.workflow.web;
 
+import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.auth.service.UserService;
-import com.netgrif.core.eventoutcomes.LocalisedEventOutcomeFactory;
-import com.netgrif.core.model.EntityModel;
 import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-import com.netgrif.core.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
-import com.netgrif.core.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateCaseBody;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;

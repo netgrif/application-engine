@@ -1,16 +1,14 @@
 package com.netgrif.application.engine.petrinet.web;
 
 import com.netgrif.application.engine.AsyncRunner;
-import com.netgrif.core.model.PagedModel;
-import com.netgrif.core.petrinet.web.responsebodies.PetriNetImportReference;
-import com.netgrif.core.petrinet.web.responsebodies.PetriNetReferenceResources;
-import com.netgrif.core.petrinet.web.responsebodies.ProcessRolesResource;
-import com.netgrif.core.petrinet.web.responsebodies.TransitionReferencesResource;
+import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetImportReference;
+import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReferenceResources;
+import com.netgrif.application.engine.petrinet.web.responsebodies.ProcessRolesResource;
+import com.netgrif.application.engine.petrinet.web.responsebodies.TransitionReferencesResource;
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.core.eventoutcomes.LocalisedEventOutcomeFactory;
+import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.core.model.EntityModel;
 import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.core.petrinet.domain.PetriNetSearch;
 import com.netgrif.core.petrinet.domain.VersionType;
@@ -19,11 +17,11 @@ import com.netgrif.application.engine.petrinet.domain.version.StringToVersionCon
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
-import com.netgrif.core.petrinet.web.responsebodies.*;
+import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
-import com.netgrif.core.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
-import com.netgrif.core.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
-import com.netgrif.core.workflow.web.responsebodies.MessageResource;
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
+import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -38,7 +36,11 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -195,10 +197,10 @@ public class PetriNetController {
     PagedModel<PetriNetReferenceResource> searchPetriNets(@RequestBody PetriNetSearch criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         Page<PetriNetReference> nets = service.search(criteria, user, pageable, locale);
-//        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetriNetController.class)
-//                .searchPetriNets(criteria, auth, pageable, assembler, locale)).withRel("search");
-//        PagedModel<PetriNetReferenceResource> resources = assembler.toModel(nets, new PetriNetReferenceResourceAssembler(), selfLink);
-//        PetriNetReferenceResourceAssembler.buildLinks(resources);
+        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetriNetController.class)
+                .searchPetriNets(criteria, auth, pageable, assembler, locale)).withRel("search");
+        PagedModel<PetriNetReferenceResource> resources = assembler.toModel(nets, new PetriNetReferenceResourceAssembler(), selfLink);
+        PetriNetReferenceResourceAssembler.buildLinks(resources);
         return PagedModel.of(nets.stream().map(PetriNetReferenceResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), nets.getTotalElements()));
     }
 

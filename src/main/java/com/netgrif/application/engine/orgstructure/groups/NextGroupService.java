@@ -16,7 +16,7 @@ import com.netgrif.core.petrinet.domain.throwable.TransitionNotExecutableExcepti
 import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.core.workflow.domain.Task;
 import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-import com.netgrif.core.workflow.web.responsebodies.TaskReference;
+import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;

@@ -10,7 +10,7 @@
 //import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 //import com.netgrif.application.engine.petrinet.domain.policies.DataFocusPolicy;
 //import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
-//import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
+//import com.netgrif.core.petrinet.domain.roles.RolePermission;
 //import com.netgrif.core.workflow.domain.triggers.Trigger;
 //import lombok.AllArgsConstructor;
 //import lombok.Builder;

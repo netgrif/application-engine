@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
 import com.netgrif.application.engine.petrinet.web.PetriNetController;
-import com.netgrif.core.petrinet.web.responsebodies.TransitionReference;
+import com.netgrif.application.engine.petrinet.web.responsebodies.TransitionReference;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 

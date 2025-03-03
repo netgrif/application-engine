@@ -35,7 +35,7 @@ public class UserResourceHelperService implements IUserResourceHelperService {
         User result = loggedUser.isImpersonating() ?
                 getLocalisedUser(user, getImpersonated(loggedUser, small), locale) :
                 getLocalisedUser(user, locale);
-        return new UserResource(result);
+        return new UserResource(result, "profile");
     }
 
     @Override

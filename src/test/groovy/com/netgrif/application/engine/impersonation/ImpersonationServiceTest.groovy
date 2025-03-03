@@ -11,7 +11,7 @@ import com.netgrif.application.engine.impersonation.service.interfaces.IImperson
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.ImpersonationRunner
 import com.netgrif.application.engine.workflow.service.interfaces.*
-import com.netgrif.core.workflow.web.requestbodies.TaskSearchRequest
+import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
 import com.netgrif.core.auth.domain.Authority
 import com.netgrif.core.auth.domain.IUser
 import com.netgrif.core.auth.domain.User
@@ -23,7 +23,7 @@ import com.netgrif.core.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.core.workflow.domain.Case
 import com.netgrif.core.workflow.domain.Task
-import com.netgrif.core.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest
+import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest
 import groovy.json.JsonSlurper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

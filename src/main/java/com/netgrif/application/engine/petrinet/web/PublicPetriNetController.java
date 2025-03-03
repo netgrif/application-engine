@@ -6,7 +6,7 @@ import com.netgrif.core.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
-import com.netgrif.core.petrinet.web.responsebodies.*;
+import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;

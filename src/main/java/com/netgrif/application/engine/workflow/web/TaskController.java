@@ -6,17 +6,15 @@ import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
-import com.netgrif.core.model.EntityModel;
-import com.netgrif.core.model.PagedModel;
-import com.netgrif.core.workflow.domain.Task;
-import com.netgrif.core.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
-import com.netgrif.core.workflow.web.requestbodies.file.FileFieldRequest;
-import com.netgrif.core.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
-import com.netgrif.core.workflow.web.responsebodies.CountResponse;
-import com.netgrif.core.workflow.web.responsebodies.LocalisedTaskResource;
-import com.netgrif.core.workflow.web.responsebodies.TaskReference;
+import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest;
+import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
+import com.netgrif.application.engine.workflow.web.responsebodies.CountResponse;
+import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskResource;
+import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
+import com.netgrif.core.workflow.domain.Task;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,7 +25,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -61,15 +62,15 @@ public class TaskController extends AbstractTaskController {
     @Override
     @Operation(summary = "Get all tasks", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, Locale locale) {
-        return super.getAll(auth, pageable, locale);
+    public PagedModel<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        return super.getAll(auth, pageable, assembler, locale);
     }
 
     @Override
     @Operation(summary = "Get all tasks by cases", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> getAllByCases(@RequestBody List<String> cases, Pageable pageable, Locale locale) {
-        return super.getAllByCases(cases, pageable, locale);
+    public PagedModel<LocalisedTaskResource> getAllByCases(@RequestBody List<String> cases, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        return super.getAllByCases(cases, pageable, assembler, locale);
     }
 
     @Override
@@ -145,29 +146,29 @@ public class TaskController extends AbstractTaskController {
     @Override
     @Operation(summary = "Get all tasks assigned to logged user", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/my", produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> getMy(Authentication auth, Pageable pageable, Locale locale) {
-        return super.getMy(auth, pageable, locale);
+    public PagedModel<LocalisedTaskResource> getMy(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        return super.getMy(auth, pageable, assembler, locale);
     }
 
     @Override
     @Operation(summary = "Get all finished tasks by logged user", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/my/finished", produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> getMyFinished(Pageable pageable, Authentication auth, Locale locale) {
-        return super.getMyFinished(pageable, auth, locale);
+    public PagedModel<LocalisedTaskResource> getMyFinished(Pageable pageable, Authentication auth,  PagedResourcesAssembler<Task> assembler, Locale locale) {
+        return super.getMyFinished(pageable, auth, assembler, locale);
     }
 
     @Override
     @Operation(summary = "Generic task search on Mongo database", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Locale locale) {
-        return super.search(auth, pageable, searchBody, operation, locale);
+    public PagedModel<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation,  PagedResourcesAssembler<Task> assembler, Locale locale) {
+        return super.search(auth, pageable, searchBody, operation, assembler, locale);
     }
 
     @Override
     @Operation(summary = "Generic task search on Elasticsearch database", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search_es", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> searchElastic(Authentication auth, Pageable pageable, @RequestBody SingleElasticTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Locale locale) {
-        return super.searchElastic(auth, pageable, searchBody, operation, locale);
+    public PagedModel<LocalisedTaskResource> searchElastic(Authentication auth, Pageable pageable, @RequestBody SingleElasticTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation,  PagedResourcesAssembler<Task> assembler, Locale locale) {
+        return super.searchElastic(auth, pageable, searchBody, operation, assembler, locale);
     }
 
     @Override

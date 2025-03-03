@@ -10,10 +10,10 @@ import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.core.petrinet.domain.throwable.MissingIconKeyException;
 import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.core.petrinet.domain.version.Version;
-import com.netgrif.core.petrinet.web.responsebodies.DataFieldReference;
-import com.netgrif.core.petrinet.web.responsebodies.PetriNetImportReference;
-import com.netgrif.core.petrinet.web.responsebodies.PetriNetReference;
-import com.netgrif.core.petrinet.web.responsebodies.TransitionReference;
+import com.netgrif.application.engine.petrinet.web.responsebodies.DataFieldReference;
+import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetImportReference;
+import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.application.engine.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import org.bson.types.ObjectId;
 import org.springframework.core.io.FileSystemResource;
@@ -32,8 +32,8 @@ public interface IPetriNetService {
     }
 
     static TransitionReference transformToReference(PetriNet net, Transition transition, Locale locale) {
-        List<com.netgrif.core.workflow.web.responsebodies.DataFieldReference> list = new ArrayList<>();
-        transition.getImmediateData().forEach(fieldId -> list.add(new com.netgrif.core.workflow.web.responsebodies.DataFieldReference(net.getDataSet().get(fieldId), locale)));
+        List<com.netgrif.application.engine.workflow.web.responsebodies.DataFieldReference> list = new ArrayList<>();
+        transition.getImmediateData().forEach(fieldId -> list.add(new com.netgrif.application.engine.workflow.web.responsebodies.DataFieldReference(net.getDataSet().get(fieldId), locale)));
         return new TransitionReference(transition.getStringId(), transition.getTitle().getTranslation(locale), net.getStringId(), list);
     }
 

@@ -1,16 +1,16 @@
-//package com.netgrif.application.engine.petrinet.web.responsebodies;
-//
-//import com.netgrif.core.petrinet.domain.Node;
-//import com.netgrif.core.petrinet.domain.Transition;
-//import lombok.Data;
-//
-//@Data
-//public class TransitionImportReference extends Node {
-//
-//    public TransitionImportReference(Transition transition) {
-//        this.setPosition(transition.getPosition());
-//        this.setTitle(transition.getTitle());
-//        this.setObjectId(transition.getObjectId());
-//        this.setImportId(transition.getImportId());
-//    }
-//}
+package com.netgrif.application.engine.petrinet.web.responsebodies;
+
+import com.netgrif.core.petrinet.domain.Node;
+import com.netgrif.core.petrinet.domain.Transition;
+import lombok.Data;
+
+@Data
+public class TransitionImportReference extends Node {
+
+    public TransitionImportReference(Transition transition) {
+        this.setPosition(transition.getPosition());
+        this.setTitle(transition.getTitle());
+        this.setObjectId(transition.getObjectId());
+        this.setImportId(transition.getImportId());
+    }
+}

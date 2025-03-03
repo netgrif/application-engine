@@ -19,7 +19,7 @@ import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.core.workflow.domain.Case
 import com.netgrif.core.workflow.domain.Task
 import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
-import com.netgrif.core.workflow.web.requestbodies.TaskSearchRequest
+import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -169,7 +169,7 @@ class QueryDSLViewPermissionTest {
         sleep(4000)
 
         TaskSearchRequest request = new TaskSearchRequest()
-        request.process = [new com.netgrif.core.workflow.web.requestbodies.taskSearch.PetriNet(netWithUserRefs.getStringId())]
+        request.process = [new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(netWithUserRefs.getStringId())]
         Page<Task> taskPage = taskService.search([request],
                 PageRequest.of(0, 20), userService.transformToLoggedUser(testUser), LocaleContextHolder.getLocale(), false)
 
@@ -184,7 +184,7 @@ class QueryDSLViewPermissionTest {
         userService.addRole(testUser, posViewRole.getStringId())
 
         TaskSearchRequest request = new TaskSearchRequest()
-        request.process = [new com.netgrif.core.workflow.web.requestbodies.taskSearch.PetriNet(netWithUserRefs.getStringId())]
+        request.process = [new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(netWithUserRefs.getStringId())]
         Page<Task> taskPage = taskService.search([request],
                 PageRequest.of(0, 20), userService.transformToLoggedUser(testUser), LocaleContextHolder.getLocale(), false)
 

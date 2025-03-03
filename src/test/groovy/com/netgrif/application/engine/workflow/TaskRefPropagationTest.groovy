@@ -10,7 +10,7 @@ import com.netgrif.core.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
-import com.netgrif.core.workflow.web.responsebodies.LocalisedField
+import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

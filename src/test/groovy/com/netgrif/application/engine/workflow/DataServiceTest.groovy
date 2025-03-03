@@ -15,7 +15,7 @@ import com.netgrif.core.workflow.domain.Case
 import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
-import com.netgrif.core.workflow.web.responsebodies.LocalisedField
+import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test

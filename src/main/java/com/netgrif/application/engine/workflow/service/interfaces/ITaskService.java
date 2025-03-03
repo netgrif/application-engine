@@ -11,8 +11,8 @@ import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEve
 import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome;
 import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.DelegateTaskEventOutcome;
 import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome;
-import com.netgrif.core.workflow.web.requestbodies.TaskSearchRequest;
-import com.netgrif.core.workflow.web.responsebodies.TaskReference;
+import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
+import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;

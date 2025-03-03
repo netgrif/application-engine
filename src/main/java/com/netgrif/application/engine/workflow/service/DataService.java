@@ -38,8 +38,8 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import com.netgrif.core.workflow.web.responsebodies.DataFieldsResource;
-import com.netgrif.core.workflow.web.responsebodies.LocalisedField;
+import com.netgrif.application.engine.workflow.web.responsebodies.DataFieldsResource;
+import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField;
 import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -330,9 +330,9 @@ public class DataService implements IDataService {
 
             List<Field<?>> resources = new LinkedList<>();
             for (String dataFieldId : dataGroup.getData()) {
-                Field field = net.getDataSet().get(dataFieldId);
+                Field<?> field = net.getDataSet().get(dataFieldId);
                 if (dataFieldMap.containsKey(dataFieldId)) {
-                    Field resource = dataFieldMap.get(dataFieldId);
+                    Field<?> resource = dataFieldMap.get(dataFieldId);
                     if (level != 0) {
                         dataGroup.setParentCaseId(useCase.getStringId());
                         resource.setParentCaseId(useCase.getStringId());
@@ -403,7 +403,7 @@ public class DataService implements IDataService {
     private void resolveTaskRefBehavior(TaskField taskRefField, List<DataGroup> taskRefDataGroups) {
         if (taskRefField.getBehavior().has("visible") && taskRefField.getBehavior().get("visible").asBoolean()) {
             taskRefDataGroups.forEach(dataGroup -> {
-                dataGroup.getFields().getContent().forEach(field -> {
+                dataGroup.getFields().getContent().stream().map(LocalisedField.class::cast).forEach(field -> {
                     if (field.getBehavior().has("editable") && field.getBehavior().get("editable").asBoolean()) {
                         changeTaskRefBehavior(field, FieldBehavior.VISIBLE);
                     }
@@ -411,7 +411,7 @@ public class DataService implements IDataService {
             });
         } else if (taskRefField.getBehavior().has("hidden") && taskRefField.getBehavior().get("hidden").asBoolean()) {
             taskRefDataGroups.forEach(dataGroup -> {
-                dataGroup.getFields().getContent().forEach(field -> {
+                dataGroup.getFields().getContent().stream().map(LocalisedField.class::cast).forEach(field -> {
                     if (!field.getBehavior().has("forbidden") || !field.getBehavior().get("forbidden").asBoolean())
                         changeTaskRefBehavior(field, FieldBehavior.HIDDEN);
                 });

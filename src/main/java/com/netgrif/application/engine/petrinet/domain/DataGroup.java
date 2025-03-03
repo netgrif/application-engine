@@ -2,8 +2,8 @@
 //
 //import com.fasterxml.jackson.annotation.JsonIgnore;
 //import com.netgrif.core.petrinet.domain.I18nString;
-//import com.netgrif.application.engine.petrinet.domain.layout.DataGroupLayout;
-//import com.netgrif.core.workflow.web.responsebodies.DataFieldsResource;
+//import com.netgrif.core.petrinet.domain.layout.DataGroupLayout;
+//import com.netgrif.application.engine.workflow.web.responsebodies.DataFieldsResource;
 //import lombok.AccessLevel;
 //import lombok.Getter;
 //import lombok.Setter;

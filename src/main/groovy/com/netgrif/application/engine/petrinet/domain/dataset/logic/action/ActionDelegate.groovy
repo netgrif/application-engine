@@ -58,8 +58,8 @@ import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutc
 import com.netgrif.core.workflow.domain.menu.MenuItemBody
 import com.netgrif.core.workflow.domain.menu.MenuItemConstants
 import com.netgrif.core.workflow.service.InitValueExpressionEvaluator
-import com.netgrif.core.workflow.web.responsebodies.MessageResource
-import com.netgrif.core.workflow.web.responsebodies.TaskReference
+import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
+import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
 import groovy.transform.NamedVariant
 import org.bson.types.ObjectId

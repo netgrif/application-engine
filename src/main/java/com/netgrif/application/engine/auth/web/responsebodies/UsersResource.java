@@ -20,7 +20,7 @@ public class UsersResource extends CollectionModel<UserResource> {
     }
 
     public UsersResource(Collection<User> content, String selfRel, boolean small) {
-        this(content.stream().map(UserResource::new)
+        this(content.stream().map(user -> new UserResource(user, small ? SELF_REL_SMALL : SELF_REL_PROFILE))
                 .collect(Collectors.toList()), selfRel);
     }
 

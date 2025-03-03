@@ -128,7 +128,7 @@ class ExportServiceTest {
 
         def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
         def taskRequest = new ElasticTaskSearchRequest()
-        taskRequest.process = [new com.netgrif.core.workflow.web.requestbodies.taskSearch.PetriNet(processId)] as List
+        taskRequest.process = [new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(processId)] as List
         taskRequest.transitionId = ["t4"] as List
         actionDelegate.exportTasksToFile([taskRequest],"src/test/resources/csv/task_elastic_export.csv",null, userService.transformToLoggedUser(userService.findByEmail("super@netgrif.com", null)))
         File csvFile = new File("src/test/resources/csv/task_elastic_export.csv")

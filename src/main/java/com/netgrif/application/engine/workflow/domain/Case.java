@@ -6,7 +6,7 @@
 //import com.netgrif.core.petrinet.domain.I18nString;
 //import com.netgrif.core.petrinet.domain.PetriNet;
 //import com.netgrif.core.petrinet.domain.dataset.*;
-//import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
+//import com.netgrif.core.petrinet.domain.roles.RolePermission;
 //import com.netgrif.core.workflow.service.InitValueExpressionEvaluator;
 //import lombok.Getter;
 //import lombok.Setter;

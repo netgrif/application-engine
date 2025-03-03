@@ -24,9 +24,9 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.TaskController
 import com.netgrif.application.engine.workflow.web.WorkflowController
-import com.netgrif.core.workflow.web.requestbodies.TaskSearchRequest
+import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
 import com.netgrif.core.petrinet.domain.roles.ProcessRole
-import com.netgrif.core.workflow.web.responsebodies.TaskReference
+import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

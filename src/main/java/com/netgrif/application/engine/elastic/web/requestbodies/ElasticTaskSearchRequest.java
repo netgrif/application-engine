@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.elastic.web.requestbodies;
 
-import com.netgrif.core.workflow.web.requestbodies.TaskSearchRequest;
-import com.netgrif.core.workflow.web.requestbodies.taskSearch.PetriNet;
-import com.netgrif.core.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
+import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
+import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet;
+import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 

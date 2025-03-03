@@ -2,7 +2,7 @@ package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
-import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
+import com.netgrif.core.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.petrinet.domain.throwable.IllegalTaskStateException;
 import com.netgrif.core.workflow.domain.Task;
 

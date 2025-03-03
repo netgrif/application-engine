@@ -6,9 +6,9 @@ import com.netgrif.core.importer.model.Logic;
 import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.core.petrinet.domain.Transition;
 import com.netgrif.core.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
+import com.netgrif.core.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
-import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
+import com.netgrif.core.petrinet.domain.roles.RolePermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
