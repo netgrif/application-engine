@@ -113,7 +113,7 @@ public class UserController {
 //                .search(small, query, pageable, assembler, auth, locale)).withRel("search");
 //        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "search"), selfLink);
 //        ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
-        return PagedModel.of(page.stream().map(u -> new UserResource((User) u)).toList(), new PagedModel.PageMetadata(pageable.getPageNumber(), pageable.getPageSize(), page.getTotalElements()));
+        return PagedModel.of(page.stream().map(u -> new UserResource(userResponseFactory.getUser(u, locale))).toList(), new PagedModel.PageMetadata(pageable.getPageNumber(), pageable.getPageSize(), page.getTotalElements()));
     }
 
     @Operation(summary = "Get user by id", security = {@SecurityRequirement(name = "BasicAuth")})
