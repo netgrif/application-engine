@@ -1,12 +1,9 @@
 package com.netgrif.application.engine.configuration.security;
 
-import com.netgrif.adapter.auth.domain.AuthorityImpl;
-import com.netgrif.adapter.petrinet.service.ProcessRoleService;
-import com.netgrif.core.auth.domain.*;
-import com.netgrif.auth.service.AuthorityService;
-import com.netgrif.auth.service.UserService;
+import com.netgrif.application.engine.auth.domain.*;
+import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
-import com.netgrif.core.auth.domain.enums.UserState;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,14 +35,12 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private final String[] exceptions;
 
     private final IJwtService jwtService;
-    private final UserService userService;
-    private final AuthorityService authorityService;
-    private final ProcessRoleService processRoleService;
+    private final IUserService userService;
+    private final IAuthorityService authorityService;
 
     public PublicAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider,
                                       String[] urls, String[] exceptions, IJwtService jwtService,
-                                      UserService userService, AuthorityService authorityService,
-                                      ProcessRoleService processRoleService) {
+                                      IUserService userService, IAuthorityService authorityService) {
         this.authenticationManager = authenticationManager;
         this.authenticationManager.getProviders().add(provider);
         this.anonymousAccessUrls = urls;
@@ -53,7 +48,6 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
         this.jwtService = jwtService;
         this.userService = userService;
         this.authorityService = authorityService;
-        this.processRoleService = processRoleService;
     }
 
     @Override
@@ -69,9 +63,9 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
 
     private void authenticate(HttpServletRequest request, String jwtToken) {
         AnonymousAuthenticationToken authRequest = new AnonymousAuthenticationToken(
-                "anonymous-user",
+                UserProperties.ANONYMOUS_AUTH_KEY,
                 jwtService.getLoggedUser(jwtToken, Authority.anonymous),
-                Collections.singleton((AuthorityImpl) authorityService.getOrCreate(Authority.anonymous))
+                Collections.singleton(authorityService.getOrCreate(Authority.anonymous))
         );
         authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
         Authentication authResult = this.authenticationManager.authenticate(authRequest);
@@ -104,17 +98,20 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
         } else {
             loggedUser = createAnonymousUser();
         }
-        loggedUser.setPassword("N/A");
+        loggedUser.eraseCredentials();
         return loggedUser;
     }
 
     private LoggedUser createAnonymousUser() {
-        User anonymousUser = new com.netgrif.adapter.auth.domain.User();
+        String hash = new ObjectId().toString();
+        AnonymousUser anonymousUser = new AnonymousUser(hash + "@anonymous.nae",
+                "n/a",
+                "User",
+                "Anonymous"
+        );
         anonymousUser.setState(UserState.ACTIVE);
-        anonymousUser.addAuthority(authorityService.getOrCreate(Authority.anonymous));
-        anonymousUser.addProcessRole(processRoleService.getAnonymousRole());
-        anonymousUser = (User) userService.saveUser(anonymousUser, null);
-        return userService.transformToLoggedUser(anonymousUser);
+        anonymousUser = userService.saveNewAnonymous(anonymousUser);
+        return anonymousUser.transformToLoggedUser();
     }
 
     private boolean isPublicApi(String path) {
