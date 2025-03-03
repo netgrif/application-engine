@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.ldap.service;
 
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.service.UserService;
+import com.netgrif.application.engine.authentication.domain.IUser;
+import com.netgrif.application.engine.authentication.service.UserService;
 import com.netgrif.application.engine.ldap.domain.LdapUser;
 import com.netgrif.application.engine.ldap.domain.repository.LdapUserRepository;
 import lombok.extern.slf4j.Slf4j;

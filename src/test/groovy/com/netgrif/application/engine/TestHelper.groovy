@@ -1,6 +1,6 @@
 package com.netgrif.application.engine
 
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository
+import com.netgrif.application.engine.authentication.domain.repositories.UserRepository
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticTaskRepository
 import com.netgrif.application.engine.petrinet.domain.repositories.UriNodeRepository

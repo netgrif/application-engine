@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.manager.web.body.response;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.LoggedUser;
 import com.netgrif.application.engine.manager.web.SessionManagerController;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;

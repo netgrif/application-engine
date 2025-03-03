@@ -147,28 +147,44 @@
 	<data type="button">
 		<id>update_available_entries_btn</id>
 		<placeholder id="update_available_entries_btn_placeholder">Update entries</placeholder>
-		<action trigger="set">
-			updateAvailableEntries(useCase)
-		</action>
+		<event type="set">
+			<id>update_available_entries_btn_set</id>
+			<actions phase="post">
+				<action>
+					updateAvailableEntries(useCase)
+
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="button">
 		<id>clear_menu_selection_btn</id>
 		<placeholder id="clear_menu_selection_btn_placeholder">Clear menu configurations</placeholder>
-		<action trigger="set">
-			change menusForExport options {[:]}
-		</action>
+		<event type="set">
+			<id>clear_menu_selection_btn_set</id>
+			<actions phase="post">
+				<action>
+					change menusForExport options {[:]}
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="text">
 		<id>export_menu_name</id>
 		<title id="exported_menu_id">Exported menu identifier</title>
 		<desc id="exported_menu_id_desc">Unique name menu configuration for selected entries.</desc>
-		<action trigger="set">
-			if (export_menu_name.rawValue == "") {
-				make add_to_export_btn, visible on navigationMenuConfig when {true}
-			} else {
-				make add_to_export_btn, editable on navigationMenuConfig when {true}
-			}
-		</action>
+		<event type="set">
+			<id>export_menu_name_set</id>
+			<actions phase="post">
+				<action>
+					if (export_menu_name.rawValue == "") {
+						make add_to_export_btn, visible on navigationMenuConfig when {true}
+					} else {
+						make add_to_export_btn, editable on navigationMenuConfig when {true}
+					}
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="multichoice_map">
 		<id>available_export_entries</id>
@@ -178,16 +194,21 @@
 	<data type="button">
 		<id>add_to_export_btn</id>
 		<placeholder id="add_to_export_placeholder">Add entries to export</placeholder>
-		<action trigger="set">
-			selectedEntries: f.available_export_entries,
-			addToExportBtn: f.this,
-			menuIdentifier: f.export_menu_name,
-			menusForExport: f.menus_for_export;
+		<event type="set">
+			<id>add_to_export_btn_set</id>
+			<actions phase="post">
+				<action>
+					selectedEntries: f.available_export_entries,
+					addToExportBtn: f.this,
+					menuIdentifier: f.export_menu_name,
+					menusForExport: f.menus_for_export;
 
 					change menusForExport options { return menuImportExportService.addSelectedEntriesToExport(selectedEntries, menusForExport, menuIdentifier.value.value) }
 
-			change selectedEntries value {[]}
-		</action>
+					change selectedEntries value {[]}
+				</action>
+			</actions>
+		</event>
 		<component>
 			<id>raised</id>
 		</component>
@@ -207,10 +228,15 @@
 		<id>export_menu_btn</id>
 		<title/>
 		<placeholder id="export_menu_btn_placeholder">Export menu</placeholder>
-		<action trigger="set">
-			change export_menu_file value { menuImportExportService.exportMenu(menus_for_export, group_id.value.value, export_menu_file) }
-			change menus_for_export options {[:]}
-		</action>
+		<event type="set">
+			<id>export_menu_btn_set</id>
+			<actions phase="post">
+				<action>
+					change export_menu_file value { menuImportExportService.exportMenu(menus_for_export, group_id.value.value, export_menu_file) }
+					change menus_for_export options {[:]}
+				</action>
+			</actions>
+		</event>
 		<component>
 			<id>raised</id>
 		</component>
@@ -226,28 +252,33 @@
 		<title/>
 		<placeholder id="import_menu_btn_placeholder">Import menu</placeholder>
 		<desc id="import_menu_btn_desc">Import menu from provided XML file</desc>
-		<action trigger="set">
-			import_file: f.import_menu_file,
-			groupId: f.group_id,
-			newEntries: f.imported_menu_ids,
-			newIdsActionSetter: f.new_entries_setter,
-			importResults: f.import_results;
+		<event type="set">
+			<id>import_menu_btn_set</id>
+			<actions phase="post">
+				<action>
+					import_file: f.import_menu_file,
+					groupId: f.group_id,
+					newEntries: f.imported_menu_ids,
+					newIdsActionSetter: f.new_entries_setter,
+					importResults: f.import_results;
 
-			change importResults value {return ""}
+					change importResults value {return ""}
 
-			def cases = findCases({ it.processIdentifier.eq("preference_filter_item") }).findAll { it.dataSet.get("parentId").rawValue == useCase.stringId }
-			change newEntries value { return menuImportExportService.importMenu(cases, import_file.value.value, useCase.stringId) }
-			// TODO: release/8.0.0 remove?
-			def actualUseCase = findCase(useCase.stringId)
-			actualUseCase.dataSet.entrySet().forEach{ e ->
-				useCase.dataSet[e.key].value.value = e.value.value
-				if(e.key == ("imported_menu_ids")) {
-					useCase.dataSet[e.key].value.value = newEntries.value.value
-				}
-			}
+					def cases = findCases({ it.processIdentifier.eq("preference_filter_item") }).findAll { it.dataSet.get("parentId").rawValue == useCase.stringId }
+					change newEntries value { return menuImportExportService.importMenu(cases, import_file.value.value, useCase.stringId) }
+					// TODO: release/8.0.0 remove?
+					def actualUseCase = findCase(useCase.stringId)
+					actualUseCase.dataSet.entrySet().forEach{ e ->
+						useCase.dataSet[e.key].value.value = e.value.value
+						if(e.key == ("imported_menu_ids")) {
+							useCase.dataSet[e.key].value.value = newEntries.value.value
+						}
+					}
 
-		change newIdsActionSetter value { "triggerAction" }
-		</action>
+					change newIdsActionSetter value { "triggerAction" }
+				</action>
+			</actions>
+		</event>
 		<component>
 			<id>raised</id>
 		</component>
@@ -255,30 +286,35 @@
 	<data type="text">
 		<id>new_entries_setter</id>
 		<title/>
-		<action trigger="set">
-			import_file: f.import_menu_file,
-			groupId: f.group_id,
-			newEntries: f.imported_menu_ids,
-			availableEntries: f.available_export_entries,
-			importResults: f.import_results;
+		<event type="set">
+			<id>new_entries_setter_set</id>
+			<actions phase="post">
+				<action>
+					import_file: f.import_menu_file,
+					groupId: f.group_id,
+					newEntries: f.imported_menu_ids,
+					availableEntries: f.available_export_entries,
+					importResults: f.import_results;
 
-            // TODO: release/8.0.0 check
-			newEntries.value.forEach { itemId -&gt;
-				def idSplit = itemId.split(',')
-				def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(idSplit[0]))})
+					// TODO: release/8.0.0 check
+					newEntries.value.forEach { itemId -&gt;
+						def idSplit = itemId.split(',')
+						def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(idSplit[0]))})
 
-				setData(initTask, [
-					"filter_case": ["type":"caseRef", "value": [idSplit[1]], "allowedNets":["filter"]],
-					"use_icon": ["type":"boolean", "value": idSplit[2]]
-				])
-			}
+						setData(initTask, [
+								"filter_case": ["type":"caseRef", "value": [idSplit[1]], "allowedNets":["filter"]],
+								"use_icon": ["type":"boolean", "value": idSplit[2]]
+						])
+					}
 
-			finishTask(initTask)
+					finishTask(initTask)
 
-			workflowService.save(useCase)
+					workflowService.save(useCase)
 
-			updateAvailableEntries(useCase)
-		</action>
+					updateAvailableEntries(useCase)
+				</action>
+			</actions>
+		</event>
 	</data>
 
 

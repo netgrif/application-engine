@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.impersonation.service.interfaces;
 
-import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Authority;
+import com.netgrif.application.engine.authentication.domain.IUser;
+import com.netgrif.application.engine.authentication.domain.LoggedUser;
 import com.netgrif.application.engine.authorization.domain.Role;
 import com.netgrif.application.engine.workflow.domain.Case;
 import org.springframework.data.domain.Page;

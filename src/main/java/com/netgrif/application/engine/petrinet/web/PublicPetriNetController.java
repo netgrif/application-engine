@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.petrinet.web;
 
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
+import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;

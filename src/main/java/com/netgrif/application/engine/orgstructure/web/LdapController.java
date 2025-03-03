@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.orgstructure.web;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.LoggedUser;
 import com.netgrif.application.engine.ldap.domain.LdapGroup;
 import com.netgrif.application.engine.ldap.domain.LdapGroupRef;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;

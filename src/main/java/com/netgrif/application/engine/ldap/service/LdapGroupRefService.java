@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.ldap.service;
 
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.LoggedUser;
 import com.netgrif.application.engine.authorization.domain.Role;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.ldap.LdapConfiguration;

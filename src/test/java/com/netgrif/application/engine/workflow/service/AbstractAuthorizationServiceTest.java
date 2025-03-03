@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.User;
+import com.netgrif.application.engine.authentication.domain.IUser;
+import com.netgrif.application.engine.authentication.domain.User;
 import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
 import org.junit.jupiter.api.Test;
@@ -52,8 +52,9 @@ class AbstractAuthorizationServiceTest {
         processRoles.add(new ProcessRole());
 
         IUser user = new User();
-        user.addRole(processRoles.get(0));
-        user.addRole(processRoles.get(1));
+//        todo 2058
+//        user.addRole(processRoles.get(0));
+//        user.addRole(processRoles.get(1));
 
         Map<String, Map<CasePermission, Boolean>> netPermissions = new HashMap<>();
         netPermissions.put(processRoles.get(0).getStringId(), getInitEntryValue());

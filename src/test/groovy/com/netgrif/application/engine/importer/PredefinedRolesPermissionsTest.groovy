@@ -8,7 +8,7 @@ import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.authorization.domain.permissions.CasePermission
 import com.netgrif.application.engine.authorization.domain.permissions.TaskPermission
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
@@ -52,7 +52,7 @@ class PredefinedRolesPermissionsTest {
     private ITaskService taskService
 
     @Autowired
-    private IProcessRoleService roleService
+    private IRoleService roleService
 
     @Autowired
     private PermissionFactory roleFactory
@@ -114,13 +114,13 @@ class PredefinedRolesPermissionsTest {
     private String ANONYMOUS_ROLE_ID
 
     @BeforeEach
-    public void before() {
+    void before() {
         testHelper.truncateDbs()
-        assert roleService.defaultRole() != null
-        DEFAULT_ROLE_ID = roleService.defaultRole().stringId
+        assert roleService.findDefaultRole() != null
+        DEFAULT_ROLE_ID = roleService.findDefaultRole().stringId
         assert DEFAULT_ROLE_ID != null
-        assert roleService.anonymousRole() != null
-        ANONYMOUS_ROLE_ID = roleService.anonymousRole().stringId
+        assert roleService.findAnonymousRole() != null
+        ANONYMOUS_ROLE_ID = roleService.findAnonymousRole().stringId
         assert ANONYMOUS_ROLE_ID != null
     }
 

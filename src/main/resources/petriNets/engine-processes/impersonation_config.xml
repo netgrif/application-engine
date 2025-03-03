@@ -11,32 +11,32 @@
 	<caseName id="caseName">Impersonators configuration</caseName>
 	<roleRef>
 		<id>admin_imp</id>
-		<caseLogic>
+		<permission>
 			<create>true</create>
 			<delete>true</delete>
 			<view>true</view>
-		</caseLogic>
+		</permission>
 	</roleRef>
 	<roleRef>
 		<id>defaultRole</id>
-		<caseLogic>
+		<permission>
 			<view>true</view>
-		</caseLogic>
+		</permission>
 	</roleRef>
 	<roleRef>
 		<id>user_imp</id>
-		<caseLogic>
+		<permission>
 			<create>true</create>
 			<view>true</view>
-		</caseLogic>
+		</permission>
 	</roleRef>
-	<userRef>
+	<roleRef type="case">
 		<id>config_owner</id>
-		<caseLogic>
+		<permission>
 			<delete>true</delete>
 			<view>true</view>
-		</caseLogic>
-	</userRef>
+		</permission>
+	</roleRef>
 	<processEvents/>
 	<caseEvents>
 		<event type="create">
@@ -363,23 +363,23 @@
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>
 			<id>admin_imp</id>
-			<logic>
-				<view>true</view>
-				<cancel>true</cancel>
-				<assign>true</assign>
-				<reassign>true</reassign>
+			<permission>
 				<perform>true</perform>
-			</logic>
+				<view>true</view>
+				<assign>true</assign>
+				<cancel>true</cancel>
+				<reassign>true</reassign>
+			</permission>
 		</roleRef>
 		<roleRef>
 			<id>config_owner</id>
-			<logic>
-				<view>true</view>
-				<cancel>true</cancel>
-				<assign>true</assign>
-				<reassign>true</reassign>
+			<permission>
 				<perform>true</perform>
-			</logic>
+				<view>true</view>
+				<assign>true</assign>
+				<cancel>true</cancel>
+				<reassign>true</reassign>
+			</permission>
 		</roleRef>
 		<event type="finish">
 			<id>t2_finish</id>
@@ -415,23 +415,23 @@
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>
 			<id>admin_imp</id>
-			<logic>
-				<view>true</view>
-				<cancel>true</cancel>
-				<assign>true</assign>
-				<reassign>true</reassign>
+			<permission>
 				<perform>true</perform>
-			</logic>
+				<view>true</view>
+				<assign>true</assign>
+				<cancel>true</cancel>
+				<reassign>true</reassign>
+			</permission>
 		</roleRef>
 		<roleRef>
 			<id>config_owner</id>
-			<logic>
-				<view>true</view>
-				<cancel>true</cancel>
-				<assign>true</assign>
-				<reassign>true</reassign>
+			<permission>
 				<perform>true</perform>
-			</logic>
+				<view>true</view>
+				<assign>true</assign>
+				<cancel>true</cancel>
+				<reassign>true</reassign>
+			</permission>
 		</roleRef>
 		<event type="assign">
 			<id>t3_assign</id>
@@ -473,23 +473,23 @@
 		<assignPolicy>auto</assignPolicy>
 		<roleRef>
 			<id>admin_imp</id>
-			<logic>
-				<view>true</view>
-				<cancel>true</cancel>
-				<assign>true</assign>
-				<reassign>true</reassign>
+			<permission>
 				<perform>true</perform>
-			</logic>
+				<view>true</view>
+				<assign>true</assign>
+				<cancel>true</cancel>
+				<reassign>true</reassign>
+			</permission>
 		</roleRef>
 		<roleRef>
 			<id>config_owner</id>
-			<logic>
-				<view>true</view>
-				<cancel>true</cancel>
-				<assign>true</assign>
-				<reassign>true</reassign>
+			<permission>
 				<perform>true</perform>
-			</logic>
+				<view>true</view>
+				<assign>true</assign>
+				<cancel>true</cancel>
+				<reassign>true</reassign>
+			</permission>
 		</roleRef>
 		<event type="assign">
 			<id>t4_assign</id>

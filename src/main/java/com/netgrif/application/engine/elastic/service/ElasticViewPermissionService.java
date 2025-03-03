@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.elastic.service;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.LoggedUser;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;

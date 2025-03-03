@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.configuration.security;
 
-import com.netgrif.application.engine.auth.domain.*;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.authentication.domain.*;
+import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;

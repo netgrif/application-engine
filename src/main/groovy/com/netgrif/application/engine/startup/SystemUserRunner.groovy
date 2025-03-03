@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.auth.domain.IUser
-import com.netgrif.application.engine.auth.domain.LoggedUser
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.authentication.domain.IUser
+import com.netgrif.application.engine.authentication.domain.LoggedUser
+import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty

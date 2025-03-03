@@ -1,9 +1,8 @@
 package com.netgrif.application.engine.petrinet.domain.dataset;
 
-import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.authentication.domain.IUser;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 // TODO: release/8.0.0 remove, store only ObjectId

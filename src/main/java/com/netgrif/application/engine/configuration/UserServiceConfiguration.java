@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.configuration;
 
-import com.netgrif.application.engine.auth.service.RegistrationService;
-import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl;
-import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.authentication.service.RegistrationService;
+import com.netgrif.application.engine.authentication.service.UserDetailsServiceImpl;
+import com.netgrif.application.engine.authentication.service.UserService;
+import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService;
+import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

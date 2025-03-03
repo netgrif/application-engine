@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 

@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.orgstructure.groups;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.RegisteredUser;
-import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
+import com.netgrif.application.engine.authentication.domain.IUser;
+import com.netgrif.application.engine.authentication.domain.RegisteredUser;
+import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService;
+import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
+import com.netgrif.application.engine.authentication.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;

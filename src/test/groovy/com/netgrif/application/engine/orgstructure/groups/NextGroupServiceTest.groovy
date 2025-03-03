@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.orgstructure.groups
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.authentication.domain.Authority
+import com.netgrif.application.engine.authentication.domain.User
+import com.netgrif.application.engine.authentication.domain.UserState
+import com.netgrif.application.engine.authentication.service.UserService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.authorization.domain.ProcessRole

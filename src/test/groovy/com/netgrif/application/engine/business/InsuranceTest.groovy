@@ -4,16 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectWriter
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.authentication.domain.Authority
+import com.netgrif.application.engine.authentication.domain.User
+import com.netgrif.application.engine.authentication.domain.UserState
+import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
@@ -102,7 +102,7 @@ class InsuranceTest {
     @Autowired
     private SuperCreator superCreator
     @Autowired
-    private IProcessRoleService roleService
+    private IRoleService roleService
     @Autowired
     private IUserService userService
     @Autowired

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.security.service;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.LoggedUser;
 
 public interface ISecurityContextService {
 

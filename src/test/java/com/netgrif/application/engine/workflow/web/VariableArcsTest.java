@@ -2,13 +2,13 @@ package com.netgrif.application.engine.workflow.web;
 
 import com.netgrif.application.engine.MockService;
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.User;
-import com.netgrif.application.engine.auth.domain.UserState;
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
+import com.netgrif.application.engine.authentication.domain.Authority;
+import com.netgrif.application.engine.authentication.domain.IUser;
+import com.netgrif.application.engine.authentication.domain.User;
+import com.netgrif.application.engine.authentication.domain.UserState;
+import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.authorization.domain.ProcessRole;
-import com.netgrif.application.engine.authorization.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
@@ -69,7 +69,7 @@ public class VariableArcsTest {
     private MockService mock;
 
     @Autowired
-    private IProcessRoleService roleService;
+    private IRoleService roleService;
 
     @Autowired
     private ImportHelper importHelper;
@@ -99,7 +99,7 @@ public class VariableArcsTest {
         testHelper.truncateDbs();
         userRunner.run("");
         repository.deleteAll();
-        assertNotNull(roleService.defaultRole());
+        assertNotNull(roleService.findDefaultRole());
         testHelper.truncateDbs();
         ImportPetriNetEventOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), VersionType.MAJOR, superCreator.getLoggedSuper());
 

@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.event.events.user;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.IUser;
+import com.netgrif.application.engine.authentication.domain.LoggedUser;
 import com.netgrif.application.engine.authorization.domain.Role;
 import lombok.Getter;
 

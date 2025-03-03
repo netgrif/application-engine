@@ -134,16 +134,6 @@ public class Task implements Serializable {
         return triggers.stream().anyMatch(trigger -> trigger != null && TriggerType.AUTO.equals(trigger.getType()));
     }
 
-    // todo 2058 decide what to do with it
-    private void compareExistingUserPermissions(String userId, Map<TaskPermission, Boolean> permissions) {
-        // TODO: release/8.0.0 check if possible to reduce duplicated code, possible solution is to have abstraction on permissions map
-//        permissions.forEach((id, perm) -> {
-//            if ((users.containsKey(userId) && !users.get(userId).containsKey(id)) || (users.containsKey(userId) && users.get(userId).containsKey(id) && users.get(userId).get(id))) {
-//                users.get(userId).put(id, perm);
-//            }
-//        });
-    }
-
     /**
      * todo javadoc
      * */
