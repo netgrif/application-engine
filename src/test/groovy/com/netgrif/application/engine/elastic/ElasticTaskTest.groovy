@@ -68,9 +68,6 @@ class ElasticTaskTest {
     @Autowired
     protected IElasticTaskService elasticTaskService
 
-    @Value("classpath:task_reindex_test.xml")
-    private Resource netResource
-
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
