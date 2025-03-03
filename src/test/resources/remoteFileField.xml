@@ -1,27 +1,43 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>remote_file_field_net</id>
-    <initials>TST</initials>
+    <version>1.0.0</version>
     <title>Test</title>
     <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TST</property>
+    </properties>
+    <processEvents/>
+    <caseEvents/>
     <data type="file">
         <id>file</id>
         <title>Remote File</title>
         <placeholder>Remote file</placeholder>
         <init>test-file.txt:https://netgrif.com</init>
-        <remote/>
+        <properties>
+            <property key="remote">true</property>
+        </properties>
     </data>
     <transition>
         <id>task</id>
         <x>0</x>
         <y>0</y>
-        <label>Task</label>
-        <dataRef>
-            <id>file</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
+        <title>Task</title>
+        <flex>
+            <id>task_flex</id>
+            <item>
+                <dataRef>
+                    <id>file</id>
+                    <logic>
+                        <behavior>visible</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
-</document>
+</process>
