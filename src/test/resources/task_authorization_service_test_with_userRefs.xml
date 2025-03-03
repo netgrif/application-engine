@@ -1,5 +1,4 @@
-<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>wst_usersRef</id>
     <version>1.0.0</version>
     <title>WorkflowAuthorizationService test</title>
@@ -74,51 +73,51 @@
         <title>Transition</title>
         <roleRef>
             <id>assign_neg_role</id>
-            <logic>
+            <permission>
                 <assign>false</assign>
-            </logic>
+            </permission>
         </roleRef>
         <roleRef>
             <id>assign_neg_ul</id>
-            <logic>
+            <permission>
                 <assign>false</assign>
-            </logic>
+            </permission>
         </roleRef>
         <roleRef>
             <id>assign_pos_role</id>
-            <logic>
+            <permission>
                 <assign>true</assign>
-            </logic>
+            </permission>
         </roleRef>
         <roleRef>
             <id>assign_pos_ul</id>
-            <logic>
+            <permission>
                 <assign>true</assign>
-            </logic>
+            </permission>
         </roleRef>
         <roleRef>
             <id>cancel_neg_ul</id>
-            <logic>
+            <permission>
                 <cancel>false</cancel>
-            </logic>
+            </permission>
         </roleRef>
         <roleRef>
             <id>cancel_pos_ul</id>
-            <logic>
+            <permission>
                 <cancel>true</cancel>
-            </logic>
+            </permission>
         </roleRef>
         <roleRef>
             <id>delegate_neg_ul</id>
-            <logic>
+            <permission>
                 <reassign>false</reassign>
-            </logic>
+            </permission>
         </roleRef>
         <roleRef>
             <id>delegate_pos_ul</id>
-            <logic>
+            <permission>
                 <reassign>true</reassign>
-            </logic>
+            </permission>
         </roleRef>
         <flex>
             <id>t1_flex</id>
