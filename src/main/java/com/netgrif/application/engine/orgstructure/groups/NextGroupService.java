@@ -135,6 +135,7 @@ public class NextGroupService implements GroupService {
         user.addGroupId(group.getStringId());
         user.getGroups().add(group);
         userService.saveUser(user, user.getRealmId());
+        group = save(group);
 
         PetriNet orgGroupNet = petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER);
         CreateCaseEventOutcome outcome = workflowService.createCase(orgGroupNet.getStringId(), identifier, "", userService.transformToLoggedUser(user));
@@ -151,7 +152,7 @@ public class NextGroupService implements GroupService {
             log.error(e.getMessage());
         }
         userService.saveUser(user, null);
-        return save(group);
+        return group;
     }
 
     @Override
