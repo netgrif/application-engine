@@ -50,6 +50,9 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     private IUser createSuperUser() {
         Authority adminAuthority = authorityService.getOrCreate(Authority.admin);
         Authority systemAuthority = authorityService.getOrCreate(Authority.systemAdmin);
+        Set<Authority> authorities = new HashSet<>();
+        authorities.add(adminAuthority);
+        authorities.add(systemAuthority);
 
         Optional<IUser> superUser = userService.findUserByUsername(SUPER_ADMIN_EMAIL, null);
         if (superUser.isEmpty()) {
@@ -60,10 +63,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
             user.setEmail(SUPER_ADMIN_EMAIL);
             user.setPassword(superAdminPassword);
             user.setState(UserState.ACTIVE);
-            user.setAuthorities(new HashSet<>(){{
-                add(adminAuthority);
-                add(systemAuthority);
-            }});
+            user.setAuthorities(authorities);
             user.setProcessRoles(new HashSet<>(processRoleService.findAll()));
             this.superUser = userService.createUser(user, null);
             log.info("Super user created");
