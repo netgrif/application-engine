@@ -13,7 +13,8 @@ public class ElasticMappingUtils {
      * todo javadoc
      * */
     public static <T> Set<String> filterRoleIdsByPermissionValue(AccessPermissions<T> permissions, T permission, boolean isPositive) {
-        return filterRoleIds(permissions, (permissionEntry) -> permissionEntry.getValue().get(permission) == isPositive);
+        return filterRoleIds(permissions, (permissionEntry) ->
+                permissionEntry.getValue().containsKey(permission) && permissionEntry.getValue().get(permission) == isPositive);
     }
 
     /**

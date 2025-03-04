@@ -110,6 +110,14 @@ public class RoleService implements IRoleService {
      * todo javadoc
      * */
     @Override
+    public List<ProcessRole> findAllProcessRolesByImportIds(Set<String> roleImportIds) {
+        return processRoleRepository.findAllByImportIdIn(roleImportIds);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
     public List<ProcessRole> findProcessRolesByDefaultTitle(String title) {
         return processRoleRepository.findAllByTitle_DefaultValue(title);
     }

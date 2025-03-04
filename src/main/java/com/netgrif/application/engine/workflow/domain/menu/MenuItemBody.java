@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.workflow.domain.menu;
 
-import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate;
@@ -11,10 +10,7 @@ import lombok.NoArgsConstructor;
 
 import javax.annotation.Nullable;
 import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Class, that holds configurable attributes of menu item. In case of attribute addition, please update also

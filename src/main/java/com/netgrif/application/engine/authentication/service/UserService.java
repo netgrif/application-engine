@@ -72,12 +72,13 @@ public class UserService extends AbstractUserService {
         filterImportExportService.createFilterImport(user);
         filterImportExportService.createFilterExport(user);
 
-        if (groupProperties.isDefaultEnabled()) {
-            groupService.createGroup(user);
-        }
-        if (groupProperties.isSystemEnabled()) {
-            groupService.addUserToDefaultGroup(user);
-        }
+        // todo 2058
+//        if (groupProperties.isDefaultEnabled()) {
+//            groupService.createGroup(user);
+//        }
+//        if (groupProperties.isSystemEnabled()) {
+//            groupService.addUserToDefaultGroup(user);
+//        }
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
 
         return savedUser;

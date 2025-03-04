@@ -291,7 +291,6 @@
         <assignPolicy>auto</assignPolicy>
         <event type="finish">
             <id>newFilter_finish</id>
-            <title id="save">Save</title>
             <actions phase="post">
                 <action id="action_4">
 					<![CDATA[
@@ -300,6 +299,7 @@
                     ]]>
 				</action>
             </actions>
+            <title id="save">Save</title>
         </event>
     </transition>
     <transition>

@@ -20,6 +20,7 @@ public interface IRoleService {
     Role findAnonymousRole();
 
     List<ProcessRole> findAllProcessRoles();
+    List<ProcessRole> findAllProcessRolesByImportIds(Set<String> roleImportIds);
     List<ProcessRole> findProcessRolesByDefaultTitle(String title);
     boolean existsProcessRoleByImportId(String importId);
     ProcessRole findProcessRoleByImportId(String importId);

@@ -55,7 +55,7 @@
 							"inheritAllowedNets"     : false
 					] }
 					changeMenuItem item filter { filter }
-					changeMenuItem item allowedRoles { ["role_2": "netgrif/test/filter_api_test"] }
+					changeMenuItem item allowedRoles { ["role_2"] }
 					changeMenuItem item uri { uri.value.value }
 					// TODO: release/8.0.0
 					/*changeMenuItem item filter { filter }
@@ -78,25 +78,12 @@
 				<action id="action_1">
 					<![CDATA[
 					def filter = createCaseFilter(title.rawValue, query.rawValue, allowed_nets.rawValue.split(",") as List, icon.rawValue)
-					def item
-					if (group.value) {
-						item = createMenuItem(
-								uri.rawValue,
-								identifier.rawValue,
-								filter,
-								group.rawValue,
-								["role_1": "filter_api_test"],
-								[:]
-						)
-					} else {
-						item = createMenuItem(
-								uri.rawValue,
-								identifier.rawValue,
-								filter,
-								["role_1": "filter_api_test"],
-								[:]
-						)
-					}
+					def body = new com.netgrif.application.engine.workflow.domain.menu.MenuItemBody(uri.rawValue,
+							identifier.rawValue, identifier.rawValue, icon.value.value)
+					body.setFilter(filter)
+
+					def item = createMenuItem(body)
+
 					change menu_stringId value { item.stringId }
 					change filter_stringId value { filter.stringId }
 					]]>
@@ -112,18 +99,15 @@
 			<actions phase="post">
 				<action id="action_4">
 					<![CDATA[
-					def item = createFilterInMenu(
-							uri.value.value,
-							identifier.value.value,
-							title.value.value,
-							query.value.value,
-							type.value.value,
-							allowed_nets.value.value.split(",") as List,
-							["role_1": "filter_api_test"],
-							[:],
-							icon.value.value
-					)
-					def filter = getFilterFromMenuItem(item)
+					def filter = createFilter(title.rawValue, query.rawValue, type.value.value, allowed_nets.rawValue.split(",") as List,
+							icon.rawValue, "private", null)
+					def body = new com.netgrif.application.engine.workflow.domain.menu.MenuItemBody(uri.rawValue,
+							identifier.rawValue, title.value.value, icon.value.value)
+					body.setFilter(filter)
+					body.setAllowedRoles(collectRolesForPreferenceItem(["role_1"]))
+
+					def item = createMenuItem(body)
+
 					change menu_stringId value { item.stringId }
 					change filter_stringId value { filter.stringId }
 					]]>
