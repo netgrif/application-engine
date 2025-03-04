@@ -98,6 +98,7 @@ class ProcessRoleTest {
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_VIEW, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [roles.find {
+                    // TODO: release/8.0.0 roles
                     it.getStringId() == net.getNet().roles.values().find {
                         it.name.defaultValue == "View"
                     }.stringId

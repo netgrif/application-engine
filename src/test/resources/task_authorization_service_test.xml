@@ -1,5 +1,4 @@
-<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>wst</id>
     <version>1.0.0</version>
     <title>WorkflowAuthorizationService test</title>
@@ -42,15 +41,15 @@
         <title>Transition</title>
         <roleRef>
             <id>assign_neg_role</id>
-            <logic>
+            <permission>
                 <assign>false</assign>
-            </logic>
+            </permission>
         </roleRef>
         <roleRef>
             <id>assign_pos_role</id>
-            <logic>
+            <permission>
                 <assign>true</assign>
-            </logic>
+            </permission>
         </roleRef>
         <flex>
             <id>t1_flex</id>

@@ -47,7 +47,7 @@ class RuleEngineTest {
 
     public static final String TEXT_VALUE = "new text value";
     public static final Double NUM_VALUE = 99.0;
-    public static final String TRANS_1 = "2";
+    public static final String TRANS_1 = "t2";
     @Autowired
     private TestHelper testHelper;
     @Autowired
@@ -151,8 +151,8 @@ class RuleEngineTest {
 
     @Test
     void testTransitionRules() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
-        final String TRANS_1 = "2";
-        final String TRANS_2 = "4";
+        final String TRANS_1 = "t2";
+        final String TRANS_2 = "t4";
         final String NEW_CASE_TITLE = "new case title";
         final String NEW_CASE_TITLE_2 = "new case title 2";
         final String TEXT_VALUE = "TEXT FIELD VALUE";

@@ -11,10 +11,10 @@
     <caseName>All data test default case name</caseName>
     <roleRef>
         <id>admin</id>
-        <caseLogic>
+        <permission>
             <create>true</create>
             <view>true</view>
-        </caseLogic>
+        </permission>
     </roleRef>
     <role>
         <id>admin</id>
@@ -93,6 +93,7 @@
         <id>file</id>
         <title>File</title>
         <event type="set">
+            <id>file_set</id>
             <actions phase="post">
                 <action id="action_1">
 					<![CDATA[
