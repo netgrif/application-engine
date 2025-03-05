@@ -128,11 +128,25 @@
     </dependencyManagement>
 
     <dependencies>
+        <!-- NAE Modules -->
+        <dependency>
+            <groupId>com.netgrif</groupId>
+            <artifactId>nae-user-common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>com.netgrif</groupId>
             <artifactId>nae-ce-user</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
+
+        <!-- Loader -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-loader</artifactId>
+        </dependency>
+
         <!-- Actuator -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
