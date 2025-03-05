@@ -28,12 +28,11 @@ class AnonymousRoleRunner extends AbstractOrderedCommandLineRunner {
             return
         }
 
-        ProcessRole anonymousRole = new ProcessRole(
-                importId: ProcessRole.ANONYMOUS_ROLE,
-                title: new I18nString(ProcessRole.ANONYMOUS_ROLE),
-                description: new I18nString("Anonymous system process role"),
-                events: new LinkedHashMap<RoleEventType, RoleEvent>()
-        )
+        ProcessRole anonymousRole = new ProcessRole(ProcessRole.ANONYMOUS_ROLE)
+        anonymousRole.title = new I18nString(ProcessRole.ANONYMOUS_ROLE)
+        anonymousRole.description = new I18nString("Anonymous system process role")
+        anonymousRole.events = new LinkedHashMap<RoleEventType, RoleEvent>()
+
         anonymousRole = repository.save(anonymousRole)
 
         if (anonymousRole == null)

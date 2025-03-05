@@ -47,9 +47,9 @@ class AbstractAuthorizationServiceTest {
 
         // init
         List<ProcessRole> processRoles = new LinkedList<>();
-        processRoles.add(new ProcessRole());
-        processRoles.add(new ProcessRole());
-        processRoles.add(new ProcessRole());
+        processRoles.add(new ProcessRole("import_id1"));
+        processRoles.add(new ProcessRole("import_id2"));
+        processRoles.add(new ProcessRole("import_id3"));
 
         IUser user = new User();
 //        todo 2058

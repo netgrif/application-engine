@@ -10,8 +10,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class UserListField extends FieldWithAllowedRoles<UserListFieldValue> {
 
-    private String roleId;
-
     public UserListField() {
         super();
     }
@@ -25,7 +23,6 @@ public class UserListField extends FieldWithAllowedRoles<UserListFieldValue> {
     @Override
     public UserListField clone() {
         UserListField clone = new UserListField();
-        clone.setRoleId(roleId);
         super.clone(clone);
         return clone;
     }

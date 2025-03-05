@@ -25,6 +25,20 @@ public class ProcessRole extends Role {
     private I18nString description;
     private UniqueKeyMap<String, String> properties;
 
+    public ProcessRole(ObjectId id, String importId) {
+        super(id);
+        this.importId = importId;
+        this.events = new HashMap<>();
+    }
+
+    public ProcessRole(String importId) {
+        this(new ObjectId(), importId);
+    }
+
+    public ProcessRole() {
+        this(new ObjectId(), null);
+    }
+
     @Override
     public Class<?> getAssignmentFactoryClass() {
         return ProcessRoleAssignmentFactory.class;
@@ -33,19 +47,6 @@ public class ProcessRole extends Role {
     @Override
     public String getTitleAsString() {
         return this.title != null ? this.title.getDefaultValue() : this.importId;
-    }
-
-    public ProcessRole(ObjectId id) {
-        super(id);
-        this.events = new HashMap<>();
-    }
-
-    public ProcessRole() {
-        this(new ObjectId());
-    }
-
-    public ProcessRole(String id) {
-        this(new ObjectId(id));
     }
 
     @EqualsAndHashCode.Include
@@ -103,9 +104,8 @@ public class ProcessRole extends Role {
 
     @Override
     public ProcessRole clone() {
-        ProcessRole clone = new ProcessRole();
+        ProcessRole clone = new ProcessRole(this.importId);
         clone.setStringId(this.getStringId());
-        clone.setImportId(this.importId);
         clone.setTitle(this.title == null ? null : this.title.clone());
         clone.setDescription(this.description == null ? null : this.description.clone());
         return clone;

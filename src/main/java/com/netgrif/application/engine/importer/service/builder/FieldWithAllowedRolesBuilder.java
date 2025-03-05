@@ -17,6 +17,6 @@ public abstract class FieldWithAllowedRolesBuilder<T extends FieldWithAllowedRol
         }
         Set<String> roles = options.getOption().stream()
                 .map(Option::getValue).collect(Collectors.toSet());
-        field.setRoles(roles);
+        field.setAllowedRoleImportIds(roles);
     }
 }

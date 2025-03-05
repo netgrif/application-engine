@@ -310,12 +310,12 @@ class RequestTest {
         netId = net.getNet().getStringId()
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        def processRoles = importHelper.getProcessRolesByImportId(net.getNet(), ["first": "first", "second": "second", "system": "system", "user": "user", "registration": "registration"])
+        def processRoles = roleService.findAllProcessRolesByImportIds(["first", "second", "system", "user", "registration"] as Set)
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
-                [processRoles.get("first"), processRoles.get("registration"), processRoles.get("second"), processRoles.get("system"), processRoles.get("user")] as ProcessRole[])
-        List<ProcessRole> roles = roleService.findAll(netId)
-        roleService.assignRolesToUser(userService.findByEmail(USER_EMAIL).stringId, roles.findAll { it.importId in ["1", "2"] }.collect { it.stringId } as Set, userService.getLoggedOrSystem().transformToLoggedUser())
+                processRoles as ProcessRole[])
+        List<ProcessRole> roles = roleService.findAllProcessRoles()
+        roleService.assignRolesToUser(userService.findByEmail(USER_EMAIL).stringId, roles.findAll { it.importId in ["1", "2"] }.collect { it.stringId } as Set)
 
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
         auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));

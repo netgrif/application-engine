@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.importer.model.EventType
-import com.netgrif.application.engine.petrinet.domain.I18nString
-import com.netgrif.application.engine.petrinet.domain.events.Event
 import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository
+import com.netgrif.application.engine.importer.model.RoleEventType
+import com.netgrif.application.engine.petrinet.domain.I18nString
+import com.netgrif.application.engine.petrinet.domain.events.RoleEvent
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,12 +30,11 @@ class DefaultRoleRunner extends AbstractOrderedCommandLineRunner {
             return
         }
 
-        ProcessRole defaultRole = new ProcessRole(
-                importId: ProcessRole.DEFAULT_ROLE,
-                title: new I18nString(ProcessRole.DEFAULT_ROLE),
-                description: new I18nString("Default system process role"),
-                events: new LinkedHashMap<EventType, Event>()
-        )
+        ProcessRole defaultRole = new ProcessRole(ProcessRole.DEFAULT_ROLE)
+        defaultRole.title = new I18nString(ProcessRole.DEFAULT_ROLE)
+        defaultRole.description = new I18nString("Default system process role")
+        defaultRole.events = new LinkedHashMap<RoleEventType, RoleEvent>()
+
         defaultRole = repository.save(defaultRole)
 
         if (defaultRole == null) {
