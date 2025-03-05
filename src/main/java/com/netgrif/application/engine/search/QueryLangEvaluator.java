@@ -445,7 +445,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         StringPath stringPath;
         boolean not = ctx.inRangeStringComparison().NOT() != null;
         boolean leftEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
         String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
         String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
 
@@ -491,7 +491,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         StringPath stringPath = QPetriNet.petriNet.identifier;
         boolean not = ctx.inRangeStringComparison().NOT() != null;
         boolean leftEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
         String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
         String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
 
@@ -519,7 +519,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     public void exitVersionRangeCmp(QueryLangParser.VersionRangeCmpContext ctx) {
         boolean not = ctx.inRangeVersionComparison().NOT() != null;
         boolean leftEndpointOpen = ctx.inRangeVersionComparison().versionRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-        boolean rightEndpointOpen = ctx.inRangeVersionComparison().versionRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeVersionComparison().versionRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
         String leftString = getStringValue(ctx.inRangeVersionComparison().versionRange().VERSION_NUMBER(0).getText());
         String rightString = getStringValue(ctx.inRangeVersionComparison().versionRange().VERSION_NUMBER(1).getText());
 
@@ -606,12 +606,12 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         LocalDateTime rightDateTime;
         if (ctx.inRangeDateComparison().dateRange() != null) {
             leftEndpointOpen = ctx.inRangeDateComparison().dateRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-            rightEndpointOpen = ctx.inRangeDateComparison().dateRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeDateComparison().dateRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
             leftDateTime = toDateTime(ctx.inRangeDateComparison().dateRange().DATE(0).getText());
             rightDateTime = toDateTime(ctx.inRangeDateComparison().dateRange().DATE(1).getText());
         } else {
             leftEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-            rightEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
             leftDateTime = toDateTime(ctx.inRangeDateComparison().dateTimeRange().DATETIME(0).getText());
             rightDateTime = toDateTime(ctx.inRangeDateComparison().dateTimeRange().DATETIME(1).getText());
         }
@@ -678,7 +678,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         StringPath stringPath = QCase.case$.processIdentifier;
         boolean not = ctx.inRangeStringComparison().NOT() != null;
         boolean leftEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
         String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
         String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
 
@@ -720,7 +720,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         StringPath stringPath = QTask.task.transitionId;
         boolean not = ctx.inRangeStringComparison().NOT() != null;
         boolean leftEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
         String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
         String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
 
@@ -799,12 +799,12 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         LocalDateTime rightDateTime;
         if (ctx.inRangeDateComparison().dateRange() != null) {
             leftEndpointOpen = ctx.inRangeDateComparison().dateRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-            rightEndpointOpen = ctx.inRangeDateComparison().dateRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeDateComparison().dateRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
             leftDateTime = toDateTime(ctx.inRangeDateComparison().dateRange().DATE(0).getText());
             rightDateTime = toDateTime(ctx.inRangeDateComparison().dateRange().DATE(1).getText());
         } else {
             leftEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-            rightEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
             leftDateTime = toDateTime(ctx.inRangeDateComparison().dateTimeRange().DATETIME(0).getText());
             rightDateTime = toDateTime(ctx.inRangeDateComparison().dateTimeRange().DATETIME(1).getText());
         }
@@ -852,12 +852,12 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         LocalDateTime rightDateTime;
         if (ctx.inRangeDateComparison().dateRange() != null) {
             leftEndpointOpen = ctx.inRangeDateComparison().dateRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-            rightEndpointOpen = ctx.inRangeDateComparison().dateRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeDateComparison().dateRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
             leftDateTime = toDateTime(ctx.inRangeDateComparison().dateRange().DATE(0).getText());
             rightDateTime = toDateTime(ctx.inRangeDateComparison().dateRange().DATE(1).getText());
         } else {
             leftEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-            rightEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
             leftDateTime = toDateTime(ctx.inRangeDateComparison().dateTimeRange().DATETIME(0).getText());
             rightDateTime = toDateTime(ctx.inRangeDateComparison().dateTimeRange().DATETIME(1).getText());
         }
@@ -889,7 +889,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         StringPath stringPath = QUser.user.name;
         boolean not = ctx.inRangeStringComparison().NOT() != null;
         boolean leftEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
         String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
         String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
 
@@ -920,7 +920,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         StringPath stringPath = QUser.user.surname;
         boolean not = ctx.inRangeStringComparison().NOT() != null;
         boolean leftEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
         String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
         String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
 
@@ -951,7 +951,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         StringPath stringPath = QUser.user.email;
         boolean not = ctx.inRangeStringComparison().NOT() != null;
         boolean leftEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
         String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
         String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
 
@@ -987,7 +987,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String fieldId = ctx.dataValue().fieldId.getText();
         boolean not = ctx.inRangeStringComparison().NOT() != null;
         boolean leftEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
         String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
         String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
 
@@ -1097,12 +1097,12 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         LocalDateTime rightDateTime;
         if (ctx.inRangeDateComparison().dateRange() != null) {
             leftEndpointOpen = ctx.inRangeDateComparison().dateRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-            rightEndpointOpen = ctx.inRangeDateComparison().dateRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeDateComparison().dateRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
             leftDateTime = toDateTime(ctx.inRangeDateComparison().dateRange().DATE(0).getText());
             rightDateTime = toDateTime(ctx.inRangeDateComparison().dateRange().DATE(1).getText());
         } else {
             leftEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-            rightEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
             leftDateTime = toDateTime(ctx.inRangeDateComparison().dateTimeRange().DATETIME(0).getText());
             rightDateTime = toDateTime(ctx.inRangeDateComparison().dateTimeRange().DATETIME(1).getText());
         }
@@ -1154,7 +1154,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String fieldId = ctx.dataOptions().fieldId.getText();
         boolean not = ctx.inRangeStringComparison().NOT() != null;
         boolean leftEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
         String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
         String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
 

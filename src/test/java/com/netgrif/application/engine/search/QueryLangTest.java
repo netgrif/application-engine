@@ -7,7 +7,10 @@ import com.netgrif.application.engine.petrinet.domain.QPetriNet;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.search.utils.MongoDbUtils;
 import com.netgrif.application.engine.workflow.domain.*;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.DateTimePath;
+import com.querydsl.core.types.dsl.StringPath;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -27,7 +30,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.netgrif.application.engine.search.utils.SearchUtils.evaluateQuery;
-import static com.netgrif.application.engine.search.utils.SearchUtils.explainQuery;
 
 @Slf4j
 @SpringBootTest
@@ -50,15 +52,7 @@ public class QueryLangTest {
         compareMongoQueries(mongoDbUtils, actual, expected);
 
         // identifier comparison
-        actual = evaluateQuery("process: identifier eq 'test'").getFullMongoQuery();
-        expected = QPetriNet.petriNet.identifier.eq("test");
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("process: identifier contains 'test'").getFullMongoQuery();
-        expected = QPetriNet.petriNet.identifier.contains("test");
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
+        checkStringComparison(mongoDbUtils, "process", "identifier", QPetriNet.petriNet.identifier);
 
         // version comparison
         actual = evaluateQuery("process: version eq 1.1.1").getFullMongoQuery();
@@ -74,10 +68,9 @@ public class QueryLangTest {
         compareMongoQueries(mongoDbUtils, actual, expected);
 
         actual = evaluateQuery("process: version lte 1.1.1").getFullMongoQuery();
-        expected = QPetriNet.petriNet.version.major.lt(1)
-                .or(QPetriNet.petriNet.version.major.eq(1L).and(QPetriNet.petriNet.version.minor.lt(1)))
-                .or(QPetriNet.petriNet.version.major.eq(1L).and(QPetriNet.petriNet.version.minor.eq(1L).and(QPetriNet.petriNet.version.patch.lt(1))))
-                .or(QPetriNet.petriNet.version.eq(new Version(1, 1, 1)));
+        expected = QPetriNet.petriNet.version.major.loe(1)
+                .or(QPetriNet.petriNet.version.major.eq(1L).and(QPetriNet.petriNet.version.minor.loe(1)))
+                .or(QPetriNet.petriNet.version.major.eq(1L).and(QPetriNet.petriNet.version.minor.eq(1L).and(QPetriNet.petriNet.version.patch.loe(1))));
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -89,51 +82,66 @@ public class QueryLangTest {
         compareMongoQueries(mongoDbUtils, actual, expected);
 
         actual = evaluateQuery("process: version gte 1.1.1").getFullMongoQuery();
-        expected = QPetriNet.petriNet.version.major.gt(1)
+        expected = QPetriNet.petriNet.version.major.goe(1)
+                .or(QPetriNet.petriNet.version.major.eq(1L).and(QPetriNet.petriNet.version.minor.goe(1)))
+                .or(QPetriNet.petriNet.version.major.eq(1L).and(QPetriNet.petriNet.version.minor.eq(1L).and(QPetriNet.petriNet.version.patch.goe(1))));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        Version v1 = new Version(1, 1, 1);
+        Version v2 = new Version(2, 2, 2);
+        Version v3 = new Version(3, 3, 3);
+        actual = evaluateQuery("process: version in (1.1.1, 2.2.2, 3.3.3)").getFullMongoQuery();
+        expected = QPetriNet.petriNet.version.in(List.of(v1, v2, v3));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("process: version not in (1.1.1, 2.2.2, 3.3.3)").getFullMongoQuery();
+        expected = QPetriNet.petriNet.version.in(List.of(v1, v2, v3)).not();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("process: version in (1.1.1 : 2.2.2)").getFullMongoQuery();
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(QPetriNet.petriNet.version.major.gt(1)
                 .or(QPetriNet.petriNet.version.major.eq(1L).and(QPetriNet.petriNet.version.minor.gt(1)))
-                .or(QPetriNet.petriNet.version.major.eq(1L).and(QPetriNet.petriNet.version.minor.eq(1L).and(QPetriNet.petriNet.version.patch.gt(1))))
-                .or(QPetriNet.petriNet.version.eq(new Version(1, 1, 1)));
+                .or(QPetriNet.petriNet.version.major.eq(1L).and(QPetriNet.petriNet.version.minor.eq(1L).and(QPetriNet.petriNet.version.patch.gt(1)))));
+        builder.and(QPetriNet.petriNet.version.major.lt(2)
+                .or(QPetriNet.petriNet.version.major.eq(2L).and(QPetriNet.petriNet.version.minor.lt(2)))
+                .or(QPetriNet.petriNet.version.major.eq(2L).and(QPetriNet.petriNet.version.minor.eq(2L).and(QPetriNet.petriNet.version.patch.lt(2)))));
+        expected = builder;
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("process: version in <1.1.1 : 2.2.2>").getFullMongoQuery();
+        builder = new BooleanBuilder();
+        builder.and(QPetriNet.petriNet.version.major.goe(1)
+                .or(QPetriNet.petriNet.version.major.eq(1L).and(QPetriNet.petriNet.version.minor.goe(1)))
+                .or(QPetriNet.petriNet.version.major.eq(1L).and(QPetriNet.petriNet.version.minor.eq(1L).and(QPetriNet.petriNet.version.patch.goe(1)))));
+        builder.and(QPetriNet.petriNet.version.major.loe(2)
+                .or(QPetriNet.petriNet.version.major.eq(2L).and(QPetriNet.petriNet.version.minor.loe(2)))
+                .or(QPetriNet.petriNet.version.major.eq(2L).and(QPetriNet.petriNet.version.minor.eq(2L).and(QPetriNet.petriNet.version.patch.loe(2)))));
+        expected = builder;
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("process: version not in (1.1.1 : 2.2.2>").getFullMongoQuery();
+        builder = new BooleanBuilder();
+        builder.and(QPetriNet.petriNet.version.major.gt(1)
+                .or(QPetriNet.petriNet.version.major.eq(1L).and(QPetriNet.petriNet.version.minor.gt(1)))
+                .or(QPetriNet.petriNet.version.major.eq(1L).and(QPetriNet.petriNet.version.minor.eq(1L).and(QPetriNet.petriNet.version.patch.gt(1)))));
+        builder.and(QPetriNet.petriNet.version.major.loe(2)
+                .or(QPetriNet.petriNet.version.major.eq(2L).and(QPetriNet.petriNet.version.minor.loe(2)))
+                .or(QPetriNet.petriNet.version.major.eq(2L).and(QPetriNet.petriNet.version.minor.eq(2L).and(QPetriNet.petriNet.version.patch.loe(2)))));
+        expected = builder.not();
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
         // title comparison
-        actual = evaluateQuery("process: title eq 'test'").getFullMongoQuery();
-        expected = QPetriNet.petriNet.title.defaultValue.eq("test");
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("process: title contains 'test'").getFullMongoQuery();
-        expected = QPetriNet.petriNet.title.defaultValue.contains("test");
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
+        checkStringComparison(mongoDbUtils, "process", "title", QPetriNet.petriNet.title.defaultValue);
 
         // creationDate comparison
-        actual = evaluateQuery("process: creationDate eq 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QPetriNet.petriNet.creationDate.eq(LocalDateTime.of(2011, 12, 3, 10, 15, 30));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("process: creationDate lt 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QPetriNet.petriNet.creationDate.lt(LocalDateTime.of(2011, 12, 3, 10, 15, 30));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("process: creationDate lte 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QPetriNet.petriNet.creationDate.lt(LocalDateTime.of(2011, 12, 3, 10, 15, 30))
-                .or(QPetriNet.petriNet.creationDate.eq(LocalDateTime.of(2011, 12, 3, 10, 15, 30)));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("process: creationDate gt 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QPetriNet.petriNet.creationDate.gt(LocalDateTime.of(2011, 12, 3, 10, 15, 30));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("process: creationDate gte 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QPetriNet.petriNet.creationDate.gt(LocalDateTime.of(2011, 12, 3, 10, 15, 30))
-                .or(QPetriNet.petriNet.creationDate.eq(LocalDateTime.of(2011, 12, 3, 10, 15, 30)));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
+        checkDateComparison(mongoDbUtils, "process", "creationDate", QPetriNet.petriNet.creationDate);
     }
 
     @Test
@@ -207,57 +215,14 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
         // processIdentifier comparison
-        actual = evaluateQuery("case: processIdentifier eq 'test'").getFullMongoQuery();
-        expected = QCase.case$.processIdentifier.eq("test");
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("case: processIdentifier contains 'test'").getFullMongoQuery();
-        expected = QCase.case$.processIdentifier.contains("test");
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
+        checkStringComparison(mongoDbUtils, "case", "processIdentifier", QCase.case$.processIdentifier);
 
         // title comparison
-        actual = evaluateQuery("case: title eq 'test'").getFullMongoQuery();
-        expected = QCase.case$.title.eq("test");
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("case: title contains 'test'").getFullMongoQuery();
-        expected = QCase.case$.title.contains("test");
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
+        checkStringComparison(mongoDbUtils, "case", "title", QCase.case$.title);
 
         // creationDate comparison
-        actual = evaluateQuery("case: creationDate eq 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QCase.case$.creationDate.eq(LocalDateTime.of(2011, 12, 3, 10, 15, 30));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("case: creationDate lt 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QCase.case$.creationDate.lt(LocalDateTime.of(2011, 12, 3, 10, 15, 30));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("case: creationDate lte 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QCase.case$.creationDate.lt(LocalDateTime.of(2011, 12, 3, 10, 15, 30))
-                .or(QCase.case$.creationDate.eq(LocalDateTime.of(2011, 12, 3, 10, 15, 30)));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("case: creationDate gt 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QCase.case$.creationDate.gt(LocalDateTime.of(2011, 12, 3, 10, 15, 30));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("case: creationDate gte 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QCase.case$.creationDate.gt(LocalDateTime.of(2011, 12, 3, 10, 15, 30))
-                .or(QCase.case$.creationDate.eq(LocalDateTime.of(2011, 12, 3, 10, 15, 30)));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
+        checkDateComparison(mongoDbUtils, "case", "creationDate", QCase.case$.creationDate);
 
         // author comparison
         actual = evaluateQuery("case: author eq 'test'").getFullMongoQuery();
@@ -391,26 +356,10 @@ public class QueryLangTest {
         compareMongoQueries(mongoDbUtils, actual, expected);
 
         // transitionId comparison
-        actual = evaluateQuery("task: transitionId eq 'test'").getFullMongoQuery();
-        expected = QTask.task.transitionId.eq("test");
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("task: transitionId contains 'test'").getFullMongoQuery();
-        expected = QTask.task.transitionId.contains("test");
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
+        checkStringComparison(mongoDbUtils, "task", "transitionId", QTask.task.transitionId);
 
         // title comparison
-        actual = evaluateQuery("task: title eq 'test'").getFullMongoQuery();
-        expected = QTask.task.title.defaultValue.eq("test");
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("task: title contains 'test'").getFullMongoQuery();
-        expected = QTask.task.title.defaultValue.contains("test");
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
+        checkStringComparison(mongoDbUtils, "task", "title", QTask.task.title.defaultValue);
 
         // state comparison
         actual = evaluateQuery("task: state eq enabled").getFullMongoQuery();
@@ -457,60 +406,10 @@ public class QueryLangTest {
         compareMongoQueries(mongoDbUtils, actual, expected);
 
         // lastAssign comparison
-        actual = evaluateQuery("task: lastAssign eq 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QTask.task.lastAssigned.eq(LocalDateTime.of(2011, 12, 3, 10, 15, 30));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("task: lastAssign lt 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QTask.task.lastAssigned.lt(LocalDateTime.of(2011, 12, 3, 10, 15, 30));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("task: lastAssign lte 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QTask.task.lastAssigned.lt(LocalDateTime.of(2011, 12, 3, 10, 15, 30))
-                .or(QTask.task.lastAssigned.eq(LocalDateTime.of(2011, 12, 3, 10, 15, 30)));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("task: lastAssign gt 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QTask.task.lastAssigned.gt(LocalDateTime.of(2011, 12, 3, 10, 15, 30));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("task: lastAssign gte 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QTask.task.lastAssigned.gt(LocalDateTime.of(2011, 12, 3, 10, 15, 30))
-                .or(QTask.task.lastAssigned.eq(LocalDateTime.of(2011, 12, 3, 10, 15, 30)));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
+        checkDateComparison(mongoDbUtils, "task", "lastAssign", QTask.task.lastAssigned);
 
         // lastFinish comparison
-        actual = evaluateQuery("task: lastFinish eq 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QTask.task.lastFinished.eq(LocalDateTime.of(2011, 12, 3, 10, 15, 30));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("task: lastFinish lt 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QTask.task.lastFinished.lt(LocalDateTime.of(2011, 12, 3, 10, 15, 30));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("task: lastFinish lte 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QTask.task.lastFinished.lt(LocalDateTime.of(2011, 12, 3, 10, 15, 30))
-                .or(QTask.task.lastFinished.eq(LocalDateTime.of(2011, 12, 3, 10, 15, 30)));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("task: lastFinish gt 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QTask.task.lastFinished.gt(LocalDateTime.of(2011, 12, 3, 10, 15, 30));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("task: lastFinish gte 2011-12-03T10:15:30").getFullMongoQuery();
-        expected = QTask.task.lastFinished.gt(LocalDateTime.of(2011, 12, 3, 10, 15, 30))
-                .or(QTask.task.lastFinished.eq(LocalDateTime.of(2011, 12, 3, 10, 15, 30)));
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
+        checkDateComparison(mongoDbUtils, "task", "lastFinish", QTask.task.lastFinished);
     }
 
     @Test
@@ -579,37 +478,13 @@ public class QueryLangTest {
         compareMongoQueries(mongoDbUtils, actual, expected);
 
         // name comparison
-        actual = evaluateQuery("user: name eq 'test'").getFullMongoQuery();
-        expected = QUser.user.name.eq("test");
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("user: name contains 'test'").getFullMongoQuery();
-        expected = QUser.user.name.contains("test");
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
+        checkStringComparison(mongoDbUtils, "user", "name", QUser.user.name);
 
         // surname comparison
-        actual = evaluateQuery("user: surname eq 'test'").getFullMongoQuery();
-        expected = QUser.user.surname.eq("test");
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("user: surname contains 'test'").getFullMongoQuery();
-        expected = QUser.user.surname.contains("test");
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
+        checkStringComparison(mongoDbUtils, "user", "surname", QUser.user.surname);
 
         // email comparison
-        actual = evaluateQuery("user: email eq 'test'").getFullMongoQuery();
-        expected = QUser.user.email.eq("test");
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
-
-        actual = evaluateQuery("user: email contains 'test'").getFullMongoQuery();
-        expected = QUser.user.email.contains("test");
-
-        compareMongoQueries(mongoDbUtils, actual, expected);
+        checkStringComparison(mongoDbUtils, "user", "email", QUser.user.email);
     }
 
     @Test
@@ -1655,12 +1530,6 @@ public class QueryLangTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case: id gt 'test'"));
         Assertions.assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case: id gte 'test'"));
 
-        // string comparison
-        Assertions.assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case: identifier lt 'test'"));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case: identifier lte 'test'"));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case: identifier gt 'test'"));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case: identifier gte 'test'"));
-
         // number comparison
         Assertions.assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case: places.p1.marking contains 1"));
 
@@ -1675,7 +1544,148 @@ public class QueryLangTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> evaluateQuery("case: data.field1.value gte true"));
     }
 
-    private void compareMongoQueries(MongoDbUtils<?> mongoDbUtils, Predicate actual, Predicate expected) {
+    private static void checkStringComparison(MongoDbUtils<?> mongoDbUtils, String resource, String attribute, StringPath stringPath) {
+        Predicate actual = evaluateQuery(String.format("%s: %s eq 'test'", resource, attribute)).getFullMongoQuery();
+        Predicate expected = stringPath.eq("test");
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s contains 'test'", resource, attribute)).getFullMongoQuery();
+        expected = stringPath.contains("test");
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s lt 'test'", resource, attribute)).getFullMongoQuery();
+        expected = stringPath.lt("test");
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s lte 'test'", resource, attribute)).getFullMongoQuery();
+        expected = stringPath.loe("test");
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s gt 'test'", resource, attribute)).getFullMongoQuery();
+        expected = stringPath.gt("test");
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s gte 'test'", resource, attribute)).getFullMongoQuery();
+        expected = stringPath.goe("test");
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s in ('test1', 'test2', 'test3')", resource, attribute)).getFullMongoQuery();
+        expected = stringPath.in(List.of("test1", "test2", "test3"));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s not in ('test1', 'test2', 'test3')", resource, attribute)).getFullMongoQuery();
+        expected = stringPath.in(List.of("test1", "test2", "test3")).not();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s in ('test1' : 'test2')", resource, attribute)).getFullMongoQuery();
+        expected = stringPath.gt("test1").and(stringPath.lt("test2"));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s in <'test1' : 'test2'>", resource, attribute)).getFullMongoQuery();
+        expected = stringPath.goe("test1").and(stringPath.loe("test2"));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s not in ('test1' : 'test2'>", resource, attribute)).getFullMongoQuery();
+        expected = stringPath.gt("test1").and(stringPath.loe("test2")).not();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+    }
+
+    private static void checkDateComparison(MongoDbUtils<?> mongoDbUtils, String resource, String attribute, DateTimePath<LocalDateTime> dateTimePath) {
+        LocalDateTime date1 = LocalDateTime.of(2011, 12, 3, 10, 15, 30);
+        LocalDateTime date2 = LocalDateTime.of(2011, 12, 3, 11, 15, 30);
+        LocalDateTime date3 = LocalDateTime.of(2011, 12, 3, 12, 15, 30);
+        LocalDateTime date4 = LocalDateTime.of(2011, 12, 3, 12, 0, 0);
+        LocalDateTime date5 = LocalDateTime.of(2011, 12, 3, 12, 0, 0);
+        LocalDateTime date6 = LocalDateTime.of(2011, 12, 3, 12, 0, 0);
+
+        Predicate actual = evaluateQuery(String.format("%s: %s eq 2011-12-03T10:15:30", resource, attribute)).getFullMongoQuery();
+        Predicate expected = dateTimePath.eq(LocalDateTime.of(2011, 12, 3, 10, 15, 30));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s lt 2011-12-03T10:15:30", resource, attribute)).getFullMongoQuery();
+        expected = dateTimePath.lt(LocalDateTime.of(2011, 12, 3, 10, 15, 30));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s lte 2011-12-03T10:15:30", resource, attribute)).getFullMongoQuery();
+        expected = dateTimePath.loe(LocalDateTime.of(2011, 12, 3, 10, 15, 30));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s gt 2011-12-03T10:15:30", resource, attribute)).getFullMongoQuery();
+        expected = dateTimePath.gt(LocalDateTime.of(2011, 12, 3, 10, 15, 30));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s gte 2011-12-03T10:15:30", resource, attribute)).getFullMongoQuery();
+        expected = dateTimePath.goe(LocalDateTime.of(2011, 12, 3, 10, 15, 30));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s in (2011-12-03T10:15:30, 2011-12-03T11:15:30, 2011-12-03T12:15:30)", resource, attribute)).getFullMongoQuery();
+        expected = dateTimePath.in(List.of(date1, date2, date3));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s not in (2011-12-03T10:15:30, 2011-12-03T11:15:30, 2011-12-03T12:15:30)", resource, attribute)).getFullMongoQuery();
+        expected = dateTimePath.in(List.of(date1, date2, date3)).not();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s in (2011-12-03T10:15:30 : 2011-12-03T11:15:30)", resource, attribute)).getFullMongoQuery();
+        expected = dateTimePath.gt(date1).and(dateTimePath.lt(date2));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s in <2011-12-03T10:15:30 : 2011-12-03T11:15:30>", resource, attribute)).getFullMongoQuery();
+        expected = dateTimePath.goe(date1).and(dateTimePath.loe(date2));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s not in (2011-12-03T10:15:30 : 2011-12-03T11:15:30>", resource, attribute)).getFullMongoQuery();
+        expected = dateTimePath.gt(date1).and(dateTimePath.loe(date2)).not();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s in (2011-12-03, 2011-12-03, 2011-12-03)", resource, attribute)).getFullMongoQuery();
+        expected = dateTimePath.in(List.of(date4, date5, date6));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s not in (2011-12-03, 2011-12-03, 2011-12-03)", resource, attribute)).getFullMongoQuery();
+        expected = dateTimePath.in(List.of(date4, date5, date6)).not();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s in (2011-12-03 : 2011-12-03)", resource, attribute)).getFullMongoQuery();
+        expected = dateTimePath.gt(date4).and(dateTimePath.lt(date5));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s in <2011-12-03 : 2011-12-03>", resource, attribute)).getFullMongoQuery();
+        expected = dateTimePath.goe(date4).and(dateTimePath.loe(date5));
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("%s: %s not in (2011-12-03 : 2011-12-03>", resource, attribute)).getFullMongoQuery();
+        expected = dateTimePath.gt(date4).and(dateTimePath.loe(date5)).not();
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+    }
+
+    private static void compareMongoQueries(MongoDbUtils<?> mongoDbUtils, Predicate actual, Predicate expected) {
         Document actualDocument = mongoDbUtils.convertPredicateToDocument(actual);
         Document expectedDocument = mongoDbUtils.convertPredicateToDocument(expected);
 
