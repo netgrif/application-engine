@@ -332,7 +332,17 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
     }
 
     @Override
-    public void exitPlacesComparison(QueryLangParser.PlacesComparisonContext ctx) {
+    public void exitPlacesBasic(QueryLangParser.PlacesBasicContext ctx) {
+        searchWithElastic = true;
+    }
+
+    @Override
+    public void enterPlacesList(QueryLangParser.PlacesListContext ctx) {
+        searchWithElastic = true;
+    }
+
+    @Override
+    public void enterPlacesRange(QueryLangParser.PlacesRangeContext ctx) {
         searchWithElastic = true;
     }
 
@@ -372,10 +382,49 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
     }
 
     @Override
-    public void enterDataOptionsComparison(QueryLangParser.DataOptionsComparisonContext ctx) {
+    public void exitDataDateList(QueryLangParser.DataDateListContext ctx) {
+        searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataDateRange(QueryLangParser.DataDateRangeContext ctx) {
+        searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataNumberList(QueryLangParser.DataNumberListContext ctx) {
+        searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataNumberRange(QueryLangParser.DataNumberRangeContext ctx) {
+        searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataStringList(QueryLangParser.DataStringListContext ctx) {
+        searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataStringRange(QueryLangParser.DataStringRangeContext ctx) {
+        searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataOptionsBasic(QueryLangParser.DataOptionsBasicContext ctx) {
         this.searchWithElastic = true;
     }
 
+    @Override
+    public void exitDataOptionsList(QueryLangParser.DataOptionsListContext ctx) {
+        searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataOptionsRange(QueryLangParser.DataOptionsRangeContext ctx) {
+        searchWithElastic = true;
+    }
 
     @Override
     public void exitPaging(QueryLangParser.PagingContext ctx) {

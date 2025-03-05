@@ -40,9 +40,8 @@ userConditionGroup: userCondition # userConditionGroupBasic
 userCondition: userComparisons SPACE? ;
 
 // delimeter
-delimeter: WHERE_DELIMETER | COLON_DELIMETER ;
-WHERE_DELIMETER: SPACE W H E R E SPACE ;
-COLON_DELIMETER: SPACE? ':' SPACE ;
+delimeter: SPACE WHERE SPACE | SPACE? ':' SPACE ;
+WHERE: W H E R E ;
 
 // paging
 paging: PAGE SPACE pageNum=INT (SPACE SIZE SPACE pageSize=INT)? SPACE?;
@@ -102,7 +101,7 @@ processComparisons: idComparison
                   ;
 
 caseComparisons: idComparison
-               | processIdComparison
+               | processIdObjIdComparison
                | processIdentifierComparison
                | titleComparison
                | creationDateComparison
@@ -133,46 +132,99 @@ userComparisons: idComparison
 
 // attribute comparisons
 idComparison: ID SPACE objectIdComparison ;
-titleComparison: TITLE SPACE stringComparison ;
-identifierComparison: IDENTIFIER SPACE stringComparison ;
-versionComparison: VERSION SPACE (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE VERSION_NUMBER ;
-creationDateComparison: CREATION_DATE SPACE dateComparison # cdDate
-                      | CREATION_DATE SPACE dateTimeComparison # cdDateTime
+titleComparison: TITLE SPACE stringComparison # titleBasic
+               | TITLE SPACE inListStringComparison # titleList
+               | TITLE SPACE inRangeStringComparison # titleRange
+               ;
+identifierComparison: IDENTIFIER SPACE stringComparison # identifierBasic
+                    | IDENTIFIER SPACE inListStringComparison # identifierList
+                    | IDENTIFIER SPACE inRangeStringComparison # identifierRange
+                    ;
+versionComparison: VERSION SPACE (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE VERSION_NUMBER # versionBasic
+                 | VERSION SPACE inListVersionComparison # versionListCmp
+                 | VERSION SPACE inRangeVersionComparison # versionRangeCmp
+                 ; // todo NAE-1997: in list/in range??
+creationDateComparison: CREATION_DATE SPACE dateComparison # cdDateBasic
+                      | CREATION_DATE SPACE dateTimeComparison # cdDateTimeBasic
+                      | CREATION_DATE SPACE inListDateComparison # cdDateList
+                      | CREATION_DATE SPACE inRangeDateComparison # cdDateRange
                       ;
-processIdComparison: PROCESS_ID SPACE stringComparison ;
-processIdentifierComparison: PROCESS_IDENTIFIER SPACE stringComparison ;
-authorComparison: AUTHOR SPACE stringComparison ;
-transitionIdComparison: TRANSITION_ID SPACE stringComparison ;
-stateComparison: STATE SPACE EQ SPACE state=(ENABLED | DISABLED) ;
-userIdComparison: USER_ID SPACE stringComparison ;
-caseIdComparison: CASE_ID SPACE stringComparison ;
-lastAssignComparison: LAST_ASSIGN SPACE dateComparison # laDate
-                    | LAST_ASSIGN SPACE dateTimeComparison # laDateTime
+processIdComparison: PROCESS_ID SPACE stringComparison ; // todo NAE-1997: in list/in range?? basicly objectIdComparison
+processIdObjIdComparison: PROCESS_ID SPACE objectIdComparison ;
+processIdentifierComparison: PROCESS_IDENTIFIER SPACE stringComparison # processIdentifierBasic
+                           | PROCESS_IDENTIFIER SPACE inListStringComparison # processIdentifierList
+                           | PROCESS_IDENTIFIER SPACE inRangeStringComparison # processIdentifierRange
+                           ;
+authorComparison: AUTHOR SPACE stringComparison ; // todo NAE-1997: in list/in range?? basicly objectIdComparison
+transitionIdComparison: TRANSITION_ID SPACE stringComparison # transitionIdBasic
+                      | TRANSITION_ID SPACE inListStringComparison # transitionIdList
+                      | TRANSITION_ID SPACE inRangeStringComparison # transitionIdRange
+                      ;
+stateComparison: STATE SPACE EQ SPACE state=(ENABLED | DISABLED) ; // todo NAE-1997: in list/in range?? only 2 values
+userIdComparison: USER_ID SPACE stringComparison ; // todo NAE-1997: in list/in range?? basicly objectIdComparison
+caseIdComparison: CASE_ID SPACE stringComparison ; // todo NAE-1997: in list/in range?? basicly objectIdComparison
+lastAssignComparison: LAST_ASSIGN SPACE dateComparison # laDateBasic
+                    | LAST_ASSIGN SPACE dateTimeComparison # laDateTimeBasic
+                    | LAST_ASSIGN SPACE inListDateComparison # laDateList
+                    | LAST_ASSIGN SPACE inRangeDateComparison # laDateRange
                     ;
-lastFinishComparison: LAST_FINISH SPACE dateComparison # lfDate
-                    | LAST_FINISH SPACE dateTimeComparison # lfDateTime
+lastFinishComparison: LAST_FINISH SPACE dateComparison # lfDateBasic
+                    | LAST_FINISH SPACE dateTimeComparison # lfDateTimeBasic
+                    | LAST_FINISH SPACE inListDateComparison # lfDateList
+                    | LAST_FINISH SPACE inRangeDateComparison # lfDateRange
                     ;
-nameComparison: NAME SPACE stringComparison ;
-surnameComparison: SURNAME SPACE stringComparison ;
-emailComparison: EMAIL SPACE stringComparison ;
-dataValueComparison: dataValue SPACE stringComparison # dataString
+nameComparison: NAME SPACE stringComparison # nameBasic
+              | NAME SPACE inListStringComparison # nameList
+              | NAME SPACE inRangeStringComparison # nameRange
+              ;
+surnameComparison: SURNAME SPACE stringComparison # surnameBasic
+                 | SURNAME SPACE inListStringComparison # surnameList
+                 | SURNAME SPACE inRangeStringComparison # surnameRange
+                 ;
+emailComparison: EMAIL SPACE stringComparison # emailBasic
+               | EMAIL SPACE inListStringComparison # emailList
+               | EMAIL SPACE inRangeStringComparison # emailRange
+               ;
+dataValueComparison: dataValue SPACE stringComparison # dataString // todo NAE-1997: how to translate to elastic query??
               | dataValue SPACE numberComparison # dataNumber
               | dataValue SPACE dateComparison # dataDate
               | dataValue SPACE dateTimeComparison # dataDatetime
               | dataValue SPACE booleanComparison # dataBoolean
+              | dataValue SPACE inListStringComparison # dataStringList
+              | dataValue SPACE inListNumberComparison # dataNumberList
+              | dataValue SPACE inListDateComparison # dataDateList
+              | dataValue SPACE inRangeStringComparison # dataStringRange
+              | dataValue SPACE inRangeNumberComparison # dataNumberRange
+              | dataValue SPACE inRangeDateComparison # dataDateRange
               ;
-dataOptionsComparison: dataOptions SPACE stringComparison ;
-placesComparison: places SPACE numberComparison ;
-tasksStateComparison: tasksState SPACE (NOT SPACE?)? op=EQ SPACE state=(ENABLED | DISABLED) ;
-tasksUserIdComparison: tasksUserId SPACE stringComparison ;
+dataOptionsComparison: dataOptions SPACE stringComparison # dataOptionsBasic
+                     | dataOptions SPACE inListStringComparison # dataOptionsList
+                     | dataOptions SPACE inRangeStringComparison # dataOptionsRange
+                     ;
+placesComparison: places SPACE numberComparison # placesBasic
+                | places SPACE inListNumberComparison # placesList
+                | places SPACE inRangeNumberComparison # placesRange
+                ;
+tasksStateComparison: tasksState SPACE (NOT SPACE?)? op=EQ SPACE state=(ENABLED | DISABLED) ; // todo NAE-1997: in list/in range?? only 2 values
+tasksUserIdComparison: tasksUserId SPACE stringComparison ; // todo NAE-1997: in list/in range?? basicly objectIdComparison
 
 // basic comparisons
 objectIdComparison: (NOT SPACE?)? op=EQ SPACE STRING ;
-stringComparison: (NOT SPACE?)? op=(EQ | CONTAINS) SPACE STRING ;
+stringComparison: (NOT SPACE?)? op=(EQ | CONTAINS | LT | GT | LTE | GTE) SPACE STRING ;
 numberComparison: (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE number=(INT | DOUBLE) ;
 dateComparison: (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE DATE ;
 dateTimeComparison: (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE DATETIME ;
 booleanComparison: (NOT SPACE?)? op=EQ SPACE BOOLEAN ;
+
+// in list/in range comparisons
+inListStringComparison: (NOT SPACE?)? op=IN SPACE stringList ;
+inListNumberComparison: (NOT SPACE?)? op=IN SPACE (intList | doubleList) ;
+inListDateComparison: (NOT SPACE?)? op=IN SPACE (dateList | dateTimeList) ;
+inListVersionComparison: (NOT SPACE?)? op=IN SPACE versionList ;
+inRangeStringComparison: (NOT SPACE?)? op=IN SPACE stringRange ;
+inRangeNumberComparison: (NOT SPACE?)? op=IN SPACE (intRange | doubleRange) ;
+inRangeDateComparison: (NOT SPACE?)? op=IN SPACE (dateRange | dateTimeRange) ;
+inRangeVersionComparison: (NOT SPACE?)? op=IN SPACE versionRange ;
 
 // special attribute rules
 dataValue: DATA '.' fieldId=JAVA_ID '.' VALUE ;
@@ -191,6 +243,7 @@ GT: G T | '>' ;
 LTE: L T E | '<=' ;
 GTE: G T E | '>=' ;
 CONTAINS: C O N T A I N S | '~';
+IN: I N ;
 
 // resurces
 CASE: C A S E ;
@@ -239,7 +292,18 @@ ASC: A S C ;
 DESC: D E S C ;
 
 // basic types
-LIST: '[' SPACE? ((STRING | NUMBER) SPACE? (',' SPACE? (STRING | NUMBER) SPACE? )* )? SPACE? ']' ;
+stringList: '(' SPACE? (STRING SPACE? (',' SPACE? STRING SPACE? )* )? SPACE? ')' ;
+intList: '(' SPACE? (INT SPACE? (',' SPACE? INT SPACE? )* )? SPACE? ')' ;
+doubleList: '(' SPACE? (DOUBLE SPACE? (',' SPACE? DOUBLE SPACE? )* )? SPACE? ')' ;
+dateList: '(' SPACE? (DATE SPACE? (',' SPACE? DATE SPACE? )* )? SPACE? ')' ;
+dateTimeList: '(' SPACE? (DATETIME SPACE? (',' SPACE? DATETIME SPACE? )* )? SPACE? ')' ;
+versionList: '(' SPACE? (VERSION_NUMBER SPACE? (',' SPACE? VERSION_NUMBER SPACE? )* )? SPACE? ')' ;
+stringRange: leftEndpoint=('(' | '<') SPACE? STRING SPACE? ':' SPACE? STRING SPACE? rightEndpoint=(')' | '>') ;
+intRange: leftEndpoint=('(' | '<') SPACE? INT SPACE? ':' SPACE? INT SPACE? rightEndpoint=(')' | '>') ;
+doubleRange: leftEndpoint=('(' | '<') SPACE? DOUBLE SPACE? ':' SPACE? DOUBLE SPACE? rightEndpoint=(')' | '>') ;
+dateRange: leftEndpoint=('(' | '<') SPACE? DATE SPACE? ':' SPACE? DATE SPACE? rightEndpoint=(')' | '>') ;
+dateTimeRange: leftEndpoint=('(' | '<') SPACE? DATETIME SPACE? ':' SPACE? DATETIME SPACE? rightEndpoint=(')' | '>') ;
+versionRange: leftEndpoint=('(' | '<') SPACE? VERSION_NUMBER SPACE? ':' SPACE? VERSION_NUMBER SPACE? rightEndpoint=(')' | '>') ;
 STRING: '\'' (~('\'' | '\r' | '\n'))* '\'' ; // todo NAE-1997: escape???
 INT: DIGIT+ ;
 DOUBLE: DIGIT+ '.' DIGIT+ ;

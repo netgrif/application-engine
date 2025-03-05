@@ -18,6 +18,7 @@ import lombok.Setter;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.bson.types.ObjectId;
 import org.bson.types.QObjectId;
 import org.springframework.data.domain.PageRequest;
@@ -375,7 +376,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 break;
             case CASE:
                 qObjectId = QCase.case$.id;
-                setElasticQuery(ctx, buildElasticQuery("stringId", op, objectId.toString(), not));
+                setElasticQuery(ctx, buildElasticQuery("stringId", op.getType(), objectId.toString(), not));
                 break;
             case TASK:
                 qObjectId = QTask.task.id;
@@ -387,11 +388,11 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 throw new IllegalArgumentException("Unknown query type: " + type);
         }
 
-        setMongoQuery(ctx, buildObjectIdPredicate(qObjectId, op, objectId, not));
+        setMongoQuery(ctx, buildObjectIdPredicate(qObjectId, op.getType(), objectId, not));
     }
 
     @Override
-    public void exitTitleComparison(QueryLangParser.TitleComparisonContext ctx) {
+    public void exitTitleBasic(QueryLangParser.TitleBasicContext ctx) {
         StringPath stringPath;
         Token op = ctx.stringComparison().op;
         boolean not = ctx.stringComparison().NOT() != null;
@@ -403,7 +404,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 break;
             case CASE:
                 stringPath = QCase.case$.title;
-                setElasticQuery(ctx, buildElasticQuery("title", op, string, not));
+                setElasticQuery(ctx, buildElasticQuery("title", op.getType(), string, not));
                 break;
             case TASK:
                 stringPath = QTask.task.title.defaultValue;
@@ -412,30 +413,121 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 throw new IllegalArgumentException("Unknown query type: " + type);
         }
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op.getType(), string, not));
     }
 
     @Override
-    public void exitIdentifierComparison(QueryLangParser.IdentifierComparisonContext ctx) {
+    public void exitTitleList(QueryLangParser.TitleListContext ctx) {
+        StringPath stringPath;
+        boolean not = ctx.inListStringComparison().NOT() != null;
+        List<String> stringList = ctx.inListStringComparison().stringList().STRING().stream().map(node -> getStringValue(node.getText())).collect(Collectors.toList());
+
+        switch (type) {
+            case PROCESS:
+                stringPath = QPetriNet.petriNet.title.defaultValue;
+                break;
+            case CASE:
+                stringPath = QCase.case$.title;
+                setElasticQuery(ctx, buildElasticQueryInList("title", stringList, not));
+                break;
+            case TASK:
+                stringPath = QTask.task.title.defaultValue;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown query type: " + type);
+        }
+
+        setMongoQuery(ctx, buildStringPredicateInList(stringPath, stringList, not));
+    }
+
+    @Override
+    public void exitTitleRange(QueryLangParser.TitleRangeContext ctx) {
+        StringPath stringPath;
+        boolean not = ctx.inRangeStringComparison().NOT() != null;
+        boolean leftEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
+        String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
+
+        switch (type) {
+            case PROCESS:
+                stringPath = QPetriNet.petriNet.title.defaultValue;
+                break;
+            case CASE:
+                stringPath = QCase.case$.title;
+                setElasticQuery(ctx, buildElasticQueryInRange("title", leftString, leftEndpointOpen, rightString, rightEndpointOpen, not));
+                break;
+            case TASK:
+                stringPath = QTask.task.title.defaultValue;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown query type: " + type);
+        }
+
+        setMongoQuery(ctx, buildStringPredicateInRange(stringPath, leftString, leftEndpointOpen, rightString, rightEndpointOpen, not));
+    }
+
+    @Override
+    public void exitIdentifierBasic(QueryLangParser.IdentifierBasicContext ctx) {
         StringPath stringPath = QPetriNet.petriNet.identifier;
         Token op = ctx.stringComparison().op;
         boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op.getType(), string, not));
     }
 
     @Override
-    public void exitVersionComparison(QueryLangParser.VersionComparisonContext ctx) {
+    public void exitIdentifierList(QueryLangParser.IdentifierListContext ctx) {
+        StringPath stringPath = QPetriNet.petriNet.identifier;
+        boolean not = ctx.inListStringComparison().NOT() != null;
+        List<String> stringList = ctx.inListStringComparison().stringList().STRING().stream().map(node -> getStringValue(node.getText())).collect(Collectors.toList());
+
+        setMongoQuery(ctx, buildStringPredicateInList(stringPath, stringList, not));
+    }
+
+    @Override
+    public void exitIdentifierRange(QueryLangParser.IdentifierRangeContext ctx) {
+        StringPath stringPath = QPetriNet.petriNet.identifier;
+        boolean not = ctx.inRangeStringComparison().NOT() != null;
+        boolean leftEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
+        String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
+
+        setMongoQuery(ctx, buildStringPredicateInRange(stringPath, leftString, leftEndpointOpen, rightString, rightEndpointOpen, not));
+    }
+
+    @Override
+    public void exitVersionBasic(QueryLangParser.VersionBasicContext ctx) {
         Token op = ctx.op;
         boolean not = ctx.NOT() != null;
         String versionString = ctx.VERSION_NUMBER().getText();
 
-        setMongoQuery(ctx, buildVersionPredicate(op, versionString, not));
+        setMongoQuery(ctx, buildVersionPredicate(op.getType(), versionString, not));
     }
 
     @Override
-    public void exitCdDate(QueryLangParser.CdDateContext ctx) {
+    public void exitVersionListCmp(QueryLangParser.VersionListCmpContext ctx) {
+        boolean not = ctx.inListVersionComparison().NOT() != null;
+        List<String> stringList = ctx.inListVersionComparison().versionList().VERSION_NUMBER().stream().map(TerminalNode::getText).collect(Collectors.toList());
+
+        setMongoQuery(ctx, buildVersionPredicateInList(stringList, not));
+    }
+
+    @Override
+    public void exitVersionRangeCmp(QueryLangParser.VersionRangeCmpContext ctx) {
+        boolean not = ctx.inRangeVersionComparison().NOT() != null;
+        boolean leftEndpointOpen = ctx.inRangeVersionComparison().versionRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeVersionComparison().versionRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        String leftString = getStringValue(ctx.inRangeVersionComparison().versionRange().VERSION_NUMBER(0).getText());
+        String rightString = getStringValue(ctx.inRangeVersionComparison().versionRange().VERSION_NUMBER(1).getText());
+
+        setMongoQuery(ctx, buildVersionPredicateInRange(leftString, leftEndpointOpen, rightString, rightEndpointOpen, not));
+    }
+
+    @Override
+    public void exitCdDateBasic(QueryLangParser.CdDateBasicContext ctx) {
         DateTimePath<LocalDateTime> dateTimePath;
         Token op = ctx.dateComparison().op;
         boolean not = ctx.dateComparison().NOT() != null;
@@ -447,17 +539,17 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 break;
             case CASE:
                 dateTimePath = QCase.case$.creationDate;
-                setElasticQuery(ctx, buildElasticQuery("creationDateSortable", op, String.valueOf(Timestamp.valueOf(localDateTime).getTime()), not));
+                setElasticQuery(ctx, buildElasticQuery("creationDateSortable", op.getType(), String.valueOf(Timestamp.valueOf(localDateTime).getTime()), not));
                 break;
             default:
                 throw new IllegalArgumentException("Unknown query type: " + type);
         }
 
-        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op, localDateTime, not));
+        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op.getType(), localDateTime, not));
     }
 
     @Override
-    public void exitCdDateTime(QueryLangParser.CdDateTimeContext ctx) {
+    public void exitCdDateTimeBasic(QueryLangParser.CdDateTimeBasicContext ctx) {
         DateTimePath<LocalDateTime> dateTimePath;
         Token op = ctx.dateTimeComparison().op;
         boolean not = ctx.dateTimeComparison().NOT() != null;
@@ -469,47 +561,128 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
                 break;
             case CASE:
                 dateTimePath = QCase.case$.creationDate;
-                setElasticQuery(ctx, buildElasticQuery("creationDateSortable", op, String.valueOf(Timestamp.valueOf(localDateTime).getTime()), not));
+                setElasticQuery(ctx, buildElasticQuery("creationDateSortable", op.getType(), String.valueOf(Timestamp.valueOf(localDateTime).getTime()), not));
                 break;
             default:
                 throw new IllegalArgumentException("Unknown query type: " + type);
         }
 
-        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op, localDateTime, not));
+        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op.getType(), localDateTime, not));
+    }
+
+    @Override
+    public void exitCdDateList(QueryLangParser.CdDateListContext ctx) {
+        DateTimePath<LocalDateTime> dateTimePath;
+        boolean not = ctx.inListDateComparison().NOT() != null;
+        List<TerminalNode> terminalNodeList = ctx.inListDateComparison().dateList() != null ? ctx.inListDateComparison().dateList().DATE() : ctx.inListDateComparison().dateTimeList().DATETIME() ;
+        List<String> stringDateList = terminalNodeList.stream().map(TerminalNode::getText).collect(Collectors.toList());
+
+        switch (type) {
+            case PROCESS:
+                dateTimePath = QPetriNet.petriNet.creationDate;
+                break;
+            case CASE:
+                dateTimePath = QCase.case$.creationDate;
+                List<String> timestampStringList = stringDateList.stream().map(dateString -> {
+                    LocalDateTime localDateTime = toDateTime(dateString);
+                    return String.valueOf(Timestamp.valueOf(localDateTime).getTime());
+                }).collect(Collectors.toList());
+                setElasticQuery(ctx, buildElasticQueryInList("creationDateSortable", timestampStringList, not));
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown query type: " + type);
+        }
+
+        setMongoQuery(ctx, buildDateTimePredicateInList(dateTimePath, stringDateList, not));
+    }
+
+    @Override
+    public void exitCdDateRange(QueryLangParser.CdDateRangeContext ctx) {
+        DateTimePath<LocalDateTime> dateTimePath;
+        boolean not = ctx.inRangeDateComparison().NOT() != null;
+        boolean leftEndpointOpen;
+        boolean rightEndpointOpen;
+        LocalDateTime leftDateTime;
+        LocalDateTime rightDateTime;
+        if (ctx.inRangeDateComparison().dateRange() != null) {
+            leftEndpointOpen = ctx.inRangeDateComparison().dateRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeDateComparison().dateRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            leftDateTime = toDateTime(ctx.inRangeDateComparison().dateRange().DATE(0).getText());
+            rightDateTime = toDateTime(ctx.inRangeDateComparison().dateRange().DATE(1).getText());
+        } else {
+            leftEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            leftDateTime = toDateTime(ctx.inRangeDateComparison().dateTimeRange().DATETIME(0).getText());
+            rightDateTime = toDateTime(ctx.inRangeDateComparison().dateTimeRange().DATETIME(1).getText());
+        }
+
+
+        switch (type) {
+            case PROCESS:
+                dateTimePath = QPetriNet.petriNet.creationDate;
+                break;
+            case CASE:
+                dateTimePath = QCase.case$.creationDate;
+                setElasticQuery(ctx, buildElasticQueryInRange("creationDateSortable", String.valueOf(Timestamp.valueOf(leftDateTime).getTime()), leftEndpointOpen, String.valueOf(Timestamp.valueOf(rightDateTime).getTime()), rightEndpointOpen, not));
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown query type: " + type);
+        }
+
+        setMongoQuery(ctx, buildDateTimePredicateInRange(dateTimePath, leftDateTime, leftEndpointOpen, rightDateTime, rightEndpointOpen, not));
     }
 
     @Override
     public void exitProcessIdComparison(QueryLangParser.ProcessIdComparisonContext ctx) {
+        StringPath stringPath = QTask.task.processId;
         Token op = ctx.stringComparison().op;
         boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        switch (type) {
-            case CASE:
-                QObjectId qObjectId = QCase.case$.petriNetObjectId;
-                ObjectId objectId = getObjectIdValue(ctx.stringComparison().STRING().getText());
-                setMongoQuery(ctx, buildObjectIdPredicate(qObjectId, op, objectId, not));
-                setElasticQuery(ctx, buildElasticQuery("processId", op, string, not));
-                break;
-            case TASK:
-                StringPath stringPath = QTask.task.processId;
-                setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown query type: " + type);
-        }
-
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op.getType(), string, not));
     }
 
     @Override
-    public void exitProcessIdentifierComparison(QueryLangParser.ProcessIdentifierComparisonContext ctx) {
+    public void exitProcessIdObjIdComparison(QueryLangParser.ProcessIdObjIdComparisonContext ctx) {
+        QObjectId qObjectId = QCase.case$.petriNetObjectId;
+        Token op = ctx.objectIdComparison().op;
+        boolean not = ctx.objectIdComparison().NOT() != null;
+        ObjectId objectId = getObjectIdValue(ctx.objectIdComparison().STRING().getText());
+
+        setMongoQuery(ctx, buildObjectIdPredicate(qObjectId, op.getType(), objectId, not));
+        setElasticQuery(ctx, buildElasticQuery("processId", op.getType(), objectId.toString(), not));
+    }
+
+    @Override
+    public void exitProcessIdentifierBasic(QueryLangParser.ProcessIdentifierBasicContext ctx) {
         StringPath stringPath = QCase.case$.processIdentifier;
         Token op = ctx.stringComparison().op;
         boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
-        setElasticQuery(ctx, buildElasticQuery("processIdentifier", op, string, not));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op.getType(), string, not));
+        setElasticQuery(ctx, buildElasticQuery("processIdentifier", op.getType(), string, not));
+    }
+
+    @Override
+    public void exitProcessIdentifierList(QueryLangParser.ProcessIdentifierListContext ctx) {
+        StringPath stringPath = QCase.case$.processIdentifier;
+        boolean not = ctx.inListStringComparison().NOT() != null;
+        List<String> stringList = ctx.inListStringComparison().stringList().STRING().stream().map(node -> getStringValue(node.getText())).collect(Collectors.toList());
+
+        setMongoQuery(ctx, buildStringPredicateInList(stringPath, stringList, not));
+    }
+
+    @Override
+    public void exitProcessIdentifierRange(QueryLangParser.ProcessIdentifierRangeContext ctx) {
+        StringPath stringPath = QCase.case$.processIdentifier;
+        boolean not = ctx.inRangeStringComparison().NOT() != null;
+        boolean leftEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
+        String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
+
+        setMongoQuery(ctx, buildStringPredicateInRange(stringPath, leftString, leftEndpointOpen, rightString, rightEndpointOpen, not));
     }
 
     @Override
@@ -519,18 +692,39 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
-        setElasticQuery(ctx, buildElasticQuery("author", op, string, not));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op.getType(), string, not));
+        setElasticQuery(ctx, buildElasticQuery("author", op.getType(), string, not));
     }
 
     @Override
-    public void exitTransitionIdComparison(QueryLangParser.TransitionIdComparisonContext ctx) {
+    public void exitTransitionIdBasic(QueryLangParser.TransitionIdBasicContext ctx) {
         StringPath stringPath = QTask.task.transitionId;
         Token op = ctx.stringComparison().op;
         boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op.getType(), string, not));
+    }
+
+    @Override
+    public void exitTransitionIdList(QueryLangParser.TransitionIdListContext ctx) {
+        StringPath stringPath = QTask.task.transitionId;
+        boolean not = ctx.inListStringComparison().NOT() != null;
+        List<String> stringList = ctx.inListStringComparison().stringList().STRING().stream().map(node -> getStringValue(node.getText())).collect(Collectors.toList());
+
+        setMongoQuery(ctx, buildStringPredicateInList(stringPath, stringList, not));
+    }
+
+    @Override
+    public void exitTransitionIdRange(QueryLangParser.TransitionIdRangeContext ctx) {
+        StringPath stringPath = QTask.task.transitionId;
+        boolean not = ctx.inRangeStringComparison().NOT() != null;
+        boolean leftEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
+        String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
+
+        setMongoQuery(ctx, buildStringPredicateInRange(stringPath, leftString, leftEndpointOpen, rightString, rightEndpointOpen, not));
     }
 
     @Override
@@ -552,7 +746,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op.getType(), string, not));
     }
 
     @Override
@@ -562,77 +756,206 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op.getType(), string, not));
     }
 
     @Override
-    public void exitLaDate(QueryLangParser.LaDateContext ctx) {
+    public void exitLaDateBasic(QueryLangParser.LaDateBasicContext ctx) {
         DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastAssigned;
         Token op = ctx.dateComparison().op;
         boolean not = ctx.dateComparison().NOT() != null;
         LocalDateTime localDateTime = toDateTime(ctx.dateComparison().DATE().getText());
 
-        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op, localDateTime, not));
+        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op.getType(), localDateTime, not));
     }
 
     @Override
-    public void exitLaDateTime(QueryLangParser.LaDateTimeContext ctx) {
+    public void exitLaDateTimeBasic(QueryLangParser.LaDateTimeBasicContext ctx) {
         DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastAssigned;
         Token op = ctx.dateTimeComparison().op;
         boolean not = ctx.dateTimeComparison().NOT() != null;
         LocalDateTime localDateTime = toDateTime(ctx.dateTimeComparison().DATETIME().getText());
 
-        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op, localDateTime, not));
+        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op.getType(), localDateTime, not));
     }
 
     @Override
-    public void exitLfDate(QueryLangParser.LfDateContext ctx) {
+    public void exitLaDateList(QueryLangParser.LaDateListContext ctx) {
+        DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastAssigned;
+        boolean not = ctx.inListDateComparison().NOT() != null;
+        List<TerminalNode> terminalNodeList = ctx.inListDateComparison().dateList() != null ? ctx.inListDateComparison().dateList().DATE() : ctx.inListDateComparison().dateTimeList().DATETIME() ;
+        List<String> stringDateList = terminalNodeList.stream().map(TerminalNode::getText).collect(Collectors.toList());
+
+        setMongoQuery(ctx, buildDateTimePredicateInList(dateTimePath, stringDateList, not));
+    }
+
+    @Override
+    public void exitLaDateRange(QueryLangParser.LaDateRangeContext ctx) {
+        DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastAssigned;
+        boolean not = ctx.inRangeDateComparison().NOT() != null;
+        boolean leftEndpointOpen;
+        boolean rightEndpointOpen;
+        LocalDateTime leftDateTime;
+        LocalDateTime rightDateTime;
+        if (ctx.inRangeDateComparison().dateRange() != null) {
+            leftEndpointOpen = ctx.inRangeDateComparison().dateRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeDateComparison().dateRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            leftDateTime = toDateTime(ctx.inRangeDateComparison().dateRange().DATE(0).getText());
+            rightDateTime = toDateTime(ctx.inRangeDateComparison().dateRange().DATE(1).getText());
+        } else {
+            leftEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            leftDateTime = toDateTime(ctx.inRangeDateComparison().dateTimeRange().DATETIME(0).getText());
+            rightDateTime = toDateTime(ctx.inRangeDateComparison().dateTimeRange().DATETIME(1).getText());
+        }
+
+        setMongoQuery(ctx, buildDateTimePredicateInRange(dateTimePath, leftDateTime, leftEndpointOpen, rightDateTime, rightEndpointOpen, not));
+    }
+
+    @Override
+    public void exitLfDateBasic(QueryLangParser.LfDateBasicContext ctx) {
         DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastFinished;
         Token op = ctx.dateComparison().op;
         boolean not = ctx.dateComparison().NOT() != null;
         LocalDateTime localDateTime = toDateTime(ctx.dateComparison().DATE().getText());
 
-        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op, localDateTime, not));
+        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op.getType(), localDateTime, not));
     }
 
     @Override
-    public void exitLfDateTime(QueryLangParser.LfDateTimeContext ctx) {
+    public void exitLfDateTimeBasic(QueryLangParser.LfDateTimeBasicContext ctx) {
         DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastFinished;
         Token op = ctx.dateTimeComparison().op;
         boolean not = ctx.dateTimeComparison().NOT() != null;
         LocalDateTime localDateTime = toDateTime(ctx.dateTimeComparison().DATETIME().getText());
 
-        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op, localDateTime, not));
+        setMongoQuery(ctx, buildDateTimePredicate(dateTimePath, op.getType(), localDateTime, not));
     }
 
     @Override
-    public void exitNameComparison(QueryLangParser.NameComparisonContext ctx) {
+    public void exitLfDateList(QueryLangParser.LfDateListContext ctx) {
+        DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastFinished;
+        boolean not = ctx.inListDateComparison().NOT() != null;
+        List<TerminalNode> terminalNodeList = ctx.inListDateComparison().dateList() != null ? ctx.inListDateComparison().dateList().DATE() : ctx.inListDateComparison().dateTimeList().DATETIME() ;
+        List<String> stringDateList = terminalNodeList.stream().map(TerminalNode::getText).collect(Collectors.toList());
+
+        setMongoQuery(ctx, buildDateTimePredicateInList(dateTimePath, stringDateList, not));
+    }
+
+    @Override
+    public void exitLfDateRange(QueryLangParser.LfDateRangeContext ctx) {
+        DateTimePath<LocalDateTime> dateTimePath = QTask.task.lastFinished;
+        boolean not = ctx.inRangeDateComparison().NOT() != null;
+        boolean leftEndpointOpen;
+        boolean rightEndpointOpen;
+        LocalDateTime leftDateTime;
+        LocalDateTime rightDateTime;
+        if (ctx.inRangeDateComparison().dateRange() != null) {
+            leftEndpointOpen = ctx.inRangeDateComparison().dateRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeDateComparison().dateRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            leftDateTime = toDateTime(ctx.inRangeDateComparison().dateRange().DATE(0).getText());
+            rightDateTime = toDateTime(ctx.inRangeDateComparison().dateRange().DATE(1).getText());
+        } else {
+            leftEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            leftDateTime = toDateTime(ctx.inRangeDateComparison().dateTimeRange().DATETIME(0).getText());
+            rightDateTime = toDateTime(ctx.inRangeDateComparison().dateTimeRange().DATETIME(1).getText());
+        }
+
+        setMongoQuery(ctx, buildDateTimePredicateInRange(dateTimePath, leftDateTime, leftEndpointOpen, rightDateTime, rightEndpointOpen, not));
+    }
+
+    @Override
+    public void exitNameBasic(QueryLangParser.NameBasicContext ctx) {
         StringPath stringPath = QUser.user.name;
         Token op = ctx.stringComparison().op;
         boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op.getType(), string, not));
     }
 
     @Override
-    public void exitSurnameComparison(QueryLangParser.SurnameComparisonContext ctx) {
+    public void exitNameList(QueryLangParser.NameListContext ctx) {
+        StringPath stringPath = QUser.user.name;
+        boolean not = ctx.inListStringComparison().NOT() != null;
+        List<String> stringList = ctx.inListStringComparison().stringList().STRING().stream().map(node -> getStringValue(node.getText())).collect(Collectors.toList());
+
+        setMongoQuery(ctx, buildStringPredicateInList(stringPath, stringList, not));
+    }
+
+    @Override
+    public void exitNameRange(QueryLangParser.NameRangeContext ctx) {
+        StringPath stringPath = QUser.user.name;
+        boolean not = ctx.inRangeStringComparison().NOT() != null;
+        boolean leftEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
+        String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
+
+        setMongoQuery(ctx, buildStringPredicateInRange(stringPath, leftString, leftEndpointOpen, rightString, rightEndpointOpen, not));
+    }
+
+    @Override
+    public void exitSurnameBasic(QueryLangParser.SurnameBasicContext ctx) {
         StringPath stringPath = QUser.user.surname;
         Token op = ctx.stringComparison().op;
         boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op.getType(), string, not));
     }
 
     @Override
-    public void exitEmailComparison(QueryLangParser.EmailComparisonContext ctx) {
+    public void exitSurnameList(QueryLangParser.SurnameListContext ctx) {
+        StringPath stringPath = QUser.user.surname;
+        boolean not = ctx.inListStringComparison().NOT() != null;
+        List<String> stringList = ctx.inListStringComparison().stringList().STRING().stream().map(node -> getStringValue(node.getText())).collect(Collectors.toList());
+
+        setMongoQuery(ctx, buildStringPredicateInList(stringPath, stringList, not));
+    }
+
+    @Override
+    public void exitSurnameRange(QueryLangParser.SurnameRangeContext ctx) {
+        StringPath stringPath = QUser.user.surname;
+        boolean not = ctx.inRangeStringComparison().NOT() != null;
+        boolean leftEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
+        String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
+
+        setMongoQuery(ctx, buildStringPredicateInRange(stringPath, leftString, leftEndpointOpen, rightString, rightEndpointOpen, not));
+    }
+
+    @Override
+    public void exitEmailBasic(QueryLangParser.EmailBasicContext ctx) {
         StringPath stringPath = QUser.user.email;
         Token op = ctx.stringComparison().op;
         boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
-        setMongoQuery(ctx, buildStringPredicate(stringPath, op, string, not));
+        setMongoQuery(ctx, buildStringPredicate(stringPath, op.getType(), string, not));
+    }
+
+    @Override
+    public void exitEmailList(QueryLangParser.EmailListContext ctx) {
+        StringPath stringPath = QUser.user.email;
+        boolean not = ctx.inListStringComparison().NOT() != null;
+        List<String> stringList = ctx.inListStringComparison().stringList().STRING().stream().map(node -> getStringValue(node.getText())).collect(Collectors.toList());
+
+        setMongoQuery(ctx, buildStringPredicateInList(stringPath, stringList, not));
+    }
+
+    @Override
+    public void exitEmailRange(QueryLangParser.EmailRangeContext ctx) {
+        StringPath stringPath = QUser.user.email;
+        boolean not = ctx.inRangeStringComparison().NOT() != null;
+        boolean leftEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
+        String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
+
+        setMongoQuery(ctx, buildStringPredicateInRange(stringPath, leftString, leftEndpointOpen, rightString, rightEndpointOpen, not));
     }
 
     @Override
@@ -644,7 +967,32 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".textValue", op, string, not));
+        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".textValue", op.getType(), string, not));
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataStringList(QueryLangParser.DataStringListContext ctx) {
+        String fieldId = ctx.dataValue().fieldId.getText();
+        boolean not = ctx.inListStringComparison().NOT() != null;
+        List<String> stringList = ctx.inListStringComparison().stringList().STRING().stream().map(node -> getStringValue(node.getText())).collect(Collectors.toList());
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, buildElasticQueryInList("dataSet." + fieldId + ".textValue", stringList, not));
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataStringRange(QueryLangParser.DataStringRangeContext ctx) {
+        String fieldId = ctx.dataValue().fieldId.getText();
+        boolean not = ctx.inRangeStringComparison().NOT() != null;
+        boolean leftEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
+        String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, buildElasticQueryInRange("dataSet." + fieldId + ".textValue", leftString, leftEndpointOpen, rightString, rightEndpointOpen, not));
         this.searchWithElastic = true;
     }
 
@@ -657,7 +1005,44 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String number = ctx.numberComparison().number.getText();
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".numberValue", op, number, not));
+        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".numberValue", op.getType(), number, not));
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataNumberList(QueryLangParser.DataNumberListContext ctx) {
+        String fieldId = ctx.dataValue().fieldId.getText();
+        boolean not = ctx.inListNumberComparison().NOT() != null;
+        List<TerminalNode> terminalNodeList = ctx.inListNumberComparison().intList() != null ? ctx.inListNumberComparison().intList().INT() : ctx.inListNumberComparison().doubleList().DOUBLE();
+        List<String> stringNumberList = terminalNodeList.stream().map(TerminalNode::getText).collect(Collectors.toList());
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, buildElasticQueryInList("dataSet." + fieldId + ".numberValue", stringNumberList, not));
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataNumberRange(QueryLangParser.DataNumberRangeContext ctx) {
+        String fieldId = ctx.dataValue().fieldId.getText();
+        boolean not = ctx.inRangeNumberComparison().NOT() != null;
+        boolean leftEndpointOpen;
+        boolean rightEndpointOpen;
+        String leftNumberAsString;
+        String rightNumberAsString;
+        if (ctx.inRangeNumberComparison().intRange() != null) {
+            leftEndpointOpen = ctx.inRangeNumberComparison().intRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeNumberComparison().intRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            leftNumberAsString = ctx.inRangeNumberComparison().intRange().INT(0).getText();
+            rightNumberAsString = ctx.inRangeNumberComparison().intRange().INT(1).getText();
+        } else {
+            leftEndpointOpen = ctx.inRangeNumberComparison().doubleRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeNumberComparison().doubleRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            leftNumberAsString = ctx.inRangeNumberComparison().doubleRange().DOUBLE(0).getText();
+            rightNumberAsString = ctx.inRangeNumberComparison().doubleRange().DOUBLE(1).getText();
+        }
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, buildElasticQueryInRange("dataSet." + fieldId + ".numberValue", leftNumberAsString, leftEndpointOpen, rightNumberAsString, rightEndpointOpen, not));
         this.searchWithElastic = true;
     }
 
@@ -670,7 +1055,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         LocalDateTime localDateTime = toDateTime(ctx.dateComparison().DATE().getText());
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".timestampValue", op, String.valueOf(Timestamp.valueOf(localDateTime).getTime()), not));
+        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".timestampValue", op.getType(), String.valueOf(Timestamp.valueOf(localDateTime).getTime()), not));
         this.searchWithElastic = true;
     }
 
@@ -683,7 +1068,47 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         LocalDateTime localDateTime = toDateTime(ctx.dateTimeComparison().DATETIME().getText());
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".timestampValue", op, String.valueOf(Timestamp.valueOf(localDateTime).getTime()), not));
+        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".timestampValue", op.getType(), String.valueOf(Timestamp.valueOf(localDateTime).getTime()), not));
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataDateList(QueryLangParser.DataDateListContext ctx) {
+        String fieldId = ctx.dataValue().fieldId.getText();
+        boolean not = ctx.inListDateComparison().NOT() != null;
+        List<TerminalNode> terminalNodeList = ctx.inListDateComparison().dateList() != null ? ctx.inListDateComparison().dateList().DATE() : ctx.inListDateComparison().dateTimeList().DATETIME();
+        List<String> stringNumberList = terminalNodeList.stream().map(TerminalNode::getText).map(dateAsString -> {
+            LocalDateTime localDateTime = toDateTime(dateAsString);
+            return String.valueOf(Timestamp.valueOf(localDateTime).getTime());
+        }).collect(Collectors.toList());
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, buildElasticQueryInList("dataSet." + fieldId + ".timestampValue", stringNumberList, not));
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataDateRange(QueryLangParser.DataDateRangeContext ctx) {
+        String fieldId = ctx.dataValue().fieldId.getText();
+        boolean not = ctx.inRangeDateComparison().NOT() != null;
+        boolean leftEndpointOpen;
+        boolean rightEndpointOpen;
+        LocalDateTime leftDateTime;
+        LocalDateTime rightDateTime;
+        if (ctx.inRangeDateComparison().dateRange() != null) {
+            leftEndpointOpen = ctx.inRangeDateComparison().dateRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeDateComparison().dateRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            leftDateTime = toDateTime(ctx.inRangeDateComparison().dateRange().DATE(0).getText());
+            rightDateTime = toDateTime(ctx.inRangeDateComparison().dateRange().DATE(1).getText());
+        } else {
+            leftEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeDateComparison().dateTimeRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            leftDateTime = toDateTime(ctx.inRangeDateComparison().dateTimeRange().DATETIME(0).getText());
+            rightDateTime = toDateTime(ctx.inRangeDateComparison().dateTimeRange().DATETIME(1).getText());
+        }
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, buildElasticQueryInRange("dataSet." + fieldId + ".timestampValue", String.valueOf(Timestamp.valueOf(leftDateTime).getTime()), leftEndpointOpen, String.valueOf(Timestamp.valueOf(rightDateTime).getTime()), rightEndpointOpen, not));
         this.searchWithElastic = true;
     }
 
@@ -696,12 +1121,12 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String booleanValue = ctx.booleanComparison().BOOLEAN().getText();
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".booleanValue", op, booleanValue, not));
+        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".booleanValue", op.getType(), booleanValue, not));
         this.searchWithElastic = true;
     }
 
     @Override
-    public void enterDataOptionsComparison(QueryLangParser.DataOptionsComparisonContext ctx) {
+    public void exitDataOptionsBasic(QueryLangParser.DataOptionsBasicContext ctx) {
         String fieldId = ctx.dataOptions().fieldId.getText();
         Token op = ctx.stringComparison().op;
         checkOp(ComparisonType.STRING, op);
@@ -709,12 +1134,37 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".options", op, string, not));
+        setElasticQuery(ctx, buildElasticQuery("dataSet." + fieldId + ".options", op.getType(), string, not));
         this.searchWithElastic = true;
     }
 
     @Override
-    public void exitPlacesComparison(QueryLangParser.PlacesComparisonContext ctx) {
+    public void exitDataOptionsList(QueryLangParser.DataOptionsListContext ctx) {
+        String fieldId = ctx.dataOptions().fieldId.getText();
+        boolean not = ctx.inListStringComparison().NOT() != null;
+        List<String> stringList = ctx.inListStringComparison().stringList().STRING().stream().map(node -> getStringValue(node.getText())).collect(Collectors.toList());
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, buildElasticQueryInList("dataSet." + fieldId + ".options", stringList, not));
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitDataOptionsRange(QueryLangParser.DataOptionsRangeContext ctx) {
+        String fieldId = ctx.dataOptions().fieldId.getText();
+        boolean not = ctx.inRangeStringComparison().NOT() != null;
+        boolean leftEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+        boolean rightEndpointOpen = ctx.inRangeStringComparison().stringRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+        String leftString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(0).getText());
+        String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, buildElasticQueryInRange("dataSet." + fieldId + ".options", leftString, leftEndpointOpen, rightString, rightEndpointOpen, not));
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitPlacesBasic(QueryLangParser.PlacesBasicContext ctx) {
         String placeId = ctx.places().placeId.getText();
         Token op = ctx.numberComparison().op;
         checkOp(ComparisonType.NUMBER, op);
@@ -722,7 +1172,44 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String numberValue = ctx.numberComparison().number.getText();
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("places." + placeId + ".marking", op, numberValue, not));
+        setElasticQuery(ctx, buildElasticQuery("places." + placeId + ".marking", op.getType(), numberValue, not));
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitPlacesList(QueryLangParser.PlacesListContext ctx) {
+        String placeId = ctx.places().placeId.getText();
+        boolean not = ctx.inListNumberComparison().NOT() != null;
+        List<TerminalNode> terminalNodeList = ctx.inListNumberComparison().intList() != null ? ctx.inListNumberComparison().intList().INT() : ctx.inListNumberComparison().doubleList().DOUBLE();
+        List<String> stringNumberList = terminalNodeList.stream().map(TerminalNode::getText).collect(Collectors.toList());
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, buildElasticQueryInList("places." + placeId + ".marking", stringNumberList, not));
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitPlacesRange(QueryLangParser.PlacesRangeContext ctx) {
+        String placeId = ctx.places().placeId.getText();
+        boolean not = ctx.inRangeNumberComparison().NOT() != null;
+        boolean leftEndpointOpen;
+        boolean rightEndpointOpen;
+        String leftNumberAsString;
+        String rightNumberAsString;
+        if (ctx.inRangeNumberComparison().intRange() != null) {
+            leftEndpointOpen = ctx.inRangeNumberComparison().intRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeNumberComparison().intRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            leftNumberAsString = ctx.inRangeNumberComparison().intRange().INT(0).getText();
+            rightNumberAsString = ctx.inRangeNumberComparison().intRange().INT(1).getText();
+        } else {
+            leftEndpointOpen = ctx.inRangeNumberComparison().doubleRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeNumberComparison().doubleRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            leftNumberAsString = ctx.inRangeNumberComparison().doubleRange().DOUBLE(0).getText();
+            rightNumberAsString = ctx.inRangeNumberComparison().doubleRange().DOUBLE(1).getText();
+        }
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, buildElasticQueryInRange("places." + placeId + ".marking", leftNumberAsString, leftEndpointOpen, rightNumberAsString, rightEndpointOpen, not));
         this.searchWithElastic = true;
     }
 
@@ -735,7 +1222,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         State state = ctx.state.getType() == QueryLangParser.ENABLED ? State.ENABLED : State.DISABLED;
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("tasks." + taskId + ".state", op, state.toString(), not));
+        setElasticQuery(ctx, buildElasticQuery("tasks." + taskId + ".state", op.getType(), state.toString(), not));
         this.searchWithElastic = true;
     }
 
@@ -748,7 +1235,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
         setMongoQuery(ctx, null);
-        setElasticQuery(ctx, buildElasticQuery("tasks." + taskId + ".userId", op, string, not));
+        setElasticQuery(ctx, buildElasticQuery("tasks." + taskId + ".userId", op.getType(), string, not));
         this.searchWithElastic = true;
     }
 
