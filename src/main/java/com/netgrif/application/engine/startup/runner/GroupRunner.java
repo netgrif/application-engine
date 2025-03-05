@@ -28,8 +28,9 @@ public class GroupRunner implements ApplicationEngineStartupRunner {
     }
 
     protected void createDefaultGroup() {
-        if (groupProperties.isSystemEnabled())
+        if (groupProperties.isSystemEnabled()) {
             groupService.create(userService.getLoggedOrSystem());
+        }
     }
 
 }
