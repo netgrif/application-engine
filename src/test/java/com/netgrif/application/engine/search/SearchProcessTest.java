@@ -86,9 +86,24 @@ public class SearchProcessTest {
         assert actualStringIds.containsAll(expectedStringIds);
     }
 
+    private void comparePetriNetsInOrder(List<PetriNet> actual, List<PetriNet> expected) {
+        List<String> actualStringIds = actual.stream().map(PetriNet::getStringId).collect(Collectors.toList());
+        List<String> expectedStringIds = expected.stream().map(PetriNet::getStringId).collect(Collectors.toList());
+
+        assert actualStringIds.containsAll(expectedStringIds);
+
+        int lastIndex = -1;
+        for (String expectedId : expectedStringIds) {
+            int currentIndex = actualStringIds.indexOf(expectedId);
+            assert currentIndex > lastIndex;
+            lastIndex = currentIndex;
+        }
+    }
+
     @Test
     public void testSearchById() {
         PetriNet net = importPetriNet("search/search_test.xml", VersionType.MAJOR);
+        PetriNet net2 = importPetriNet("search/search_test.xml", VersionType.MAJOR);
 
         String query = String.format("process: id eq '%s'", net.getStringId());
 
@@ -98,6 +113,14 @@ public class SearchProcessTest {
         Object process = searchService.search(query);
 
         comparePetriNets(convertToPetriNet(process), net);
+
+        query = String.format("processes: identifier eq '%s' sort by id", net.getIdentifier());
+        Object processes = searchService.search(query);
+        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(net, net2));
+
+        query = String.format("processes: identifier eq '%s' sort by id desc", net.getIdentifier());
+        processes = searchService.search(query);
+        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(net2, net));
     }
 
     @Test
@@ -105,6 +128,7 @@ public class SearchProcessTest {
         PetriNet net = importPetriNet("search/search_test.xml", VersionType.MAJOR);
         PetriNet netNewer = importPetriNet("search/search_test.xml", VersionType.MAJOR);
         PetriNet net2 = importPetriNet("search/search_test2.xml", VersionType.MAJOR);
+        PetriNet net3 = importPetriNet("search/search_test3.xml", VersionType.MAJOR);
 
         String query = String.format("process: identifier eq '%s'", net.getIdentifier());
         String queryMore = String.format("processes: identifier eq '%s'", net.getIdentifier());
@@ -117,6 +141,25 @@ public class SearchProcessTest {
 
         Object processes = searchService.search(queryMore);
         comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewer));
+
+        // in list
+        String queryInList = String.format("processes: identifier in ('%s', '%s', '%s')", net.getIdentifier(), net2.getIdentifier(), net3.getIdentifier());
+        processes = searchService.search(queryInList);
+        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewer, net2, net3));
+
+        // in range
+        String queryInRange = String.format("processes: identifier in <'%s' : '%s')", net.getIdentifier(), net3.getIdentifier());
+        processes = searchService.search(queryInRange);
+        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewer, net2));
+
+        // sort
+        queryMore = String.format("processes: identifier in ('%s', '%s') sort by identifier", net.getIdentifier(), net2.getIdentifier());
+        processes = searchService.search(queryMore);
+        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(net, netNewer, net2));
+
+        queryMore = String.format("processes: identifier in ('%s', '%s') sort by identifier desc", net.getIdentifier(), net2.getIdentifier());
+        processes = searchService.search(queryMore);
+        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(net2, net, netNewer));
     }
 
     @Test
@@ -165,6 +208,25 @@ public class SearchProcessTest {
 
         processes = searchService.search(queryGte);
         comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewerPatch, netNewerMinor, netNewerMajor));
+
+        // in list
+        String queryInList = String.format("processes: identifier eq '%s' and version in (%s, %s, %s)", net.getIdentifier(), "1.0.0", "1.0.1", "1.1.0");
+        processes = searchService.search(queryInList);
+        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewerPatch, netNewerMinor));
+
+        // in range
+        String queryInRange = String.format("processes: identifier eq '%s' and version in <%s : %s)", net.getIdentifier(), "1.0.0", "1.1.0");
+        processes = searchService.search(queryInRange);
+        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewerPatch));
+
+        // sort
+        String query = String.format("processes: identifier eq '%s' sort by version", net.getIdentifier());
+        processes = searchService.search(query);
+        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(net, netNewerPatch, netNewerMinor, netNewerMajor));
+
+        query = String.format("processes: identifier eq '%s' sort by version desc", net.getIdentifier());
+        processes = searchService.search(query);
+        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(netNewerMajor, netNewerMinor, netNewerPatch, net));
     }
 
     @Test
@@ -191,6 +253,25 @@ public class SearchProcessTest {
 
         Object processes = searchService.search(queryMore);
         comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewer));
+
+        // in list
+        String queryInList = String.format("processes: identifier in ('%s', '%s') and title in ('%s', '%s')", net.getIdentifier(), net2.getIdentifier(), net.getTitle().getDefaultValue(), net2.getTitle().getDefaultValue());
+        processes = searchService.search(queryInList);
+        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewer, net2));
+
+        // in range
+        String queryInRange = String.format("processes: identifier in ('%s', '%s') and title in <'%s' : '%s')", net.getIdentifier(), net2.getIdentifier(), net.getTitle().getDefaultValue(), net2.getTitle().getDefaultValue());
+        processes = searchService.search(queryInRange);
+        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewer));
+
+        // sort
+        queryMore = String.format("processes: identifier in ('%s', '%s') sort by title", net.getIdentifier(), net2.getIdentifier());
+        processes = searchService.search(queryMore);
+        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(net, netNewer, net2));
+
+        queryMore = String.format("processes: identifier in ('%s', '%s') sort by title desc", net.getIdentifier(), net2.getIdentifier());
+        processes = searchService.search(queryMore);
+        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(net2, net, netNewer));
     }
 
     @Test
@@ -234,6 +315,49 @@ public class SearchProcessTest {
 
         processes = searchService.search(queryGte);
         comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewer, netNewest));
+
+        // in list
+        String queryInList = String.format("processes: identifier eq '%s' and creationDate in (%s, %s)", net.getIdentifier(), toDateTimeString(net.getCreationDate()), toDateTimeString(netNewest.getCreationDate()));
+        processes = searchService.search(queryInList);
+        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewest));
+
+        // in range
+        String queryInRange = String.format("processes: identifier eq '%s' and creationDate in <%s : %s)", net.getIdentifier(), toDateTimeString(net.getCreationDate()), toDateTimeString(netNewest.getCreationDate()));
+        processes = searchService.search(queryInRange);
+        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewer));
+
+        // sort
+        String query = String.format("processes: identifier eq '%s' sort by creationDate", net.getIdentifier());
+        processes = searchService.search(query);
+        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(net, netNewer, netNewest));
+
+        query = String.format("processes: identifier eq '%s' sort by creationDate desc", net.getIdentifier());
+        processes = searchService.search(query);
+        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(netNewest, netNewer, net));
+    }
+
+    @Test
+    public void testPagination() {
+        List<PetriNet> nets = new ArrayList<>();
+        for (int i = 0; i < 50; i++) {
+            nets.add(importPetriNet("search/search_test.xml", VersionType.MAJOR));
+        }
+
+        String queryOne = String.format("process: identifier eq '%s'", "search_test");
+        String queryMore = String.format("processes: identifier eq '%s'", "search_test");
+        String queryMoreCustomPagination = String.format("processes: identifier eq '%s' page 1 size 5", "search_test");
+
+        long count = searchService.count(queryOne);
+        assert count == 50;
+
+        Object process = searchService.search(queryOne);
+        comparePetriNets(convertToPetriNet(process), nets.get(0));
+
+        Object processes = searchService.search(queryMore);
+        comparePetriNets(convertToPetriNetList(processes), nets.subList(0, 19));
+
+        processes = searchService.search(queryMoreCustomPagination);
+        comparePetriNets(convertToPetriNetList(processes), nets.subList(5, 9));
     }
 
 }

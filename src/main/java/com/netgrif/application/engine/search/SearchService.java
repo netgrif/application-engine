@@ -4,7 +4,6 @@ import com.netgrif.application.engine.auth.domain.repositories.UserRepository;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.search.interfaces.ISearchService;
 import com.netgrif.application.engine.search.utils.SearchUtils;
@@ -15,7 +14,6 @@ import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -65,7 +63,6 @@ public class SearchService implements ISearchService {
     }
 
     private boolean existsCasesElastic(String elasticQuery) {
-        // todo NAE-1997: implement exists to elasticCaseService
         return countCasesElastic(elasticQuery) > 0;
     }
 
