@@ -3,7 +3,7 @@ package com.netgrif.application.engine.startup.runner;
 import com.netgrif.auth.service.RealmService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
-import com.netgrif.core.auth.web.requestbodies.RealmCreateRequest;
+import com.netgrif.core.auth.domain.Realm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -22,7 +22,7 @@ public class DefaultRealmRunner implements ApplicationEngineStartupRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         if (realmService.getDefaultRealm().isEmpty()) {
-            RealmCreateRequest createRequest = new RealmCreateRequest();
+            Realm createRequest = new Realm();
             createRequest.setName("Default");
             createRequest.setDescription("Default realm");
             createRequest.setAdminRealm(true);

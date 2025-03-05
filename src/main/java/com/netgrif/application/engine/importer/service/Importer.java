@@ -697,7 +697,7 @@ public class Importer {
 
     @Transactional
     protected void addDataWithDefaultGroup(Transition transition, DataRef dataRef) throws MissingIconKeyException {
-        DataGroup dataGroup = new DataGroup();
+        DataGroup dataGroup = new com.netgrif.adapter.workflow.domain.DataGroup();
         dataGroup.setImportId(transition.getImportId() + "_" + dataRef.getId() + "_" + System.currentTimeMillis());
         if (transition.getLayout() != null && transition.getLayout().getCols() != null) {
             dataGroup.setLayout(new DataGroupLayout(null, transition.getLayout().getCols(), null, null, null));
@@ -715,9 +715,9 @@ public class Importer {
     @Transactional
     protected void addDataGroup(Transition transition, com.netgrif.core.importer.model.DataGroup importDataGroup, int index) throws MissingIconKeyException {
         String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
-        DataGroup dataGroup = new DataGroup();
+        DataGroup dataGroup = new com.netgrif.adapter.workflow.domain.DataGroup();
 
-        if (importDataGroup.getId() != null && importDataGroup.getId().length() > 0)
+        if (importDataGroup.getId() != null && !importDataGroup.getId().isEmpty())
             dataGroup.setImportId(importDataGroup.getId());
         else
             dataGroup.setImportId(transition.getImportId() + "_dg_" + index);

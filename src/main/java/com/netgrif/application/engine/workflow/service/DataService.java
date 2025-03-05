@@ -321,8 +321,8 @@ public class DataService implements IDataService {
         List<DataGroup> resultDataGroups = new ArrayList<>();
 
         List<Field<?>> data = getData(task, useCase).getData();
-        Map<String, Field> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
-        List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::new).toList();
+        Map<String, Field<?>> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
+        List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map((dg) -> (DataGroup) new com.netgrif.adapter.workflow.domain.DataGroup((com.netgrif.adapter.workflow.domain.DataGroup) dg)).toList();
         for (DataGroup dataGroup : dataGroups) {
             resolveTaskRefOrderOnGrid(dataGroup, dataFieldMap);
             resultDataGroups.add(dataGroup);
@@ -387,7 +387,7 @@ public class DataService implements IDataService {
         return groups;
     }
 
-    private void resolveTaskRefOrderOnGrid(DataGroup dataGroup, Map<String, Field> dataFieldMap) {
+    private void resolveTaskRefOrderOnGrid(DataGroup dataGroup, Map<String, Field<?>> dataFieldMap) {
         if (dataGroup.getLayout() != null && Objects.equals(dataGroup.getLayout().getType(), "grid")) {
             dataGroup.setData(
                     dataGroup.getData().stream()
