@@ -1,28 +1,31 @@
 package com.netgrif.application.engine.menu
 
-import com.netgrif.application.engine.TestHelper
-import com.netgrif.core.auth.domain.Authority
-import com.netgrif.core.auth.domain.User
-import com.netgrif.core.auth.domain.enums.UserState
-import com.netgrif.auth.service.UserService
-import com.netgrif.application.engine.orgstructure.groups.NextGroupService
-import com.netgrif.core.petrinet.domain.I18nString
-import com.netgrif.core.petrinet.domain.dataset.FileFieldValue
-import com.netgrif.core.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.startup.runner.*
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.core.workflow.domain.Case
 import com.netgrif.adapter.workflow.domain.QCase
 import com.netgrif.adapter.workflow.domain.QTask
-import com.netgrif.core.workflow.domain.Task
-import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
-import com.netgrif.core.workflow.domain.menu.MenuAndFilters
+import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
+import com.netgrif.application.engine.startup.runner.FilterRunner
+import com.netgrif.application.engine.startup.runner.GroupRunner
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.UserFilterSearchService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IMenuImportExportService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.auth.service.GroupService
+import com.netgrif.auth.service.UserService
+import com.netgrif.core.auth.domain.Authority
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
+import com.netgrif.core.petrinet.domain.I18nString
+import com.netgrif.core.petrinet.domain.dataset.FileFieldValue
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.core.workflow.domain.Task
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.core.workflow.domain.menu.MenuAndFilters
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -34,7 +37,6 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
-
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -112,7 +114,7 @@ class MenuImportExportTest {
     private CaseRepository caseRepository
 
     @Autowired
-    private NextGroupService nextGroupService
+    private GroupService groupService
 
     @Autowired
     private SuperCreatorRunner superCreator
