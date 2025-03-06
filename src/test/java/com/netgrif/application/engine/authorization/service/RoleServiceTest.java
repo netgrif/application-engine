@@ -151,7 +151,7 @@ public class RoleServiceTest {
         ProcessRole processRole2 = new ProcessRole("import_id2");
         processRole2.setTitle(new I18nString("testTitle"));
         ProcessRole processRole3 = new ProcessRole("import_id3");
-        processRole2.setTitle(new I18nString("otherTitle"));
+        processRole3.setTitle(new I18nString("otherTitle"));
         repository.saveAll(List.of(processRole1, processRole2, processRole3));
 
         List<ProcessRole> processRoles = roleService.findProcessRolesByDefaultTitle("testTitle");

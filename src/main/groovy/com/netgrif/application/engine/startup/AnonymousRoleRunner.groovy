@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.startup
 
 import com.netgrif.application.engine.authorization.domain.ProcessRole
-import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.importer.model.RoleEventType
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.events.RoleEvent
@@ -16,13 +16,13 @@ import org.springframework.stereotype.Component
 class AnonymousRoleRunner extends AbstractOrderedCommandLineRunner {
 
     @Autowired
-    private ProcessRoleRepository repository
+    private IRoleService roleService
 
     @Override
     void run(String... strings) throws Exception {
         log.info("Creating anonymous process role")
 
-        def role = repository.findAllByImportId(ProcessRole.ANONYMOUS_ROLE)
+        def role = roleService.findProcessRolesByDefaultTitle(ProcessRole.ANONYMOUS_ROLE)
         if (role && !role.isEmpty()) {
             log.info("Anonymous role already exists")
             return
@@ -33,9 +33,7 @@ class AnonymousRoleRunner extends AbstractOrderedCommandLineRunner {
         anonymousRole.description = new I18nString("Anonymous system process role")
         anonymousRole.events = new LinkedHashMap<RoleEventType, RoleEvent>()
 
-        anonymousRole = repository.save(anonymousRole)
-
-        if (anonymousRole == null)
+        if (roleService.save(anonymousRole) == null)
             log.error("Error saving anonymous process role")
     }
 }
