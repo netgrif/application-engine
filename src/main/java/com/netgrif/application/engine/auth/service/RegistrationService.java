@@ -12,6 +12,7 @@ import com.netgrif.application.engine.configuration.properties.ServerAuthPropert
 import com.netgrif.auth.service.GroupService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -119,6 +120,7 @@ public class RegistrationService implements IRegistrationService {
         } else {
             user = new com.netgrif.adapter.auth.domain.User();
             user.setEmail(newUser.email);
+            user.setUsername(newUser.email);
             log.info("Creating new user [" + newUser.email + "]");
         }
         user.setToken(generateTokenKey());
@@ -155,11 +157,11 @@ public class RegistrationService implements IRegistrationService {
         user.setLastName(registrationRequest.surname);
         user.setPassword(registrationRequest.password);
 
-        user.setToken(null);
+        user.setToken(StringUtils.EMPTY);
         user.setExpirationDate(null);
         user.setState(UserState.ACTIVE);
 
-        return (RegisteredUser) userService.saveNewAndAuthenticate(user, null);
+        return (RegisteredUser) userService.saveUser(user, null);
     }
 
     @Override

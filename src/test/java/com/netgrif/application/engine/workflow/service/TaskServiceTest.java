@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.adapter.auth.domain.LoggedUserImpl;
+import com.netgrif.application.engine.startup.runner.DefaultRealmRunner;
 import com.netgrif.auth.service.UserService;
 import com.netgrif.core.auth.domain.Authority;
 import com.netgrif.core.auth.domain.LoggedUser;
@@ -79,10 +80,14 @@ public class TaskServiceTest {
     @Autowired
     private SuperCreatorRunner superCreator;
 
+    @Autowired
+    private DefaultRealmRunner realmRunner;
+
     @BeforeEach
     public void setUp() throws Exception {
         mongoTemplate.getDb().drop();
         taskRepository.deleteAll();
+        realmRunner.run(null);
         userRunner.run(null);
         uriRunner.run(null);
 

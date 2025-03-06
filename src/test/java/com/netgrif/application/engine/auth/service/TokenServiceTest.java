@@ -29,12 +29,12 @@ public class TokenServiceTest {
 
     @BeforeEach
     public void setUp() {
-        userService.deleteAllUsers();
+        userService.deleteAllUsers(null);
     }
 
     @AfterEach
     public void cleanUp() {
-        userService.deleteAllUsers();
+        userService.deleteAllUsers(null);
     }
 
     @Test
@@ -58,7 +58,7 @@ public class TokenServiceTest {
 
         service.removeExpiredUsers();
 
-        assert userService.findAllUsers(null).size() == 3;
+        assert userService.findAllUsers(null).size() == 1;
     }
 
     @Test

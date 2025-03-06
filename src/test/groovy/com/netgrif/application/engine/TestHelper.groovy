@@ -88,7 +88,7 @@ class TestHelper {
         indexService.deleteIndex(ElasticPetriNet.class)
         indexService.deleteIndex(ElasticCase.class)
         indexService.deleteIndex(ElasticTask.class)
-        userService.deleteAllUsers()
+        userService.deleteAllUsers(null)
         roleService.deleteAll()
         roleService.clearCache()
         actionsCacheService.clearActionCache()

@@ -106,7 +106,7 @@ class RemoveActionTest {
 
     private void cleanDatabases() {
         template.db.drop()
-        userService.deleteAllUsers()
+        userService.deleteAllUsers(null)
         processRoleService.deleteAll()
     }
 

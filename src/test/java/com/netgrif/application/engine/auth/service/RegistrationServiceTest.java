@@ -43,7 +43,7 @@ public class RegistrationServiceTest {
 
     @AfterEach
     public void cleanUp() {
-        userService.deleteAllUsers();
+        userService.deleteAllUsers(null);
     }
 
     @Test
