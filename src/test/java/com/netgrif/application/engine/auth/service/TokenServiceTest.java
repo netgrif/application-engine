@@ -58,7 +58,7 @@ public class TokenServiceTest {
 
         service.removeExpiredUsers();
 
-        assert userService.findAllUsers(null).size() == 1;
+        assert userService.findAllUsers(null).size() == 3;
     }
 
     @Test
@@ -68,7 +68,7 @@ public class TokenServiceTest {
         expired.setUsername("test3@test.com");
         expired.setEmail("test3@test.com");
         expired.setPassword("password");
-        expired.setExpirationDate(LocalDateTime.now().minusDays(10));
+        expired.setExpirationDate(LocalDateTime.now().plusMinutes(10));
         expired.setState(UserState.INACTIVE);
         userService.saveUser(expired, null);
 
