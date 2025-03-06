@@ -11,6 +11,7 @@ public interface IRoleAssignmentService {
 
     List<RoleAssignment> findAllByUserIdAndRoleIdIn(String userId, Set<String> roleIds);
     List<RoleAssignment> findAllByRoleIdIn(Set<String> roleIds);
+    List<RoleAssignment> findAllByUserId(String userId);
 
     List<RoleAssignment> createAssignments(String userId, List<Role> roles);
     RoleAssignment createAssignment(String userId, Role role);

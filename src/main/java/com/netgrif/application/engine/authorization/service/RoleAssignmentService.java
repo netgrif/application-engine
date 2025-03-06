@@ -24,14 +24,28 @@ public class RoleAssignmentService implements IRoleAssignmentService {
     private final CaseRoleAssignmentRepository caseRoleAssignmentRepository;
     private final ApplicationContext applicationContext;
 
+    /**
+     * todo javadoc
+     * */
     @Override
     public List<RoleAssignment> findAllByUserIdAndRoleIdIn(String userId, Set<String> roleIds) {
         return (List<RoleAssignment>) repository.findAllByUserIdAndRoleIdIn(userId, roleIds);
     }
 
+    /**
+     * todo javadoc
+     * */
     @Override
     public List<RoleAssignment> findAllByRoleIdIn(Set<String> roleIds) {
-        return (List<RoleAssignment>) repository.findAllById(roleIds);
+        return (List<RoleAssignment>) repository.findAllByRoleIdIn(roleIds);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public List<RoleAssignment> findAllByUserId(String userId) {
+        return (List<RoleAssignment>) repository.findAllByUserId(userId);
     }
 
     /**
