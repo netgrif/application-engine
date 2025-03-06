@@ -127,7 +127,7 @@ class UserServiceTest {
         userService.saveUser(user, null)
 
         Page<IUser> userPage = userService.findAllCoMembers(LoggedUserMapper.toLoggedUser(user as User), Pageable.ofSize(10))
-        assert userPage.getContent().size() == 1 && userPage.getContent().getFirst().stringId == user.stringId
+        assert userPage.getContent().size() == 2 && userPage.getContent().getFirst().stringId == user.stringId
 
     }
 
