@@ -28,14 +28,24 @@ import java.util.stream.Collectors;
  * plugin execution requests to desired plugin.
  * */
 @Slf4j
-@Service
-@RequiredArgsConstructor
 public class PluginService implements IPluginService {
-    private final PluginRepository pluginRepository;
-    private final PluginRegistrationConfigProperties properties;
-    private Server server;
+    protected final PluginRepository pluginRepository;
+    protected final PluginRegistrationConfigProperties properties;
+    protected Server server;
 
-    @PostConstruct
+    public PluginService(PluginRegistrationConfigProperties properties, PluginRepository pluginRepository) throws IOException {
+        this.properties = properties;
+        this.pluginRepository = pluginRepository;
+        this.startServer();
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        if (server != null) {
+            this.stopServer();
+        }
+    }
+
     public void startServer() throws IOException {
         server = ServerBuilder
                 .forPort(properties.getPort())
@@ -45,7 +55,6 @@ public class PluginService implements IPluginService {
         log.info("[gRPC Server] - Started on port " + properties.getPort());
     }
 
-    @PreDestroy
     public void stopServer() {
         server.shutdown();
         log.info("[gRPC Server] - Sopped server on port " + properties.getPort());
