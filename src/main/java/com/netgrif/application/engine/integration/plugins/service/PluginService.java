@@ -5,17 +5,16 @@ import com.netgrif.application.engine.integration.plugin.injector.PluginInjector
 import com.netgrif.application.engine.integration.plugins.domain.Plugin;
 import com.netgrif.application.engine.integration.plugins.properties.PluginRegistrationConfigProperties;
 import com.netgrif.application.engine.integration.plugins.repository.PluginRepository;
-import com.netgrif.pluginlibrary.core.*;
+import com.netgrif.pluginlibrary.core.ExecutionRequest;
+import com.netgrif.pluginlibrary.core.ExecutionResponse;
+import com.netgrif.pluginlibrary.core.ExecutionServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.io.Serializable;
