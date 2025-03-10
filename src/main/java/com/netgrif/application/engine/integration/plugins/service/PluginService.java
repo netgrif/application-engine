@@ -1,27 +1,30 @@
 package com.netgrif.application.engine.integration.plugins.service;
 
 import com.google.protobuf.ByteString;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.integration.plugin.injector.PluginInjector;
 import com.netgrif.application.engine.integration.plugins.exceptions.PluginIsAlreadyActiveException;
-import com.netgrif.application.engine.integration.plugins.outcomes.CreateOrUpdateOutcome;
-import com.netgrif.application.engine.integration.plugins.outcomes.GetOrCreateOutcome;
 import com.netgrif.application.engine.integration.plugins.properties.PluginConfigProperties;
 import com.netgrif.application.engine.integration.plugins.utils.PluginConstants;
 import com.netgrif.application.engine.integration.plugins.utils.PluginUtils;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
-import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.core.petrinet.domain.dataset.FieldType;
+import com.netgrif.core.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.startup.ImportHelper;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.pluginlibrary.core.*;
+import com.netgrif.pluginlibrary.core.domain.EntryPoint;
+import com.netgrif.pluginlibrary.core.domain.Method;
+import com.netgrif.pluginlibrary.core.domain.Plugin;
+import com.netgrif.pluginlibrary.core.outcomes.CreateOrUpdateOutcome;
+import com.netgrif.pluginlibrary.core.outcomes.GetOrCreateOutcome;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
@@ -33,8 +36,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
@@ -60,7 +63,7 @@ public class PluginService implements IPluginService {
     private final PluginConfigProperties properties;
     private final IElasticCaseService elasticCaseService;
     private final IWorkflowService workflowService;
-    private final IUserService userService;
+    private final UserService userService;
     private final IDataService dataService;
     private final ITaskService taskService;
     private final PluginInjector pluginInjector;
@@ -88,17 +91,17 @@ public class PluginService implements IPluginService {
     /**
      * Registers provided plugin into repository. If the plugin already exists, it's activated.
      *
-     * @param request - plugin to be registered or if already registered, then activated
+     * @param plugin - plugin to be registered or if already registered, then activated
      * @return activation or registration string message is returned
      */
     @Override
-    public String registerOrActivate(RegistrationRequest request) throws PluginIsAlreadyActiveException {
-        Optional<Case> existingPluginOpt = findByIdentifier(request.getIdentifier());
+    public String registerOrActivate(Plugin plugin) throws PluginIsAlreadyActiveException {
+        Optional<Case> existingPluginOpt = findByIdentifier(plugin.getIdentifier());
         try {
             if (existingPluginOpt.isPresent()) {
-                return activate(existingPluginOpt.get(), request);
+                return activate(existingPluginOpt.get(), plugin);
             } else {
-                return register(request);
+                return register(plugin);
             }
         } catch (TransitionNotExecutableException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
@@ -215,8 +218,8 @@ public class PluginService implements IPluginService {
         return result.hasContent() ? Optional.of(result.getContent().get(0)) : Optional.empty();
     }
 
-    private String register(RegistrationRequest request) throws TransitionNotExecutableException, NoSuchAlgorithmException {
-        Case pluginCase = createOrUpdatePluginCase(request, Optional.empty());
+    private String register(Plugin plugin) throws TransitionNotExecutableException, NoSuchAlgorithmException {
+        Case pluginCase = createOrUpdatePluginCase(plugin, Optional.empty());
         pluginCase = doActivation(pluginCase);
 
         pluginInjector.inject(pluginCase);
@@ -226,14 +229,14 @@ public class PluginService implements IPluginService {
         return responseMsg;
     }
 
-    private String activate(Case pluginCase, RegistrationRequest request) throws TransitionNotExecutableException,
+    private String activate(Case pluginCase, Plugin plugin) throws TransitionNotExecutableException,
             PluginIsAlreadyActiveException, NoSuchAlgorithmException {
         if (isPluginActive(pluginCase)) {
             throw new PluginIsAlreadyActiveException(String.format("Plugin with identifier [%s] is already active. Plugin must be inactive.",
-                    request.getIdentifier()));
+                    plugin.getIdentifier()));
         }
         pluginInjector.uninject(pluginCase); // remove potentially outdated meta data
-        pluginCase = createOrUpdatePluginCase(request, Optional.of(pluginCase));
+        pluginCase = createOrUpdatePluginCase(plugin, Optional.of(pluginCase));
         pluginCase = doActivation(pluginCase);
 
         String responseMsg = String.format("Plugin with identifier \"%s\" was activated.", getPluginIdentifier(pluginCase));
@@ -248,19 +251,19 @@ public class PluginService implements IPluginService {
         return taskService.finishTask(activateTask, user).getCase();
     }
 
-    private Case createOrUpdatePluginCase(RegistrationRequest request, Optional<Case> pluginCaseOpt) throws NoSuchAlgorithmException {
+    private Case createOrUpdatePluginCase(Plugin plugin, Optional<Case> pluginCaseOpt) throws NoSuchAlgorithmException {
         Set<String> createdCaseIds = new HashSet<>();
         LoggedUser loggedUser = userService.getLoggedOrSystem().transformToLoggedUser();
 
         try {
             Case pluginCase = pluginCaseOpt.orElseGet(() -> {
-                Case newPluginCase = workflowService.createCaseByIdentifier(PluginConstants.PLUGIN_PROCESS_IDENTIFIER, request.getName(),
+                Case newPluginCase = workflowService.createCaseByIdentifier(PluginConstants.PLUGIN_PROCESS_IDENTIFIER, plugin.getName(),
                         "", loggedUser).getCase();
                 createdCaseIds.add(newPluginCase.getStringId());
                 return newPluginCase;
             });
 
-            CreateOrUpdateOutcome epOutcome = createOrUpdateEntryPointCases(request.getEntryPointsList(), loggedUser,
+            CreateOrUpdateOutcome epOutcome = createOrUpdateEntryPointCases(plugin.getEntryPoints().values(), loggedUser,
                     utils.getPluginEntryPoints(pluginCase));
 
             createdCaseIds.addAll(epOutcome.getCreatedCaseIds());
@@ -268,17 +271,17 @@ public class PluginService implements IPluginService {
             epToBeRemovedIds.removeAll(epOutcome.getSubjectCaseIds());
 
             Map<String, Map<String, Object>> dataToSet = new HashMap<>();
-            dataToSet.put(PLUGIN_IDENTIFIER_FIELD_ID, Map.of("value", request.getIdentifier(), "type",
+            dataToSet.put(PLUGIN_IDENTIFIER_FIELD_ID, Map.of("value", plugin.getIdentifier(), "type",
                     FieldType.TEXT.getName()));
-            dataToSet.put(PLUGIN_NAME_FIELD_ID, Map.of("value", request.getName(), "type", FieldType.TEXT.getName()));
-            dataToSet.put(PLUGIN_URL_FIELD_ID, Map.of("value", request.getUrl(), "type", FieldType.TEXT.getName()));
-            dataToSet.put(PLUGIN_PORT_FIELD_ID, Map.of("value", String.valueOf(request.getPort()), "type",
+            dataToSet.put(PLUGIN_NAME_FIELD_ID, Map.of("value", plugin.getName(), "type", FieldType.TEXT.getName()));
+            dataToSet.put(PLUGIN_URL_FIELD_ID, Map.of("value", plugin.getUrl(), "type", FieldType.TEXT.getName()));
+            dataToSet.put(PLUGIN_PORT_FIELD_ID, Map.of("value", String.valueOf(plugin.getPort()), "type",
                     FieldType.NUMBER.getName()));
             dataToSet.put(PLUGIN_ENTRY_POINTS_FIELD_ID, Map.of("value", epOutcome.getSubjectCaseIds(), "type",
                     FieldType.CASE_REF.getName()));
 
             String taskId = findTaskIdInCase(pluginCase, PLUGIN_ACTIVATE_TRANS_ID);
-            dataService.setData(taskId, ImportHelper.populateDatasetAsObjects(dataToSet));
+            dataService.setData(taskId, ImportHelper.populateDatasetWithObject(dataToSet));
 
             removeEntryPointCases(epToBeRemovedIds);
 
@@ -289,7 +292,7 @@ public class PluginService implements IPluginService {
         }
     }
 
-    private CreateOrUpdateOutcome createOrUpdateEntryPointCases(List<EntryPoint> entryPoints, LoggedUser loggedUser,
+    private CreateOrUpdateOutcome createOrUpdateEntryPointCases(Collection<EntryPoint> entryPoints, LoggedUser loggedUser,
                                                                 List<Case> existingEpCases) throws NoSuchAlgorithmException {
         CreateOrUpdateOutcome outcome = new CreateOrUpdateOutcome();
 
@@ -316,7 +319,7 @@ public class PluginService implements IPluginService {
                         "type", FieldType.CASE_REF.getName()));
 
                 String taskId = findTaskIdInCase(entryPointCase, ENTRY_POINT_DETAIL_TRANS_ID);
-                dataService.setData(taskId, ImportHelper.populateDatasetAsObjects(dataToSet));
+                dataService.setData(taskId, ImportHelper.populateDatasetWithObject(dataToSet));
 
                 removeCases(methodToBeRemovedIds);
             }
@@ -342,8 +345,8 @@ public class PluginService implements IPluginService {
         CreateOrUpdateOutcome outcome = new CreateOrUpdateOutcome();
 
         try {
-            for (com.netgrif.pluginlibrary.core.Method method : entryPoint.getMethodsList()) {
-                GetOrCreateOutcome methodOutcome = getOrCreateMethodCase(method, loggedUser, method.getArgsList(), existingMethodCases);
+            for (Method method : entryPoint.getMethods().values()) {
+                GetOrCreateOutcome methodOutcome = getOrCreateMethodCase(method, loggedUser, method.getArgTypes(), existingMethodCases);
 
                 Case methodCase = methodOutcome.getSubjectCase();
                 if (methodOutcome.isNew()) {
@@ -355,7 +358,7 @@ public class PluginService implements IPluginService {
                 Map<String, Map<String, Object>> dataToSet = new HashMap<>();
                 dataToSet.put(METHOD_NAME_FIELD_ID, Map.of("value", method.getName(),
                         "type", FieldType.TEXT.getName()));
-                dataToSet.put(METHOD_ARGUMENTS_FIELD_ID, Map.of("value", method.getArgsList(), "type",
+                dataToSet.put(METHOD_ARGUMENTS_FIELD_ID, Map.of("value", method.getArgTypes().stream().map(Class::getName), "type",
                         FieldType.STRING_COLLECTION.getName()));
                 dataToSet.put(METHOD_RETURN_TYPE_FIELD_ID, Map.of("value", method.getReturnType(), "type",
                         FieldType.TEXT.getName()));
@@ -363,7 +366,7 @@ public class PluginService implements IPluginService {
                         "type", FieldType.TEXT.getName()));
 
                 String taskId = findTaskIdInCase(methodCase, METHOD_DETAIL_TRANS_ID);
-                dataService.setData(taskId, ImportHelper.populateDatasetAsObjects(dataToSet));
+                dataService.setData(taskId, ImportHelper.populateDatasetWithObject(dataToSet));
             }
 
             return outcome;
@@ -373,7 +376,7 @@ public class PluginService implements IPluginService {
         }
     }
 
-    private GetOrCreateOutcome getOrCreateMethodCase(Method method, LoggedUser loggedUser, List<String> argTypes,
+    private GetOrCreateOutcome getOrCreateMethodCase(Method method, LoggedUser loggedUser, List<Class<?>> argTypes,
                                                      List<Case> existingMethodCases)
             throws NoSuchAlgorithmException {
         String hashedSignature = PluginUtils.hashMethodSignature(method.getName(), argTypes);

@@ -12,6 +12,6 @@ message ExecutionResponse {
   bytes response = 1;
 }
 
-service ExecutionService {
+service PluginExecutionService {
   rpc execute(ExecutionRequest) returns (ExecutionResponse);
 }

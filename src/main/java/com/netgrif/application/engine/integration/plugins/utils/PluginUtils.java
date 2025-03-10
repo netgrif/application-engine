@@ -1,13 +1,13 @@
 package com.netgrif.application.engine.integration.plugins.utils;
 
 import com.google.protobuf.ByteString;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.TaskPair;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.auth.service.UserService;
+import com.netgrif.core.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Task;
+import com.netgrif.core.workflow.domain.TaskPair;
+import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ import java.util.Optional;
 public class PluginUtils {
     private final IWorkflowService workflowService;
     private final ITaskService taskService;
-    private final IUserService userService;
+    private final UserService userService;
 
     /**
      * Finds task id in provided case by transition id
@@ -217,8 +217,8 @@ public class PluginUtils {
      *
      * @return SHA-256 string hash of the provided input
      * */
-    public static String hashMethodSignature(String methodName, List<String> argTypes) throws NoSuchAlgorithmException {
-        String original = methodName + argTypes;
+    public static String hashMethodSignature(String methodName, List<Class<?>> argTypes) throws NoSuchAlgorithmException {
+        String original = methodName + argTypes.stream().map(Class::getName);
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] encodedHash = digest.digest(original.getBytes(StandardCharsets.UTF_8));
         return bytesToHex(encodedHash);

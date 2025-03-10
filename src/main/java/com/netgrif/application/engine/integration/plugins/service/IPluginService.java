@@ -1,14 +1,14 @@
 package com.netgrif.application.engine.integration.plugins.service;
 
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.pluginlibrary.core.RegistrationRequest;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.pluginlibrary.core.domain.Plugin;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
 public interface IPluginService {
-    String registerOrActivate(RegistrationRequest request);
+    String registerOrActivate(Plugin plugin);
 
     String unregister(String identifier) throws IllegalArgumentException;
 

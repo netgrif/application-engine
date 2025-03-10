@@ -66,6 +66,8 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <jackson.version>2.17.1</jackson.version>
         <jwt.version>0.11.5</jwt.version>
+        <protobuf.version>4.27.0</protobuf.version>
+        <grpc.version>1.64.0</grpc.version>
     </properties>
 
     <repositories>
@@ -139,6 +141,11 @@
             <artifactId>nae-ce-user</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.netgrif</groupId>
+            <artifactId>plugin-core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <!-- Loader -->
@@ -302,19 +309,34 @@
             <version>4.0.21</version>
             <type>pom</type>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.codehaus.groovy.modules.http-builder</groupId>-->
-<!--            <artifactId>http-builder</artifactId>-->
-<!--            <version>0.7.1</version>-->
-<!--        </dependency>-->
 
-        <!-- https://mvnrepository.com/artifact/org.mongodb/bson -->
+        <!-- Protobuf -->
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty</artifactId>
+            <version>${grpc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf</artifactId>
+            <version>${grpc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+            <version>${grpc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>${protobuf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
+        </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.mongodb</groupId>-->
-<!--            <artifactId>bson</artifactId>-->
-<!--            <version>5.1.0</version>-->
-<!--        </dependency>-->
 
         <!-- Lombok -->
         <dependency>
@@ -590,6 +612,13 @@
     </dependencies>
 
     <build>
+        <extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.6.1</version>
+            </extension>
+        </extensions>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -648,6 +677,24 @@
                         <configuration>
                             <classifier>exec</classifier>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>0.6.1</version>
+                <configuration>
+                    <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
+                    <pluginId>grpc-java</pluginId>
+                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>compile-custom</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

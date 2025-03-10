@@ -3,17 +3,22 @@ package com.netgrif.application.engine.integration.plugins.service;
 import com.netgrif.application.engine.integration.plugins.exceptions.InvalidRequestException;
 import com.netgrif.application.engine.integration.plugins.exceptions.PluginIsAlreadyActiveException;
 import com.netgrif.pluginlibrary.core.*;
+import com.netgrif.pluginlibrary.core.domain.EntryPoint;
+import com.netgrif.pluginlibrary.core.domain.Method;
+import com.netgrif.pluginlibrary.core.domain.Plugin;
+import com.netgrif.pluginlibrary.core.utils.AbstractObjectParser;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
+import io.grpc.stub.AbstractAsyncStub;
 import io.grpc.stub.StreamObserver;
-import joptsimple.internal.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 /**
- * Implementation of {@link com.netgrif.pluginlibrary.core.RegistrationServiceGrpc.RegistrationServiceImplBase}. This
+ * Implementation of {@link com.netgrif.pluginlibrary.core.PluginRegistrationServiceGrpc.PluginRegistrationServiceImplBase}. This
  * serves as gRPC controller, that provides remotely executable functions.
  * */
 @Slf4j
@@ -24,7 +29,7 @@ import org.springframework.stereotype.Service;
         havingValue = "true",
         matchIfMissing = true
 )
-public final class PluginRegistrationService extends RegistrationServiceGrpc.RegistrationServiceImplBase {
+public final class PluginRegistrationService extends PluginRegistrationServiceGrpc.PluginRegistrationServiceImplBase {
     private final IPluginService pluginService;
 
     /**
@@ -34,8 +39,9 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
      * */
     @Override
     public void register(RegistrationRequest request, StreamObserver<RegistrationResponse> responseObserver) {
+        Plugin plugin = (Plugin) AbstractObjectParser.deserialize(request.getPlugin().toByteArray());
         try {
-            validateRequest(request);
+            validateRequest(plugin);
             String responseMsg = pluginService.registerOrActivate(request);
             RegistrationResponse response = RegistrationResponse.newBuilder().setMessage(responseMsg).build();
             responseObserver.onNext(response);
@@ -45,7 +51,7 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
             responseObserver.onError(new StatusRuntimeException(Status.INVALID_ARGUMENT.withDescription(e.getMessage())));
         } catch (RuntimeException e) {
             String message = String.format("Something went wrong when registering or activating plugin with identifier [%s]",
-                    request.getIdentifier());
+                    plugin.getIdentifier());
             log.error(message, e);
             responseObserver.onError(new StatusRuntimeException(Status.INTERNAL.withDescription(message)));
         }
@@ -99,7 +105,7 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
         }
     }
 
-    private void validateRequest(RegistrationRequest request) throws InvalidRequestException {
+    private void validateRequest(Plugin request) throws InvalidRequestException {
         if (request.getIdentifier().equals(Strings.EMPTY)) {
             throw new InvalidRequestException("Plugin identifier is null or empty");
         }
@@ -109,11 +115,11 @@ public final class PluginRegistrationService extends RegistrationServiceGrpc.Reg
         if (request.getUrl().equals(Strings.EMPTY)) {
             throw new InvalidRequestException("Plugin URL is null or empty");
         }
-        for (EntryPoint ep : request.getEntryPointsList()) {
+        for (EntryPoint ep : request.getEntryPoints().values()) {
             if (ep.getName().equals(Strings.EMPTY)) {
                 throw new InvalidRequestException("Entry point name is null or empty");
             }
-            for (Method m : ep.getMethodsList()) {
+            for (Method m : ep.getMethods().values()) {
                 if (m.getName().equals(Strings.EMPTY)) {
                     throw new InvalidRequestException("Method name is null or empty");
                 }

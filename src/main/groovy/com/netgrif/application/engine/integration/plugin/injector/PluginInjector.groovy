@@ -6,7 +6,7 @@ import com.netgrif.application.engine.integration.plugin.injector.meta.PluginMet
 import com.netgrif.application.engine.integration.plugins.service.PluginService
 import com.netgrif.application.engine.integration.plugins.utils.PluginUtils
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
-import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.core.workflow.domain.Case
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 

@@ -48,7 +48,7 @@ public final class PluginProperties {
 
         try {
             Class<?>[] argTypes = new Class[args.length];
-            Arrays.stream(args).map(Object::getClass).collect(Collectors.toList()).toArray(argTypes);
+            Arrays.stream(args).map(Object::getClass).toList().toArray(argTypes);
             permission = (Permission) permClass.getDeclaredConstructor(argTypes).newInstance(args);
         } catch (InstantiationException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             log.error("Cannot create an instance of type [" + permClass + "]", e);
