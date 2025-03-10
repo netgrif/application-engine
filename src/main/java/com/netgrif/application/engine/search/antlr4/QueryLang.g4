@@ -143,26 +143,26 @@ identifierComparison: IDENTIFIER SPACE stringComparison # identifierBasic
 versionComparison: VERSION SPACE (NOT SPACE?)? op=(EQ | LT | GT | LTE | GTE) SPACE VERSION_NUMBER # versionBasic
                  | VERSION SPACE inListVersionComparison # versionListCmp
                  | VERSION SPACE inRangeVersionComparison # versionRangeCmp
-                 ; // todo NAE-1997: in list/in range??
+                 ;
 creationDateComparison: CREATION_DATE SPACE dateComparison # cdDateBasic
                       | CREATION_DATE SPACE dateTimeComparison # cdDateTimeBasic
                       | CREATION_DATE SPACE inListDateComparison # cdDateList
                       | CREATION_DATE SPACE inRangeDateComparison # cdDateRange
                       ;
-processIdComparison: PROCESS_ID SPACE stringComparison ; // todo NAE-1997: in list/in range?? basicly objectIdComparison
+processIdComparison: PROCESS_ID SPACE stringComparison ;
 processIdObjIdComparison: PROCESS_ID SPACE objectIdComparison ;
 processIdentifierComparison: PROCESS_IDENTIFIER SPACE stringComparison # processIdentifierBasic
                            | PROCESS_IDENTIFIER SPACE inListStringComparison # processIdentifierList
                            | PROCESS_IDENTIFIER SPACE inRangeStringComparison # processIdentifierRange
                            ;
-authorComparison: AUTHOR SPACE stringComparison ; // todo NAE-1997: in list/in range?? basicly objectIdComparison
+authorComparison: AUTHOR SPACE stringComparison ;
 transitionIdComparison: TRANSITION_ID SPACE stringComparison # transitionIdBasic
                       | TRANSITION_ID SPACE inListStringComparison # transitionIdList
                       | TRANSITION_ID SPACE inRangeStringComparison # transitionIdRange
                       ;
-stateComparison: STATE SPACE EQ SPACE state=(ENABLED | DISABLED) ; // todo NAE-1997: in list/in range?? only 2 values
-userIdComparison: USER_ID SPACE stringComparison ; // todo NAE-1997: in list/in range?? basicly objectIdComparison
-caseIdComparison: CASE_ID SPACE stringComparison ; // todo NAE-1997: in list/in range?? basicly objectIdComparison
+stateComparison: STATE SPACE EQ SPACE state=(ENABLED | DISABLED) ;
+userIdComparison: USER_ID SPACE stringComparison ;
+caseIdComparison: CASE_ID SPACE stringComparison ;
 lastAssignComparison: LAST_ASSIGN SPACE dateComparison # laDateBasic
                     | LAST_ASSIGN SPACE dateTimeComparison # laDateTimeBasic
                     | LAST_ASSIGN SPACE inListDateComparison # laDateList
@@ -185,7 +185,7 @@ emailComparison: EMAIL SPACE stringComparison # emailBasic
                | EMAIL SPACE inListStringComparison # emailList
                | EMAIL SPACE inRangeStringComparison # emailRange
                ;
-dataValueComparison: dataValue SPACE stringComparison # dataString // todo NAE-1997: how to translate to elastic query??
+dataValueComparison: dataValue SPACE stringComparison # dataString
               | dataValue SPACE numberComparison # dataNumber
               | dataValue SPACE dateComparison # dataDate
               | dataValue SPACE dateTimeComparison # dataDatetime
@@ -205,8 +205,8 @@ placesComparison: places SPACE numberComparison # placesBasic
                 | places SPACE inListNumberComparison # placesList
                 | places SPACE inRangeNumberComparison # placesRange
                 ;
-tasksStateComparison: tasksState SPACE (NOT SPACE?)? op=EQ SPACE state=(ENABLED | DISABLED) ; // todo NAE-1997: in list/in range?? only 2 values
-tasksUserIdComparison: tasksUserId SPACE stringComparison ; // todo NAE-1997: in list/in range?? basicly objectIdComparison
+tasksStateComparison: tasksState SPACE (NOT SPACE?)? op=EQ SPACE state=(ENABLED | DISABLED) ;
+tasksUserIdComparison: tasksUserId SPACE stringComparison ;
 
 // basic comparisons
 objectIdComparison: (NOT SPACE?)? op=EQ SPACE STRING ;

@@ -1031,12 +1031,12 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String rightNumberAsString;
         if (ctx.inRangeNumberComparison().intRange() != null) {
             leftEndpointOpen = ctx.inRangeNumberComparison().intRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-            rightEndpointOpen = ctx.inRangeNumberComparison().intRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeNumberComparison().intRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
             leftNumberAsString = ctx.inRangeNumberComparison().intRange().INT(0).getText();
             rightNumberAsString = ctx.inRangeNumberComparison().intRange().INT(1).getText();
         } else {
             leftEndpointOpen = ctx.inRangeNumberComparison().doubleRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-            rightEndpointOpen = ctx.inRangeNumberComparison().doubleRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeNumberComparison().doubleRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
             leftNumberAsString = ctx.inRangeNumberComparison().doubleRange().DOUBLE(0).getText();
             rightNumberAsString = ctx.inRangeNumberComparison().doubleRange().DOUBLE(1).getText();
         }
