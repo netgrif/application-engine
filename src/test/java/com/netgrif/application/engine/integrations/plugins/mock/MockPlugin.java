@@ -1,10 +1,16 @@
 package com.netgrif.application.engine.integrations.plugins.mock;
 
 import com.google.protobuf.ByteString;
-import com.netgrif.pluginlibrary.core.*;
+import com.netgrif.pluginlibrary.core.domain.EntryPoint;
+import com.netgrif.pluginlibrary.core.domain.Method;
+import com.netgrif.pluginlibrary.core.domain.Plugin;
+import com.netgrif.pluginlibrary.core.utils.AbstractObjectParser;
+import com.netgrif.pluginlibrary.service.services.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import org.apache.commons.lang3.SerializationUtils;
+
+import java.util.List;
+import java.util.Map;
 
 public class MockPlugin {
 
@@ -21,20 +27,24 @@ public class MockPlugin {
                 .usePlaintext()
                 .build();
 
-        RegistrationServiceGrpc.RegistrationServiceBlockingStub stub = RegistrationServiceGrpc.newBlockingStub(channel);
+        PluginRegistrationServiceGrpc.PluginRegistrationServiceBlockingStub stub = PluginRegistrationServiceGrpc.newBlockingStub(channel);
+        Plugin plugin = Plugin.builder()
+                .identifier(mockIdentifier)
+                .name(mockName)
+                .url("mockurl")
+                .port(1)
+                .entryPoints(Map.of(
+                        "epName", EntryPoint.builder()
+                                .name(mockEntryPointName)
+                                .methods(Map.of(mockMethodName, Method.builder()
+                                        .name(mockMethodName)
+                                        .argTypes(List.of(mockArgumentType))
+                                        .build()))
+                                .build()
+                ))
+                .build();
         stub.register(RegistrationRequest.newBuilder()
-                .setIdentifier(mockIdentifier)
-                .setName(mockName)
-                .setUrl("mockurl")
-                .setPort(9999)
-                .addEntryPoints(EntryPoint.newBuilder()
-                        .setName(mockEntryPointName)
-                        .addMethods(Method.newBuilder()
-                                .setName(mockMethodName)
-                                .addArgs(mockArgumentType.getName())
-                                .setReturnType(mockOutputType.getName())
-                                .build())
-                        .build())
+                .setPlugin(ByteString.copyFrom(AbstractObjectParser.serialize(plugin)))
                 .build());
         channel.shutdown();
     }
@@ -45,7 +55,7 @@ public class MockPlugin {
                 .usePlaintext()
                 .build();
 
-        RegistrationServiceGrpc.RegistrationServiceBlockingStub stub = RegistrationServiceGrpc.newBlockingStub(channel);
+        PluginRegistrationServiceGrpc.PluginRegistrationServiceBlockingStub stub = PluginRegistrationServiceGrpc.newBlockingStub(channel);
         stub.register(request);
         channel.shutdown();
     }
@@ -56,7 +66,7 @@ public class MockPlugin {
                 .usePlaintext()
                 .build();
 
-        RegistrationServiceGrpc.RegistrationServiceBlockingStub stub = RegistrationServiceGrpc.newBlockingStub(channel);
+        PluginRegistrationServiceGrpc.PluginRegistrationServiceBlockingStub stub = PluginRegistrationServiceGrpc.newBlockingStub(channel);
         stub.unregister(UnregistrationRequest.newBuilder()
                 .setIdentifier(mockIdentifier)
                 .build());
@@ -69,7 +79,7 @@ public class MockPlugin {
                 .usePlaintext()
                 .build();
 
-        RegistrationServiceGrpc.RegistrationServiceBlockingStub stub = RegistrationServiceGrpc.newBlockingStub(channel);
+        PluginRegistrationServiceGrpc.PluginRegistrationServiceBlockingStub stub = PluginRegistrationServiceGrpc.newBlockingStub(channel);
         stub.unregister(request);
         channel.shutdown();
     }
@@ -80,7 +90,7 @@ public class MockPlugin {
                 .usePlaintext()
                 .build();
 
-        RegistrationServiceGrpc.RegistrationServiceBlockingStub stub = RegistrationServiceGrpc.newBlockingStub(channel);
+        PluginRegistrationServiceGrpc.PluginRegistrationServiceBlockingStub stub = PluginRegistrationServiceGrpc.newBlockingStub(channel);
         stub.deactivate(DeactivationRequest.newBuilder()
                 .setIdentifier(mockIdentifier)
                 .build());
@@ -93,7 +103,7 @@ public class MockPlugin {
                 .usePlaintext()
                 .build();
 
-        RegistrationServiceGrpc.RegistrationServiceBlockingStub stub = RegistrationServiceGrpc.newBlockingStub(channel);
+        PluginRegistrationServiceGrpc.PluginRegistrationServiceBlockingStub stub = PluginRegistrationServiceGrpc.newBlockingStub(channel);
         stub.deactivate(request);
         channel.shutdown();
     }

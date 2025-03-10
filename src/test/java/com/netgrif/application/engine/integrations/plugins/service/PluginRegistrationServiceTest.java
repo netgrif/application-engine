@@ -1,19 +1,24 @@
 package com.netgrif.application.engine.integrations.plugins.service;
 
+import com.google.protobuf.ByteString;
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.integration.plugins.utils.PluginUtils;
 import com.netgrif.application.engine.integrations.plugins.mock.MockPlugin;
-import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.core.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ImportHelper;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.QCase;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.QCase;
+import com.netgrif.core.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import com.netgrif.pluginlibrary.core.*;
+import com.netgrif.pluginlibrary.core.domain.EntryPoint;
+import com.netgrif.pluginlibrary.core.domain.Method;
+import com.netgrif.pluginlibrary.core.domain.Plugin;
+import com.netgrif.pluginlibrary.core.utils.AbstractObjectParser;
+import com.netgrif.pluginlibrary.service.services.*;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +30,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static com.netgrif.application.engine.integration.plugins.utils.PluginUtils.*;
@@ -47,7 +53,7 @@ public class PluginRegistrationServiceTest {
     private IPetriNetService petriNetService;
 
     @Autowired
-    private IUserService userService;
+    private UserService userService;
 
     @Autowired
     private ITaskService taskService;
@@ -203,22 +209,27 @@ public class PluginRegistrationServiceTest {
     public void testRegistrationWithOverloadingMethods() throws InterruptedException {
         String pluginIdentifier = "identifier";
 
+        Plugin plugin = Plugin.builder()
+                .identifier(pluginIdentifier)
+                .name("pluginName")
+                .url("url")
+                .port(1)
+                .entryPoints(Map.of(
+                    "epName", EntryPoint.builder()
+                        .name("epName")
+                        .methods(Map.of("method1", Method.builder()
+                                .name("method1")
+                                .argTypes(List.of(Integer.class))
+                                .build(), "method2", Method.builder()
+                                .name("method2")
+                                .argTypes(List.of(Double.class))
+                                .build()))
+                        .build()
+                    ))
+                .build();
+
         RegistrationRequest req = RegistrationRequest.newBuilder()
-                .setIdentifier(pluginIdentifier)
-                .setName("pluginName")
-                .setUrl("url")
-                .setPort(1)
-                .addEntryPoints(EntryPoint.newBuilder()
-                        .setName("epName")
-                        .addMethods(Method.newBuilder()
-                                .setName("method1")
-                                .addArgs(Integer.class.getName())
-                                .build())
-                        .addMethods(Method.newBuilder()
-                                .setName("method1")
-                                .addArgs(Double.class.getName())
-                                .build())
-                        .build())
+                .setPlugin(ByteString.copyFrom(AbstractObjectParser.serialize(plugin)))
                 .build();
 
         MockPlugin.registerOrActivateWithCustomRequest(req);
@@ -241,64 +252,79 @@ public class PluginRegistrationServiceTest {
 
     @Test
     public void testRegistrationWithCorruptIdentifier() {
+        Plugin plugin = Plugin.builder()
+                .identifier("")
+                .name("name")
+                .url("url")
+                .port(1)
+                .build();
         RegistrationRequest corruptReq = RegistrationRequest.newBuilder()
-                .setIdentifier("")
-                .setName("name")
-                .setUrl("url")
-                .setPort(1)
+                .setPlugin(ByteString.copyFrom(AbstractObjectParser.serialize(plugin)))
                 .build();
         assertCorruptRegistrationRequest(corruptReq);
     }
 
     @Test
     public void testRegistrationWithCorruptName() {
+        Plugin plugin = Plugin.builder()
+                .identifier("identifier")
+                .name("")
+                .url("url")
+                .port(1)
+                .build();
         RegistrationRequest corruptReq = RegistrationRequest.newBuilder()
-                .setIdentifier("identifier")
-                .setName("")
-                .setUrl("url")
-                .setPort(1)
+                .setPlugin(ByteString.copyFrom(AbstractObjectParser.serialize(plugin)))
                 .build();
         assertCorruptRegistrationRequest(corruptReq);
     }
 
     @Test
     public void testRegistrationWithCorruptUrl() {
+        Plugin plugin = Plugin.builder()
+                .identifier("identifier")
+                .name("name")
+                .url("")
+                .port(1)
+                .build();
         RegistrationRequest corruptReq = RegistrationRequest.newBuilder()
-                .setIdentifier("identifier")
-                .setName("name")
-                .setUrl("")
-                .setPort(1)
+                .setPlugin(ByteString.copyFrom(AbstractObjectParser.serialize(plugin)))
                 .build();
         assertCorruptRegistrationRequest(corruptReq);
     }
 
     @Test
     public void testRegistrationWithCorruptEntryPointName() {
+        Plugin plugin = Plugin.builder()
+                .identifier("")
+                .name("name")
+                .url("url")
+                .port(1)
+                .entryPoints(Map.of("name", EntryPoint.builder()
+                        .name("")
+                        .build()))
+                .build();
         RegistrationRequest corruptReq = RegistrationRequest.newBuilder()
-                .setIdentifier("identifier")
-                .setName("name")
-                .setUrl("url")
-                .setPort(1)
-                .addEntryPoints(EntryPoint.newBuilder()
-                        .setName("")
-                        .build())
+                .setPlugin(ByteString.copyFrom(AbstractObjectParser.serialize(plugin)))
                 .build();
         assertCorruptRegistrationRequest(corruptReq);
     }
 
     @Test
     public void testRegistrationWithCorruptMethodName() {
+        Plugin plugin = Plugin.builder()
+                .identifier("")
+                .name("name")
+                .url("url")
+                .port(1)
+                .entryPoints(Map.of("name", EntryPoint.builder()
+                                .name("name")
+                                .methods(Map.of("name", Method.builder()
+                                                .name("")
+                                        .build()))
+                        .build()))
+                .build();
         RegistrationRequest corruptReq = RegistrationRequest.newBuilder()
-                .setIdentifier("identifier")
-                .setName("name")
-                .setUrl("url")
-                .setPort(1)
-                .addEntryPoints(EntryPoint.newBuilder()
-                        .setName("name")
-                        .addMethods(Method.newBuilder()
-                                .setName("")
-                                .build())
-                        .build())
+                .setPlugin(ByteString.copyFrom(AbstractObjectParser.serialize(plugin)))
                 .build();
         assertCorruptRegistrationRequest(corruptReq);
     }

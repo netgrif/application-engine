@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.integrations.plugins.outcomes;
 
-import com.netgrif.application.engine.integration.plugins.outcomes.CreateOrUpdateOutcome;
+import com.netgrif.pluginlibrary.core.outcomes.CreateOrUpdateOutcome;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;

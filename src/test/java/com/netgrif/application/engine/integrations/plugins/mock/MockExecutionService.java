@@ -1,9 +1,7 @@
 package com.netgrif.application.engine.integrations.plugins.mock;
 
 import com.google.protobuf.ByteString;
-import com.netgrif.pluginlibrary.core.ExecutionRequest;
-import com.netgrif.pluginlibrary.core.ExecutionResponse;
-import com.netgrif.pluginlibrary.core.ExecutionServiceGrpc;
+import com.netgrif.pluginlibrary.service.services.*;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
@@ -15,7 +13,7 @@ import javax.annotation.PreDestroy;
 import java.io.IOException;
 
 @Service
-public class MockExecutionService extends ExecutionServiceGrpc.ExecutionServiceImplBase {
+public class MockExecutionService extends PluginExecutionServiceGrpc.PluginExecutionServiceImplBase {
 
     public static final int port = 8090;
     private Server server;

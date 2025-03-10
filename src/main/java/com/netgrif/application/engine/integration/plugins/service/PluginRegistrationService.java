@@ -2,14 +2,13 @@ package com.netgrif.application.engine.integration.plugins.service;
 
 import com.netgrif.application.engine.integration.plugins.exceptions.InvalidRequestException;
 import com.netgrif.application.engine.integration.plugins.exceptions.PluginIsAlreadyActiveException;
-import com.netgrif.pluginlibrary.core.*;
 import com.netgrif.pluginlibrary.core.domain.EntryPoint;
 import com.netgrif.pluginlibrary.core.domain.Method;
 import com.netgrif.pluginlibrary.core.domain.Plugin;
 import com.netgrif.pluginlibrary.core.utils.AbstractObjectParser;
+import com.netgrif.pluginlibrary.service.services.*;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
-import io.grpc.stub.AbstractAsyncStub;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +17,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 /**
- * Implementation of {@link com.netgrif.pluginlibrary.core.PluginRegistrationServiceGrpc.PluginRegistrationServiceImplBase}. This
+ * Implementation of {@link com.netgrif.pluginlibrary.service.services.PluginRegistrationServiceGrpc.PluginRegistrationServiceImplBase}. This
  * serves as gRPC controller, that provides remotely executable functions.
  * */
 @Slf4j
@@ -42,7 +41,7 @@ public final class PluginRegistrationService extends PluginRegistrationServiceGr
         Plugin plugin = (Plugin) AbstractObjectParser.deserialize(request.getPlugin().toByteArray());
         try {
             validateRequest(plugin);
-            String responseMsg = pluginService.registerOrActivate(request);
+            String responseMsg = pluginService.registerOrActivate(plugin);
             RegistrationResponse response = RegistrationResponse.newBuilder().setMessage(responseMsg).build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();

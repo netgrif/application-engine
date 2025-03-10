@@ -19,7 +19,7 @@ import com.netgrif.core.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import com.netgrif.pluginlibrary.core.*;
+import com.netgrif.pluginlibrary.service.services.*;
 import com.netgrif.pluginlibrary.core.domain.EntryPoint;
 import com.netgrif.pluginlibrary.core.domain.Method;
 import com.netgrif.pluginlibrary.core.domain.Plugin;
@@ -146,7 +146,7 @@ public class PluginService implements IPluginService {
                 .usePlaintext()
                 .build();
         List<ByteString> argBytes = Arrays.stream(args).map(PluginUtils::serializeObject).collect(Collectors.toList());
-        ExecutionServiceGrpc.ExecutionServiceBlockingStub stub = ExecutionServiceGrpc.newBlockingStub(channel);
+        PluginExecutionServiceGrpc.PluginExecutionServiceBlockingStub stub = PluginExecutionServiceGrpc.newBlockingStub(channel);
         ExecutionResponse responseMessage = stub.execute(ExecutionRequest.newBuilder()
                 .setEntryPoint(entryPoint)
                 .setMethod(method)

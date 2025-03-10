@@ -425,13 +425,6 @@
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>3.19.6</version>
-        </dependency>
-
         <!-- Drools -->
 <!--        <dependency>-->
 <!--            <groupId>org.kie</groupId>-->
@@ -616,7 +609,7 @@
             <extension>
                 <groupId>kr.motd.maven</groupId>
                 <artifactId>os-maven-plugin</artifactId>
-                <version>1.6.1</version>
+                <version>1.7.1</version>
             </extension>
         </extensions>
         <resources>
@@ -790,7 +783,7 @@
                     <detectJavaApiLink>false</detectJavaApiLink>
                     <failOnWarnings>false</failOnWarnings>
                     <quiet>true</quiet>
-                    <sourcepath>src/main/java;target/generated-sources/groovy-stubs/main;target/generated-sources/java
+                    <sourcepath>src/main/java;target/generated-sources/groovy-stubs/main;target/generated-sources/java;target/generated-sources/protobuf
                     </sourcepath>
                     <additionalOptions>
                         <additionalOption>-Xdoclint:none</additionalOption>
