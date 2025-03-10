@@ -113,7 +113,7 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery("process: version in <1.1.1 : 2.2.2>").getFullMongoQuery();
+        actual = evaluateQuery("process: version in [1.1.1 : 2.2.2]").getFullMongoQuery();
         builder = new BooleanBuilder();
         builder.and(QPetriNet.petriNet.version.major.goe(1)
                 .or(QPetriNet.petriNet.version.major.eq(1L).and(QPetriNet.petriNet.version.minor.goe(1)))
@@ -125,7 +125,7 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery("process: version not in (1.1.1 : 2.2.2>").getFullMongoQuery();
+        actual = evaluateQuery("process: version not in (1.1.1 : 2.2.2]").getFullMongoQuery();
         builder = new BooleanBuilder();
         builder.and(QPetriNet.petriNet.version.major.gt(1)
                 .or(QPetriNet.petriNet.version.major.eq(1L).and(QPetriNet.petriNet.version.minor.gt(1)))
@@ -1590,12 +1590,12 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery(String.format("%s: %s in <'test1' : 'test2'>", resource, attribute)).getFullMongoQuery();
+        actual = evaluateQuery(String.format("%s: %s in ['test1' : 'test2']", resource, attribute)).getFullMongoQuery();
         expected = stringPath.goe("test1").and(stringPath.loe("test2"));
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery(String.format("%s: %s not in ('test1' : 'test2'>", resource, attribute)).getFullMongoQuery();
+        actual = evaluateQuery(String.format("%s: %s not in ('test1' : 'test2']", resource, attribute)).getFullMongoQuery();
         expected = stringPath.gt("test1").and(stringPath.loe("test2")).not();
 
         compareMongoQueries(mongoDbUtils, actual, expected);
@@ -1649,12 +1649,12 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery(String.format("%s: %s in <2011-12-03T10:15:30 : 2011-12-03T11:15:30>", resource, attribute)).getFullMongoQuery();
+        actual = evaluateQuery(String.format("%s: %s in [2011-12-03T10:15:30 : 2011-12-03T11:15:30]", resource, attribute)).getFullMongoQuery();
         expected = dateTimePath.goe(date1).and(dateTimePath.loe(date2));
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery(String.format("%s: %s not in (2011-12-03T10:15:30 : 2011-12-03T11:15:30>", resource, attribute)).getFullMongoQuery();
+        actual = evaluateQuery(String.format("%s: %s not in (2011-12-03T10:15:30 : 2011-12-03T11:15:30]", resource, attribute)).getFullMongoQuery();
         expected = dateTimePath.gt(date1).and(dateTimePath.loe(date2)).not();
 
         compareMongoQueries(mongoDbUtils, actual, expected);
@@ -1674,12 +1674,12 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery(String.format("%s: %s in <2011-12-03 : 2011-12-03>", resource, attribute)).getFullMongoQuery();
+        actual = evaluateQuery(String.format("%s: %s in [2011-12-03 : 2011-12-03]", resource, attribute)).getFullMongoQuery();
         expected = dateTimePath.goe(date4).and(dateTimePath.loe(date5));
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
-        actual = evaluateQuery(String.format("%s: %s not in (2011-12-03 : 2011-12-03>", resource, attribute)).getFullMongoQuery();
+        actual = evaluateQuery(String.format("%s: %s not in (2011-12-03 : 2011-12-03]", resource, attribute)).getFullMongoQuery();
         expected = dateTimePath.gt(date4).and(dateTimePath.loe(date5)).not();
 
         compareMongoQueries(mongoDbUtils, actual, expected);

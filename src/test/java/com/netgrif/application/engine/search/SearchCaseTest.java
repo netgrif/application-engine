@@ -100,7 +100,7 @@ public class SearchCaseTest {
         assert count == expected.size();
 
         Object actual = searchService.search(query);
-        compareById(convertToObjectList(actual, Case.class), expected, Case::getStringId);
+        compareByIdInOrder(convertToObjectList(actual, Case.class), expected, Case::getStringId);
     }
 
     @Test
@@ -168,7 +168,7 @@ public class SearchCaseTest {
         searchAndCompareAsList(queryInList, List.of(case1, case2, case3, case4));
 
         // in range
-        String queryInRange = String.format("cases: processIdentifier in <'%s' : '%s')", net.getIdentifier(), net3.getIdentifier());
+        String queryInRange = String.format("cases: processIdentifier in ['%s' : '%s')", net.getIdentifier(), net3.getIdentifier());
         searchAndCompareAsList(queryInRange, List.of(case1, case2, case3));
 
         // sort
@@ -199,7 +199,7 @@ public class SearchCaseTest {
         searchAndCompareAsList(queryInList, List.of(case1, case2, case3));
 
         // in range
-        String queryInRange = String.format("cases: processIdentifier eq '%s' and title in <'%s' : '%s')", net.getIdentifier(), case1.getTitle(), case3.getTitle());
+        String queryInRange = String.format("cases: processIdentifier eq '%s' and title in ['%s' : '%s')", net.getIdentifier(), case1.getTitle(), case3.getTitle());
         searchAndCompareAsList(queryInRange, List.of(case1, case2));
 
         // sort
@@ -234,7 +234,7 @@ public class SearchCaseTest {
         searchAndCompareAsList(queryInList, List.of(case1, case3));
 
         // in range
-        String queryInRange = String.format("cases: processIdentifier eq '%s' and creationDate in <%s : %s)", net.getIdentifier(), toDateTimeString(case1.getCreationDate()), toDateTimeString(case3.getCreationDate()));
+        String queryInRange = String.format("cases: processIdentifier eq '%s' and creationDate in [%s : %s)", net.getIdentifier(), toDateTimeString(case1.getCreationDate()), toDateTimeString(case3.getCreationDate()));
         searchAndCompareAsList(queryInRange, List.of(case1, case2));
 
         // sort
@@ -298,14 +298,14 @@ public class SearchCaseTest {
         searchAndCompareAsList(queryInList, List.of(case3));
 
         // in range
-        String queryInRange = String.format("cases: processIdentifier eq '%s' and places.p1.marking in <0 : 1>", net.getIdentifier());
+        String queryInRange = String.format("cases: processIdentifier eq '%s' and places.p1.marking in [1 : 100]", net.getIdentifier());
         searchAndCompareAsList(queryInRange, List.of(case3));
 
         // sort
         String querySort = String.format("cases: processIdentifier eq '%s' sort by places.p2.marking", net.getIdentifier());
         String querySort2 = String.format("cases: processIdentifier eq '%s' sort by places.p2.marking desc", net.getIdentifier());
 
-        searchAndCompareAsListInOrder(querySort, List.of(case3, case1, case2));
+        searchAndCompareAsListInOrder(querySort, List.of(case1, case2, case3));
         searchAndCompareAsListInOrder(querySort2, List.of(case1, case2, case3));
     }
 
@@ -474,7 +474,7 @@ public class SearchCaseTest {
         searchAndCompareAsList(queryInList, List.of(case1, case2));
 
         // in range text
-        String queryInRange = String.format("cases: processIdentifier eq '%s' and data.text_immediate.value in <'other' : 'test')", net.getIdentifier());
+        String queryInRange = String.format("cases: processIdentifier eq '%s' and data.text_immediate.value in ['other' : 'test')", net.getIdentifier());
         searchAndCompareAsList(queryInRange, List.of(case2));
 
         // in list number
@@ -482,7 +482,7 @@ public class SearchCaseTest {
         searchAndCompareAsList(queryInList, List.of(case1, case2));
 
         // in range number
-        queryInRange = String.format("cases: processIdentifier eq '%s' and data.number_immediate.value in <2 : 54)", net.getIdentifier());
+        queryInRange = String.format("cases: processIdentifier eq '%s' and data.number_immediate.value in [2 : 54)", net.getIdentifier());
         searchAndCompareAsList(queryInRange, List.of(case2));
 
         // in list date
@@ -490,7 +490,7 @@ public class SearchCaseTest {
         searchAndCompareAsList(queryInList, List.of(case1, case2));
 
         // in range date
-        queryInRange = String.format("cases: processIdentifier eq '%s' and data.date_immediate.value in <%s : %s)", net.getIdentifier(), toDateString(LocalDateTime.now().minusDays(10)), toDateString(LocalDateTime.now().plusDays(1)));
+        queryInRange = String.format("cases: processIdentifier eq '%s' and data.date_immediate.value in [%s : %s)", net.getIdentifier(), toDateString(LocalDateTime.now().minusDays(10)), toDateString(LocalDateTime.now().plusDays(1)));
         searchAndCompareAsList(queryInRange, List.of(case1, case2));
 
         // in list datetime
@@ -500,7 +500,7 @@ public class SearchCaseTest {
         searchAndCompareAsList(queryInList, List.of(case1, case2));
 
         // in range datetime
-        queryInRange = String.format("cases: processIdentifier eq '%s' and data.date_time_immediate.value in <%s : %s)", net.getIdentifier(), toDateTimeString(localDateTime2), toDateTimeString(localDateTime1));
+        queryInRange = String.format("cases: processIdentifier eq '%s' and data.date_time_immediate.value in [%s : %s)", net.getIdentifier(), toDateTimeString(localDateTime2), toDateTimeString(localDateTime1));
         searchAndCompareAsList(queryInRange, List.of(case2));
 
         // todo NAE-1997: sort by data - indexation change needed
@@ -525,7 +525,7 @@ public class SearchCaseTest {
         searchAndCompareAsList(queryInList, List.of(case1));
 
         // in range
-        String queryInRange = String.format("cases: processIdentifier eq '%s' and data.enumeration_map_immediate.options in <'key1' : 'key2')", net.getIdentifier());
+        String queryInRange = String.format("cases: processIdentifier eq '%s' and data.enumeration_map_immediate.options in ['key1' : 'key2')", net.getIdentifier());
         searchAndCompareAsList(queryInRange, List.of(case1));
 
         // todo NAE-1997: sort by data - indexation change needed

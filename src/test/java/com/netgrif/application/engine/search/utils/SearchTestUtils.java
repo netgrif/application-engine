@@ -51,7 +51,7 @@ public class SearchTestUtils {
                 .map(getId)
                 .collect(Collectors.toList());
 
-        assert actualIds.containsAll(expectedIds);
+        assert actualIds.equals(expectedIds);
 
         int lastIndex = -1;
         for (String expectedId : expectedIds) {

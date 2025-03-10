@@ -298,12 +298,12 @@ doubleList: '(' SPACE? (DOUBLE SPACE? (',' SPACE? DOUBLE SPACE? )* )? SPACE? ')'
 dateList: '(' SPACE? (DATE SPACE? (',' SPACE? DATE SPACE? )* )? SPACE? ')' ;
 dateTimeList: '(' SPACE? (DATETIME SPACE? (',' SPACE? DATETIME SPACE? )* )? SPACE? ')' ;
 versionList: '(' SPACE? (VERSION_NUMBER SPACE? (',' SPACE? VERSION_NUMBER SPACE? )* )? SPACE? ')' ;
-stringRange: leftEndpoint=('(' | '<') SPACE? STRING SPACE? ':' SPACE? STRING SPACE? rightEndpoint=(')' | '>') ;
-intRange: leftEndpoint=('(' | '<') SPACE? INT SPACE? ':' SPACE? INT SPACE? rightEndpoint=(')' | '>') ;
-doubleRange: leftEndpoint=('(' | '<') SPACE? DOUBLE SPACE? ':' SPACE? DOUBLE SPACE? rightEndpoint=(')' | '>') ;
-dateRange: leftEndpoint=('(' | '<') SPACE? DATE SPACE? ':' SPACE? DATE SPACE? rightEndpoint=(')' | '>') ;
-dateTimeRange: leftEndpoint=('(' | '<') SPACE? DATETIME SPACE? ':' SPACE? DATETIME SPACE? rightEndpoint=(')' | '>') ;
-versionRange: leftEndpoint=('(' | '<') SPACE? VERSION_NUMBER SPACE? ':' SPACE? VERSION_NUMBER SPACE? rightEndpoint=(')' | '>') ;
+stringRange: leftEndpoint=('(' | '[') SPACE? STRING SPACE? ':' SPACE? STRING SPACE? rightEndpoint=(')' | ']') ;
+intRange: leftEndpoint=('(' | '[') SPACE? INT SPACE? ':' SPACE? INT SPACE? rightEndpoint=(')' | ']') ;
+doubleRange: leftEndpoint=('(' | '[') SPACE? DOUBLE SPACE? ':' SPACE? DOUBLE SPACE? rightEndpoint=(')' | ']') ;
+dateRange: leftEndpoint=('(' | '[') SPACE? DATE SPACE? ':' SPACE? DATE SPACE? rightEndpoint=(')' | ']') ;
+dateTimeRange: leftEndpoint=('(' | '[') SPACE? DATETIME SPACE? ':' SPACE? DATETIME SPACE? rightEndpoint=(')' | ']') ;
+versionRange: leftEndpoint=('(' | '[') SPACE? VERSION_NUMBER SPACE? ':' SPACE? VERSION_NUMBER SPACE? rightEndpoint=(')' | ']') ;
 STRING: '\'' (~('\'' | '\r' | '\n'))* '\'' ; // todo NAE-1997: escape???
 INT: DIGIT+ ;
 DOUBLE: DIGIT+ '.' DIGIT+ ;

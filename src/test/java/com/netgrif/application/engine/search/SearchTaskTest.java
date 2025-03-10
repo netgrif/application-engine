@@ -10,6 +10,7 @@ import com.netgrif.application.engine.search.interfaces.ISearchService;
 import com.netgrif.application.engine.search.utils.SearchUtils;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.State;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +23,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.netgrif.application.engine.search.utils.SearchTestUtils.*;
 
 @Slf4j
 @SpringBootTest
@@ -67,81 +71,66 @@ public class SearchTaskTest {
         return importHelper.createUser(user, authorities, processRoles);
     }
 
+    private void searchAndCompare(String query, Task expectedResult) {
+        long count = searchService.count(query);
+        assert count == 1;
 
-    private static Task convertToTask(Object taskObject) {
-        assert taskObject instanceof Task;
-        return (Task) taskObject;
+        Object actual = searchService.search(query);
+        compareById(convertToObject(actual, Task.class), expectedResult, Task::getStringId);
     }
 
-    private static List<Task> convertToTaskList(Object taskListObject) {
-        assert taskListObject instanceof List<?>;
-        for (Object taskObject : (List<?>) taskListObject) {
-            assert taskObject instanceof Task;
-        }
+    private void searchAndCompare(String query, List<Task> expected) {
+        long count = searchService.count(query);
+        assert count == expected.size();
 
-        return (List<Task>) taskListObject;
+        Object actual = searchService.search(query);
+        compareById(convertToObject(actual, Task.class), expected, Task::getStringId);
     }
 
-    private void compareTasks(Task actual, Task expected) {
-        assert actual.getStringId().equals(expected.getStringId());
+    private void searchAndCompareAsList(String query, List<Task> expected) {
+        long count = searchService.count(query);
+        assert count == expected.size();
+
+        Object actual = searchService.search(query);
+        compareById(convertToObjectList(actual, Task.class), expected, Task::getStringId);
     }
 
-    private void compareTasks(Task actual, List<Task> expected) {
-        List<String> expectedStringIds = expected.stream().map(Task::getStringId).collect(Collectors.toList());
+    private void searchAndCompareAsListInOrder(String query, List<Task> expected) {
+        long count = searchService.count(query);
+        assert count == expected.size();
 
-        assert expectedStringIds.contains(actual.getStringId());
-    }
-
-    private void compareTasks(List<Task> actual, List<Task> expected) {
-        List<String> actualStringIds = actual.stream().map(Task::getStringId).collect(Collectors.toList());
-        List<String> expectedStringIds = expected.stream().map(Task::getStringId).collect(Collectors.toList());
-
-        assert actualStringIds.containsAll(expectedStringIds);
+        Object actual = searchService.search(query);
+        compareByIdInOrder(convertToObjectList(actual, Task.class), expected, Task::getStringId);
     }
 
     @Test
     public void testSearchById() {
         PetriNet net = importPetriNet("search/search_test.xml");
-
         Case caze = importHelper.createCase("Search Test", net);
-
         String taskId = caze.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task = taskService.findOne(taskId);
 
         String query = String.format("task: id eq '%s'", taskId);
 
-        long count = searchService.count(query);
-        assert count == 1;
-
-        Object foundTask = searchService.search(query);
-        compareTasks(convertToTask(foundTask), task);
+        searchAndCompare(query, task);
     }
 
     @Test
     public void testSearchByTransitionId() {
         PetriNet net = importPetriNet("search/search_test.xml");
         PetriNet net2 = importPetriNet("search/search_test2.xml");
-
         Case caze = importHelper.createCase("Search Test", net);
         Case caze2 = importHelper.createCase("Search Test2", net2);
-
         String taskId = caze.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task = taskService.findOne(taskId);
-
         String task2Id = caze2.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task2 = taskService.findOne(task2Id);
 
         String query = String.format("task: transitionId eq '%s'", TEST_TRANSITION_ID);
         String queryMore = String.format("tasks: transitionId eq '%s'", TEST_TRANSITION_ID);
 
-        long count = searchService.count(query);
-        assert count == 2;
-
-        Object foundTask = searchService.search(query);
-        compareTasks(convertToTask(foundTask), List.of(task, task2));
-
-        Object foundTasks = searchService.search(queryMore);
-        compareTasks(convertToTaskList(foundTasks), List.of(task, task2));
+        searchAndCompare(query, List.of(task, task2));
+        searchAndCompareAsList(queryMore, List.of(task, task2));
     }
 
     @Test
@@ -150,7 +139,6 @@ public class SearchTaskTest {
         Case case1 = importHelper.createCase("Search Test", net);
         Case case2 = importHelper.createCase("Search Test", net);
         Case case3 = importHelper.createCase("Search Test2", net);
-
         String taskId = case1.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task = taskService.findOne(taskId);
         String task2Id = case2.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
@@ -158,85 +146,53 @@ public class SearchTaskTest {
         String task3Id = case3.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task3 = taskService.findOne(task3Id);
 
-        String query = String.format("task: title eq '%s'", task.getTitle());
-        String queryMore = String.format("tasks: title eq '%s'", task.getTitle());
+        String query = String.format("task: title eq '%s'", task.getTitle().getDefaultValue());
+        String queryMore = String.format("tasks: title eq '%s'", task.getTitle().getDefaultValue());
 
-        long count = searchService.count(query);
-        assert count == 3;
-
-        Object foundTask = searchService.search(query);
-        compareTasks(convertToTask(foundTask), List.of(task, task2, task3));
-
-        Object foundTasks = searchService.search(queryMore);
-        compareTasks(convertToTaskList(foundTasks), List.of(task, task2));
+        searchAndCompare(query, List.of(task, task2, task3));
+        searchAndCompareAsList(queryMore, List.of(task, task2, task3));
     }
 
     @Test
     public void testSearchByState() {
         PetriNet net = importPetriNet("search/search_test.xml");
-
         IUser user1 = createUser("Name1", "Surname1", "Email1", "user");
-
         Case case1 = importHelper.createCase("Search Test", net);
-        Case case2 = importHelper.createCase("Search Test", net);
-        Case case3 = importHelper.createCase("Search Test2", net);
-
         importHelper.assignTask("Test", case1.getStringId(), user1.transformToLoggedUser());
-        importHelper.finishTask("Test", case1.getStringId(), user1.transformToLoggedUser());
-        importHelper.assignTask("Test", case2.getStringId(), user1.transformToLoggedUser());
-        importHelper.finishTask("Test", case2.getStringId(), user1.transformToLoggedUser());
-
-        String taskId = case1.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
-        Task task = taskService.findOne(taskId);
-        String task2Id = case2.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
-        Task task2 = taskService.findOne(task2Id);
-        String task3Id = case3.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
-        Task task3 = taskService.findOne(task3Id);
-        String task4Id = case1.getTasks().get(TEST_TRANSITION2_ID).getTaskStringId();
-        Task task4 = taskService.findOne(task4Id);
-        String task5Id = case2.getTasks().get(TEST_TRANSITION2_ID).getTaskStringId();
-        Task task5 = taskService.findOne(task5Id);
-        String task6Id = case3.getTasks().get(TEST_TRANSITION2_ID).getTaskStringId();
-        Task task6 = taskService.findOne(task6Id);
+        case1 = importHelper.finishTask("Test", case1.getStringId(), user1.transformToLoggedUser()).getCase();
+        List<Task> case1Tasks = case1.getTasks().values().stream()
+                .map(taskPair -> taskService.findOne(taskPair.getTaskStringId()))
+                .collect(Collectors.toList());
+        List<Task> disabled = case1Tasks.stream()
+                .filter(task -> task.getState().equals(State.DISABLED))
+                .collect(Collectors.toList());
+        List<Task> enabled = case1Tasks.stream()
+                .filter(task -> task.getState().equals(State.ENABLED))
+                .collect(Collectors.toList());
 
         String query = String.format("task: processId eq '%s' and state eq %s", net.getStringId(), "disabled");
         String queryOther = String.format("tasks: processId eq '%s' and state eq %s", net.getStringId(), "enabled");
         String queryMore = String.format("tasks: processId eq '%s' and state eq %s", net.getStringId(), "disabled");
 
-        long count = searchService.count(query);
-        assert count == 4;
-
-        count = searchService.count(queryOther);
-        assert count == 5;
-
-        Object foundTask = searchService.search(query);
-        compareTasks(convertToTask(foundTask), List.of(task, task2, task4, task5));
-
-        Object foundTasks = searchService.search(queryOther);
-        compareTasks(convertToTaskList(foundTasks), List.of(task3, task6));
-
-        foundTasks = searchService.search(queryMore);
-        compareTasks(convertToTaskList(foundTasks), List.of(task, task2, task4, task5));
+        searchAndCompare(query, disabled);
+        searchAndCompareAsList(queryOther, enabled);
+        searchAndCompareAsList(queryMore, disabled);
     }
 
     @Test
     public void testSearchByUserId() {
         PetriNet net = importPetriNet("search/search_test.xml");
-
         IUser user1 = createUser("Name1", "Surname1", "Email1", "user");
         IUser user2 = createUser("Name2", "Surname2", "Email2", "user");
-
         Case case1 = importHelper.createCase("Search Test", net);
         Case case2 = importHelper.createCase("Search Test", net);
         Case case3 = importHelper.createCase("Search Test2", net);
-
         String taskId = case1.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task = taskService.findOne(taskId);
         String task2Id = case2.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task2 = taskService.findOne(task2Id);
         String task3Id = case3.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task3 = taskService.findOne(task3Id);
-
         importHelper.assignTask("Test", case1.getStringId(), user1.transformToLoggedUser());
         importHelper.assignTask("Test", case2.getStringId(), user1.transformToLoggedUser());
         importHelper.assignTask("Test", case3.getStringId(), user2.transformToLoggedUser());
@@ -245,169 +201,103 @@ public class SearchTaskTest {
         String queryOther = String.format("task: userId eq '%s'", user2.getStringId());
         String queryMore = String.format("tasks: userId eq '%s'", user1.getStringId());
 
-        long count = searchService.count(query);
-        assert count == 2;
-
-        count = searchService.count(queryOther);
-        assert count == 1;
-
-        Object foundTask = searchService.search(query);
-        compareTasks(convertToTask(foundTask), List.of(task, task2));
-
-        foundTask = searchService.search(queryOther);
-        compareTasks(convertToTask(foundTask), task3);
-
-        Object foundTasks = searchService.search(queryMore);
-        compareTasks(convertToTaskList(foundTasks), List.of(task, task2));
+        searchAndCompare(query, List.of(task, task2));
+        searchAndCompare(queryOther, List.of(task3));
+        searchAndCompareAsList(queryMore, List.of(task, task2));
     }
 
     @Test
     public void testSearchByCaseId() {
         PetriNet net = importPetriNet("search/search_test.xml");
-
         Case case1 = importHelper.createCase("Search Test", net);
         Case case2 = importHelper.createCase("Search Test", net);
-
-        String taskId = case1.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
-        Task task = taskService.findOne(taskId);
-        String task2Id = case1.getTasks().get(TEST_TRANSITION2_ID).getTaskStringId();
-        Task task2 = taskService.findOne(task2Id);
-        String task3Id = case2.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
-        Task task3 = taskService.findOne(task3Id);
-        String task4Id = case2.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
-        Task task4 = taskService.findOne(task4Id);
+        List<Task> case1Tasks = case1.getTasks().values().stream()
+                .map(taskPair -> taskService.findOne(taskPair.getTaskStringId()))
+                .collect(Collectors.toList());
+        List<Task> case2Tasks = case2.getTasks().values().stream()
+                .map(taskPair -> taskService.findOne(taskPair.getTaskStringId()))
+                .collect(Collectors.toList());
 
         String query = String.format("task: caseId eq '%s'", case1.getStringId());
         String queryOther = String.format("task: caseId eq '%s'", case2.getStringId());
         String queryMore = String.format("tasks: caseId eq '%s'", case1.getStringId());
 
-        long count = searchService.count(query);
-        assert count == 3;
-
-        count = searchService.count(queryOther);
-        assert count == 3;
-
-        Object foundTask = searchService.search(query);
-        compareTasks(convertToTask(foundTask), List.of(task, task2));
-
-        foundTask = searchService.search(queryOther);
-        compareTasks(convertToTask(foundTask), List.of(task3, task4));
-
-        Object foundTasks = searchService.search(queryMore);
-        compareTasks(convertToTaskList(foundTasks), List.of(task, task2));
+        searchAndCompare(query, case1Tasks);
+        searchAndCompare(queryOther, case2Tasks);
+        searchAndCompareAsList(queryMore, case1Tasks);
     }
 
     @Test
     public void testSearchByProcessId() {
         PetriNet net = importPetriNet("search/search_test.xml");
         PetriNet net2 = importPetriNet("search/search_test2.xml");
-
         Case case1 = importHelper.createCase("Search Test", net);
         Case case2 = importHelper.createCase("Search Test", net);
         Case case3 = importHelper.createCase("Search Test2", net2);
-
-        String taskId = case1.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
-        Task task = taskService.findOne(taskId);
-        String task2Id = case2.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
-        Task task2 = taskService.findOne(task2Id);
-        String task3Id = case3.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
-        Task task3 = taskService.findOne(task3Id);
+        List<Task> netTasks = case1.getTasks().values().stream()
+                .map(taskPair -> taskService.findOne(taskPair.getTaskStringId()))
+                .collect(Collectors.toList());
+        netTasks.addAll(case2.getTasks().values().stream()
+                .map(taskPair -> taskService.findOne(taskPair.getTaskStringId()))
+                .collect(Collectors.toList()));
+        List<Task> net2Tasks = case3.getTasks().values().stream()
+                .map(taskPair -> taskService.findOne(taskPair.getTaskStringId()))
+                .collect(Collectors.toList());
 
         String query = String.format("task: processId eq '%s'", net.getStringId());
         String queryOther = String.format("task: processId eq '%s'", net2.getStringId());
         String queryMore = String.format("tasks: processId eq '%s'", net.getStringId());
 
-        long count = searchService.count(query);
-        assert count == 6;
-
-        count = searchService.count(queryOther);
-        assert count == 2;
-
-        Object foundTask = searchService.search(query);
-        compareTasks(convertToTask(foundTask), List.of(task, task2));
-
-        foundTask = searchService.search(queryOther);
-        compareTasks(convertToTask(foundTask), task3);
-
-        Object foundTasks = searchService.search(queryMore);
-        compareTasks(convertToTaskList(foundTasks), List.of(task, task2));
+        searchAndCompare(query, netTasks);
+        searchAndCompare(queryOther, net2Tasks);
+        searchAndCompareAsList(queryMore, netTasks);
     }
 
     @Test
     public void testSearchByLastAssign() {
         PetriNet net = importPetriNet("search/search_test.xml");
-
         IUser user1 = createUser("Name1", "Surname1", "Email1", "user");
-
         Case case1 = importHelper.createCase("Search Test", net);
         Case case2 = importHelper.createCase("Search Test", net);
-
         LocalDateTime before = LocalDateTime.now();
         importHelper.assignTask("Test", case1.getStringId(), user1.transformToLoggedUser());
         importHelper.assignTask("Test", case2.getStringId(), user1.transformToLoggedUser());
-
         String taskId = case1.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task = taskService.findOne(taskId);
         String task2Id = case2.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task2 = taskService.findOne(task2Id);
 
         String query = String.format("task: lastAssign eq %s", SearchUtils.toDateTimeString(task.getLastAssigned()));
-        String queryBefore = String.format("task: lastAssign > %s", SearchUtils.toDateTimeString(before));
-        String queryMore = String.format("tasks: lastAssign > %s", SearchUtils.toDateTimeString(before));
+        String queryBefore = String.format("task: lastAssign gt %s", SearchUtils.toDateTimeString(before));
+        String queryMore = String.format("tasks: lastAssign gt %s", SearchUtils.toDateTimeString(before));
 
-        long count = searchService.count(query);
-        assert count == 1;
-
-        count = searchService.count(queryBefore);
-        assert count == 2;
-
-        Object foundTask = searchService.search(query);
-        compareTasks(convertToTask(foundTask), task);
-
-        foundTask = searchService.search(queryBefore);
-        compareTasks(convertToTask(foundTask), List.of(task, task2));
-
-        Object foundTasks = searchService.search(queryMore);
-        compareTasks(convertToTaskList(foundTasks), List.of(task, task2));
+        searchAndCompare(query, task);
+        searchAndCompare(queryBefore, List.of(task, task2));
+        searchAndCompareAsList(queryMore, List.of(task, task2));
     }
 
     @Test
     public void testSearchByLastFinish() {
         PetriNet net = importPetriNet("search/search_test.xml");
-
         IUser user1 = createUser("Name1", "Surname1", "Email1", "user");
-
         Case case1 = importHelper.createCase("Search Test", net);
         Case case2 = importHelper.createCase("Search Test", net);
-
         LocalDateTime before = LocalDateTime.now();
         importHelper.assignTask("Test", case1.getStringId(), user1.transformToLoggedUser());
         importHelper.finishTask("Test", case1.getStringId(), user1.transformToLoggedUser());
         importHelper.assignTask("Test", case2.getStringId(), user1.transformToLoggedUser());
         importHelper.finishTask("Test", case2.getStringId(), user1.transformToLoggedUser());
-
         String taskId = case1.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task = taskService.findOne(taskId);
         String task2Id = case2.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task2 = taskService.findOne(task2Id);
 
         String query = String.format("task: lastFinish eq %s", SearchUtils.toDateTimeString(task.getLastFinished()));
-        String queryBefore = String.format("task: lastFinish > %s", SearchUtils.toDateTimeString(before));
-        String queryMore = String.format("tasks: lastFinish > %s", SearchUtils.toDateTimeString(before));
+        String queryBefore = String.format("task: lastFinish gt %s", SearchUtils.toDateTimeString(before));
+        String queryMore = String.format("tasks: lastFinish gt %s", SearchUtils.toDateTimeString(before));
 
-        long count = searchService.count(query);
-        assert count == 1;
-
-        count = searchService.count(queryBefore);
-        assert count == 2;
-
-        Object foundTask = searchService.search(query);
-        compareTasks(convertToTask(foundTask), task);
-
-        foundTask = searchService.search(queryBefore);
-        compareTasks(convertToTask(foundTask), List.of(task, task2));
-
-        Object foundTasks = searchService.search(queryMore);
-        compareTasks(convertToTaskList(foundTasks), List.of(task, task2));
+        searchAndCompare(query, task);
+        searchAndCompare(queryBefore, List.of(task, task2));
+        searchAndCompareAsList(queryMore, List.of(task, task2));
     }
 }
