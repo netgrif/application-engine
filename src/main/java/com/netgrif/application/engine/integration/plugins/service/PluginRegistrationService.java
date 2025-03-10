@@ -6,7 +6,7 @@ import com.netgrif.pluginlibrary.core.domain.EntryPoint;
 import com.netgrif.pluginlibrary.core.domain.Method;
 import com.netgrif.pluginlibrary.core.domain.Plugin;
 import com.netgrif.pluginlibrary.core.utils.AbstractObjectParser;
-import com.netgrif.pluginlibrary.service.services.*;
+import com.netgrif.pluginlibrary.services.service.*;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
@@ -17,7 +17,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 /**
- * Implementation of {@link com.netgrif.pluginlibrary.service.services.PluginRegistrationServiceGrpc.PluginRegistrationServiceImplBase}. This
+ * Implementation of {@link com.netgrif.pluginlibrary.services.service.PluginRegistrationServiceGrpc.PluginRegistrationServiceImplBase}. This
  * serves as gRPC controller, that provides remotely executable functions.
  * */
 @Slf4j

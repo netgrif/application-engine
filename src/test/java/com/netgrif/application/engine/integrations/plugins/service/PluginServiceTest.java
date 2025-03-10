@@ -3,7 +3,7 @@ package com.netgrif.application.engine.integrations.plugins.service;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.integration.plugins.service.IPluginService;
 import com.netgrif.application.engine.integrations.plugins.mock.MockExecutionService;
-import com.netgrif.pluginlibrary.service.services.ExecutionRequest;
+import com.netgrif.pluginlibrary.services.service.ExecutionRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

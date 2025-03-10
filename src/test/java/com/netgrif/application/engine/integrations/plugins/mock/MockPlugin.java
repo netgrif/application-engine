@@ -5,7 +5,7 @@ import com.netgrif.pluginlibrary.core.domain.EntryPoint;
 import com.netgrif.pluginlibrary.core.domain.Method;
 import com.netgrif.pluginlibrary.core.domain.Plugin;
 import com.netgrif.pluginlibrary.core.utils.AbstractObjectParser;
-import com.netgrif.pluginlibrary.service.services.*;
+import com.netgrif.pluginlibrary.services.service.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 

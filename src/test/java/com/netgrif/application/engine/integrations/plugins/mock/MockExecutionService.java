@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.integrations.plugins.mock;
 
 import com.google.protobuf.ByteString;
-import com.netgrif.pluginlibrary.service.services.*;
+import com.netgrif.pluginlibrary.services.service.*;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
