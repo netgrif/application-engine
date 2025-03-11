@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
         matchIfMissing = true
 )
 public final class PluginRegistrationService extends PluginRegistrationServiceGrpc.PluginRegistrationServiceImplBase {
-    private final IPluginService pluginService;
+    private final PluginService pluginService;
 
     /**
      * Registers or activate plugin provided by request.

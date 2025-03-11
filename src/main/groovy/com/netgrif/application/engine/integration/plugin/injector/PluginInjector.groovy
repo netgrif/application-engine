@@ -3,7 +3,7 @@ package com.netgrif.application.engine.integration.plugin.injector
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
 import com.netgrif.application.engine.integration.plugin.injector.meta.EntryPointMeta
 import com.netgrif.application.engine.integration.plugin.injector.meta.PluginMeta
-import com.netgrif.application.engine.integration.plugins.service.PluginService
+import com.netgrif.application.engine.integration.plugins.service.PluginServiceImpl
 import com.netgrif.application.engine.integration.plugins.utils.PluginUtils
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.core.workflow.domain.Case
@@ -55,7 +55,7 @@ class PluginInjector {
                     entryPointMetaClass[methodName] = null
                 } else {
                     entryPointMetaClass[methodName] = { Serializable... args ->
-                        PluginService pluginService = ApplicationContextProvider.getBean("pluginService") as PluginService
+                        PluginServiceImpl pluginService = ApplicationContextProvider.getBean("pluginService") as PluginServiceImpl
                         return pluginService.call(pluginUrl, pluginPort, epName, methodName, args)
                     }
                 }

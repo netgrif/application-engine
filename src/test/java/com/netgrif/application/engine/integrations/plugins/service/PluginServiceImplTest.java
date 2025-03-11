@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.integrations.plugins.service;
 
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.integration.plugins.service.IPluginService;
+import com.netgrif.application.engine.integration.plugins.service.PluginService;
 import com.netgrif.application.engine.integrations.plugins.mock.MockExecutionService;
 import com.netgrif.pluginlibrary.services.service.ExecutionRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,13 +12,13 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
-public class PluginServiceTest {
+public class PluginServiceImplTest {
 
     @Autowired
     private TestHelper testHelper;
 
     @Autowired
-    private IPluginService pluginService;
+    private PluginService pluginService;
 
     @Autowired
     private MockExecutionService mockExecutionService;
