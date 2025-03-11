@@ -3,6 +3,7 @@ package com.netgrif.application.engine.workflow.service;
 import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.model.Properties;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.workflow.domain.triggers.AutoTrigger;
 import com.netgrif.application.engine.workflow.domain.triggers.TimeTrigger;
@@ -13,11 +14,16 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Slf4j
@@ -26,36 +32,56 @@ public class CaseExporter {
     @Autowired
     private ITaskService taskService;
 
+    @Value("${nae.schema.location}")
+    private String schemaLocation;
+
     private final ObjectFactory objectFactory = new ObjectFactory();
 
-    public void exportCases(Collection<com.netgrif.application.engine.workflow.domain.Case> casesToExport, OutputStream outputStream) {
-        casesToExport.forEach(caseToExport -> exportCase(caseToExport, outputStream));
-    }
+    private OutputStream outputStream;
+    private com.netgrif.application.engine.workflow.domain.Case caseToExport;
+    private Case xmlCase;
 
-    public void exportCase(com.netgrif.application.engine.workflow.domain.Case caseToExport, OutputStream outputStream) {
-        Case xmlCase = objectFactory.createCase();
-        exportCaseMetadata(caseToExport, xmlCase);
-        List<com.netgrif.application.engine.workflow.domain.Task> tasks = caseToExport.getTasks().stream()
-                .map(taskPair -> taskService.findOne(taskPair.getTask()))
-                .toList();
-        exportTasks(tasks, xmlCase.getTask());
-        exportDataFields(caseToExport.getDataSet(), xmlCase.getDataField());
+    //    todo custom error handling?
+    public void exportCases(Collection<com.netgrif.application.engine.workflow.domain.Case> casesToExport, OutputStream outputStream) throws RuntimeException {
+        this.outputStream = outputStream;
+
+        Cases xmlCases = objectFactory.createCases();
+        casesToExport.forEach(caseToExport -> {
+            this.caseToExport = caseToExport;
+            xmlCases.getCase().add(exportCase());
+        });
+
         try {
-            marshallCase(xmlCase, outputStream);
+            marshallCase(xmlCases);
         } catch (JAXBException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void exportDataFields(LinkedHashMap<String, com.netgrif.application.engine.workflow.domain.DataField> dataSet, List<DataField> dataField) {
-        dataSet.forEach((key, value) -> dataField.add(exportDataField(key, value)));
+    private Case exportCase() {
+        this.xmlCase = objectFactory.createCase();
+        exportCaseMetadata(caseToExport);
+        exportTasks();
+        exportDataFields();
+        return xmlCase;
+    }
+
+    private void exportDataFields() {
+        LinkedHashMap<String, com.netgrif.application.engine.workflow.domain.DataField> dataSet = this.caseToExport.getDataSet();
+        if (dataSet == null || dataSet.isEmpty()) {
+            return;
+        }
+        dataSet.forEach((key, value) -> xmlCase.getDataField().add(exportDataField(key, value)));
     }
 
     private DataField exportDataField(String fieldId, com.netgrif.application.engine.workflow.domain.DataField dataFieldToExport) {
         DataField xmlDataField = objectFactory.createDataField();
         xmlDataField.setId(fieldId);
-        xmlDataField.setValue(exportDataFieldValue(dataFieldToExport.getValue()));
-        xmlDataField.setFilterMetadata(exportDataFieldValue(dataFieldToExport.getFilterMetadata()));
+        xmlDataField.setType(DataType.fromValue(caseToExport.getField(fieldId).getType().getName()));
+        xmlDataField.setValues(exportDataFieldValue(dataFieldToExport.getValue(), caseToExport.getField(fieldId).getType()));
+        if(this.caseToExport.getField(fieldId).getType().equals(FieldType.FILTER)) {
+            xmlDataField.setFilterMetadata(exportFilterMetadata(dataFieldToExport.getFilterMetadata()));
+        }
         xmlDataField.setEncryption(dataFieldToExport.getEncryption());
         xmlDataField.setLastModified(exportLocalDateTime(dataFieldToExport.getLastModified()));
         xmlDataField.setVersion(dataFieldToExport.getVersion());
@@ -66,6 +92,60 @@ public class CaseExporter {
         xmlDataField.setOptions(exportOptions(dataFieldToExport.getOptions()));
         xmlDataField.setBehaviors(exportTaskBehaviors(dataFieldToExport.getBehavior()));
         return xmlDataField;
+    }
+
+    private FilterMetadata exportFilterMetadata(Map<String, Object> filterMetadata) {
+//        todo refactor whole metadata object
+        if (filterMetadata == null || filterMetadata.isEmpty()) {
+            return null;
+        }
+        FilterMetadata xmlMetadata = objectFactory.createFilterMetadata();
+        xmlMetadata.setFilterType(FilterType.fromValue(filterMetadata.get("filterType").toString()));
+        xmlMetadata.setPredicateMetadata(parsePredicateTreeMetadata((List<List<Object>>)filterMetadata.get("predicateTreeMetadata")));
+        xmlMetadata.getSearchCategories().getValue().addAll((List<String>)filterMetadata.get("searchCategories"));
+        xmlMetadata.setDefaultSearchCategories((Boolean) filterMetadata.get("defaultSearchCategories"));
+        xmlMetadata.setInheritAllowedNets((Boolean) filterMetadata.get("inheritAllowedNets"));
+        return xmlMetadata;
+    }
+
+    private PredicateTreeMetadata parsePredicateTreeMetadata(List<List<Object>> predicateTreeMetadata) {
+        if(predicateTreeMetadata == null || predicateTreeMetadata.isEmpty()) {
+            return null;
+        }
+        PredicateTreeMetadata xmlPredicateTreeMetadata = objectFactory.createPredicateTreeMetadata();
+        predicateTreeMetadata.forEach(list -> {
+            if(list == null || list.isEmpty()) {
+                return;
+            }
+            PredicateMetadataArray metadataArray = objectFactory.createPredicateMetadataArray();
+            list.forEach(data -> {
+                if (data == null) {
+                    return;
+                }
+                CategoryGeneratorMetadata metadata = objectFactory.createCategoryGeneratorMetadata();
+                Map<String, Object> retypedData = (Map<String, Object>) data;
+                metadata.setCategory(retypedData.get("category").toString());
+                metadata.setValues(exportCollectionOfStrings((Collection<String>) retypedData.get("category")));
+                metadata.setConfiguration(exportMetadataConfiguration((Map<String, String>)retypedData.get("configuration")));
+                metadataArray.getData().add(metadata);
+            });
+            xmlPredicateTreeMetadata.getPredicate().add(metadataArray);
+        });
+        return xmlPredicateTreeMetadata;
+    }
+
+    private CategoryMetadataConfiguration exportMetadataConfiguration(Map<String, String> configuration) {
+        if (configuration == null || configuration.isEmpty()) {
+            return null;
+        }
+        CategoryMetadataConfiguration xmlMetadata = objectFactory.createCategoryMetadataConfiguration();
+        configuration.forEach((key, value) -> {
+           ConfigurationValue xmlValue = objectFactory.createConfigurationValue();
+           xmlValue.setValue(value);
+           xmlValue.setId(key);
+           xmlMetadata.getValue().add(xmlValue);
+        });
+        return xmlMetadata;
     }
 
     private TaskBehaviors exportTaskBehaviors(Map<String, Set<FieldBehavior>> taskBehavior) {
@@ -105,7 +185,7 @@ public class CaseExporter {
         }
         Validations xmlValidations = objectFactory.createValidations();
         validations.forEach(validation -> {
-//            todo resolve other Validation object properties after 6.4.0 is merged into 7.0.0
+//            todo resolve other Validation object properties after NAE-1892 is merged into 7.0.0
             Validation xmlValidation = objectFactory.createValidation();
             xmlValidation.setMessage(exportI18NString(validation.getValidationMessage()));
             xmlValidations.getValidation().add(xmlValidation);
@@ -115,13 +195,14 @@ public class CaseExporter {
 
     private List<DataRefComponent> exportDataRefComponents(Map<String, com.netgrif.application.engine.petrinet.domain.Component> dataRefComponents) {
         if (dataRefComponents == null || dataRefComponents.isEmpty()) {
-            return null;
+            return Collections.emptyList();
         }
         List<DataRefComponent> xmlDataRefComponents = new ArrayList<>();
         dataRefComponents.forEach((taskId, component) -> {
             DataRefComponent xmlDataRefComponent = objectFactory.createDataRefComponent();
             Component xmlComponent = exportComponent(component);
             xmlDataRefComponent.setTaskId(taskId);
+            xmlDataRefComponent.setComponent(xmlComponent);
             xmlDataRefComponents.add(xmlDataRefComponent);
         });
         return xmlDataRefComponents;
@@ -163,15 +244,59 @@ public class CaseExporter {
         return xmlProperties;
     }
 
-    private String exportDataFieldValue(Object value) {
+    private StringCollection exportDataFieldValue(Object value, FieldType type) {
         if (value == null) {
             return null;
         }
-        return value.toString();
+        StringCollection values = objectFactory.createStringCollection();
+        switch (type) {
+            case DATE:
+            case DATETIME:
+                values.getValue().add(exportLocalDateTime(value instanceof LocalDate ? ((LocalDate) value).atTime(LocalTime.NOON) : (LocalDateTime) value));
+                break;
+            case CASE_REF:
+            case TASK_REF:
+            case MULTICHOICE:
+            case STRING_COLLECTION:
+            case MULTICHOICE_MAP:
+                ((Collection) value).forEach(it ->values.getValue().add(it.toString()));
+                break;
+            case USER:
+            case USERLIST:
+                Set<UserFieldValue> userFieldValues = new HashSet<>();
+                if (value instanceof UserFieldValue) {
+                    userFieldValues.add((UserFieldValue) value);
+                } else {
+                    userFieldValues = ((UserListFieldValue) value).getUserValues();
+                }
+                userFieldValues.forEach(userFieldValue -> {
+                   values.getValue().add(userFieldValue.getId());
+                });
+                break;
+            case FILE:
+            case FILELIST:
+                Set<FileFieldValue> fileFieldValues = new HashSet<>();
+                if (value instanceof FileFieldValue) {
+                    fileFieldValues.add((FileFieldValue) value);
+                } else {
+                    fileFieldValues = ((FileListFieldValue) value).getNamesPaths();
+                }
+                fileFieldValues.forEach(fieldValue -> {
+                    values.getValue().add(fieldValue.getName().concat(":").concat(fieldValue.getPath()));
+                });
+                break;
+            default:
+                values.getValue().add(value.toString());
+                break;
+        }
+        return values;
     }
 
-    private void exportTasks(List<com.netgrif.application.engine.workflow.domain.Task> tasksToExport, List<Task> xmlTasks) {
-        tasksToExport.forEach(taskToExport -> xmlTasks.add(exportTask(taskToExport)));
+    private void exportTasks() {
+        List<com.netgrif.application.engine.workflow.domain.Task> tasksToExport = caseToExport.getTasks().stream()
+                .map(taskPair -> taskService.findOne(taskPair.getTask()))
+                .toList();
+        tasksToExport.forEach(taskToExport -> this.xmlCase.getTask().add(exportTask(taskToExport)));
     }
 
     private Task exportTask(com.netgrif.application.engine.workflow.domain.Task taskToExport) {
@@ -179,16 +304,16 @@ public class CaseExporter {
         xmlTask.setId(taskToExport.getStringId());
         xmlTask.setTransitionId(taskToExport.getTransitionId());
         xmlTask.setTitle(exportI18NString(taskToExport.getTitle()));
-        xmlTask.setPriority(BigInteger.valueOf(taskToExport.getPriority()));
+        xmlTask.setPriority(exportInteger(taskToExport.getPriority()));
         xmlTask.setUserId(taskToExport.getUserId());
         xmlTask.setStartDate(exportLocalDateTime(taskToExport.getStartDate()));
         xmlTask.setFinishDate(exportLocalDateTime(taskToExport.getFinishDate()));
         xmlTask.setFinishedBy(taskToExport.getFinishedBy());
         xmlTask.setTransactionId(taskToExport.getTransactionId());
         xmlTask.setIcon(taskToExport.getIcon());
-        xmlTask.setAssignPolicy(AssignPolicy.fromValue(taskToExport.getAssignPolicy().toString()));
-        xmlTask.setDataFocusPolicy(DataFocusPolicy.fromValue(taskToExport.getDataFocusPolicy().toString()));
-        xmlTask.setFinishPolicy(FinishPolicy.fromValue(taskToExport.getFinishPolicy().toString()));
+        xmlTask.setAssignPolicy(AssignPolicy.fromValue(taskToExport.getAssignPolicy().toString().toLowerCase()));
+        xmlTask.setDataFocusPolicy(DataFocusPolicy.fromValue(taskToExport.getDataFocusPolicy().toString().toLowerCase()));
+        xmlTask.setFinishPolicy(FinishPolicy.fromValue(taskToExport.getFinishPolicy().toString().toLowerCase()));
         xmlTask.setTags(exportTags(taskToExport.getTags()));
         xmlTask.setViewRoles(exportCollectionOfStrings(taskToExport.getViewRoles()));
         xmlTask.setViewUserRefs(exportCollectionOfStrings(taskToExport.getNegativeViewUsers()));
@@ -204,7 +329,14 @@ public class CaseExporter {
         return xmlTask;
     }
 
+    private BigInteger exportInteger(Integer priority) {
+        return priority == null ? null : BigInteger.valueOf(priority);
+    }
+
     private TaskTrigger exportTriggers(List<Trigger> triggers) {
+        if (triggers == null || triggers.isEmpty()) {
+            return null;
+        }
         TaskTrigger taskTrigger = objectFactory.createTaskTrigger();
         triggers.forEach(trigger -> {
             TriggerWithId xmlTrigger = objectFactory.createTriggerWithId();
@@ -218,7 +350,7 @@ public class CaseExporter {
                 triggerTypeString = TriggerType.USER;
             }
             xmlTrigger.setType(triggerTypeString);
-            taskTrigger.setTrigger(xmlTrigger);
+            taskTrigger.getTrigger().add(xmlTrigger);
         });
         return taskTrigger;
     }
@@ -229,40 +361,39 @@ public class CaseExporter {
         return assignedUserPolicies;
     }
 
-    protected void marshallCase(com.netgrif.application.engine.importer.model.Case caseToExport, OutputStream outputStream) throws JAXBException {
-        JAXBContext jaxbContext = JAXBContext.newInstance(com.netgrif.application.engine.importer.model.Case.class);
+    protected void marshallCase(com.netgrif.application.engine.importer.model.Cases caseToExport) throws JAXBException {
+        JAXBContext jaxbContext = JAXBContext.newInstance(com.netgrif.application.engine.importer.model.Cases.class);
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-//        todo extract to property?
-        marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "https://petriflow.com/petriflow.schema.xsd");
-        marshaller.marshal(caseToExport, outputStream);
+        marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
+        marshaller.marshal(caseToExport, this.outputStream);
     }
 
-    private void exportCaseMetadata(com.netgrif.application.engine.workflow.domain.Case caseToExport, Case xmlCase) {
-        xmlCase.setId(caseToExport.getStringId());
+    private void exportCaseMetadata(com.netgrif.application.engine.workflow.domain.Case caseToExport) {
+        this.xmlCase.setId(caseToExport.getStringId());
 //        todo should the whole object be exported? is id specific enough? should email be exported instead of id?
-        xmlCase.setAuthor(caseToExport.getAuthor().getId());
-        xmlCase.setColor(caseToExport.getColor());
-        xmlCase.setProcessVersion(caseToExport.getPetriNet().getVersion().toString());
-        xmlCase.setProcessIdentifier(xmlCase.getProcessIdentifier());
-        xmlCase.setVisualId(xmlCase.getVisualId());
-        xmlCase.setUriNodeId(xmlCase.getUriNodeId());
-        xmlCase.setTags(exportTags(caseToExport.getTags()));
-        xmlCase.setTitle(caseToExport.getTitle());
-        xmlCase.setCreationDate(exportLocalDateTime(caseToExport.getCreationDate()));
-        xmlCase.setLastModified(exportLocalDateTime(caseToExport.getLastModified()));
-        xmlCase.setEnabledRoles(exportCollectionOfStrings(caseToExport.getEnabledRoles()));
-        xmlCase.setViewRoles(exportCollectionOfStrings(caseToExport.getViewRoles()));
-        xmlCase.setViewUserRefs(exportCollectionOfStrings(caseToExport.getNegativeViewUsers()));
-        xmlCase.setViewUsers(exportCollectionOfStrings(caseToExport.getNegativeViewUsers()));
-        xmlCase.setNegativeViewRoles(exportCollectionOfStrings(caseToExport.getNegativeViewRoles()));
-        xmlCase.setNegativeViewUsers(exportCollectionOfStrings(caseToExport.getNegativeViewUsers()));
-        xmlCase.setImmediateDataFields(exportCollectionOfStrings(caseToExport.getImmediateDataFields()));
-        xmlCase.setActivePlaces(exportMapXsdType(caseToExport.getActivePlaces()));
-        xmlCase.setConsumedTokens(exportMapXsdType(caseToExport.getConsumedTokens()));
-        xmlCase.setPermissions(exportPermissions(caseToExport.getPermissions()));
-        xmlCase.setUserRefs(exportPermissions(caseToExport.getUserRefs()));
-        xmlCase.setUsers(exportPermissions(caseToExport.getUsers()));
+        this.xmlCase.setAuthor(caseToExport.getAuthor().getId());
+        this.xmlCase.setColor(caseToExport.getColor());
+        this.xmlCase.setProcessVersion(caseToExport.getPetriNet().getVersion().toString());
+        this.xmlCase.setProcessIdentifier(caseToExport.getProcessIdentifier());
+        this.xmlCase.setVisualId(caseToExport.getVisualId());
+        this.xmlCase.setUriNodeId(caseToExport.getUriNodeId());
+        this.xmlCase.setTags(exportTags(caseToExport.getTags()));
+        this.xmlCase.setTitle(caseToExport.getTitle());
+        this.xmlCase.setCreationDate(exportLocalDateTime(caseToExport.getCreationDate()));
+        this.xmlCase.setLastModified(exportLocalDateTime(caseToExport.getLastModified()));
+        this.xmlCase.setEnabledRoles(exportCollectionOfStrings(caseToExport.getEnabledRoles()));
+        this.xmlCase.setViewRoles(exportCollectionOfStrings(caseToExport.getViewRoles()));
+        this.xmlCase.setViewUserRefs(exportCollectionOfStrings(caseToExport.getNegativeViewUsers()));
+        this.xmlCase.setViewUsers(exportCollectionOfStrings(caseToExport.getNegativeViewUsers()));
+        this.xmlCase.setNegativeViewRoles(exportCollectionOfStrings(caseToExport.getNegativeViewRoles()));
+        this.xmlCase.setNegativeViewUsers(exportCollectionOfStrings(caseToExport.getNegativeViewUsers()));
+        this.xmlCase.setImmediateDataFields(exportCollectionOfStrings(caseToExport.getImmediateDataFields()));
+        this.xmlCase.setActivePlaces(exportMapXsdType(caseToExport.getActivePlaces()));
+        this.xmlCase.setConsumedTokens(exportMapXsdType(caseToExport.getConsumedTokens()));
+        this.xmlCase.setPermissions(exportPermissions(caseToExport.getPermissions()));
+        this.xmlCase.setUserRefs(exportPermissions(caseToExport.getUserRefs()));
+        this.xmlCase.setUsers(exportPermissions(caseToExport.getUsers()));
     }
 
     private Tags exportTags(Map<String, String> tags) {
@@ -280,28 +411,39 @@ public class CaseExporter {
     }
 
     private I18NStringType exportI18NString(I18nString i18nString) {
+        if (i18nString == null) {
+            return null;
+        }
         I18NStringType i18NStringType = objectFactory.createI18NStringType();
         i18NStringType.setName(i18nString.getKey());
         i18NStringType.setValue(i18nString.getDefaultValue());
+//        todo export translations too probably
         return i18NStringType;
     }
 
     private String exportLocalDateTime(LocalDateTime toExport) {
-        return toExport == null ? null : toExport.format(DateTimeFormatter.ISO_ZONED_DATE_TIME);
+//        todo LocalDate and DateTime do not store information about Zone/Offset, Date and DateTime fields needs to be refactored to store values as either Zoned or Offset dateTime
+        return toExport == null ? null : toExport.atZone(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
 
     private StringCollection exportCollectionOfStrings(Collection<String> collection) {
+        if (collection == null || collection.isEmpty()) {
+            return null;
+        }
         StringCollection stringCollection = objectFactory.createStringCollection();
         stringCollection.getValue().addAll(collection);
         return stringCollection;
     }
 
     private MapXsdType exportMapXsdType(Map<String, Integer> map) {
+        if (map == null || map.isEmpty()) {
+            return null;
+        }
         MapXsdType xsdType = objectFactory.createMapXsdType();
         map.forEach((key, value) -> {
             IntegerMapEntry mapEntry = objectFactory.createIntegerMapEntry();
             mapEntry.setKey(key);
-            mapEntry.setValue(BigInteger.valueOf(value));
+            mapEntry.setValue(exportInteger(value));
             xsdType.getEntry().add(mapEntry);
         });
         return xsdType;
