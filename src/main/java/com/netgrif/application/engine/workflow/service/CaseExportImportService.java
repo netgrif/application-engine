@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CaseImportExportService implements ICaseExportImportService {
+public class CaseExportImportService implements ICaseExportImportService {
 
     private final ObjectFactory<CaseImporter> caseImporterObjectFactory;
     private final ObjectFactory<CaseExporter> caseExporterObjectFactory;
@@ -40,7 +40,7 @@ public class CaseImportExportService implements ICaseExportImportService {
 
     @Override
     public void findAndExportCases(Set<String> caseIdsToExport, OutputStream exportFile) {
-        this.exportCases(caseIdsToExport.stream().map(caseId -> workflowService.findOne(caseId)).collect(Collectors.toSet()), exportFile);
+        this.exportCases(caseIdsToExport.stream().map(workflowService::findOne).collect(Collectors.toSet()), exportFile);
     }
 
     @Override
