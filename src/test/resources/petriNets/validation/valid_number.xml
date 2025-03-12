@@ -12,7 +12,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>odd</expression>
+                <name>odd</name>
                 <message>error-number01</message>
             </validation>
         </validations>
@@ -22,7 +22,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>even</expression>
+                <name>even</name>
                 <message>error-number02</message>
             </validation>
         </validations>
@@ -32,7 +32,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>positive</expression>
+                <name>positive</name>
                 <message>error-number03</message>
             </validation>
         </validations>
@@ -42,7 +42,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>negative</expression>
+                <name>negative</name>
                 <message>error-number04</message>
             </validation>
         </validations>
@@ -52,7 +52,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>decimal</expression>
+                <name>decimal</name>
                 <message>error-number05</message>
             </validation>
         </validations>
@@ -62,7 +62,15 @@
         <title/>
         <validations>
             <validation>
-                <expression>inrange 10,20</expression>
+                <name>inrange</name>
+                <serverArguments>
+                    <argument>10</argument>
+                    <argument>20</argument>
+                </serverArguments>
+                <clientArguments>
+                    <argument>10</argument>
+                    <argument>20</argument>
+                </clientArguments>
                 <message>error-number06</message>
             </validation>
         </validations>
@@ -73,11 +81,19 @@
         <title/>
         <validations>
             <validation>
-                <expression>odd</expression>
+                <name>odd</name>
                 <message>error-number07-1</message>
             </validation>
             <validation>
-                <expression>inrange 1,5</expression>
+                <name>inrange</name>
+                <serverArguments>
+                    <argument>inf</argument>
+                    <argument>5</argument>
+                </serverArguments>
+                <clientArguments>
+                    <argument>inf</argument>
+                    <argument>5</argument>
+                </clientArguments>
                 <message>error-number07-2</message>
             </validation>
         </validations>

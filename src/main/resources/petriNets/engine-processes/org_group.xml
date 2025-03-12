@@ -103,7 +103,7 @@
 		<desc name="invite_by_mail_desc">Add e-meail address to send invitation</desc>
 		<validations>
 			<validation>
-				<expression>email</expression>
+				<name>email</name>
 				<message/>
 			</validation>
 		</validations>

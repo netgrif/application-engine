@@ -1,0 +1,610 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>validation</id>
+    <version>1.0.0</version>
+    <initials>VAL</initials>
+    <title>Validation</title>
+    <icon>home</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <transitionRole>false</transitionRole>
+
+    <roleRef>
+        <id>system</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>admin</id>
+        <caseLogic>
+            <create>false</create>
+            <delete>false</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>default</id>
+        <caseLogic>
+            <create>false</create>
+            <delete>false</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <role>
+        <id>system</id>
+        <title>System</title>
+    </role>
+    <role>
+        <id>admin</id>
+        <title>Admin</title>
+    </role>
+
+    <data type="text" immediate="true">
+        <id>name</id>
+        <title name="name">Name</title>
+    </data>
+    <data type="text">
+        <id>validation_definition_groovy</id>
+        <title name="validation_definition_groovy">Validation definition - Groovy</title>
+		<component>
+			<name>textarea</name>
+		</component>
+    </data>
+    <data type="number">
+        <id>num_arguments_groovy</id>
+        <title name="num_arguments_groovy">Number of arguments - Groovy</title>
+    </data>
+    <data type="text">
+        <id>validation_definition_javascript</id>
+        <title name="validation_definition_javascript">Validation definition - JavaScript</title>
+		<component>
+			<name>textarea</name>
+		</component>
+    </data>
+	<data type="number">
+		<id>num_arguments_javascript</id>
+		<title name="num_arguments_javascript">Number of arguments - JavaScript</title>
+	</data>
+    <data type="text">
+        <id>version</id>
+        <title name="version">Version</title>
+    </data>
+	<data type="multichoice_map">
+		<id>validation_type</id>
+		<title name="type">Type</title>
+		<options>
+			<option key="client">Client</option>
+			<option key="server">Server</option>
+		</options>
+		<event type="set">
+			<id>validation_type_set</id>
+			<actions phase="post">
+				<action>
+					validation_type: f.validation_type,
+					validation_definition_groovy: f.validation_definition_groovy,
+					num_arguments_groovy: f.num_arguments_groovy,
+					validation_definition_javascript: f.validation_definition_javascript,
+					num_arguments_javascript: f.num_arguments_javascript,
+					init_trans: t.init,
+					detail_trans: t.detail;
+
+					make [validation_definition_groovy, num_arguments_groovy], editable on init_trans when { validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("server") }
+					make [validation_definition_groovy, num_arguments_groovy], editable on detail_trans when { validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("server") }
+					make [validation_definition_groovy, num_arguments_groovy], hidden on transitions when { !validation_type.rawValue || !validation_type.rawValue.contains("server") }
+					make [validation_definition_javascript, num_arguments_javascript], editable on init_trans when { validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("client") }
+					make [validation_definition_javascript, num_arguments_javascript], editable on detail_trans when { validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("client") }
+					make [validation_definition_javascript, num_arguments_javascript], hidden on transitions when { !validation_type.rawValue || !validation_type.rawValue.contains("client") }
+				</action>
+			</actions>
+		</event>
+	</data>
+
+    <i18n locale="sk">
+        <i18nString name="name">Meno</i18nString>
+        <i18nString name="type">Typ</i18nString>
+        <i18nString name="validation_definition_groovy">Definícia validácie - Groovy</i18nString>
+        <i18nString name="num_arguments_groovy">Počet argumentov - Groovy</i18nString>
+        <i18nString name="validation_definition_javascript">Definícia validácie - JavaScript</i18nString>
+        <i18nString name="num_arguments_javascript">Počet argumentov - JavaScript</i18nString>
+        <i18nString name="version">Verzia</i18nString>
+        <i18nString name="detail">Detail</i18nString>
+        <i18nString name="activate">Aktivovať</i18nString>
+        <i18nString name="deactivate">Deaktivovať</i18nString>
+    </i18n>
+    <i18n locale="de">
+        <i18nString name="name">Name</i18nString>
+		<i18nString name="type">Typ</i18nString>
+        <i18nString name="validation_definition_groovy">Validierungsdefinition - Groovy</i18nString>
+        <i18nString name="num_arguments_groovy">Anzahl der Argumente - Groovy</i18nString>
+        <i18nString name="validation_definition_javascript">Validierungsdefinition - JavaScript</i18nString>
+        <i18nString name="num_arguments_javascript">Anzahl der Argumente - JavaScript</i18nString>
+        <i18nString name="version">Ausführung</i18nString>
+        <i18nString name="detail">Detail</i18nString>
+        <i18nString name="activate">Aktivieren</i18nString>
+        <i18nString name="deactivate">Deaktivieren</i18nString>
+    </i18n>
+
+    <transition>
+        <id>init</id>
+        <x>300</x>
+        <y>300</y>
+        <label>Init</label>
+		<dataGroup>
+			<id>init_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>name</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>validation_definition_groovy</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>validation_definition_javascript</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>5</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>version</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>num_arguments_groovy</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>num_arguments_javascript</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>7</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>validation_type</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>init_assign</id>
+		</event>
+		<event type="finish">
+			<id>init_finish</id>
+		</event>
+		<event type="cancel">
+			<id>init_cancel</id>
+		</event>
+		<event type="delegate">
+			<id>init_delegate</id>
+		</event>
+    </transition>
+    <transition>
+        <id>activate</id>
+        <x>580</x>
+        <y>220</y>
+        <label name="activate">Activate</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+                <view>true</view>
+                <cancel>true</cancel>
+                <assign>true</assign>
+				<perform>true</perform>
+            </logic>
+        </roleRef>
+        <event type="finish">
+            <id>onFinish_activate</id>
+            <actions phase="pre">
+                <action>
+                    name: f.name,
+                    validation_definition_groovy: f.validation_definition_groovy,
+					validation_type: f.validation_type;
+
+					if (validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("server")) {
+						validationService.registerValidation(name.rawValue, validation_definition_groovy.rawValue)
+					}
+                </action>
+            </actions>
+			<actions phase="post">
+				<action>
+					validation_type: f.validation_type,
+					validation_definition_groovy: f.validation_definition_groovy,
+					num_arguments_groovy: f.num_arguments_groovy,
+					validation_definition_javascript: f.validation_definition_javascript,
+					num_arguments_javascript: f.num_arguments_javascript,
+					detail_trans: t.detail;
+
+					make [validation_definition_groovy, num_arguments_groovy], visible on detail_trans when { validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("server") }
+					make [validation_definition_groovy, num_arguments_groovy], hidden on detail_trans when { !validation_type.rawValue || !validation_type.rawValue.contains("server") }
+					make [validation_definition_javascript, num_arguments_javascript], visible on detail_trans when { validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("client") }
+					make [validation_definition_javascript, num_arguments_javascript], hidden on detail_trans when { !validation_type.rawValue || !validation_type.rawValue.contains("client") }
+				</action>
+			</actions>
+        </event>
+    </transition>
+    <transition>
+        <id>deactivate</id>
+        <x>580</x>
+        <y>380</y>
+        <label name="deactivate">Deactivate</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+                <view>true</view>
+                <cancel>true</cancel>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <event type="finish">
+            <id>onFinish_deactivate</id>
+            <actions phase="post">
+                <action>
+                    name: f.name,
+					validation_type: f.validation_type,
+					validation_definition_groovy: f.validation_definition_groovy,
+					num_arguments_groovy: f.num_arguments_groovy,
+					validation_definition_javascript: f.validation_definition_javascript,
+					num_arguments_javascript: f.num_arguments_javascript,
+					detail_trans: t.detail;
+
+					make [validation_definition_groovy, num_arguments_groovy], editable on detail_trans when { validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("server") }
+					make [validation_definition_groovy, num_arguments_groovy], hidden on detail_trans when { !validation_type.rawValue || !validation_type.rawValue.contains("server") }
+					make [validation_definition_javascript, num_arguments_javascript], editable on detail_trans when { validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("client") }
+					make [validation_definition_javascript, num_arguments_javascript], hidden on detail_trans when { !validation_type.rawValue || !validation_type.rawValue.contains("client") }
+
+					if (validation_type.rawValue &amp;&amp; validation_type.rawValue.contains("server")) {
+						validationService.unregisterValidation(name.rawValue)
+					}
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>detail</id>
+        <x>300</x>
+        <y>60</y>
+        <label name="detail">Detail</label>
+		<dataGroup>
+			<id>detail_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>name</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>immediate</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>version</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>validation_definition_javascript</id>
+				<logic>
+					<behavior>hidden</behavior>
+					<behavior>immediate</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>5</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>validation_definition_groovy</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>num_arguments_groovy</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>num_arguments_javascript</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>7</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>validation_type</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>immediate</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>detail_assign</id>
+		</event>
+		<event type="finish">
+			<id>detail_finish</id>
+		</event>
+		<event type="cancel">
+			<id>detail_cancel</id>
+		</event>
+		<event type="delegate">
+			<id>detail_delegate</id>
+		</event>
+    </transition>
+    <transition>
+		<id>active_detail</id>
+		<x>752</x>
+		<y>208</y>
+		<label>Active detail</label>
+		<dataGroup>
+			<id>detail_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>name</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>immediate</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>validation_definition_javascript</id>
+				<logic>
+					<behavior>hidden</behavior>
+					<behavior>immediate</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>validation_type</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>immediate</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+    <place>
+        <id>p1</id>
+        <x>180</x>
+        <y>300</y>
+        <label/>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>inactive</id>
+        <x>420</x>
+        <y>300</y>
+        <label>inactive</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>active</id>
+        <x>740</x>
+        <y>300</y>
+        <label>active</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>initialized</id>
+        <x>300</x>
+        <y>180</y>
+        <label>initialized</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>init</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>init</sourceId>
+		<destinationId>initialized</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>read</type>
+		<sourceId>initialized</sourceId>
+		<destinationId>detail</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>init</sourceId>
+		<destinationId>inactive</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>regular</type>
+		<sourceId>inactive</sourceId>
+		<destinationId>activate</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>regular</type>
+		<sourceId>activate</sourceId>
+		<destinationId>active</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a8</id>
+		<type>regular</type>
+		<sourceId>active</sourceId>
+		<destinationId>deactivate</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a9</id>
+		<type>regular</type>
+		<sourceId>deactivate</sourceId>
+		<destinationId>inactive</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a10</id>
+		<type>read</type>
+		<sourceId>active</sourceId>
+		<destinationId>active_detail</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

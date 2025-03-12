@@ -6,6 +6,7 @@ import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.Petr
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import com.netgrif.application.engine.workflow.domain.State;
 
 import java.util.List;
 import java.util.Map;
@@ -45,4 +46,6 @@ public class TaskSearchRequest {
     public List<String> stringId;
 
     public Map<String, String> tags;
+
+    public State state;
 }

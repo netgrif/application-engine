@@ -12,7 +12,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>email</expression>
+                <name>email</name>
                 <message>error-text01</message>
             </validation>
         </validations>
@@ -22,7 +22,7 @@
         <title/>
         <validations>
             <validation>
-                <expression>telnumber</expression>
+                <name>telNumber</name>
                 <message>error-text02</message>
             </validation>
         </validations>
@@ -32,7 +32,13 @@
         <title/>
         <validations>
             <validation>
-                <expression>maxlength 6</expression>
+                <name>maxLength</name>
+                <serverArguments>
+                    <argument>6</argument>
+                </serverArguments>
+                <clientArguments>
+                    <argument>6</argument>
+                </clientArguments>
                 <message>error-text03</message>
             </validation>
         </validations>
@@ -42,7 +48,13 @@
         <title/>
         <validations>
             <validation>
-                <expression>minlength 3</expression>
+                <name>minLength</name>
+                <serverArguments>
+                    <argument>3</argument>
+                </serverArguments>
+                <clientArguments>
+                    <argument>3</argument>
+                </clientArguments>
                 <message>error-text04</message>
             </validation>
         </validations>
@@ -52,14 +64,60 @@
         <title/>
         <validations>
             <validation>
-                <expression>minlength 3</expression>
+                <name>minLength</name>
+                <serverArguments>
+                    <argument>3</argument>
+                </serverArguments>
+                <clientArguments>
+                    <argument>3</argument>
+                </clientArguments>
                 <message>error-text05</message>
             </validation>
             <validation>
-                <expression>maxlength 6</expression>
+                <name>maxLength</name>
+                <serverArguments>
+                    <argument>6</argument>
+                </serverArguments>
+                <clientArguments>
+                    <argument>6</argument>
+                </clientArguments>
                 <message>error-text05</message>
             </validation>
         </validations>
+    </data>
+    <data type="text">
+        <id>text06</id>
+        <title/>
+        <validations>
+            <validation>
+                <name>aaaa</name>
+                <serverArguments>
+                    <argument dynamic="true">number01.rawValue</argument>
+                </serverArguments>
+                <clientArguments>
+                    <argument dynamic="true">number01.rawValue</argument>
+                </clientArguments>
+                <message>error-text06</message>
+            </validation>
+        </validations>
+    </data>
+    <data type="text">
+        <id>text07</id>
+        <title/>
+        <validations>
+            <validation>
+                <name>number01</name>
+                <serverArguments>
+                    <argument dynamic="true">number01.rawValue</argument>
+                </serverArguments>
+                <message>error-text07</message>
+            </validation>
+        </validations>
+    </data>
+    <data type="number">
+        <id>number01</id>
+        <title/>
+        <init>5</init>
     </data>
     <transition>
         <id>t1</id>
@@ -134,6 +192,20 @@
                 <layout>
                     <x>0</x>
                     <y>4</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>text06</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>5</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <template>material</template>

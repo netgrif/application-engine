@@ -14,9 +14,9 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
-import org.junit.Ignore
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,7 +25,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @SpringBootTest
 @ActiveProfiles(["test"])

@@ -4,6 +4,7 @@ import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssemb
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ExpressionDelegate;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ValidationDelegate;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +30,12 @@ public class PrototypesConfiguration {
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public ExpressionDelegate expressionDelegate() {
         return new ExpressionDelegate();
+    }
+
+    @Bean("validationDelegate")
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public ValidationDelegate validationDelegate() {
+        return new ValidationDelegate();
     }
 
     @Bean("fileStorageConfiguration")

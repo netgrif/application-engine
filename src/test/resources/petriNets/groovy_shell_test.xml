@@ -25,7 +25,7 @@
 		<id>newVariable_1</id>
 		<title></title>
 		<init dynamic="true">
-			validation("String", new I18nString("I18nString"))
+			validation("String", null, null, new I18nString("I18nString"))
 			return "value"
 		</init>
 	</data>
@@ -43,7 +43,7 @@
 			<id>t1_assign</id>
 			<actions phase="pre">
 				<action>
-					validation("String", new I18nString("I18nString"))
+					validation("String", null, null, new I18nString("I18nString"))
 				</action>
 			</actions>
 		</event>

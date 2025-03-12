@@ -3,14 +3,11 @@ package com.netgrif.application.engine.importer.service;
 import com.netgrif.application.engine.configuration.properties.DatabaseProperties;
 import com.netgrif.application.engine.importer.model.Data;
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.importer.model.Valid;
 import com.netgrif.application.engine.importer.service.builder.FieldBuilder;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.importer.service.validation.IDataValidator;
 import com.netgrif.application.engine.petrinet.domain.Component;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.Validation;
+import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -54,19 +51,18 @@ public final class FieldFactory {
         if (data.getPlaceholder() != null)
             field.setPlaceholder(importer.toI18NString(data.getPlaceholder()));
 
-        // TODO: release/8.0.0 validation register
-        // TODO: release/8.0.0 valid deprecated
-        if (data.getValid() != null) {
-            List<Valid> list = data.getValid();
-            for (Valid item : list) {
-                // TODO: release/8.0.0 new I18nString?
-                field.addValidation(new Validation(item.getValue(), new I18nString()));
-            }
-        }
         if (data.getValidations() != null) {
             List<com.netgrif.application.engine.importer.model.Validation> list = data.getValidations().getValidation();
             for (com.netgrif.application.engine.importer.model.Validation item : list) {
-                field.addValidation(new Validation(item.getExpression().getValue(), importer.toI18NString(item.getMessage())));
+                Arguments clientArguments = null;
+                if (item.getClientArguments() != null) {
+                    clientArguments = new Arguments(item.getClientArguments().getArgument().stream().map(arg -> new Argument(arg.getValue(), arg.isDynamic())).collect(Collectors.toList()));
+                }
+                Arguments serverArguments = null;
+                if (item.getServerArguments() != null) {
+                    serverArguments = new Arguments(item.getServerArguments().getArgument().stream().map(arg -> new Argument(arg.getValue(), arg.isDynamic())).collect(Collectors.toList()));
+                }
+                field.addValidation(new Validation(item.getName(), clientArguments, serverArguments, importer.toI18NString(item.getMessage())));
             }
         }
         if (data.getComponent() != null) {
