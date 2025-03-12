@@ -7,7 +7,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.4.1](https://github.com/netgrif/application-engine/commits/v6.4.1)
 
-## [6.4.1](https://github.com/netgrif/application-engine/releases/tag/v6.4.1) (2025-02-26)
+## [6.4.1](https://github.com/netgrif/application-engine/releases/tag/v6.4.1) (2025-03-12)
 
 ### Fixed
 - [NAE-2031] Dashboard bug fix
