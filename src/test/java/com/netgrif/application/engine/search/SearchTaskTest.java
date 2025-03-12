@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.netgrif.application.engine.search.utils.SearchTestUtils.*;
+import static com.netgrif.application.engine.search.utils.SearchUtils.toDateTimeString;
 
 @Slf4j
 @SpringBootTest
@@ -111,10 +112,17 @@ public class SearchTaskTest {
         Case caze = importHelper.createCase("Search Test", net);
         String taskId = caze.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task = taskService.findOne(taskId);
+        String task2Id = caze.getTasks().get(TEST_TRANSITION2_ID).getTaskStringId();
+        Task task2 = taskService.findOne(task2Id);
 
         String query = String.format("task: id eq '%s'", taskId);
 
         searchAndCompare(query, task);
+
+        // in list
+        String queryInList = String.format("tasks: id in ('%s', '%s')", task.getStringId(), task2.getStringId());
+
+        searchAndCompareAsList(queryInList, List.of(task, task2));
 
         // sort
         String querySort = String.format("tasks: caseId eq '%s' sort by id", caze.getStringId());
@@ -137,19 +145,27 @@ public class SearchTaskTest {
     @Test
     public void testSearchByTransitionId() {
         PetriNet net = importPetriNet("search/search_test.xml");
-        PetriNet net2 = importPetriNet("search/search_test2.xml");
         Case case1 = importHelper.createCase("Search Test", net);
-        Case case2 = importHelper.createCase("Search Test2", net2);
         String taskId = case1.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
         Task task = taskService.findOne(taskId);
-        String task2Id = case2.getTasks().get(TEST_TRANSITION_ID).getTaskStringId();
+        String task2Id = case1.getTasks().get(TEST_TRANSITION2_ID).getTaskStringId();
         Task task2 = taskService.findOne(task2Id);
 
         String query = String.format("task: transitionId eq '%s'", TEST_TRANSITION_ID);
         String queryMore = String.format("tasks: transitionId eq '%s'", TEST_TRANSITION_ID);
 
-        searchAndCompare(query, List.of(task, task2));
-        searchAndCompareAsList(queryMore, List.of(task, task2));
+        searchAndCompare(query, task);
+        searchAndCompareAsList(queryMore, List.of(task));
+
+        // in list
+        String queryInList = String.format("tasks: transitionId in ('%s', '%s')", TEST_TRANSITION_ID, TEST_TRANSITION2_ID);
+
+        searchAndCompareAsList(queryInList, List.of(task, task2));
+
+        // in range
+        String queryInRange = String.format("tasks: transitionId in ('%s' : '%s']", TEST_TRANSITION_ID, TEST_TRANSITION2_ID);
+
+        searchAndCompareAsList(queryInRange, List.of(task2));
 
         // sort
         String querySort = String.format("tasks: caseId eq '%s' sort by transitionId", case1.getStringId());
@@ -189,6 +205,16 @@ public class SearchTaskTest {
 
         searchAndCompare(query, List.of(task, task2));
         searchAndCompareAsList(queryMore, List.of(task, task2));
+
+        // in list
+        String queryInList = String.format("tasks: transitionId eq '%s' and title in ('%s', '%s')", TEST_TRANSITION_ID, task.getTitle().getDefaultValue(), task3.getTitle().getDefaultValue());
+
+        searchAndCompareAsList(queryInList, List.of(task, task2, task3));
+
+        // in range
+        String queryInRange = String.format("tasks: transitionId eq '%s' and title in ('%s' : '%s']", TEST_TRANSITION_ID, task.getTitle().getDefaultValue(), task3.getTitle().getDefaultValue());
+
+        searchAndCompareAsList(queryInRange, List.of(task3));
 
         // sort
         String querySort = String.format("tasks: transitionId eq '%s' sort by title", TEST_TRANSITION_ID);
@@ -265,6 +291,11 @@ public class SearchTaskTest {
         searchAndCompare(queryOther, List.of(task3));
         searchAndCompareAsList(queryMore, List.of(task, task2));
 
+        // in list
+        String queryInList = String.format("tasks: userId in ('%s', '%s')", user1.getStringId(), user2.getStringId());
+
+        searchAndCompareAsList(queryInList, List.of(task, task2, task3));
+
         // sort
         String querySort = String.format("tasks: transitionId eq '%s' sort by userId", TEST_TRANSITION_ID);
         String querySort2 = String.format("tasks: transitionId eq '%s' sort by userId desc", TEST_TRANSITION_ID);
@@ -294,6 +325,14 @@ public class SearchTaskTest {
         searchAndCompare(query, case1Tasks);
         searchAndCompare(queryOther, case2Tasks);
         searchAndCompareAsList(queryMore, case1Tasks);
+
+        // in list
+        String queryInList = String.format("tasks: caseId in ('%s', '%s')", case1.getStringId(), case2.getStringId());
+
+        List<Task> allTasks = new ArrayList<>();
+        allTasks.addAll(case1Tasks);
+        allTasks.addAll(case2Tasks);
+        searchAndCompareAsList(queryInList, allTasks);
 
         // sort
         String querySort = String.format("tasks: processId eq '%s' sort by caseId", net.getStringId());
@@ -333,9 +372,17 @@ public class SearchTaskTest {
         searchAndCompare(queryOther, net2Tasks);
         searchAndCompareAsList(queryMore, netTasks);
 
+        // in list
+        String queryInList = String.format("tasks: processId in ('%s', '%s')", net.getStringId(), net2.getStringId());
+
+        List<Task> allTasks = new ArrayList<>();
+        allTasks.addAll(netTasks);
+        allTasks.addAll(net2Tasks);
+        searchAndCompareAsList(queryInList, allTasks);
+
         // sort
-        String querySort = String.format("tasks: processId eq '%s' or processId eq '%s' sort by processId", net.getStringId(), net2.getStringId());
-        String querySort2 = String.format("tasks: processId eq '%s' or processId eq '%s' sort by processId desc", net.getStringId(), net2.getStringId());
+        String querySort = String.format("tasks: processId in ('%s', '%s') sort by processId", net.getStringId(), net2.getStringId());
+        String querySort2 = String.format("tasks: processId in ('%s', '%s') sort by processId desc", net.getStringId(), net2.getStringId());
 
         List<Task> asc = new ArrayList<>();
         asc.addAll(netTasks);
@@ -370,6 +417,14 @@ public class SearchTaskTest {
         searchAndCompare(queryBefore, List.of(task, task2));
         searchAndCompareAsList(queryMore, List.of(task, task2));
 
+        // in list
+        String queryInList = String.format("tasks: transitionId eq '%s' and lastAssign in (%s, %s)", TEST_TRANSITION_ID, toDateTimeString(task.getLastAssigned()), toDateTimeString(task2.getLastAssigned()));
+        searchAndCompareAsList(queryInList, List.of(task, task2));
+
+        // in range
+        String queryInRange = String.format("tasks: transitionId eq '%s' and lastAssign in [%s : %s)", TEST_TRANSITION_ID, toDateTimeString(task.getLastAssigned()), toDateTimeString(task2.getLastAssigned()));
+        searchAndCompareAsList(queryInRange, List.of(task));
+
         // sort
         String querySort = String.format("tasks: transitionId eq '%s' sort by lastAssign", TEST_TRANSITION_ID);
         String querySort2 = String.format("tasks: transitionId eq '%s' sort by lastAssign desc", TEST_TRANSITION_ID);
@@ -402,11 +457,48 @@ public class SearchTaskTest {
         searchAndCompare(queryBefore, List.of(task, task2));
         searchAndCompareAsList(queryMore, List.of(task, task2));
 
+        // in list
+        String queryInList = String.format("tasks: transitionId eq '%s' and lastFinish in (%s, %s)", TEST_TRANSITION_ID, toDateTimeString(task.getLastFinished()), toDateTimeString(task2.getLastFinished()));
+        searchAndCompareAsList(queryInList, List.of(task, task2));
+
+        // in range
+        String queryInRange = String.format("tasks: transitionId eq '%s' and lastFinish in [%s : %s)", TEST_TRANSITION_ID, toDateTimeString(task.getLastFinished()), toDateTimeString(task2.getLastFinished()));
+        searchAndCompareAsList(queryInRange, List.of(task));
+
         // sort
         String querySort = String.format("tasks: transitionId eq '%s' sort by lastFinish", TEST_TRANSITION_ID);
         String querySort2 = String.format("tasks: transitionId eq '%s' sort by lastFinish desc", TEST_TRANSITION_ID);
 
         searchAndCompareAsListInOrder(querySort, List.of(task, task2));
         searchAndCompareAsListInOrder(querySort2, List.of(task2, task));
+    }
+
+    @Test
+    public void testPagination() {
+        PetriNet net = importPetriNet("search/search_test.xml");
+        List<Task> tasks = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Case c = importHelper.createCase("Search Test", net);
+            tasks.addAll(c.getTasks().values().stream()
+                    .map(taskPair -> taskService.findOne(taskPair.getTaskStringId()))
+                            .sorted(Comparator.comparing(Task::getStringId))
+                    .collect(Collectors.toList()));
+        }
+
+        String queryOne = String.format("task: processId eq '%s'", net.getStringId());
+        String queryMore = String.format("tasks: processId eq '%s'", net.getStringId());
+        String queryMoreCustomPagination = String.format("tasks: processId eq '%s' page 1 size 5", net.getStringId());
+
+        long count = searchService.count(queryOne);
+        assert count == 30;
+
+        Object actual = searchService.search(queryOne);
+        compareById(convertToObject(actual, Task.class), tasks.get(0), Task::getStringId);
+
+        actual = searchService.search(queryMore);
+        compareById(convertToObjectList(actual, Task.class), tasks.subList(0, 19), Task::getStringId);
+
+        actual = searchService.search(queryMoreCustomPagination);
+        compareById(convertToObjectList(actual, Task.class), tasks.subList(5, 9), Task::getStringId);
     }
 }

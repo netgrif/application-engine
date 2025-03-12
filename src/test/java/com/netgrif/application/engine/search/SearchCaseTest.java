@@ -113,6 +113,11 @@ public class SearchCaseTest {
 
         searchAndCompare(query, case1);
 
+        // in list
+        String queryInList = String.format("cases: id in ('%s', '%s')", case1.getStringId(), case2.getStringId());
+
+        searchAndCompareAsList(queryInList, List.of(case1, case2));
+
         // sort
         String querySort = String.format("cases: processIdentifier eq '%s' sort by id", net.getIdentifier());
         String querySort2 = String.format("cases: processIdentifier eq '%s' sort by id desc", net.getIdentifier());
@@ -136,6 +141,11 @@ public class SearchCaseTest {
         searchAndCompare(queryEq, List.of(case1, case2));
         searchAndCompare(queryOther, case3);
         searchAndCompareAsList(queryMore, List.of(case1, case2));
+
+        // in list
+        String queryInList = String.format("cases: processId in ('%s', '%s')", net.getStringId(), net2.getStringId());
+
+        searchAndCompareAsList(queryInList, List.of(case1, case2, case3));
 
         // sort
         String querySort = String.format("cases: processIdentifier in ('%s', '%s') sort by processId", net.getIdentifier(), net2.getIdentifier());
@@ -262,6 +272,11 @@ public class SearchCaseTest {
         searchAndCompare(queryOther, case3);
         searchAndCompareAsList(queryMore, List.of(case1, case2));
 
+        // in list
+        String queryInList = String.format("cases: author in ('%s', '%s')", user1.getStringId(), user2.getStringId());
+
+        searchAndCompareAsList(queryInList, List.of(case1, case2, case3));
+
         // sort
         String querySort = String.format("cases: processIdentifier eq '%s' sort by author", net.getIdentifier());
         String querySort2 = String.format("cases: processIdentifier eq '%s' sort by author desc", net.getIdentifier());
@@ -360,6 +375,11 @@ public class SearchCaseTest {
         searchAndCompare(query, List.of(case1, case2));
         searchAndCompare(queryOther, case3);
         searchAndCompareAsList(queryMore, List.of(case1, case2));
+
+        // in list
+        String queryInList = String.format("cases: tasks.%s.userId in ('%s', '%s')", TEST_TRANSITION_ID, user1.getStringId(), user2.getStringId());
+
+        searchAndCompareAsList(queryInList, List.of(case1, case2, case3));
 
         // sort
         String querySort = String.format("cases: processIdentifier eq '%s' sort by tasks.%s.userId", net.getIdentifier(), TEST_TRANSITION_ID);

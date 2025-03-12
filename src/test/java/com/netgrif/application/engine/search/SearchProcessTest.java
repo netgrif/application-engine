@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.netgrif.application.engine.search.utils.SearchTestUtils.*;
 import static com.netgrif.application.engine.search.utils.SearchUtils.toDateTimeString;
 
 @Slf4j
@@ -55,49 +56,36 @@ public class SearchProcessTest {
         return testNet;
     }
 
-    private static PetriNet convertToPetriNet(Object petriNetObject) {
-        assert petriNetObject instanceof PetriNet;
-        return (PetriNet) petriNetObject;
+    private void searchAndCompare(String query, PetriNet expected) {
+        long count = searchService.count(query);
+        assert count == 1;
+
+        Object actual = searchService.search(query);
+        compareById(convertToObject(actual, PetriNet.class), expected, PetriNet::getStringId);
     }
 
-    private static List<PetriNet> convertToPetriNetList(Object petriNetListObject) {
-        assert petriNetListObject instanceof List<?>;
-        for (Object petriNetObject : (List<?>) petriNetListObject) {
-            assert petriNetObject instanceof PetriNet;
-        }
+    private void searchAndCompare(String query, List<PetriNet> expected) {
+        long count = searchService.count(query);
+        assert count == expected.size();
 
-        return (List<PetriNet>) petriNetListObject;
+        Object actual = searchService.search(query);
+        compareById(convertToObject(actual, PetriNet.class), expected, PetriNet::getStringId);
     }
 
-    private void comparePetriNets(PetriNet actual, PetriNet expected) {
-        assert actual.getStringId().equals(expected.getStringId());
+    private void searchAndCompareAsList(String query, List<PetriNet> expected) {
+        long count = searchService.count(query);
+        assert count == expected.size();
+
+        Object actual = searchService.search(query);
+        compareById(convertToObjectList(actual, PetriNet.class), expected, PetriNet::getStringId);
     }
 
-    private void comparePetriNets(PetriNet actual, List<PetriNet> expected) {
-        List<String> expectedStringIds = expected.stream().map(PetriNet::getStringId).collect(Collectors.toList());
+    private void searchAndCompareAsListInOrder(String query, List<PetriNet> expected) {
+        long count = searchService.count(query);
+        assert count == expected.size();
 
-        assert expectedStringIds.contains(actual.getStringId());
-    }
-
-    private void comparePetriNets(List<PetriNet> actual, List<PetriNet> expected) {
-        List<String> actualStringIds = actual.stream().map(PetriNet::getStringId).collect(Collectors.toList());
-        List<String> expectedStringIds = expected.stream().map(PetriNet::getStringId).collect(Collectors.toList());
-
-        assert actualStringIds.containsAll(expectedStringIds);
-    }
-
-    private void comparePetriNetsInOrder(List<PetriNet> actual, List<PetriNet> expected) {
-        List<String> actualStringIds = actual.stream().map(PetriNet::getStringId).collect(Collectors.toList());
-        List<String> expectedStringIds = expected.stream().map(PetriNet::getStringId).collect(Collectors.toList());
-
-        assert actualStringIds.containsAll(expectedStringIds);
-
-        int lastIndex = -1;
-        for (String expectedId : expectedStringIds) {
-            int currentIndex = actualStringIds.indexOf(expectedId);
-            assert currentIndex > lastIndex;
-            lastIndex = currentIndex;
-        }
+        Object actual = searchService.search(query);
+        compareByIdInOrder(convertToObjectList(actual, PetriNet.class), expected, PetriNet::getStringId);
     }
 
     @Test
@@ -107,20 +95,19 @@ public class SearchProcessTest {
 
         String query = String.format("process: id eq '%s'", net.getStringId());
 
-        long count = searchService.count(query);
-        assert count == 1;
+        searchAndCompare(query, net);
 
-        Object process = searchService.search(query);
+        // in list
+        String queryInList = String.format("processes: id in ('%s', '%s')", net.getStringId(), net2.getStringId());
 
-        comparePetriNets(convertToPetriNet(process), net);
+        searchAndCompareAsList(queryInList, List.of(net, net2));
 
+        // sort
         query = String.format("processes: identifier eq '%s' sort by id", net.getIdentifier());
-        Object processes = searchService.search(query);
-        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(net, net2));
+        searchAndCompareAsListInOrder(query, List.of(net, net2));
 
         query = String.format("processes: identifier eq '%s' sort by id desc", net.getIdentifier());
-        processes = searchService.search(query);
-        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(net2, net));
+        searchAndCompareAsListInOrder(query, List.of(net2, net));
     }
 
     @Test
@@ -133,33 +120,23 @@ public class SearchProcessTest {
         String query = String.format("process: identifier eq '%s'", net.getIdentifier());
         String queryMore = String.format("processes: identifier eq '%s'", net.getIdentifier());
 
-        long count = searchService.count(query);
-        assert count == 2;
-
-        Object process = searchService.search(query);
-        comparePetriNets(convertToPetriNet(process), List.of(net, netNewer));
-
-        Object processes = searchService.search(queryMore);
-        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewer));
+        searchAndCompare(query, List.of(net, netNewer));
+        searchAndCompareAsList(queryMore, List.of(net, netNewer));
 
         // in list
         String queryInList = String.format("processes: identifier in ('%s', '%s', '%s')", net.getIdentifier(), net2.getIdentifier(), net3.getIdentifier());
-        processes = searchService.search(queryInList);
-        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewer, net2, net3));
+        searchAndCompareAsList(queryInList, List.of(net, netNewer, net2, net3));
 
         // in range
-        String queryInRange = String.format("processes: identifier in <'%s' : '%s')", net.getIdentifier(), net3.getIdentifier());
-        processes = searchService.search(queryInRange);
-        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewer, net2));
+        String queryInRange = String.format("processes: identifier in ['%s' : '%s')", net.getIdentifier(), net3.getIdentifier());
+        searchAndCompareAsList(queryInRange, List.of(net, netNewer, net2));
 
         // sort
         queryMore = String.format("processes: identifier in ('%s', '%s') sort by identifier", net.getIdentifier(), net2.getIdentifier());
-        processes = searchService.search(queryMore);
-        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(net, netNewer, net2));
+        searchAndCompareAsListInOrder(queryMore, List.of(net, netNewer, net2));
 
         queryMore = String.format("processes: identifier in ('%s', '%s') sort by identifier desc", net.getIdentifier(), net2.getIdentifier());
-        processes = searchService.search(queryMore);
-        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(net2, net, netNewer));
+        searchAndCompareAsListInOrder(queryMore, List.of(net2, net, netNewer));
     }
 
     @Test
@@ -175,58 +152,26 @@ public class SearchProcessTest {
         String queryGt = String.format("processes: identifier eq '%s' and version gt %s", net.getIdentifier(), "1.0.0");
         String queryGte = String.format("processes: identifier eq '%s' and version gte %s", net.getIdentifier(), "1.0.0");
 
-        long count = searchService.count(queryEq);
-        assert count == 1;
-
-        Object process = searchService.search(queryEq);
-        comparePetriNets(convertToPetriNet(process), List.of(net));
-
-        count = searchService.count(queryLt);
-        assert count == 3;
-
-        Object processes = searchService.search(queryLt);
-        List<PetriNet> actual = convertToPetriNetList(processes);
-        comparePetriNets(actual, List.of(net, netNewerPatch, netNewerMinor));
-        assert !actual.stream().map(PetriNet::getStringId).collect(Collectors.toList()).contains(netNewerMajor.getStringId());
-
-        count = searchService.count(queryLte);
-        assert count == 4;
-
-        processes = searchService.search(queryLte);
-        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewerPatch, netNewerMinor, netNewerMajor));
-
-        count = searchService.count(queryGt);
-        assert count == 3;
-
-        processes = searchService.search(queryGt);
-        actual = convertToPetriNetList(processes);
-        comparePetriNets(actual, List.of(netNewerPatch, netNewerMinor, netNewerMajor));
-        assert !actual.stream().map(PetriNet::getStringId).collect(Collectors.toList()).contains(net.getStringId());
-
-        count = searchService.count(queryGte);
-        assert count == 4;
-
-        processes = searchService.search(queryGte);
-        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewerPatch, netNewerMinor, netNewerMajor));
+        searchAndCompare(queryEq, net);
+        searchAndCompareAsList(queryLt, List.of(net, netNewerPatch, netNewerMinor));
+        searchAndCompareAsList(queryLte, List.of(net, netNewerPatch, netNewerMinor, netNewerMajor));
+        searchAndCompareAsList(queryGt, List.of(netNewerPatch, netNewerMinor, netNewerMajor));
+        searchAndCompareAsList(queryGte, List.of(net, netNewerPatch, netNewerMinor, netNewerMajor));
 
         // in list
         String queryInList = String.format("processes: identifier eq '%s' and version in (%s, %s, %s)", net.getIdentifier(), "1.0.0", "1.0.1", "1.1.0");
-        processes = searchService.search(queryInList);
-        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewerPatch, netNewerMinor));
+        searchAndCompareAsList(queryInList, List.of(net, netNewerPatch, netNewerMinor));
 
         // in range
-        String queryInRange = String.format("processes: identifier eq '%s' and version in <%s : %s)", net.getIdentifier(), "1.0.0", "1.1.0");
-        processes = searchService.search(queryInRange);
-        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewerPatch));
+        String queryInRange = String.format("processes: identifier eq '%s' and version in [%s : %s)", net.getIdentifier(), "1.0.0", "1.1.0");
+        searchAndCompareAsList(queryInRange, List.of(net, netNewerPatch));
 
         // sort
         String query = String.format("processes: identifier eq '%s' sort by version", net.getIdentifier());
-        processes = searchService.search(query);
-        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(net, netNewerPatch, netNewerMinor, netNewerMajor));
+        searchAndCompareAsListInOrder(query, List.of(net, netNewerPatch, netNewerMinor, netNewerMajor));
 
         query = String.format("processes: identifier eq '%s' sort by version desc", net.getIdentifier());
-        processes = searchService.search(query);
-        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(netNewerMajor, netNewerMinor, netNewerPatch, net));
+        searchAndCompareAsListInOrder(query, List.of(netNewerMajor, netNewerMinor, netNewerPatch, net));
     }
 
     @Test
@@ -239,39 +184,24 @@ public class SearchProcessTest {
         String queryOther = String.format("process: title eq '%s'", net2.getTitle().toString());
         String queryMore = String.format("processes: title eq '%s'", net.getTitle().toString());
 
-        long count = searchService.count(query);
-        assert count == 2;
-
-        Object process = searchService.search(query);
-        comparePetriNets(convertToPetriNet(process), List.of(net, netNewer));
-
-        count = searchService.count(queryOther);
-        assert count == 1;
-
-        process = searchService.search(queryOther);
-        comparePetriNets(convertToPetriNet(process), net2);
-
-        Object processes = searchService.search(queryMore);
-        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewer));
+        searchAndCompare(query, List.of(net, netNewer));
+        searchAndCompare(queryOther, net2);
+        searchAndCompareAsList(queryMore, List.of(net, netNewer));
 
         // in list
         String queryInList = String.format("processes: identifier in ('%s', '%s') and title in ('%s', '%s')", net.getIdentifier(), net2.getIdentifier(), net.getTitle().getDefaultValue(), net2.getTitle().getDefaultValue());
-        processes = searchService.search(queryInList);
-        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewer, net2));
+        searchAndCompareAsList(queryInList, List.of(net, netNewer, net2));
 
         // in range
-        String queryInRange = String.format("processes: identifier in ('%s', '%s') and title in <'%s' : '%s')", net.getIdentifier(), net2.getIdentifier(), net.getTitle().getDefaultValue(), net2.getTitle().getDefaultValue());
-        processes = searchService.search(queryInRange);
-        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewer));
+        String queryInRange = String.format("processes: identifier in ('%s', '%s') and title in ['%s' : '%s')", net.getIdentifier(), net2.getIdentifier(), net.getTitle().getDefaultValue(), net2.getTitle().getDefaultValue());
+        searchAndCompareAsList(queryInRange, List.of(net, netNewer));
 
         // sort
         queryMore = String.format("processes: identifier in ('%s', '%s') sort by title", net.getIdentifier(), net2.getIdentifier());
-        processes = searchService.search(queryMore);
-        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(net, netNewer, net2));
+        searchAndCompareAsListInOrder(queryMore, List.of(net, netNewer, net2));
 
         queryMore = String.format("processes: identifier in ('%s', '%s') sort by title desc", net.getIdentifier(), net2.getIdentifier());
-        processes = searchService.search(queryMore);
-        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(net2, net, netNewer));
+        searchAndCompareAsListInOrder(queryMore, List.of(net2, net, netNewer));
     }
 
     @Test
@@ -286,54 +216,26 @@ public class SearchProcessTest {
         String queryGt = String.format("processes: identifier eq '%s' and creationDate gt %s", net.getIdentifier(), toDateTimeString(net.getCreationDate()));
         String queryGte = String.format("processes: identifier eq '%s' and creationDate gte %s", net.getIdentifier(), toDateTimeString(net.getCreationDate()));
 
-        long count = searchService.count(queryEq);
-        assert count == 1;
-
-        Object process = searchService.search(queryEq);
-        comparePetriNets(convertToPetriNet(process), net);
-
-        count = searchService.count(queryLt);
-        assert count == 2;
-
-        Object processes = searchService.search(queryLt);
-        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewer));
-
-        count = searchService.count(queryLte);
-        assert count == 3;
-
-        processes = searchService.search(queryLte);
-        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewer, netNewest));
-
-        count = searchService.count(queryGt);
-        assert count == 2;
-
-        processes = searchService.search(queryGt);
-        comparePetriNets(convertToPetriNetList(processes), List.of(netNewer, netNewest));
-
-        count = searchService.count(queryGte);
-        assert count == 3;
-
-        processes = searchService.search(queryGte);
-        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewer, netNewest));
+        searchAndCompare(queryEq, net);
+        searchAndCompareAsList(queryLt, List.of(net, netNewer));
+        searchAndCompareAsList(queryLte, List.of(net, netNewer, netNewest));
+        searchAndCompareAsList(queryGt, List.of(netNewer, netNewest));
+        searchAndCompareAsList(queryGte, List.of(net, netNewer, netNewest));
 
         // in list
         String queryInList = String.format("processes: identifier eq '%s' and creationDate in (%s, %s)", net.getIdentifier(), toDateTimeString(net.getCreationDate()), toDateTimeString(netNewest.getCreationDate()));
-        processes = searchService.search(queryInList);
-        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewest));
+        searchAndCompareAsList(queryInList, List.of(net, netNewest));
 
         // in range
-        String queryInRange = String.format("processes: identifier eq '%s' and creationDate in <%s : %s)", net.getIdentifier(), toDateTimeString(net.getCreationDate()), toDateTimeString(netNewest.getCreationDate()));
-        processes = searchService.search(queryInRange);
-        comparePetriNets(convertToPetriNetList(processes), List.of(net, netNewer));
+        String queryInRange = String.format("processes: identifier eq '%s' and creationDate in [%s : %s)", net.getIdentifier(), toDateTimeString(net.getCreationDate()), toDateTimeString(netNewest.getCreationDate()));
+        searchAndCompareAsList(queryInRange, List.of(net, netNewer));
 
         // sort
         String query = String.format("processes: identifier eq '%s' sort by creationDate", net.getIdentifier());
-        processes = searchService.search(query);
-        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(net, netNewer, netNewest));
+        searchAndCompareAsListInOrder(query, List.of(net, netNewer, netNewest));
 
         query = String.format("processes: identifier eq '%s' sort by creationDate desc", net.getIdentifier());
-        processes = searchService.search(query);
-        comparePetriNetsInOrder(convertToPetriNetList(processes), List.of(netNewest, netNewer, net));
+        searchAndCompareAsListInOrder(query, List.of(netNewest, netNewer, net));
     }
 
     @Test
@@ -351,13 +253,13 @@ public class SearchProcessTest {
         assert count == 50;
 
         Object process = searchService.search(queryOne);
-        comparePetriNets(convertToPetriNet(process), nets.get(0));
+        compareById(convertToObject(process, PetriNet.class), nets.get(0), PetriNet::getStringId);
 
         Object processes = searchService.search(queryMore);
-        comparePetriNets(convertToPetriNetList(processes), nets.subList(0, 19));
+        compareById(convertToObjectList(processes, PetriNet.class), nets.subList(0, 19), PetriNet::getStringId);
 
         processes = searchService.search(queryMoreCustomPagination);
-        comparePetriNets(convertToPetriNetList(processes), nets.subList(5, 9));
+        compareById(convertToObjectList(processes, PetriNet.class), nets.subList(5, 9), PetriNet::getStringId);
     }
 
 }
