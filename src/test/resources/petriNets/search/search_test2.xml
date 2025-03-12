@@ -1,0 +1,207 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>search_test2</id>
+    <initials>ST2</initials>
+    <title>Search Test 2</title>
+    <icon>check_circle</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>true</anonymousRole>
+    <transitionRole>false</transitionRole>
+    <data type="text" immediate="true">
+        <id>text_immediate</id>
+        <title/>
+        <init>test</init>
+    </data>
+    <data type="number" immediate="true">
+        <id>number_immediate</id>
+        <title/>
+        <init>54</init>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>enumeration_map_immediate</id>
+        <title/>
+        <options>
+            <option key="key1">value1</option>
+            <option key="key2">value2</option>
+            <option key="key3">value3</option>
+        </options>
+        <init>key2</init>
+    </data>
+    <data type="multichoice_map" immediate="true">
+        <id>multichoice_map_immediate</id>
+        <title/>
+        <options>
+            <option key="key1">value1</option>
+            <option key="key2">value2</option>
+            <option key="key3">value3</option>
+        </options>
+        <inits>
+            <init>key1</init>
+            <init>key2</init>
+        </inits>
+    </data>
+    <data type="boolean" immediate="true">
+        <id>boolean_immediate</id>
+        <title/>
+        <init>true</init>
+    </data>
+    <data type="date" immediate="true">
+        <id>date_immediate</id>
+        <title/>
+        <init dynamic="true">java.time.LocalDate.now()</init>
+    </data>
+    <data type="dateTime" immediate="true">
+        <id>date_time_immediate</id>
+        <title/>
+        <init dynamic="true">java.time.LocalDateTime.now()</init>
+    </data>
+    <transition>
+        <id>search_test_t1</id>
+        <x>260</x>
+        <y>100</y>
+        <label>Test2</label>
+        <dataGroup>
+            <id>search_test_t1_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>text_immediate</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>number_immediate</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_map_immediate</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>multichoice_map_immediate</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>boolean_immediate</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>date_immediate</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>5</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>date_time_immediate</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>6</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>search_test_t1_asign</id>
+        </event>
+        <event type="finish">
+            <id>search_test_t1_fiish</id>
+        </event>
+        <event type="cancel">
+            <id>search_test_t1_cacel</id>
+        </event>
+        <event type="delegate">
+            <id>search_test_t1_deleate</id>
+        </event>
+    </transition>
+    <place>
+        <id>p1</id>
+        <x>180</x>
+        <y>100</y>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p2</id>
+        <x>340</x>
+        <y>100</y>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <arc>
+        <id>a1</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>search_test_t1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a2</id>
+        <type>regular</type>
+        <sourceId>search_test_t1</sourceId>
+        <destinationId>p2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>
