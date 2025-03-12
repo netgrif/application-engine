@@ -22,7 +22,7 @@
         <title/>
         <validations>
             <validation>
-                <name>telnumber</name>
+                <name>telNumber</name>
                 <message>error-text02</message>
             </validation>
         </validations>
@@ -32,10 +32,13 @@
         <title/>
         <validations>
             <validation>
-                <name>maxlength</name>
+                <name>maxLength</name>
                 <serverArguments>
                     <argument>6</argument>
                 </serverArguments>
+                <clientArguments>
+                    <argument>6</argument>
+                </clientArguments>
                 <message>error-text03</message>
             </validation>
         </validations>
@@ -45,10 +48,13 @@
         <title/>
         <validations>
             <validation>
-                <name>minlength</name>
+                <name>minLength</name>
                 <serverArguments>
                     <argument>3</argument>
                 </serverArguments>
+                <clientArguments>
+                    <argument>3</argument>
+                </clientArguments>
                 <message>error-text04</message>
             </validation>
         </validations>
@@ -58,17 +64,23 @@
         <title/>
         <validations>
             <validation>
-                <name>minlength</name>
+                <name>minLength</name>
                 <serverArguments>
                     <argument>3</argument>
                 </serverArguments>
+                <clientArguments>
+                    <argument>3</argument>
+                </clientArguments>
                 <message>error-text05</message>
             </validation>
             <validation>
-                <name>maxlength</name>
+                <name>maxLength</name>
                 <serverArguments>
                     <argument>6</argument>
                 </serverArguments>
+                <clientArguments>
+                    <argument>6</argument>
+                </clientArguments>
                 <message>error-text05</message>
             </validation>
         </validations>
@@ -82,6 +94,9 @@
                 <serverArguments>
                     <argument dynamic="true">number01.rawValue</argument>
                 </serverArguments>
+                <clientArguments>
+                    <argument dynamic="true">number01.rawValue</argument>
+                </clientArguments>
                 <message>error-text06</message>
             </validation>
         </validations>

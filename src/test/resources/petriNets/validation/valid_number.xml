@@ -67,6 +67,10 @@
                     <argument>10</argument>
                     <argument>20</argument>
                 </serverArguments>
+                <clientArguments>
+                    <argument>10</argument>
+                    <argument>20</argument>
+                </clientArguments>
                 <message>error-number06</message>
             </validation>
         </validations>
@@ -86,6 +90,10 @@
                     <argument>inf</argument>
                     <argument>5</argument>
                 </serverArguments>
+                <clientArguments>
+                    <argument>inf</argument>
+                    <argument>5</argument>
+                </clientArguments>
                 <message>error-number07-2</message>
             </validation>
         </validations>

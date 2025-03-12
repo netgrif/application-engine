@@ -741,7 +741,8 @@ public class DataService implements IDataService {
     @Override
     public List<Field<?>> getImmediateFields(Task task) {
         Case useCase = workflowService.findOne(task.getCaseId());
-        List<Field<?>> fields = task.getImmediateDataFields().stream().map(f -> useCase.getDataSet().get(f)).collect(Collectors.toList());
+        Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+        List<Field<?>> fields = transition.getDataSet().keySet().stream().map(f -> useCase.getDataSet().get(f)).filter(field -> field.getBehaviors().get(task.getTransitionId()).isImmediate()).collect(Collectors.toList());
 //        TODO: release/8.0.0 order?
 //        LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
         return fields;

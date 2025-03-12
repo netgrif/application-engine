@@ -34,14 +34,14 @@ class BooleanFieldValidationTest {
         ValidationDelegate delegate = getValidationDelegate()
         delegate.thisField = new BooleanField(rawValue: true)
 
-        assert delegate.requiredtrue()
+        assert delegate.requiredTrue()
     }
     @Test
     void requiredTrue_fail() {
         ValidationDelegate delegate = getValidationDelegate()
         delegate.thisField = new BooleanField(rawValue: false)
 
-        assert !delegate.requiredtrue()
+        assert !delegate.requiredTrue()
     }
 
     @Test
@@ -49,7 +49,7 @@ class BooleanFieldValidationTest {
         ValidationDelegate delegate = getValidationDelegate()
         delegate.thisField = new BooleanField(rawValue: true)
 
-        assert delegate.notempty()
+        assert delegate.notEmpty()
     }
 
     @Test
@@ -57,6 +57,6 @@ class BooleanFieldValidationTest {
         ValidationDelegate delegate = getValidationDelegate()
         delegate.thisField = new BooleanField(rawValue: null)
 
-        assert !delegate.notempty()
+        assert !delegate.notEmpty()
     }
 }

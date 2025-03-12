@@ -111,12 +111,6 @@ public class Task implements Serializable {
 
     private String transactionId;
 
-    // TODO: release/8.0.0 remove, dynamically load from dataSet
-    @Getter
-    @Setter
-    @JsonIgnore
-    @Builder.Default
-    private LinkedHashSet<String> immediateDataFields = new LinkedHashSet<>();
     @Getter
     @Setter
     @Transient

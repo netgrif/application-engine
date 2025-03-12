@@ -11,7 +11,7 @@
 		<title/>
 		<validations>
 			<validation>
-				<name>requiredtrue</name>
+				<name>requiredTrue</name>
 				<message>error-boolean</message>
 			</validation>
 		</validations>

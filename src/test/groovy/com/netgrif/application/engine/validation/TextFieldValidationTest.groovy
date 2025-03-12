@@ -37,26 +37,26 @@ class TextFieldValidationTest {
     }
 
     @Test
-    void minlength() {
+    void minLength() {
         ValidationDelegate delegate = getValidationDelegate()
         delegate.thisField = new TextField(rawValue: 'totok')
 
-        assert !delegate.minlength(6)
+        assert !delegate.minLength(6)
 
-        assert delegate.minlength(5)
+        assert delegate.minLength(5)
 
-        assert delegate.minlength(4)
+        assert delegate.minLength(4)
     }
 
     @Test
-    void maxlength() {
+    void maxLength() {
         ValidationDelegate delegate = getValidationDelegate()
         delegate.thisField = new TextField(rawValue: 'totok')
 
-        assert !delegate.maxlength(4)
+        assert !delegate.maxLength(4)
 
-        assert delegate.maxlength(5)
+        assert delegate.maxLength(5)
 
-        assert delegate.maxlength(6)
+        assert delegate.maxLength(6)
     }
 }

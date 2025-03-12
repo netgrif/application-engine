@@ -345,6 +345,7 @@
 				<id>name</id>
 				<logic>
 					<behavior>visible</behavior>
+					<behavior>immediate</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -373,6 +374,7 @@
 				<id>validation_definition_javascript</id>
 				<logic>
 					<behavior>hidden</behavior>
+					<behavior>immediate</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -429,6 +431,7 @@
 				<id>validation_type</id>
 				<logic>
 					<behavior>visible</behavior>
+					<behavior>immediate</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -453,6 +456,62 @@
 			<id>detail_delegate</id>
 		</event>
     </transition>
+    <transition>
+		<id>active_detail</id>
+		<x>752</x>
+		<y>208</y>
+		<label>Active detail</label>
+		<dataGroup>
+			<id>detail_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>name</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>immediate</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>validation_definition_javascript</id>
+				<logic>
+					<behavior>hidden</behavior>
+					<behavior>immediate</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>validation_type</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>immediate</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
     <place>
         <id>p1</id>
         <x>180</x>
@@ -539,6 +598,13 @@
 		<type>regular</type>
 		<sourceId>deactivate</sourceId>
 		<destinationId>inactive</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a10</id>
+		<type>read</type>
+		<sourceId>active</sourceId>
+		<destinationId>active_detail</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 </document>

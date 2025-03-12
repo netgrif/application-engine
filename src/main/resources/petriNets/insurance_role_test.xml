@@ -5512,7 +5512,7 @@
         <title>Telefónne číslo</title>
         <id>109018</id>
         <desc>Poistník</desc>
-        <valid>telnumber</valid>
+        <valid>telNumber</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.109020,
@@ -6358,7 +6358,7 @@
         <title>Telefónne číslo</title>
         <id>109032</id>
         <desc>Poistený</desc>
-        <valid>telnumber</valid>
+        <valid>telNumber</valid>
     </data>
     <data type="text">
         <title>Email</title>

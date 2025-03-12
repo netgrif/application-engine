@@ -757,7 +757,6 @@ public class TaskService implements ITaskService {
                 .caseTitle(useCase.getTitle())
                 .priority(transition.getPriority())
                 .icon(transition.getIcon() == null ? useCase.getIcon() : transition.getIcon())
-                .immediateDataFields(transition.getImmediateData())
                 .assignPolicy(transition.getAssignPolicy())
                 .dataFocusPolicy(transition.getDataFocusPolicy())
                 .finishPolicy(transition.getFinishPolicy())

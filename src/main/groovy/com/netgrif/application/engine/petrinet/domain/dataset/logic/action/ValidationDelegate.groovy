@@ -23,10 +23,10 @@ class ValidationDelegate {
     // todo NAE-1788: thisField keyword
     Field<?> thisField
 
-    Boolean notempty() { return thisField.rawValue != null }
+    Boolean notEmpty() { return thisField.rawValue != null }
 
     // boolean field validations
-    Boolean requiredtrue() { return thisField instanceof BooleanField && notempty() && thisField.rawValue == true }
+    Boolean requiredTrue() { return thisField instanceof BooleanField && notEmpty() && thisField.rawValue == true }
 
     // date field validations
     Boolean between(def from, def to) {
@@ -81,10 +81,10 @@ class ValidationDelegate {
         return true
     }
 
-    Boolean workday() { return (thisField instanceof DateField || thisField instanceof DateTimeField) && notempty() && !thisField.rawValue.dayOfWeek.isWeekend() }
+    Boolean workday() { return (thisField instanceof DateField || thisField instanceof DateTimeField) && notEmpty() && !thisField.rawValue.dayOfWeek.isWeekend() }
 
 
-    Boolean weekend() { return (thisField instanceof DateField || thisField instanceof DateTimeField) && notempty() && thisField.rawValue.dayOfWeek.isWeekend() }
+    Boolean weekend() { return (thisField instanceof DateField || thisField instanceof DateTimeField) && notEmpty() && thisField.rawValue.dayOfWeek.isWeekend() }
 
     protected static LocalDate parseStringToLocalDate(String stringDate) {
         if (stringDate == null) {
@@ -109,15 +109,15 @@ class ValidationDelegate {
     }
 
     // number field validations
-    Boolean odd() { return thisField instanceof NumberField && notempty() && thisField.rawValue as Double % 2 != 0 }
+    Boolean odd() { return thisField instanceof NumberField && notEmpty() && thisField.rawValue as Double % 2 != 0 }
 
-    Boolean even() { return thisField instanceof NumberField && notempty() && thisField.rawValue as Double % 2 == 0 }
+    Boolean even() { return thisField instanceof NumberField && notEmpty() && thisField.rawValue as Double % 2 == 0 }
 
-    Boolean positive() { return thisField instanceof NumberField && notempty() && thisField.rawValue >= 0 }
+    Boolean positive() { return thisField instanceof NumberField && notEmpty() && thisField.rawValue >= 0 }
 
-    Boolean negative() { return thisField instanceof NumberField && notempty() && thisField.rawValue <= 0 }
+    Boolean negative() { return thisField instanceof NumberField && notEmpty() && thisField.rawValue <= 0 }
 
-    Boolean decimal() { return thisField instanceof NumberField && notempty() && thisField.rawValue as Double % 1 == 0 }
+    Boolean decimal() { return thisField instanceof NumberField && notEmpty() && thisField.rawValue as Double % 1 == 0 }
 
     Boolean inrange(def from, def to) {
 
@@ -128,17 +128,17 @@ class ValidationDelegate {
         if (to instanceof String && to.toLowerCase() == INF) {
             to = Double.MAX_VALUE
         }
-        return thisField instanceof NumberField && notempty() && thisField.rawValue >= from as Double && thisField.rawValue <= to as Double
+        return thisField instanceof NumberField && notEmpty() && thisField.rawValue >= from as Double && thisField.rawValue <= to as Double
     }
 
     // text field validations
-    Boolean regex(String pattern) { return thisField instanceof TextField && notempty() && thisField.rawValue ==~ pattern }
+    Boolean regex(String pattern) { return thisField instanceof TextField && notEmpty() && thisField.rawValue ==~ pattern }
 
-    Boolean minlength(Integer minLength) { return thisField instanceof TextField && notempty() && (thisField.rawValue as String).length() >= minLength }
+    Boolean minLength(Integer minLength) { return thisField instanceof TextField && notEmpty() && (thisField.rawValue as String).length() >= minLength }
 
-    Boolean maxlength(Integer maxLength) { return thisField instanceof TextField && notempty() && (thisField.rawValue as String).length() <= maxLength }
+    Boolean maxLength(Integer maxLength) { return thisField instanceof TextField && notEmpty() && (thisField.rawValue as String).length() <= maxLength }
 
-    Boolean telnumber() { return regex(TEL_NUMBER_REGEX) }
+    Boolean telNumber() { return regex(TEL_NUMBER_REGEX) }
 
     Boolean email() { return regex(EMAIL_REGEX) }
 

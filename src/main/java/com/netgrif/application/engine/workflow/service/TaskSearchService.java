@@ -7,6 +7,7 @@ import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetRefere
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.application.engine.workflow.domain.State;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import com.querydsl.core.BooleanBuilder;
@@ -112,12 +113,22 @@ public class TaskSearchService extends MongoSearchService<Task> {
         buildFullTextQuery(request, builder);
         buildTransitionQuery(request, builder);
         buildTagsQuery(request, builder);
+        buildStateQuery(request, builder);
         boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, builder);
 
         if (resultAlwaysEmpty)
             return null;
         else
             return builder;
+    }
+
+    private void buildStateQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.state == null) {
+            return;
+        }
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.or(QTask.task.state.eq(request.state));
+        query.and(builder);
     }
 
     private void buildStringIdQuery(TaskSearchRequest request, BooleanBuilder query) {

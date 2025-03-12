@@ -15,6 +15,7 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
@@ -59,6 +60,8 @@ public class ExportService implements IExportService {
     @Autowired
     private IUserService userService;
 
+    @Autowired
+    private IDataService dataService;
 
     @Override
     public Set<String> buildDefaultCsvCaseHeader(List<Case> exportCases) {
@@ -74,7 +77,7 @@ public class ExportService implements IExportService {
         Set<String> header = new LinkedHashSet<>();
         exportTasks.forEach(
                 exportTask ->
-                        header.addAll(exportTask.getImmediateDataFields())
+                        header.addAll(dataService.getImmediateFields(exportTask).stream().map(Field::getStringId).collect(Collectors.toSet()))
         );
         return header;
     }
