@@ -651,49 +651,23 @@ public class QueryLangTest {
         String expected = String.format("stringId:%s", GENERIC_OBJECT_ID);
         assert expected.equals(actual);
 
+        // todo NAE-1997: id in list
+
         // processId comparison
         actual = evaluateQuery(String.format("case: processId eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         expected = String.format("processId:%s", GENERIC_OBJECT_ID);
         assert expected.equals(actual);
 
-        // processIdentifier comparison
-        actual = evaluateQuery("case: processIdentifier eq 'test'").getFullElasticQuery();
-        expected = "processIdentifier:test";
-        assert expected.equals(actual);
+        // todo NAE-1997: processId id in list
 
-        actual = evaluateQuery("case: processIdentifier contains 'test'").getFullElasticQuery();
-        expected = "processIdentifier:*test*";
-        assert expected.equals(actual);
+        // processIdentifier comparison
+        checkStringComparisonElastic("case", "processIdentifier", "processIdentifier");
 
         // title comparison
-        actual = evaluateQuery("case: title eq 'test'").getFullElasticQuery();
-        expected = "title:test";
-        assert expected.equals(actual);
-
-        actual = evaluateQuery("case: title contains 'test'").getFullElasticQuery();
-        expected = "title:*test*";
-        assert expected.equals(actual);
+        checkStringComparisonElastic("case", "title", "title");
 
         // creationDate comparison
-        actual = evaluateQuery("case: creationDate eq 2011-12-03T10:15:30").getFullElasticQuery();
-        expected = String.format("creationDateSortable:%s", Timestamp.valueOf(localDateTime).getTime());
-        assert expected.equals(actual);
-
-        actual = evaluateQuery("case: creationDate lt 2011-12-03T10:15:30").getFullElasticQuery();
-        expected = String.format("creationDateSortable:<%s", Timestamp.valueOf(localDateTime).getTime());
-        assert expected.equals(actual);
-
-        actual = evaluateQuery("case: creationDate lte 2011-12-03T10:15:30").getFullElasticQuery();
-        expected = String.format("creationDateSortable:<=%s", Timestamp.valueOf(localDateTime).getTime());
-        assert expected.equals(actual);
-
-        actual = evaluateQuery("case: creationDate gt 2011-12-03T10:15:30").getFullElasticQuery();
-        expected = String.format("creationDateSortable:>%s", Timestamp.valueOf(localDateTime).getTime());
-        assert expected.equals(actual);
-
-        actual = evaluateQuery("case: creationDate gte 2011-12-03T10:15:30").getFullElasticQuery();
-        expected = String.format("creationDateSortable:>=%s", Timestamp.valueOf(localDateTime).getTime());
-        assert expected.equals(actual);
+        checkDateComparisonElastic("case", "creationDate", "creationDateSortable");
 
         // author comparison
         actual = evaluateQuery("case: author eq 'test'").getFullElasticQuery();
@@ -704,10 +678,10 @@ public class QueryLangTest {
         expected = "author:*test*";
         assert expected.equals(actual);
 
+        // todo NAE-1997: author in list
+
         // places comparison
-        actual = evaluateQuery("case: places.p1.marking eq 1").getFullElasticQuery();
-        expected = "places.p1.marking:1";
-        assert expected.equals(actual);
+        checkNumberComparisonElastic("case", "places.p1.marking", "places.p1.marking");
 
         // task state comparison
         actual = evaluateQuery("case: tasks.t1.state eq enabled").getFullElasticQuery();
@@ -727,54 +701,14 @@ public class QueryLangTest {
         expected = "tasks.t1.userId:*test*";
         assert expected.equals(actual);
 
+        // todo NAE-1997: task userId in list
+
         // data value comparison
-        actual = evaluateQuery("case: data.field1.value eq 'test'").getFullElasticQuery();
-        expected = "dataSet.field1.textValue:test";
-        assert expected.equals(actual);
+        checkStringComparisonElastic("case", "data.field1.value", "dataSet.field1.textValue");
 
-        actual = evaluateQuery("case: data.field1.value contains 'test'").getFullElasticQuery();
-        expected = "dataSet.field1.textValue:*test*";
-        assert expected.equals(actual);
+        checkNumberComparisonElastic("case", "data.field2.value", "dataSet.field2.numberValue");
 
-        actual = evaluateQuery("case: data.field1.value eq 1").getFullElasticQuery();
-        expected = "dataSet.field1.numberValue:1";
-        assert expected.equals(actual);
-
-        actual = evaluateQuery("case: data.field1.value lt 1").getFullElasticQuery();
-        expected = "dataSet.field1.numberValue:<1";
-        assert expected.equals(actual);
-
-        actual = evaluateQuery("case: data.field1.value lte 1").getFullElasticQuery();
-        expected = "dataSet.field1.numberValue:<=1";
-        assert expected.equals(actual);
-
-        actual = evaluateQuery("case: data.field1.value gt 1").getFullElasticQuery();
-        expected = "dataSet.field1.numberValue:>1";
-        assert expected.equals(actual);
-
-        actual = evaluateQuery("case: data.field1.value gte 1").getFullElasticQuery();
-        expected = "dataSet.field1.numberValue:>=1";
-        assert expected.equals(actual);
-
-        actual = evaluateQuery("case: data.field1.value eq 2011-12-03T10:15:30").getFullElasticQuery();
-        expected = String.format("dataSet.field1.timestampValue:%s", Timestamp.valueOf(localDateTime).getTime());
-        assert expected.equals(actual);
-
-        actual = evaluateQuery("case: data.field1.value lt 2011-12-03T10:15:30").getFullElasticQuery();
-        expected = String.format("dataSet.field1.timestampValue:<%s", Timestamp.valueOf(localDateTime).getTime());
-        assert expected.equals(actual);
-
-        actual = evaluateQuery("case: data.field1.value lte 2011-12-03T10:15:30").getFullElasticQuery();
-        expected = String.format("dataSet.field1.timestampValue:<=%s", Timestamp.valueOf(localDateTime).getTime());
-        assert expected.equals(actual);
-
-        actual = evaluateQuery("case: data.field1.value gt 2011-12-03T10:15:30").getFullElasticQuery();
-        expected = String.format("dataSet.field1.timestampValue:>%s", Timestamp.valueOf(localDateTime).getTime());
-        assert expected.equals(actual);
-
-        actual = evaluateQuery("case: data.field1.value gte 2011-12-03T10:15:30").getFullElasticQuery();
-        expected = String.format("dataSet.field1.timestampValue:>=%s", Timestamp.valueOf(localDateTime).getTime());
-        assert expected.equals(actual);
+        checkDateComparisonElastic("case", "data.field3.value", "dataSet.field3.timestampValue");
 
         actual = evaluateQuery("case: data.field1.value eq true").getFullElasticQuery();
         expected = "dataSet.field1.booleanValue:true";
@@ -785,13 +719,7 @@ public class QueryLangTest {
         assert expected.equals(actual);
 
         // data options comparison
-        actual = evaluateQuery("case: data.field1.options eq 'test'").getFullElasticQuery();
-        expected = "dataSet.field1.options:test";
-        assert expected.equals(actual);
-
-        actual = evaluateQuery("case: data.field1.options contains 'test'").getFullElasticQuery();
-        expected = "dataSet.field1.options:*test*";
-        assert expected.equals(actual);
+        checkStringComparisonElastic("case", "data.field1.options", "dataSet.field1.options");
     }
 
     @Test
@@ -1683,6 +1611,199 @@ public class QueryLangTest {
         expected = dateTimePath.gt(date4).and(dateTimePath.loe(date5)).not();
 
         compareMongoQueries(mongoDbUtils, actual, expected);
+    }
+
+    private static void checkStringComparisonElastic(String resource, String attribute, String resultAttribute) {
+        String actual = evaluateQuery(String.format("%s: %s eq 'test'", resource, attribute)).getFullElasticQuery();
+        String expected = String.format("%s:test", resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s contains 'test'", resource, attribute)).getFullElasticQuery();
+        expected = String.format("%s:*test*", resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s lt 'test'", resource, attribute)).getFullElasticQuery();
+        expected = String.format("%s:<test", resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s lte 'test'", resource, attribute)).getFullElasticQuery();
+        expected = String.format("%s:<=test", resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s gt 'test'", resource, attribute)).getFullElasticQuery();
+        expected = String.format("%s:>test", resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s gte 'test'", resource, attribute)).getFullElasticQuery();
+        expected = String.format("%s:>=test", resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s in ('test1', 'test2', 'test3')", resource, attribute)).getFullElasticQuery();
+        expected = String.format("%s:(test1 OR test2 OR test3)", resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s not in ('test1', 'test2', 'test3')", resource, attribute)).getFullElasticQuery();
+        expected = String.format("NOT %s:(test1 OR test2 OR test3)", resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s in ('test1' : 'test2')", resource, attribute)).getFullElasticQuery();
+        expected = String.format("(%s:>test1 AND %s:<test2)", resultAttribute, resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s in ['test1' : 'test2']", resource, attribute)).getFullElasticQuery();
+        expected = String.format("(%s:>=test1 AND %s:<=test2)", resultAttribute, resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s not in ('test1' : 'test2']", resource, attribute)).getFullElasticQuery();
+        expected = String.format("NOT (%s:>test1 AND %s:<=test2)", resultAttribute, resultAttribute);
+
+        assert actual.equals(expected);
+    }
+
+    private static void checkNumberComparisonElastic(String resource, String attribute, String resultAttribute) {
+        String actual = evaluateQuery(String.format("%s: %s eq 1", resource, attribute)).getFullElasticQuery();
+        String expected = String.format("%s:1", resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s lt 1", resource, attribute)).getFullElasticQuery();
+        expected = String.format("%s:<1", resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s lte 1", resource, attribute)).getFullElasticQuery();
+        expected = String.format("%s:<=1", resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s gt 1", resource, attribute)).getFullElasticQuery();
+        expected = String.format("%s:>1", resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s gte 1", resource, attribute)).getFullElasticQuery();
+        expected = String.format("%s:>=1", resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s in (1, 2, 3)", resource, attribute)).getFullElasticQuery();
+        expected = String.format("%s:(1 OR 2 OR 3)", resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s not in (1, 2, 3)", resource, attribute)).getFullElasticQuery();
+        expected = String.format("NOT %s:(1 OR 2 OR 3)", resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s in (1 : 2)", resource, attribute)).getFullElasticQuery();
+        expected = String.format("(%s:>1 AND %s:<2)", resultAttribute, resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s in [1 : 2]", resource, attribute)).getFullElasticQuery();
+        expected = String.format("(%s:>=1 AND %s:<=2)", resultAttribute, resultAttribute);
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s not in (1 : 2]", resource, attribute)).getFullElasticQuery();
+        expected = String.format("NOT (%s:>1 AND %s:<=2)", resultAttribute, resultAttribute);
+
+        assert actual.equals(expected);
+    }
+
+    private static void checkDateComparisonElastic(String resource, String attribute, String resultAttribute) {
+        LocalDateTime date1 = LocalDateTime.of(2011, 12, 3, 10, 15, 30);
+        LocalDateTime date2 = LocalDateTime.of(2011, 12, 3, 11, 15, 30);
+        LocalDateTime date3 = LocalDateTime.of(2011, 12, 3, 12, 15, 30);
+        LocalDateTime date4 = LocalDateTime.of(2011, 12, 3, 12, 0, 0);
+        LocalDateTime date5 = LocalDateTime.of(2011, 12, 3, 12, 0, 0);
+        LocalDateTime date6 = LocalDateTime.of(2011, 12, 3, 12, 0, 0);
+
+        String actual = evaluateQuery(String.format("%s: %s eq 2011-12-03T10:15:30", resource, attribute)).getFullElasticQuery();
+        String expected = String.format("%s:%s", resultAttribute, Timestamp.valueOf(date1).getTime());
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s lt 2011-12-03T10:15:30", resource, attribute)).getFullElasticQuery();
+        expected = String.format("%s:<%s", resultAttribute, Timestamp.valueOf(date1).getTime());
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s lte 2011-12-03T10:15:30", resource, attribute)).getFullElasticQuery();
+        expected = String.format("%s:<=%s", resultAttribute, Timestamp.valueOf(date1).getTime());
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s gt 2011-12-03T10:15:30", resource, attribute)).getFullElasticQuery();
+        expected = String.format("%s:>%s", resultAttribute, Timestamp.valueOf(date1).getTime());
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s gte 2011-12-03T10:15:30", resource, attribute)).getFullElasticQuery();
+        expected = String.format("%s:>=%s", resultAttribute, Timestamp.valueOf(date1).getTime());
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s in (2011-12-03T10:15:30, 2011-12-03T11:15:30, 2011-12-03T12:15:30)", resource, attribute)).getFullElasticQuery();
+        expected = String.format("%s:(%s OR %s OR %s)", resultAttribute, Timestamp.valueOf(date1).getTime(), Timestamp.valueOf(date2).getTime(), Timestamp.valueOf(date3).getTime());
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s not in (2011-12-03T10:15:30, 2011-12-03T11:15:30, 2011-12-03T12:15:30)", resource, attribute)).getFullElasticQuery();
+        expected = String.format("NOT %s:(%s OR %s OR %s)", resultAttribute, Timestamp.valueOf(date1).getTime(), Timestamp.valueOf(date2).getTime(), Timestamp.valueOf(date3).getTime());
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s in (2011-12-03T10:15:30 : 2011-12-03T11:15:30)", resource, attribute)).getFullElasticQuery();
+        expected = String.format("(%s:>%s AND %s:<%s)", resultAttribute, Timestamp.valueOf(date1).getTime(), resultAttribute, Timestamp.valueOf(date2).getTime());
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s in [2011-12-03T10:15:30 : 2011-12-03T11:15:30]", resource, attribute)).getFullElasticQuery();
+        expected = String.format("(%s:>=%s AND %s:<=%s)", resultAttribute, Timestamp.valueOf(date1).getTime(), resultAttribute, Timestamp.valueOf(date2).getTime());
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s not in (2011-12-03T10:15:30 : 2011-12-03T11:15:30]", resource, attribute)).getFullElasticQuery();
+        expected = String.format("NOT (%s:>%s AND %s:<=%s)", resultAttribute, Timestamp.valueOf(date1).getTime(), resultAttribute, Timestamp.valueOf(date2).getTime());
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s in (2011-12-03, 2011-12-03, 2011-12-03)", resource, attribute)).getFullElasticQuery();
+        expected = String.format("%s:(%s OR %s OR %s)", resultAttribute, Timestamp.valueOf(date4).getTime(), Timestamp.valueOf(date5).getTime(), Timestamp.valueOf(date6).getTime());
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s not in (2011-12-03, 2011-12-03, 2011-12-03)", resource, attribute)).getFullElasticQuery();
+        expected = String.format("NOT %s:(%s OR %s OR %s)", resultAttribute, Timestamp.valueOf(date4).getTime(), Timestamp.valueOf(date5).getTime(), Timestamp.valueOf(date6).getTime());
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s in (2011-12-03 : 2011-12-03)", resource, attribute)).getFullElasticQuery();
+        expected = String.format("(%s:>%s AND %s:<%s)", resultAttribute, Timestamp.valueOf(date4).getTime(), resultAttribute, Timestamp.valueOf(date5).getTime());
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s in [2011-12-03 : 2011-12-03]", resource, attribute)).getFullElasticQuery();
+        expected = String.format("(%s:>=%s AND %s:<=%s)", resultAttribute, Timestamp.valueOf(date4).getTime(), resultAttribute, Timestamp.valueOf(date5).getTime());
+
+        assert actual.equals(expected);
+
+        actual = evaluateQuery(String.format("%s: %s not in (2011-12-03 : 2011-12-03]", resource, attribute)).getFullElasticQuery();
+        expected = String.format("NOT (%s:>%s AND %s:<=%s)", resultAttribute, Timestamp.valueOf(date4).getTime(), resultAttribute, Timestamp.valueOf(date5).getTime());
+
+        assert actual.equals(expected);
     }
 
     private static void compareMongoQueries(MongoDbUtils<?> mongoDbUtils, Predicate actual, Predicate expected) {

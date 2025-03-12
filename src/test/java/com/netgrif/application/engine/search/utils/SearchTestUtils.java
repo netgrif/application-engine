@@ -52,12 +52,5 @@ public class SearchTestUtils {
                 .collect(Collectors.toList());
 
         assert actualIds.equals(expectedIds);
-
-        int lastIndex = -1;
-        for (String expectedId : expectedIds) {
-            int currentIndex = actualIds.indexOf(expectedId);
-            assert currentIndex > lastIndex;
-            lastIndex = currentIndex;
-        }
     }
 }

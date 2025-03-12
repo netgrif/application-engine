@@ -671,6 +671,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         List<String> stringList = ctx.inListStringComparison().stringList().STRING().stream().map(node -> getStringValue(node.getText())).collect(Collectors.toList());
 
         setMongoQuery(ctx, buildStringPredicateInList(stringPath, stringList, not));
+        setElasticQuery(ctx, buildElasticQueryInList("processIdentifier", stringList, not));
     }
 
     @Override
@@ -683,6 +684,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String rightString = getStringValue(ctx.inRangeStringComparison().stringRange().STRING(1).getText());
 
         setMongoQuery(ctx, buildStringPredicateInRange(stringPath, leftString, leftEndpointOpen, rightString, rightEndpointOpen, not));
+        setElasticQuery(ctx, buildElasticQueryInRange("processIdentifier", leftString, leftEndpointOpen, rightString, rightEndpointOpen, not));
     }
 
     @Override
@@ -1198,12 +1200,12 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         String rightNumberAsString;
         if (ctx.inRangeNumberComparison().intRange() != null) {
             leftEndpointOpen = ctx.inRangeNumberComparison().intRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-            rightEndpointOpen = ctx.inRangeNumberComparison().intRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeNumberComparison().intRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
             leftNumberAsString = ctx.inRangeNumberComparison().intRange().INT(0).getText();
             rightNumberAsString = ctx.inRangeNumberComparison().intRange().INT(1).getText();
         } else {
             leftEndpointOpen = ctx.inRangeNumberComparison().doubleRange().leftEndpoint.getText().equals(LEFT_OPEN_ENDPOINT);
-            rightEndpointOpen = ctx.inRangeNumberComparison().doubleRange().leftEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
+            rightEndpointOpen = ctx.inRangeNumberComparison().doubleRange().rightEndpoint.getText().equals(RIGHT_OPEN_ENDPOINT);
             leftNumberAsString = ctx.inRangeNumberComparison().doubleRange().DOUBLE(0).getText();
             rightNumberAsString = ctx.inRangeNumberComparison().doubleRange().DOUBLE(1).getText();
         }

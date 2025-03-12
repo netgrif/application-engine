@@ -36,12 +36,11 @@ public class SearchUtils {
 
     public static final Map<ComparisonType, List<Integer>> comparisonOperators = Map.of(
             ComparisonType.ID, List.of(QueryLangParser.EQ),
-            ComparisonType.STRING, List.of(QueryLangParser.EQ, QueryLangParser.CONTAINS),
+            ComparisonType.STRING, List.of(QueryLangParser.EQ, QueryLangParser.CONTAINS, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
             ComparisonType.NUMBER, List.of(QueryLangParser.EQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
             ComparisonType.DATE, List.of(QueryLangParser.EQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
             ComparisonType.DATETIME, List.of(QueryLangParser.EQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
-            ComparisonType.BOOLEAN, List.of(QueryLangParser.EQ),
-            ComparisonType.OPTIONS, List.of(QueryLangParser.EQ, QueryLangParser.CONTAINS)
+            ComparisonType.BOOLEAN, List.of(QueryLangParser.EQ)
     );
 
     public static final Map<String, String> processAttrToSortPropMapping = Map.of(
