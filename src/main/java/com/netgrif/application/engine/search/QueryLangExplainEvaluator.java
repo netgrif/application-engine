@@ -352,7 +352,12 @@ public class QueryLangExplainEvaluator extends QueryLangBaseListener {
     }
 
     @Override
-    public void exitTasksUserIdComparison(QueryLangParser.TasksUserIdComparisonContext ctx) {
+    public void exitTasksUserIdBasic(QueryLangParser.TasksUserIdBasicContext ctx) {
+        searchWithElastic = true;
+    }
+
+    @Override
+    public void exitTasksUserIdList(QueryLangParser.TasksUserIdListContext ctx) {
         searchWithElastic = true;
     }
 

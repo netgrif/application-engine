@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 public class SearchUtils {
 
     public static final Map<ComparisonType, List<Integer>> comparisonOperators = Map.of(
-            ComparisonType.ID, List.of(QueryLangParser.EQ),
+            ComparisonType.ID, List.of(QueryLangParser.EQ, QueryLangParser.IN),
             ComparisonType.STRING, List.of(QueryLangParser.EQ, QueryLangParser.CONTAINS, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
             ComparisonType.NUMBER, List.of(QueryLangParser.EQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
             ComparisonType.DATE, List.of(QueryLangParser.EQ, QueryLangParser.LT, QueryLangParser.LTE, QueryLangParser.GT, QueryLangParser.GTE),
@@ -205,6 +205,12 @@ public class SearchUtils {
             predicate = predicate.not();
         }
         return predicate;
+    }
+
+    public static Predicate buildObjectIdPredicateInList(QObjectId qObjectId, List<ObjectId> values, boolean not) {
+        Predicate predicate = qObjectId.in(values);
+
+        return not ? predicate.not() : predicate;
     }
 
     public static Predicate buildStringPredicate(StringPath stringPath, int op, String string, boolean not) {

@@ -51,6 +51,11 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        actual = evaluateQuery(String.format("process: id in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QPetriNet.petriNet.id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // identifier comparison
         checkStringComparison(mongoDbUtils, "process", "identifier", QPetriNet.petriNet.identifier);
 
@@ -209,9 +214,19 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        actual = evaluateQuery(String.format("case: id in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QCase.case$.id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // processId comparison
         actual = evaluateQuery(String.format("case: processId eq '%s'", GENERIC_OBJECT_ID)).getFullMongoQuery();
         expected = QCase.case$.petriNetObjectId.eq(GENERIC_OBJECT_ID);
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("case: processId in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QCase.case$.petriNetObjectId.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -232,6 +247,11 @@ public class QueryLangTest {
 
         actual = evaluateQuery("case: author contains 'test'").getFullMongoQuery();
         expected = QCase.case$.author.id.contains("test");
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("case: author in ('test', 'test1')").getFullMongoQuery();
+        expected = QCase.case$.author.id.in("test", "test1");
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -355,6 +375,11 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        actual = evaluateQuery(String.format("task: id in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QTask.task.id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // transitionId comparison
         checkStringComparison(mongoDbUtils, "task", "transitionId", QTask.task.transitionId);
 
@@ -383,6 +408,11 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        actual = evaluateQuery("task: userId in ('test', 'test1')").getFullMongoQuery();
+        expected = QTask.task.userId.in("test", "test1");
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // caseId comparison
         actual = evaluateQuery("task: caseId eq 'test'").getFullMongoQuery();
         expected = QTask.task.caseId.eq("test");
@@ -394,6 +424,11 @@ public class QueryLangTest {
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
+        actual = evaluateQuery("task: caseId in ('test', 'test1')").getFullMongoQuery();
+        expected = QTask.task.caseId.in("test", "test1");
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
         // processId comparison
         actual = evaluateQuery("task: processId eq 'test'").getFullMongoQuery();
         expected = QTask.task.processId.eq("test");
@@ -402,6 +437,11 @@ public class QueryLangTest {
 
         actual = evaluateQuery("task: processId contains 'test'").getFullMongoQuery();
         expected = QTask.task.processId.contains("test");
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery("task: processId in ('test', 'test1')").getFullMongoQuery();
+        expected = QTask.task.processId.in("test", "test1");
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -474,6 +514,11 @@ public class QueryLangTest {
         // id comparison
         Predicate actual = evaluateQuery(String.format("user: id eq '%s'", GENERIC_OBJECT_ID)).getFullMongoQuery();
         Predicate expected = QUser.user.id.eq(GENERIC_OBJECT_ID);
+
+        compareMongoQueries(mongoDbUtils, actual, expected);
+
+        actual = evaluateQuery(String.format("user: id in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullMongoQuery();
+        expected = QUser.user.id.in(GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
 
         compareMongoQueries(mongoDbUtils, actual, expected);
 
@@ -644,21 +689,23 @@ public class QueryLangTest {
 
     @Test
     public void testSimpleElasticCaseQuery() {
-        LocalDateTime localDateTime = LocalDateTime.of(2011, 12, 3, 10, 15, 30);
-
         // id comparison
         String actual = evaluateQuery(String.format("case: id eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         String expected = String.format("stringId:%s", GENERIC_OBJECT_ID);
         assert expected.equals(actual);
 
-        // todo NAE-1997: id in list
+        actual = evaluateQuery(String.format("case: id in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("stringId:(%s OR %s)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
+        assert expected.equals(actual);
 
         // processId comparison
         actual = evaluateQuery(String.format("case: processId eq '%s'", GENERIC_OBJECT_ID)).getFullElasticQuery();
         expected = String.format("processId:%s", GENERIC_OBJECT_ID);
         assert expected.equals(actual);
 
-        // todo NAE-1997: processId id in list
+        actual = evaluateQuery(String.format("case: processId in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("processId:(%s OR %s)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
+        assert expected.equals(actual);
 
         // processIdentifier comparison
         checkStringComparisonElastic("case", "processIdentifier", "processIdentifier");
@@ -678,7 +725,9 @@ public class QueryLangTest {
         expected = "author:*test*";
         assert expected.equals(actual);
 
-        // todo NAE-1997: author in list
+        actual = evaluateQuery(String.format("case: author in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("author:(%s OR %s)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
+        assert expected.equals(actual);
 
         // places comparison
         checkNumberComparisonElastic("case", "places.p1.marking", "places.p1.marking");
@@ -701,7 +750,9 @@ public class QueryLangTest {
         expected = "tasks.t1.userId:*test*";
         assert expected.equals(actual);
 
-        // todo NAE-1997: task userId in list
+        actual = evaluateQuery(String.format("case: tasks.t1.userId in ('%s', '%s')", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID)).getFullElasticQuery();
+        expected = String.format("tasks.t1.userId:(%s OR %s)", GENERIC_OBJECT_ID, GENERIC_OBJECT_ID);
+        assert expected.equals(actual);
 
         // data value comparison
         checkStringComparisonElastic("case", "data.field1.value", "dataSet.field1.textValue");

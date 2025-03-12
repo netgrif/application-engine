@@ -131,7 +131,9 @@ userComparisons: idComparison
                ;
 
 // attribute comparisons
-idComparison: ID SPACE objectIdComparison ;
+idComparison: ID SPACE objectIdComparison # idBasic
+            | ID SPACE inListStringComparison # idList
+            ;
 titleComparison: TITLE SPACE stringComparison # titleBasic
                | TITLE SPACE inListStringComparison # titleList
                | TITLE SPACE inRangeStringComparison # titleRange
@@ -149,20 +151,30 @@ creationDateComparison: CREATION_DATE SPACE dateComparison # cdDateBasic
                       | CREATION_DATE SPACE inListDateComparison # cdDateList
                       | CREATION_DATE SPACE inRangeDateComparison # cdDateRange
                       ;
-processIdComparison: PROCESS_ID SPACE stringComparison ;
-processIdObjIdComparison: PROCESS_ID SPACE objectIdComparison ;
+processIdComparison: PROCESS_ID SPACE stringComparison # processIdBasic
+                   | PROCESS_ID SPACE inListStringComparison # processIdList
+                   ;
+processIdObjIdComparison: PROCESS_ID SPACE objectIdComparison # processIdObjIdBasic
+                   | PROCESS_ID SPACE inListStringComparison # processIdObjIdList
+                   ;
 processIdentifierComparison: PROCESS_IDENTIFIER SPACE stringComparison # processIdentifierBasic
                            | PROCESS_IDENTIFIER SPACE inListStringComparison # processIdentifierList
                            | PROCESS_IDENTIFIER SPACE inRangeStringComparison # processIdentifierRange
                            ;
-authorComparison: AUTHOR SPACE stringComparison ;
+authorComparison: AUTHOR SPACE stringComparison # authorBasic
+                | AUTHOR SPACE inListStringComparison # authorList
+                ;
 transitionIdComparison: TRANSITION_ID SPACE stringComparison # transitionIdBasic
                       | TRANSITION_ID SPACE inListStringComparison # transitionIdList
                       | TRANSITION_ID SPACE inRangeStringComparison # transitionIdRange
                       ;
 stateComparison: STATE SPACE EQ SPACE state=(ENABLED | DISABLED) ;
-userIdComparison: USER_ID SPACE stringComparison ;
-caseIdComparison: CASE_ID SPACE stringComparison ;
+userIdComparison: USER_ID SPACE stringComparison # userIdBasic
+                | USER_ID SPACE inListStringComparison # userIdList
+                ;
+caseIdComparison: CASE_ID SPACE stringComparison # caseIdBasic
+                | CASE_ID SPACE inListStringComparison # caseIdList
+                ;
 lastAssignComparison: LAST_ASSIGN SPACE dateComparison # laDateBasic
                     | LAST_ASSIGN SPACE dateTimeComparison # laDateTimeBasic
                     | LAST_ASSIGN SPACE inListDateComparison # laDateList
@@ -206,7 +218,9 @@ placesComparison: places SPACE numberComparison # placesBasic
                 | places SPACE inRangeNumberComparison # placesRange
                 ;
 tasksStateComparison: tasksState SPACE (NOT SPACE?)? op=EQ SPACE state=(ENABLED | DISABLED) ;
-tasksUserIdComparison: tasksUserId SPACE stringComparison ;
+tasksUserIdComparison: tasksUserId SPACE stringComparison # tasksUserIdBasic
+                     | tasksUserId SPACE inListStringComparison # tasksUserIdList
+                     ;
 
 // basic comparisons
 objectIdComparison: (NOT SPACE?)? op=EQ SPACE STRING ;

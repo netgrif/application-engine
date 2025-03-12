@@ -363,7 +363,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     }
 
     @Override
-    public void exitIdComparison(QueryLangParser.IdComparisonContext ctx) {
+    public void exitIdBasic(QueryLangParser.IdBasicContext ctx) {
         QObjectId qObjectId;
         Token op = ctx.objectIdComparison().op;
         boolean not = ctx.objectIdComparison().NOT() != null;
@@ -389,6 +389,40 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
         }
 
         setMongoQuery(ctx, buildObjectIdPredicate(qObjectId, op.getType(), objectId, not));
+    }
+
+    @Override
+    public void exitIdList(QueryLangParser.IdListContext ctx) {
+        QObjectId qObjectId;
+        Token op = ctx.inListStringComparison().op;
+        boolean not = ctx.inListStringComparison().NOT() != null;
+        checkOp(ComparisonType.ID, op);
+        List<ObjectId> objectIdList = ctx.inListStringComparison().stringList().STRING().stream()
+                .map(node -> getObjectIdValue(node.getText()))
+                .collect(Collectors.toList());
+        List<String> stringIdList = ctx.inListStringComparison().stringList().STRING().stream()
+                .map(node -> getStringValue(node.getText()))
+                .collect(Collectors.toList());
+
+        switch (type) {
+            case PROCESS:
+                qObjectId = QPetriNet.petriNet.id;
+                break;
+            case CASE:
+                qObjectId = QCase.case$.id;
+                setElasticQuery(ctx, buildElasticQueryInList("stringId", stringIdList, not));
+                break;
+            case TASK:
+                qObjectId = QTask.task.id;
+                break;
+            case USER:
+                qObjectId = QUser.user.id;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown query type: " + type);
+        }
+
+        setMongoQuery(ctx, buildObjectIdPredicateInList(qObjectId, objectIdList, not));
     }
 
     @Override
@@ -633,7 +667,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     }
 
     @Override
-    public void exitProcessIdComparison(QueryLangParser.ProcessIdComparisonContext ctx) {
+    public void exitProcessIdBasic(QueryLangParser.ProcessIdBasicContext ctx) {
         StringPath stringPath = QTask.task.processId;
         Token op = ctx.stringComparison().op;
         boolean not = ctx.stringComparison().NOT() != null;
@@ -643,7 +677,18 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     }
 
     @Override
-    public void exitProcessIdObjIdComparison(QueryLangParser.ProcessIdObjIdComparisonContext ctx) {
+    public void exitProcessIdList(QueryLangParser.ProcessIdListContext ctx) {
+        StringPath stringPath = QTask.task.processId;
+        boolean not = ctx.inListStringComparison().NOT() != null;
+        List<String> stringList = ctx.inListStringComparison().stringList().STRING().stream()
+                .map(node -> getStringValue(node.getText()))
+                .collect(Collectors.toList());
+
+        setMongoQuery(ctx, buildStringPredicateInList(stringPath, stringList, not));
+    }
+
+    @Override
+    public void exitProcessIdObjIdBasic(QueryLangParser.ProcessIdObjIdBasicContext ctx) {
         QObjectId qObjectId = QCase.case$.petriNetObjectId;
         Token op = ctx.objectIdComparison().op;
         boolean not = ctx.objectIdComparison().NOT() != null;
@@ -651,6 +696,21 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
         setMongoQuery(ctx, buildObjectIdPredicate(qObjectId, op.getType(), objectId, not));
         setElasticQuery(ctx, buildElasticQuery("processId", op.getType(), objectId.toString(), not));
+    }
+
+    @Override
+    public void exitProcessIdObjIdList(QueryLangParser.ProcessIdObjIdListContext ctx) {
+        QObjectId qObjectId = QCase.case$.petriNetObjectId;
+        boolean not = ctx.inListStringComparison().NOT() != null;
+        List<ObjectId> objectIdList = ctx.inListStringComparison().stringList().STRING().stream()
+                .map(node -> getObjectIdValue(node.getText()))
+                .collect(Collectors.toList());
+        List<String> stringList = ctx.inListStringComparison().stringList().STRING().stream()
+                .map(node -> getStringValue(node.getText()))
+                .collect(Collectors.toList());
+
+        setMongoQuery(ctx, buildObjectIdPredicateInList(qObjectId, objectIdList, not));
+        setElasticQuery(ctx, buildElasticQueryInList("processId", stringList, not));
     }
 
     @Override
@@ -688,7 +748,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     }
 
     @Override
-    public void exitAuthorComparison(QueryLangParser.AuthorComparisonContext ctx) {
+    public void exitAuthorBasic(QueryLangParser.AuthorBasicContext ctx) {
         StringPath stringPath = QCase.case$.author.id;
         Token op = ctx.stringComparison().op;
         boolean not = ctx.stringComparison().NOT() != null;
@@ -696,6 +756,18 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
         setMongoQuery(ctx, buildStringPredicate(stringPath, op.getType(), string, not));
         setElasticQuery(ctx, buildElasticQuery("author", op.getType(), string, not));
+    }
+
+    @Override
+    public void exitAuthorList(QueryLangParser.AuthorListContext ctx) {
+        StringPath stringPath = QCase.case$.author.id;
+        boolean not = ctx.inListStringComparison().NOT() != null;
+        List<String> stringList = ctx.inListStringComparison().stringList().STRING().stream()
+                .map(node -> getStringValue(node.getText()))
+                .collect(Collectors.toList());
+
+        setMongoQuery(ctx, buildStringPredicateInList(stringPath, stringList, not));
+        setElasticQuery(ctx, buildElasticQueryInList("author", stringList, not));
     }
 
     @Override
@@ -742,7 +814,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     }
 
     @Override
-    public void exitUserIdComparison(QueryLangParser.UserIdComparisonContext ctx) {
+    public void exitUserIdBasic(QueryLangParser.UserIdBasicContext ctx) {
         StringPath stringPath = QTask.task.userId;
         Token op = ctx.stringComparison().op;
         boolean not = ctx.stringComparison().NOT() != null;
@@ -752,13 +824,35 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     }
 
     @Override
-    public void exitCaseIdComparison(QueryLangParser.CaseIdComparisonContext ctx) {
+    public void exitUserIdList(QueryLangParser.UserIdListContext ctx) {
+        StringPath stringPath = QTask.task.userId;
+        boolean not = ctx.inListStringComparison().NOT() != null;
+        List<String> stringList = ctx.inListStringComparison().stringList().STRING().stream()
+                .map(node -> getStringValue(node.getText()))
+                .collect(Collectors.toList());
+
+        setMongoQuery(ctx, buildStringPredicateInList(stringPath, stringList, not));
+    }
+
+    @Override
+    public void exitCaseIdBasic(QueryLangParser.CaseIdBasicContext ctx) {
         StringPath stringPath = QTask.task.caseId;
         Token op = ctx.stringComparison().op;
         boolean not = ctx.stringComparison().NOT() != null;
         String string = getStringValue(ctx.stringComparison().STRING().getText());
 
         setMongoQuery(ctx, buildStringPredicate(stringPath, op.getType(), string, not));
+    }
+
+    @Override
+    public void exitCaseIdList(QueryLangParser.CaseIdListContext ctx) {
+        StringPath stringPath = QTask.task.caseId;
+        boolean not = ctx.inListStringComparison().NOT() != null;
+        List<String> stringList = ctx.inListStringComparison().stringList().STRING().stream()
+                .map(node -> getStringValue(node.getText()))
+                .collect(Collectors.toList());
+
+        setMongoQuery(ctx, buildStringPredicateInList(stringPath, stringList, not));
     }
 
     @Override
@@ -1229,7 +1323,7 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
     }
 
     @Override
-    public void exitTasksUserIdComparison(QueryLangParser.TasksUserIdComparisonContext ctx) {
+    public void exitTasksUserIdBasic(QueryLangParser.TasksUserIdBasicContext ctx) {
         String taskId = ctx.tasksUserId().taskId.getText();
         Token op = ctx.stringComparison().op;
         checkOp(ComparisonType.STRING, op);
@@ -1238,6 +1332,19 @@ public class QueryLangEvaluator extends QueryLangBaseListener {
 
         setMongoQuery(ctx, null);
         setElasticQuery(ctx, buildElasticQuery("tasks." + taskId + ".userId", op.getType(), string, not));
+        this.searchWithElastic = true;
+    }
+
+    @Override
+    public void exitTasksUserIdList(QueryLangParser.TasksUserIdListContext ctx) {
+        String taskId = ctx.tasksUserId().taskId.getText();
+        boolean not = ctx.inListStringComparison().NOT() != null;
+        List<String> stringList = ctx.inListStringComparison().stringList().STRING().stream()
+                .map(node -> getStringValue(node.getText()))
+                .collect(Collectors.toList());
+
+        setMongoQuery(ctx, null);
+        setElasticQuery(ctx, buildElasticQueryInList("tasks." + taskId + ".userId", stringList, not));
         this.searchWithElastic = true;
     }
 
