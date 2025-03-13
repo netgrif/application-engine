@@ -8,9 +8,7 @@ import com.netgrif.application.engine.integration.plugins.utils.PluginUtils
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.core.workflow.domain.Case
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Service
 
-@Service
 class PluginInjector {
 
     @Autowired
@@ -41,8 +39,7 @@ class PluginInjector {
         List<Case> entryPointCases = utils.getPluginEntryPoints(pluginCase)
 
         String pluginName = PluginUtils.getPluginName(pluginCase)
-        String pluginUrl = PluginUtils.getPluginUrl(pluginCase)
-        int pluginPort = PluginUtils.getPluginPort(pluginCase)
+        String pluginIdentifier = PluginUtils.getPluginIdentifier(pluginCase)
 
         entryPointCases.each { epCase ->
             MetaClass entryPointMetaClass = EntryPointMeta.metaClass
@@ -56,7 +53,7 @@ class PluginInjector {
                 } else {
                     entryPointMetaClass[methodName] = { Serializable... args ->
                         PluginServiceImpl pluginService = ApplicationContextProvider.getBean("pluginService") as PluginServiceImpl
-                        return pluginService.call(pluginUrl, pluginPort, epName, methodName, args)
+                        return pluginService.call(pluginIdentifier, epName, methodName, args)
                     }
                 }
             }

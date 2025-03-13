@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.integration.plugins.service;
 
-import com.google.protobuf.ByteString;
+import com.netgrif.application.engine.configuration.ApplicationContextProvider;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.auth.service.UserService;
@@ -19,23 +19,19 @@ import com.netgrif.core.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import com.netgrif.pluginlibrary.services.service.*;
 import com.netgrif.pluginlibrary.core.domain.EntryPoint;
 import com.netgrif.pluginlibrary.core.domain.Method;
 import com.netgrif.pluginlibrary.core.domain.Plugin;
 import com.netgrif.pluginlibrary.core.outcomes.CreateOrUpdateOutcome;
 import com.netgrif.pluginlibrary.core.outcomes.GetOrCreateOutcome;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
-import io.grpc.Server;
-import lombok.RequiredArgsConstructor;
+import com.netgrif.pluginlibrary.core.service.PluginExecutionService;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import jakarta.annotation.PreDestroy;
 
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
@@ -50,30 +46,63 @@ import static com.netgrif.application.engine.integration.plugins.utils.PluginUti
  * plugin execution requests to desired plugin.
  */
 @Slf4j
+@Getter
 @Service
-@RequiredArgsConstructor
 @ConditionalOnProperty(
         value = "nae.plugin.enabled",
         havingValue = "true",
         matchIfMissing = true
 )
 public class PluginServiceImpl implements PluginService {
-    private final PluginConfigProperties properties;
-    private final IElasticCaseService elasticCaseService;
-    private final IWorkflowService workflowService;
-    private final UserService userService;
-    private final IDataService dataService;
-    private final ITaskService taskService;
-    private final PluginInjector pluginInjector;
-    private final PluginUtils utils;
-    private Server server;
+    private PluginConfigProperties properties;
+    private IElasticCaseService elasticCaseService;
+    private IWorkflowService workflowService;
+    private UserService userService;
+    private IDataService dataService;
+    private ITaskService taskService;
+    private PluginInjector pluginInjector;
+    private PluginUtils utils;
 
     private static final String LOG_PREFIX = "[gRPC Server] -";
 
-    @PreDestroy
-    public void stopServer() {
-        server.shutdown();
-        log.info("{} Stopped server on port {}", LOG_PREFIX, properties.getPort());
+    @Autowired
+    public void setProperties(PluginConfigProperties properties) {
+        this.properties = properties;
+    }
+
+    @Autowired
+    public void setElasticCaseService(IElasticCaseService elasticCaseService) {
+        this.elasticCaseService = elasticCaseService;
+    }
+
+    @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setDataService(IDataService dataService) {
+        this.dataService = dataService;
+    }
+
+    @Autowired
+    public void setTaskService(ITaskService taskService) {
+        this.taskService = taskService;
+    }
+
+    @Autowired
+    public void setPluginInjector(PluginInjector pluginInjector) {
+        this.pluginInjector = pluginInjector;
+    }
+
+    @Autowired
+    public void setUtils(PluginUtils utils) {
+        this.utils = utils;
     }
 
     /**
@@ -121,27 +150,21 @@ public class PluginServiceImpl implements PluginService {
     /**
      * Calls method with arguments of a specified entry point. Plugin must exist and be activated.
      *
-     * @param url   URL of the plugin microservice
-     * @param port   port of the plugin microservice
+     * @param identifier plugin identifier
      * @param entryPoint name of entry point in plugin, that contains the method to be executed
      * @param method     name of method to be executed
      * @param args       arguments to send to plugin method. All args should be the exact type of method input arguments type (not superclass, or subclass)
      * @return the returned object of the executed plugin method
      */
     @Override
-    public Object call(String url, int port, String entryPoint, String method, Serializable... args) throws IllegalArgumentException {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress(url, port)
-                .usePlaintext()
-                .build();
-        List<ByteString> argBytes = Arrays.stream(args).map(PluginUtils::serializeObject).collect(Collectors.toList());
-        PluginExecutionServiceGrpc.PluginExecutionServiceBlockingStub stub = PluginExecutionServiceGrpc.newBlockingStub(channel);
-        ExecutionResponse responseMessage = stub.execute(ExecutionRequest.newBuilder()
-                .setEntryPoint(entryPoint)
-                .setMethod(method)
-                .addAllArgs(argBytes)
-                .build());
-        channel.shutdownNow();
-        return deserializeObject(responseMessage.getResponse());
+    public Object call(String identifier, String entryPoint, String method, Serializable... args) throws IllegalArgumentException {
+        Optional<Case> existingPluginOpt = findByIdentifier(identifier);
+        if (existingPluginOpt.isEmpty()) {
+            throw new IllegalArgumentException("Plugin with identifier \"" + identifier + "\" cannot be found");
+        }
+        PluginExecutionService pluginExecutionService = ApplicationContextProvider.getAppContext().getBean(PluginExecutionService.class);
+        plu
+        return null;
     }
 
     /**
@@ -203,7 +226,7 @@ public class PluginServiceImpl implements PluginService {
         LoggedUser loggedUser = userService.getLoggedOrSystem().transformToLoggedUser();
         Page<Case> result = elasticCaseService.search(requestAsList, loggedUser, PageRequest.ofSize(1), Locale.getDefault(), false);
 
-        return result.hasContent() ? Optional.of(result.getContent().get(0)) : Optional.empty();
+        return result.hasContent() ? Optional.of(result.getContent().getFirst()) : Optional.empty();
     }
 
     private String register(Plugin plugin) throws TransitionNotExecutableException, NoSuchAlgorithmException {

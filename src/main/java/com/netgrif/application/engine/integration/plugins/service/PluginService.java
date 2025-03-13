@@ -12,7 +12,7 @@ public interface PluginService {
 
     String unregister(String identifier) throws IllegalArgumentException;
 
-    Object call(String url, int port, String entryPoint, String method, Serializable... args) throws IllegalArgumentException;
+    Object call(String pluginCaseId, String entryPoint, String method, Serializable... args) throws IllegalArgumentException;
 
     String deactivate(String identifier) throws IllegalArgumentException;
 
