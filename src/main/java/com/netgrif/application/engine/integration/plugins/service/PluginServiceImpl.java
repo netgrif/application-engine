@@ -163,7 +163,7 @@ public class PluginServiceImpl implements PluginService {
             throw new IllegalArgumentException("Plugin with identifier \"" + identifier + "\" cannot be found");
         }
         PluginExecutionService pluginExecutionService = ApplicationContextProvider.getAppContext().getBean(PluginExecutionService.class);
-        plu
+
         return null;
     }
 
