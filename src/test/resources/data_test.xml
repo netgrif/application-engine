@@ -1,69 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-    <id>1</id>
-    <initials>TES</initials>
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>data_test</id>
+    <version>1.0.0</version>
     <title>Data test</title>
     <defaultRole>true</defaultRole>
-    <!-- NUMBER -->
-    <data type="number">
-        <id>number</id>
-        <title>Number</title>
-        <placeholder>Number field placeholder</placeholder>
-        <desc>Number field description</desc>
-        <validations>
-            <validation>
-                <name>inrange</name>
-                <serverArguments>
-                    <argument>0</argument>
-                    <argument>inf</argument>
-                </serverArguments>
-                <message>Number field validation message</message>
-            </validation>
-        </validations>
-        <init>10</init>
-    </data>
-    <!-- TEXT -->
-    <data type="text">
-        <id>text</id>
-        <title>Text</title>
-        <placeholder>Text field placeholder</placeholder>
-        <desc>Text field description</desc>
-        <validations>
-            <validation>
-                <name>email</name>
-                <message>Mail validation message</message>
-            </validation>
-        </validations>
-        <init>text</init>
-    </data>
-    <!-- ENUMERATION -->
-    <data type="enumeration">
-        <id>enumeration</id>
-        <title>Enumeration</title>
-        <placeholder>Enumeration field placeholder</placeholder>
-        <desc>Enumeration field description</desc>
-        <values>enumeration</values>
-        <values>enumeration2</values>
-        <values>enumeration3</values>
-        <init>enumeration</init>
-    </data>
-    <!-- MULTICHOICE -->
-    <data type="multichoice">
-        <id>multichoice</id>
-        <title>Multichoice</title>
-        <placeholder>Multichoice field placeholder</placeholder>
-        <desc>Multichoice field description</desc>
-        <values>multichoice</values>
-        <values>multichoice2</values>
-        <values>multichoice3</values>
-        <init>multichoice, multichoice2</init>
-    </data>
-    <!--  EMPTY MULTICHOICE  -->
-    <data type="multichoice">
-        <id>emptyMultichoice</id>
-        <title>empty multichoice</title>
-    </data>
-    <!-- BOOLEAN -->
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TES</property>
+    </properties>
+    <processEvents/>
+    <caseEvents/>
     <data type="boolean">
         <id>boolean</id>
         <title>Boolean</title>
@@ -77,7 +22,14 @@
         </validations>
         <init>true</init>
     </data>
-    <!-- DATE -->
+    <data type="caseRef">
+        <id>caseRef</id>
+        <title>CaseRef</title>
+        <allowedNets>
+            <allowedNet>processId1</allowedNet>
+            <allowedNet>processId2</allowedNet>
+        </allowedNets>
+    </data>
     <data type="date">
         <id>date</id>
         <title>Date</title>
@@ -102,21 +54,6 @@
             </validation>
         </validations>
     </data>
-    <!-- FILE -->
-    <data type="file">
-        <id>file</id>
-        <title>File</title>
-        <placeholder>File field placeholder</placeholder>
-        <desc>File field description</desc>
-    </data>
-    <!-- USER -->
-    <data type="user">
-        <id>user</id>
-        <title>User</title>
-        <placeholder>User field placeholder</placeholder>
-        <desc>User field description</desc>
-    </data>
-    <!-- DATETIME -->
     <data type="dateTime">
         <id>dateTime</id>
         <title>DateTime</title>
@@ -141,40 +78,48 @@
             </validation>
         </validations>
     </data>
-    <!-- CASE REF -->
-    <data type="caseRef">
-        <id>caseRef</id>
-        <title>CaseRef</title>
-        <allowedNets>
-            <allowedNet>processId1</allowedNet>
-            <allowedNet>processId2</allowedNet>
-        </allowedNets>
+    <data type="multichoice">
+        <id>emptyMultichoice</id>
+        <title>empty multichoice</title>
     </data>
-    <!--  USER LIST  -->
+    <data type="multichoice_map">
+        <id>emptyMultichoiceMap</id>
+        <title>Empty multichoice map</title>
+        <placeholder>Multichoice map placeholder</placeholder>
+        <desc>Multichoice map description</desc>
+    </data>
+    <data type="taskRef">
+        <id>emptyTaskRef</id>
+        <title>Empty task ref</title>
+    </data>
     <data type="userList">
         <id>emptyUserList</id>
         <title>Empty user list</title>
         <desc>User list description</desc>
     </data>
-    <!--  TASK REF  -->
-    <data type="taskRef">
-        <id>emptyTaskRef</id>
-        <title>Empty task ref</title>
+    <data type="enumeration">
+        <id>enumeration</id>
+        <title>Enumeration</title>
+        <placeholder>Enumeration field placeholder</placeholder>
+        <desc>Enumeration field description</desc>
+        <options>
+            <option key="enumeration">enumeration</option>
+            <option key="enumeration2">enumeration2</option>
+            <option key="enumeration3">enumeration3</option>
+        </options>
+        <init>enumeration</init>
     </data>
-    <!--  MULTICHOICE MAP  -->
-    <data type="multichoice_map">
-        <id>emptyMultichoiceMap</id>
-        <title>Empty multichoice map</title>
-        <desc>Multichoice map description</desc>
-        <placeholder>Multichoice map placeholder</placeholder>
+    <data type="file">
+        <id>file</id>
+        <title>File</title>
+        <placeholder>File field placeholder</placeholder>
+        <desc>File field description</desc>
     </data>
-    <!-- I18N FIELD -->
     <data type="i18n">
         <id>i18n</id>
         <title>Text I18n</title>
         <placeholder>Text I18n field</placeholder>
         <desc>This is I18n text field</desc>
-        <init name="i18n_text">Default i18n text value</init>
         <validations>
             <validation>
                 <name>translationRequired</name>
@@ -195,103 +140,258 @@
                 <message>Only Slovak, English, Czech and German languages allowed</message>
             </validation>
         </validations>
+        <init id="i18n_text">Default i18n text value</init>
     </data>
-    <!-- I18NS -->
-    <!-- TRANSITIONS -->
+    <data type="multichoice">
+        <id>multichoice</id>
+        <title>Multichoice</title>
+        <placeholder>Multichoice field placeholder</placeholder>
+        <desc>Multichoice field description</desc>
+        <options>
+            <option key="multichoice">multichoice</option>
+            <option key="multichoice2">multichoice2</option>
+            <option key="multichoice3">multichoice3</option>
+        </options>
+        <init>multichoice, multichoice2</init>
+    </data>
+    <data type="number">
+        <id>number</id>
+        <title>Number</title>
+        <placeholder>Number field placeholder</placeholder>
+        <desc>Number field description</desc>
+        <validations>
+            <validation>
+                <name>inrange</name>
+                <serverArguments>
+                    <argument>0</argument>
+                    <argument>inf</argument>
+                </serverArguments>
+                <message>Number field validation message</message>
+            </validation>
+        </validations>
+        <init>10</init>
+    </data>
+    <data type="text">
+        <id>text</id>
+        <title>Text</title>
+        <placeholder>Text field placeholder</placeholder>
+        <desc>Text field description</desc>
+        <validations>
+            <validation>
+                <name>email</name>
+                <message>Mail validation message</message>
+            </validation>
+        </validations>
+        <init>text</init>
+    </data>
+    <data type="user">
+        <id>user</id>
+        <title>User</title>
+        <placeholder>User field placeholder</placeholder>
+        <desc>User field description</desc>
+    </data>
     <transition>
-        <id>1</id>
+        <id>t1</id>
         <x>1</x>
         <y>1</y>
-        <label>Transition</label>
-        <dataRef>
-            <id>number</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>text</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>enumeration</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>multichoice</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>boolean</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>date</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>file</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>user</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>dateTime</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>caseRef</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>emptyUserList</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>emptyMultichoice</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>emptyTaskRef</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>emptyMultichoiceMap</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>i18n</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
+        <title>Transition</title>
+        <flex>
+            <id>t1_flex</id>
+            <item>
+                <dataRef>
+                    <id>number</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>text</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>multichoice</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>boolean</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>date</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>file</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>user</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>dateTime</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>caseRef</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>emptyUserList</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>emptyMultichoice</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>emptyTaskRef</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>emptyMultichoiceMap</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>i18n</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
-</document>
+</process>

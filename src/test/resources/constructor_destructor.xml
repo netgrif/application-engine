@@ -10,10 +10,10 @@
     </properties>
     <roleRef>
         <id>process_role</id>
-        <caseLogic>
+        <permission>
             <create>true</create>
             <delete>false</delete>
-        </caseLogic>
+        </permission>
     </roleRef>
     <processEvents>
         <event type="upload">

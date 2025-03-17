@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
-    <id>currency_test.xml</id>
+    <id>currency_test</id>
     <version>1.0.0</version>
     <title>Test</title>
     <caseName id="translation">Slovenský preklad</caseName>
