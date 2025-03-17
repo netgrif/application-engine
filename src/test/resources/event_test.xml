@@ -22,13 +22,18 @@
     <data type="text">
         <id>task_cancel_pre</id>
         <title>task_cancel_pre</title>
-        <action trigger="set">
-            <!-- @formatter:off -->
-            change chained about {
-                return "chained"
-            }
-            <!-- @formatter:on -->
-        </action>
+        <event type="set">
+            <id>task_cancel_pre_set</id>
+            <actions phase="post">
+                <action>
+                    <!-- @formatter:off -->
+                    change chained about {
+                    return "chained"
+                    }
+                    <!-- @formatter:on -->
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="text">
         <id>task_cancel_post</id>
@@ -45,8 +50,6 @@
         <title>task</title>
         <event type="assign">
             <id>task_assign</id>
-            <title>Prirad</title>
-            <message>Task assigned</message>
             <actions phase="post">
                 <action>
                     <!-- @formatter:off -->
@@ -65,11 +68,11 @@
                     <!-- @formatter:on -->
                 </action>
             </actions>
+            <message>Task assigned</message>
+            <title>Prirad</title>
         </event>
         <event type="finish">
             <id>task_finish</id>
-            <title>Dokonic</title>
-            <message>Task finished</message>
             <actions phase="post">
                 <action>
                     <!-- @formatter:off -->
@@ -88,16 +91,16 @@
                     <!-- @formatter:on -->
                 </action>
             </actions>
+            <message>Task finished</message>
+            <title>Dokonic</title>
         </event>
         <event type="cancel">
             <id>task_cancel</id>
-            <title>Zrus</title>
-            <message>Task cancelled</message>
             <actions phase="post">
                 <action>
                     <!-- @formatter:off -->
                     change task_cancel_post about {
-                        return "task_cancel_post"
+                    return "task_cancel_post"
                     }
                     <!-- @formatter:on -->
                 </action>
@@ -106,11 +109,13 @@
                 <action>
                     <!-- @formatter:off -->
                     change task_cancel_pre about {
-                        return "task_cancel_pre"
+                    return "task_cancel_pre"
                     }
                     <!-- @formatter:on -->
                 </action>
-            </actions> 
+            </actions>
+            <message>Task cancelled</message>
+            <title>Zrus</title>
         </event>
     </transition>
 </process>
