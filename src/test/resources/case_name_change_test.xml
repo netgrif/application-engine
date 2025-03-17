@@ -1,54 +1,77 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
 	<id>case_name_change_test</id>
-	<initials>CNC</initials>
+	<version>1.0.0</version>
 	<title>Case name change Test</title>
 	<icon>device_hub</icon>
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
-	<transitionRole>false</transitionRole>
+	<properties>
+		<property key="initials">CNC</property>
+	</properties>
+	<processEvents/>
+	<caseEvents/>
 	<data type="boolean">
 		<id>bln</id>
 		<title/>
-		<action trigger="set">
-			changeCaseProperty "title" about { "Set action title" }
-		</action>
+		<event type="set">
+			<id>bln_set</id>
+			<actions phase="post">
+				<action id="action_0">
+					<![CDATA[
+					changeCaseProperty "title" about { "Set action title" }
+					]]>
+				</action>
+			</actions>
+		</event>
 	</data>
 	<transition>
 		<id>t1</id>
 		<x>580</x>
 		<y>100</y>
-		<label>Transition 1</label>
-		<dataGroup>
-			<id>t1</id>
-			<layout>legacy</layout>
-			<dataRef>
-				<id>bln</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-			</dataRef>
-		</dataGroup>
+		<title>Transition 1</title>
+		<flex>
+			<id>t1_flex</id>
+			<item>
+				<dataRef>
+					<id>bln</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+		</flex>
 		<event type="assign">
 			<id>test_event0</id>
 			<actions phase="pre">
-				<action>
+				<action id="action_1">
+					<![CDATA[
 					changeCaseProperty "title" about { "Pre assign title" }
+					]]>
 				</action>
 			</actions>
 		</event>
 		<event type="cancel">
 			<id>test_event2</id>
 			<actions phase="pre">
-				<action>
+				<action id="action_2">
+					<![CDATA[
 					changeCaseProperty "title" about { "Pre cancel title" }
+					]]>
 				</action>
 			</actions>
 		</event>
-		<event type="delegate">
+		<event type="reassign">
 			<id>test_event4</id>
 			<actions phase="pre">
-				<action>
+				<action id="action_3">
+					<![CDATA[
 					changeCaseProperty "title" about { "Pre delegate title" }
+					]]>
 				</action>
 			</actions>
 		</event>
@@ -57,29 +80,26 @@
 		<id>t2</id>
 		<x>580</x>
 		<y>220</y>
-		<label>Transition 2</label>
+		<title>Transition 2</title>
 	</transition>
 	<transition>
 		<id>t3</id>
 		<x>900</x>
 		<y>100</y>
-		<label/>
+		<title/>
 	</transition>
 	<place>
 		<id>p1</id>
 		<x>420</x>
 		<y>100</y>
-		<label>init</label>
+		<title>init</title>
 		<tokens>1</tokens>
-		<static>false</static>
 	</place>
 	<place>
 		<id>p2</id>
 		<x>740</x>
 		<y>100</y>
-		<label/>
 		<tokens>0</tokens>
-		<static>false</static>
 	</place>
 	<arc>
 		<id>a1</id>
@@ -117,4 +137,4 @@
 		<destinationId>t3</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
-</document>
+</process>

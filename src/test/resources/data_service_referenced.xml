@@ -1,48 +1,65 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>referenced</id>
     <version>1.0.0</version>
-    <initials>RFD</initials>
     <title>Referenced</title>
     <defaultRole>true</defaultRole>
-    <transitionRole>false</transitionRole>
-    <!-- TRANSACTIONS -->
-    <!-- ROLES -->
-    <!-- DATA -->
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">RFD</property>
+    </properties>
     <data type="file">
         <id>file</id>
         <title>File</title>
-        <action trigger="set">
-            res: f.result;
-            change res value {
-            return "OK";
-            }
-        </action>
+        <event type="set">
+            <id>file_set</id>
+            <actions phase="post">
+                <action id="action_0">
+					<![CDATA[
+                    change result value {
+                        return "OK";
+                    }
+                    ]]>
+				</action>
+            </actions>
+        </event>
     </data>
     <data type="text">
         <id>result</id>
         <title>Result</title>
     </data>
-    <!-- TRANSITIONS -->
     <transition>
-        <id>1</id>
+        <id>t1</id>
         <x>546</x>
         <y>177</y>
-        <label>Transition</label>
-        <dataRef>
-            <id>file</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>result</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
+        <title>Transition</title>
+        <flex>
+            <id>t1_flex</id>
+            <item>
+                <dataRef>
+                    <id>file</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>result</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
-    <!-- PLACES -->
-    <!-- ARCS -->
-</document>
+</process>

@@ -121,7 +121,7 @@ class TaskControllerTest {
     @Test
     void testDeleteFile() {
         Case testCase = helper.createCase("My case", net)
-        String taskId = testCase.getTaskStringId("1")
+        String taskId = testCase.getTaskStringId("t1")
 
         // TODO: release/8.0.0
 // java.lang.NullPointerException: Cannot invoke "com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue.getName()" because the return value of "com.netgrif.application.engine.workflow.domain.DataFieldValue.getValue()" is null
@@ -137,7 +137,7 @@ class TaskControllerTest {
     @Test
     void testDeleteFileByName() {
         Case testCase = helper.createCase("My case", net)
-        String taskId = testCase.getTaskStringId( "1")
+        String taskId = testCase.getTaskStringId( "t1")
 
         dataService.saveFiles(taskId, "fileList", new MockMultipartFile[]{new MockMultipartFile("test", "test", null, new byte[]{})})
         testCase = workflowService.findOne(testCase.stringId)

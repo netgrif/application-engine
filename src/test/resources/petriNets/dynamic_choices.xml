@@ -1,66 +1,94 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
     <id>dynamic_choices</id>
+    <version>1.0.0</version>
     <title>dynamic_choices</title>
     <defaultRole>true</defaultRole>
-    <initials>DVT</initials>
-    <!-- ROLES -->
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">DVT</property>
+    </properties>
     <data type="enumeration">
         <id>enumeration</id>
         <title>enumeration</title>
-        <values dynamic="true">["A", "B", "C"]</values>
+        <options>
+            <option key="[&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]">["A", "B", "C"]</option>
+        </options>
     </data>
     <data type="enumeration_map">
         <id>enumeration_map</id>
         <title>enumeration_map</title>
-        <options>
-            <init>["a": "A", "b": "B"]</init>
-        </options>
     </data>
     <data type="multichoice">
         <id>multichoice</id>
         <title>multichoice</title>
-        <values dynamic="true">["A", "B", "C"]</values>
+        <options>
+            <option key="[&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]">["A", "B", "C"]</option>
+        </options>
     </data>
     <data type="multichoice_map">
         <id>multichoice_map</id>
         <title>multichoice_map</title>
-        <options>
-            <init>["a": "A", "b": "B"]</init>
-        </options>
     </data>
-
     <transition>
         <id>transition</id>
         <x>200</x>
         <y>200</y>
-        <label>Transition</label>
+        <title>Transition</title>
         <assignPolicy>auto</assignPolicy>
-
-        <dataRef>
-            <id>enumeration</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>enumeration_map</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>multichoice</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>multichoice_map</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
+        <flex>
+            <id>transition_flex</id>
+            <item>
+                <dataRef>
+                    <id>enumeration</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>enumeration_map</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>multichoice</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+            <item>
+                <dataRef>
+                    <id>multichoice_map</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
     </transition>
-
-</document>
+</process>

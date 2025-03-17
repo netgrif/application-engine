@@ -1,17 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>secondary</id>
-    <initials>ORG</initials>
+    <version>1.0.0</version>
     <title>secondary</title>
     <icon>business</icon>
     <defaultRole>false</defaultRole>
-
-
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">ORG</property>
+    </properties>
     <caseName>Nová organizácia</caseName>
-    <!-- ROLES -->
+    <processEvents/>
+    <caseEvents/>
     <role>
         <id>admin_secondary</id>
         <title>admin_secondary</title>
     </role>
-</document>
+</process>

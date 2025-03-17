@@ -1,5 +1,4 @@
-<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
 	<id>new_model</id>
 	<version>1.0.0</version>
 	<title>New Model</title>
@@ -65,22 +64,6 @@
 			</actions>
 		</event>
 	</data>
-	<data type="boolean">
-		<id>boolean_3</id>
-		<title>Edit behavior of multiple fields on multiple transitions</title>
-		<init>false</init>
-		<event type="set">
-			<actions phase="post">
-				<action id="action_3">
-					<![CDATA[
-					log.info("boolean_3.rawValue: ${boolean_3.rawValue}")
-					make [text_0, text_1], editable on ([t1, t2]) when { boolean_3.rawValue }
-					make [text_0, text_1], visible on ([t1, t2]) when { !boolean_3.rawValue }
-					]]>
-				</action>
-			</actions>
-		</event>
-	</data>
 	<data type="text">
 		<id>text_0</id>
 		<title>Text field 1</title>
@@ -106,6 +89,11 @@
 						<behavior>visible</behavior>
 					</logic>
 				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
 			</item>
 			<item>
 				<dataRef>
@@ -114,6 +102,11 @@
 						<behavior>visible</behavior>
 					</logic>
 				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
 			</item>
 			<item>
 				<dataRef>
@@ -122,6 +115,11 @@
 						<behavior>editable</behavior>
 					</logic>
 				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
 			</item>
 			<item>
 				<dataRef>
@@ -130,6 +128,11 @@
 						<behavior>editable</behavior>
 					</logic>
 				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
 			</item>
 			<item>
 				<dataRef>
@@ -138,6 +141,11 @@
 						<behavior>editable</behavior>
 					</logic>
 				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
 			</item>
 			<item>
 				<dataRef>
@@ -146,6 +154,11 @@
 						<behavior>editable</behavior>
 					</logic>
 				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
 			</item>
 		</flex>
 	</transition>
@@ -163,6 +176,11 @@
 						<behavior>visible</behavior>
 					</logic>
 				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
 			</item>
 			<item>
 				<dataRef>
@@ -171,6 +189,11 @@
 						<behavior>visible</behavior>
 					</logic>
 				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
 			</item>
 		</flex>
 	</transition>
@@ -188,6 +211,11 @@
 						<behavior>visible</behavior>
 					</logic>
 				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
 			</item>
 			<item>
 				<dataRef>
@@ -196,6 +224,11 @@
 						<behavior>visible</behavior>
 					</logic>
 				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
 			</item>
 		</flex>
 	</transition>
@@ -213,6 +246,11 @@
 						<behavior>visible</behavior>
 					</logic>
 				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
 			</item>
 			<item>
 				<dataRef>
@@ -221,6 +259,11 @@
 						<behavior>visible</behavior>
 					</logic>
 				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
 			</item>
 		</flex>
 	</transition>
