@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
@@ -91,8 +91,8 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> assign(Authentication auth, @PathVariable("id") String taskId) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        return super.assign(loggedUser, taskId);
+        Identity identity = (Identity) auth.getPrincipal();
+        return super.assign(identity, taskId);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallDelegate(#auth.getPrincipal(), #taskId)")
@@ -105,8 +105,8 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody String delegatedId) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        return super.delegate(loggedUser, taskId, delegatedId);
+        Identity identity = (Identity) auth.getPrincipal();
+        return super.delegate(identity, taskId, delegatedId);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallFinish(#auth.getPrincipal(), #taskId)")
@@ -119,8 +119,8 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> finish(Authentication auth, @PathVariable("id") String taskId) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        return super.finish(loggedUser, taskId);
+        Identity identity = (Identity) auth.getPrincipal();
+        return super.finish(identity, taskId);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallCancel(#auth.getPrincipal(), #taskId)")
@@ -133,8 +133,8 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> cancel(Authentication auth, @PathVariable("id") String taskId) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        return super.cancel(loggedUser, taskId);
+        Identity identity = (Identity) auth.getPrincipal();
+        return super.cancel(identity, taskId);
     }
 
     @Override

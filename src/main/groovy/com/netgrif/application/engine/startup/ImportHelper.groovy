@@ -90,18 +90,18 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    Optional<Process> createNet(String fileName, String release, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().stringId) {
+    Optional<Process> createNet(String fileName, String release, Identity author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().stringId) {
         return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author, uriNodeId)
     }
 
-    Optional<Process> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().stringId) {
+    Optional<Process> createNet(String fileName, VersionType release = VersionType.MAJOR, Identity author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().stringId) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
         Process petriNet = petriNetService.importPetriNet(netStream, release, author, uriNodeId).getNet()
         log.info("Imported '${petriNet?.title?.defaultValue}' ['${petriNet?.identifier}', ${petriNet?.stringId}]")
         return Optional.of(petriNet)
     }
 
-    Optional<Process> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser()) {
+    Optional<Process> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, Identity author = userService.getSystem().transformToLoggedUser()) {
         Process petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
         if (!petriNet) {
             return createNet(filename, release, author)
@@ -119,7 +119,7 @@ class ImportHelper {
         return user
     }
 
-    Case createCase(String title, Process net, LoggedUser user) {
+    Case createCase(String title, Process net, Identity user) {
         return workflowService.createCase(net.getStringId(), title, "", user).getCase()
     }
 
@@ -131,7 +131,7 @@ class ImportHelper {
         return createCase(title, net, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
-    AssignTaskEventOutcome assignTask(String taskTitle, String caseId, LoggedUser author) {
+    AssignTaskEventOutcome assignTask(String taskTitle, String caseId, Identity author) {
         return taskService.assignTask(author, getTaskId(taskTitle, caseId))
     }
 
@@ -139,7 +139,7 @@ class ImportHelper {
         return assignTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
-    FinishTaskEventOutcome finishTask(String taskTitle, String caseId, LoggedUser author) {
+    FinishTaskEventOutcome finishTask(String taskTitle, String caseId, Identity author) {
         return taskService.finishTask(author, getTaskId(taskTitle, caseId))
     }
 
@@ -147,7 +147,7 @@ class ImportHelper {
         return finishTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
-    CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, LoggedUser user) {
+    CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, Identity user) {
         return taskService.cancelTask(user, getTaskId(taskTitle, caseId))
     }
 

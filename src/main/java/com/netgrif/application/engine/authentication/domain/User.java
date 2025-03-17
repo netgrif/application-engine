@@ -88,19 +88,19 @@ public class User extends AbstractUser implements RegisteredUser {
         return id.toString();
     }
 
-    public LoggedUser transformToLoggedUser() {
-        LoggedUser loggedUser = new LoggedUser(this.getId().toString(), this.getEmail(), this.getPassword(), this.getAuthorities());
-        loggedUser.setFullName(this.getFullName());
-        loggedUser.setAnonymous(false);
+    public Identity transformToLoggedUser() {
+        Identity identity = new Identity(this.getId().toString(), this.getEmail(), this.getPassword(), this.getAuthorities());
+        identity.setFullName(this.getFullName());
+        identity.setAnonymous(false);
         // todo 2058
 //        if (!this.getRoles().isEmpty()) {
 //            loggedUser.parseRoles(this.getRoles());
 //        }
-        loggedUser.setGroups(this.getNextGroups());
+        identity.setGroups(this.getNextGroups());
         if (this.isImpersonating()) {
-            loggedUser.impersonate(this.getImpersonated().transformToLoggedUser());
+            identity.impersonate(this.getImpersonated().transformToLoggedUser());
         }
-        return loggedUser;
+        return identity;
     }
 
     @Override

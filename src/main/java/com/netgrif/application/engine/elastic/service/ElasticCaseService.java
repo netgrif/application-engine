@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.elastic.service;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepository;
@@ -123,12 +123,12 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     @Override
-    public Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+    public Page<Case> search(List<CaseSearchRequest> requests, Identity user, Pageable pageable, Locale locale, Boolean isIntersection) {
         if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        Identity loggedOrImpersonated = user.getSelfOrImpersonated();
         pageable = resolveUnmappedSortAttributes(pageable);
         NativeSearchQuery query = buildQuery(requests, loggedOrImpersonated, pageable, locale, isIntersection);
         List<Case> casePage;
@@ -147,12 +147,12 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     @Override
-    public long count(List<CaseSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
+    public long count(List<CaseSearchRequest> requests, Identity user, Locale locale, Boolean isIntersection) {
         if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        Identity loggedOrImpersonated = user.getSelfOrImpersonated();
         NativeSearchQuery query = buildQuery(requests, loggedOrImpersonated, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
             return template.count(query, ElasticCase.class);
@@ -174,7 +174,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         return elasticCase.getUriNodeId();
     }
 
-    protected NativeSearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+    protected NativeSearchQuery buildQuery(List<CaseSearchRequest> requests, Identity user, Pageable pageable, Locale locale, Boolean isIntersection) {
         List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
@@ -198,10 +198,10 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                 .build();
     }
 
-    protected BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, LoggedUser user, Locale locale) {
+    protected BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, Identity user, Locale locale) {
         BoolQueryBuilder query = boolQuery();
 
-        buildViewPermissionQuery(query, user);
+        buildViewPermissionQuery(query, user.getId());
         buildPetriNetQuery(request, user, query);
         buildAuthorQuery(request, query);
         buildTaskQuery(request, query);
@@ -222,7 +222,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             return query;
     }
 
-    protected void buildPetriNetQuery(CaseSearchRequest request, LoggedUser user, BoolQueryBuilder query) {
+    protected void buildPetriNetQuery(CaseSearchRequest request, Identity user, BoolQueryBuilder query) {
         if (request.process == null || request.process.isEmpty()) {
             return;
         }
@@ -403,7 +403,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     /**
      * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a>
      */
-    protected void buildStringQuery(CaseSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
+    protected void buildStringQuery(CaseSearchRequest request, BoolQueryBuilder query, Identity user) {
         if (request.query == null || request.query.isEmpty()) {
             return;
         }
@@ -469,7 +469,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
      * }
      * </pre>
      */
-    protected boolean buildGroupQuery(CaseSearchRequest request, LoggedUser user, Locale locale, BoolQueryBuilder query) {
+    protected boolean buildGroupQuery(CaseSearchRequest request, Identity user, Locale locale, BoolQueryBuilder query) {
         if (request.group == null || request.group.isEmpty()) {
             return false;
         }

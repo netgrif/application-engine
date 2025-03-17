@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
 import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
@@ -159,13 +159,13 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public SetDataEventOutcome setData(String taskId, DataSet values, LoggedUser loggedUser) {
-        return setData(taskId, values, loggedUser, new HashMap<>());
+    public SetDataEventOutcome setData(String taskId, DataSet values, Identity identity) {
+        return setData(taskId, values, identity, new HashMap<>());
     }
 
     @Override
-    public SetDataEventOutcome setData(String taskId, DataSet dataSet, LoggedUser loggedUser, Map<String, String> params) {
-        IUser user = userService.getUserFromLoggedUser(loggedUser);
+    public SetDataEventOutcome setData(String taskId, DataSet dataSet, Identity identity, Map<String, String> params) {
+        IUser user = userService.getUserFromLoggedUser(identity);
         return setData(taskId, dataSet, user, params);
     }
 
@@ -253,8 +253,8 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public GetLayoutsEventOutcome getLayouts(String taskId, Locale locale, LoggedUser loggedUser) {
-        IUser user = userService.getUserFromLoggedUser(loggedUser);
+    public GetLayoutsEventOutcome getLayouts(String taskId, Locale locale, Identity identity) {
+        IUser user = userService.getUserFromLoggedUser(identity);
         return getLayouts(taskId, locale, user);
     }
 

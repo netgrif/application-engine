@@ -2,7 +2,7 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Authority;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.User;
 import com.netgrif.application.engine.authentication.domain.UserState;
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository;
@@ -97,8 +97,8 @@ public class TaskServiceTest {
     @Test
     public void resetArcTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
         Process net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet();
-        LoggedUser loggedUser = mockLoggedUser();
-        CreateCaseEventOutcome outcome = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);
+        Identity identity = mockLoggedUser();
+        CreateCaseEventOutcome outcome = workflowService.createCase(net.getStringId(), "Reset test", "color", identity);
         User user = new User();
         user.setName("name");
         user.setPassword("password");
@@ -130,8 +130,8 @@ public class TaskServiceTest {
         assert useCase.getActivePlaces().values().contains(5);
     }
 
-    public LoggedUser mockLoggedUser() {
+    public Identity mockLoggedUser() {
         Authority authorityUser = authorityService.getOrCreate(Authority.user);
-        return new LoggedUser(new ObjectId().toString(), configuration.getEmail(), configuration.getPassword(), Collections.singleton(authorityUser));
+        return new Identity(new ObjectId().toString(), configuration.getEmail(), configuration.getPassword(), Collections.singleton(authorityUser));
     }
 }

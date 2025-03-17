@@ -181,12 +181,12 @@
     <data type="user">
         <id>user_dynamic</id>
         <title/>
-        <init dynamic="true">new UserFieldValue(userService.findById(loggedUser.id))</init>
+        <init dynamic="true">new UserFieldValue(userService.findById(identity.id))</init>
     </data>
     <data type="userList">
         <id>userList_dynamic</id>
         <title/>
-        <init dynamic="true">new UserListFieldValue(new UserFieldValue(userService.findById(loggedUser.id)))</init>
+        <init dynamic="true">new UserListFieldValue(new UserFieldValue(userService.findById(identity.id)))</init>
     </data>
 
     <transition>

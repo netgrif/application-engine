@@ -95,19 +95,19 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void resolveClaims(Map<String, Object> claims, HttpServletRequest request) {
-        LoggedUser loggedUser = createAnonymousUser(request);
+        Identity identity = createAnonymousUser(request);
 
         if (claims.containsKey("user")) {
             IUser user = userService.findAnonymousByEmail((String) ((LinkedHashMap) claims.get("user")).get("email"));
             if (user != null) {
-                loggedUser = user.transformToLoggedUser();
+                identity = user.transformToLoggedUser();
             }
         }
-        loggedUser.eraseCredentials();
-        claims.put("user", loggedUser);
+        identity.eraseCredentials();
+        claims.put("user", identity);
     }
 
-    private LoggedUser createAnonymousUser(HttpServletRequest request) {
+    private Identity createAnonymousUser(HttpServletRequest request) {
         String hash = new ObjectId().toString();
 
         // TODO: release/8.0.0 string constants, properties?

@@ -3,7 +3,7 @@ package com.netgrif.application.engine.ldap.domain;
 
 import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.UserState;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @ConditionalOnExpression("${nae.ldap.enabled:false}")
-public class LdapLoggedUser extends LoggedUser {
+public class LdapIdentity extends Identity {
 
     @Getter
     @Setter
@@ -39,12 +39,12 @@ public class LdapLoggedUser extends LoggedUser {
     private String homeDirectory;
 
 
-    public LdapLoggedUser(String id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public LdapIdentity(String id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(id, username, password, authorities);
     }
 
 
-    public LdapLoggedUser(String id, String username, String password, String dn, String commonName, Set<String> memberOf, String uid, String homeDirectory, Collection<? extends GrantedAuthority> authorities) {
+    public LdapIdentity(String id, String username, String password, String dn, String commonName, Set<String> memberOf, String uid, String homeDirectory, Collection<? extends GrantedAuthority> authorities) {
         super(id, username, password, authorities);
         this.dn = dn;
         this.commonName = commonName;

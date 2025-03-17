@@ -1,14 +1,14 @@
 package com.netgrif.application.engine.event.events.user;
 
 import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.RegisteredUser;
 import com.netgrif.application.engine.utils.DateUtils;
 
 public class UserRegistrationEvent extends UserEvent {
 
     public UserRegistrationEvent(RegisteredUser user) {
-        super(new LoggedUser(
+        super(new Identity(
                 user.getStringId(),
                 user.getEmail(),
                 user.getPassword(),
@@ -16,12 +16,12 @@ public class UserRegistrationEvent extends UserEvent {
         ));
     }
 
-    public UserRegistrationEvent(LoggedUser user) {
+    public UserRegistrationEvent(Identity user) {
         super(user);
     }
 
     public UserRegistrationEvent(IUser user) {
-        super(new LoggedUser(
+        super(new Identity(
                 user.getStringId(),
                 user.getEmail(),
                 "",

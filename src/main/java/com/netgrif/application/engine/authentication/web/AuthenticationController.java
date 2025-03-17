@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.authentication.web;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.RegisteredUser;
 import com.netgrif.application.engine.authentication.service.InvalidUserTokenException;
 import com.netgrif.application.engine.authentication.service.UserDetailsServiceImpl;
@@ -91,7 +91,7 @@ public class AuthenticationController {
     @PostMapping(value = "/invite", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource invite(@RequestBody NewUserRequest newUserRequest, Authentication auth) {
         try {
-            if (!serverAuthProperties.isOpenRegistration() && (auth == null || !((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated().isAdmin())) {
+            if (!serverAuthProperties.isOpenRegistration() && (auth == null || !((Identity) auth.getPrincipal()).getSelfOrImpersonated().isAdmin())) {
                 return MessageResource.errorMessage("Only admin can invite new users!");
             }
 
@@ -130,8 +130,8 @@ public class AuthenticationController {
     @Operation(summary = "Verify validity of an authentication token")
     @GetMapping(value = "/verify", produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource verifyAuthToken(Authentication auth) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        return MessageResource.successMessage("Auth Token successfully verified, for user [" + loggedUser.getId() + "] " + loggedUser.getFullName());
+        Identity identity = (Identity) auth.getPrincipal();
+        return MessageResource.successMessage("Auth Token successfully verified, for user [" + identity.getId() + "] " + identity.getFullName());
     }
 
     @Operation(summary = "Login to the system", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -194,8 +194,8 @@ public class AuthenticationController {
             String password = new String(Base64.getDecoder().decode(request.password));
             if (registrationService.stringMatchesUserPassword(user, password)) {
                 registrationService.changePassword(user, newPassword);
-                securityContextService.saveToken(((LoggedUser) auth.getPrincipal()).getId());
-                securityContextService.reloadSecurityContext((LoggedUser) auth.getPrincipal());
+                securityContextService.saveToken(((Identity) auth.getPrincipal()).getId());
+                securityContextService.reloadSecurityContext((Identity) auth.getPrincipal());
 
             } else {
                 return MessageResource.errorMessage("Incorrect password!");

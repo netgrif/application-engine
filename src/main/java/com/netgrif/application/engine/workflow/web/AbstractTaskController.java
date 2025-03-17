@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -55,8 +55,8 @@ public abstract class AbstractTaskController {
     }
 
     public PagedModel<TaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        Page<Task> page = taskService.getAll(loggedUser, pageable, locale);
+        Identity identity = (Identity) auth.getPrincipal();
+        Page<Task> page = taskService.getAll(identity, pageable, locale);
 
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .getAll(auth, pageable, assembler, locale)).withRel("all");
@@ -87,27 +87,27 @@ public abstract class AbstractTaskController {
         return new TaskResource(task);
     }
 
-    public EntityModel<EventOutcomeWithMessage> assign(LoggedUser loggedUser, String taskId) {
+    public EntityModel<EventOutcomeWithMessage> assign(Identity identity, String taskId) {
         try {
-            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName(), taskService.assignTask(loggedUser, taskId));
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + identity.getFullName(), taskService.assignTask(identity, taskId));
         } catch (TransitionNotExecutableException e) {
             log.error("Assigning task [{}] failed: ", taskId, e);
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
 
-    public EntityModel<EventOutcomeWithMessage> delegate(LoggedUser loggedUser, String taskId, String delegatedId) {
+    public EntityModel<EventOutcomeWithMessage> delegate(Identity identity, String taskId, String delegatedId) {
         try {
-            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]", taskService.delegateTask(loggedUser, delegatedId, taskId));
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]", taskService.delegateTask(identity, delegatedId, taskId));
         } catch (Exception e) {
             log.error("Delegating task [{}] failed: ", taskId, e);
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
 
-    public EntityModel<EventOutcomeWithMessage> finish(LoggedUser loggedUser, String taskId) {
+    public EntityModel<EventOutcomeWithMessage> finish(Identity identity, String taskId) {
         try {
-            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " finished", taskService.finishTask(loggedUser, taskId));
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " finished", taskService.finishTask(identity, taskId));
         } catch (Exception e) {
             log.error("Finishing task [{}] failed: ", taskId, e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
@@ -118,9 +118,9 @@ public abstract class AbstractTaskController {
         }
     }
 
-    public EntityModel<EventOutcomeWithMessage> cancel(LoggedUser loggedUser, String taskId) {
+    public EntityModel<EventOutcomeWithMessage> cancel(Identity identity, String taskId) {
         try {
-            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " canceled", taskService.cancelTask(loggedUser, taskId));
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " canceled", taskService.cancelTask(identity, taskId));
         } catch (Exception e) {
             log.error("Canceling task [{}] failed: ", taskId, e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
@@ -132,7 +132,7 @@ public abstract class AbstractTaskController {
     }
 
     public PagedModel<TaskResource> getMy(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        Page<Task> page = taskService.findByUser(pageable, ((LoggedUser) auth.getPrincipal()).transformToUser());
+        Page<Task> page = taskService.findByUser(pageable, ((Identity) auth.getPrincipal()).transformToUser());
 
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .getMy(auth, pageable, assembler, locale)).withRel("my");
@@ -142,7 +142,7 @@ public abstract class AbstractTaskController {
     }
 
     public PagedModel<TaskResource> getMyFinished(Pageable pageable, Authentication auth, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        Page<Task> page = taskService.findByUser(pageable, ((LoggedUser) auth.getPrincipal()).transformToUser());
+        Page<Task> page = taskService.findByUser(pageable, ((Identity) auth.getPrincipal()).transformToUser());
 
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .getMyFinished(pageable, auth, assembler, locale)).withRel("finished");
@@ -152,7 +152,7 @@ public abstract class AbstractTaskController {
     }
 
     public PagedModel<TaskResource> search(Authentication auth, Pageable pageable, SingleTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        Page<Task> tasks = taskService.search(searchBody.getList(), pageable, (LoggedUser) auth.getPrincipal(), locale, operation == MergeFilterOperation.AND);
+        Page<Task> tasks = taskService.search(searchBody.getList(), pageable, (Identity) auth.getPrincipal(), locale, operation == MergeFilterOperation.AND);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .search(auth, pageable, searchBody, operation, assembler, locale)).withRel("search");
         PagedModel<TaskResource> resources = assembler.toModel(tasks, new TaskResourceAssembler(), selfLink);
@@ -160,17 +160,17 @@ public abstract class AbstractTaskController {
         return resources;
     }
 
-    public PagedModel<TaskResource> searchPublic(LoggedUser loggedUser, Pageable pageable, SingleTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<com.netgrif.application.engine.workflow.domain.Task> assembler, Locale locale) {
-        Page<com.netgrif.application.engine.workflow.domain.Task> tasks = taskService.search(searchBody.getList(), pageable, loggedUser, locale, operation == MergeFilterOperation.AND);
+    public PagedModel<TaskResource> searchPublic(Identity identity, Pageable pageable, SingleTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<com.netgrif.application.engine.workflow.domain.Task> assembler, Locale locale) {
+        Page<com.netgrif.application.engine.workflow.domain.Task> tasks = taskService.search(searchBody.getList(), pageable, identity, locale, operation == MergeFilterOperation.AND);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicTaskController.class)
-                .searchPublic(loggedUser, pageable, searchBody, operation, assembler, locale)).withRel("search");
+                .searchPublic(identity, pageable, searchBody, operation, assembler, locale)).withRel("search");
         PagedModel<TaskResource> resources = assembler.toModel(tasks, new TaskResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Task.class, selfLink.getRel().toString());
         return resources;
     }
 
     public PagedModel<TaskResource> searchElastic(Authentication auth, Pageable pageable, SingleElasticTaskSearchRequestAsList searchBody, MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        Page<Task> tasks = searchService.search(searchBody.getList(), (LoggedUser) auth.getPrincipal(), pageable, locale, operation == MergeFilterOperation.AND);
+        Page<Task> tasks = searchService.search(searchBody.getList(), (Identity) auth.getPrincipal(), pageable, locale, operation == MergeFilterOperation.AND);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .searchElastic(auth, pageable, searchBody, operation, assembler, locale)).withRel("search_es");
         PagedModel<TaskResource> resources = assembler.toModel(tasks, new TaskResourceAssembler(), selfLink);
@@ -179,14 +179,14 @@ public abstract class AbstractTaskController {
     }
 
     public CountResponse count(SingleElasticTaskSearchRequestAsList query, MergeFilterOperation operation, Authentication auth, Locale locale) {
-        long count = searchService.count(query.getList(), (LoggedUser) auth.getPrincipal(), locale, operation == MergeFilterOperation.AND);
+        long count = searchService.count(query.getList(), (Identity) auth.getPrincipal(), locale, operation == MergeFilterOperation.AND);
         return CountResponse.taskCount(count);
     }
 
 //// TODO: NAE-1969 fix
     public EntityModel<EventOutcomeWithMessage> getData(String taskId, Locale locale, Authentication auth) {
         try {
-            GetLayoutsEventOutcome outcome = dataService.getLayouts(taskId, locale, (LoggedUser) auth.getPrincipal());
+            GetLayoutsEventOutcome outcome = dataService.getLayouts(taskId, locale, (Identity) auth.getPrincipal());
             return EventOutcomeWithMessageResource.successMessage("Get data groups successful", outcome);
         } catch (IllegalArgumentWithChangedFieldsException e) {
             log.error("Get data on task [{}] failed: ", taskId, e);
@@ -200,7 +200,7 @@ public abstract class AbstractTaskController {
     public EntityModel<EventOutcomeWithMessage> setData(String taskId, TaskDataSets dataBody, Authentication auth) {
         try {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
-            dataBody.getBody().forEach((task, dataSet) -> outcomes.put(task, dataService.setData(task, dataSet, (LoggedUser) auth.getPrincipal())));
+            dataBody.getBody().forEach((task, dataSet) -> outcomes.put(task, dataService.setData(task, dataSet, (Identity) auth.getPrincipal())));
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set", mainOutcome);
         } catch (IllegalArgumentWithChangedFieldsException e) {

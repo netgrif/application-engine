@@ -2,7 +2,7 @@ package com.netgrif.application.engine.impersonation.service.interfaces;
 
 import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authorization.domain.Role;
 import com.netgrif.application.engine.workflow.domain.Case;
 import org.springframework.data.domain.Page;
@@ -13,11 +13,11 @@ import java.util.List;
 
 public interface IImpersonationAuthorizationService {
 
-    Page<IUser> getConfiguredImpersonationUsers(String query, LoggedUser impersonator, Pageable pageable);
+    Page<IUser> getConfiguredImpersonationUsers(String query, Identity impersonator, Pageable pageable);
 
-    boolean canImpersonate(LoggedUser loggedUser, String configId);
+    boolean canImpersonate(Identity identity, String configId);
 
-    boolean canImpersonateUser(LoggedUser impersonator, String userId);
+    boolean canImpersonateUser(Identity impersonator, String userId);
 
     Page<Case> searchConfigs(String impersonatorId, Pageable pageable);
 

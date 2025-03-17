@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.service.interfaces;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
@@ -45,18 +45,18 @@ public interface IPetriNetService {
     Process clone(ObjectId petriNetId);
 
     @Deprecated
-    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, Identity user) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
     @Deprecated
-    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, Identity user, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
-    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, Identity user) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
-    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, Identity user, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
-    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, Identity user, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
-    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user, String uriNodeId, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, Identity user, String uriNodeId, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
     Optional<Process> save(Process petriNet);
 
@@ -76,21 +76,21 @@ public interface IPetriNetService {
 
     FileSystemResource getFile(String netId, String title);
 
-    List<PetriNetReference> getReferences(LoggedUser user, Locale locale);
+    List<PetriNetReference> getReferences(Identity user, Locale locale);
 
-    List<PetriNetReference> getReferencesByIdentifier(String identifier, LoggedUser user, Locale locale);
+    List<PetriNetReference> getReferencesByIdentifier(String identifier, Identity user, Locale locale);
 
-    List<PetriNetReference> getReferencesByVersion(Version version, LoggedUser user, Locale locale);
+    List<PetriNetReference> getReferencesByVersion(Version version, Identity user, Locale locale);
 
-    List<PetriNetReference> getReferencesByUsersRoles(LoggedUser user, Locale locale);
+    List<PetriNetReference> getReferencesByUsersRoles(Identity user, Locale locale);
 
-    PetriNetReference getReference(String identifier, Version version, LoggedUser user, Locale locale);
+    PetriNetReference getReference(String identifier, Version version, Identity user, Locale locale);
 
-    List<TransitionReference> getTransitionReferences(List<String> netsIds, LoggedUser user, Locale locale);
+    List<TransitionReference> getTransitionReferences(List<String> netsIds, Identity user, Locale locale);
 
     List<DataFieldReference> getDataFieldReferences(List<TransitionReference> transitions, Locale locale);
 
-    Page<PetriNetReference> search(PetriNetSearch criteria, LoggedUser user, Pageable pageable, Locale locale);
+    Page<PetriNetReference> search(PetriNetSearch criteria, Identity user, Pageable pageable, Locale locale);
 
     Optional<Process> findByImportId(String id);
 

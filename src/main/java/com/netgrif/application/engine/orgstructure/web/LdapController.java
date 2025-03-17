@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.orgstructure.web;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.ldap.domain.LdapGroup;
 import com.netgrif.application.engine.ldap.domain.LdapGroupRef;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
@@ -80,7 +80,7 @@ public class LdapController {
     })
     public MessageResource assignRolesToLdapGroup(@RequestBody LdapGroupRoleAssignRequestBody requestBody, Authentication auth) {
         try {
-            service.setRoleToLdapGroup(requestBody.getGroupDn(), requestBody.getRoleIds(), (LoggedUser) auth.getPrincipal());
+            service.setRoleToLdapGroup(requestBody.getGroupDn(), requestBody.getRoleIds(), (Identity) auth.getPrincipal());
             log.info("Process roles " + requestBody.getRoleIds() + " assigned to group " + requestBody.getGroupDn());
             return MessageResource.successMessage("Selected roles assigned to group " + requestBody.getGroupDn());
         } catch (IllegalArgumentException e) {

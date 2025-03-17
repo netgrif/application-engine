@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.event
 
 import com.netgrif.application.engine.EngineTest
-import com.netgrif.application.engine.authentication.domain.LoggedUser
+import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.authorization.domain.ProcessRole
@@ -53,7 +53,7 @@ class GroovyShellFactoryTest extends EngineTest {
         roleService.assignRolesToUser(
                 user.getStringId(),
                 new HashSet<String>([role.stringId] + user.roles.collect { it.stringId }),
-                new LoggedUser("", "a", "", [])
+                new Identity("", "a", "", [])
         )
         user = userService.findByEmail(userService.getSystem().getEmail())
         assert user.roles.size() == roleCount + 1

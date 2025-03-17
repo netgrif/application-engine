@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
@@ -18,8 +18,8 @@ public class TaskSearchService extends MongoSearchService<Task> {
     @Autowired
     private IPetriNetService petriNetService;
 
-    public Predicate buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
-        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+    public Predicate buildQuery(List<TaskSearchRequest> requests, Identity user, Locale locale, Boolean isIntersection) {
+        Identity loggedOrImpersonated = user.getSelfOrImpersonated();
         List<Predicate> singleQueries = requests.stream().map(r -> this.buildSingleQuery(r, loggedOrImpersonated, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
@@ -94,7 +94,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
 //    }
 
 
-    private Predicate buildSingleQuery(TaskSearchRequest request, LoggedUser user, Locale locale) {
+    private Predicate buildSingleQuery(TaskSearchRequest request, Identity user, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
 
 //        buildStringIdQuery(request, builder);

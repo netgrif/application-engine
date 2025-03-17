@@ -63,11 +63,11 @@ public abstract class AbstractUserService implements IUserService {
     }
 
     @Override
-    public LoggedUser getAnonymousLogged() {
+    public Identity getAnonymousLogged() {
         if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals(UserProperties.ANONYMOUS_AUTH_KEY)) {
             getLoggedUser().transformToLoggedUser();
         }
-        return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return (Identity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     @Override
@@ -90,9 +90,9 @@ public abstract class AbstractUserService implements IUserService {
     }
 
     @Override
-    public IUser getUserFromLoggedUser(LoggedUser loggedUser) {
-        IUser user = resolveById(loggedUser.getId());
-        IUser fromLogged = loggedUser.transformToUser();
+    public IUser getUserFromLoggedUser(Identity identity) {
+        IUser user = resolveById(identity.getId());
+        IUser fromLogged = identity.transformToUser();
         user.setImpersonated(fromLogged.getImpersonated());
         return user;
     }

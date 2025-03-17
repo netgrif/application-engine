@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
@@ -205,7 +205,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale, Map<String, String> params) {
+    public CreateCaseEventOutcome createCase(String netId, String title, String color, Identity user, Locale locale, Map<String, String> params) {
         if (locale == null) {
             locale = LocaleContextHolder.getLocale();
         }
@@ -216,22 +216,22 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale) {
+    public CreateCaseEventOutcome createCase(String netId, String title, String color, Identity user, Locale locale) {
         return this.createCase(netId, title, color, user, locale, new HashMap<>());
     }
 
     @Override
-    public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Map<String, String> params) {
+    public CreateCaseEventOutcome createCase(String netId, String title, String color, Identity user, Map<String, String> params) {
         return createCase(netId, (u) -> title, color, user, params);
     }
 
     @Override
-    public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user) {
+    public CreateCaseEventOutcome createCase(String netId, String title, String color, Identity user) {
         return this.createCase(netId, (u) -> title, color, user);
     }
 
     @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale, Map<String, String> params) {
+    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, Identity user, Locale locale, Map<String, String> params) {
         Process net = petriNetService.getNewestVersionByIdentifier(identifier);
         if (net == null) {
             throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
@@ -240,12 +240,12 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale) {
+    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, Identity user, Locale locale) {
         return this.createCaseByIdentifier(identifier, title, color, user, locale, new HashMap<>());
     }
 
     @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Map<String, String> params) {
+    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, Identity user, Map<String, String> params) {
         Process net = petriNetService.getNewestVersionByIdentifier(identifier);
         if (net == null) {
             throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
@@ -254,7 +254,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user) {
+    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, Identity user) {
         Process net = petriNetService.getNewestVersionByIdentifier(identifier);
         if (net == null) {
             throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
@@ -262,13 +262,13 @@ public class WorkflowService implements IWorkflowService {
         return this.createCase(net.getStringId(), title, color, user);
     }
 
-    public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
+    public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, Identity user) {
         return this.createCase(netId, makeTitle, color, user, new HashMap<>());
     }
 
     // TODO: release/8.0.0 remove color
-    public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user, Map<String, String> params) {
-        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+    public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, Identity user, Map<String, String> params) {
+        Identity loggedOrImpersonated = user.getSelfOrImpersonated();
         Process petriNet = petriNetService.clone(new ObjectId(netId));
         int rulesExecuted;
         Case useCase = new Case(petriNet);

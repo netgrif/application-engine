@@ -2,7 +2,7 @@ package com.netgrif.application.engine.authentication.service.interfaces;
 
 import com.netgrif.application.engine.authentication.domain.AnonymousUser;
 import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.web.requestbodies.UpdateUserRequest;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
@@ -36,7 +36,7 @@ public interface IUserService {
 
     List<IUser> findAll();
 
-    Page<IUser> findAllCoMembers(LoggedUser loggedUser, Pageable pageable);
+    Page<IUser> findAllCoMembers(Identity identity, Pageable pageable);
 
     List<IUser> findAllByIds(Set<String> ids);
 
@@ -54,19 +54,19 @@ public interface IUserService {
 
     IUser getSystem();
 
-    LoggedUser getAnonymousLogged();
+    Identity getAnonymousLogged();
 
-    LoggedUser getLoggedUserFromContext();
+    Identity getLoggedUserFromContext();
 
-    Page<IUser> searchAllCoMembers(String query, LoggedUser principal, Pageable pageable);
+    Page<IUser> searchAllCoMembers(String query, Identity principal, Pageable pageable);
 
     void deleteUser(IUser user);
 
-    Page<IUser> searchAllCoMembers(String query, List<ObjectId> roles, List<ObjectId> negateRoleIds, LoggedUser principal, Pageable pageable);
+    Page<IUser> searchAllCoMembers(String query, List<ObjectId> roles, List<ObjectId> negateRoleIds, Identity principal, Pageable pageable);
 
     IUser createSystemUser();
 
     boolean existsById(String id);
 
-    IUser getUserFromLoggedUser(LoggedUser loggedUser);
+    IUser getUserFromLoggedUser(Identity identity);
 }

@@ -2,7 +2,7 @@ package com.netgrif.application.engine.petrinet.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.properties.CacheProperties;
@@ -186,33 +186,33 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     @Deprecated
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, Identity author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author, uriService.getRoot().getStringId());
     }
 
     @Override
     @Deprecated
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, Identity author, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author, uriNodeId);
     }
 
     @Override
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, Identity author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         return importPetriNet(xmlFile, releaseType, author, uriService.getRoot().getStringId());
     }
 
     @Override
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, Identity author, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         return importPetriNet(xmlFile, releaseType, author, uriService.getRoot().getStringId(), params);
     }
 
     @Override
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, Identity author, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         return importPetriNet(xmlFile, releaseType, author, uriNodeId, new HashMap<>());
     }
 
     @Override
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author, String uriNodeId, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, Identity author, String uriNodeId, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
         ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
         IOUtils.copy(xmlFile, xmlCopy);
@@ -391,17 +391,17 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNetReference> getReferences(LoggedUser user, Locale locale) {
+    public List<PetriNetReference> getReferences(Identity user, Locale locale) {
         return getAll().stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
     }
 
     @Override
-    public List<PetriNetReference> getReferencesByIdentifier(String identifier, LoggedUser user, Locale locale) {
+    public List<PetriNetReference> getReferencesByIdentifier(String identifier, Identity user, Locale locale) {
         return getByIdentifier(identifier).stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
     }
 
     @Override
-    public List<PetriNetReference> getReferencesByVersion(Version version, LoggedUser user, Locale locale) {
+    public List<PetriNetReference> getReferencesByVersion(Version version, Identity user, Locale locale) {
         List<PetriNetReference> references;
 
         if (version == null) {
@@ -424,7 +424,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNetReference> getReferencesByUsersRoles(LoggedUser user, Locale locale) {
+    public List<PetriNetReference> getReferencesByUsersRoles(Identity user, Locale locale) {
         // todo 2058
 //        Query query = Query.query(getRolesCriteria(user));
 //        return mongoTemplate.find(query, Process.class).stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
@@ -432,13 +432,13 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public PetriNetReference getReference(String identifier, Version version, LoggedUser user, Locale locale) {
+    public PetriNetReference getReference(String identifier, Version version, Identity user, Locale locale) {
         Process net = version == null ? getNewestVersionByIdentifier(identifier) : getPetriNet(identifier, version);
         return net != null ? transformToReference(net, locale) : new PetriNetReference();
     }
 
     @Override
-    public List<TransitionReference> getTransitionReferences(List<String> netIds, LoggedUser user, Locale locale) {
+    public List<TransitionReference> getTransitionReferences(List<String> netIds, Identity user, Locale locale) {
         Iterable<Process> nets = get(netIds);
         List<TransitionReference> references = new ArrayList<>();
 
@@ -474,7 +474,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public Page<PetriNetReference> search(PetriNetSearch criteriaClass, LoggedUser user, Pageable pageable, Locale locale) {
+    public Page<PetriNetReference> search(PetriNetSearch criteriaClass, Identity user, Pageable pageable, Locale locale) {
         Query query = new Query();
         Query queryTotal = new Query();
 

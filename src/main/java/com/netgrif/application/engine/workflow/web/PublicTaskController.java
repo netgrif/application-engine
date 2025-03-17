@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
@@ -72,8 +72,8 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> assign(@PathVariable("id") String taskId) {
-        LoggedUser loggedUser = userService.getAnonymousLogged();
-        return super.assign(loggedUser, taskId);
+        Identity identity = userService.getAnonymousLogged();
+        return super.assign(identity, taskId);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallFinish(@userService.getAnonymousLogged(), #taskId)")
@@ -87,8 +87,8 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> finish(@PathVariable("id") String taskId) {
-        LoggedUser loggedUser = userService.getAnonymousLogged();
-        return super.finish(loggedUser, taskId);
+        Identity identity = userService.getAnonymousLogged();
+        return super.finish(identity, taskId);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallCancel(@userService.getAnonymousLogged(), #taskId)")
@@ -102,8 +102,8 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> cancel(@PathVariable("id") String taskId) {
-        LoggedUser loggedUser = userService.getAnonymousLogged();
-        return super.cancel(loggedUser, taskId);
+        Identity identity = userService.getAnonymousLogged();
+        return super.cancel(identity, taskId);
     }
 
     // TODO: NAE-1969 fix

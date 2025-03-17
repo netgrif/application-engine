@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.authentication.service;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.User;
 import com.netgrif.application.engine.authentication.domain.UserState;
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository;
@@ -42,14 +42,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new RuntimeException("blocked");
         }
 
-        LoggedUser loggedUser = getLoggedUser(email);
+        Identity identity = getLoggedUser(email);
 
-        publisher.publishEvent(new UserLoginEvent(loggedUser));
+        publisher.publishEvent(new UserLoginEvent(identity));
 
-        return loggedUser;
+        return identity;
     }
 
-    protected LoggedUser getLoggedUser(String email) throws UsernameNotFoundException {
+    protected Identity getLoggedUser(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);
         if (user == null)
             throw new UsernameNotFoundException("No user was found for login: " + email);

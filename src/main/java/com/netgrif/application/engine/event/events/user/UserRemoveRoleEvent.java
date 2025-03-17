@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.event.events.user;
 
 import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authorization.domain.Role;
 import lombok.Getter;
 
@@ -12,7 +12,7 @@ public class UserRemoveRoleEvent extends UserEvent{
 
     protected final Collection<Role> roles;
 
-    public UserRemoveRoleEvent(LoggedUser user, Collection<Role> roles) {
+    public UserRemoveRoleEvent(Identity user, Collection<Role> roles) {
         super(user);
         this.roles = roles;
     }

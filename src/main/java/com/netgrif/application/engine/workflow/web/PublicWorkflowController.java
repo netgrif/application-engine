@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
@@ -45,9 +45,9 @@ public class PublicWorkflowController {
     @PostMapping(value = "/case", consumes = "application/json;charset=UTF-8", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Create new case")
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Locale locale) {
-        LoggedUser loggedUser = userService.getAnonymousLogged();
+        Identity identity = userService.getAnonymousLogged();
         try {
-            CreateCaseEventOutcome outcome = this.workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
+            CreateCaseEventOutcome outcome = this.workflowService.createCase(body.netId, body.title, body.color, identity, locale);
             return EventOutcomeWithMessageResource.successMessage("Case created successfully", outcome);
         } catch (Exception e) {
             log.error("Creating case failed:" + e.getMessage(), e);

@@ -93,7 +93,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
         return superUser
     }
 
-    LoggedUser getLoggedSuper() {
+    Identity getLoggedSuper() {
         return superUser.transformToLoggedUser()
     }
 }

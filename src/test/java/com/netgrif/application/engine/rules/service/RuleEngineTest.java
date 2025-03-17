@@ -2,7 +2,7 @@ package com.netgrif.application.engine.rules.service;
 
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.drools.RefreshableKieBase;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
@@ -65,7 +65,7 @@ class RuleEngineTest {
     @Autowired
     private IUserService userService;
 
-    private LoggedUser superUser;
+    private Identity superUser;
 
 
     @BeforeEach

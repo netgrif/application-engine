@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.configuration.security.jwt;
 
 import com.netgrif.application.engine.authentication.domain.Authority;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -53,9 +53,9 @@ public class JwtService implements IJwtService {
     }
 
     @Override
-    public LoggedUser getLoggedUser(String token, Authority anonymousAuthority) {
+    public Identity getLoggedUser(String token, Authority anonymousAuthority) {
         LinkedHashMap<String, Object> userMap = (LinkedHashMap<String, Object>) getAllClaimsFromToken(token).get("user");
-        LoggedUser user = new LoggedUser(
+        Identity user = new Identity(
                 userMap.get("id").toString(),
                 userMap.get("username").toString(),
                 "n/a",

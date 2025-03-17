@@ -179,18 +179,18 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
-    public Page<IUser> findAllCoMembers(LoggedUser loggedUser, Pageable pageable) {
+    public Page<IUser> findAllCoMembers(Identity identity, Pageable pageable) {
         // TODO: 8/27/18 make all pageable
-        Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser());
-        members.add(loggedUser.getSelfOrImpersonated().getId());
+        Set<String> members = groupService.getAllCoMembers(identity.getSelfOrImpersonated().transformToUser());
+        members.add(identity.getSelfOrImpersonated().getId());
         Set<ObjectId> objMembers = members.stream().map(ObjectId::new).collect(Collectors.toSet());
         return changeType(userRepository.findAllByIdInAndState(objMembers, UserState.ACTIVE, pageable), pageable);
     }
 
     @Override
-    public Page<IUser> searchAllCoMembers(String query, LoggedUser loggedUser, Pageable pageable) {
-        Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser());
-        members.add(loggedUser.getSelfOrImpersonated().getId());
+    public Page<IUser> searchAllCoMembers(String query, Identity identity, Pageable pageable) {
+        Set<String> members = groupService.getAllCoMembers(identity.getSelfOrImpersonated().transformToUser());
+        members.add(identity.getSelfOrImpersonated().getId());
 
         return changeType(userRepository.findAll(buildPredicate(members.stream().map(ObjectId::new)
                 .collect(Collectors.toSet()), query), pageable), pageable);
@@ -198,17 +198,17 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
-    public Page<IUser> searchAllCoMembers(String query, List<ObjectId> roleIds, List<ObjectId> negateRoleIds, LoggedUser loggedUser, Pageable pageable) {
+    public Page<IUser> searchAllCoMembers(String query, List<ObjectId> roleIds, List<ObjectId> negateRoleIds, Identity identity, Pageable pageable) {
         if ((roleIds == null || roleIds.isEmpty()) && (negateRoleIds == null || negateRoleIds.isEmpty()))
-            return searchAllCoMembers(query, loggedUser, pageable);
+            return searchAllCoMembers(query, identity, pageable);
 
         if (negateRoleIds == null) {
             negateRoleIds = new ArrayList<>();
         }
 
 
-        Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser());
-        members.add(loggedUser.getSelfOrImpersonated().getId());
+        Set<String> members = groupService.getAllCoMembers(identity.getSelfOrImpersonated().transformToUser());
+        members.add(identity.getSelfOrImpersonated().getId());
         BooleanExpression predicate = buildPredicate(members.stream().map(ObjectId::new).collect(Collectors.toSet()), query);
         if (!(roleIds == null || roleIds.isEmpty())) {
             // todo 2058
@@ -293,24 +293,24 @@ public class UserService extends AbstractUserService {
 
     @Override
     public IUser getLoggedUser() {
-        LoggedUser loggedUser = getLoggedUserFromContext();
-        if (!loggedUser.isAnonymous()) {
-            IUser user = findByEmail(loggedUser.getEmail());
-            if (loggedUser.isImpersonating()) {
+        Identity identity = getLoggedUserFromContext();
+        if (!identity.isAnonymous()) {
+            IUser user = findByEmail(identity.getEmail());
+            if (identity.isImpersonating()) {
                 // cannot be simply reloaded from DB, impersonated user holds a subset of roles and authorities.
                 // this reloads the impersonated user's roles as they are not complete (LoggedUser creates incomplete ProcessRole objects)
-                IUser impersonated = loggedUser.getImpersonated().transformToUser();
+                IUser impersonated = identity.getImpersonated().transformToUser();
                 // todo 2058
 //                impersonated.setRoles(roleService.findByIds(loggedUser.getImpersonated().getRoles()));
                 user.setImpersonated(impersonated);
             }
             return user;
         }
-        return loggedUser.transformToAnonymousUser();
+        return identity.transformToAnonymousUser();
     }
 
     @Override
-    public LoggedUser getAnonymousLogged() {
+    public Identity getAnonymousLogged() {
         if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals(UserProperties.ANONYMOUS_AUTH_KEY)) {
             return getLoggedUser().transformToLoggedUser();
         }
@@ -318,8 +318,8 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
-    public LoggedUser getLoggedUserFromContext() {
-        return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public Identity getLoggedUserFromContext() {
+        return (Identity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     @Override

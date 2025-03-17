@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
@@ -37,9 +37,9 @@ public interface IDataService {
 
     SetDataEventOutcome setData(String taskId, DataSet values, IUser user, Map<String, String> params);
 
-    SetDataEventOutcome setData(String taskId, DataSet values, LoggedUser loggedUser);
+    SetDataEventOutcome setData(String taskId, DataSet values, Identity identity);
 
-    SetDataEventOutcome setData(String taskId, DataSet values, LoggedUser loggedUser, Map<String, String> params);
+    SetDataEventOutcome setData(String taskId, DataSet values, Identity identity, Map<String, String> params);
 
     SetDataEventOutcome setData(Case useCase, DataSet dataSet, IUser user);
 
@@ -95,7 +95,7 @@ public interface IDataService {
     // TODO: release/8.0.0 deprecated by forms
     GetLayoutsEventOutcome getLayouts(String taskId, Locale locale, IUser user);
 
-    GetLayoutsEventOutcome getLayouts(String taskId, Locale locale, LoggedUser loggedUser);
+    GetLayoutsEventOutcome getLayouts(String taskId, Locale locale, Identity identity);
 
     // TODO: release/8.0.0 revision
     Page<Task> setImmediateFields(Page<Task> tasks);

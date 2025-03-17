@@ -1,11 +1,11 @@
 package com.netgrif.application.engine.event.events.user;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.utils.DateUtils;
 
 public class UserLogoutEvent extends UserEvent {
 
-    public UserLogoutEvent(LoggedUser user) {
+    public UserLogoutEvent(Identity user) {
         super(user);
     }
 

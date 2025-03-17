@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.manager.web;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.manager.web.body.request.LogoutRequest;
 import com.netgrif.application.engine.manager.web.body.response.AllLoggedUsersResponse;
@@ -43,8 +43,8 @@ public class SessionManagerController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public AllLoggedUsersResponse getAllSessions() {
-        Collection<LoggedUser> loggedUsers = sessionManagerService.getAllLoggedUsers();
-        return new AllLoggedUsersResponse(loggedUsers);
+        Collection<Identity> identities = sessionManagerService.getAllLoggedUsers();
+        return new AllLoggedUsersResponse(identities);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

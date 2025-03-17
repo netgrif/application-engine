@@ -2,7 +2,6 @@ package com.netgrif.application.engine.authentication
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.IUser
-import com.netgrif.application.engine.authentication.domain.LoggedUser
 import com.netgrif.application.engine.authentication.domain.User
 import com.netgrif.application.engine.authentication.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
@@ -23,8 +22,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension
-
-import java.util.stream.Collectors;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])

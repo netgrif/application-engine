@@ -790,7 +790,7 @@
 <!--            <actions phase="pre">-->
 <!--                <action id="action_12">-->
 <!--					<![CDATA[-->
-<!--                    change processes_available options { return configurableMenuService.getNetsByAuthorAsMapOptions(loggedUser(), org.springframework.context.i18n.LocaleContextHolder.locale) }-->
+<!--                    change processes_available options { return configurableMenuService.getNetsByAuthorAsMapOptions(identity(), org.springframework.context.i18n.LocaleContextHolder.locale) }-->
 <!--                    ]]>-->
 <!--				</action>-->
 <!--            </actions>-->

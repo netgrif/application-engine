@@ -2,9 +2,9 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.AsyncRunner
-import com.netgrif.application.engine.authentication.domain.Author
+
 import com.netgrif.application.engine.authentication.domain.IUser
-import com.netgrif.application.engine.authentication.domain.LoggedUser
+import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.authentication.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
@@ -1136,7 +1136,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     File exportCasesToFile(List<CaseSearchRequest> requests, String pathName, ExportDataConfig config = null,
-                           LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                           Identity user = userService.loggedOrSystem.transformToLoggedUser(),
                            int pageSize = exportConfiguration.getMongoPageSize(),
                            Locale locale = LocaleContextHolder.getLocale(),
                            Boolean isIntersection = false) {
@@ -1147,7 +1147,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     OutputStream exportCases(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config = null,
-                             LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                             Identity user = userService.loggedOrSystem.transformToLoggedUser(),
                              int pageSize = exportConfiguration.getMongoPageSize(),
                              Locale locale = LocaleContextHolder.getLocale(),
                              Boolean isIntersection = false) {
@@ -1167,7 +1167,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     File exportTasksToFile(List<ElasticTaskSearchRequest> requests, String pathName, ExportDataConfig config = null,
-                           LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                           Identity user = userService.loggedOrSystem.transformToLoggedUser(),
                            int pageSize = exportConfiguration.getMongoPageSize(),
                            Locale locale = LocaleContextHolder.getLocale(),
                            Boolean isIntersection = false) {
@@ -1178,7 +1178,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     OutputStream exportTasks(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config = null,
-                             LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                             Identity user = userService.loggedOrSystem.transformToLoggedUser(),
                              int pageSize = exportConfiguration.getMongoPageSize(),
                              Locale locale = LocaleContextHolder.getLocale(),
                              Boolean isIntersection = false) {
@@ -1211,7 +1211,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Case> findCasesElastic(List<CaseSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Case> findCasesElastic(List<CaseSearchRequest> requests, Identity loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
                                 int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         return elasticCaseService.search(requests, loggedUser, PageRequest.of(page, pageSize), locale, isIntersection)
     }
@@ -1226,7 +1226,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Case> findCasesElastic(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Case> findCasesElastic(Map<String, Object> request, Identity loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
                                 int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         List<CaseSearchRequest> requests = Collections.singletonList(new CaseSearchRequest(request))
         return findCasesElastic(requests, loggedUser, page, pageSize, locale, isIntersection)
@@ -1242,7 +1242,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Task> findTasks(List<ElasticTaskSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Task> findTasks(List<ElasticTaskSearchRequest> requests, Identity loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
                          int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         return elasticTaskService.search(requests, loggedUser, PageRequest.of(page, pageSize), locale, isIntersection)
     }
@@ -1257,7 +1257,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Task> findTasks(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Task> findTasks(Map<String, Object> request, Identity loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
                          int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         List<ElasticTaskSearchRequest> requests = Collections.singletonList(new ElasticTaskSearchRequest(request))
         return findTasks(requests, loggedUser, page, pageSize, locale, isIntersection)

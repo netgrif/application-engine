@@ -42,7 +42,7 @@ public interface IUser {
 
     void addAuthority(Authority authority);
 
-    LoggedUser transformToLoggedUser();
+    Identity transformToLoggedUser();
 
     Author transformToAuthor();
 

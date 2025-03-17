@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.configuration.security;
 
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.configuration.security.interfaces.IAuthenticationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import lombok.Data;
@@ -103,8 +103,8 @@ public class AuthenticationService implements IAuthenticationService, Applicatio
 
     protected void resolveImpersonatorOnLogin(Object principal) {
         try {
-            if (principal instanceof LoggedUser) {
-                impersonationService.removeImpersonator(((LoggedUser) principal).getId());
+            if (principal instanceof Identity) {
+                impersonationService.removeImpersonator(((Identity) principal).getId());
             }
         } catch (Exception e) {
             log.warn("Failed to resolve impersonator " + principal, e);
@@ -113,8 +113,8 @@ public class AuthenticationService implements IAuthenticationService, Applicatio
 
     protected void resolveImpersonatorOnLogout(Object principal) {
         try {
-            if (principal instanceof LoggedUser && ((LoggedUser) principal).isImpersonating()) {
-                impersonationService.onSessionDestroy((LoggedUser) principal);
+            if (principal instanceof Identity && ((Identity) principal).isImpersonating()) {
+                impersonationService.onSessionDestroy((Identity) principal);
             }
         } catch (Exception e) {
             log.warn("Failed to resolve impersonator " + principal, e);

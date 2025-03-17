@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.impersonation.service.interfaces;
 
 import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
 import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserHasSessionException;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -11,9 +11,9 @@ import java.util.Optional;
 
 public interface IImpersonationService {
 
-    LoggedUser impersonateUser(String impersonatedId) throws ImpersonatedUserHasSessionException;
+    Identity impersonateUser(String impersonatedId) throws ImpersonatedUserHasSessionException;
 
-    LoggedUser impersonateByConfig(String configId) throws ImpersonatedUserHasSessionException;
+    Identity impersonateByConfig(String configId) throws ImpersonatedUserHasSessionException;
 
     Optional<Impersonator> findImpersonator(String impersonatorId);
 
@@ -21,11 +21,11 @@ public interface IImpersonationService {
 
     void removeImpersonator(String impersonatorId);
 
-    LoggedUser endImpersonation();
+    Identity endImpersonation();
 
-    LoggedUser endImpersonation(LoggedUser impersonator);
+    Identity endImpersonation(Identity impersonator);
 
-    void onSessionDestroy(LoggedUser impersonator);
+    void onSessionDestroy(Identity impersonator);
 
     IUser reloadImpersonatedUserRoles(IUser impersonated, String impersonatorId);
 

@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.authentication.web;
 
 import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
@@ -74,7 +74,7 @@ public class UserController {
     @Operation(summary = "Get all users", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> getAll(Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
-        Page<IUser> page = userService.findAllCoMembers((LoggedUser) auth.getPrincipal(), pageable);
+        Page<IUser> page = userService.findAllCoMembers((Identity) auth.getPrincipal(), pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .getAll(pageable, assembler, auth, locale)).withRel("all");
         PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler("all"), selfLink);
@@ -91,7 +91,7 @@ public class UserController {
         Page<IUser> page = userService.searchAllCoMembers(query.getFulltext(),
                 roles,
                 negativeRoles,
-                (LoggedUser) auth.getPrincipal(), pageable);
+                (Identity) auth.getPrincipal(), pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .search(query, pageable, assembler, auth, locale)).withRel("search");
         PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler("search"), selfLink);
@@ -102,9 +102,9 @@ public class UserController {
     @Operation(summary = "Get user by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource getUser(@PathVariable("id") String userId, Locale locale) {
-        LoggedUser actualUser = userService.getLoggedUserFromContext();
-        LoggedUser loggedUser = actualUser.getSelfOrImpersonated();
-        if (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)) {
+        Identity actualUser = userService.getLoggedUserFromContext();
+        Identity identity = actualUser.getSelfOrImpersonated();
+        if (!identity.isAdmin() && !Objects.equals(identity.getId(), userId)) {
             log.info("User {} trying to get another user with ID {}", actualUser.getUsername(), userId);
             throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
         }
@@ -115,7 +115,7 @@ public class UserController {
     @Operation(summary = "Get logged user", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource getLoggedUser(Authentication auth, Locale locale) {
-        return new UserResource(new User(((LoggedUser)auth.getPrincipal()).transformToUser()), "me");
+        return new UserResource(new User(((Identity)auth.getPrincipal()).transformToUser()), "me");
     }
 
     @Operation(summary = "Update user", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -123,16 +123,16 @@ public class UserController {
     public UserResource updateUser(@PathVariable("id") String userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) throws UnauthorisedRequestException {
         if (!serverAuthProperties.isEnableProfileEdit()) return null;
 
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        Identity identity = (Identity) auth.getPrincipal();
         IUser user = userService.resolveById(userId);
-        if (user == null || (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to modify profile of " + user.transformToLoggedUser().getUsername());
+        if (user == null || (!identity.isAdmin() && !Objects.equals(identity.getId(), userId)))
+            throw new UnauthorisedRequestException("User " + identity.getUsername() + " doesn't have permission to modify profile of " + user.transformToLoggedUser().getUsername());
 
         user = userService.update(user, updates);
         securityContextService.saveToken(userId);
-        if (Objects.equals(loggedUser.getId(), userId)) {
-            loggedUser.setFullName(user.getFullName());
-            securityContextService.reloadSecurityContext(loggedUser);
+        if (Objects.equals(identity.getId(), userId)) {
+            identity.setFullName(user.getFullName());
+            securityContextService.reloadSecurityContext(identity);
         }
         log.info("Updating user {} with data {}", user.getEmail(), updates.toString());
         return new UserResource(new User(user), "profile");
@@ -179,7 +179,7 @@ public class UserController {
     @Operation(summary = "Get user's preferences", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/preferences", produces = MediaTypes.HAL_JSON_VALUE)
     public PreferencesResource preferences(Authentication auth) {
-        String userId = ((LoggedUser) auth.getPrincipal()).getId();
+        String userId = ((Identity) auth.getPrincipal()).getId();
         Preferences preferences = preferencesService.get(userId);
 
         if (preferences == null) {
@@ -193,7 +193,7 @@ public class UserController {
     @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource savePreferences(@RequestBody Preferences preferences, Authentication auth) {
         try {
-            String userId = ((LoggedUser) auth.getPrincipal()).getId();
+            String userId = ((Identity) auth.getPrincipal()).getId();
             preferences.setUserId(userId);
             preferencesService.save(preferences);
             return MessageResource.successMessage("User preferences saved");

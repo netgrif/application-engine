@@ -21,16 +21,16 @@ public class AnonymousUser extends User {
     }
 
     @Override
-    public LoggedUser transformToLoggedUser() {
-        LoggedUser loggedUser = new LoggedUser(this.getId().toString(), this.getEmail(), "n/a", this.getAuthorities());
-        loggedUser.setFullName(this.getFullName());
-        loggedUser.setAnonymous(true);
+    public Identity transformToLoggedUser() {
+        Identity identity = new Identity(this.getId().toString(), this.getEmail(), "n/a", this.getAuthorities());
+        identity.setFullName(this.getFullName());
+        identity.setAnonymous(true);
         // todo 2058
 //        if (!this.getRoles().isEmpty())
 //            loggedUser.parseRoles(this.getRoles());
         if (!this.getNextGroups().isEmpty())
-            loggedUser.setGroups(this.getNextGroups());
+            identity.setGroups(this.getNextGroups());
 
-        return loggedUser;
+        return identity;
     }
 }

@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.ldap.domain;
 
 import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.User;
 import lombok.Data;
 import org.bson.types.ObjectId;
@@ -59,8 +59,8 @@ public class LdapUser extends User {
 
 
     @Override
-    public LoggedUser transformToLoggedUser() {
-        LdapLoggedUser loggedUser = new LdapLoggedUser(this.getStringId(), this.getEmail(), this.getPassword(), getDn(), getCommonName(), getMemberOf(), getUid(), getHomeDirectory(), this.getAuthorities());
+    public Identity transformToLoggedUser() {
+        LdapIdentity loggedUser = new LdapIdentity(this.getStringId(), this.getEmail(), this.getPassword(), getDn(), getCommonName(), getMemberOf(), getUid(), getHomeDirectory(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
         // todo 2058
 //        if (!this.getRoles().isEmpty())

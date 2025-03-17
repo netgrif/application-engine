@@ -2,7 +2,7 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
@@ -137,22 +137,22 @@ public class TaskService implements ITaskService {
 
     @Override
     public AssignTaskEventOutcome assignTask(String taskId, Map<String, String> params) throws TransitionNotExecutableException {
-        LoggedUser user = userService.getLoggedOrSystem().transformToLoggedUser();
+        Identity user = userService.getLoggedOrSystem().transformToLoggedUser();
         return assignTask(user, taskId, params);
     }
 
     @Override
-    public AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException {
-        return assignTask(loggedUser, taskId, new HashMap<>());
+    public AssignTaskEventOutcome assignTask(Identity identity, String taskId) throws TransitionNotExecutableException {
+        return assignTask(identity, taskId, new HashMap<>());
     }
 
     @Override
-    public AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId, Map<String, String> params) throws TransitionNotExecutableException, TaskNotFoundException {
+    public AssignTaskEventOutcome assignTask(Identity identity, String taskId, Map<String, String> params) throws TransitionNotExecutableException, TaskNotFoundException {
         Optional<Task> taskOptional = taskRepository.findById(taskId);
         if (taskOptional.isEmpty()) {
             throw new TaskNotFoundException("Could not find task with id [" + taskId + "]");
         }
-        IUser user = userService.getUserFromLoggedUser(loggedUser);
+        IUser user = userService.getUserFromLoggedUser(identity);
         return assignTask(taskOptional.get(), user, params);
     }
 
@@ -224,23 +224,23 @@ public class TaskService implements ITaskService {
 
     @Override
     public FinishTaskEventOutcome finishTask(String taskId, Map<String, String> params) throws IllegalArgumentException, TransitionNotExecutableException {
-        LoggedUser user = userService.getLoggedOrSystem().transformToLoggedUser();
+        Identity user = userService.getLoggedOrSystem().transformToLoggedUser();
         return finishTask(user, taskId, params);
     }
 
     @Override
-    public FinishTaskEventOutcome finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException {
-        return finishTask(loggedUser, taskId, new HashMap<>());
+    public FinishTaskEventOutcome finishTask(Identity identity, String taskId) throws IllegalArgumentException, TransitionNotExecutableException {
+        return finishTask(identity, taskId, new HashMap<>());
     }
 
     @Override
-    public FinishTaskEventOutcome finishTask(LoggedUser loggedUser, String taskId, Map<String, String> params) throws IllegalArgumentException, TransitionNotExecutableException {
+    public FinishTaskEventOutcome finishTask(Identity identity, String taskId, Map<String, String> params) throws IllegalArgumentException, TransitionNotExecutableException {
         Optional<Task> taskOptional = taskRepository.findById(taskId);
         if (taskOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         }
         Task task = taskOptional.get();
-        IUser user = userService.getUserFromLoggedUser(loggedUser);
+        IUser user = userService.getUserFromLoggedUser(identity);
 
 //        TODO: release/8.0.0
 //        if (task.getUserId() == null) {
@@ -306,17 +306,17 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public CancelTaskEventOutcome cancelTask(LoggedUser loggedUser, String taskId) {
-        return cancelTask(loggedUser, taskId, new HashMap<>());
+    public CancelTaskEventOutcome cancelTask(Identity identity, String taskId) {
+        return cancelTask(identity, taskId, new HashMap<>());
     }
 
     @Override
-    public CancelTaskEventOutcome cancelTask(LoggedUser loggedUser, String taskId, Map<String, String> params) {
+    public CancelTaskEventOutcome cancelTask(Identity identity, String taskId, Map<String, String> params) {
         Optional<Task> taskOptional = taskRepository.findById(taskId);
         if (taskOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         }
-        IUser user = userService.getUserFromLoggedUser(loggedUser);
+        IUser user = userService.getUserFromLoggedUser(identity);
         return cancelTask(taskOptional.get(), user, params);
     }
 
@@ -375,14 +375,14 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId) throws TransitionNotExecutableException {
-        return delegateTask(loggedUser, delegatedId, taskId, new HashMap<>());
+    public DelegateTaskEventOutcome delegateTask(Identity identity, String delegatedId, String taskId) throws TransitionNotExecutableException {
+        return delegateTask(identity, delegatedId, taskId, new HashMap<>());
     }
 
     @Override
-    public DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId, Map<String, String> params) throws TransitionNotExecutableException {
+    public DelegateTaskEventOutcome delegateTask(Identity identity, String delegatedId, String taskId, Map<String, String> params) throws TransitionNotExecutableException {
         IUser delegatedUser = userService.resolveById(delegatedId);
-        IUser delegateUser = userService.getUserFromLoggedUser(loggedUser);
+        IUser delegateUser = userService.getUserFromLoggedUser(identity);
 
         Optional<Task> taskOptional = taskRepository.findById(taskId);
         if (taskOptional.isEmpty()) {
@@ -569,9 +569,9 @@ public class TaskService implements ITaskService {
 
     // TODO: release/8.0.0 check usage and delete/replace with current implementation
     @Override
-    public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable, Locale locale) {
+    public Page<Task> getAll(Identity identity, Pageable pageable, Locale locale) {
         List<Task> tasks;
-        LoggedUser loggedOrImpersonated = loggedUser.getSelfOrImpersonated();
+        Identity loggedOrImpersonated = identity.getSelfOrImpersonated();
 
         // todo 2058
 //        if (loggedOrImpersonated.getRoles().isEmpty()) {
@@ -600,7 +600,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Page<Task> search(List<TaskSearchRequest> requests, Pageable pageable, LoggedUser user, Locale locale, Boolean isIntersection) {
+    public Page<Task> search(List<TaskSearchRequest> requests, Pageable pageable, Identity user, Locale locale, Boolean isIntersection) {
         com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
         if (searchPredicate != null) {
             Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
@@ -613,7 +613,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public long count(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
+    public long count(List<TaskSearchRequest> requests, Identity user, Locale locale, Boolean isIntersection) {
         com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
         if (searchPredicate == null) {
             return 0;

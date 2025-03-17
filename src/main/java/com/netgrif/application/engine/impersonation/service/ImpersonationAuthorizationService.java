@@ -2,7 +2,7 @@ package com.netgrif.application.engine.impersonation.service;
 
 import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.authorization.domain.Role;
@@ -53,7 +53,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     protected IRoleService roleService;
 
     @Override
-    public Page<IUser> getConfiguredImpersonationUsers(String query, LoggedUser impersonator, Pageable pageable) {
+    public Page<IUser> getConfiguredImpersonationUsers(String query, Identity impersonator, Pageable pageable) {
         if (impersonator.isAdmin()) {
             return userService.searchAllCoMembers(query, impersonator, pageable);
 
@@ -69,13 +69,13 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     }
 
     @Override
-    public boolean canImpersonate(LoggedUser impersonator, String configId) {
+    public boolean canImpersonate(Identity impersonator, String configId) {
         Case config = getConfig(configId);
         return isValidAndContainsUser(config, impersonator.getId());
     }
 
     @Override
-    public boolean canImpersonateUser(LoggedUser impersonator, String userId) {
+    public boolean canImpersonateUser(Identity impersonator, String userId) {
         IUser impersonated = userService.findById(userId);
         return impersonator.isAdmin() || !searchConfigs(impersonator.getId(), impersonated.getStringId()).isEmpty();
     }

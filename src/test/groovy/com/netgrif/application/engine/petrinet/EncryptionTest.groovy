@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet
 
 import com.netgrif.application.engine.authentication.domain.Authority
-import com.netgrif.application.engine.authentication.domain.LoggedUser
+import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.importer.service.Importer
@@ -91,8 +91,8 @@ class EncryptionTest {
         return workflowService.save(useCase).stringId
     }
 
-    LoggedUser mockLoggedUser() {
+    Identity mockLoggedUser() {
         def authorityUser = authorityService.getOrCreate(Authority.user)
-        return new LoggedUser(superCreator.getSuperUser().getStringId(), configuration.email, configuration.password, [authorityUser])
+        return new Identity(superCreator.getSuperUser().getStringId(), configuration.email, configuration.password, [authorityUser])
     }
 }
