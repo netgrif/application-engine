@@ -3,12 +3,22 @@ package com.netgrif.application.engine.authentication.service;
 import com.netgrif.application.engine.authentication.domain.IUser;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.UserState;
+import com.netgrif.application.engine.authentication.domain.repositories.UserRepository;
+import com.netgrif.application.engine.authentication.service.interfaces.ILoginAttemptService;
 import com.netgrif.application.engine.ldap.domain.LdapUser;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import javax.servlet.http.HttpServletRequest;
 
 @ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapUserDetailsService extends UserDetailsServiceImpl {
+
+    public LdapUserDetailsService(UserRepository userRepository, ApplicationEventPublisher publisher,
+                                  ILoginAttemptService loginAttemptService, HttpServletRequest request) {
+        super(userRepository, publisher, loginAttemptService, request);
+    }
 
     @Override
     protected Identity getLoggedUser(String email) throws UsernameNotFoundException {

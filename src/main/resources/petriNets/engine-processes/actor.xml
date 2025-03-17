@@ -30,10 +30,6 @@
 		<title>Last name</title>
 	</data>
 	<data type="text">
-		<id>password</id>
-		<title>Password</title>
-	</data>
-	<data type="text">
 		<id>registration_token</id>
 		<title>Registration token</title>
 	</data>
