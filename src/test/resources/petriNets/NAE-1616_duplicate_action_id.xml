@@ -55,7 +55,7 @@
     <role>
         <id>newRole_1</id>
         <title/>
-        <event type="cancel">
+        <event type="remove">
             <id>newRole_1_cancel</id>
             <actions phase="pre">
                 <action id="7"><![CDATA[
@@ -187,7 +187,7 @@
                         </actions>
                         <actions phase="post">
                             <action id="34">println "text_1_dataref_set_post"</action>
-                            <action trigger="set" id="32">
+                            <action id="32">
                                 println "text_1_dataref_trigger_set"
                             </action>
                         </actions>
@@ -196,7 +196,7 @@
                         <id>text_1_get</id>
                         <actions phase="pre">
                             <action id="35">println "text_1_dataref_get_pre"</action>
-                            <action trigger="get" id="31">
+                            <action id="31">
                                 println "text_1_dataref_trigger_get"
                             </action>
                         </actions>

@@ -10,21 +10,24 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public abstract class FieldWithAllowedRoles<T> extends Field<T> {
 
-    private Set<String> roles;
+    private Set<String> allowedRoleImportIds;
+    private Set<String> caseRoleIds;
 
     public FieldWithAllowedRoles() {
         super();
+        this.caseRoleIds = new HashSet<>();
     }
 
-    public FieldWithAllowedRoles(Set<String> roles) {
+    public FieldWithAllowedRoles(Set<String> allowedRoleImportIds) {
         this();
-        this.setRoles(roles);
+        this.setAllowedRoleImportIds(allowedRoleImportIds);
     }
 
     public void clone(FieldWithAllowedRoles<T> clone) {
         super.clone(clone);
-        if (roles != null) {
-            clone.roles = new HashSet<>(roles);
+        if (allowedRoleImportIds != null) {
+            clone.allowedRoleImportIds = new HashSet<>(allowedRoleImportIds);
         }
+        clone.setCaseRoleIds(new HashSet<>(caseRoleIds));
     }
 }

@@ -4,7 +4,8 @@ import com.netgrif.application.engine.event.events.user.*;
 import com.netgrif.application.engine.history.domain.baseevent.repository.EventLogRepository;
 import com.netgrif.application.engine.history.domain.userevents.AdminActionEventLog;
 import com.netgrif.application.engine.history.domain.userevents.UserEventLog;
-import com.netgrif.application.engine.history.domain.userevents.UserRoleEventLog;
+import com.netgrif.application.engine.history.domain.userevents.UserAssignRoleEventLog;
+import com.netgrif.application.engine.history.domain.userevents.UserRemoveRoleEventLog;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +35,12 @@ public class UserEventListener {
 
     @EventListener
     public void onUserRoleChangeEvent(UserAssignRoleEvent event) {
-        repository.save(new UserRoleEventLog(event.getUser().getUsername(), event.getRoles()));
+        repository.save(new UserAssignRoleEventLog(event.getUser().getUsername(), event.getRoles()));
+    }
+
+    @EventListener
+    public void onUserRoleChangeEvent(UserRemoveRoleEvent event) {
+        repository.save(new UserRemoveRoleEventLog(event.getUser().getUsername(), event.getRoles()));
     }
 
     @EventListener

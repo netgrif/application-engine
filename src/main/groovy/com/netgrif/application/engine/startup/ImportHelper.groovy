@@ -3,14 +3,13 @@ package com.netgrif.application.engine.startup
 import com.netgrif.application.engine.authentication.domain.*
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
+import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.DataRef
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
-import com.netgrif.application.engine.authorization.domain.ProcessRole
-
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.workflow.domain.Case
@@ -29,6 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
+
+import java.util.stream.Collectors
 
 @Slf4j
 @Component
@@ -112,7 +113,8 @@ class ImportHelper {
         authorities.each { user.addAuthority(it) }
         user.state = UserState.ACTIVE
         user = userService.saveNew(user)
-        roleService.assignRolesToUser(user.stringId, roles as Set<String>)
+        Set<String> roleIds = Arrays.stream(roles).map { role -> role.stringId }.collect(Collectors.toSet())
+        roleService.assignRolesToUser(user.stringId, roleIds)
         log.info("User $user.name $user.surname created")
         return user
     }

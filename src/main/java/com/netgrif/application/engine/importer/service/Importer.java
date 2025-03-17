@@ -650,8 +650,7 @@ public class Importer {
             return;
         }
 
-        ProcessRole processRole = new ProcessRole();
-        processRole.setImportId(importRole.getId());
+        ProcessRole processRole = new ProcessRole(importRole.getId());
         processRole.setTitle(toI18NString(importRole.getTitle()));
         if (importRole.getEvent() != null) {
             importRole.getEvent().forEach(event -> processRole.addEvent(createEvent(event)));

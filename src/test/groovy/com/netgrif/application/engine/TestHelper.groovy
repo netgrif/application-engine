@@ -1,11 +1,12 @@
 package com.netgrif.application.engine
 
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository
+import com.netgrif.application.engine.authorization.domain.repositories.RoleAssignmentRepository
+import com.netgrif.application.engine.authorization.domain.repositories.RoleRepository
+import com.netgrif.application.engine.authorization.service.RoleService
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticTaskRepository
 import com.netgrif.application.engine.petrinet.domain.repositories.UriNodeRepository
-import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository
-import com.netgrif.application.engine.authorization.service.RoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.*
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
@@ -23,7 +24,9 @@ class TestHelper {
     @Autowired
     private UserRepository userRepository
     @Autowired
-    private ProcessRoleRepository roleRepository
+    private RoleRepository roleRepository
+    @Autowired
+    private RoleAssignmentRepository roleAssignmentRepository
     @Autowired
     private RoleService roleService
     @Autowired
@@ -61,6 +64,7 @@ class TestHelper {
         elasticCaseRepository.deleteAll()
         uriNodeRepository.deleteAll()
         userRepository.deleteAll()
+        roleAssignmentRepository.deleteAll()
         roleRepository.deleteAll()
         roleService.clearCache()
         actionsCacheService.clearActionCache()

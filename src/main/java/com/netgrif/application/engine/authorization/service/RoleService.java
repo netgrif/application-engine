@@ -20,7 +20,7 @@ import com.netgrif.application.engine.event.events.user.UserRemoveRoleEvent;
 import com.netgrif.application.engine.importer.model.EventPhaseType;
 import com.netgrif.application.engine.importer.model.RoleEventType;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListField;
+import com.netgrif.application.engine.petrinet.domain.dataset.FieldWithAllowedRoles;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.RoleEvent;
@@ -110,6 +110,14 @@ public class RoleService implements IRoleService {
      * todo javadoc
      * */
     @Override
+    public List<ProcessRole> findAllProcessRolesByImportIds(Set<String> roleImportIds) {
+        return processRoleRepository.findAllByImportIdIn(roleImportIds);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
     public List<ProcessRole> findProcessRolesByDefaultTitle(String title) {
         return processRoleRepository.findAllByTitle_DefaultValue(title);
     }
@@ -128,6 +136,14 @@ public class RoleService implements IRoleService {
     @Override
     public ProcessRole findProcessRoleByImportId(String importId) {
         return processRoleRepository.findByImportId(importId);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public List<CaseRole> findAllCaseRoles() {
+        return caseRoleRepository.findAll();
     }
 
     /**
@@ -275,7 +291,7 @@ public class RoleService implements IRoleService {
     }
 
     private ProcessRole findSystemRoleByImportId(String importId) {
-        List<ProcessRole> processRoles = processRoleRepository.findAllByImportId(ProcessRole.DEFAULT_ROLE);
+        List<ProcessRole> processRoles = processRoleRepository.findAllByImportId(importId);
         if (processRoles.isEmpty()) {
             throw new IllegalStateException(String.format("No %s process role has been found!", importId));
         }
@@ -297,7 +313,7 @@ public class RoleService implements IRoleService {
             CaseRole caseRole = new CaseRole(userListId, useCase.getStringId());
             Field<?> userListField = useCase.getDataSet().getFields().get(userListId);
             if (userListField != null) {
-                ((UserListField) userListField).setRoleId(caseRole.getStringId());
+                ((FieldWithAllowedRoles<?>) userListField).getCaseRoleIds().add(caseRole.getStringId());
             } else {
                 throw new IllegalStateException(String.format("Case role [%s} in process [%s] references non existing dataField in case [%s]",
                         userListId, useCase.getPetriNetId(), useCase.getStringId()));

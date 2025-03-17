@@ -48,8 +48,8 @@ class MenuItemApiTest extends EngineTest {
         assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_MENU_NAME.attributeId).rawValue == new I18nString("FILTER")
         assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_IDENTIFIER.attributeId).rawValue.toString() == "new_menu_item"
         assert (item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_FILTER_CASE.attributeId).rawValue as List)[0] == filter.stringId
-        assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_ALLOWED_ROLES.attributeId).options.containsKey("role_1:filter_api_test")
-        assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_BANNED_ROLES.attributeId).options.containsKey("role_2:filter_api_test")
+        assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_ALLOWED_ROLES.attributeId).options.containsKey("role_1")
+        assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_BANNED_ROLES.attributeId).options.containsKey("role_2")
         assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS.attributeId).rawValue == "meta-title,meta-title"
         assert item.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS.attributeId).rawValue == "meta-title,meta-title"
 

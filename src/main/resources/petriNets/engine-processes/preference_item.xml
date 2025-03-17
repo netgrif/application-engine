@@ -136,37 +136,39 @@
         <id>add_allowed_roles</id>
         <title/>
         <placeholder id="allow_roles">Allow view for roles</placeholder>
-        <event type="set">
-            <id>add_allowed_roles_set</id>
-            <actions phase="post">
-                <action id="action_8">
-					<![CDATA[
-                    change allowed_roles options {return configurableMenuService.addSelectedRoles(allowed_roles, processes_available, roles_available)}
-                    change roles_available value {[]}
-                    change roles_available options {[:]}
-                    change processes_available value {null}
-                    ]]>
-				</action>
-            </actions>
-        </event>
+<!--        todo: release/8.0.0-->
+<!--        <event type="set">-->
+<!--            <id>add_allowed_roles_set</id>-->
+<!--            <actions phase="post">-->
+<!--                <action id="action_8">-->
+<!--					<![CDATA[-->
+<!--                    change allowed_roles options {return configurableMenuService.addSelectedRoles(allowed_roles, processes_available, roles_available)}-->
+<!--                    change roles_available value {[]}-->
+<!--                    change roles_available options {[:]}-->
+<!--                    change processes_available value {null}-->
+<!--                    ]]>-->
+<!--				</action>-->
+<!--            </actions>-->
+<!--        </event>-->
     </data>
     <data type="button">
         <id>add_banned_roles</id>
         <title/>
         <placeholder id="ban_roles">Ban view for roles</placeholder>
-        <event type="set">
-            <id>add_banned_roles_set</id>
-            <actions phase="post">
-                <action id="action_10">
-					<![CDATA[
-                    change banned_roles options {return configurableMenuService.addSelectedRoles(banned_roles, processes_available, roles_available)}
-                    change roles_available value {[]}
-                    change roles_available options {[:]}
-                    change processes_available value {null}
-                    ]]>
-				</action>
-            </actions>
-        </event>
+        <!--        todo: release/8.0.0-->
+<!--        <event type="set">-->
+<!--            <id>add_banned_roles_set</id>-->
+<!--            <actions phase="post">-->
+<!--                <action id="action_10">-->
+<!--					<![CDATA[-->
+<!--                    change banned_roles options {return configurableMenuService.addSelectedRoles(banned_roles, processes_available, roles_available)}-->
+<!--                    change roles_available value {[]}-->
+<!--                    change roles_available options {[:]}-->
+<!--                    change processes_available value {null}-->
+<!--                    ]]>-->
+<!--				</action>-->
+<!--            </actions>-->
+<!--        </event>-->
     </data>
     <data type="enumeration_map">
         <id>additional_filter_autocomplete_selection</id>
@@ -223,12 +225,12 @@
             <allowedNet>filter</allowedNet>
         </allowedNets>
     </data>
-    <data type="multichoice_map" immediate="true">
+    <data type="enumeration_map" immediate="true">
         <id>allowed_roles</id>
         <title id="roles_allowed">Allowed roles</title>
         <desc id="roles_allowed_desc">List of roles allowed to view this menu entry.</desc>
     </data>
-    <data type="multichoice_map" immediate="true">
+    <data type="enumeration_map" immediate="true">
         <id>banned_roles</id>
         <title id="roles_banned">Banned roles</title>
         <desc id="roles_banned_desc">List of roles not allowed to view this menu entry.</desc>
@@ -535,12 +537,11 @@
             <actions phase="post">
                 <action id="action_5">
 					<![CDATA[
-                    changeCaseProperty "menu_icon" about { menu_icon.rawValue; }
                     if (menu_icon.rawValue == "") {
-                        change menu_menu_icon_preview value {"""<span></span>"""}
+                        change menu_icon_preview value {"""<span></span>"""}
                         return;
                     }
-                    change menu_menu_icon_preview value {
+                    change menu_icon_preview value {
                         """<link href="https://fonts.googleapis.com/menu_icon?family=Material+Icons" rel="stylesheet"><span class="material-menu_icons">""" + menu_icon.rawValue + """</span>"""
                     }
                     ]]>
@@ -568,9 +569,8 @@
             <actions phase="post">
                 <action id="action_6">
 					<![CDATA[
-                    changeCaseProperty "title" about { menu_name.rawValue }
-                    change menu_menu_name_as_visible choices { [menu_name.rawValue] }
-                    change menu_menu_name_as_visible value { menu_name.rawValue }
+                    change menu_name_as_visible options { [(menu_name.rawValue.defaultValue): menu_name.rawValue] }
+                    change menu_name_as_visible value { menu_name.rawValue.defaultValue }
                     ]]>
 				</action>
             </actions>
@@ -784,31 +784,32 @@
         <id>processes_available</id>
         <title id="available_processes">Your processes</title>
         <desc id="available_processes_desc">Select a process containing roles you wish to add to allowed or banned roles lists.</desc>
-        <event type="get">
-            <id>processes_available_get</id>
-            <actions phase="pre">
-                <action id="action_12">
-					<![CDATA[
-                    change processes_available options { return configurableMenuService.getNetsByAuthorAsMapOptions(loggedUser(), org.springframework.context.i18n.LocaleContextHolder.locale) }
-                    ]]>
-				</action>
-            </actions>
-        </event>
-        <event type="set">
-            <id>processes_available_set</id>
-            <actions phase="post">
-                <action id="action_13">
-					<![CDATA[
-                    if (processes_available.rawValue != null) {
-                        change roles_available options { return configurableMenuService.getAvailableRolesFromNet(processes_available, allowed_roles, banned_roles) }
-                    } else {
-                        change roles_available options { [:] }
-                    }
-                    change roles_available value { [] }
-                    ]]>
-				</action>
-            </actions>
-        </event>
+        <!--        todo: release/8.0.0-->
+<!--        <event type="get">-->
+<!--            <id>processes_available_get</id>-->
+<!--            <actions phase="pre">-->
+<!--                <action id="action_12">-->
+<!--					<![CDATA[-->
+<!--                    change processes_available options { return configurableMenuService.getNetsByAuthorAsMapOptions(loggedUser(), org.springframework.context.i18n.LocaleContextHolder.locale) }-->
+<!--                    ]]>-->
+<!--				</action>-->
+<!--            </actions>-->
+<!--        </event>-->
+<!--        <event type="set">-->
+<!--            <id>processes_available_set</id>-->
+<!--            <actions phase="post">-->
+<!--                <action id="action_13">-->
+<!--					<![CDATA[-->
+<!--                    if (processes_available.rawValue != null) {-->
+<!--                        change roles_available options { return configurableMenuService.getAvailableRolesFromNet(processes_available, allowed_roles, banned_roles) }-->
+<!--                    } else {-->
+<!--                        change roles_available options { [:] }-->
+<!--                    }-->
+<!--                    change roles_available value { [] }-->
+<!--                    ]]>-->
+<!--				</action>-->
+<!--            </actions>-->
+<!--        </event>-->
     </data>
     <data type="button">
         <id>remove_additional_filter</id>
@@ -832,39 +833,41 @@
         <id>remove_allowed_roles</id>
         <title/>
         <placeholder id="remove_from_allowed_roles">Remove from allowed roles</placeholder>
-        <event type="set">
-            <id>remove_allowed_roles_set</id>
-            <actions phase="post">
-                <action id="action_9">
-					<![CDATA[
-                    change allowed_roles options {return configurableMenuService.removeSelectedRoles(allowed_roles)}
-                    change allowed_roles value {[]}
-                    change roles_available value {[]}
-                    change roles_available options {[:]}
-                    change processes_available value {null}
-                    ]]>
-				</action>
-            </actions>
-        </event>
+        <!--        todo: release/8.0.0-->
+<!--        <event type="set">-->
+<!--            <id>remove_allowed_roles_set</id>-->
+<!--            <actions phase="post">-->
+<!--                <action id="action_9">-->
+<!--					<![CDATA[-->
+<!--                    change allowed_roles options {return configurableMenuService.removeSelectedRoles(allowed_roles)}-->
+<!--                    change allowed_roles value {[]}-->
+<!--                    change roles_available value {[]}-->
+<!--                    change roles_available options {[:]}-->
+<!--                    change processes_available value {null}-->
+<!--                    ]]>-->
+<!--				</action>-->
+<!--            </actions>-->
+<!--        </event>-->
     </data>
     <data type="button">
         <id>remove_banned_roles</id>
         <title/>
         <placeholder id="remove_from_banned_roles">Remove from banned roles</placeholder>
-        <event type="set">
-            <id>remove_banned_roles_set</id>
-            <actions phase="post">
-                <action id="action_11">
-					<![CDATA[
-                    change banned_roles options { return configurableMenuService.removeSelectedRoles(banned_roles) }
-                    change banned_roles value { [] }
-                    change roles_available value { [] }
-                    change roles_available options { [:] }
-                    change processes_available value { null }
-                    ]]>
-				</action>
-            </actions>
-        </event>
+        <!--        todo: release/8.0.0-->
+<!--        <event type="set">-->
+<!--            <id>remove_banned_roles_set</id>-->
+<!--            <actions phase="post">-->
+<!--                <action id="action_11">-->
+<!--					<![CDATA[-->
+<!--                    change banned_roles options { return configurableMenuService.removeSelectedRoles(banned_roles) }-->
+<!--                    change banned_roles value { [] }-->
+<!--                    change roles_available value { [] }-->
+<!--                    change roles_available options { [:] }-->
+<!--                    change processes_available value { null }-->
+<!--                    ]]>-->
+<!--				</action>-->
+<!--            </actions>-->
+<!--        </event>-->
     </data>
     <data type="multichoice_map" immediate="true">
         <id>roles_available</id>
@@ -893,10 +896,10 @@
                 <action id="action_7">
 					<![CDATA[
                     if (tab_icon.rawValue == "") {
-                        change tab_tab_icon_preview value {"""<span></span>"""}
+                        change tab_icon_preview value {"""<span></span>"""}
                         return;
                     }
-                    change tab_tab_icon_preview value {
+                    change tab_icon_preview value {
                         """<link href="https://fonts.googleapis.com/tab_icon?family=Material+Icons" rel="stylesheet"><span class="material-tab_icons">""" + tab_icon.rawValue + """</span>"""
                     }
                     ]]>
@@ -1765,9 +1768,9 @@
                         <actions phase="post">
                             <action id="action_34">
 								<![CDATA[
-                                make tab_tab_icon_preview,visible on this when { use_tab_icon.rawValue }
+                                make tab_icon_preview,visible on this when { use_tab_icon.rawValue }
                                 make tab_icon,editable on this when { use_tab_icon.rawValue }
-                                make tab_tab_icon_preview,hidden on this when { !use_tab_icon.rawValue }
+                                make tab_icon_preview,hidden on this when { !use_tab_icon.rawValue }
                                 make tab_icon,hidden on this when { !use_tab_icon.rawValue }
                                 ]]>
 							</action>

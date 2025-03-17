@@ -10,10 +10,12 @@ import java.util.Set;
 @Repository
 public interface RoleAssignmentRepository extends MongoRepository<RoleAssignment, String>, QuerydslPredicateExecutor<RoleAssignment> {
     Iterable<RoleAssignment> findAllByUserIdAndRoleIdIn(String userId, Set<String> roleIds);
+    Iterable<RoleAssignment> findAllByRoleIdIn(Set<String> roleIds);
+    Iterable<RoleAssignment> findAllByUserId(String userId);
+
     Iterable<RoleAssignment> removeAllByUserIdAndRoleIdIn(String userId, Set<String> roleIds);
     RoleAssignment removeByUserIdAndRoleId(String userId, String roleId);
     Iterable<RoleAssignment> removeAllByUserId(String userId);
     Iterable<RoleAssignment> removeAllByRoleId(String roleId);
     Iterable<RoleAssignment> removeAllByRoleIdIn(Set<String> roleIds);
-    boolean existsByUserIdAndRoleId(String userId, String roleId);
 }

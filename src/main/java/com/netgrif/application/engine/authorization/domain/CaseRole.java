@@ -16,6 +16,10 @@ public class CaseRole extends Role {
     @Indexed
     private String caseId;
 
+    public CaseRole() {
+        this(new ObjectId(), null, null);
+    }
+
     public CaseRole(String importId, String caseId) {
         this(new ObjectId(), importId, caseId);
     }

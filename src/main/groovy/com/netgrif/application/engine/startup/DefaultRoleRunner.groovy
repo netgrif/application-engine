@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.importer.model.EventType
-import com.netgrif.application.engine.petrinet.domain.I18nString
-import com.netgrif.application.engine.petrinet.domain.events.Event
 import com.netgrif.application.engine.authorization.domain.ProcessRole
-import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
+import com.netgrif.application.engine.importer.model.RoleEventType
+import com.netgrif.application.engine.petrinet.domain.I18nString
+import com.netgrif.application.engine.petrinet.domain.events.RoleEvent
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,27 +18,24 @@ import org.springframework.stereotype.Component
 class DefaultRoleRunner extends AbstractOrderedCommandLineRunner {
 
     @Autowired
-    private ProcessRoleRepository repository
+    private IRoleService roleService
 
     @Override
     void run(String... strings) throws Exception {
         log.info("Creating default process role")
 
-        def role = repository.findAllByTitle_DefaultValue(ProcessRole.DEFAULT_ROLE)
+        def role = roleService.findProcessRolesByDefaultTitle(ProcessRole.DEFAULT_ROLE)
         if (role) {
             log.info("Default role already exists")
             return
         }
 
-        ProcessRole defaultRole = new ProcessRole(
-                importId: ProcessRole.DEFAULT_ROLE,
-                title: new I18nString(ProcessRole.DEFAULT_ROLE),
-                description: new I18nString("Default system process role"),
-                events: new LinkedHashMap<EventType, Event>()
-        )
-        defaultRole = repository.save(defaultRole)
+        ProcessRole defaultRole = new ProcessRole(ProcessRole.DEFAULT_ROLE)
+        defaultRole.title = new I18nString(ProcessRole.DEFAULT_ROLE)
+        defaultRole.description = new I18nString("Default system process role")
+        defaultRole.events = new LinkedHashMap<RoleEventType, RoleEvent>()
 
-        if (defaultRole == null) {
+        if (roleService.save(defaultRole) == null) {
             log.error("Error saving default process role")
         }
     }
