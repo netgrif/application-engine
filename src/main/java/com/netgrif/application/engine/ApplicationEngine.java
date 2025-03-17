@@ -30,7 +30,7 @@ import java.util.List;
 @EnableAspectJAutoProxy
 @SpringBootApplication(
         exclude = {DataSourceAutoConfiguration.class},
-        scanBasePackages = {"com.netgrif"})
+        scanBasePackages = {"com.netgrif", "org.steren.demo"})
 @EnableMongoAuditing
 @EnableMongoRepositories("com.netgrif")
 @ConfigurationPropertiesScan

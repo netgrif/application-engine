@@ -25,6 +25,7 @@ import com.netgrif.pluginlibrary.core.domain.Plugin;
 import com.netgrif.pluginlibrary.core.outcomes.CreateOrUpdateOutcome;
 import com.netgrif.pluginlibrary.core.outcomes.GetOrCreateOutcome;
 import com.netgrif.pluginlibrary.core.service.PluginExecutionService;
+import com.netgrif.pluginlibrary.core.service.PluginService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,12 +49,6 @@ import static com.netgrif.application.engine.integration.plugins.utils.PluginUti
  */
 @Slf4j
 @Getter
-@Service
-@ConditionalOnProperty(
-        value = "nae.plugin.enabled",
-        havingValue = "true",
-        matchIfMissing = true
-)
 public class PluginServiceImpl implements PluginService {
     private PluginConfigProperties properties;
     private IElasticCaseService elasticCaseService;
@@ -160,11 +156,15 @@ public class PluginServiceImpl implements PluginService {
     public Object call(String identifier, String entryPoint, String method, Serializable... args) throws IllegalArgumentException {
         Optional<Case> existingPluginOpt = findByIdentifier(identifier);
         if (existingPluginOpt.isEmpty()) {
-            throw new IllegalArgumentException("Plugin with identifier \"" + identifier + "\" cannot be found");
+            throw new IllegalArgumentException("Plugin with identifier \"" + identifier + "\" is not registered.");
         }
         PluginExecutionService pluginExecutionService = ApplicationContextProvider.getAppContext().getBean(PluginExecutionService.class);
-
-        return null;
+        try {
+            return pluginExecutionService.execute(entryPoint, method, List.of(args));
+        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+            log.error(LOG_PREFIX + " Failed to execute method [{}] on entryPoint [{}] in plugin [{}]", method, entryPoint, identifier);
+            throw new RuntimeException(e);
+        }
     }
 
     /**

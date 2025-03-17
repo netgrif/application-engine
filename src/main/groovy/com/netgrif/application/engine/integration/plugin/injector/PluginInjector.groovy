@@ -3,16 +3,19 @@ package com.netgrif.application.engine.integration.plugin.injector
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
 import com.netgrif.application.engine.integration.plugin.injector.meta.EntryPointMeta
 import com.netgrif.application.engine.integration.plugin.injector.meta.PluginMeta
-import com.netgrif.application.engine.integration.plugins.service.PluginServiceImpl
 import com.netgrif.application.engine.integration.plugins.utils.PluginUtils
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.core.workflow.domain.Case
+import com.netgrif.pluginlibrary.core.service.PluginService
 import org.springframework.beans.factory.annotation.Autowired
 
 class PluginInjector {
 
     @Autowired
     protected PluginUtils utils
+
+    @Autowired
+    protected PluginService pluginService
 
     /**
      * Injects provided plugin into meta class of {@link ActionDelegate}
@@ -52,7 +55,6 @@ class PluginInjector {
                     entryPointMetaClass[methodName] = null
                 } else {
                     entryPointMetaClass[methodName] = { Serializable... args ->
-                        PluginServiceImpl pluginService = ApplicationContextProvider.getBean("pluginService") as PluginServiceImpl
                         return pluginService.call(pluginIdentifier, epName, methodName, args)
                     }
                 }

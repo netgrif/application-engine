@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.core.auth.domain.Authority;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorizationService;
 import com.netgrif.auth.service.UserService;
