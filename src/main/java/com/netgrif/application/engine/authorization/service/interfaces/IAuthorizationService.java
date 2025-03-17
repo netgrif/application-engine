@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.authentication.service.interfaces;
+package com.netgrif.application.engine.authorization.service.interfaces;
 
 public interface IAuthorizationService {
     boolean hasAuthority(String authority);
