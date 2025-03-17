@@ -24,9 +24,9 @@
         <title>reset</title>
         <roleRef>
             <id>role1</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -36,9 +36,9 @@
         <title>inhibit</title>
         <roleRef>
             <id>role1</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <place>

@@ -89,9 +89,9 @@
         <title>Submit request</title>
         <roleRef>
             <id>user</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
         <flex>
             <id>t1_0</id>
@@ -122,9 +122,9 @@
         <title>Registration</title>
         <roleRef>
             <id>registration</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
         <flex>
             <id>t2_0</id>
@@ -179,9 +179,9 @@
         <title>To first</title>
         <roleRef>
             <id>system</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -191,9 +191,9 @@
         <title>First department</title>
         <roleRef>
             <id>first</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
         <flex>
             <id>t4_0</id>
@@ -226,9 +226,9 @@
         <title>Answer of the registration</title>
         <roleRef>
             <id>registration</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
         <flex>
             <id>t5_0</id>
@@ -280,9 +280,9 @@
         <title>To second</title>
         <roleRef>
             <id>system</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -292,9 +292,9 @@
         <title>Second department</title>
         <roleRef>
             <id>second</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
         <flex>
             <id>t7_0</id>
@@ -324,9 +324,9 @@
         <title>Detail</title>
         <roleRef>
             <id>default</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
         <flex>
             <id>t8_0</id>
@@ -363,9 +363,9 @@
         <title>Form</title>
         <roleRef>
             <id>system</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
         <flex>
             <id>t9_0</id>

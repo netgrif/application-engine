@@ -5,16 +5,16 @@
     <title>Test</title>
     <defaultRole>false</defaultRole>
     <anonymousRole>false</anonymousRole>
-    <role>
-        <id>rola1</id>
-        <title>Rola 1</title>
-    </role>
     <properties>
         <property key="initials">TST</property>
     </properties>
     <processEvents/>
     <caseEvents/>
-    <transition scope="process">
+    <role>
+        <id>rola1</id>
+        <title>Rola 1</title>
+    </role>
+    <transition>
         <id>t1</id>
         <x>0</x>
         <y>0</y>

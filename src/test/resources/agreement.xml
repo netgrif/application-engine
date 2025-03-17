@@ -1,11 +1,15 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
-	<id>Agreement</id>
-	<initials>Agr</initials>
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+	<id>agreement</id>
+	<version>1.0.0</version>
 	<title>Agreement</title>
 	<icon>device_hub</icon>
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
-	<transitionRole>false</transitionRole>
+	<properties>
+		<property key="initials">Agr</property>
+	</properties>
+	<processEvents/>
+	<caseEvents/>
 	<data type="text">
 		<id>contract_name</id>
 		<title>Contract name</title>
@@ -16,10 +20,9 @@
 		<title/>
 		<init>Customer details</init>
 	</data>
-	<data type="taskRef">
-		<id>taskRef_0</id>
-		<title/>
-		<init>t1</init>
+	<data type="text">
+		<id>decision_result</id>
+		<title>Agreement decision</title>
 	</data>
 	<data type="enumeration_map">
 		<id>issue_type</id>
@@ -28,6 +31,11 @@
 			<option key="formal">formal</option>
 			<option key="fundamental">fundamental</option>
 		</options>
+	</data>
+	<data type="taskRef">
+		<id>taskRef_0</id>
+		<title/>
+		<init>t1</init>
 	</data>
 	<data type="taskRef">
 		<id>taskRef_1</id>
@@ -39,154 +47,132 @@
 		<title/>
 		<init>t13</init>
 	</data>
-	<data type="text">
-		<id>decision_result</id>
-		<title>Agreement decision</title>
-	</data>
 	<transition>
 		<id>t1</id>
 		<x>60</x>
 		<y>340</y>
-		<label>contract</label>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<dataGroup>
-			<id>t1_0</id>
-			<cols>4</cols>
-			<layout>grid</layout>
-			<dataRef>
-				<id>contract_name</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>3</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>customer_details</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<template>material</template>
-					<appearance>standard</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-	</transition>
-	<transition>
-		<id>t4</id>
-		<x>60</x>
-		<y>420</y>
-		<label>comment</label>
-		<dataGroup>
-			<id>t4_0</id>
-			<cols>4</cols>
-			<layout>grid</layout>
-			<dataRef>
-				<id>issue_type</id>
-				<logic>
-					<behavior>editable</behavior>
-					<behavior>required</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-	</transition>
-	<transition>
-		<id>t6</id>
-		<x>140</x>
-		<y>340</y>
-		<label>summary A</label>
-		<dataGroup>
-			<id>t6_0</id>
-			<cols>4</cols>
-			<layout>grid</layout>
-			<dataRef>
-				<id>taskRef_1</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>taskRef_0</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>taskRef_result</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
+		<title>contract</title>
+		<flex>
+			<id>t1_flex</id>
+			<item>
+				<dataRef>
+					<id>contract_name</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>customer_details</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+		</flex>
 	</transition>
 	<transition>
 		<id>t13</id>
 		<x>60</x>
 		<y>500</y>
-		<label>result</label>
-		<dataGroup>
-			<id>t13_0</id>
-			<cols>4</cols>
-			<layout>grid</layout>
-			<dataRef>
-				<id>decision_result</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
+		<title>result</title>
+		<flex>
+			<id>t13_flex</id>
+			<item>
+				<dataRef>
+					<id>decision_result</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+		</flex>
 	</transition>
-</document>
+	<transition>
+		<id>t4</id>
+		<x>60</x>
+		<y>420</y>
+		<title>comment</title>
+		<flex>
+			<id>t4_flex</id>
+			<item>
+				<dataRef>
+					<id>issue_type</id>
+					<logic>
+						<behavior>editable</behavior>
+						<required>true</required>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+		</flex>
+	</transition>
+	<transition>
+		<id>t6</id>
+		<x>140</x>
+		<y>340</y>
+		<title>summary A</title>
+		<flex>
+			<id>t6_flex</id>
+			<item>
+				<dataRef>
+					<id>taskRef_1</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>taskRef_0</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>taskRef_result</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+		</flex>
+	</transition>
+</process>

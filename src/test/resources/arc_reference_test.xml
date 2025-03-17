@@ -1,32 +1,35 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>arc_ref_test</id>
-    <initials>ART</initials>
+    <version>1.0.0</version>
     <title>Arc ref test</title>
-    <!-- TRANSITIONS -->
+    <defaultRole>false</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">ART</property>
+    </properties>
+    <processEvents/>
+    <caseEvents/>
     <transition>
-        <id>1</id>
+        <id>t1</id>
         <x>0</x>
         <y>0</y>
-        <label>1</label>
+        <title>1</title>
     </transition>
-    <!-- PLACES -->
     <place>
-        <id>2</id>
+        <id>p2</id>
         <x>0</x>
         <y>0</y>
-        <label/>
         <tokens>5</tokens>
-        <static>false</static>
     </place>
-    <!-- ARCS -->
     <arc>
-        <id>7</id>
+        <id>a7</id>
         <type>reset</type>
         <sourceId>2</sourceId>
         <destinationId>1</destinationId>
-        <multiplicity>1</multiplicity>
-        <reference>2</reference>
+        <multiplicity dynamic="true">
+            <![CDATA[
+			p2
+			]]>
+        </multiplicity>
     </arc>
-</document>
+</process>

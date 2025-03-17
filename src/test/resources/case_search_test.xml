@@ -1,28 +1,28 @@
 <process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
-    <id>case_search_test.xml</id>
+    <id>case_search_test</id>
     <version>1.0.0</version>
     <title>Test</title>
     <defaultRole>true</defaultRole>
     <!-- ========== DATA ========== -->
     <data type="number" immediate="true">
-        <id>1</id>
+        <id>data_1</id>
         <title>1</title>
     </data>
     <data type="text" immediate="true">
-        <id>2</id>
+        <id>data_2</id>
         <title>2</title>
     </data>
     <data type="text" immediate="true">
-        <id>3</id>
+        <id>data_3</id>
         <title>3</title>
     </data>
     <data type="date" immediate="true">
-        <id>4</id>
+        <id>data_4</id>
         <title>date</title>
     </data>
     <data type="enumeration" immediate="true">
-        <id>5</id>
+        <id>data_5</id>
         <title>enumeration</title>
         <options>
             <option key="VALUE1">VALUE1</option>
@@ -42,7 +42,7 @@
             <id>tran_grid</id>
             <item>
                 <dataRef>
-                    <id>1</id>
+                    <id>data_1</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>
@@ -50,7 +50,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>2</id>
+                    <id>data_2</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>
@@ -58,7 +58,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>3</id>
+                    <id>data_3</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>
@@ -66,7 +66,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>4</id>
+                    <id>data_4</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>
@@ -74,7 +74,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>5</id>
+                    <id>data_5</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>

@@ -1,10 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>assign_cancel_finish_with_Case_net</id>
-    <initials>TST</initials>
+    <version>1.0.0</version>
     <title>Test</title>
     <defaultRole>false</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TST</property>
+    </properties>
+    <processEvents/>
+    <caseEvents/>
     <data type="number">
         <id>field</id>
         <title>Field</title>
@@ -14,18 +18,19 @@
         <id>task</id>
         <x>0</x>
         <y>0</y>
-        <label>Task</label>
+        <title>Task</title>
         <event type="assign">
-            <id>1</id>
+            <id>task_assign</id>
             <actions phase="post">
-                <action>
+                <action id="action_0">
+					<![CDATA[
                     def c = createCase("assign_cancel_finish_with_Case_net","Case 2");
-
                     assignTask("task2", c);
                     cancelTask("task2", c);
                     assignTask("task2", c);
                     finishTask("task2", c);
-                </action>
+                    ]]>
+				</action>
             </actions>
         </event>
     </transition>
@@ -33,17 +38,16 @@
         <id>task2</id>
         <x>0</x>
         <y>0</y>
-        <label>Task2</label>
+        <title>Task2</title>
         <event type="finish">
-            <id>1</id>
+            <id>task2_finish</id>
             <actions phase="post">
-                <action>
-                    <!-- @formatter:off -->
-                    field: f.field;
+                <action id="action_1">
+					<![CDATA[
                     change field value {return 1}
-                    <!-- @formatter:on -->
-                </action>
+                    ]]>
+				</action>
             </actions>
         </event>
     </transition>
-</document>
+</process>

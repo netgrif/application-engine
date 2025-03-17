@@ -1,128 +1,95 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-    <id>actionref_test.xml</id>
-    <initials>TST</initials>
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>actionref_test</id>
+    <version>1.0.0</version>
     <title>Test</title>
-    <!-- ROLE -->
-    <!-- DATA -->
+    <defaultRole>false</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">TST</property>
+    </properties>
+    <processEvents/>
+    <caseEvents/>
     <data type="text">
         <id>text_1</id>
         <title>Text 1</title>
-        <action trigger="set" id="data_action_set">
-            field: f.text_1;
-            def a = "data_action_set";
-        </action>
-        <action trigger="get" id="data_action_get">
-            field: f.text_1;
-            def a = "data_action_get";
-        </action>
-        <actionRef>
-            <id>data_action_set</id>
-        </actionRef>
-        <actionRef>
-            <id>data_action_get</id>
-        </actionRef>
-        <actionRef>
-            <id>dataref_action_set</id>
-        </actionRef>
-        <actionRef>
-            <id>dataref_action_get</id>
-        </actionRef>
-        <actionRef>
-            <id>event_action_pre</id>
-        </actionRef>
-        <actionRef>
-            <id>event_action_post</id>
-        </actionRef>
+        <event type="set">
+            <id>text_1_set</id>
+            <actions phase="post">
+                <action id="data_action_set">
+					<![CDATA[
+                    def a = "data_action_set";
+                    ]]>
+				</action>
+            </actions>
+        </event>
+        <event type="get">
+            <id>text_1_get</id>
+            <actions phase="pre">
+                <action id="data_action_get">
+					<![CDATA[
+                    def a = "data_action_get";
+                    ]]>
+				</action>
+            </actions>
+        </event>
     </data>
-    <!-- TRANSITIONS -->
     <transition>
         <id>task</id>
         <x>0</x>
         <y>0</y>
-        <label>Task</label>
-        <dataRef>
-            <id>text_1</id>
-            <logic>
-                <action trigger="get" id="dataref_action_get">
-                    field: f.text_1;
-                    def a = "dataref_action_get";
-                </action>
-                <action trigger="set" id="dataref_action_set">
-                    field: f.text_1;
-                    def a = "dataref_action_set";
-                </action>
-                <actionRef>
-                    <id>data_action_set</id>
-                </actionRef>
-                <actionRef>
-                    <id>data_action_get</id>
-                </actionRef>
-                <actionRef>
-                    <id>dataref_action_set</id>
-                </actionRef>
-                <actionRef>
-                    <id>dataref_action_get</id>
-                </actionRef>
-                <actionRef>
-                    <id>event_action_pre</id>
-                </actionRef>
-                <actionRef>
-                    <id>event_action_post</id>
-                </actionRef>
-            </logic>
-        </dataRef>
+        <title>Task</title>
+        <flex>
+            <id>task_flex</id>
+            <item>
+                <dataRef>
+                    <id>text_1</id>
+                    <logic>
+                        <behavior>editable</behavior>
+                    </logic>
+                    <event type="get">
+                        <id>text_1_ref_get</id>
+                        <actions phase="pre">
+                            <action id="dataref_action_get">
+								<![CDATA[
+                                def a = "dataref_action_get";
+                                ]]>
+							</action>
+                        </actions>
+                    </event>
+                    <event type="set">
+                        <id>text_1_ref_set</id>
+                        <actions phase="post">
+                            <action id="dataref_action_set">
+								<![CDATA[
+                                def a = "dataref_action_set";
+                                ]]>
+							</action>
+                        </actions>
+                    </event>
+                </dataRef>
+                <properties>
+                    <order>0</order>
+                    <flex-grow>0</flex-grow>
+                    <flex-shrink>1</flex-shrink>
+                </properties>
+            </item>
+        </flex>
         <event type="finish">
             <id>onFinish</id>
             <actions phase="pre">
                 <action id="event_action_pre">
-                    field: f.text_1;
+					<![CDATA[
                     def a = "event_action_pre";
-                </action>
-                <actionRef>
-                    <id>data_action_set</id>
-                </actionRef>
-                <actionRef>
-                    <id>data_action_get</id>
-                </actionRef>
-                <actionRef>
-                    <id>dataref_action_set</id>
-                </actionRef>
-                <actionRef>
-                    <id>dataref_action_get</id>
-                </actionRef>
-                <actionRef>
-                    <id>event_action_pre</id>
-                </actionRef>
-                <actionRef>
-                    <id>event_action_post</id>
-                </actionRef>
+                    ]]>
+				</action>
             </actions>
             <actions phase="post">
                 <action id="event_action_post">
-                    field: f.text_1;
+					<![CDATA[
                     def a = "event_action_post";
-                </action>
-                <actionRef>
-                    <id>data_action_set</id>
-                </actionRef>
-                <actionRef>
-                    <id>data_action_get</id>
-                </actionRef>
-                <actionRef>
-                    <id>dataref_action_set</id>
-                </actionRef>
-                <actionRef>
-                    <id>dataref_action_get</id>
-                </actionRef>
-                <actionRef>
-                    <id>event_action_pre</id>
-                </actionRef>
-                <actionRef>
-                    <id>event_action_post</id>
-                </actionRef>
+                    ]]>
+				</action>
             </actions>
         </event>
     </transition>
-</document>
+</process>
