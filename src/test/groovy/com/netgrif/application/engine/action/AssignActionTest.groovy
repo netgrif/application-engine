@@ -1,14 +1,16 @@
 package com.netgrif.application.engine.action
 
+import com.netgrif.adapter.auth.domain.AuthorityImpl
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository
+import com.netgrif.core.auth.domain.Authority
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -63,7 +65,7 @@ class AssignActionTest {
     private MongoTemplate template
 
     @Autowired
-    private UserRepository userRepository
+    private UserService userService
 
     @Autowired
     private ProcessRoleRepository processRoleRepository
@@ -97,7 +99,7 @@ class AssignActionTest {
 
         auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
+        importHelper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
 //                [org] as Group[],
                 [] as ProcessRole[])
@@ -116,20 +118,21 @@ class AssignActionTest {
 
     private void cleanDatabases() {
         template.db.drop()
-        userRepository.deleteAll()
+        userService.deleteAll()
         processRoleRepository.deleteAll()
     }
 
     @Test
     void testAssignRoleOnSecondaryNetWhenRoleIsAddedOnPrimaryNet() {
-        User user = userRepository.findByEmail(USER_EMAIL)
+        IUser user = userService.findByEmail(USER_EMAIL, null)
 
-        authentication = new UsernamePasswordAuthenticationToken(user.transformToLoggedUser(), USER_PASSWORD, [auths.get("user"), auths.get("admin")] as List<Authority>)
+        authentication = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(user), USER_PASSWORD, [auths.get("user"), auths.get("admin")] as List<AuthorityImpl>)
         authentication.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
 
         String roleIdInMainNet = mainNet.getRoles().find { it.value.name.defaultValue == "admin_main" }.key
+        String roleIdInSecondaryNetNet = secondaryNet.getRoles().find { it.value.name.defaultValue == "admin_secondary" }.key
 
-        def content = JsonOutput.toJson([roleIdInMainNet])
+        def content = JsonOutput.toJson([roleIdInMainNet, roleIdInSecondaryNetNet])
         String userId = user.getStringId()
 
         def result = mvc.perform(MockMvcRequestBuilders.post(ROLE_API.replace("{}", userId))
@@ -141,7 +144,7 @@ class AssignActionTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn()
 
-        User updatedUser = userRepository.findByEmail(USER_EMAIL)
+        IUser updatedUser = userService.findByEmail(USER_EMAIL, null)
         Set<ProcessRole> roles = updatedUser.getProcessRoles()
 
         String adminMainId = processRoleRepository.findAllByName_DefaultValue("admin_main")?.first()?.stringId

@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Case;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;

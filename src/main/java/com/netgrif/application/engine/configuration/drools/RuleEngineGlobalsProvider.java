@@ -1,6 +1,6 @@
 //package com.netgrif.application.engine.configuration.drools;
 //
-//import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+//import com.netgrif.auth.service.UserService;
 //import com.netgrif.application.engine.configuration.drools.interfaces.IRuleEngineGlobalsProvider;
 //import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 //import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
@@ -84,7 +84,7 @@
 //    protected List<String> initializeImports() {
 //        List<String> imports = new ArrayList<>();
 //        globals.forEach(global -> imports.add(asImport(global.fullyQualifiedName())));
-//        imports.add(asImport("com.netgrif.application.engine.petrinet.domain.events.*"));
+//        imports.add(asImport("com.netgrif.core.petrinet.domain.events.*"));
 //        return imports;
 //    }
 //

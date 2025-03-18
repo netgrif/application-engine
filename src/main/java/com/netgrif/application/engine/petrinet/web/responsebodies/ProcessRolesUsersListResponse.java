@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
-import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.core.auth.domain.IUser;
 
 import java.util.LinkedList;
 import java.util.List;

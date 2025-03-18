@@ -4,12 +4,12 @@ import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.*;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDataHelper;
-import com.netgrif.application.engine.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.Transition;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.QTask;
+import com.netgrif.core.petrinet.domain.DataGroup;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.Transition;
+import com.netgrif.core.petrinet.domain.dataset.FieldType;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.adapter.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.web.responsebodies.*;
@@ -116,7 +116,7 @@ public class PdfDataHelper implements IPdfDataHelper {
     }
 
     private void generateFromDataGroup(DataGroup dataGroup) {
-        Collection<LocalisedField> fields = dataGroup.getFields().getContent();
+        Collection<LocalisedField> fields = (Collection<LocalisedField>) dataGroup.getFields().getContent();
         if (dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals("grid")) {
             fields = fields.stream().sorted(Comparator.<LocalisedField, Integer>comparing(f -> f.getLayout().getY()).thenComparing(f -> f.getLayout().getX())).collect(Collectors.toList());
         }

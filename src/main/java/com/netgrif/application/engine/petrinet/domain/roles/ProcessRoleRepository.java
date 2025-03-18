@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.roles;
 
-import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
+import com.netgrif.core.petrinet.domain.roles.ProcessRole;
+import com.netgrif.core.workflow.domain.ProcessResourceId;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -13,7 +14,9 @@ import java.util.stream.Collectors;
 @Repository
 public interface ProcessRoleRepository extends MongoRepository<ProcessRole, String>, QuerydslPredicateExecutor<ProcessRole> {
 
-    Set<ProcessRole> findAllByNetId(String netId);
+    ProcessRole findByImportId(String importId);
+
+    Set<ProcessRole> findAllByProcessId(String netId);
 
     Set<ProcessRole> findAllByImportIdIn(Set<String> importIds);
 
@@ -46,6 +49,10 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
         } else {
             return findByIdObjectId(new ObjectId(compositeId));
         }
+    }
+
+    default List<ProcessRole> findAllByCompositeId(Collection<String> compositeId) {
+        return compositeId.stream().map(this::findByCompositeId).map(optional -> optional.orElse(null)).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     @Query("{ '_id.shortProcessId': ?0, '_id.objectId': ?1 }")

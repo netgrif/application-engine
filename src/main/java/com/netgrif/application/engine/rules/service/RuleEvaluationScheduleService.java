@@ -1,6 +1,6 @@
 //package com.netgrif.application.engine.rules.service;
 //
-//import com.netgrif.application.engine.petrinet.domain.PetriNet;
+//import com.netgrif.core.petrinet.domain.PetriNet;
 //import com.netgrif.application.engine.rules.domain.RuleRepository;
 //import com.netgrif.application.engine.rules.domain.StoredRule;
 //import com.netgrif.application.engine.rules.domain.scheduled.CaseRuleEvaluationJob;
@@ -9,7 +9,7 @@
 //import com.netgrif.application.engine.rules.domain.scheduled.ScheduleOutcome;
 //import com.netgrif.application.engine.rules.service.interfaces.IRuleEvaluationScheduleService;
 //import com.netgrif.application.engine.rules.service.throwable.RuleEvaluationScheduleException;
-//import com.netgrif.application.engine.workflow.domain.Case;
+//import com.netgrif.core.workflow.domain.Case;
 //import org.quartz.*;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;

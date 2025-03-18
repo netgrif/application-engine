@@ -2,8 +2,8 @@ package com.netgrif.application.engine.petrinet.domain.dataset.factory;
 
 import com.netgrif.application.engine.files.IStorageResolverService;
 import com.netgrif.application.engine.files.interfaces.IStorageService;
-import com.netgrif.application.engine.importer.model.Data;
-import com.netgrif.application.engine.petrinet.domain.dataset.Storage;
+import com.netgrif.core.importer.model.Data;
+import com.netgrif.core.petrinet.domain.dataset.Storage;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Set;

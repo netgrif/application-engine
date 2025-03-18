@@ -1,0 +1,346 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>plugin</id>
+	<version>1.0.0</version>
+	<initials>PLG</initials>
+	<title>Plugin</title>
+	<icon>auto_awesome_motion</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<roleRef>
+		<id>system</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>admin</id>
+		<caseLogic>
+			<create>false</create>
+			<delete>false</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>default</id>
+		<caseLogic>
+			<create>false</create>
+			<delete>false</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
+	<data type="text" immediate="true">
+		<id>identifier</id>
+		<title>Identifier</title>
+	</data>
+	<data type="text" immediate="true">
+		<id>name</id>
+		<title name="name">Name</title>
+	</data>
+	<data type="text">
+		<id>url</id>
+		<title name="url">Url</title>
+	</data>
+	<data type="number">
+		<id>port</id>
+		<title name="port">Port</title>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>active</id>
+		<title name="active">Is active</title>
+		<init>false</init>
+	</data>
+	<data type="caseRef">
+		<id>entry_point_ids</id>
+		<title/>
+		<allowedNets>
+			<allowedNet>entry_point</allowedNet>
+		</allowedNets>
+	</data>
+	<i18n locale="sk">
+		<i18nString name="name">Názov</i18nString>
+		<i18nString name="url">Url</i18nString>
+		<i18nString name="port">Port</i18nString>
+		<i18nString name="active">Je aktívny</i18nString>
+		<i18nString name="detail">Detail</i18nString>
+		<i18nString name="activate">Aktivovať</i18nString>
+		<i18nString name="deactivate">Deaktivovať</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="name">Name</i18nString>
+		<i18nString name="url">Url</i18nString>
+		<i18nString name="port">Port</i18nString>
+		<i18nString name="active">Ist aktiv</i18nString>
+		<i18nString name="detail">Detail</i18nString>
+		<i18nString name="activate">Aktivieren</i18nString>
+		<i18nString name="deactivate">Deaktivieren</i18nString>
+	</i18n>
+	<transition>
+		<id>init</id>
+		<x>400</x>
+		<y>368</y>
+		<label>[auto] init</label>
+		<trigger type="auto"/>
+	</transition>
+	<transition>
+		<id>detail</id>
+		<x>400</x>
+		<y>176</y>
+		<label name="detail">Detail</label>
+		<dataGroup>
+			<id>detail_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>identifier</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>name</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>active</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>url</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>port</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>entry_point_ids</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>activate</id>
+		<x>624</x>
+		<y>304</y>
+		<label name="activate">Activate</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
+		<event type="finish">
+			<id>onFinish_activate</id>
+			<actions phase="post">
+				<action>
+					active: f.active;
+
+					pluginInjector.inject(useCase)
+					change active value { true }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>deactivate</id>
+		<x>624</x>
+		<y>432</y>
+		<label name="deactivate">Deactivate</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+			</logic>
+		</roleRef>
+		<event type="finish">
+			<id>onFinish_deactivate</id>
+			<actions phase="post">
+				<action>
+					active: f.active;
+
+					pluginInjector.uninject(useCase)
+					change active value { false }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<place>
+		<id>active</id>
+		<x>752</x>
+		<y>368</y>
+		<label/>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>inactive</id>
+		<x>496</x>
+		<y>368</y>
+		<label/>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p1</id>
+		<x>304</x>
+		<y>368</y>
+		<label/>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>initialized</id>
+		<x>400</x>
+		<y>272</y>
+		<label/>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>inactive</sourceId>
+		<destinationId>activate</destinationId>
+		<multiplicity>1</multiplicity>
+		<breakpoint>
+			<x>496</x>
+			<y>304</y>
+		</breakpoint>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>activate</sourceId>
+		<destinationId>active</destinationId>
+		<multiplicity>1</multiplicity>
+		<breakpoint>
+			<x>752</x>
+			<y>304</y>
+		</breakpoint>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>active</sourceId>
+		<destinationId>deactivate</destinationId>
+		<multiplicity>1</multiplicity>
+		<breakpoint>
+			<x>752</x>
+			<y>432</y>
+		</breakpoint>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>deactivate</sourceId>
+		<destinationId>inactive</destinationId>
+		<multiplicity>1</multiplicity>
+		<breakpoint>
+			<x>496</x>
+			<y>432</y>
+		</breakpoint>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>init</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>regular</type>
+		<sourceId>init</sourceId>
+		<destinationId>inactive</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>regular</type>
+		<sourceId>init</sourceId>
+		<destinationId>initialized</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a8</id>
+		<type>read</type>
+		<sourceId>initialized</sourceId>
+		<destinationId>detail</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

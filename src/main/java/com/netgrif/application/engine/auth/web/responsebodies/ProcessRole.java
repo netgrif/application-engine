@@ -27,7 +27,7 @@ public class ProcessRole {
      *
      * Use the ProcessRoleFactory to create instances that have these attributes set.
      */
-    public ProcessRole(com.netgrif.application.engine.petrinet.domain.roles.ProcessRole role, Locale locale) {
+    public ProcessRole(com.netgrif.core.petrinet.domain.roles.ProcessRole role, Locale locale) {
         stringId = role.getStringId();
         name = role.getLocalisedName(locale);
         description = role.getDescription();

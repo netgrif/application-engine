@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.importer.service;
 
-import com.netgrif.application.engine.workflow.domain.triggers.*;
+import com.netgrif.core.workflow.domain.triggers.*;
 import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeParseException;
@@ -8,7 +8,7 @@ import java.time.format.DateTimeParseException;
 @Component
 public class TriggerFactory {
 
-    public Trigger buildTrigger(com.netgrif.application.engine.importer.model.Trigger trigger) throws IllegalArgumentException, DateTimeParseException {
+    public Trigger buildTrigger(com.netgrif.core.importer.model.Trigger trigger) throws IllegalArgumentException, DateTimeParseException {
         switch (trigger.getType()) {
             case AUTO:
                 return buildAutoTrigger();
@@ -25,7 +25,7 @@ public class TriggerFactory {
         return new AutoTrigger();
     }
 
-    private TimeTrigger buildTimeTrigger(com.netgrif.application.engine.importer.model.Trigger trigger) throws DateTimeParseException {
+    private TimeTrigger buildTimeTrigger(com.netgrif.core.importer.model.Trigger trigger) throws DateTimeParseException {
         if (trigger.getDelay() != null) {
             return new DelayTimeTrigger(trigger.getDelay().toString());
         } else if (trigger.getExact() != null) {

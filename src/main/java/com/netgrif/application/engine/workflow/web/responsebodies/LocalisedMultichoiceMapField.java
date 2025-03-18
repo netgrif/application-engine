@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
-import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
+import com.netgrif.core.petrinet.domain.dataset.MultichoiceMapField;
 
 import java.util.LinkedHashSet;
 import java.util.Locale;

@@ -1,9 +1,9 @@
 com.fasterxml.jackson.databind
 com.fasterxml.jackson.databind.node
 com.netgrif.application.engine
-com.netgrif.application.engine.auth.domain
-com.netgrif.application.engine.auth.domain.repositories
-com.netgrif.application.engine.auth.domain.throwable
+com.netgrif.core.auth.domain.Authority;
+com.netgrif.core.auth.domain.Authority;.repositories
+com.netgrif.core.auth.domain.Authority;.throwable
 com.netgrif.application.engine.auth.service
 com.netgrif.application.engine.auth.service.interfaces
 com.netgrif.application.engine.auth.web
@@ -74,7 +74,7 @@ com.netgrif.application.engine.impersonation.service.interfaces
 com.netgrif.application.engine.impersonation.web
 com.netgrif.application.engine.impersonation.web.requestbodies
 com.netgrif.application.engine.impersonation.web.responsebodies
-com.netgrif.application.engine.importer.model
+com.netgrif.core.importer.model
 com.netgrif.application.engine.importer.service
 com.netgrif.application.engine.importer.service.throwable
 com.netgrif.application.engine.integration.dashboards.service
@@ -119,7 +119,7 @@ com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 com.netgrif.application.engine.petrinet.domain.dataset.logic.action.context
 com.netgrif.application.engine.petrinet.domain.dataset.logic.action.delegate
 com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner
-com.netgrif.application.engine.petrinet.domain.dataset.logic.validation
+com.netgrif.core.petrinet.domain.dataset.logic.validation
 com.netgrif.application.engine.petrinet.domain.events
 com.netgrif.application.engine.petrinet.domain.layout
 com.netgrif.application.engine.petrinet.domain.policies

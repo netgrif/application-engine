@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.elastic.service;
 
-import com.netgrif.application.engine.elastic.domain.ElasticPetriNet;
+import com.netgrif.core.elastic.domain.ElasticPetriNet;
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +40,9 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
     public void index(ElasticPetriNet net) {
         executors.execute(net.getStringId(), () -> {
             try {
-                ElasticPetriNet elasticPetriNet = repository.findByStringId(net.getStringId());
+                com.netgrif.adapter.elastic.domain.ElasticPetriNet elasticPetriNet = repository.findByStringId(net.getStringId());
                 if (elasticPetriNet == null) {
-                    repository.save(net);
+                    repository.save((com.netgrif.adapter.elastic.domain.ElasticPetriNet) net);
                 } else {
                     elasticPetriNet.update(net);
                     repository.save(elasticPetriNet);
@@ -51,7 +51,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
             } catch (InvalidDataAccessApiUsageException ignored) {
                 log.debug("[" + net.getStringId() + "]: PetriNet \"" + net.getTitle() + "\" has duplicates, will be reindexed");
                 repository.deleteAllByStringId(net.getStringId());
-                repository.save(net);
+                repository.save((com.netgrif.adapter.elastic.domain.ElasticPetriNet) net);
                 log.debug("[" + net.getStringId() + "]: PetriNet \"" + net.getTitle() + "\" indexed");
             }
         });
@@ -86,7 +86,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
 
     @Override
     public List<PetriNet> findAllByUriNodeId(String uriNodeId) {
-        List<ElasticPetriNet> elasticPetriNets = repository.findAllByUriNodeId(uriNodeId);
+        List<com.netgrif.adapter.elastic.domain.ElasticPetriNet> elasticPetriNets = repository.findAllByUriNodeId(uriNodeId);
         return petriNetService.findAllById(elasticPetriNets.stream().map(ElasticPetriNet::getStringId).collect(Collectors.toList()));
     }
 }

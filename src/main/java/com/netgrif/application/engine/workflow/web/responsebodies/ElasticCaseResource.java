@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
-import com.netgrif.application.engine.elastic.domain.ElasticCase;
+import com.netgrif.core.elastic.domain.ElasticCase;
 import org.springframework.hateoas.EntityModel;
 
 import java.util.ArrayList;

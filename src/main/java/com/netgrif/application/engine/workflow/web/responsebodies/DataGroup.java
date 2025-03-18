@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
-import com.netgrif.application.engine.petrinet.domain.layout.DataGroupLayout;
+import com.netgrif.core.petrinet.domain.layout.DataGroupLayout;
 import lombok.Data;
 
 @Data

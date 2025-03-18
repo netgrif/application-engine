@@ -2,11 +2,11 @@ package com.netgrif.application.engine.workflow.web.responsebodies;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.auth.web.responsebodies.User;
-import com.netgrif.application.engine.elastic.domain.ElasticTask;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.events.EventType;
-import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
-import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
+import com.netgrif.core.elastic.domain.ElasticTask;
+import com.netgrif.core.petrinet.domain.dataset.Field;
+import com.netgrif.core.petrinet.domain.events.EventType;
+import com.netgrif.core.petrinet.domain.layout.TaskLayout;
+import com.netgrif.core.workflow.domain.ProcessResourceId;
 import lombok.Data;
 import org.bson.types.ObjectId;
 
@@ -54,7 +54,7 @@ public class Task {
 
     private Boolean requiredFilled;
 
-    private List<Field> immediateData;
+    private List<Field<?>> immediateData;
 
     private String icon;
 
@@ -76,7 +76,7 @@ public class Task {
 
     private Map<String, String> tags;
 
-    public Task(com.netgrif.application.engine.workflow.domain.Task task, Locale locale) {
+    public Task(com.netgrif.core.workflow.domain.Task task, Locale locale) {
         this._id = task.getObjectId();
         this.caseId = task.getCaseId();
         this.transitionId = task.getTransitionId();
@@ -110,7 +110,7 @@ public class Task {
         _id = new ProcessResourceId(entity.getStringId());
         caseId = entity.getCaseId();
         transitionId = entity.getTransitionId();
-        title = entity.getTitle();
+        title = entity.getTitle().getDefaultValue();
         caseTitle = entity.getCaseTitle();
         priority = entity.getPriority();
     }

@@ -1,29 +1,28 @@
 package com.netgrif.application.engine.petrinet.service
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Author
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
+import com.netgrif.core.auth.domain.Author
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
+import com.netgrif.auth.service.UserService
+import com.netgrif.core.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
-import com.netgrif.application.engine.petrinet.domain.I18nString
-import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.PetriNetSearch
-import com.netgrif.application.engine.petrinet.domain.UriContentType
-import com.netgrif.application.engine.petrinet.domain.UriNode
-import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.PetriNetSearch
+import com.netgrif.core.petrinet.domain.UriContentType
+import com.netgrif.core.petrinet.domain.UriNode
+import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
-import com.netgrif.application.engine.petrinet.domain.version.Version
+import com.netgrif.core.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
+import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -38,8 +37,6 @@ import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
-
-import java.time.LocalDateTime
 
 @Disabled
 @ExtendWith(SpringExtension.class)
@@ -70,10 +67,10 @@ class PetriNetServiceTest {
     private TaskRepository taskRepository
 
     @Autowired
-    private IProcessRoleService userProcessRoleService
+    private ProcessRoleService userProcessRoleService
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private PetriNetRepository petriNetRepository
@@ -99,7 +96,7 @@ class PetriNetServiceTest {
     void setup() {
         testHelper.truncateDbs()
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        importHelper.createUser(new User(name: "Customer", surname: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Customer", lastName: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
     }
@@ -126,12 +123,12 @@ class PetriNetServiceTest {
         assert taskRepository.count() == taskCount + 2
         assert processRoleRepository.count() == processRoleCount + 2
 
-        def user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
+        def user = userService.findUserByUsername(CUSTOMER_USER_MAIL, null)
         assert user != null
         assert user.processRoles.size() == 1
 
         userService.addRole(user, testNet.roles.values().collect().get(0).stringId)
-        user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
+        user = userService.findUserByUsername(CUSTOMER_USER_MAIL, null)
         assert user != null
         assert user.processRoles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
@@ -143,7 +140,7 @@ class PetriNetServiceTest {
         assert caseRepository.findAllByProcessIdentifier(testNetOptional.getNet().getImportId()).size() == 0
         assert taskRepository.count() == taskCount
         assert processRoleRepository.count() == processRoleCount
-        user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
+        user = userService.findUserByUsername(CUSTOMER_USER_MAIL, null)
         assert user != null
         assert user.processRoles.size() == 1
 
@@ -174,10 +171,10 @@ class PetriNetServiceTest {
         long processCount = petriNetRepository.count()
 
 
-        def user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
+        def user = userService.findUserByUsername(CUSTOMER_USER_MAIL, null)
         assert user != null
         petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        petriNetService.importPetriNet(stream(NET_SEARCH_FILE), VersionType.MAJOR, user.transformToLoggedUser())
+        petriNetService.importPetriNet(stream(NET_SEARCH_FILE), VersionType.MAJOR, userService.transformToLoggedUser(user))
 
         assert petriNetRepository.count() == processCount + 2
 

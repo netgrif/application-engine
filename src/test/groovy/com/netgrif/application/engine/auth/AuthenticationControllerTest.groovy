@@ -3,18 +3,19 @@ package com.netgrif.application.engine.auth
 import com.icegreen.greenmail.configuration.GreenMailConfiguration
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
+import com.netgrif.auth.service.AuthorityService
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.repositories.AuthorityRepository
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository
+import com.netgrif.core.auth.domain.Authority
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.User
 import com.netgrif.application.engine.auth.web.AuthenticationController
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.mail.EmailType
-import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.core.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -59,10 +60,10 @@ class AuthenticationControllerTest {
     private ImportHelper importHelper
 
     @Autowired
-    private UserRepository userRepository
+    private UserService userService
 
     @Autowired
-    private AuthorityRepository authorityRepository
+    private AuthorityService authorityService
 
     @Autowired
     private IPetriNetService petriNetService
@@ -85,7 +86,7 @@ class AuthenticationControllerTest {
 
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
-        if (authorityRepository.count() == 0)
+        if (authorityService.findAll().size() == 0)
             importHelper.createAuthority(Authority.user)
 //        group = importHelper.createGroup(GROUP_NAME)
 //        processRoles = importHelper.getProcessRoles(net.getNet())
@@ -102,11 +103,10 @@ class AuthenticationControllerTest {
         String content = getTextFromMimeMultipart(messages[0].content as MimeMultipart)
         String token = content.substring(content.indexOf("/signup/") + "/signup/".length(), content.lastIndexOf(" This is"))
 
-        controller.signup(new RegistrationRequest(token: token, name: NAME, surname: SURNAME, password: PASSWORD))
+        controller.signup(new RegistrationRequest(token: token, name: NAME, lastName: SURNAME, password: PASSWORD))
 
-        User user = userRepository.findByEmail(EMAIL)
+        IUser user = userService.findByEmail(EMAIL, null)
         assert user
-
     }
 
     @AfterEach

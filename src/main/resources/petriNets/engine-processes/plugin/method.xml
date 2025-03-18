@@ -1,0 +1,138 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>method</id>
+	<version>1.0.0</version>
+	<initials>MTH</initials>
+	<title>Method</title>
+	<icon>task</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<roleRef>
+		<id>system</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>admin</id>
+		<caseLogic>
+			<create>false</create>
+			<delete>false</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>default</id>
+		<caseLogic>
+			<create>false</create>
+			<delete>false</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
+	<data type="text" immediate="true">
+		<id>name</id>
+		<title name="name">Name</title>
+	</data>
+	<data type="stringCollection">
+		<id>arguments</id>
+		<title name="arguments">Method arguments</title>
+	</data>
+	<data type="text">
+		<id>return_type</id>
+		<title name="return_type">Output type</title>
+	</data>
+	<data type="text">
+		<id>hashed_signature</id>
+		<title/>
+	</data>
+	<i18n locale="sk">
+		<i18nString name="name">Názov</i18nString>
+		<i18nString name="arguments">Argumenty funkcie</i18nString>
+		<i18nString name="return_type">Typ výstupu funkcie</i18nString>
+		<i18nString name="detail">Detail</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="name">Name</i18nString>
+		<i18nString name="arguments">Methodenargumente</i18nString>
+		<i18nString name="return_type">Methode Ausgabetyp</i18nString>
+		<i18nString name="detail">Detail</i18nString>
+	</i18n>
+	<transition>
+		<id>detail</id>
+		<x>368</x>
+		<y>112</y>
+		<label name="detail">Detail</label>
+		<dataGroup>
+			<id>detail_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>name</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>arguments</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>return_type</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>240</x>
+		<y>112</y>
+		<label/>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>read</type>
+		<sourceId>p1</sourceId>
+		<destinationId>detail</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

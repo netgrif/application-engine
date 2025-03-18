@@ -1,11 +1,14 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.core.petrinet.domain.dataset.EnumerationMapField
+import com.netgrif.core.petrinet.domain.dataset.Field
+import com.netgrif.core.petrinet.domain.dataset.MultichoiceMapField
+import com.netgrif.core.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

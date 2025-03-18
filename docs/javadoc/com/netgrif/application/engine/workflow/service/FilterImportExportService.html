@@ -194,22 +194,22 @@ implements <a href="interfaces/IFilterImportExportService.html" title="interface
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>protected <a href="../domain/filter/FilterImportExport.html" title="class in com.netgrif.application.engine.workflow.domain.filter">FilterImportExport</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createExportClass(com.netgrif.application.engine.workflow.domain.Case)">createExportClass</a></span>&#8203;(<a href="../domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;filter)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createExportClass(com.netgrif.core.workflow.domain.Case)">createExportClass</a></span>&#8203;(<a href="../domain/Case.html" title="class in com.netgrif.application.engine.workflow.domain">Case</a>&nbsp;filter)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createFilterExport(com.netgrif.application.engine.auth.domain.IUser)">createFilterExport</a></span>&#8203;(<a href="../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;author)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createFilterExport(com.netgrif.core.auth.domain.IUser)">createFilterExport</a></span>&#8203;(<a href="../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;author)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createFilterImport(com.netgrif.application.engine.auth.domain.IUser)">createFilterImport</a></span>&#8203;(<a href="../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;author)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createFilterImport(com.netgrif.core.auth.domain.IUser)">createFilterImport</a></span>&#8203;(<a href="../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;author)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>protected <a href="../../petrinet/domain/dataset/FileFieldValue.html" title="class in com.netgrif.application.engine.petrinet.domain.dataset">FileFieldValue</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createXML(com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList)">createXML</a></span>&#8203;(<a href="../domain/filter/FilterImportExportList.html" title="class in com.netgrif.application.engine.workflow.domain.filter">FilterImportExportList</a>&nbsp;filters)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createXML(com.netgrif.core.workflow.domain.filter.FilterImportExportList)">createXML</a></span>&#8203;(<a href="../domain/filter/FilterImportExportList.html" title="class in com.netgrif.application.engine.workflow.domain.filter">FilterImportExportList</a>&nbsp;filters)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i5" class="rowColor">
@@ -235,7 +235,7 @@ implements <a href="interfaces/IFilterImportExportService.html" title="interface
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importFilters(com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList)">importFilters</a></span>&#8203;(<a href="../domain/filter/FilterImportExportList.html" title="class in com.netgrif.application.engine.workflow.domain.filter">FilterImportExportList</a>&nbsp;filterList)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importFilters(com.netgrif.core.workflow.domain.filter.FilterImportExportList)">importFilters</a></span>&#8203;(<a href="../domain/filter/FilterImportExportList.html" title="class in com.netgrif.application.engine.workflow.domain.filter">FilterImportExportList</a>&nbsp;filterList)</code></th>
 <td class="colLast">
 <div class="block">Method which performs import of filters from already created filter import class instances
  passed in as parameter.</div>
@@ -248,7 +248,7 @@ implements <a href="interfaces/IFilterImportExportService.html" title="interface
 </tr>
 <tr id="i10" class="altColor">
 <td class="colFirst"><code>protected java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#performImport(com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList)">performImport</a></span>&#8203;(<a href="../domain/filter/FilterImportExportList.html" title="class in com.netgrif.application.engine.workflow.domain.filter">FilterImportExportList</a>&nbsp;filterList)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#performImport(com.netgrif.core.workflow.domain.filter.FilterImportExportList)">performImport</a></span>&#8203;(<a href="../domain/filter/FilterImportExportList.html" title="class in com.netgrif.application.engine.workflow.domain.filter">FilterImportExportList</a>&nbsp;filterList)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -294,29 +294,29 @@ implements <a href="interfaces/IFilterImportExportService.html" title="interface
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="createFilterImport(com.netgrif.application.engine.auth.domain.IUser)">
+<a id="createFilterImport(com.netgrif.core.auth.domain.IUser)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>createFilterImport</h4>
-<pre class="methodSignature">public&nbsp;void&nbsp;createFilterImport&#8203;(<a href="../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;author)</pre>
+<pre class="methodSignature">public&nbsp;void&nbsp;createFilterImport&#8203;(<a href="../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;author)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IFilterImportExportService.html#createFilterImport(com.netgrif.application.engine.auth.domain.IUser)">createFilterImport</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IFilterImportExportService.html" title="interface in com.netgrif.application.engine.workflow.service.interfaces">IFilterImportExportService</a></code></dd>
+<dd><code><a href="interfaces/IFilterImportExportService.html#createFilterImport(com.netgrif.core.auth.domain.IUser)">createFilterImport</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IFilterImportExportService.html" title="interface in com.netgrif.application.engine.workflow.service.interfaces">IFilterImportExportService</a></code></dd>
 </dl>
 </li>
 </ul>
-<a id="createFilterExport(com.netgrif.application.engine.auth.domain.IUser)">
+<a id="createFilterExport(com.netgrif.core.auth.domain.IUser)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>createFilterExport</h4>
-<pre class="methodSignature">public&nbsp;void&nbsp;createFilterExport&#8203;(<a href="../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;author)</pre>
+<pre class="methodSignature">public&nbsp;void&nbsp;createFilterExport&#8203;(<a href="../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;author)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IFilterImportExportService.html#createFilterExport(com.netgrif.application.engine.auth.domain.IUser)">createFilterExport</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IFilterImportExportService.html" title="interface in com.netgrif.application.engine.workflow.service.interfaces">IFilterImportExportService</a></code></dd>
+<dd><code><a href="interfaces/IFilterImportExportService.html#createFilterExport(com.netgrif.core.auth.domain.IUser)">createFilterExport</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IFilterImportExportService.html" title="interface in com.netgrif.application.engine.workflow.service.interfaces">IFilterImportExportService</a></code></dd>
 </dl>
 </li>
 </ul>
@@ -389,7 +389,7 @@ implements <a href="interfaces/IFilterImportExportService.html" title="interface
 </dl>
 </li>
 </ul>
-<a id="importFilters(com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList)">
+<a id="importFilters(com.netgrif.core.workflow.domain.filter.FilterImportExportList)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -402,7 +402,7 @@ implements <a href="interfaces/IFilterImportExportService.html" title="interface
  passed in as parameter.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="interfaces/IFilterImportExportService.html#importFilters(com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList)">importFilters</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IFilterImportExportService.html" title="interface in com.netgrif.application.engine.workflow.service.interfaces">IFilterImportExportService</a></code></dd>
+<dd><code><a href="interfaces/IFilterImportExportService.html#importFilters(com.netgrif.core.workflow.domain.filter.FilterImportExportList)">importFilters</a></code>&nbsp;in interface&nbsp;<code><a href="interfaces/IFilterImportExportService.html" title="interface in com.netgrif.application.engine.workflow.service.interfaces">IFilterImportExportService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>filterList</code> - - instance of class FilterImportExportList</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -413,7 +413,7 @@ implements <a href="interfaces/IFilterImportExportService.html" title="interface
 </dl>
 </li>
 </ul>
-<a id="performImport(com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList)">
+<a id="performImport(com.netgrif.core.workflow.domain.filter.FilterImportExportList)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -463,7 +463,7 @@ protected&nbsp;<a href="../domain/filter/FilterImportExportList.html" title="cla
 </dl>
 </li>
 </ul>
-<a id="createXML(com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList)">
+<a id="createXML(com.netgrif.core.workflow.domain.filter.FilterImportExportList)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -478,7 +478,7 @@ protected&nbsp;<a href="../../petrinet/domain/dataset/FileFieldValue.html" title
 </dl>
 </li>
 </ul>
-<a id="createExportClass(com.netgrif.application.engine.workflow.domain.Case)">
+<a id="createExportClass(com.netgrif.core.workflow.domain.Case)">
 <!--   -->
 </a>
 <ul class="blockListLast">

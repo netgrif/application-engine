@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
+//import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.pdf.generator.service.PdfDataHelper;

@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.User;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.User;
+import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,11 +43,11 @@ class AbstractAuthorizationServiceTest {
 
         // init
         List<ProcessRole> roles = new LinkedList<>();
-        roles.add(new ProcessRole());
-        roles.add(new ProcessRole());
-        roles.add(new ProcessRole());
+        roles.add(new com.netgrif.adapter.petrinet.domain.roles.ProcessRole());
+        roles.add(new com.netgrif.adapter.petrinet.domain.roles.ProcessRole());
+        roles.add(new com.netgrif.adapter.petrinet.domain.roles.ProcessRole());
 
-        IUser user = new User();
+        IUser user = new com.netgrif.adapter.auth.domain.User();
         user.addProcessRole(roles.get(0));
         user.addProcessRole(roles.get(1));
 

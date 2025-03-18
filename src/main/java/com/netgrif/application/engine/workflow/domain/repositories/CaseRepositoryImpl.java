@@ -1,11 +1,11 @@
 package com.netgrif.application.engine.workflow.domain.repositories;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.Reference;
-import com.netgrif.application.engine.workflow.domain.QCase;
-import com.netgrif.application.engine.workflow.domain.QDataField;
+import com.netgrif.adapter.workflow.domain.QCase;
+import com.netgrif.core.workflow.domain.QDataField;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringExpression;

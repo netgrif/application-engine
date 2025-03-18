@@ -1,7 +1,7 @@
-package com.netgrif.application.engine.auth.domain.repositories;
-
-import org.springframework.stereotype.Repository;
-
-@Repository("userRepository")
-public abstract class UserRepositoryImpl implements UserRepository {
-}
+//package com.netgrif.core.auth.domain.Authority;.repositories;
+//
+//import org.springframework.stereotype.Repository;
+//
+//@Repository("userRepository")
+//public abstract class UserRepositoryImpl implements UserRepository {
+//}

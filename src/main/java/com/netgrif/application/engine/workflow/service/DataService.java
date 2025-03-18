@@ -7,33 +7,33 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.auth.service.UserService;
+import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.application.engine.files.StorageResolverService;
 import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.files.throwable.StorageException;
-import com.netgrif.application.engine.event.events.data.GetDataEvent;
-import com.netgrif.application.engine.event.events.data.SetDataEvent;
-import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
-import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
+import com.netgrif.core.event.events.data.GetDataEvent;
+import com.netgrif.core.event.events.data.SetDataEvent;
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.FieldFactory;
-import com.netgrif.application.engine.petrinet.domain.Component;
-import com.netgrif.application.engine.petrinet.domain.*;
-import com.netgrif.application.engine.petrinet.domain.dataset.*;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.core.petrinet.domain.Component;
+import com.netgrif.core.petrinet.domain.*;
+import com.netgrif.core.petrinet.domain.dataset.*;
+import com.netgrif.core.petrinet.domain.dataset.logic.ChangedField;
+import com.netgrif.core.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
-import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
-import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
-import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
+import com.netgrif.core.petrinet.domain.events.DataEvent;
+import com.netgrif.core.petrinet.domain.events.DataEventType;
+import com.netgrif.core.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
-import com.netgrif.application.engine.workflow.domain.*;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
+import com.netgrif.core.workflow.domain.*;
+import com.netgrif.core.workflow.domain.eventoutcomes.EventOutcome;
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -80,7 +80,7 @@ public class DataService implements IDataService {
     protected IWorkflowService workflowService;
 
     @Autowired
-    protected IUserService userService;
+    protected UserService userService;
 
     @Autowired
     protected FieldFactory fieldFactory;
@@ -134,9 +134,9 @@ public class DataService implements IDataService {
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
         Set<String> fieldsIds = transition.getDataSet().keySet();
-        List<Field> dataSetFields = new ArrayList<>();
+        List<Field<?>> dataSetFields = new ArrayList<>();
         if (task.getUserId() != null) {
-            task.setUser(userService.findById(task.getUserId(), false));
+            task.setUser(userService.findById(task.getUserId(), null));
         }
         GetDataEventOutcome outcome = new GetDataEventOutcome(useCase, task);
         fieldsIds.forEach(fieldId -> {
@@ -144,7 +144,7 @@ public class DataService implements IDataService {
                 return;
             Field field = useCase.getPetriNet().getField(fieldId).get();
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, params));
-            historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE, user));
+            publisher.publishEvent(new GetDataEvent(outcome, EventPhase.PRE, user));
 
             if (outcome.getMessage() == null) {
                 Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
@@ -177,7 +177,7 @@ public class DataService implements IDataService {
                 }
             }
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task, params));
-            historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST, user));
+            publisher.publishEvent(new GetDataEvent(outcome, EventPhase.POST, user));
         });
 
         workflowService.save(useCase);
@@ -192,7 +192,7 @@ public class DataService implements IDataService {
         LongStream.range(0L, dataSetFields.size())
                 .forEach(index -> dataSetFields.get((int) index).setOrder(index));
         outcome.setData(dataSetFields);
-        publisher.publishEvent(new GetDataEvent(outcome));
+        publisher.publishEvent(new GetDataEvent(outcome, user));
         return outcome;
     }
 
@@ -228,7 +228,7 @@ public class DataService implements IDataService {
         log.info("[" + useCase.getStringId() + "]: Setting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
 
         if (task.getUserId() != null) {
-            task.setUser(userService.findById(task.getUserId(), false));
+            task.setUser(userService.findById(task.getUserId(), null));
         }
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
         values.fields().forEachRemaining(entry -> {
@@ -294,10 +294,8 @@ public class DataService implements IDataService {
                 }
                 outcome.addChangedField(fieldId, changedField);
                 workflowService.save(useCase);
-                historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE, Collections.singletonMap(fieldId, changedField), user));
+                publisher.publishEvent(new SetDataEvent(outcome, EventPhase.PRE, user));
                 outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, params));
-
-                historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, null, user));
                 applyFieldConnectedChanges(useCase, field);
             }
         });
@@ -322,19 +320,19 @@ public class DataService implements IDataService {
         log.info("Getting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level);
         List<DataGroup> resultDataGroups = new ArrayList<>();
 
-        List<Field> data = getData(task, useCase).getData();
-        Map<String, Field> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
-        List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::clone).collect(Collectors.toList());
+        List<Field<?>> data = getData(task, useCase).getData();
+        Map<String, Field<?>> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
+        List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map((dg) -> (DataGroup) new com.netgrif.adapter.workflow.domain.DataGroup((com.netgrif.adapter.workflow.domain.DataGroup) dg)).toList();
         for (DataGroup dataGroup : dataGroups) {
             resolveTaskRefOrderOnGrid(dataGroup, dataFieldMap);
             resultDataGroups.add(dataGroup);
             log.debug("Setting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level + " " + dataGroup.getImportId());
 
-            List<Field> resources = new LinkedList<>();
+            List<Field<?>> resources = new LinkedList<>();
             for (String dataFieldId : dataGroup.getData()) {
-                Field field = net.getDataSet().get(dataFieldId);
+                Field<?> field = net.getDataSet().get(dataFieldId);
                 if (dataFieldMap.containsKey(dataFieldId)) {
-                    Field resource = dataFieldMap.get(dataFieldId);
+                    Field<?> resource = dataFieldMap.get(dataFieldId);
                     if (level != 0) {
                         dataGroup.setParentCaseId(useCase.getStringId());
                         resource.setParentCaseId(useCase.getStringId());
@@ -389,7 +387,7 @@ public class DataService implements IDataService {
         return groups;
     }
 
-    private void resolveTaskRefOrderOnGrid(DataGroup dataGroup, Map<String, Field> dataFieldMap) {
+    private void resolveTaskRefOrderOnGrid(DataGroup dataGroup, Map<String, Field<?>> dataFieldMap) {
         if (dataGroup.getLayout() != null && Objects.equals(dataGroup.getLayout().getType(), "grid")) {
             dataGroup.setData(
                     dataGroup.getData().stream()
@@ -405,7 +403,7 @@ public class DataService implements IDataService {
     private void resolveTaskRefBehavior(TaskField taskRefField, List<DataGroup> taskRefDataGroups) {
         if (taskRefField.getBehavior().has("visible") && taskRefField.getBehavior().get("visible").asBoolean()) {
             taskRefDataGroups.forEach(dataGroup -> {
-                dataGroup.getFields().getContent().forEach(field -> {
+                dataGroup.getFields().getContent().stream().map(LocalisedField.class::cast).forEach(field -> {
                     if (field.getBehavior().has("editable") && field.getBehavior().get("editable").asBoolean()) {
                         changeTaskRefBehavior(field, FieldBehavior.VISIBLE);
                     }
@@ -413,7 +411,7 @@ public class DataService implements IDataService {
             });
         } else if (taskRefField.getBehavior().has("hidden") && taskRefField.getBehavior().get("hidden").asBoolean()) {
             taskRefDataGroups.forEach(dataGroup -> {
-                dataGroup.getFields().getContent().forEach(field -> {
+                dataGroup.getFields().getContent().stream().map(LocalisedField.class::cast).forEach(field -> {
                     if (!field.getBehavior().has("forbidden") || !field.getBehavior().get("forbidden").asBoolean())
                         changeTaskRefBehavior(field, FieldBehavior.HIDDEN);
                 });
@@ -744,16 +742,16 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public List<Field> getImmediateFields(Task task) {
+    public List<Field<?>> getImmediateFields(Task task) {
         Case useCase = workflowService.findOne(task.getCaseId());
-        List<Field> fields = task.getImmediateDataFields().stream().map(id -> fieldFactory.buildFieldWithoutValidation(useCase, id, task.getTransitionId())).collect(Collectors.toList());
+        List<Field<?>> fields = task.getImmediateDataFields().stream().map(id -> fieldFactory.buildFieldWithoutValidation(useCase, id, task.getTransitionId())).collect(Collectors.toList());
         LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
         return fields;
     }
 
     @Override
     public UserFieldValue makeUserFieldValue(String id) {
-        IUser user = userService.resolveById(id, true);
+        IUser user = userService.findById(id, null);
         return new UserFieldValue(user);
     }
 
@@ -1057,7 +1055,7 @@ public class DataService implements IDataService {
         }
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(I18nString.class, new I18nStringDeserializer());
+        module.addDeserializer(I18nString.class, new com.netgrif.core.petrinet.domain.I18nStringDeserializer());
         mapper.registerModule(module);
         Map<String, I18nString> optionsMapped = mapper.convertValue(optionsNode, new TypeReference<Map<String, I18nString>>() {
         });

@@ -1,7 +1,7 @@
 //package com.netgrif.application.engine.workflow.web;
 //
-//import com.netgrif.application.engine.auth.domain.LoggedUser;
-//import com.netgrif.application.engine.auth.domain.throwable.UnauthorisedRequestException;
+//import com.netgrif.core.auth.domain.LoggedUser;
+//import com.netgrif.core.auth.domain.Authority;.throwable.UnauthorisedRequestException;
 //import com.netgrif.application.engine.workflow.domain.Filter;
 //import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 //import com.netgrif.application.engine.workflow.service.interfaces.IFilterService;

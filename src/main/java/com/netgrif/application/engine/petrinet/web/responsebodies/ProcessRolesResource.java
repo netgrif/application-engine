@@ -18,7 +18,7 @@ public class ProcessRolesResource extends EntityModel<ProcessRolesAndPermissions
         buildLinks(netId);
     }
 
-    public ProcessRolesResource(Collection<com.netgrif.application.engine.petrinet.domain.roles.ProcessRole> content, Map<String, Map<String, Boolean>> permissions, String netId, Locale locale) {
+    public ProcessRolesResource(Collection<com.netgrif.core.petrinet.domain.roles.ProcessRole> content, Map<String, Map<String, Boolean>> permissions, String netId, Locale locale) {
         this(new ProcessRolesAndPermissions(content.stream().map(role -> new ProcessRole(
                 role.getStringId(), role.getName().getTranslation(locale), role.getDescription()
         )).collect(Collectors.toList()), permissions), netId);

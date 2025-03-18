@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.manager.service;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

@@ -3,15 +3,15 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.IUser
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.core.auth.domain.IUser
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.core.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest
 import org.assertj.core.api.Assertions
@@ -73,7 +73,7 @@ class FileFieldTest {
     private IWorkflowService workflowService
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private WebApplicationContext context
@@ -108,10 +108,10 @@ class FileFieldTest {
     void downloadFileByCase() {
         Case useCase = uploadTestFile()
 
-        IUser user = userService.findByEmail(USER_EMAIL, true)
+        IUser user = userService.findUserByUsername(USER_EMAIL, null).get()
         assert user != null
 
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), userService.transformToLoggedUser(user))
 
         mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file")
                 .param("fieldId", FIELD_ID)
@@ -127,13 +127,13 @@ class FileFieldTest {
     void downloadFileByTask() {
         Case useCase = uploadTestFile()
 
-        IUser user = userService.findByEmail(USER_EMAIL, true)
+        IUser user = userService.findUserByUsername(USER_EMAIL, null).get()
         assert user != null
 
         def taskPair = useCase.tasks.find { it.transition == "task" }
         assert taskPair != null
 
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), userService.transformToLoggedUser(user))
 
         mockMvc.perform(get("/api/task/" + taskPair.task + "/file")
                 .param("fieldId", FIELD_ID)
@@ -173,10 +173,10 @@ class FileFieldTest {
 
     private Case uploadTestFile() {
         PetriNet net = getNet()
-        IUser user = userService.findByEmail(USER_EMAIL, true)
+        IUser user = userService.findUserByUsername(USER_EMAIL, null).get()
         assert user != null
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getCase()
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", userService.transformToLoggedUser(user)).getCase()
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), userService.transformToLoggedUser(user))
 
         MockMultipartFile file
                 = new MockMultipartFile(

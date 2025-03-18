@@ -16,6 +16,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.hateoas.server.LinkRelationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -29,8 +30,9 @@ import java.util.List;
 @EnableAspectJAutoProxy
 @SpringBootApplication(
         exclude = {DataSourceAutoConfiguration.class},
-        scanBasePackages = {"com.netgrif.application.engine"})
+        scanBasePackages = {"com.netgrif", "org.steren.demo"})
 @EnableMongoAuditing
+@EnableMongoRepositories("com.netgrif")
 @ConfigurationPropertiesScan
 @Aspect
 @Slf4j
