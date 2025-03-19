@@ -106,6 +106,7 @@ class ImportHelper {
         if (!petriNet) {
             return createNet(filename, release, author)
         }
+        log.info("Process with identifier [{}] already exists", identifier)
         return Optional.of(petriNet)
     }
 

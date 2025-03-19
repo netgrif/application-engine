@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.authentication.domain.constants;
 
 public class IdentityConstants {
+    public static final String PROCESS_IDENTIFIER = "identity";
+    public static final String FILE_PATH = "engine-processes/identity.xml";
     public static final String USERNAME_FIELD_ID = "username";
     public static final String FIRSTNAME_FIELD_ID = "firstname";
     public static final String LASTNAME_FIELD_ID = "lastname";

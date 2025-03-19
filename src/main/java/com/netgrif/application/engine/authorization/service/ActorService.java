@@ -70,7 +70,7 @@ public class ActorService implements IActorService {
     @Override
     @SuppressWarnings("unchecked")
     public List<Actor> findAll() {
-        List<Case> result = workflowService.searchAll(QCase.case$.processIdentifier.eq("actor")).getContent();
+        List<Case> result = workflowService.searchAll(QCase.case$.processIdentifier.eq(ActorConstants.PROCESS_IDENTIFIER)).getContent();
         return (List<Actor>) (List<? extends Case>) result;
     }
 
@@ -79,7 +79,8 @@ public class ActorService implements IActorService {
      * */
     @Override
     public Actor create(ActorParams params) {
-        Actor actor = workflowService.createCaseByIdentifier("actor", params.getFullName(), "", identityService.getLoggedIdentity());
+        Actor actor = workflowService.createCaseByIdentifier(ActorConstants.PROCESS_IDENTIFIER, params.getFullName(),
+                "", identityService.getLoggedIdentity());
         return (Actor) dataService.setData(actor, params.toDataSet(), userService.getSystem()).getCase();
     }
 

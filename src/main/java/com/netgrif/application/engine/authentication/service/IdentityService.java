@@ -104,8 +104,8 @@ public class IdentityService implements IIdentityService {
      * */
     @Override
     public Identity create(IdentityParams params) {
-        Identity identity = (Identity) workflowService.createCaseByIdentifier("identity", params.getFullName(),
-                "", getLoggedIdentity());
+        Identity identity = (Identity) workflowService.createCaseByIdentifier(IdentityConstants.PROCESS_IDENTIFIER,
+                params.getFullName(), "", getLoggedIdentity());
         return (Identity) dataService.setData(identity, params.toDataSet(), userService.getSystem()).getCase();
     }
 
