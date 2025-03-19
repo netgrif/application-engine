@@ -3,7 +3,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runn
 import com.netgrif.application.engine.event.IGroovyShellFactory
 import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
-import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.core.workflow.domain.Case
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -31,14 +31,14 @@ abstract class CaseFieldsExpressionRunner {
         this.cacheSize = cacheSize
     }
 
-    def run(Case useCase, Expression expression, Map<String, String> params = [:]) {
+    def run(Case useCase, com.netgrif.core.petrinet.domain.dataset.logic.action.runner.Expression expression, Map<String, String> params = [:]) {
         Map<String, String> fields = useCase.getDataSet().keySet().collectEntries { fieldId ->
             [(fieldId): (fieldId)]
         } as Map<String, String>
         return run(useCase, fields, expression, params)
     }
 
-    def run(Case useCase, Map<String, String> fields, Expression expression, Map<String, String> params = [:]) {
+    def run(Case useCase, Map<String, String> fields, com.netgrif.core.petrinet.domain.dataset.logic.action.runner.Expression expression, Map<String, String> params = [:]) {
         logger().debug("Expression: $expression")
         def code = getExpressionCode(expression)
         try {
@@ -50,7 +50,7 @@ abstract class CaseFieldsExpressionRunner {
         }
     }
 
-    protected Closure getExpressionCode(Expression expression) {
+    protected Closure getExpressionCode(com.netgrif.core.petrinet.domain.dataset.logic.action.runner.Expression expression) {
         def code
         if (cache.containsKey(expression.stringId)) {
             code = cache.get(expression.stringId)

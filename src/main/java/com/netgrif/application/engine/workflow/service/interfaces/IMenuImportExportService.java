@@ -1,14 +1,14 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
-import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.core.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.dataset.EnumerationMapField;
+import com.netgrif.core.petrinet.domain.dataset.FileField;
+import com.netgrif.core.petrinet.domain.dataset.FileFieldValue;
+import com.netgrif.core.petrinet.domain.dataset.MultichoiceMapField;
+import com.netgrif.core.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.IllegalMenuFileException;
-import com.netgrif.application.engine.workflow.domain.menu.MenuEntry;
+import com.netgrif.core.workflow.domain.menu.MenuEntry;
 
 import java.io.IOException;
 import java.util.List;

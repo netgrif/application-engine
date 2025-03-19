@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.mail;
 
-import com.netgrif.application.engine.auth.domain.RegisteredUser;
+import com.netgrif.core.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.mail.domain.MailDraft;
@@ -91,7 +91,7 @@ public class MailService implements IMailService {
     public void sendPasswordResetEmail(RegisteredUser user) throws IOException, TemplateException, MessagingException {
         Map<String, Object> model = new HashMap<>();
 
-        model.put(NAME, user.getName());
+        model.put(NAME, user.getFirstName());
         model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
         model.put(VALIDITY, "" + serverAuthProperties.getTokenValidityPeriod());
         model.put(EXPIRATION, registrationService.generateExpirationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));

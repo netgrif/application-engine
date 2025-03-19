@@ -14,7 +14,7 @@
 	<!-- FUNCTIONS -->
 	<function scope="process" name="updateAvailableEntries">
 		{
-			com.netgrif.application.engine.workflow.domain.Case useCase ->
+			com.netgrif.core.workflow.domain.Case useCase ->
 
 			def cases = findCasesElastic(
 							"processIdentifier:\"preference_filter_item\" AND dataSet.parentId.textValue.keyword:\"$useCase.stringId\"" as String,
@@ -32,10 +32,6 @@
 		<title>Group ID</title>
 		<placeholder>Enter group ID</placeholder>
 		<desc>ID of organization group</desc>
-		<action trigger="get">
-			id: f.group_id;
-			change id value { useCase.stringId }
-		</action>
 	</data>
 	<data type="user">
 		<id>author</id>
@@ -47,8 +43,14 @@
 		<placeholder>Enter group name</placeholder>
 		<desc>Name of organization group</desc>
 		<action trigger="set">
-			name: f.group_name;
+			name: f.group_name,
+			id: f.group_id;
 			useCase.setTitle(name.value)
+
+			def group = groupService.findById(id.value)
+			group.setDisplayName(name.value)
+			groupService.save(group)
+
 			workflowService.save(useCase)
 		</action>
 	</data>
@@ -63,8 +65,13 @@
 		</action>
 		<action trigger="set">
 			selection: f.members,
-			userField: f.user_selection;
-			change selection options {  nextGroupService.addUser(userField.value, selection.options) }
+			userField: f.user_selection,
+			id: f.group_id;
+
+			def group = groupService.addUser(userField.value.id, group.stringId, userField.value.realmId)
+			def options = selection.options
+			options.put(user.getStringId(), new com.netgrif.core.petrinet.domain.I18nString(user.getUsername()))
+			change selection options { options }
 		</action>
 	</data>
 	<data type="multichoice_map">
@@ -80,7 +87,7 @@
 		<title name="user_action_selection">Select action</title>
 		<options>
 			<option key="add" name="user_action_selection_add">Add existing user</option>
-			<option key="invite" name="user_action_selection_invite">Invite new user</option>
+<!--			<option key="invite" name="user_action_selection_invite">Invite new user</option>-->
 		</options>
 		<init>add</init>
 		<action trigger="set">
@@ -92,8 +99,8 @@
 			make user_selection, editable on trans when { action_selection.value == "add" }
 			make invite_by_mail, hidden on trans when { action_selection.value == "add" }
 
-			make user_selection, hidden on trans when { action_selection.value == "invite" }
-			make invite_by_mail, editable on trans when { action_selection.value == "invite" }
+//			make user_selection, hidden on trans when { action_selection.value == "invite" }
+//			make invite_by_mail, editable on trans when { action_selection.value == "invite" }
 		</action>
 	</data>
 	<data type="text">
@@ -565,6 +572,7 @@
 					members: f.members;
 
 					if(action_selection.value == "invite" &amp;&amp; invite_by_mail.value != null){
+						//MODULARISATION: inviting users through mail??
 						change members options { nextGroupService.inviteUser(invite_by_mail.value, members.options, useCase) }
 					}
 				</action>

@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +22,12 @@ public class SystemUserRunner implements ApplicationEngineStartupRunner {
     public static final String SYSTEM_USER_NAME = "application";
     public static final String SYSTEM_USER_SURNAME = "engine";
 
-    private final IUserService service;
+    private final UserService userService;
 
     private IUser systemUser;
 
     public IUser createSystemUser() {
-        return service.createSystemUser();
+        return userService.createSystemUser();
     }
 
     public LoggedUser getLoggedSystem() {
@@ -35,7 +35,7 @@ public class SystemUserRunner implements ApplicationEngineStartupRunner {
             log.warn("System user is null");
             return null;
         }
-        return this.systemUser.transformToLoggedUser();
+        return (LoggedUser) userService.transformToLoggedUser(this.systemUser);
     }
 
     @Override

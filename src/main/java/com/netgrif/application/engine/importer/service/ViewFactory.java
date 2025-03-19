@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.importer.service;
 
-import com.netgrif.application.engine.importer.model.Data;
-import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.petrinet.domain.views.*;
+import com.netgrif.core.importer.model.Data;
+import com.netgrif.core.importer.model.DataType;
+import com.netgrif.core.petrinet.domain.views.*;
 import org.springframework.stereotype.Component;
 
 @Component

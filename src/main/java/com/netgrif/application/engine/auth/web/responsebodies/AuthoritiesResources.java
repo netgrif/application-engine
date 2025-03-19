@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.auth.web.responsebodies;
 
 
-import com.netgrif.application.engine.auth.domain.Authority;
+import com.netgrif.core.auth.domain.Authority;
 import com.netgrif.application.engine.auth.web.UserController;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;

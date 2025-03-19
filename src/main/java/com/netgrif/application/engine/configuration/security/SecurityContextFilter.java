@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.configuration.security;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

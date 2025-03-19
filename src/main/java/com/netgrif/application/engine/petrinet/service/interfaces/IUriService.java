@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.service.interfaces;
 
-import com.netgrif.application.engine.petrinet.domain.UriContentType;
-import com.netgrif.application.engine.petrinet.domain.UriNode;
+import com.netgrif.core.petrinet.domain.UriContentType;
+import com.netgrif.core.petrinet.domain.UriNode;
 
 import java.util.List;
 

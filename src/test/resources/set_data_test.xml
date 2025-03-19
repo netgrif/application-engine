@@ -831,17 +831,17 @@
 
 					if ( thisField.options.size() > 3){
 						change thisField options { [
-								"al":new com.netgrif.application.engine.petrinet.domain.I18nString("Alice"),
-								"bo":new com.netgrif.application.engine.petrinet.domain.I18nString("Bob"),
-								"ca":new com.netgrif.application.engine.petrinet.domain.I18nString("Carol")
+								"al":new com.netgrif.core.petrinet.domain.I18nString("Alice"),
+								"bo":new com.netgrif.core.petrinet.domain.I18nString("Bob"),
+								"ca":new com.netgrif.core.petrinet.domain.I18nString("Carol")
 						]}
 					} else {
 						change thisField options { [
-								"jo":new com.netgrif.application.engine.petrinet.domain.I18nString("Jozef"),
-								"ju":new com.netgrif.application.engine.petrinet.domain.I18nString("Juraj"),
-								"sa":new com.netgrif.application.engine.petrinet.domain.I18nString("Samuel"),
-								"on":new com.netgrif.application.engine.petrinet.domain.I18nString("Ondrej"),
-								"mi":new com.netgrif.application.engine.petrinet.domain.I18nString("Milan")
+								"jo":new com.netgrif.core.petrinet.domain.I18nString("Jozef"),
+								"ju":new com.netgrif.core.petrinet.domain.I18nString("Juraj"),
+								"sa":new com.netgrif.core.petrinet.domain.I18nString("Samuel"),
+								"on":new com.netgrif.core.petrinet.domain.I18nString("Ondrej"),
+								"mi":new com.netgrif.core.petrinet.domain.I18nString("Milan")
 						] }
 					}
 				</action>
@@ -863,17 +863,17 @@
 
 					if ( thisField.choices.size() > 3){
 						change thisField choices { [
-						        new com.netgrif.application.engine.petrinet.domain.I18nString("Alice"),
-						        new com.netgrif.application.engine.petrinet.domain.I18nString("Bob"),
-						        new com.netgrif.application.engine.petrinet.domain.I18nString("Carol")
+						        new com.netgrif.core.petrinet.domain.I18nString("Alice"),
+						        new com.netgrif.core.petrinet.domain.I18nString("Bob"),
+						        new com.netgrif.core.petrinet.domain.I18nString("Carol")
 						] }
 					} else {
 						change thisField choices { [
-								new com.netgrif.application.engine.petrinet.domain.I18nString("Jozef"),
-								new com.netgrif.application.engine.petrinet.domain.I18nString("Juraj"),
-								new com.netgrif.application.engine.petrinet.domain.I18nString("Samuel"),
-								new com.netgrif.application.engine.petrinet.domain.I18nString("Ondrej"),
-								new com.netgrif.application.engine.petrinet.domain.I18nString("Milan")
+								new com.netgrif.core.petrinet.domain.I18nString("Jozef"),
+								new com.netgrif.core.petrinet.domain.I18nString("Juraj"),
+								new com.netgrif.core.petrinet.domain.I18nString("Samuel"),
+								new com.netgrif.core.petrinet.domain.I18nString("Ondrej"),
+								new com.netgrif.core.petrinet.domain.I18nString("Milan")
 						] }
 					}
 				</action>
@@ -970,17 +970,17 @@
 
 					if ( thisField.choices.size() > 3){
 						change thisField choices { [
-								new com.netgrif.application.engine.petrinet.domain.I18nString("Alice"),
-								new com.netgrif.application.engine.petrinet.domain.I18nString("Bob"),
-								new com.netgrif.application.engine.petrinet.domain.I18nString("Carol")
+								new com.netgrif.core.petrinet.domain.I18nString("Alice"),
+								new com.netgrif.core.petrinet.domain.I18nString("Bob"),
+								new com.netgrif.core.petrinet.domain.I18nString("Carol")
 						] }
 					} else {
 						change thisField choices { [
-								new com.netgrif.application.engine.petrinet.domain.I18nString("Jozef"),
-								new com.netgrif.application.engine.petrinet.domain.I18nString("Juraj"),
-								new com.netgrif.application.engine.petrinet.domain.I18nString("Samuel"),
-								new com.netgrif.application.engine.petrinet.domain.I18nString("Ondrej"),
-								new com.netgrif.application.engine.petrinet.domain.I18nString("Milan")
+								new com.netgrif.core.petrinet.domain.I18nString("Jozef"),
+								new com.netgrif.core.petrinet.domain.I18nString("Juraj"),
+								new com.netgrif.core.petrinet.domain.I18nString("Samuel"),
+								new com.netgrif.core.petrinet.domain.I18nString("Ondrej"),
+								new com.netgrif.core.petrinet.domain.I18nString("Milan")
 						] }
 					}
 				</action>
@@ -1077,17 +1077,17 @@
 
 					if ( thisField.options.size() > 3){
 						change thisField options { [
-								"al":new com.netgrif.application.engine.petrinet.domain.I18nString("Alice"),
-								"bo":new com.netgrif.application.engine.petrinet.domain.I18nString("Bob"),
-								"ca":new com.netgrif.application.engine.petrinet.domain.I18nString("Carol")
+								"al":new com.netgrif.core.petrinet.domain.I18nString("Alice"),
+								"bo":new com.netgrif.core.petrinet.domain.I18nString("Bob"),
+								"ca":new com.netgrif.core.petrinet.domain.I18nString("Carol")
 						]}
 					} else {
 						change thisField options { [
-								"jo":new com.netgrif.application.engine.petrinet.domain.I18nString("Jozef"),
-								"ju":new com.netgrif.application.engine.petrinet.domain.I18nString("Juraj"),
-								"sa":new com.netgrif.application.engine.petrinet.domain.I18nString("Samuel"),
-								"on":new com.netgrif.application.engine.petrinet.domain.I18nString("Ondrej"),
-								"mi":new com.netgrif.application.engine.petrinet.domain.I18nString("Milan")
+								"jo":new com.netgrif.core.petrinet.domain.I18nString("Jozef"),
+								"ju":new com.netgrif.core.petrinet.domain.I18nString("Juraj"),
+								"sa":new com.netgrif.core.petrinet.domain.I18nString("Samuel"),
+								"on":new com.netgrif.core.petrinet.domain.I18nString("Ondrej"),
+								"mi":new com.netgrif.core.petrinet.domain.I18nString("Milan")
 						] }
 					}
 				</action>

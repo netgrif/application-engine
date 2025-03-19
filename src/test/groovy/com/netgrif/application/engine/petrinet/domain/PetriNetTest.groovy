@@ -2,10 +2,12 @@ package com.netgrif.application.engine.petrinet.domain
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.petrinet.domain.arcs.Arc
-import com.netgrif.application.engine.petrinet.domain.arcs.InhibitorArc
-import com.netgrif.application.engine.petrinet.domain.arcs.ReadArc
-import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.arcs.Arc
+import com.netgrif.core.petrinet.domain.arcs.InhibitorArc
+import com.netgrif.core.petrinet.domain.arcs.ReadArc
+import com.netgrif.core.petrinet.domain.arcs.ResetArc
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -60,8 +62,8 @@ class PetriNetTest {
 
         assert netOptional.getNet() != null
 
-        def net = netOptional.getNet()
-        def clone = net.clone()
+        PetriNet net = netOptional.getNet()
+        PetriNet clone = new com.netgrif.adapter.petrinet.domain.PetriNet(net as com.netgrif.adapter.petrinet.domain.PetriNet)
 
         def arcs = clone.getArcsOfTransition(CLONE_NET_TASK)
 

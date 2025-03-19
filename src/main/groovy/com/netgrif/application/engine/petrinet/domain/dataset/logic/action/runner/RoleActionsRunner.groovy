@@ -2,7 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runn
 
 
 import com.netgrif.application.engine.event.IGroovyShellFactory
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action
+import com.netgrif.core.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.context.RoleContext
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.delegate.RoleActionDelegate
 import org.codehaus.groovy.control.CompilerConfiguration

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain
 
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.startup.ImportHelper
 import org.junit.jupiter.api.Test
@@ -32,7 +32,7 @@ class ArcReferenceTest {
     private ImportHelper helper
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     private def stream = { String name ->
         return ArcOrderTest.getClassLoader().getResourceAsStream(name)

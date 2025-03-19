@@ -184,7 +184,7 @@ implements <a href="IDocumentValidator.html" title="interface in com.netgrif.app
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#checkConflictingAttributes(com.netgrif.application.engine.importer.model.Document,java.lang.Object,java.lang.Object,java.lang.String,java.lang.String)">checkConflictingAttributes</a></span>&#8203;(<a href="../model/Document.html" title="class in com.netgrif.application.engine.importer.model">Document</a>&nbsp;document,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#checkConflictingAttributes(com.netgrif.core.importer.model.Document,java.lang.Object,java.lang.Object,java.lang.String,java.lang.String)">checkConflictingAttributes</a></span>&#8203;(<a href="../model/Document.html" title="class in com.netgrif.core.importer.model">Document</a>&nbsp;document,
                           java.lang.Object&nbsp;attr1,
                           java.lang.Object&nbsp;attr2,
                           java.lang.String&nbsp;attr1Name,
@@ -195,7 +195,7 @@ implements <a href="IDocumentValidator.html" title="interface in com.netgrif.app
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#checkDeprecatedAttributes(com.netgrif.application.engine.importer.model.Document)">checkDeprecatedAttributes</a></span>&#8203;(<a href="../model/Document.html" title="class in com.netgrif.application.engine.importer.model">Document</a>&nbsp;document)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#checkDeprecatedAttributes(com.netgrif.core.importer.model.Document)">checkDeprecatedAttributes</a></span>&#8203;(<a href="../model/Document.html" title="class in com.netgrif.core.importer.model">Document</a>&nbsp;document)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -248,38 +248,38 @@ implements <a href="IDocumentValidator.html" title="interface in com.netgrif.app
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="checkDeprecatedAttributes(com.netgrif.application.engine.importer.model.Document)">
+<a id="checkDeprecatedAttributes(com.netgrif.core.importer.model.Document)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>checkDeprecatedAttributes</h4>
-<pre class="methodSignature">public&nbsp;void&nbsp;checkDeprecatedAttributes&#8203;(<a href="../model/Document.html" title="class in com.netgrif.application.engine.importer.model">Document</a>&nbsp;document)</pre>
+<pre class="methodSignature">public&nbsp;void&nbsp;checkDeprecatedAttributes&#8203;(<a href="../model/Document.html" title="class in com.netgrif.core.importer.model">Document</a>&nbsp;document)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="IDocumentValidator.html#checkDeprecatedAttributes(com.netgrif.application.engine.importer.model.Document)">checkDeprecatedAttributes</a></code>&nbsp;in interface&nbsp;<code><a href="IDocumentValidator.html" title="interface in com.netgrif.application.engine.importer.service">IDocumentValidator</a></code></dd>
+<dd><code><a href="IDocumentValidator.html#checkDeprecatedAttributes(com.netgrif.core.importer.model.Document)">checkDeprecatedAttributes</a></code>&nbsp;in interface&nbsp;<code><a href="IDocumentValidator.html" title="interface in com.netgrif.application.engine.importer.service">IDocumentValidator</a></code></dd>
 </dl>
 </li>
 </ul>
-<a id="checkConflictingAttributes(com.netgrif.application.engine.importer.model.Document,java.lang.Object,java.lang.Object,java.lang.String,java.lang.String)">
+<a id="checkConflictingAttributes(com.netgrif.core.importer.model.Document,java.lang.Object,java.lang.Object,java.lang.String,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>checkConflictingAttributes</h4>
-<pre class="methodSignature">public&nbsp;void&nbsp;checkConflictingAttributes&#8203;(<a href="../model/Document.html" title="class in com.netgrif.application.engine.importer.model">Document</a>&nbsp;document,
+<pre class="methodSignature">public&nbsp;void&nbsp;checkConflictingAttributes&#8203;(<a href="../model/Document.html" title="class in com.netgrif.core.importer.model">Document</a>&nbsp;document,
                                        java.lang.Object&nbsp;attr1,
                                        java.lang.Object&nbsp;attr2,
                                        java.lang.String&nbsp;attr1Name,
                                        java.lang.String&nbsp;attr2Name)
                                 throws <a href="throwable/BeatingAttributesException.html" title="class in com.netgrif.application.engine.importer.service.throwable">BeatingAttributesException</a></pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="IDocumentValidator.html#checkConflictingAttributes(com.netgrif.application.engine.importer.model.Document,java.lang.Object,java.lang.Object,java.lang.String,java.lang.String)">IDocumentValidator</a></code></span></div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="IDocumentValidator.html#checkConflictingAttributes(com.netgrif.core.importer.model.Document,java.lang.Object,java.lang.Object,java.lang.String,java.lang.String)">IDocumentValidator</a></code></span></div>
 <div class="block">Self-beating attributes are two attributes, that should not be present inside their parent at the same time.
  E.g.: if user defines <userRef> in transition, the tag <usersRef> will be disabled, however, additional
  <userRef> tags can be still added.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="IDocumentValidator.html#checkConflictingAttributes(com.netgrif.application.engine.importer.model.Document,java.lang.Object,java.lang.Object,java.lang.String,java.lang.String)">checkConflictingAttributes</a></code>&nbsp;in interface&nbsp;<code><a href="IDocumentValidator.html" title="interface in com.netgrif.application.engine.importer.service">IDocumentValidator</a></code></dd>
+<dd><code><a href="IDocumentValidator.html#checkConflictingAttributes(com.netgrif.core.importer.model.Document,java.lang.Object,java.lang.Object,java.lang.String,java.lang.String)">checkConflictingAttributes</a></code>&nbsp;in interface&nbsp;<code><a href="IDocumentValidator.html" title="interface in com.netgrif.application.engine.importer.service">IDocumentValidator</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>document</code> - the model of PetriNet</dd>
 <dd><code>attr1</code> - first element to be compared</dd>

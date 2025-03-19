@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes.base;
 
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FrontAction;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
+import com.netgrif.core.petrinet.domain.dataset.logic.FrontAction;
+import com.netgrif.core.workflow.domain.eventoutcomes.EventOutcome;
 import lombok.Data;
 
 import java.util.List;

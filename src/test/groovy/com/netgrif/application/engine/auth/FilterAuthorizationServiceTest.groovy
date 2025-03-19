@@ -1,10 +1,10 @@
 //package com.netgrif.application.engine.auth
 //
 //import com.netgrif.application.engine.TestHelper
-//import com.netgrif.application.engine.auth.domain.Authority
-//import com.netgrif.application.engine.auth.domain.User
-//import com.netgrif.application.engine.auth.domain.UserState
-//import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+//import com.netgrif.core.auth.domain.Authority;
+//import com.netgrif.core.auth.domain.User
+//import com.netgrif.core.auth.domain.enums.UserState
+//import com.netgrif.core.petrinet.domain.roles.ProcessRole
 //import com.netgrif.application.engine.startup.ImportHelper
 //import com.netgrif.application.engine.workflow.domain.Filter
 //import com.netgrif.application.engine.workflow.domain.repositories.FilterRepository
@@ -75,14 +75,14 @@
 //
 //        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 //
-//        importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+//        importHelper.createUser(new User(firstName: "Role", lastName: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
 //                [auths.get("user")] as Authority[],
 //                [] as ProcessRole[])
 //
 //        userAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
 //        userAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 //
-//        importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
+//        importHelper.createUser(new User(firstName: "Admin", lastName: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
 //                [auths.get("admin")] as Authority[],
 //                [] as ProcessRole[])
 //

@@ -1,20 +1,24 @@
 package com.netgrif.application.engine.petrinet.web;
 
 import com.netgrif.application.engine.AsyncRunner;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetImportReference;
+import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReferenceResources;
+import com.netgrif.application.engine.petrinet.web.responsebodies.ProcessRolesResource;
+import com.netgrif.application.engine.petrinet.web.responsebodies.TransitionReferencesResource;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
-import com.netgrif.application.engine.petrinet.domain.VersionType;
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.PetriNetSearch;
+import com.netgrif.core.petrinet.domain.VersionType;
+import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.application.engine.petrinet.web.responsebodies.*;
+import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.application.engine.petrinet.web.responsebodies.*;
+import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
@@ -72,7 +76,7 @@ public class PetriNetController {
     private IPetriNetService service;
 
     @Autowired
-    private IProcessRoleService roleService;
+    private ProcessRoleService roleService;
 
     @Autowired
     private StringToVersionConverter converter;
@@ -115,6 +119,8 @@ public class PetriNetController {
         } catch (IOException e) {
             log.error("Importing Petri net failed: ", e);
             return EventOutcomeWithMessageResource.errorMessage("IO error while importing Petri net");
+        } catch (MissingPetriNetMetaDataException e) {
+            return EventOutcomeWithMessageResource.errorMessage("Missing metadata error while importing Petri net");
         }
     }
 
@@ -195,7 +201,7 @@ public class PetriNetController {
                 .searchPetriNets(criteria, auth, pageable, assembler, locale)).withRel("search");
         PagedModel<PetriNetReferenceResource> resources = assembler.toModel(nets, new PetriNetReferenceResourceAssembler(), selfLink);
         PetriNetReferenceResourceAssembler.buildLinks(resources);
-        return resources;
+        return PagedModel.of(nets.stream().map(PetriNetReferenceResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageSize(), pageable.getPageNumber(), nets.getTotalElements()));
     }
 
     @PreAuthorize("@petriNetAuthorizationService.canCallProcessDelete(#auth.getPrincipal(), #processId)")

@@ -2,15 +2,15 @@ package com.netgrif.application.engine.insurance.mvc
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.core.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
+import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import groovy.json.JsonOutput
@@ -114,10 +114,10 @@ class InsuranceTest {
     private SuperCreatorRunner superCreator
 
     @Autowired
-    private IProcessRoleService processRoleService
+    private ProcessRoleService processRoleService
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private TestHelper testHelper
@@ -139,11 +139,11 @@ class InsuranceTest {
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         def processRoles = importHelper.getProcessRolesByImportId(net.getNet(), ["agent": "1", "company": "2"])
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Test", lastName: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
                 [processRoles.get("agent"), processRoles.get("company")] as ProcessRole[])
         List<ProcessRole> roles = processRoleService.findAll(netId)
-        processRoleService.assignRolesToUser(userService.findByEmail(USER_EMAIL, false).getId(), roles.findAll { it.importId in ["1", "2"] }.collect { it.stringId } as Set, userService.getLoggedOrSystem().transformToLoggedUser())
+        processRoleService.assignRolesToUser(userService.findUserByUsername(USER_EMAIL, null).getId(), roles.findAll { it.importId in ["1", "2"] }.collect { it.stringId } as Set, userService.transformToLoggedUser(userService.getLoggedOrSystem()))
 
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
         auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));

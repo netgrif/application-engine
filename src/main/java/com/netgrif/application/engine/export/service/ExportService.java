@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.export.service;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
@@ -9,10 +9,10 @@ import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearc
 import com.netgrif.application.engine.export.configuration.ExportConfiguration;
 import com.netgrif.application.engine.export.domain.ExportDataConfig;
 import com.netgrif.application.engine.export.service.interfaces.IExportService;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.*;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.core.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.dataset.*;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -57,7 +57,7 @@ public class ExportService implements IExportService {
     private ExportConfiguration exportConfiguration;
 
     @Autowired
-    private IUserService userService;
+    private UserService userService;
 
 
     @Override
@@ -101,12 +101,12 @@ public class ExportService implements IExportService {
 
     @Override
     public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile) throws FileNotFoundException {
-        return fillCsvCaseData(requests, outFile, null, userService.getLoggedOrSystem().transformToLoggedUser(), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+        return fillCsvCaseData(requests, outFile, null, userService.transformToLoggedUser(userService.getLoggedOrSystem()), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
     }
 
     @Override
     public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config) throws FileNotFoundException {
-        return fillCsvCaseData(requests, outFile, config, userService.getLoggedOrSystem().transformToLoggedUser(), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+        return fillCsvCaseData(requests, outFile, config,  userService.transformToLoggedUser(userService.getLoggedOrSystem()), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
     }
 
     @Override
@@ -158,12 +158,12 @@ public class ExportService implements IExportService {
 
     @Override
     public OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile) throws FileNotFoundException {
-        return fillCsvTaskData(requests, outFile, null, userService.getLoggedOrSystem().transformToLoggedUser(), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+        return fillCsvTaskData(requests, outFile, null,  userService.transformToLoggedUser(userService.getLoggedOrSystem()), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
     }
 
     @Override
     public OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config) throws FileNotFoundException {
-        return fillCsvTaskData(requests, outFile, config, userService.getLoggedOrSystem().transformToLoggedUser(), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+        return fillCsvTaskData(requests, outFile, config,  userService.transformToLoggedUser(userService.getLoggedOrSystem()), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
     }
 
     @Override

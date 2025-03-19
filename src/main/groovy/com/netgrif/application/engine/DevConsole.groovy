@@ -1,6 +1,6 @@
 package com.netgrif.application.engine
 
-import com.netgrif.application.engine.importer.model.Document
+import com.netgrif.core.importer.model.Document
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import org.slf4j.Logger

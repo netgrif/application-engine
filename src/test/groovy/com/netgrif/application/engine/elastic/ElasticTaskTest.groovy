@@ -2,15 +2,16 @@ package com.netgrif.application.engine.elastic
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
-import com.netgrif.application.engine.elastic.domain.ElasticTask
+import com.netgrif.core.elastic.domain.ElasticTask
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
 import com.netgrif.application.engine.elastic.service.ReindexingTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
-import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.I18nString
+import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.workflow.domain.QCase
+import com.netgrif.adapter.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -91,9 +92,9 @@ class ElasticTaskTest {
 
     @Test
     void testIndexTask() {
-        ElasticTask task = new ElasticTask()
+        ElasticTask task = new com.netgrif.adapter.elastic.domain.ElasticTask()
         task.setTaskId("TestTask")
-        task.setTitle("Test")
+        task.setTitle(new I18nString("Test"))
         task.setProcessId("Process")
 
         Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(task)
@@ -105,28 +106,28 @@ class ElasticTaskTest {
         ElasticTask resultFromDB = elasticTaskRepository.findByTaskId("TestTask")
         assert resultFromDB.getTitle() == "Test"
 
-        task.setTitle("Test2")
+        task.setTitle(new I18nString("Test2"))
 
         Future<ElasticTask> resultFuture2 = elasticTaskService.scheduleTaskIndexing(task)
         ElasticTask result2 = resultFuture2.get()
 
         assert result2 != null
-        assert result2.getTitle().equals("Test2")
+        assert result2.getTitle().getDefaultValue().equals("Test2")
 
-        task.setTitle("Test3")
+        task.setTitle(new I18nString("Test3"))
 
         Future<ElasticTask> resultFuture3 = elasticTaskService.scheduleTaskIndexing(task)
         ElasticTask result3 = resultFuture3.get()
 
         assert result3 != null
-        assert result3.getTitle().equals("Test3")
+        assert result3.getTitle().getDefaultValue().equals("Test3")
     }
 
     @Test
     void testRemoveTaskByProcess() throws Exception {
-        ElasticTask task = new ElasticTask()
+        ElasticTask task = new com.netgrif.adapter.elastic.domain.ElasticTask()
         task.setTaskId("TestTask")
-        task.setTitle("Test")
+        task.setTitle(new I18nString("Test"))
         task.setProcessId("Process")
 
         Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(task) as CompletableFuture<ElasticTask>
@@ -146,9 +147,9 @@ class ElasticTaskTest {
     @Test
     void reindexTaskAllTest() throws InterruptedException, ExecutionException {
         int pocetOpakovani = 100
-        ElasticTask task = new ElasticTask()
+        ElasticTask task = new com.netgrif.adapter.elastic.domain.ElasticTask()
         task.setTaskId("TestTask")
-        task.setTitle("START")
+        task.setTitle(new I18nString("Test"))
         task.setProcessId("TestProcess")
         elasticTaskService.index(task)
 
@@ -158,14 +159,14 @@ class ElasticTaskTest {
             final int index = it
             executorService.submit(() -> {
                 try {
-                    ElasticTask taskParallel = new ElasticTask()
+                    ElasticTask taskParallel = new com.netgrif.adapter.elastic.domain.ElasticTask()
                     taskParallel.setTaskId("TestTask")
-                    taskParallel.setTitle("START" + index)
+                    task.setTitle(new I18nString("START" + index))
                     taskParallel.setProcessId("TestProcess")
                     Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(taskParallel)
                     ElasticTask result = resultFuture.get()
                     assert result != null
-                    assert result.getTitle().equals("START" + index)
+                    assert result.getTitle().getDefaultValue().equals("START" + index)
                 } catch (Exception e) {
                     e.printStackTrace()
                 } finally {
@@ -187,9 +188,9 @@ class ElasticTaskTest {
     @Test
     void reindexTaskTest() throws InterruptedException, ExecutionException {
         int pocetOpakovani = 100
-        ElasticTask task = new ElasticTask()
+        ElasticTask task = new com.netgrif.adapter.elastic.domain.ElasticTask()
         task.setTaskId("TestTask")
-        task.setTitle("START")
+        task.setTitle(new I18nString("START"))
         task.setStringId("TestTask")
         elasticTaskService.index(task)
 
@@ -200,14 +201,14 @@ class ElasticTaskTest {
             final int index = it
             executorService.submit(() -> {
                 try {
-                    ElasticTask taskParallel = new ElasticTask()
+                    ElasticTask taskParallel = new com.netgrif.adapter.elastic.domain.ElasticTask()
                     taskParallel.setTaskId("TestTask")
-                    taskParallel.setTitle("START" + index)
+                    task.setTitle(new I18nString("START" + index))
                     taskParallel.setStringId("TestTask")
                     Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(taskParallel)
                     ElasticTask result = resultFuture.get()
                     assert result != null
-                    assert result.getTitle().equals("START" + index)
+                    assert result.getTitle().getDefaultValue().equals("START" + index)
                 } catch (Exception e) {
                     e.printStackTrace()
                 } finally {
@@ -219,20 +220,20 @@ class ElasticTaskTest {
         latch.await(5, TimeUnit.SECONDS)
 
         String title = "FINISH"
-        task.setTitle(title)
+        task.setTitle(new I18nString(title))
         Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(task) as CompletableFuture<ElasticTask>
         ElasticTask result = resultFuture.get()
         assert result != null
-        assert result.getTitle().equals(title)
+        assert result.getTitle().getDefaultValue().equals(title)
     }
 
 
     @Test
     void reindexTaskParallelTest() throws InterruptedException, ExecutionException {
         int pocetOpakovani = 1000
-        ElasticTask task = new ElasticTask()
+        ElasticTask task = new com.netgrif.adapter.elastic.domain.ElasticTask()
         task.setTaskId("TestTask")
-        task.setTitle("START")
+        task.setTitle(new I18nString("START"))
         elasticTaskService.index(task)
 
         ExecutorService executorService = Executors.newFixedThreadPool(3)
@@ -242,14 +243,14 @@ class ElasticTaskTest {
             final int index = it
             executorService.submit(() -> {
                 try {
-                    ElasticTask taskParallel = new ElasticTask()
+                    ElasticTask taskParallel = new com.netgrif.adapter.elastic.domain.ElasticTask()
                     taskParallel.setTaskId("TestTask"+ index)
-                    taskParallel.setTitle("START")
+                    task.setTitle(new I18nString("START"))
                     taskParallel.setStringId("TestTask"+index)
                     Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(taskParallel)
                     ElasticTask result = resultFuture.get()
                     assert result != null
-                    assert result.getTitle().equals("TestTask"+ index)
+                    assert result.getTitle().getDefaultValue().equals("TestTask"+ index)
                 } catch (Exception e) {
                     e.printStackTrace()
                 } finally {
@@ -269,11 +270,11 @@ class ElasticTaskTest {
 
         latch.await(50, TimeUnit.SECONDS)
         String title = "FINISH"
-        task.setTitle(title)
+        task.setTitle(new I18nString(title))
         Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(task) as CompletableFuture<ElasticTask>
         ElasticTask result = resultFuture.get()
         assert result != null
-        assert result.getTitle().equals(title)
+        assert result.getTitle().getDefaultValue().equals(title)
     }
 
 

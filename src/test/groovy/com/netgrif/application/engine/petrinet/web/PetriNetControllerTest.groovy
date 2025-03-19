@@ -1,13 +1,15 @@
 package com.netgrif.application.engine.petrinet.webprocessRolesAndPermissionses
 
+import com.netgrif.adapter.auth.domain.AuthorityImpl
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
+import com.netgrif.core.auth.domain.Authority
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.application.engine.ipc.TaskApiTest
-import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -63,6 +65,9 @@ class PetriNetControllerTest {
     @Autowired
     private TestHelper testHelper
 
+    @Autowired
+    private UserService userService
+
     private PetriNet net
 
     private Authentication userAuth
@@ -88,20 +93,20 @@ class PetriNetControllerTest {
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 
-        def simpleUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        def simpleUser = importHelper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Role", lastName: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
 //                [] as Group[],
                 [] as ProcessRole[])
 
-        userAuth = new UsernamePasswordAuthenticationToken(simpleUser.transformToLoggedUser(), "password",  [auths.get("user")] as List<Authority>)
+        userAuth = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(simpleUser), "password",  [auths.get("user")] as List<AuthorityImpl>)
         userAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        def adminUser = importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
+        def adminUser = importHelper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Admin", lastName: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("admin")] as Authority[],
 //                [] as Group[],
                 [] as ProcessRole[])
 
-        adminAuth = new UsernamePasswordAuthenticationToken(adminUser.transformToLoggedUser(), "password", [auths.get("admin")] as List<Authority>)
+        adminAuth = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(adminUser), "password", [auths.get("admin")] as List<AuthorityImpl>)
         adminAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
     }
 

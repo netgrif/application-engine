@@ -206,7 +206,7 @@
 
                     def cases = findAllFilters()
                     change filterSelect options {
-                        cases.collectEntries { [it.stringId, new com.netgrif.application.engine.petrinet.domain.I18nString(it.title)] }
+                        cases.collectEntries { [it.stringId, new com.netgrif.core.petrinet.domain.I18nString(it.title)] }
                     }
                 </action>
             </actions>

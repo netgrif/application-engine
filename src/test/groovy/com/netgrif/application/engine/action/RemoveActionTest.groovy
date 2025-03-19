@@ -1,15 +1,16 @@
 package com.netgrif.application.engine.action
 
+import com.netgrif.auth.service.UserService
+import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository
+import com.netgrif.core.auth.domain.Authority
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
@@ -58,10 +59,10 @@ class RemoveActionTest {
     private MongoTemplate template
 
     @Autowired
-    private UserRepository userRepository
+    private UserService userService
 
     @Autowired
-    private ProcessRoleRepository processRoleRepository
+    private ProcessRoleService processRoleService
 
     @Autowired
     private Importer importer
@@ -98,22 +99,22 @@ class RemoveActionTest {
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
+        importHelper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Test", lastName : "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
     }
 
     private void cleanDatabases() {
         template.db.drop()
-        userRepository.deleteAll()
-        processRoleRepository.deleteAll()
+        userService.deleteAllUsers(null)
+        processRoleService.deleteAll()
     }
 
     @Test
     @Disabled(" GroovyRuntime Could not find matching")
     void addAndRemoveRole() {
-        User user = userRepository.findByEmail(USER_EMAIL)
-        auth = new UsernamePasswordAuthenticationToken("super@netgrif.com",)
+        IUser user = userService.findByEmail(USER_EMAIL, null)
+        auth = new UsernamePasswordAuthenticationToken("super@netgrif.com", "password")
 
         String adminRoleId = petriNet.getRoles().find { it.value.name.defaultValue == "admin" }.key
 
@@ -130,10 +131,10 @@ class RemoveActionTest {
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(containsString("Selected roles assigned to user")))
 
-        User updatedUser = userRepository.findByEmail(USER_EMAIL)
+        User updatedUser = userService.findByEmail(USER_EMAIL, null) as User
         Set<ProcessRole> roles = updatedUser.getProcessRoles()
 
-        String managerRoleId = processRoleRepository.findAllByName_DefaultValue("manager")?.first()?.stringId
+        String managerRoleId = processRoleService.findAllByDefaultName("manager")?.first()?.stringId
 
         assert roles.find { it.getStringId() == adminRoleId }
         assert roles.find { it.getStringId() == managerRoleId }
@@ -151,7 +152,7 @@ class RemoveActionTest {
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(containsString("Selected roles assigned to user")))
 
-        updatedUser = userRepository.findByEmail(USER_EMAIL)
+        updatedUser = userService.findByEmail(USER_EMAIL, null) as User
         roles = updatedUser.getProcessRoles()
 
         Assert.assertNull(roles.find { it.stringId == adminRoleId })

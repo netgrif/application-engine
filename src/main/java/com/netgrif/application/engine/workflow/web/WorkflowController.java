@@ -1,14 +1,14 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.elastic.domain.ElasticCase;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.core.elastic.domain.ElasticCase;
+import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
+import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
@@ -102,7 +102,7 @@ public class WorkflowController {
                 .getAll(pageable, assembler)).withRel("all");
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
-        return resources;
+        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageNumber(), pageable.getPageSize(), cases.getTotalElements()));
     }
 
     @Operation(summary = "Generic case search with QueryDSL predicate", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -113,7 +113,7 @@ public class WorkflowController {
                 .search2(predicate, pageable, assembler)).withRel("search2");
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
-        return resources;
+        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageNumber(), pageable.getPageSize(), cases.getTotalElements()));
     }
 
     @Operation(summary = "Generic case search on Elasticsearch database", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -121,24 +121,23 @@ public class WorkflowController {
     public PagedModel<CaseResource> search(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, locale, operation == MergeFilterOperation.AND);
-
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                 .search(searchBody, operation, pageable, assembler, auth, locale)).withRel("search");
 
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, ElasticCase.class, selfLink.getRel().toString());
-        return resources;
+        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageNumber(), pageable.getPageSize(), cases.getTotalElements()));
     }
 
     @Operation(summary = "Generic case search on Mongo database", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/search_mongo", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<CaseResource> searchMongo(@RequestBody Map<String, Object> searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
+    public PagedModel<CaseResource> searchMongo(@RequestBody Map<String, Object> searchBody, Pageable pageable, Authentication auth, PagedResourcesAssembler<Case> assembler, Locale locale) {
         Page<Case> cases = workflowService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal(), locale);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
-                .searchMongo(searchBody, pageable, assembler, auth, locale)).withRel("search");
+                .searchMongo(searchBody, pageable, auth, assembler, locale)).withRel("search");
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
-        return resources;
+        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageNumber(), pageable.getPageSize(), cases.getTotalElements()));
     }
 
 
@@ -160,13 +159,13 @@ public class WorkflowController {
 
     @Operation(summary = "Get all cases by user that created them", security = {@SecurityRequirement(name = "BasicAuth")})
     @RequestMapping(value = "/case/author/{id}", method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<CaseResource> findAllByAuthor(@PathVariable("id") String authorId, @RequestBody String petriNet, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
+    public PagedModel<CaseResource> findAllByAuthor(@PathVariable("id") String authorId, @RequestBody String petriNet, PagedResourcesAssembler<Case> assembler, Pageable pageable) {
         Page<Case> cases = workflowService.findAllByAuthor(authorId, petriNet, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
-                .findAllByAuthor(authorId, petriNet, pageable, assembler)).withRel("author");
+                .findAllByAuthor(authorId, petriNet, assembler, pageable)).withRel("author");
         PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
-        return resources;
+        return PagedModel.of(cases.stream().map(CaseResource::new).toList(), new PagedModel.PageMetadata(pageable.getPageNumber(), pageable.getPageSize(), cases.getTotalElements()));
     }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")

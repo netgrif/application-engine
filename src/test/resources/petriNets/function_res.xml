@@ -6,7 +6,7 @@
     <title>Test</title>
     <!-- FUNCTIONS -->
     <function name="createUser" scope="namespace">
-        {  com.netgrif.application.engine.auth.domain.User user ->
+        {  com.netgrif.core.auth.domain.User user ->
             if (user != null) {
                 userService.encodeUserPassword(user)
                 userService.save(user)

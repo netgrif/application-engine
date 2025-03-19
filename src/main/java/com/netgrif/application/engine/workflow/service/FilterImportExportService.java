@@ -6,26 +6,31 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.google.common.collect.Lists;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
+import com.netgrif.application.engine.workflow.domain.FilterDeserializer;
+import com.netgrif.core.workflow.domain.IllegalFilterFileException;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.FilterProperties;
-import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.application.engine.workflow.domain.filter.FilterImportExport;
-import com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.core.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.core.workflow.domain.filter.FilterImportExport;
+import com.netgrif.core.workflow.domain.filter.FilterImportExportList;
+import com.netgrif.core.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.dataset.EnumerationMapField;
+import com.netgrif.core.petrinet.domain.dataset.FileFieldValue;
+import com.netgrif.core.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.utils.InputStreamToString;
-import com.netgrif.application.engine.workflow.domain.*;
+import com.netgrif.core.workflow.domain.*;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +74,7 @@ public class FilterImportExportService implements IFilterImportExportService {
     private static final String FIELD_MISSING_NETS_TRANSLATION = "missing_nets_translation";
 
     @Autowired
-    IUserService userService;
+    UserService userService;
 
     @Autowired
     IWorkflowService workflowService;
@@ -94,12 +99,12 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Override
     public void createFilterImport(IUser author) {
-        workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER, "Import filters " + author.getFullName(), "", author.transformToLoggedUser());
+        workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER, "Import filters " + author.getFullName(), "", userService.transformToLoggedUser(author));
     }
 
     @Override
     public void createFilterExport(IUser author) {
-        workflowService.createCaseByIdentifier(EXPORT_NET_IDENTIFIER, "Export filters " + author.getFullName(), "", author.transformToLoggedUser());
+        workflowService.createCaseByIdentifier(EXPORT_NET_IDENTIFIER, "Export filters " + author.getFullName(), "", userService.transformToLoggedUser(author));
     }
 
     /**

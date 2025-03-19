@@ -2,7 +2,7 @@ package com.netgrif.application.engine.pdf.generator.service.interfaces;
 
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
+import com.netgrif.core.petrinet.domain.dataset.FieldType;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 

@@ -1,15 +1,15 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
+import com.netgrif.auth.service.UserService
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.QTask
-import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.adapter.workflow.domain.QTask
+import com.netgrif.core.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -42,7 +42,7 @@ class ChangeBehaviorTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private TestHelper testHelper
@@ -65,7 +65,7 @@ class ChangeBehaviorTest {
     @BeforeEach
     void initNet() {
         testHelper.truncateDbs()
-        net = petriNetService.importPetriNet(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).getNet()
+        net = petriNetService.importPetriNet(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR, userService.transformToLoggedUser(userService.getLoggedOrSystem())).getNet()
         assert net != null
     }
 

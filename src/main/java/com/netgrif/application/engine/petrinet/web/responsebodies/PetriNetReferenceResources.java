@@ -2,7 +2,7 @@ package com.netgrif.application.engine.petrinet.web.responsebodies;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
-
+import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import java.util.List;
 import java.util.stream.Collectors;
 

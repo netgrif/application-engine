@@ -2,21 +2,21 @@ package com.netgrif.application.engine.elastic.service;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
-import com.netgrif.application.engine.elastic.domain.ElasticCase;
+import com.netgrif.core.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
-import com.netgrif.application.engine.event.events.workflow.IndexCaseEvent;
-import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
+import com.netgrif.core.event.events.workflow.IndexCaseEvent;
+import com.netgrif.core.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -101,9 +101,9 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     public void index(ElasticCase useCase) {
         executors.execute(useCase.getStringId(), () -> {
             try {
-                ElasticCase elasticCase = repository.findByStringId(useCase.getStringId());
+                com.netgrif.adapter.elastic.domain.ElasticCase elasticCase = repository.findByStringId(useCase.getStringId());
                 if (elasticCase == null) {
-                    repository.save(useCase);
+                    repository.save((com.netgrif.adapter.elastic.domain.ElasticCase) useCase);
                 } else {
                     elasticCase.update(useCase);
                     repository.save(elasticCase);
@@ -113,7 +113,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             } catch (InvalidDataAccessApiUsageException ignored) {
                 log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" has duplicates, will be reindexed");
                 repository.deleteAllByStringId(useCase.getStringId());
-                repository.save(useCase);
+                repository.save((com.netgrif.adapter.elastic.domain.ElasticCase) useCase);
                 log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
             }
         });
@@ -158,7 +158,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
         NativeQuery query = buildQuery(requests, loggedOrImpersonated, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
-            return template.count(query, ElasticCase.class);
+            return template.count(query, com.netgrif.adapter.elastic.domain.ElasticCase.class);
         } else {
             return 0;
         }

@@ -44,7 +44,7 @@
 					} else if (!select_impersonator.options.containsKey(select_impersonator.value)) {
 						def selectableUsers = userService.searchAllCoMembers(
 								select_impersonator.value,
-								userService.loggedUser.transformToLoggedUser(),
+								userService.loggeduserService.transformToLoggedUser(user),
 								false,
 								new com.netgrif.application.engine.utils.FullPageRequest()).content
 						change select_impersonator options {

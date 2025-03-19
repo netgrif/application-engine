@@ -1,15 +1,16 @@
 package com.netgrif.application.engine.insurance
 
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.LoggedUser
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
+import com.netgrif.adapter.auth.domain.LoggedUserImpl
+import com.netgrif.core.auth.domain.Authority
+import com.netgrif.core.auth.domain.LoggedUser
+import com.netgrif.auth.service.AuthorityService
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.DataField
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.core.workflow.domain.DataField
+import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -38,7 +39,7 @@ class EncryptionTest {
     private Importer importer
 
     @Autowired
-    private IAuthorityService authorityService
+    private AuthorityService authorityService
 
     @Autowired
     private IPetriNetService petriNetService
@@ -88,6 +89,6 @@ class EncryptionTest {
 
     LoggedUser mockLoggedUser() {
         def authorityUser = authorityService.getOrCreate(Authority.user)
-        return new LoggedUser(superCreator.getSuperUser().getStringId(), "super@netgrif.com", "password", [authorityUser])
+        return new LoggedUserImpl(superCreator.getSuperUser().getStringId(), "super@netgrif.com", "password", [authorityUser] as Set, [] as Set)
     }
 }

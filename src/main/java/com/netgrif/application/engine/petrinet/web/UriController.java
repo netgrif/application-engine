@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.web;
 
-import com.netgrif.application.engine.petrinet.domain.UriNode;
+import com.netgrif.core.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.UriNodeResource;
 import com.netgrif.application.engine.petrinet.web.responsebodies.UriNodeResources;

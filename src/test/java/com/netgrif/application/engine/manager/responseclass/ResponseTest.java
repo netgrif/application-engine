@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.manager.responseclass;
 
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.manager.web.body.response.AllLoggedUsersResponse;
 import com.netgrif.application.engine.manager.web.body.response.MessageLogoutResponse;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;

@@ -1,13 +1,27 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
-import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.application.engine.startup.runner.GroupRunner
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.startup.runner.SystemUserRunner
+import com.netgrif.core.petrinet.domain.dataset.BooleanField
+import com.netgrif.core.petrinet.domain.dataset.CaseField
+import com.netgrif.core.petrinet.domain.dataset.DateField
+import com.netgrif.core.petrinet.domain.dataset.DateTimeField
+import com.netgrif.core.petrinet.domain.dataset.EnumerationField
+import com.netgrif.core.petrinet.domain.dataset.FileField
+import com.netgrif.core.petrinet.domain.dataset.I18nField
+import com.netgrif.core.petrinet.domain.dataset.MultichoiceField
+import com.netgrif.core.petrinet.domain.dataset.MultichoiceMapField
+import com.netgrif.core.petrinet.domain.dataset.NumberField
+import com.netgrif.core.petrinet.domain.dataset.TaskField
+import com.netgrif.core.petrinet.domain.dataset.TextField
+import com.netgrif.core.petrinet.domain.dataset.UserField
+import com.netgrif.core.petrinet.domain.dataset.UserListField
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -33,7 +47,7 @@ class FieldTest {
     private MongoTemplate template
 
     @Autowired
-    private UserRepository userRepository
+    private UserService userService
 
     @Autowired
     private SystemUserRunner systemUserRunner

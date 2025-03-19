@@ -1,13 +1,13 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.application.engine.petrinet.domain.Component;
-import com.netgrif.application.engine.petrinet.domain.Format;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.LocalizedValidation;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation;
+import com.netgrif.core.petrinet.domain.Component;
+import com.netgrif.core.petrinet.domain.Format;
+import com.netgrif.core.petrinet.domain.dataset.Field;
+import com.netgrif.core.petrinet.domain.dataset.FieldType;
+import com.netgrif.core.petrinet.domain.dataset.logic.FieldLayout;
+import com.netgrif.core.petrinet.domain.dataset.logic.validation.LocalizedValidation;
+import com.netgrif.core.petrinet.domain.dataset.logic.validation.Validation;
 import lombok.Data;
 
 import java.io.Serial;

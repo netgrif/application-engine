@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
-import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
+import com.netgrif.core.petrinet.domain.dataset.CaseField;
 import lombok.Data;
 
 import java.util.List;

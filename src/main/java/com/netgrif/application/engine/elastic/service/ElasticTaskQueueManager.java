@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.elastic.service;
 
-import com.netgrif.application.engine.elastic.domain.ElasticJob;
-import com.netgrif.application.engine.elastic.domain.ElasticTask;
+import com.netgrif.core.elastic.domain.ElasticJob;
+import com.netgrif.core.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.elastic.domain.ElasticTaskJob;
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -114,11 +114,11 @@ public class ElasticTaskQueueManager {
 
     private ElasticTask indexTaskWorker(ElasticTask task) {
         log.debug("Indexing task [{}] in thread [{}]", task.getTaskId(), Thread.currentThread().getName());
-        ElasticTask elasticTask = null;
+        com.netgrif.adapter.elastic.domain.ElasticTask elasticTask = null;
         try {
             elasticTask = repository.findByStringId(task.getStringId());
             if (elasticTask == null) {
-                elasticTask = repository.save(task);
+                elasticTask = repository.save((com.netgrif.adapter.elastic.domain.ElasticTask) task);
             } else {
                 elasticTask.update(task);
                 elasticTask = repository.save(elasticTask);
@@ -127,7 +127,7 @@ public class ElasticTaskQueueManager {
         } catch (InvalidDataAccessApiUsageException e) {
             log.debug("[{}]: Task \"{}\" has duplicates, will be reindexed", task.getCaseId(), task.getTitle());
             repository.deleteAllByStringId(task.getStringId());
-            repository.save(task);
+            repository.save((com.netgrif.adapter.elastic.domain.ElasticTask) task);
             log.debug("[{}]: Task \"{}\" indexed", task.getCaseId(), task.getTitle());
         } catch (RuntimeException e) {
             log.error("Elastic executor was killed before finish: {}", e.getMessage());
@@ -147,7 +147,7 @@ public class ElasticTaskQueueManager {
     }
 
     public void removeTasksByProcess(String processId) {
-        List<ElasticTask> tasks = repository.findAllByProcessId(processId);
+        List<com.netgrif.adapter.elastic.domain.ElasticTask> tasks = repository.findAllByProcessId(processId);
         long maxWaitTime = 30;
         long baseWaitTime = 1;
 

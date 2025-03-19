@@ -1,6 +1,5 @@
 //package com.netgrif.application.engine.workflow.web.responsebodies;
 //
-//import com.netgrif.application.engine.auth.domain.throwable.UnauthorisedRequestException;
 //import com.netgrif.application.engine.workflow.web.FilterController;
 //import org.springframework.hateoas.EntityModel;
 //import org.springframework.hateoas.Link;

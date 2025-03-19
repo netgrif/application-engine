@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain
 
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
@@ -10,8 +10,9 @@ import com.netgrif.application.engine.startup.runner.DefaultRoleRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.startup.runner.SystemUserRunner
-import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.core.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import com.netgrif.application.engine.workflow.service.TaskService
@@ -63,7 +64,7 @@ class EventTest {
     private MongoTemplate template
 
     @Autowired
-    private UserRepository userRepository
+    private UserService userService
 
     @Autowired
     private SystemUserRunner userRunner

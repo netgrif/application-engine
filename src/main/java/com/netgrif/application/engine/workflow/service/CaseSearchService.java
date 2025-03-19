@@ -1,18 +1,18 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.importer.service.FieldFactory;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
+import com.netgrif.core.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.PetriNetSearch;
+import com.netgrif.core.petrinet.domain.dataset.FieldType;
+import com.netgrif.core.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
-import com.netgrif.application.engine.workflow.domain.QCase;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.ProcessResourceId;
+import com.netgrif.adapter.workflow.domain.QCase;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Ops;
@@ -20,7 +20,6 @@ import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,7 +98,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     protected Predicate buildViewRoleQueryConstraint(LoggedUser user) {
-        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::viewRoleQuery).collect(Collectors.toList());
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(r -> viewRoleQuery(r.getStringId())).collect(Collectors.toList());
         return constructPredicateTree(roleConstraints, BooleanBuilder::or);
     }
 
@@ -117,7 +116,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     protected Predicate buildNegativeViewRoleQueryConstraint(LoggedUser user) {
-        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::negativeViewRoleQuery).collect(Collectors.toList());
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(r -> negativeViewRoleQuery(r.getStringId())).collect(Collectors.toList());
         return constructPredicateTree(roleConstraints, BooleanBuilder::or);
     }
 

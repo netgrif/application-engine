@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
-import com.netgrif.application.engine.petrinet.domain.dataset.FileField
-import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.core.petrinet.domain.dataset.FileField
+import com.netgrif.core.workflow.domain.Case
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

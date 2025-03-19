@@ -5,7 +5,7 @@ import com.netgrif.application.engine.pdf.generator.config.types.PdfBooleanForma
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDrawer;
 import com.netgrif.application.engine.pdf.generator.service.renderer.*;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
+import com.netgrif.core.petrinet.domain.dataset.FieldType;
 import lombok.Setter;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.multipdf.PDFCloneUtility;

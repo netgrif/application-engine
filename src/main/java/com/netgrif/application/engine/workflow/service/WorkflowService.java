@@ -1,39 +1,37 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.event.evaluators.Evaluator;
-import com.netgrif.application.engine.event.events.workflow.CaseEvent;
-import com.netgrif.application.engine.event.events.workflow.CreateCaseEvent;
-import com.netgrif.application.engine.event.events.workflow.DeleteCaseEvent;
+import com.netgrif.core.event.events.workflow.CaseEvent;
+import com.netgrif.core.event.events.workflow.CreateCaseEvent;
+import com.netgrif.core.event.events.workflow.DeleteCaseEvent;
 import com.netgrif.application.engine.event.services.EvaluationService;
-import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventLog;
-import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventLog;
-import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.FieldFactory;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.TaskField;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
+import com.netgrif.core.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.dataset.Field;
+import com.netgrif.core.petrinet.domain.dataset.TaskField;
+import com.netgrif.core.petrinet.domain.dataset.UserFieldValue;
+import com.netgrif.core.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
-import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
-import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
+import com.netgrif.core.petrinet.domain.events.CaseEventType;
+import com.netgrif.core.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.security.service.EncryptionService;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.application.engine.workflow.domain.*;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
+import com.netgrif.core.workflow.domain.*;
+import com.netgrif.core.workflow.domain.eventoutcomes.EventOutcome;
+import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
-import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
+import com.netgrif.core.workflow.service.InitValueExpressionEvaluator;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
@@ -74,7 +72,7 @@ public class WorkflowService implements IWorkflowService {
     protected IPetriNetService petriNetService;
 
     @Autowired
-    protected IProcessRoleService processRoleService;
+    protected ProcessRoleService processRoleService;
 
     @Autowired
     protected ITaskService taskService;
@@ -95,10 +93,10 @@ public class WorkflowService implements IWorkflowService {
     protected FieldActionsRunner actionsRunner;
 
     @Autowired
-    protected IUserService userService;
+    protected UserService userService;
 
     @Autowired
-    protected IInitValueExpressionEvaluator initValueExpressionEvaluator;
+    protected InitValueExpressionEvaluator initValueExpressionEvaluator;
 
     @Autowired
     protected IElasticCaseMappingService caseMappingService;
@@ -106,9 +104,6 @@ public class WorkflowService implements IWorkflowService {
     @Lazy
     @Autowired
     protected IEventService eventService;
-
-    @Autowired
-    protected IHistoryService historyService;
 
     protected IElasticCaseService elasticCaseService;
 
@@ -265,7 +260,7 @@ public class WorkflowService implements IWorkflowService {
         if (userListValue == null)
             return null;
         return userListValue.getUserValues().stream().map(UserFieldValue::getId)
-                .filter(id -> userService.resolveById(id, false) != null)
+                .filter(id -> userService.findById(id, null) != null)
                 .collect(Collectors.toList());
     }
 
@@ -333,9 +328,9 @@ public class WorkflowService implements IWorkflowService {
 
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user, Map<String, String> params) {
         LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
-        PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
+        PetriNet petriNet = new com.netgrif.adapter.petrinet.domain.PetriNet((com.netgrif.adapter.petrinet.domain.PetriNet) petriNetService.get(new ObjectId(netId)));
 //        int rulesExecuted;
-        Case useCase = new Case(petriNet);
+        Case useCase = new com.netgrif.adapter.workflow.domain.Case(petriNet);
         useCase.populateDataSet(initValueExpressionEvaluator, params);
         useCase.setColor(color);
         useCase.setAuthor(loggedOrImpersonated.transformToAuthor());
@@ -347,7 +342,7 @@ public class WorkflowService implements IWorkflowService {
         outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty(), params));
         //evaluateRules(new CreateCaseEvent(new CreateCaseEventOutcome(null, outcome.getOutcomes()), EventPhase.PRE));
 
-        historyService.save(new CreateCaseEventLog(useCase, EventPhase.PRE));
+        publisher.publishEvent(new CreateCaseEvent(outcome, EventPhase.PRE));
         log.info("[" + useCase.getStringId() + "]: Case " + useCase.getTitle() + " created");
 
         useCase.getPetriNet().initializeArcs(useCase.getDataSet());
@@ -364,15 +359,14 @@ public class WorkflowService implements IWorkflowService {
 //            useCase = save(useCase);
 //        }
 
-        historyService.save(new CreateCaseEventLog(useCase, EventPhase.POST));
+        publisher.publishEvent(new CreateCaseEvent(outcome, EventPhase.POST));
         outcome.setCase(setImmediateDataFields(useCase));
         addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
-//        publisher.publishEvent(new CreateCaseEvent(outcome));
         return outcome;
     }
 
     protected Function<Case, String> resolveDefaultCaseTitle(String netId, Locale locale, Map<String, String> params) {
-        PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
+        PetriNet petriNet = new com.netgrif.adapter.petrinet.domain.PetriNet((com.netgrif.adapter.petrinet.domain.PetriNet) petriNetService.get(new ObjectId(netId)));
         Function<Case, String> makeTitle;
         if (petriNet.hasDynamicCaseName()) {
             makeTitle = (u) -> initValueExpressionEvaluator.evaluateCaseName(u, petriNet.getDefaultCaseNameExpression(), params).getTranslation(locale);
@@ -407,7 +401,7 @@ public class WorkflowService implements IWorkflowService {
     public DeleteCaseEventOutcome deleteCase(Case useCase, Map<String, String> params) {
 
         DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty(), params));
-        historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
+        publisher.publishEvent(new DeleteCaseEvent(outcome, EventPhase.PRE));
         useCase = ((Evaluator<DeleteCaseEvent, Case>) evaluationService.getEvaluator("default")).apply(new DeleteCaseEvent(outcome, EventPhase.PRE));;
         log.info("[" + useCase.getStringId() + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting case " + useCase.getTitle());
 
@@ -417,8 +411,7 @@ public class WorkflowService implements IWorkflowService {
         outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty(), params));
         addMessageToOutcome(useCase.getPetriNet(), CaseEventType.DELETE, outcome);
         ((Evaluator<DeleteCaseEvent, Case>) evaluationService.getEvaluator("noContext")).apply(new DeleteCaseEvent(outcome, EventPhase.POST));
-        historyService.save(new DeleteCaseEventLog(useCase, EventPhase.POST));
-//        publisher.publishEvent(new DeleteCaseEvent(outcome));
+        publisher.publishEvent(new DeleteCaseEvent(outcome, EventPhase.POST));
         return outcome;
     }
 
@@ -489,7 +482,7 @@ public class WorkflowService implements IWorkflowService {
         Page<Case> page = search(predicate, PageRequest.of(0, 1));
         if (page.getContent().isEmpty())
             return null;
-        return page.getContent().get(0);
+        return page.getContent().getFirst();
     }
 
     @Override
@@ -535,7 +528,7 @@ public class WorkflowService implements IWorkflowService {
 //    }
 
     private void setImmediateDataFieldsReadOnly(Case useCase) {
-        List<Field> immediateData = new ArrayList<>();
+        List<Field<?>> immediateData = new ArrayList<>();
 
         useCase.getImmediateDataFields().forEach(fieldId -> {
             try {
@@ -556,7 +549,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     protected Case setImmediateDataFields(Case useCase) {
-        List<Field> immediateData = new ArrayList<>();
+        List<Field<?>> immediateData = new ArrayList<>();
 
         useCase.getImmediateDataFields().forEach(fieldId ->
                 immediateData.add(fieldFactory.buildImmediateField(useCase, fieldId))
@@ -613,7 +606,7 @@ public class WorkflowService implements IWorkflowService {
     private void setPetriNet(Case useCase) {
         PetriNet model = useCase.getPetriNet();
         if (model == null) {
-            model = petriNetService.clone(useCase.getPetriNetObjectId());
+            model = new com.netgrif.adapter.petrinet.domain.PetriNet((com.netgrif.adapter.petrinet.domain.PetriNet) petriNetService.get(new ObjectId(useCase.getPetriNetId())));
             useCase.setPetriNet(model);
         }
         model.initializeTokens(useCase.getActivePlaces());

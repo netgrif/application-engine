@@ -1,13 +1,14 @@
 package com.netgrif.application.engine.petrinet.domain.version;
 
+import com.netgrif.core.petrinet.domain.version.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.stereotype.Component;
 
-import static com.netgrif.application.engine.petrinet.domain.version.Version.LATEST;
-import static com.netgrif.application.engine.petrinet.domain.version.Version.NEWEST;
+import static com.netgrif.core.petrinet.domain.version.Version.LATEST;
+import static com.netgrif.core.petrinet.domain.version.Version.NEWEST;
 
 @Component
 @ReadingConverter

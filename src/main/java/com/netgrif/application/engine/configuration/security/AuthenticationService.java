@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.configuration.security;
 
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.configuration.security.interfaces.IAuthenticationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import jakarta.servlet.http.HttpServletRequest;

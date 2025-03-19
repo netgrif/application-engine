@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.web;
 
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

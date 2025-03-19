@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.orgstructure.web.responsebodies;
 
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;

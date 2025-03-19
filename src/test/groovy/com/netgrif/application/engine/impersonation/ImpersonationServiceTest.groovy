@@ -1,32 +1,28 @@
 package com.netgrif.application.engine.impersonation
 
+import com.netgrif.auth.service.AuthorityService
+import com.netgrif.auth.service.UserService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.IUser
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
-import com.netgrif.application.engine.petrinet.domain.I18nString
-import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.runner.ImpersonationRunner
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.Task
-import com.netgrif.application.engine.workflow.service.interfaces.IDataService
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskAuthorizationService
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowAuthorizationService
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.startup.runner.ImpersonationRunner
+import com.netgrif.application.engine.workflow.service.interfaces.*
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
+import com.netgrif.core.auth.domain.Authority
+import com.netgrif.core.auth.domain.IUser
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
+import com.netgrif.core.petrinet.domain.I18nString
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.dataset.UserFieldValue
+import com.netgrif.core.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.core.workflow.domain.Task
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest
 import groovy.json.JsonSlurper
 import org.junit.jupiter.api.BeforeEach
@@ -40,6 +36,7 @@ import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.session.web.http.SessionRepositoryFilter
@@ -53,8 +50,8 @@ import java.time.LocalDateTime
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @SpringBootTest
@@ -71,7 +68,7 @@ class ImpersonationServiceTest {
     private ImportHelper helper
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private IElasticCaseService elasticCaseService
@@ -89,7 +86,7 @@ class ImpersonationServiceTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private IAuthorityService authorityService
+    private AuthorityService authorityService
 
     @Autowired
     private IImpersonationService impersonationService
@@ -130,25 +127,25 @@ class ImpersonationServiceTest {
         def authorityAnon = authorityService.getOrCreate(Authority.anonymous)
         def authorityAdmin = authorityService.getOrCreate(Authority.admin)
 
-        user1 = helper.createUser(new User(name: "Test", surname: "User", email: "test@netgrif.com", password: "password", state: UserState.ACTIVE),
+        user1 = helper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Test", lastName: "User", email: "test@netgrif.com", "username": "test@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority] as Authority[],
                 [] as ProcessRole[])
 
-        auth1 = new UsernamePasswordAuthenticationToken(user1.transformToLoggedUser(), (user1 as User).password, user1.authorities)
+        auth1 = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(user1), (user1 as User).password, user1.authorities as List<GrantedAuthority>)
         auth1.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        user2 = helper.createUser(new User(name: "Test", surname: "User2", email: "test2@netgrif.com", password: "password", state: UserState.ACTIVE),
+        user2 = helper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Test", lastName: "User2", email: "test2@netgrif.com", "username": "test2@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority, authorityAnon] as Authority[],
                 testNet.roles.values() as ProcessRole[])
 
-        auth2 = new UsernamePasswordAuthenticationToken(user2.transformToLoggedUser(), (user2 as User).password, user2.authorities)
+        auth2 = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(user2), (user2 as User).password, user2.authorities as List<GrantedAuthority>)
         auth2.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        adminUser = helper.createUser(new User(name: "Admin", surname: "User", email: "admin@netgrif.com", password: "password", state: UserState.ACTIVE),
+        adminUser = helper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Admin", lastName: "User", email: "admin@netgrif.com", "username": "admin@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority, authorityAdmin] as Authority[],
                 testNet.roles.values() as ProcessRole[])
 
-        adminUserAuth = new UsernamePasswordAuthenticationToken(adminUser.transformToLoggedUser(), (adminUser as User).password, adminUser.authorities)
+        adminUserAuth = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(adminUser), (adminUser as User).password, adminUser.authorities as List<GrantedAuthority>)
         adminUserAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
     }
 
@@ -185,14 +182,14 @@ class ImpersonationServiceTest {
         impersonationService.impersonateByConfig(config.stringId)
         def impersonatedRoles = userService.loggedUser.getImpersonated().getProcessRoles()
         def impersonatedAuths = userService.loggedUser.getImpersonated().getAuthorities()
-        assert impersonatedRoles.size() == 2 && impersonatedRoles.any { it.stringId ==role.stringId }  // default role counts
+        assert impersonatedRoles.size() == 2 && impersonatedRoles.any { it.stringId == role.stringId }  // default role counts
         assert impersonatedAuths.size() == 1 && impersonatedAuths[0].stringId == auth.stringId
 
-        def transformedUser = userService.loggedUser.transformToLoggedUser()
+        def transformedUser = userService.transformToLoggedUser(userService.loggedUser)
         def transformedUserImpersonated = transformedUser.getSelfOrImpersonated()
         assert transformedUser.isImpersonating()
-        assert transformedUserImpersonated.getProcessRoles().size() == 2 && transformedUserImpersonated.getProcessRoles().any { it == role.stringId }  // default role counts
-        assert transformedUserImpersonated.getAuthorities().size() == 1 && (transformedUserImpersonated.getAuthorities()[0] as Authority).stringId == auth.stringId
+        assert transformedUserImpersonated.getProcessRoles().size() == 2 && transformedUserImpersonated.getProcessRoles().any { it.stringId == role.stringId }  // default role counts
+        assert transformedUserImpersonated.getAuthoritySet().size() == 1 && (transformedUserImpersonated.getAuthoritySet()[0] as Authority).stringId == auth.stringId
     }
 
     @Test
@@ -209,17 +206,17 @@ class ImpersonationServiceTest {
 
         def caseReq = new CaseSearchRequest()
         caseReq.process = [new CaseSearchRequest.PetriNet(testCase.processIdentifier)]
-        def cases = elasticCaseService.search([caseReq], userService.loggedUser.transformToLoggedUser(), PageRequest.of(0, 1), LocaleContextHolder.locale, false)
+        def cases = elasticCaseService.search([caseReq], userService.transformToLoggedUser(userService.loggedUser) , PageRequest.of(0, 1), LocaleContextHolder.locale, false)
         assert !cases.content.isEmpty()
 
         def searchReq = new TaskSearchRequest()
         searchReq.transitionId = ["t1"]
         searchReq.useCase = [new TaskSearchCaseRequest(testCase.stringId, null)]
-        def tasks = taskService.search([searchReq], PageRequest.of(0, 1), userService.loggedUser.transformToLoggedUser(), LocaleContextHolder.locale, false)
+        def tasks = taskService.search([searchReq], PageRequest.of(0, 1), userService.transformToLoggedUser(userService.loggedUser) , LocaleContextHolder.locale, false)
         assert tasks.content[0].stringId == testTask1.stringId
 
         assert taskAuthorizationService.canCallAssign(userService.loggedUserFromContext, testTask1.stringId)
-        taskService.assignTask(userService.loggedUser.transformToLoggedUser(), testTask1.stringId)
+        taskService.assignTask(userService.transformToLoggedUser(userService.loggedUser) , testTask1.stringId)
         testTask1 = reloadTask(testTask1)
         assert testTask1.userId == user2.stringId
 
@@ -227,7 +224,7 @@ class ImpersonationServiceTest {
         assert taskAuthorizationService.canCallSaveFile(userService.loggedUserFromContext, testTask1.stringId)
 
         assert taskAuthorizationService.canCallFinish(userService.loggedUserFromContext, testTask1.stringId)
-        taskService.finishTask(userService.loggedUser.transformToLoggedUser(), testTask1.stringId)
+        taskService.finishTask(userService.transformToLoggedUser(userService.loggedUser) , testTask1.stringId)
     }
 
     @Test
@@ -235,7 +232,7 @@ class ImpersonationServiceTest {
         def config = setup()
         sleep(4000) // elastic
 
-        def logged = userService.loggedUser.transformToLoggedUser()
+        def logged = userService.transformToLoggedUser(userService.loggedUser)
         assert impersonationAuthorizationService.canImpersonate(logged, config.stringId)
         assert impersonationAuthorizationService.canImpersonateUser(logged, user2.stringId)
 
@@ -318,8 +315,8 @@ class ImpersonationServiceTest {
         caze.dataSet["impersonated_authorities"].options = (caze.dataSet["impersonated_authorities"].value as List).collectEntries { [(it): new I18nString(it as String)] } as Map<String, I18nString>
         caze = workflowService.save(caze)
         def initTask = caze.tasks.find { it.transition == "t2" }.task
-        taskService.assignTask(userService.system.transformToLoggedUser(), initTask)
-        taskService.finishTask(userService.system.transformToLoggedUser(), initTask)
+        taskService.assignTask(userService.transformToLoggedUser(userService.system), initTask)
+        taskService.finishTask(userService.transformToLoggedUser(userService.system), initTask)
         return workflowService.findOne(caze.stringId)
     }
 

@@ -181,7 +181,7 @@ implements org.springframework.security.core.userdetails.UserDetailsService</pre
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>protected <a href="../domain/repositories/UserRepository.html" title="interface in com.netgrif.application.engine.auth.domain.repositories">UserRepository</a></code></td>
+<td class="colFirst"><code>protected <a href="../domain/repositories/UserRepository.html" title="interface in com.netgrif.core.auth.domain.Authority;.repositories">UserRepository</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#userRepository">userRepository</a></span></code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -230,7 +230,7 @@ implements org.springframework.security.core.userdetails.UserDetailsService</pre
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>protected <a href="../domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a></code></td>
+<td class="colFirst"><code>protected <a href="../domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getLoggedUser(java.lang.String)">getLoggedUser</a></span>&#8203;(java.lang.String&nbsp;email)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -270,7 +270,7 @@ implements org.springframework.security.core.userdetails.UserDetailsService</pre
 <li class="blockList">
 <h4>userRepository</h4>
 <pre>@Autowired
-protected&nbsp;<a href="../domain/repositories/UserRepository.html" title="interface in com.netgrif.application.engine.auth.domain.repositories">UserRepository</a> userRepository</pre>
+protected&nbsp;<a href="../domain/repositories/UserRepository.html" title="interface in com.netgrif.core.auth.domain.Authority;.repositories">UserRepository</a> userRepository</pre>
 </li>
 </ul>
 <a id="publisher">
@@ -355,7 +355,7 @@ public&nbsp;org.springframework.security.core.userdetails.UserDetails&nbsp;loadU
 <ul class="blockList">
 <li class="blockList">
 <h4>getLoggedUser</h4>
-<pre class="methodSignature">protected&nbsp;<a href="../domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a>&nbsp;getLoggedUser&#8203;(java.lang.String&nbsp;email)
+<pre class="methodSignature">protected&nbsp;<a href="../domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a>&nbsp;getLoggedUser&#8203;(java.lang.String&nbsp;email)
                             throws org.springframework.security.core.userdetails.UsernameNotFoundException</pre>
 <dl>
 <dt><span class="throwsLabel">Throws:</span></dt>

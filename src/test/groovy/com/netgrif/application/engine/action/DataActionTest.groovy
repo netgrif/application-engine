@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.petrinet.domain.dataset.Field
+import com.netgrif.core.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.workflow.domain.Task
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.core.workflow.domain.Task
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import groovy.transform.CompileStatic
@@ -42,7 +42,7 @@ class DataActionTest {
         def $case = importHelper.createCase("Case 1", mainNet.get())
         Task task = taskService.findOne($case.tasks.first().task)
 
-        List<Field> dataGet = dataService.getData($case.tasks.first().task).getData()
+        List<Field<?>> dataGet = dataService.getData($case.tasks.first().task).getData()
         dataGet.first().value == ";get-pre;get-post"
 
         SetDataEventOutcome dataSet = dataService.setData(task.stringId, ImportHelper.populateDataset(

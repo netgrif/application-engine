@@ -7,7 +7,7 @@ import java.util.Locale;
 
 public class TransactionResource extends EntityModel<Transaction> {
 
-    public TransactionResource(com.netgrif.application.engine.petrinet.domain.Transaction content, Locale locale) {
+    public TransactionResource(com.netgrif.core.petrinet.domain.Transaction content, Locale locale) {
         super(new Transaction(content.getTransitions(), content.getTitle().getTranslation(locale)), new ArrayList<>());
     }
 }

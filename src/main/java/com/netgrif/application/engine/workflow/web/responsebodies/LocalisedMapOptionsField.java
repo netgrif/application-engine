@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
+import com.netgrif.core.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.dataset.MapOptionsField;
 import lombok.Data;
 
 import java.util.LinkedHashMap;

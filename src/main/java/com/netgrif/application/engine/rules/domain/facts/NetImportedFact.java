@@ -1,6 +1,6 @@
 //package com.netgrif.application.engine.rules.domain.facts;
 //
-//import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
+//import com.netgrif.core.petrinet.domain.events.EventPhase;
 //import lombok.Data;
 //import lombok.EqualsAndHashCode;
 //

@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes.base;
 
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.PetriNetEventOutcome;
+import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.PetriNetEventOutcome;
 
 import java.util.List;
 import java.util.Locale;

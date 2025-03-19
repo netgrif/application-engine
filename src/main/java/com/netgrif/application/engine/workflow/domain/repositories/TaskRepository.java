@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.workflow.domain.repositories;
 
-import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
-import com.netgrif.application.engine.workflow.domain.QTask;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.core.workflow.domain.ProcessResourceId;
+import com.netgrif.adapter.workflow.domain.QTask;
+import com.netgrif.core.workflow.domain.Task;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

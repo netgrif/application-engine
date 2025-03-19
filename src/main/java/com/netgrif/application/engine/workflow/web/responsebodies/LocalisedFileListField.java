@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
-import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
+import com.netgrif.core.petrinet.domain.dataset.FileListField;
 import lombok.Data;
 
 import java.util.Locale;

@@ -1,13 +1,13 @@
 package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action
+import com.netgrif.core.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner
-import com.netgrif.application.engine.petrinet.domain.events.*
+import com.netgrif.core.petrinet.domain.events.*
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.ProcessResourceId
-import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.core.workflow.domain.ProcessResourceId
+import com.netgrif.core.workflow.domain.Task
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -32,12 +32,12 @@ class ActionTest {
 
     @Test
     void testActionImports() {
-        Case dummy = new Case()
-        Task task = Task.with()._id(new ProcessResourceId()).transitionId("0").build()
+        Case dummy = new com.netgrif.adapter.workflow.domain.Case()
+        Task task = com.netgrif.adapter.workflow.domain.Task.with()._id(new ProcessResourceId()).transitionId("0").build()
         Action testAction = new Action('''
             println LocalDate.now()
             println LocalDate.MAX
-            println new ProcessResourceId().toString()
+            println new com.netgrif.core.workflow.domain.ProcessResourceId().toString()
         ''', "set")
         runner.run(testAction, dummy, Optional.of(task), new HashMap<>())
     }

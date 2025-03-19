@@ -1,11 +1,13 @@
 package com.netgrif.application.engine.auth.web;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.domain.RegisteredUser;
+import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.auth.service.InvalidUserTokenException;
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.auth.web.requestbodies.ChangePasswordRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest;
@@ -15,7 +17,6 @@ import com.netgrif.application.engine.configuration.properties.ServerAuthPropert
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
-import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import freemarker.template.TemplateException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -34,6 +35,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Locale;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -56,7 +58,7 @@ public class AuthenticationController {
     private IMailService mailService;
 
     @Autowired
-    private IUserService userService;
+    private UserService userService;
 
     @Autowired
     private IMailAttemptService mailAttemptService;
@@ -140,7 +142,7 @@ public class AuthenticationController {
     @Operation(summary = "Login to the system", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/login", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource login(Authentication auth, Locale locale) {
-        return new UserResource(userResponseFactory.getUser(userService.findByAuth(auth), locale), "profile");
+        return new UserResource(userResponseFactory.getUser(userService.findByAuth(auth, null), locale), "profile");
     }
 
     @Operation(summary = "Reset password")
@@ -184,8 +186,8 @@ public class AuthenticationController {
     @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource changePassword(Authentication auth, @RequestBody ChangePasswordRequest request) {
         try {
-            RegisteredUser user = (RegisteredUser) userService.findByEmail(request.login, false);
-            if (user == null || request.password == null || request.newPassword == null) {
+            Optional<IUser> user = userService.findUserByUsername(request.login, null);
+            if (user.isEmpty() || request.password == null || request.newPassword == null) {
                 return MessageResource.errorMessage("Incorrect login!");
             }
 
@@ -195,8 +197,8 @@ public class AuthenticationController {
             }
 
             String password = new String(Base64.getDecoder().decode(request.password));
-            if (registrationService.stringMatchesUserPassword(user, password)) {
-                registrationService.changePassword(user, newPassword);
+            if (registrationService.stringMatchesUserPassword((RegisteredUser) user.get(), password)) {
+                registrationService.changePassword(((RegisteredUser) user.get()), newPassword);
                 securityContextService.saveToken(((LoggedUser) auth.getPrincipal()).getId());
                 securityContextService.reloadSecurityContext((LoggedUser) auth.getPrincipal());
 

@@ -1,9 +1,9 @@
 //package com.netgrif.application.engine.rules.service.interfaces;
 //
-//import com.netgrif.application.engine.petrinet.domain.PetriNet;
+//import com.netgrif.core.petrinet.domain.PetriNet;
 //import com.netgrif.application.engine.rules.domain.scheduled.ScheduleOutcome;
 //import com.netgrif.application.engine.rules.service.throwable.RuleEvaluationScheduleException;
-//import com.netgrif.application.engine.workflow.domain.Case;
+//import com.netgrif.core.workflow.domain.Case;
 //import org.quartz.Trigger;
 //import org.quartz.TriggerBuilder;
 //

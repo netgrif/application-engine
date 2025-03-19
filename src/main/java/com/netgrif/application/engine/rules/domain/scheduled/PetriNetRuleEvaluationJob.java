@@ -1,6 +1,6 @@
 //package com.netgrif.application.engine.rules.domain.scheduled;
 //
-//import com.netgrif.application.engine.petrinet.domain.PetriNet;
+//import com.netgrif.core.petrinet.domain.PetriNet;
 //import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 //import com.netgrif.application.engine.rules.domain.facts.ScheduledRuleFact;
 //import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;

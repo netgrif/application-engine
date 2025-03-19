@@ -3,7 +3,8 @@ package com.netgrif.application.engine.petrinet.domain
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.arcs.ArcOrderComparator
-import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc
+import com.netgrif.core.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.arcs.ResetArc
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner

@@ -2,14 +2,16 @@ package com.netgrif.application.engine.petrinet.domain
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
-import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
+import com.netgrif.core.petrinet.domain.PetriNet
+import com.netgrif.core.petrinet.domain.VersionType
+import com.netgrif.core.petrinet.domain.dataset.ChoiceField
+import com.netgrif.core.petrinet.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
-import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
+import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
-import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.core.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach

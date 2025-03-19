@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.validation.service.interfaces
 
-import com.netgrif.application.engine.petrinet.domain.dataset.Field
-import com.netgrif.application.engine.workflow.domain.DataField
+import com.netgrif.core.petrinet.domain.dataset.Field
+import com.netgrif.core.workflow.domain.DataField
 
 
 interface IValidationService {
