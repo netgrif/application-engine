@@ -136,12 +136,6 @@
         </dependency>
         <dependency>
             <groupId>com.netgrif</groupId>
-            <artifactId>nae-ce-user</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.netgrif</groupId>
             <artifactId>plugin-core</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
