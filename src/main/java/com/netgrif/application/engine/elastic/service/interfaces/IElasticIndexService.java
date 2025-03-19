@@ -13,6 +13,8 @@ public interface IElasticIndexService {
 
     boolean indexExists(String indexName);
 
+    boolean bulkIndex(List<?> list, Class<?> clazz, String... placeholders);
+
     boolean createIndex(Class<?> clazz, String... placeholders);
 
     Map<String, Object> prepareAnalysisSettings();
@@ -25,9 +27,21 @@ public interface IElasticIndexService {
 
     <T> String index(Class<T> clazz, T source, String... placeholders);
 
+    boolean openIndex(Class<?> clazz, String... placeholders);
+
+    boolean closeIndex(Class<?> clazz, String... placeholders);
+
     SearchHits<?> search(Query query, Class<?> clazz, String... placeholders);
 
     void applySettings(HashMap<String, Object> settingMap, Class<?> clazz);
+
+    boolean putTemplate(String name, String source);
+
+    SearchScrollHits<?> scrollFirst(Query query, Class<?> clazz, String... placeholders);
+
+    SearchScrollHits<?> scroll(String scrollId, Class<?> clazz, String... placeholders);
+
+    void clearScrollHits(List<String> scrollIds);
 
 //    void clearScrollHits(List<String> scrollIds);
 }

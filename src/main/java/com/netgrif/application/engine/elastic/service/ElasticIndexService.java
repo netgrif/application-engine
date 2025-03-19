@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.elastic.service;
 
 
+import co.elastic.clients.elasticsearch._types.AcknowledgedResponse;
+import co.elastic.clients.elasticsearch.indices.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
@@ -10,10 +12,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Setting;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.SearchScrollHits;
 import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -30,13 +34,13 @@ public class ElasticIndexService implements IElasticIndexService {
 
     private static final String PLACEHOLDERS = "petriNetIndex, caseIndex, taskIndex";
     private final ApplicationContext context;
-    private final ElasticsearchOperations elasticsearchOperations;
+    private final ElasticsearchTemplate elasticsearchTemplate;
     private final ElasticsearchProperties elasticsearchProperties;
 
     @Override
     public boolean indexExists(String indexName) {
         try {
-            return elasticsearchOperations.indexOps(IndexCoordinates.of(indexName)).exists();
+            return elasticsearchTemplate.indexOps(IndexCoordinates.of(indexName)).exists();
         } catch (Exception e) {
             log.error("indexExists:", e);
             return false;
@@ -46,26 +50,26 @@ public class ElasticIndexService implements IElasticIndexService {
     @Override
     public <T> String index(Class<T> clazz, T source, String... placeholders) {
         String indexName = getIndexName(clazz, placeholders);
-        return elasticsearchOperations.index(new IndexQueryBuilder().withId(getIdFromSource(source))
+        return elasticsearchTemplate.index(new IndexQueryBuilder().withId(getIdFromSource(source))
                 .withObject(source).build(), IndexCoordinates.of(indexName));
     }
 
-//    @Override
-//    public boolean bulkIndex(List<?> list, Class<?> clazz, String... placeholders) {
-//        String indexName = getIndexName(clazz, placeholders);
-//        try {
-//            if (list != null && !list.isEmpty()) {
-//                List<IndexQuery> indexQueries = new ArrayList<>();
-//                list.forEach(source ->
-//                        indexQueries.add(new IndexQueryBuilder().withId(getIdFromSource(source)).withObject(source).build()));
-//                elasticsearchTemplate.bulkIndex(indexQueries, IndexCoordinates.of(indexName));
-//            }
-//        } catch (Exception e) {
-//            log.error("bulkIndex:", e);
-//            return false;
-//        }
-//        return true;
-//    }
+    @Override
+    public boolean bulkIndex(List<?> list, Class<?> clazz, String... placeholders) {
+        String indexName = getIndexName(clazz, placeholders);
+        try {
+            if (list != null && !list.isEmpty()) {
+                List<IndexQuery> indexQueries = new ArrayList<>();
+                list.forEach(source ->
+                        indexQueries.add(new IndexQueryBuilder().withId(getIdFromSource(source)).withObject(source).build()));
+                elasticsearchTemplate.bulkIndex(indexQueries, IndexCoordinates.of(indexName));
+            }
+        } catch (Exception e) {
+            log.error("bulkIndex:", e);
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public boolean createIndex(Class<?> clazz, String... placeholders) {
@@ -74,9 +78,9 @@ public class ElasticIndexService implements IElasticIndexService {
             if (!this.indexExists(indexName)) {
                 // https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html
                 HashMap<String, Object> settingMap = new HashMap<>();
-//                applySettings(settingMap, clazz);
-//                settingMap.put("number_of_shards", getShardsFromClass(clazz));
-//                settingMap.put("number_of_replicas", getReplicasFromClass(clazz));
+                applySettings(settingMap, clazz);
+                settingMap.put("number_of_shards", getShardsFromClass(clazz));
+                settingMap.put("number_of_replicas", getReplicasFromClass(clazz));
 
                 Map<String, Object> analysisSettings = prepareAnalysisSettings();
                 if (analysisSettings != null) {
@@ -85,7 +89,7 @@ public class ElasticIndexService implements IElasticIndexService {
 
                 Document settings = Document.from(settingMap);
                 log.info("Creating new index - {} ", indexName);
-                return elasticsearchOperations.indexOps(IndexCoordinates.of(indexName)).create(settings);
+                return elasticsearchTemplate.indexOps(IndexCoordinates.of(indexName)).create(settings);
             } else {
                 log.info("This index {} already exists", indexName);
             }
@@ -160,7 +164,7 @@ public class ElasticIndexService implements IElasticIndexService {
             String indexName = getIndexName(clazz, placeholders);
             if (this.indexExists(indexName)) {
                 log.warn("Index: " + indexName + " has been deleted!");
-                return elasticsearchOperations.indexOps(IndexCoordinates.of(indexName)).delete();
+                return elasticsearchTemplate.indexOps(IndexCoordinates.of(indexName)).delete();
             } else {
                 log.warn("Index: " + indexName + " not found!");
             }
@@ -170,87 +174,49 @@ public class ElasticIndexService implements IElasticIndexService {
         return false;
     }
 
-//    @Override
-//    public boolean openIndex(Class<?> clazz, String... placeholders) {
-//        try {
-//            String indexName = getIndexName(clazz, placeholders);
-//            OpenIndexRequest request = new OpenIndexRequest(indexName);
-//            OpenIndexResponse execute = elasticsearchTemplate.execute(client -> client.indices().open(request, RequestOptions.DEFAULT));
-//            boolean acknowledged = execute.isAcknowledged();
-//            if (acknowledged) {
-//                log.info("Open index {} success", indexName);
-//            } else {
-//                log.info("Open index {} fail", indexName);
-//            }
-//            return acknowledged;
-//        } catch (Exception e) {
-//            log.error("DeleteIndex:", e);
-//            return false;
-//        }
-//    }
-//
-//    @Override
-//    public boolean closeIndex(Class<?> clazz, String... placeholders) {
-//        try {
-//            String indexName = getIndexName(clazz, placeholders);
-//            CloseIndexRequest request = new CloseIndexRequest(indexName);
-//            CloseIndexResponse execute = elasticsearchTemplate.execute(client -> client.indices().close(request, RequestOptions.DEFAULT));
-//            boolean acknowledged = execute.isAcknowledged();
-//            if (acknowledged) {
-//                log.info("Close index {} success", indexName);
-//            } else {
-//                log.info("Close index {} fail", indexName);
-//            }
-//            return acknowledged;
-//        } catch (Exception e) {
-//            log.error("deleteIndex:", e);
-//            return false;
-//        }
-//    }
+    @Override
+    public boolean openIndex(Class<?> clazz, String... placeholders) {
+        try {
+            String indexName = getIndexName(clazz, placeholders);
+            OpenRequest request = OpenRequest.of((builder -> builder.index(indexName)));
+            OpenResponse execute = elasticsearchTemplate.execute(client -> client.indices().open(request));
+            boolean acknowledged = execute.acknowledged();
+            if (acknowledged) {
+                log.info("Open index {} success", indexName);
+            } else {
+                log.info("Open index {} fail", indexName);
+            }
+            return acknowledged;
+        } catch (Exception e) {
+            log.error("DeleteIndex:", e);
+            return false;
+        }
+    }
 
-//    @Override
-//    public boolean openIndex(Class<?> clazz, String... placeholders) {
-//        try {
-//            String indexName = getIndexName(clazz, placeholders);
-//            OpenRequest request = OpenRequest.of((builder -> builder.index(indexName)));
-//            OpenResponse execute = elasticsearchTemplate.execute(client -> client.indices().open(request));
-//            boolean acknowledged = execute.acknowledged();
-//            if (acknowledged) {
-//                log.info("Open index {} success", indexName);
-//            } else {
-//                log.info("Open index {} fail", indexName);
-//            }
-//            return acknowledged;
-//        } catch (Exception e) {
-//            log.error("DeleteIndex:", e);
-//            return false;
-//        }
-//    }
-
-//    @Override
-//    public boolean closeIndex(Class<?> clazz, String... placeholders) {
-//        try {
-//            String indexName = getIndexName(clazz, placeholders);
-//            CloseIndexRequest request = CloseIndexRequest.of((builder) -> builder.index(indexName));
-//            CloseIndexResponse execute = elasticsearchTemplate.execute(client -> client.indices().close(request));
-//            boolean acknowledged = execute.acknowledged();
-//            if (acknowledged) {
-//                log.info("Close index {} success", indexName);
-//            } else {
-//                log.info("Close index {} fail", indexName);
-//            }
-//            return acknowledged;
-//        } catch (Exception e) {
-//            log.error("deleteIndex:", e);
-//            return false;
-//        }
-//    }
+    @Override
+    public boolean closeIndex(Class<?> clazz, String... placeholders) {
+        try {
+            String indexName = getIndexName(clazz, placeholders);
+            CloseIndexRequest request = new CloseIndexRequest.Builder().index(indexName).build();
+            CloseIndexResponse execute = elasticsearchTemplate.execute(client -> client.indices().close(request));
+            boolean acknowledged = execute.acknowledged();
+            if (acknowledged) {
+                log.info("Close index {} success", indexName);
+            } else {
+                log.info("Close index {} fail", indexName);
+            }
+            return acknowledged;
+        } catch (Exception e) {
+            log.error("deleteIndex:", e);
+            return false;
+        }
+    }
 
     @Override
     public SearchHits<?> search(Query query, Class<?> clazz, String... placeholders) {
         try {
             String indexName = getIndexName(clazz, placeholders);
-            return elasticsearchOperations.search(query, clazz, IndexCoordinates.of(indexName));
+            return elasticsearchTemplate.search(query, clazz, IndexCoordinates.of(indexName));
         } catch (Exception e) {
             log.error("scrollFirst:", e);
         }
@@ -261,9 +227,9 @@ public class ElasticIndexService implements IElasticIndexService {
     public boolean putMapping(Class<?> clazz, String... placeholders) {
         try {
             String indexName = getIndexName(clazz, placeholders);
-            Document mapping = elasticsearchOperations.indexOps(clazz).createMapping();
+            Document mapping = elasticsearchTemplate.indexOps(clazz).createMapping();
             applyMappingSettings(mapping);
-            return elasticsearchOperations.indexOps(IndexCoordinates.of(indexName)).putMapping(mapping);
+            return elasticsearchTemplate.indexOps(IndexCoordinates.of(indexName)).putMapping(mapping);
         } catch (Exception e) {
             log.error("Error in putMapping:", e);
             return false;
@@ -278,50 +244,50 @@ public class ElasticIndexService implements IElasticIndexService {
         }
     }
 
-//    @Override
-//    public boolean putTemplate(String name, String source) {
-//        try {
-//            PutTemplateRequest request = PutTemplateRequest.of((builder) -> builder
-//                    .name(name)
-//            );
-//            AcknowledgedResponse response = elasticsearchTemplate.execute(client -> client.indices().putTemplate(request));
-//            return response.acknowledged();
-//        } catch (Exception e) {
-//            log.error("putTemplate:", e);
-//            return false;
-//        }
-//    }
+    @Override
+    public boolean putTemplate(String name, String source) {
+        try {
+            PutTemplateRequest request = PutTemplateRequest.of((builder) -> builder
+                    .name(name)
+            );
+            AcknowledgedResponse response = elasticsearchTemplate.execute(client -> client.indices().putTemplate(request));
+            return response.acknowledged();
+        } catch (Exception e) {
+            log.error("putTemplate:", e);
+            return false;
+        }
+    }
 
-//    @Override
-//    public SearchScrollHits<?> scrollFirst(Query query, Class<?> clazz, String... placeholders) {
-//        String indexName = getIndexName(clazz, placeholders);
-//        try {
-//            return elasticsearchTemplate.searchScrollStart(60000, query, clazz, IndexCoordinates.of(indexName));
-//        } catch (Exception e) {
-//            log.error("scrollFirst: ", e);
-//        }
-//        return null;
-//    }
+    @Override
+    public SearchScrollHits<?> scrollFirst(Query query, Class<?> clazz, String... placeholders) {
+        String indexName = getIndexName(clazz, placeholders);
+        try {
+            return elasticsearchTemplate.searchScrollStart(60000, query, clazz, IndexCoordinates.of(indexName));
+        } catch (Exception e) {
+            log.error("scrollFirst: ", e);
+        }
+        return null;
+    }
 
-//    @Override
-//    public SearchScrollHits<?> scroll(String scrollId, Class<?> clazz, String... placeholders) {
-//        String indexName = getIndexName(clazz, placeholders);
-//        try {
-//            return elasticsearchTemplate.searchScrollContinue(scrollId, 60000, clazz, IndexCoordinates.of(indexName));
-//        } catch (Exception e) {
-//            log.error("scroll:", e);
-//        }
-//        return null;
-//    }
+    @Override
+    public SearchScrollHits<?> scroll(String scrollId, Class<?> clazz, String... placeholders) {
+        String indexName = getIndexName(clazz, placeholders);
+        try {
+            return elasticsearchTemplate.searchScrollContinue(scrollId, 60000, clazz, IndexCoordinates.of(indexName));
+        } catch (Exception e) {
+            log.error("scroll:", e);
+        }
+        return null;
+    }
 
-//    @Override
-//    public void clearScrollHits(List<String> scrollIds) {
-//        try {
-//            elasticsearchTemplate.searchScrollClear(scrollIds);
-//        } catch (Exception e) {
-//            log.error("clearScrollHits:", e);
-//        }
-//    }
+    @Override
+    public void clearScrollHits(List<String> scrollIds) {
+        try {
+            elasticsearchTemplate.searchScrollClear(scrollIds);
+        } catch (Exception e) {
+            log.error("clearScrollHits:", e);
+        }
+    }
 
     private String getIdFromSource(Object source) {
         if (source == null) {
