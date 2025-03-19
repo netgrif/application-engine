@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.mail;
 
-import com.netgrif.application.engine.authentication.domain.RegisteredUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.mail.domain.MailDraft;
@@ -68,12 +68,12 @@ public class MailService implements IMailService {
     private ServerAuthProperties serverAuthProperties;
 
     @Override
-    public void sendRegistrationEmail(RegisteredUser user) throws MessagingException, IOException, TemplateException {
+    public void sendRegistrationEmail(Identity identity) throws MessagingException, IOException, TemplateException {
         List<String> recipients = new LinkedList<>();
         Map<String, Object> model = new HashMap<>();
 
-        recipients.add(user.getEmail());
-        model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
+        recipients.add(identity.getUsername());
+        model.put(TOKEN, registrationService.encodeToken(identity.getUsername(), identity.getRegistrationToken()));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         model.put(VALIDITY, "" + serverAuthProperties.getTokenValidityPeriod());
         model.put(EXPIRATION, registrationService.generateExpirationDate().format(formatter));
@@ -84,25 +84,27 @@ public class MailService implements IMailService {
         MimeMessage email = buildEmail(mailDraft);
         mailSender.send(email);
 
-        log.info("Registration email sent to [" + user.getEmail() + "] with token [" + model.get(TOKEN) + "], expiring on [" + model.get(EXPIRATION) + "]");
+        log.info("Registration email sent to [{}] with token [{}], expiring on [{}]", identity.getUsername(),
+                model.get(TOKEN), model.get(EXPIRATION));
     }
 
     @Override
-    public void sendPasswordResetEmail(RegisteredUser user) throws MessagingException, IOException, TemplateException {
+    public void sendPasswordResetEmail(Identity identity) throws MessagingException, IOException, TemplateException {
         Map<String, Object> model = new HashMap<>();
 
-        model.put(NAME, user.getName());
-        model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
+        model.put(NAME, identity.getFullName());
+        model.put(TOKEN, registrationService.encodeToken(identity.getUsername(), identity.getRegistrationToken()));
         model.put(VALIDITY, "" + serverAuthProperties.getTokenValidityPeriod());
         model.put(EXPIRATION, registrationService.generateExpirationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         model.put(SERVER, getServerURL());
 
-        MailDraft mailDraft = MailDraft.builder(mailFrom, Collections.singletonList(user.getEmail())).subject(EmailType.PASSWORD_RESET.getSubject())
+        MailDraft mailDraft = MailDraft.builder(mailFrom, Collections.singletonList(identity.getUsername())).subject(EmailType.PASSWORD_RESET.getSubject())
                 .body(configuration.getTemplate(EmailType.PASSWORD_RESET.template).toString()).model(model).build();
         MimeMessage email = buildEmail(mailDraft);
         mailSender.send(email);
 
-        log.info("Reset email sent to [" + user.getEmail() + "] with token [" + model.get(TOKEN) + "], expiring on [" + model.get(EXPIRATION) + "]");
+        log.info("Reset email sent to [{}] with token [{}], expiring on [{}]", identity.getUsername(), model.get(TOKEN),
+                model.get(EXPIRATION));
     }
 
     @Override
@@ -122,7 +124,7 @@ public class MailService implements IMailService {
         mailSender.send(email);
 
         String formattedRecipients = StringUtils.join(mailDraft.getTo(), ", ");
-        log.info("Email sent to [" + formattedRecipients + "]");
+        log.info("Email sent to [{}]", formattedRecipients);
     }
 
     protected MimeMessage buildEmail(MailDraft draft) throws MessagingException, IOException, TemplateException {

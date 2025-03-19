@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import java.util.HashSet;
 import java.util.Optional;
 
 @Slf4j
@@ -59,7 +60,8 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
 
-        UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(identity, presentedPassword, identity.getAuthorities());
+        UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(identity.toSession(),
+                presentedPassword, new HashSet<>());
         result.setDetails(authentication.getDetails());
         loginAttemptService.loginSucceeded(key);
         return result;

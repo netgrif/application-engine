@@ -2,7 +2,7 @@ package com.netgrif.application.engine.ldap.service;
 
 
 import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.UserState;
+import com.netgrif.application.engine.authentication.domain.IdentityState;
 import com.netgrif.application.engine.authentication.service.interfaces.ILdapUserRefService;
 import com.netgrif.application.engine.configuration.ldap.LdapConfiguration;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
@@ -68,7 +68,7 @@ public class LdapUserRefService implements ILdapUserRefService {
         LdapUser ldapUser = new LdapUser(ldapUserRef.getDn().toString(), ldapUserRef.getCn(), ldapUserRef.getUid(), ldapUserRef.getHomeDirectory(), ldapUserRef.getMail(), ldapUserRef.getFirstName(), ldapUserRef.getSurname(), ldapUserRef.getMemberOf(), ldapUserRef.getTelNumber());
         ldapUser.setToken(null);
         ldapUser.setExpirationDate(null);
-        ldapUser.setState(UserState.ACTIVE);
+        ldapUser.setState(IdentityState.ACTIVE);
 
         String generatedString = RandomStringUtils.randomAlphanumeric(35);
         ldapUser.setPassword(generatedString);

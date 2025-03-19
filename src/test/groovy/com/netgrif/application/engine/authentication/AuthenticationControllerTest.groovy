@@ -8,7 +8,7 @@ import com.netgrif.application.engine.authentication.domain.User
 import com.netgrif.application.engine.authentication.domain.repositories.AuthorityRepository
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository
 import com.netgrif.application.engine.authentication.web.AuthenticationController
-import com.netgrif.application.engine.authentication.web.requestbodies.NewUserRequest
+import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest
 import com.netgrif.application.engine.authentication.web.requestbodies.RegistrationRequest
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.mail.EmailType
@@ -87,7 +87,7 @@ class AuthenticationControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void inviteTest() {
-        controller.invite(new NewUserRequest(email: EMAIL, groups: [] as Set, roles: [] as Set), null)
+        controller.invite(new NewIdentityRequest(email: EMAIL, groups: [] as Set, roles: [] as Set), null)
 
         MimeMessage[] messages = smtpServer.getReceivedMessages()
         assertMessageReceived(messages)

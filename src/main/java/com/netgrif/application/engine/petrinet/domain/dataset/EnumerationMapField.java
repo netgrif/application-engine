@@ -18,6 +18,11 @@ public class EnumerationMapField extends MapOptionsField<I18nString, String> {
         super();
     }
 
+    public EnumerationMapField(String value) {
+        this();
+        setRawValue(value);
+    }
+
     @Override
     @QueryType(PropertyType.NONE)
     public DataType getType() {

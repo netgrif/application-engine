@@ -4,7 +4,7 @@ package com.netgrif.application.engine.ldap.domain;
 import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.IUser;
 import com.netgrif.application.engine.authentication.domain.Identity;
-import com.netgrif.application.engine.authentication.domain.UserState;
+import com.netgrif.application.engine.authentication.domain.IdentityState;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -64,7 +64,7 @@ public class LdapIdentity extends Identity {
         user.setUid(this.uid);
         user.setMemberOf(this.memberOf);
         user.setHomeDirectory(homeDirectory);
-        user.setState(UserState.ACTIVE);
+        user.setState(IdentityState.ACTIVE);
         user.setPassword("n/a");
         user.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
         // todo 2058

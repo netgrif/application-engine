@@ -3,7 +3,7 @@ package com.netgrif.application.engine.action
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.Authority
 import com.netgrif.application.engine.authentication.domain.User
-import com.netgrif.application.engine.authentication.domain.UserState
+import com.netgrif.application.engine.authentication.domain.IdentityState
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.Process
@@ -94,7 +94,7 @@ class AssignActionTest {
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
+        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: IdentityState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
 //                [org] as Group[],
                 [] as ProcessRole[])

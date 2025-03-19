@@ -75,7 +75,7 @@ public abstract class AbstractUserService implements IUserService {
         User system = repository.findByEmail(SYSTEM_USER_EMAIL);
         if (system == null) {
             system = new User(SYSTEM_USER_EMAIL, "n/a", SYSTEM_USER_NAME, SYSTEM_USER_SURNAME);
-            system.setState(UserState.ACTIVE);
+            system.setState(IdentityState.ACTIVE);
             repository.save(system);
         }
         return system;

@@ -3,7 +3,7 @@ package com.netgrif.application.engine.menu
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.Authority
 import com.netgrif.application.engine.authentication.domain.User
-import com.netgrif.application.engine.authentication.domain.UserState
+import com.netgrif.application.engine.authentication.domain.IdentityState
 import com.netgrif.application.engine.authentication.service.UserService
 import com.netgrif.application.engine.orgstructure.groups.NextGroupService
 import com.netgrif.application.engine.petrinet.domain.I18nString
@@ -200,7 +200,7 @@ class MenuImportExportTest {
 
     private User createDummyUser() {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        return importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: UserState.ACTIVE),
+        return importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: IdentityState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
     }

@@ -5,7 +5,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.Authority
 import com.netgrif.application.engine.authentication.domain.IUser
 import com.netgrif.application.engine.authentication.domain.User
-import com.netgrif.application.engine.authentication.domain.UserState
+import com.netgrif.application.engine.authentication.domain.IdentityState
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -121,13 +121,13 @@ class WorkflowAuthorizationServiceTest {
         this.netWithUserRefs = netWithUserRefs.getNet()
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: IdentityState.ACTIVE),
                 [auths.get("user")]as Authority[],
                 [] as ProcessRole[])
         testUserAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
         testUserAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
 
-        importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: IdentityState.ACTIVE),
                 [auths.get("admin")] as Authority[],
                 [] as ProcessRole[])
         adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")

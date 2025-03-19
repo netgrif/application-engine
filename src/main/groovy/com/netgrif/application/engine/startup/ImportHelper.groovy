@@ -111,7 +111,7 @@ class ImportHelper {
 
     IUser createUser(User user, Authority[] authorities, ProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
-        user.state = UserState.ACTIVE
+        user.state = IdentityState.ACTIVE
         user = userService.saveNew(user)
         Set<String> roleIds = Arrays.stream(roles).map { role -> role.stringId }.collect(Collectors.toSet())
         roleService.assignRolesToUser(user.stringId, roleIds)

@@ -16,7 +16,7 @@ public abstract class AbstractUser implements IUser, Serializable {
 
     @NotNull
     @Setter
-    protected UserState state;
+    protected IdentityState state;
 
     @Setter
     protected Set<Authority> authorities;
@@ -49,7 +49,7 @@ public abstract class AbstractUser implements IUser, Serializable {
     }
 
     public boolean isActive() {
-        return UserState.ACTIVE.equals(state) || UserState.BLOCKED.equals(state);
+        return IdentityState.ACTIVE.equals(state) || IdentityState.BLOCKED.equals(state);
     }
 
     public Author transformToAuthor() {

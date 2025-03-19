@@ -4,7 +4,7 @@ import com.netgrif.application.engine.authentication.domain.IUser;
 import com.netgrif.application.engine.authentication.domain.RegisteredUser;
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
-import com.netgrif.application.engine.authentication.web.requestbodies.NewUserRequest;
+import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
@@ -176,15 +176,15 @@ public class NextGroupService implements INextGroupService {
             return addUser(user, existingUsers);
         } else {
             log.info("Inviting new user to group.");
-            NewUserRequest newUserRequest = new NewUserRequest();
-            newUserRequest.email = email;
-            RegisteredUser regUser = registrationService.createNewUser(newUserRequest);
+            NewIdentityRequest newIdentityRequest = new NewIdentityRequest();
+            newIdentityRequest.email = email;
+            RegisteredUser regUser = registrationService.createNewIdentity(newIdentityRequest);
             regUser.addGroup(groupCase.getStringId());
             userService.save(regUser);
 
             try {
                 mailService.sendRegistrationEmail(regUser);
-                mailAttemptService.mailAttempt(newUserRequest.email);
+                mailAttemptService.mailAttempt(newIdentityRequest.email);
             } catch (MessagingException | IOException | TemplateException e) {
                 log.error(e.getMessage());
             }

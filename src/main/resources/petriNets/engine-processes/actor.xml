@@ -29,23 +29,6 @@
 		<id>lastname</id>
 		<title>Last name</title>
 	</data>
-	<data type="text">
-		<id>registration_token</id>
-		<title>Registration token</title>
-	</data>
-	<data type="dateTime">
-		<id>expiration</id>
-		<title>Expiration date</title>
-	</data>
-	<data type="enumeration_map">
-		<id>state</id>
-		<title>State</title>
-		<options>
-			<option id="active">Active</option>
-			<option id="blocked">Blocked</option>
-			<option id="invited">Invited</option>
-		</options>
-	</data>
 <!--	todo preklady-->
 	<transition>
 		<id>t1</id>
@@ -79,22 +62,6 @@
 			<item>
 				<dataRef>
 					<id>lastname</id>
-					<logic>
-						<behavior>editable</behavior>
-					</logic>
-				</dataRef>
-			</item>
-			<item>
-				<dataRef>
-					<id>expiration</id>
-					<logic>
-						<behavior>editable</behavior>
-					</logic>
-				</dataRef>
-			</item>
-			<item>
-				<dataRef>
-					<id>state</id>
 					<logic>
 						<behavior>editable</behavior>
 					</logic>

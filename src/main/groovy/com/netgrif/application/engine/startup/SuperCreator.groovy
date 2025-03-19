@@ -58,7 +58,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
                 surname: configuration.surname,
                 email: configuration.email,
                 password: configuration.password,
-                state: UserState.ACTIVE,
+                state: IdentityState.ACTIVE,
                 authorities: [adminAuthority, systemAuthority] as Set<Authority>))
 
         Set<String> allRoleIds = roleService.findAll().stream().map { it.stringId }.collect(Collectors.toSet())

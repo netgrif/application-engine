@@ -4,8 +4,8 @@ import com.netgrif.application.engine.MockService;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.IUser;
+import com.netgrif.application.engine.authentication.domain.IdentityState;
 import com.netgrif.application.engine.authentication.domain.User;
-import com.netgrif.application.engine.authentication.domain.UserState;
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
@@ -110,7 +110,7 @@ public class VariableArcsTest {
         user.setName("Test");
         user.setSurname("Test");
         user.setPassword("password");
-        user.setState(UserState.ACTIVE);
+        user.setState(IdentityState.ACTIVE);
         user.setEmail("VariableArcsTest@test.com");
         testUser = importHelper.createUser(user,
                 new Authority[]{authorityService.getOrCreate(Authority.user)},

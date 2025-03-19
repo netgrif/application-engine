@@ -2,7 +2,7 @@ package com.netgrif.application.engine.authentication.service;
 
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.User;
-import com.netgrif.application.engine.authentication.domain.UserState;
+import com.netgrif.application.engine.authentication.domain.IdentityState;
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository;
 import com.netgrif.application.engine.authentication.service.interfaces.ILoginAttemptService;
 import com.netgrif.application.engine.event.events.user.UserLoginEvent;
@@ -50,7 +50,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userRepository.findByEmail(email);
         if (user == null)
             throw new UsernameNotFoundException("No user was found for login: " + email);
-        if (user.getPassword() == null || user.getState() != UserState.ACTIVE)
+        if (user.getPassword() == null || user.getState() != IdentityState.ACTIVE)
             throw new UsernameNotFoundException("User with login " + email + " cannot be logged in!");
 
         return user.transformToLoggedUser();

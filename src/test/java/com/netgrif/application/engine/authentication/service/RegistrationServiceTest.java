@@ -6,7 +6,7 @@ import com.netgrif.application.engine.authentication.domain.RegisteredUser;
 import com.netgrif.application.engine.authentication.domain.User;
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository;
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService;
-import com.netgrif.application.engine.authentication.web.requestbodies.NewUserRequest;
+import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest;
 import com.netgrif.application.engine.authentication.web.requestbodies.RegistrationRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,11 +48,11 @@ public class RegistrationServiceTest {
 
     @Test
 //    @WithMockUser(username = "myUser", roles = { "myAuthority" })
-    public void testRegisterUser() throws InvalidUserTokenException {
-        NewUserRequest request = new NewUserRequest();
+    public void testRegisterIdentity() throws InvalidIdentityTokenException {
+        NewIdentityRequest request = new NewIdentityRequest();
         request.email = "test@test.com";
 
-        RegisteredUser user = service.createNewUser(request);
+        RegisteredUser user = service.createNewIdentity(request);
 
         RegistrationRequest registrationRequest = new RegistrationRequest();
         registrationRequest.token = service.encodeToken(user.getEmail(), user.getToken());
@@ -64,7 +64,7 @@ public class RegistrationServiceTest {
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         Mockito.when(securityContext.getAuthentication()).thenReturn(auth);
         SecurityContextHolder.setContext(securityContext);
-        User registered = (User) service.registerUser(registrationRequest);
+        User registered = (User) service.registerIdentity(registrationRequest);
 
         assert registered != null;
     }

@@ -1,32 +1,45 @@
 package com.netgrif.application.engine.authentication.service;
 
 import com.netgrif.application.engine.authentication.domain.Identity;
-import com.netgrif.application.engine.authentication.domain.repositories.IdentityRepository;
+import com.netgrif.application.engine.authentication.domain.IdentityState;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
+import com.netgrif.application.engine.authentication.domain.constants.IdentityConstants;
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
-import com.netgrif.application.engine.security.service.ISecurityContextService;
+import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
+import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.LongStream;
 
 @Service
 @RequiredArgsConstructor
 public class IdentityService implements IIdentityService {
 
-    private final IdentityRepository repository;
-    private final ISecurityContextService securityContextService;
+    private final IElasticCaseService elasticCaseService;
+    private final IWorkflowService workflowService;
+    private final IDataService dataService;
+    private final IUserService userService;
+    // todo: release/8.0.0 make encoder configurable
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    /**
-     * todo javadoc
-     */
     @Override
-    public Optional<Identity> getLoggedIdentityFromContext() {
-        // todo 2058 identitu ma aj system actor?
-        Identity identity = (Identity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return Optional.of(identity);
+    public LoggedIdentity getLoggedIdentity() {
+        return (LoggedIdentity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     /**
@@ -37,13 +50,11 @@ public class IdentityService implements IIdentityService {
         if (id == null) {
             return Optional.empty();
         }
-
-        Optional<Identity> identityOpt = getLoggedIdentityFromContext();
-        if (identityOpt.isPresent() && identityOpt.get().getId().equals(id)) {
-            return identityOpt;
+        try {
+            return Optional.of((Identity) workflowService.findOne(id));
+        } catch (IllegalArgumentException ignored) {
+            return Optional.empty();
         }
-
-        return repository.findById(id);
     }
 
     /**
@@ -54,13 +65,15 @@ public class IdentityService implements IIdentityService {
         if (username == null) {
             return Optional.empty();
         }
+        return findOneByQuery(usernameQuery(username));
+    }
 
-        Optional<Identity> identityOpt = getLoggedIdentityFromContext();
-        if (identityOpt.isPresent() && identityOpt.get().getUsername().equals(username)) {
-            return identityOpt;
+    @Override
+    public boolean existsByUsername(String username) {
+        if (username == null) {
+            return false;
         }
-
-        return repository.findByUsername(username);
+        return countByQuery(usernameQuery(username)) > 0;
     }
 
     /**
@@ -68,72 +81,58 @@ public class IdentityService implements IIdentityService {
      * */
     @Override
     public Set<String> findActorIds(String id) {
-        Optional<Identity> identityOpt = getLoggedIdentityFromContext();
-        if (identityOpt.isEmpty() || !identityOpt.get().getId().equals(id)) {
-            identityOpt = findById(id);
-        }
+        Optional<Identity> identityOpt = findById(id);
 
         if (identityOpt.isPresent()) {
-            Set<String> actorIds = new HashSet<>(identityOpt.get().getAdditionalActorIds());
-            actorIds.add(identityOpt.get().getMainActorId());
-            return actorIds;
+            return identityOpt.get().getAllActors();
         }
 
         return Set.of();
     }
 
-    /**
-     * todo javadoc
-     * */
     @Override
-    public Identity save(Identity identity) {
-        if (identity == null) {
-            return null;
+    @SuppressWarnings("unchecked")
+    public List<Identity> findAllByStateAndExpirationDateBefore(IdentityState state, LocalDateTime dateTime) {
+        if (state == null || dateTime == null) {
+            return List.of();
         }
-
-        identity = repository.save(identity);
-        securityContextService.reloadSecurityContext(identity);
-
-        return identity;
+        return (List<Identity>) findAllByQuery(stateAndExpirationDateBeforeQuery(state, dateTime));
     }
 
     /**
      * todo javadoc
      * */
     @Override
-    public Identity addMainActor(String identityId, String actorId) {
-        Optional<Identity> identityOpt = findById(identityId);
-        if (identityOpt.isEmpty()) {
-            throw new IllegalArgumentException(String.format("Could not find identity with id [%s]", identityId));
-        }
-
-        return addMainActor(identityOpt.get(), actorId);
+    public Identity create(IdentityParams params) {
+        Identity identity = (Identity) workflowService.createCaseByIdentifier("identity", params.getFullName(),
+                "", getLoggedIdentity());
+        return (Identity) dataService.setData(identity, params.toDataSet(), userService.getSystem()).getCase();
     }
 
     /**
      * todo javadoc
      * */
     @Override
-    public Identity addMainActor(Identity identity, String actorId) {
-        if (identity == null) {
-            throw new IllegalArgumentException("Provided identity is null");
-        }
-
-        identity.setMainActorId(actorId);
-
-        return save(identity);
+    public Identity encodePasswordAndCreate(IdentityParams params) {
+        encodePassword(params);
+        return create(params);
     }
 
     /**
      * todo javadoc
      * */
     @Override
-    public Identity addAdditionalActor(String identityId, String actorId) {
-        Optional<Identity> identityOpt = findById(identityId);
-        if (identityOpt.isEmpty()) {
-            throw new IllegalArgumentException(String.format("Could not find identity with id [%s]", identityId));
-        }
-        return addAdditionalActors(identityOpt.get(), Set.of(actorId));
+    public Identity update(Identity identity, IdentityParams params) {
+        return (Identity) dataService.setData(identity, params.toDataSet(), userService.getSystem()).getCase();
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public Identity encodePasswordAndUpdate(Identity identity, IdentityParams params) {
+        encodePassword(params);
+        return update(identity, params);
     }
 
     /**
@@ -152,25 +151,99 @@ public class IdentityService implements IIdentityService {
      * todo javadoc
      * */
     @Override
-    public Identity addAdditionalActors(String identityId, Set<String> actorIds) {
-        Optional<Identity> identityOpt = findById(identityId);
-        if (identityOpt.isEmpty()) {
-            throw new IllegalArgumentException(String.format("Could not find identity with id [%s]", identityId));
+    public Identity addAdditionalActors(Identity identity, Set<String> actorIds) {
+        if (identity == null) {
+            throw new IllegalArgumentException("Provided identity is null");
         }
-        return addAdditionalActors(identityOpt.get(), actorIds);
+
+        List<String> additionalActorIds = new ArrayList<>(identity.getAdditionalActorIds());
+        additionalActorIds.addAll(actorIds);
+
+        return update(identity, IdentityParams.with()
+                .additionalActors(CaseField.withValue(additionalActorIds))
+                .build());
     }
 
     /**
      * todo javadoc
      * */
     @Override
-    public Identity addAdditionalActors(Identity identity, Set<String> actorIds) {
-        if (identity == null) {
-            throw new IllegalArgumentException("Provided identity is null");
+    @SuppressWarnings("unchecked")
+    public List<Identity> removeAllByStateAndExpirationDateBefore(IdentityState state, LocalDateTime dateTime) {
+        if (state == null || dateTime == null) {
+            return List.of();
         }
 
-        identity.getAdditionalActorIds().addAll(actorIds);
+        List<Identity> identities = (List<Identity>) findAllByQuery(stateAndExpirationDateBeforeQuery(state, dateTime));
+        for (Identity identity : identities) {
+            workflowService.deleteCase(identity);
+        }
 
-        return save(identity);
+        return identities;
     }
+
+    private void encodePassword(IdentityParams params) {
+        String password = params.getPassword();
+        if (password == null) {
+            throw new IllegalArgumentException("Identity has no password");
+        }
+        params.setPassword(new TextField(passwordEncoder.encode(password)));
+    }
+
+    private Optional<Identity> findOneByQuery(String query) {
+        CaseSearchRequest request = CaseSearchRequest.builder()
+                .query(buildQuery(Set.of(query)))
+                .build();
+        Page<Case> resultAsPage = elasticCaseService.search(List.of(request), getLoggedIdentity(), PageRequest.of(0, 1),
+                Locale.getDefault(), false);
+        if (resultAsPage.hasContent()) {
+            return Optional.of((Identity) resultAsPage.getContent().get(0));
+        }
+        return Optional.empty();
+    }
+
+    private List<? extends Case> findAllByQuery(String query) {
+        CaseSearchRequest request = CaseSearchRequest.builder()
+                .query(buildQuery(Set.of(query)))
+                .build();
+
+        List<Case> result = new ArrayList<>();
+
+        long identityCount = elasticCaseService.count(List.of(request), getLoggedIdentity(), Locale.getDefault(), false);
+        long pageCount = (identityCount / 100) + 1;
+        LongStream.range(0, pageCount).forEach(pageIdx -> {
+            Page<Case> pageResult = elasticCaseService.search(List.of(request), getLoggedIdentity(), PageRequest.of((int) pageIdx, 100),
+                    Locale.getDefault(), false);
+            result.addAll(pageResult.getContent());
+        });
+
+        return result;
+    }
+
+    private long countByQuery(String query) {
+        CaseSearchRequest request = CaseSearchRequest.builder()
+                .query(buildQuery(Set.of(query)))
+                .build();
+        return elasticCaseService.count(List.of(request), getLoggedIdentity(), Locale.getDefault(), false);
+    }
+
+    private static String buildQuery(Set<String> andQueries) {
+        StringBuilder queryBuilder = new StringBuilder("processIdentifier:identity");
+        for (String query : andQueries) {
+            queryBuilder.append(" AND ");
+            queryBuilder.append(query);
+        }
+        return queryBuilder.toString();
+    }
+
+    private static String usernameQuery(String username) {
+        return String.format("dataSet.%s.fulltextValue:\"%s\"", IdentityConstants.USERNAME_FIELD_ID, username);
+    }
+
+    private static String stateAndExpirationDateBeforeQuery(IdentityState state, LocalDateTime dateTime) {
+        long timestamp = Timestamp.valueOf(dateTime).getTime();
+        return String.format("dataSet.%s.keyValue:\"%s\" AND dataSet.%s.timestampValue:<=%d",
+                IdentityConstants.STATE_FIELD_ID, state.name(), IdentityConstants.EXPIRATION_DATE_FIELD_ID, timestamp);
+    }
+
 }

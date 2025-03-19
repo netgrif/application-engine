@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.authentication.domain;
 
-public enum UserState {
+public enum IdentityState {
     ACTIVE,
     BLOCKED,
     INVITED

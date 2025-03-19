@@ -83,12 +83,12 @@
         <event type="set">
             <actions phase="post">
                 <action id="action_9">
-					<![CDATA[
+                    <![CDATA[
                     def user = new com.netgrif.application.engine.authentication.domain.User("test@test.com", "password", "test", "test")
-                    user.state = com.netgrif.application.engine.authentication.domain.UserState.ACTIVE
+                    user.state = com.netgrif.application.engine.authentication.domain.IdentityState.ACTIVE
                     function_res.createUser(user)
                     ]]>
-				</action>
+                </action>
             </actions>
         </event>
     </data>

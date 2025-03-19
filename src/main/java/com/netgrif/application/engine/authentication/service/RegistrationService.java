@@ -1,18 +1,24 @@
 package com.netgrif.application.engine.authentication.service;
 
-import com.netgrif.application.engine.authentication.domain.RegisteredUser;
-import com.netgrif.application.engine.authentication.domain.User;
-import com.netgrif.application.engine.authentication.domain.UserState;
-import com.netgrif.application.engine.authentication.domain.repositories.UserRepository;
+import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.IdentityState;
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService;
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
-import com.netgrif.application.engine.authentication.web.requestbodies.NewUserRequest;
+import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest;
 import com.netgrif.application.engine.authentication.web.requestbodies.RegistrationRequest;
+import com.netgrif.application.engine.authorization.domain.Actor;
+import com.netgrif.application.engine.authorization.domain.params.ActorParams;
+import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
+import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
+import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,222 +27,285 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class RegistrationService implements IRegistrationService {
 
-    @Autowired
-    protected BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final INextGroupService groupService;
+    private final IRoleService roleService;
+    private final IActorService actorService;
+    private final ServerAuthProperties serverAuthProperties;
+    private final IIdentityService identityService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private static final String TOKEN_DELIMITER = ":";
 
-    @Autowired
-    private IUserService userService;
-
-    @Autowired
-    private INextGroupService groupService;
-
-    @Autowired
-    private IRoleService roleService;
-
-    @Autowired
-    private ServerAuthProperties serverAuthProperties;
-
+    /**
+     * todo javadoc
+     * */
     @Override
     @Transactional
-    @Scheduled(cron = "0 0 1 * * *")
-    public void removeExpiredUsers() {
-        log.info("Removing expired unactivated invited users");
-        List<User> expired = userRepository.removeAllByStateAndExpirationDateBefore(UserState.INVITED, LocalDateTime.now());
-        log.info("Removed " + expired.size() + " unactivated users");
-    }
+    public Identity createNewIdentity(NewIdentityRequest request) {
+        IdentityParams identityParams = IdentityParams.with()
+                .username(new TextField(request.email))
+                .state(new EnumerationMapField(IdentityState.INVITED.name()))
+                .expirationDateTime(new DateTimeField(generateExpirationDate()))
+                .registrationToken(new TextField(generateTokenKey()))
+                .build();
+        Optional<Identity> identityOpt = identityService.findByUsername(request.email);
+        Identity identity;
 
-    @Override
-    @Transactional
-    @Scheduled(cron = "0 0 1 * * *")
-    public void resetExpiredToken() {
-        log.info("Resetting expired user tokens");
-        List<User> users = userRepository.findAllByStateAndExpirationDateBefore(UserState.BLOCKED, LocalDateTime.now());
-        if (users == null || users.isEmpty()) {
-            log.info("There are none expired tokens. Everything is awesome.");
-            return;
+        if (identityOpt.isPresent()) {
+            if (identityOpt.get().isActive()) {
+                return null;
+            }
+            log.info("Renewing old identity [{}]", request.email);
+            identity = identityService.update(identityOpt.get(), identityParams);
+        } else {
+            log.info("Creating new identity [{}]", request.email);
+            ActorParams actorParams = ActorParams.with()
+                    .email(new TextField(request.email))
+                    .build();
+            Actor defaultActor = actorService.create(actorParams);
+
+            identityParams.setMainActor(CaseField.withValue(List.of(defaultActor.getStringId())));
+            identity = identityService.create(identityParams);
+
+            if (request.roles != null && !request.roles.isEmpty()) {
+                roleService.assignRolesToUser(defaultActor.getStringId(), request.roles);
+            }
+            // todo 2058 add authorities (default app roles)
+            roleService.assignRolesToUser(defaultActor.getStringId(), Set.of(roleService.findDefaultRole().getStringId()));
+
+            // todo 2058 groups
+//            if (newUser.groups != null && !newUser.groups.isEmpty()) {
+//                for (String group : newUser.groups) {
+//                    groupService.addUser(user, group);
+//                }
+//            }
         }
 
-        users.forEach(user -> {
-            user.setToken(null);
-            user.setExpirationDate(null);
-        });
-        users = userRepository.saveAll(users);
-        log.info("Reset " + users.size() + " expired user tokens");
+        return identity;
     }
 
+    /**
+     * todo javadoc
+     * */
     @Override
-    public void changePassword(RegisteredUser user, String newPassword) {
-        user.setPassword(newPassword);
-        encodeUserPassword(user);
-        userService.save(user);
-        log.info("Changed password for user " + user.getEmail() + ".");
+    @Transactional
+    public Identity registerIdentity(RegistrationRequest registrationRequest) throws InvalidIdentityTokenException {
+        String email = decodeToken(registrationRequest.token)[0];
+        log.info("Registering user {}", email);
+
+        Optional<Identity> identityOpt = identityService.findByUsername(email);
+        if (identityOpt.isEmpty()) {
+            return null;
+        }
+
+        Identity identity = identityOpt.get();
+        IdentityParams identityParams = IdentityParams.with()
+                .password(new TextField(registrationRequest.password))
+                .firstname(new TextField(registrationRequest.name))
+                .lastname(new TextField(registrationRequest.surname))
+                .registrationToken(new TextField(null))
+                .expirationDateTime(new DateTimeField(null))
+                .state(new EnumerationMapField(IdentityState.ACTIVE.name()))
+                .build();
+        identity = identityService.encodePasswordAndUpdate(identity, identityParams);
+
+        Optional<Actor> actorOpt = actorService.findById(identity.getMainActorId());
+        if (actorOpt.isEmpty()) {
+            throw new IllegalStateException(String.format("Identity [%s] has no default actor!", identity.getStringId()));
+        }
+
+        ActorParams actorParams = ActorParams.with()
+                .firstname(new TextField(registrationRequest.name))
+                .lastname(new TextField(registrationRequest.surname))
+                .build();
+        actorService.update(actorOpt.get(), actorParams);
+
+        return identity;
     }
 
+    /**
+     * todo javadoc
+     * */
     @Override
     public boolean verifyToken(String token) {
         try {
-            log.info("Verifying token:" + token);
+            log.info("Verifying token: {}", token);
             String[] tokenParts = decodeToken(token);
-            User user = userRepository.findByEmail(tokenParts[0]);
-            return user != null && Objects.equals(user.getToken(), tokenParts[1]) && user.getExpirationDate().isAfter(LocalDateTime.now());
-        } catch (InvalidUserTokenException e) {
+            String email = tokenParts[0];
+            String decodedToken = tokenParts[1];
+            Optional<Identity> identityOpt = identityService.findByUsername(email);
+            return identityOpt.isPresent()
+                    && Objects.equals(identityOpt.get().getRegistrationToken(), decodedToken)
+                    && identityOpt.get().getExpirationDate().isAfter(LocalDateTime.now());
+        } catch (InvalidIdentityTokenException e) {
             log.error(e.getMessage());
             return false;
         }
     }
 
-    @Override
-    public void encodeUserPassword(RegisteredUser user) {
-        String pass = user.getPassword();
-        if (pass == null) {
-            throw new IllegalArgumentException("User has no password");
-        }
-        user.setPassword(bCryptPasswordEncoder.encode(pass));
-    }
-
-    @Override
-    public boolean stringMatchesUserPassword(RegisteredUser user, String passwordToCompare) {
-        return bCryptPasswordEncoder.matches(passwordToCompare, user.getPassword());
-    }
-
-    @Override
-    @Transactional
-    public User createNewUser(NewUserRequest newUser) {
-        User user;
-        if (userRepository.existsByEmail(newUser.email)) {
-            user = userRepository.findByEmail(newUser.email);
-            if (user.isActive()) {
-                return null;
-            }
-            log.info("Renewing old user [{}]", newUser.email);
-        } else {
-            user = new User(newUser.email, null, User.UNKNOWN, User.UNKNOWN);
-            log.info("Creating new user [{}]", newUser.email);
-        }
-        user.setToken(generateTokenKey());
-        user.setPassword("");
-        user.setExpirationDate(generateExpirationDate());
-        user.setState(UserState.INVITED);
-        userService.addDefaultAuthorities(user);
-
-        user = userRepository.save(user);
-        if (newUser.roles != null && !newUser.roles.isEmpty()) {
-            roleService.assignRolesToUser(user.getStringId(), newUser.roles);
-        }
-        userService.addDefaultRole(user);
-
-        if (newUser.groups != null && !newUser.groups.isEmpty()) {
-            for (String group : newUser.groups) {
-                groupService.addUser(user, group);
-            }
-        }
-
-        return userRepository.save(user);
-    }
-
-    @Override
-    public RegisteredUser registerUser(RegistrationRequest registrationRequest) throws InvalidUserTokenException {
-        String email = decodeToken(registrationRequest.token)[0];
-        log.info("Registering user " + email);
-        RegisteredUser user = userRepository.findByEmail(email);
-        if (user == null) {
-            return null;
-        }
-
-        user.setName(registrationRequest.name);
-        user.setSurname(registrationRequest.surname);
-        user.setPassword(registrationRequest.password);
-
-        user.setToken(null);
-        user.setExpirationDate(null);
-        user.setState(UserState.ACTIVE);
-
-        return (RegisteredUser) userService.saveNewAndAuthenticate(user);
-    }
-
-    @Override
-    public RegisteredUser resetPassword(String email) {
-        log.info("Resetting password of " + email);
-        User user = userRepository.findByEmail(email);
-        if (user == null || !user.isActive()) {
-            String state = user == null ? "Non-existing" : "Inactive";
-            log.info(state + " user [" + email + "] tried to reset his password");
-            return null;
-        }
-
-        user.setState(UserState.BLOCKED);
-        user.setPassword(null);
-        user.setToken(generateTokenKey());
-        user.setExpirationDate(generateExpirationDate());
-        return (RegisteredUser) userService.save(user);
-    }
-
-    @Override
-    public RegisteredUser recover(String email, String newPassword) {
-        log.info("Recovering user " + email);
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            return null;
-        }
-        user.setState(UserState.ACTIVE);
-        user.setPassword(newPassword);
-        encodeUserPassword(user);
-        user.setToken(null);
-        user.setExpirationDate(null);
-
-        return (RegisteredUser) userService.save(user);
-    }
-
+    /**
+     * todo javadoc
+     * */
     @Override
     public String generateTokenKey() {
         return new BigInteger(256, new SecureRandom()).toString(32);
     }
 
+    /**
+     * todo javadoc
+     * */
     @Override
-    public String[] decodeToken(String token) throws InvalidUserTokenException {
+    public String[] decodeToken(String token) throws InvalidIdentityTokenException {
         if (token == null || token.isEmpty()) {
-            throw new InvalidUserTokenException(token);
+            throw new InvalidIdentityTokenException(token);
         }
         byte[] decodedBytes;
 
         try {
             decodedBytes = Base64.getDecoder().decode(token);
         } catch (IllegalArgumentException exception) {
-            throw new InvalidUserTokenException(token);
+            throw new InvalidIdentityTokenException(token);
         }
         String decodedString = new String(decodedBytes);
-        String[] parts = decodedString.split(":");
+        String[] parts = decodedString.split(TOKEN_DELIMITER);
 
         if (parts.length != 2 || !parts[0].contains("@")) {
-            throw new InvalidUserTokenException(token);
+            throw new InvalidIdentityTokenException(token);
         }
 
         return parts;
     }
 
+    /**
+     * todo javadoc
+     * */
     @Override
     public String encodeToken(String email, String tokenKey) {
-        return Base64.getEncoder().encodeToString((email + ":" + tokenKey).getBytes());
+        return Base64.getEncoder().encodeToString((email + TOKEN_DELIMITER + tokenKey).getBytes());
     }
 
+    /**
+     * todo javadoc
+     * */
+    @Override
+    @Transactional
+    @Scheduled(cron = "0 0 1 * * *")
+    public void removeExpiredIdentities() {
+        log.info("Removing expired unactivated identities");
+        List<Identity> expired = identityService.removeAllByStateAndExpirationDateBefore(IdentityState.INVITED,
+                LocalDateTime.now());
+        log.info("Removed {} unactivated identities", expired.size());
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    @Transactional
+    @Scheduled(cron = "0 0 1 * * *")
+    public void resetExpiredToken() {
+        log.info("Resetting expired identity tokens");
+        List<Identity> identities = identityService.findAllByStateAndExpirationDateBefore(IdentityState.BLOCKED,
+                LocalDateTime.now());
+        if (identities.isEmpty()) {
+            log.info("There are none expired tokens. Everything is awesome.");
+            return;
+        }
+
+        identities.forEach(identity -> {
+            identityService.update(identity, IdentityParams.with()
+                    .registrationToken(new TextField(null))
+                    .expirationDateTime(new DateTimeField(null))
+                    .build());
+        });
+
+        log.info("Reset {} expired identity tokens", identities.size());
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public void changePassword(Identity identity, String newPassword) {
+        identityService.encodePasswordAndUpdate(identity, IdentityParams.with()
+                .password(new TextField(newPassword))
+                .build());
+        log.info("Changed password for identity {}.", identity.getUsername());
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public boolean matchesIdentityPassword(Identity identity, String passwordToCompare) {
+        return bCryptPasswordEncoder.matches(passwordToCompare, identity.getPassword());
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public Identity resetPassword(String email) {
+        log.info("Resetting password of {}", email);
+
+        Optional<Identity> identityOpt = identityService.findByUsername(email);
+        if (identityOpt.isEmpty() || !identityOpt.get().isActive()) {
+            String state = identityOpt.isEmpty() ? "Non-existing" : "Inactive";
+            log.info("{} identity [{}] tried to reset his password", state, email);
+            return null;
+        }
+        IdentityParams params = IdentityParams.with()
+                .state(new EnumerationMapField(IdentityState.BLOCKED.name()))
+                .password(new TextField(null))
+                .registrationToken(new TextField(generateTokenKey()))
+                .expirationDateTime(new DateTimeField(generateExpirationDate()))
+                .build();
+
+        return identityService.update(identityOpt.get(), params);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public Identity recover(String email, String newPassword) {
+        log.info("Recovering identity {}", email);
+
+        Optional<Identity> identityOpt = identityService.findByUsername(email);
+        if (identityOpt.isEmpty()) {
+            return null;
+        }
+        IdentityParams params = IdentityParams.with()
+                .state(new EnumerationMapField(IdentityState.ACTIVE.name()))
+                .password(new TextField(newPassword))
+                .registrationToken(new TextField(null))
+                .expirationDateTime(new DateTimeField(null))
+                .build();
+
+        return identityService.encodePasswordAndUpdate(identityOpt.get(), params);
+    }
+
+    /**
+     * todo javadoc
+     * */
     @Override
     public LocalDateTime generateExpirationDate() {
         return LocalDateTime.now().plusDays(serverAuthProperties.getTokenValidityPeriod());
     }
 
+    /**
+     * todo javadoc
+     * */
     @Override
     public boolean isPasswordSufficient(String password) {
+        // todo: release/8.0.0 is this enough?
         return password.length() >= serverAuthProperties.getMinimalPasswordLength();
     }
 }

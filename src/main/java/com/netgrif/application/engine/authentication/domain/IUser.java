@@ -24,9 +24,9 @@ public interface IUser {
 
     String getTelNumber();
 
-    UserState getState();
+    IdentityState getState();
 
-    void setState(UserState state);
+    void setState(IdentityState state);
 
     Set<Authority> getAuthorities();
 

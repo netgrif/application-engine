@@ -65,7 +65,7 @@ public class UserService extends AbstractUserService {
 
     @Override
     public IUser saveNew(IUser user) {
-        registrationService.encodeUserPassword((RegisteredUser) user);
+        registrationService.encodePassword((RegisteredUser) user);
         addDefaultAuthorities(user);
 
         User savedUser = userRepository.save((User) user);
@@ -184,7 +184,7 @@ public class UserService extends AbstractUserService {
         Set<String> members = groupService.getAllCoMembers(identity.getSelfOrImpersonated().transformToUser());
         members.add(identity.getSelfOrImpersonated().getId());
         Set<ObjectId> objMembers = members.stream().map(ObjectId::new).collect(Collectors.toSet());
-        return changeType(userRepository.findAllByIdInAndState(objMembers, UserState.ACTIVE, pageable), pageable);
+        return changeType(userRepository.findAllByIdInAndState(objMembers, IdentityState.ACTIVE, pageable), pageable);
     }
 
     @Override
@@ -223,7 +223,7 @@ public class UserService extends AbstractUserService {
     private BooleanExpression buildPredicate(Set<ObjectId> members, String query) {
         BooleanExpression predicate = QUser.user
                 .id.in(members)
-                .and(QUser.user.state.eq(UserState.ACTIVE));
+                .and(QUser.user.state.eq(IdentityState.ACTIVE));
         for (String word : query.split(" ")) {
             predicate = predicate
                     .andAnyOf(QUser.user.email.containsIgnoreCase(word),

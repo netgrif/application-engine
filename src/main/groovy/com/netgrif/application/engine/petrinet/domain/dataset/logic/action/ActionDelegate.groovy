@@ -8,7 +8,7 @@ import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.authentication.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
-import com.netgrif.application.engine.authentication.web.requestbodies.NewUserRequest
+import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest
 import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.authorization.domain.Role
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
@@ -1036,15 +1036,15 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     MessageResource inviteUser(String email) {
-        NewUserRequest newUserRequest = new NewUserRequest()
+        NewIdentityRequest newUserRequest = new NewIdentityRequest()
         newUserRequest.email = email
         newUserRequest.groups = new HashSet<>()
         newUserRequest.roles = new HashSet<>()
         return inviteUser(newUserRequest)
     }
 
-    MessageResource inviteUser(NewUserRequest newUserRequest) {
-        IUser user = registrationService.createNewUser(newUserRequest)
+    MessageResource inviteUser(NewIdentityRequest newUserRequest) {
+        IUser user = registrationService.createNewIdentity(newUserRequest)
         if (user == null)
             return MessageResource.successMessage("Done")
         mailService.sendRegistrationEmail(user)

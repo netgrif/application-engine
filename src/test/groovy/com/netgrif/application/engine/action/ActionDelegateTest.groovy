@@ -5,7 +5,7 @@ import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.IUser
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
-import com.netgrif.application.engine.authentication.web.requestbodies.NewUserRequest
+import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest
 import com.netgrif.application.engine.configuration.PublicViewProperties
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
@@ -83,7 +83,7 @@ class ActionDelegateTest {
         GreenMail smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
         smtpServer.start()
 
-        NewUserRequest newUserRequest = new NewUserRequest()
+        NewIdentityRequest newUserRequest = new NewIdentityRequest()
         newUserRequest.setEmail("test@netgrif.com")
         newUserRequest.groups = new HashSet<>()
         newUserRequest.roles = new HashSet<>()

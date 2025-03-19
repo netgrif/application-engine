@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.elastic.service;
 
-import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepository;
@@ -123,14 +123,13 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     @Override
-    public Page<Case> search(List<CaseSearchRequest> requests, Identity user, Pageable pageable, Locale locale, Boolean isIntersection) {
+    public Page<Case> search(List<CaseSearchRequest> requests, LoggedIdentity identity, Pageable pageable, Locale locale, Boolean isIntersection) {
         if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        Identity loggedOrImpersonated = user.getSelfOrImpersonated();
         pageable = resolveUnmappedSortAttributes(pageable);
-        NativeSearchQuery query = buildQuery(requests, loggedOrImpersonated, pageable, locale, isIntersection);
+        NativeSearchQuery query = buildQuery(requests, identity, pageable, locale, isIntersection);
         List<Case> casePage;
         long total;
         if (query != null) {
@@ -147,13 +146,12 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     @Override
-    public long count(List<CaseSearchRequest> requests, Identity user, Locale locale, Boolean isIntersection) {
+    public long count(List<CaseSearchRequest> requests, LoggedIdentity identity, Locale locale, Boolean isIntersection) {
         if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        Identity loggedOrImpersonated = user.getSelfOrImpersonated();
-        NativeSearchQuery query = buildQuery(requests, loggedOrImpersonated, new FullPageRequest(), locale, isIntersection);
+        NativeSearchQuery query = buildQuery(requests, identity, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
             return template.count(query, ElasticCase.class);
         } else {
@@ -174,8 +172,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         return elasticCase.getUriNodeId();
     }
 
-    protected NativeSearchQuery buildQuery(List<CaseSearchRequest> requests, Identity user, Pageable pageable, Locale locale, Boolean isIntersection) {
-        List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
+    protected NativeSearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedIdentity identity, Pageable pageable, Locale locale, Boolean isIntersection) {
+        List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, identity, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
             // one of the queries evaluates to empty set => the entire result is an empty set
@@ -198,21 +196,21 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                 .build();
     }
 
-    protected BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, Identity user, Locale locale) {
+    protected BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, LoggedIdentity identity, Locale locale) {
         BoolQueryBuilder query = boolQuery();
 
-        buildViewPermissionQuery(query, user.getId());
-        buildPetriNetQuery(request, user, query);
+        buildViewPermissionQuery(query, identity.getActiveActorId());
+        buildPetriNetQuery(request, identity, query);
         buildAuthorQuery(request, query);
         buildTaskQuery(request, query);
         buildRoleQuery(request, query);
         buildDataQuery(request, query);
         buildFullTextQuery(request, query);
-        buildStringQuery(request, query, user);
+        buildStringQuery(request, query, identity);
         buildCaseIdQuery(request, query);
         buildUriNodeIdQuery(request, query);
         buildTagsQuery(request, query);
-        boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
+        boolean resultAlwaysEmpty = buildGroupQuery(request, identity, locale, query);
 
         // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch
 
@@ -222,7 +220,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             return query;
     }
 
-    protected void buildPetriNetQuery(CaseSearchRequest request, Identity user, BoolQueryBuilder query) {
+    protected void buildPetriNetQuery(CaseSearchRequest request, LoggedIdentity identity, BoolQueryBuilder query) {
         if (request.process == null || request.process.isEmpty()) {
             return;
         }
@@ -403,7 +401,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     /**
      * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a>
      */
-    protected void buildStringQuery(CaseSearchRequest request, BoolQueryBuilder query, Identity user) {
+    protected void buildStringQuery(CaseSearchRequest request, BoolQueryBuilder query, LoggedIdentity identity) {
         if (request.query == null || request.query.isEmpty()) {
             return;
         }
@@ -469,7 +467,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
      * }
      * </pre>
      */
-    protected boolean buildGroupQuery(CaseSearchRequest request, Identity user, Locale locale, BoolQueryBuilder query) {
+    protected boolean buildGroupQuery(CaseSearchRequest request, LoggedIdentity identity, Locale locale, BoolQueryBuilder query) {
         if (request.group == null || request.group.isEmpty()) {
             return false;
         }

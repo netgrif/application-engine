@@ -1,37 +1,35 @@
 package com.netgrif.application.engine.authentication.service.interfaces;
 
-import com.netgrif.application.engine.authentication.domain.RegisteredUser;
-import com.netgrif.application.engine.authentication.service.InvalidUserTokenException;
-import com.netgrif.application.engine.authentication.web.requestbodies.NewUserRequest;
+import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.service.InvalidIdentityTokenException;
+import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest;
 import com.netgrif.application.engine.authentication.web.requestbodies.RegistrationRequest;
 
 import java.time.LocalDateTime;
 
 public interface IRegistrationService {
 
-    void removeExpiredUsers();
+    void removeExpiredIdentities();
 
     void resetExpiredToken();
 
-    void changePassword(RegisteredUser user, String newPassword);
-
-    void encodeUserPassword(RegisteredUser user);
-
-    boolean stringMatchesUserPassword(RegisteredUser user, String passwordToCompare);
+    void changePassword(Identity identity, String newPassword);
 
     boolean verifyToken(String token);
 
-    RegisteredUser createNewUser(NewUserRequest newUser);
+    Identity createNewIdentity(NewIdentityRequest newUser);
 
-    RegisteredUser registerUser(RegistrationRequest registrationRequest) throws InvalidUserTokenException;
+    Identity registerIdentity(RegistrationRequest registrationRequest) throws InvalidIdentityTokenException;
 
-    RegisteredUser resetPassword(String email);
+    boolean matchesIdentityPassword(Identity identity, String passwordToCompare);
 
-    RegisteredUser recover(String email, String newPassword);
+    Identity resetPassword(String email);
+
+    Identity recover(String email, String newPassword);
 
     String generateTokenKey();
 
-    String[] decodeToken(String token) throws InvalidUserTokenException;
+    String[] decodeToken(String token) throws InvalidIdentityTokenException;
 
     String encodeToken(String email, String tokenKey);
 
