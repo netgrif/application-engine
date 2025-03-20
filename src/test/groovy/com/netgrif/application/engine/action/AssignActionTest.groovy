@@ -2,7 +2,7 @@ package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.Authority
-import com.netgrif.application.engine.authentication.domain.User
+
 import com.netgrif.application.engine.authentication.domain.IdentityState
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository
 import com.netgrif.application.engine.importer.service.Importer

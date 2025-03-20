@@ -28,8 +28,11 @@ public class RoleAssignmentService implements IRoleAssignmentService {
      * todo javadoc
      * */
     @Override
-    public List<RoleAssignment> findAllByUserIdAndRoleIdIn(String userId, Set<String> roleIds) {
-        return (List<RoleAssignment>) repository.findAllByUserIdAndRoleIdIn(userId, roleIds);
+    public List<RoleAssignment> findAllByActorIdAndRoleIdIn(String actorId, Set<String> roleIds) {
+        if (actorId == null || roleIds == null || roleIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return (List<RoleAssignment>) repository.findAllByActorIdAndRoleIdIn(actorId, roleIds);
     }
 
     /**
@@ -37,6 +40,9 @@ public class RoleAssignmentService implements IRoleAssignmentService {
      * */
     @Override
     public List<RoleAssignment> findAllByRoleIdIn(Set<String> roleIds) {
+        if (roleIds == null || roleIds.isEmpty()) {
+            return new ArrayList<>();
+        }
         return (List<RoleAssignment>) repository.findAllByRoleIdIn(roleIds);
     }
 
@@ -44,16 +50,22 @@ public class RoleAssignmentService implements IRoleAssignmentService {
      * todo javadoc
      * */
     @Override
-    public List<RoleAssignment> findAllByUserId(String userId) {
-        return (List<RoleAssignment>) repository.findAllByUserId(userId);
+    public List<RoleAssignment> findAllByActorId(String actorId) {
+        if (actorId == null) {
+            return new ArrayList<>();
+        }
+        return (List<RoleAssignment>) repository.findAllByActorId(actorId);
     }
 
     /**
      * todo javadoc
      * */
     @Override
-    public List<RoleAssignment> createAssignments(String userId, List<Role> roles) {
-        List<RoleAssignment> assignments = doCreateAssignments(userId, roles);
+    public List<RoleAssignment> createAssignments(String actorId, List<Role> roles) {
+        if (actorId == null || roles == null || roles.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<RoleAssignment> assignments = doCreateAssignments(actorId, roles);
         return repository.saveAll(assignments);
     }
 
@@ -61,33 +73,41 @@ public class RoleAssignmentService implements IRoleAssignmentService {
      * todo javadoc
      * */
     @Override
-    public RoleAssignment createAssignment(String userId, Role role) {
-        RoleAssignment assignment = doCreateAssignment(userId, role);
-        return repository.save(assignment);
+    public RoleAssignment createAssignment(String actorId, Role role) {
+        return createAssignments(actorId, List.of(role)).stream().findFirst().orElse(null);
     }
 
     /**
      * todo javadoc
      * */
     @Override
-    public List<RoleAssignment> removeAssignments(String userId, Set<String> roleIds) {
-        return (List<RoleAssignment>) repository.removeAllByUserIdAndRoleIdIn(userId, roleIds);
+    public List<RoleAssignment> removeAssignments(String actorId, Set<String> roleIds) {
+        if (actorId == null || roleIds == null || roleIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return (List<RoleAssignment>) repository.removeAllByActorIdAndRoleIdIn(actorId, roleIds);
     }
 
     /**
      * todo javadoc
      * */
     @Override
-    public RoleAssignment removeAssignment(String userId, String roleId) {
-        return repository.removeByUserIdAndRoleId(userId, roleId);
+    public RoleAssignment removeAssignment(String actorId, String roleId) {
+        if (actorId == null || roleId == null) {
+            return null;
+        }
+        return repository.removeByActorIdAndRoleId(actorId, roleId);
     }
 
     /**
      * todo javadoc
      * */
     @Override
-    public List<RoleAssignment> removeAssignmentsByUser(String userId) {
-        return (List<RoleAssignment>) repository.removeAllByUserId(userId);
+    public List<RoleAssignment> removeAssignmentsByActor(String actorId) {
+        if (actorId == null) {
+            return new ArrayList<>();
+        }
+        return (List<RoleAssignment>) repository.removeAllByActorId(actorId);
     }
 
     /**
@@ -95,6 +115,9 @@ public class RoleAssignmentService implements IRoleAssignmentService {
      * */
     @Override
     public List<RoleAssignment> removeAssignmentsByRole(String roleId) {
+        if (roleId == null) {
+            return new ArrayList<>();
+        }
         return (List<RoleAssignment>) repository.removeAllByRoleId(roleId);
     }
 
@@ -103,6 +126,9 @@ public class RoleAssignmentService implements IRoleAssignmentService {
      * */
     @Override
     public List<RoleAssignment> removeAssignmentsByRoles(Set<String> roleIds) {
+        if (roleIds == null || roleIds.isEmpty()) {
+            return new ArrayList<>();
+        }
         return (List<RoleAssignment>) repository.removeAllByRoleIdIn(roleIds);
     }
 
@@ -111,16 +137,17 @@ public class RoleAssignmentService implements IRoleAssignmentService {
      * */
     @Override
     public List<CaseRoleAssignment> removeAssignmentsByCase(String caseId) {
+        if (caseId == null) {
+            return new ArrayList<>();
+        }
         return (List<CaseRoleAssignment>) caseRoleAssignmentRepository.removeAllByCaseId(caseId);
     }
 
-    private List<RoleAssignment> doCreateAssignments(String userId, List<Role> roles) {
-        return roles.stream().map(role -> createAssignment(userId, role)).collect(Collectors.toList());
-    }
-
-    private RoleAssignment doCreateAssignment(String userId, Role role) {
-        RoleAssignmentFactory factory = getAssignmentFactoryBean(role);
-        return factory.createAssignment(role, userId);
+    private List<RoleAssignment> doCreateAssignments(String actorId, List<Role> roles) {
+        return roles.stream().map(role -> {
+            RoleAssignmentFactory factory = getAssignmentFactoryBean(role);
+            return factory.createAssignment(role, actorId);
+        }).collect(Collectors.toList());
     }
 
     private RoleAssignmentFactory getAssignmentFactoryBean(Role role) {

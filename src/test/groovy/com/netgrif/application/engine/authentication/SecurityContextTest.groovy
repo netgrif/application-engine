@@ -1,8 +1,7 @@
 package com.netgrif.application.engine.authentication
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.authentication.domain.IUser
-import com.netgrif.application.engine.authentication.domain.User
+
 import com.netgrif.application.engine.authentication.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.Process
@@ -78,7 +77,7 @@ class SecurityContextTest {
         SecurityContextHolder.getContext().setAuthentication(token)
 
         // situation 1
-        roleService.assignRolesToUser(user.getStringId(), roleIds)
+        roleService.assignRolesToActor(user.getStringId(), roleIds)
         IUser updatedUser = userService.findById(user.getStringId())
         // todo 2058
 //        Set<String> updatedUserRoles = updatedUser.getRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())

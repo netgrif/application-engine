@@ -50,7 +50,7 @@ class GroovyShellFactoryTest extends EngineTest {
         def roleId = "newRole_1"
         def role = roles.find {it.importId == roleId}
         assert role != null
-        roleService.assignRolesToUser(
+        roleService.assignRolesToActor(
                 user.getStringId(),
                 new HashSet<String>([role.stringId] + user.roles.collect { it.stringId }),
                 new Identity("", "a", "", [])

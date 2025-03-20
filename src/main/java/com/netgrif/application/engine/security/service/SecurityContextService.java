@@ -2,7 +2,7 @@ package com.netgrif.application.engine.security.service;
 
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
-import com.netgrif.application.engine.authentication.service.IdentityService;
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,9 +24,9 @@ public class SecurityContextService implements ISecurityContextService {
      * List containing user IDs that's state was changed during an action
      */
     private final Set<String> cachedTokens;
-    private final IdentityService identityService;
+    private final IIdentityService identityService;
 
-    protected SecurityContextService(IdentityService identityService) {
+    protected SecurityContextService(IIdentityService identityService) {
         this.cachedTokens = ConcurrentHashMap.newKeySet();
         this.identityService = identityService;
     }

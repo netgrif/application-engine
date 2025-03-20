@@ -90,7 +90,7 @@ public class UserService extends AbstractUserService {
         user = userRepository.save(user);
 
         Role anonymousRole = roleService.findAnonymousRole();
-        roleService.assignRolesToUser(user.getStringId(), Set.of(anonymousRole.getStringId()));
+        roleService.assignRolesToActor(user.getStringId(), Set.of(anonymousRole.getStringId()));
 
         return user;
     }
@@ -240,7 +240,7 @@ public class UserService extends AbstractUserService {
     public Page<IUser> findAllActiveByRoles(Set<String> roleIds, Pageable pageable) {
         List<RoleAssignment> assignments = roleAssignmentService.findAllByRoleIdIn(roleIds);
         Set<ObjectId> userIds = assignments.stream()
-                .map(assignment -> new ObjectId(assignment.getUserId()))
+                .map(assignment -> new ObjectId(assignment.getActorId()))
                 .collect(Collectors.toSet());
         Page<User> users = userRepository.findAllByIdIn(userIds, pageable);
         return changeType(users, pageable);
@@ -287,7 +287,7 @@ public class UserService extends AbstractUserService {
         IUser system = userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
         List<ProcessRole> roles = roleService.findAllProcessRoles();
         Set<String> roleIds = roles.stream().map(ProcessRole::getStringId).collect(Collectors.toSet());
-        roleService.assignRolesToUser(system.getStringId(), roleIds);
+        roleService.assignRolesToActor(system.getStringId(), roleIds);
         return system;
     }
 
@@ -328,7 +328,7 @@ public class UserService extends AbstractUserService {
         if (userRepository.findById(dbUser.getStringId()).isEmpty()) {
             throw new IllegalArgumentException(String.format("Could not find user with id [%s]", dbUser.getId()));
         }
-        roleAssignmentService.removeAssignmentsByUser(user.getStringId());
+        roleAssignmentService.removeAssignmentsByActor(user.getStringId());
         userRepository.delete(dbUser);
     }
 }

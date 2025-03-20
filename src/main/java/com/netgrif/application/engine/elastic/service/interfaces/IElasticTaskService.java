@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.elastic.service.interfaces;
 
-import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -24,9 +24,9 @@ public interface IElasticTaskService {
 
     void indexNow(ElasticTask task);
 
-    Page<Task> search(List<ElasticTaskSearchRequest> requests, Identity user, Pageable pageable, Locale locale, Boolean isIntersection);
+    Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedIdentity identity, Pageable pageable, Locale locale, Boolean isIntersection);
 
-    long count(List<ElasticTaskSearchRequest> requests, Identity user, Locale locale, Boolean isIntersection);
+    long count(List<ElasticTaskSearchRequest> requests, LoggedIdentity identity, Locale locale, Boolean isIntersection);
 
     void remove(String taskId);
 

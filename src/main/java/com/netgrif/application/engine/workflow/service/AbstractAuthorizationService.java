@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.authentication.domain.IUser;
 import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
 import com.netgrif.application.engine.authorization.domain.permissions.TaskPermission;
 

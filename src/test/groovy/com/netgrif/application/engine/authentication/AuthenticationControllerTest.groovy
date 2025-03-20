@@ -4,7 +4,7 @@ import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.Authority
-import com.netgrif.application.engine.authentication.domain.User
+
 import com.netgrif.application.engine.authentication.domain.repositories.AuthorityRepository
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository
 import com.netgrif.application.engine.authentication.web.AuthenticationController

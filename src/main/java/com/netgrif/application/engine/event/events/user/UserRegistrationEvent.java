@@ -1,11 +1,9 @@
 package com.netgrif.application.engine.event.events.user;
 
-import com.netgrif.application.engine.authentication.domain.IUser;
 import com.netgrif.application.engine.authentication.domain.Identity;
-import com.netgrif.application.engine.authentication.domain.RegisteredUser;
 import com.netgrif.application.engine.utils.DateUtils;
 
-public class UserRegistrationEvent extends UserEvent {
+public class UserRegistrationEvent extends ActorEvent {
 
     public UserRegistrationEvent(RegisteredUser user) {
         super(new Identity(

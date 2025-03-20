@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.elastic.service;
 
 import com.google.common.collect.ImmutableMap;
-import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.elastic.domain.*;
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticTaskRepository;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
@@ -124,8 +124,8 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     }
 
     @Override
-    public Page<Task> search(List<ElasticTaskSearchRequest> requests, Identity user, Pageable pageable, Locale locale, Boolean isIntersection) {
-        NativeSearchQuery query = buildQuery(requests, user.getSelfOrImpersonated(), pageable, locale, isIntersection);
+    public Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedIdentity identity, Pageable pageable, Locale locale, Boolean isIntersection) {
+        NativeSearchQuery query = buildQuery(requests, identity, pageable, locale, isIntersection);
         List<Task> taskPage;
         long total;
         if (query != null) {
@@ -142,8 +142,8 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     }
 
     @Override
-    public long count(List<ElasticTaskSearchRequest> requests, Identity user, Locale locale, Boolean isIntersection) {
-        NativeSearchQuery query = buildQuery(requests, user.getSelfOrImpersonated(), new FullPageRequest(), locale, isIntersection);
+    public long count(List<ElasticTaskSearchRequest> requests, LoggedIdentity identity, Locale locale, Boolean isIntersection) {
+        NativeSearchQuery query = buildQuery(requests, identity, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
             return template.count(query, ElasticTask.class);
         } else {
@@ -151,8 +151,8 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         }
     }
 
-    protected NativeSearchQuery buildQuery(List<ElasticTaskSearchRequest> requests, Identity user, Pageable pageable, Locale locale, Boolean isIntersection) {
-        List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
+    protected NativeSearchQuery buildQuery(List<ElasticTaskSearchRequest> requests, LoggedIdentity identity, Pageable pageable, Locale locale, Boolean isIntersection) {
+        List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, identity, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
             // one of the queries evaluates to empty set => the entire result is an empty set
@@ -175,14 +175,14 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
                 .build();
     }
 
-    protected BoolQueryBuilder buildSingleQuery(ElasticTaskSearchRequest request, Identity user, Locale locale) {
+    protected BoolQueryBuilder buildSingleQuery(ElasticTaskSearchRequest request, LoggedIdentity identity, Locale locale) {
         if (request == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
-        addRolesQueryConstraint(request, user);
+        addRolesQueryConstraint(request, identity);
 
         BoolQueryBuilder query = boolQuery();
-        buildViewPermissionQuery(query, user.getId());
+        buildViewPermissionQuery(query, identity.getActiveActorId());
         buildCaseQuery(request, query);
         buildTitleQuery(request, query);
         buildUserQuery(request, query);
@@ -190,8 +190,8 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         buildFullTextQuery(request, query);
         buildTransitionQuery(request, query);
         buildTagsQuery(request, query);
-        buildStringQuery(request, query, user);
-        boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
+        buildStringQuery(request, query, identity);
+        boolean resultAlwaysEmpty = buildGroupQuery(request, identity, locale, query);
 
         if (resultAlwaysEmpty)
             return null;
@@ -199,7 +199,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
             return query;
     }
 
-    protected void addRolesQueryConstraint(ElasticTaskSearchRequest request, Identity user) {
+    protected void addRolesQueryConstraint(ElasticTaskSearchRequest request, LoggedIdentity identity) {
         if (request.role != null && !request.role.isEmpty()) {
             Set<String> roles = new HashSet<>(request.role);
             // todo 2058
@@ -306,6 +306,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
      * Tasks assigned to user with id 1 OR 2
      */
     protected void buildUserQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+        // todo 2058
         if (request.user == null || request.user.isEmpty()) {
             return;
         }
@@ -400,12 +401,12 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     /**
      * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a>
      */
-    protected void buildStringQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, Identity user) {
+    protected void buildStringQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedIdentity identity) {
         if (request.query == null || request.query.isEmpty()) {
             return;
         }
 
-        String populatedQuery = request.query.replaceAll(ElasticQueryConstants.USER_ID_TEMPLATE, user.getId().toString());
+        String populatedQuery = request.query.replaceAll(ElasticQueryConstants.USER_ID_TEMPLATE, identity.getActiveActorId());
 
         query.must(queryStringQuery(populatedQuery));
     }
@@ -424,13 +425,13 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
      * ]
      * }
      */
-    public boolean buildGroupQuery(TaskSearchRequest request, Identity user, Locale locale, BoolQueryBuilder query) {
+    public boolean buildGroupQuery(TaskSearchRequest request, LoggedIdentity identity, Locale locale, BoolQueryBuilder query) {
         if (request.group == null || request.group.isEmpty())
             return false;
 
         PetriNetSearch processQuery = new PetriNetSearch();
         processQuery.setGroup(request.group);
-        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
+        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, identity, new FullPageRequest(), locale).getContent();
         if (groupProcesses.size() == 0)
             return true;
 

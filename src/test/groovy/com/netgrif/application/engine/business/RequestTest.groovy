@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectWriter
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.Authority
-import com.netgrif.application.engine.authentication.domain.User
+
 import com.netgrif.application.engine.authentication.domain.IdentityState
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -315,7 +315,7 @@ class RequestTest {
                 [auths.get("user"), auths.get("admin")] as Authority[],
                 processRoles as ProcessRole[])
         List<ProcessRole> roles = roleService.findAllProcessRoles()
-        roleService.assignRolesToUser(userService.findByEmail(USER_EMAIL).stringId, roles.findAll { it.importId in ["1", "2"] }.collect { it.stringId } as Set)
+        roleService.assignRolesToActor(userService.findByEmail(USER_EMAIL).stringId, roles.findAll { it.importId in ["1", "2"] }.collect { it.stringId } as Set)
 
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
         auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));

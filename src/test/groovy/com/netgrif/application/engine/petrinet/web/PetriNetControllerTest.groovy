@@ -2,7 +2,7 @@ package com.netgrif.application.engine.petrinet.web
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.Authority
-import com.netgrif.application.engine.authentication.domain.User
+
 import com.netgrif.application.engine.authentication.domain.IdentityState
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.Process

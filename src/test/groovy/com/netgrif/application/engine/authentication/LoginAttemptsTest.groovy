@@ -2,7 +2,7 @@ package com.netgrif.application.engine.authentication
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.Authority
-import com.netgrif.application.engine.authentication.domain.User
+
 import com.netgrif.application.engine.authentication.domain.IdentityState
 import com.netgrif.application.engine.configuration.properties.SecurityLimitsProperties
 import com.netgrif.application.engine.authorization.domain.ProcessRole

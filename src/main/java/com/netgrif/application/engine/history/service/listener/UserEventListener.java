@@ -34,12 +34,12 @@ public class UserEventListener {
     }
 
     @EventListener
-    public void onUserRoleChangeEvent(UserAssignRoleEvent event) {
+    public void onUserRoleChangeEvent(ActorAssignRoleEvent event) {
         repository.save(new UserAssignRoleEventLog(event.getUser().getUsername(), event.getRoles()));
     }
 
     @EventListener
-    public void onUserRoleChangeEvent(UserRemoveRoleEvent event) {
+    public void onUserRoleChangeEvent(ActorRemoveRoleEvent event) {
         repository.save(new UserRemoveRoleEventLog(event.getUser().getUsername(), event.getRoles()));
     }
 

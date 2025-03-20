@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.authentication.web.responsebodies;
 
 import com.netgrif.application.engine.authentication.domain.Authority;
-import com.netgrif.application.engine.authentication.domain.IUser;
 import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import lombok.Data;
 

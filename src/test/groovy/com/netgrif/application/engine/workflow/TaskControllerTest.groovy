@@ -2,7 +2,7 @@ package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.Authority
-import com.netgrif.application.engine.authentication.domain.User
+
 import com.netgrif.application.engine.authentication.domain.IdentityState
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
@@ -210,7 +210,7 @@ class TaskControllerTest {
                 this.role = role
             }
         }
-        roleService.assignRolesToUser(userService.findByEmail(DUMMY_USER_MAIL).getStringId(), [role.id.toString()] as Set)
+        roleService.assignRolesToActor(userService.findByEmail(DUMMY_USER_MAIL).getStringId(), [role.id.toString()] as Set)
     }
 
     Page<Task> findTasksByMongo() {

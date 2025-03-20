@@ -2,7 +2,7 @@ package com.netgrif.application.engine.menu
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.Authority
-import com.netgrif.application.engine.authentication.domain.User
+
 import com.netgrif.application.engine.authentication.domain.IdentityState
 import com.netgrif.application.engine.authentication.service.UserService
 import com.netgrif.application.engine.orgstructure.groups.NextGroupService

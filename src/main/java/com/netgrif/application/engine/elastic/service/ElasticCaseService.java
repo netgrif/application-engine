@@ -406,7 +406,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             return;
         }
 
-        String populatedQuery = request.query.replaceAll(ElasticQueryConstants.USER_ID_TEMPLATE, user.getId().toString());
+        String populatedQuery = request.query.replaceAll(ElasticQueryConstants.USER_ID_TEMPLATE, identity.getActiveActorId());
 
         query.must(queryStringQuery(populatedQuery).allowLeadingWildcard(true).analyzeWildcard(true));
     }
@@ -474,7 +474,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
         PetriNetSearch processQuery = new PetriNetSearch();
         processQuery.setGroup(request.group);
-        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
+        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, identity, new FullPageRequest(), locale).getContent();
         if (groupProcesses.size() == 0)
             return true;
 

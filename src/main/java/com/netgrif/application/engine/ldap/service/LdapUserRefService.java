@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.ldap.service;
 
 
-import com.netgrif.application.engine.authentication.domain.IUser;
 import com.netgrif.application.engine.authentication.domain.IdentityState;
 import com.netgrif.application.engine.authentication.service.interfaces.ILdapUserRefService;
 import com.netgrif.application.engine.configuration.ldap.LdapConfiguration;

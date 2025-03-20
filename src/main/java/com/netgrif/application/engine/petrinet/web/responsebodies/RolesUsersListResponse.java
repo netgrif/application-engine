@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
-import com.netgrif.application.engine.authentication.domain.IUser;
 import lombok.Getter;
 import lombok.Setter;
 

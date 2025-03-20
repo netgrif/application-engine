@@ -3,7 +3,6 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.AsyncRunner
 
-import com.netgrif.application.engine.authentication.domain.IUser
 import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.authentication.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService
@@ -826,7 +825,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      * todo javadoc
      * */
     List<Role> assignRoles(Set<String> roleIds, String userId = userService.loggedUser.stringId, Map<String, String> params = this.params) {
-        return roleService.assignRolesToUser(userId, roleIds, params)
+        return roleService.assignRolesToActor(userId, roleIds, params)
     }
 
     /**
@@ -841,7 +840,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      * todo javadoc
      * */
     List<Role> removeRoles(Set<String> roleIds, String userId = userService.loggedUser.stringId, Map<String, String> params = this.params) {
-        return roleService.removeRolesFromUser(userId, roleIds, params)
+        return roleService.removeRolesFromActor(userId, roleIds, params)
     }
 
     // TODO: release/8.0.0 merge check, params x dataset
@@ -1061,14 +1060,14 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     void deleteUser(IUser user) {
-        List<Task> tasks = taskService.findByUser(new FullPageRequest(), user).toList()
+        List<Task> tasks = taskService.findByAssignee(new FullPageRequest(), user).toList()
         if (tasks != null && tasks.size() > 0)
             taskService.cancelTasks(tasks, user)
 
         QCase qCase = new QCase("case")
         List<Case> cases = workflowService.searchAll(qCase.author.eq(user.transformToAuthor())).toList()
         if (cases != null)
-            cases.forEach({ aCase -> aCase.setAuthor(Author.createAnonymizedAuthor()) })
+            cases.forEach({ aCase -> aCase.setAuthorId(Author.createAnonymizedAuthor()) })
 
         userService.deleteUser(user)
     }

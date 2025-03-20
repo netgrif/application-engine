@@ -115,7 +115,7 @@ class ImportHelper {
         user.state = IdentityState.ACTIVE
         user = userService.saveNew(user)
         Set<String> roleIds = Arrays.stream(roles).map { role -> role.stringId }.collect(Collectors.toSet())
-        roleService.assignRolesToUser(user.stringId, roleIds)
+        roleService.assignRolesToActor(user.stringId, roleIds)
         log.info("User $user.name $user.surname created")
         return user
     }

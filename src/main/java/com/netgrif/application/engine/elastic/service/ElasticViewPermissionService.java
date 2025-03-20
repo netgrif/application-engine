@@ -19,7 +19,7 @@ public abstract class ElasticViewPermissionService {
     /**
      * todo javadoc
      * */
-    protected void buildViewPermissionQuery(BoolQueryBuilder query, String userId) {
+    protected void buildViewPermissionQuery(BoolQueryBuilder query, String actorId) {
         // Check if processRoles or caseRoles exist
         BoolQueryBuilder viewPermsExists = boolQuery()
                 .should(existsQuery("viewProcessRoles"))
@@ -29,7 +29,7 @@ public abstract class ElasticViewPermissionService {
                 .mustNot(viewPermsExists);
 
         // Collect assigned roles to user
-        List<RoleAssignment> assignments = roleAssignmentService.findAllByUserId(userId);
+        List<RoleAssignment> assignments = roleAssignmentService.findAllByActorId(actorId);
         final Set<String> assignedRoleIds = assignments.stream().map(RoleAssignment::getRoleId).collect(toUnmodifiableSet());
 
         // Build queries for each role type

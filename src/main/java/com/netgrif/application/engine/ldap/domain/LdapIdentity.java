@@ -2,7 +2,6 @@ package com.netgrif.application.engine.ldap.domain;
 
 
 import com.netgrif.application.engine.authentication.domain.Authority;
-import com.netgrif.application.engine.authentication.domain.IUser;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.IdentityState;
 import lombok.Getter;

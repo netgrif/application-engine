@@ -20,7 +20,21 @@ public class Actor extends Case {
     /**
      * todo javadoc
      * */
-    public boolean isActive() {
-        return (Boolean) getDataSet().get(ActorConstants.STATE_FIELD_ID).getRawValue();
+    public String getEmail() {
+        return (String) getDataSet().get(ActorConstants.EMAIL_FIELD_ID).getRawValue();
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public String getFirstname() {
+        return (String) getDataSet().get(ActorConstants.FIRSTNAME_FIELD_ID).getRawValue();
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public String getLastname() {
+        return (String) getDataSet().get(ActorConstants.LASTNAME_FIELD_ID).getRawValue();
     }
 }

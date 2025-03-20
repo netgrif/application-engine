@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.petrinet.domain.dataset;
 
-import com.netgrif.application.engine.authentication.domain.IUser;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.authentication.service.interfaces;
 
-import com.netgrif.application.engine.authentication.domain.AnonymousUser;
-import com.netgrif.application.engine.authentication.domain.IUser;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.web.requestbodies.UpdateUserRequest;
 import org.bson.types.ObjectId;

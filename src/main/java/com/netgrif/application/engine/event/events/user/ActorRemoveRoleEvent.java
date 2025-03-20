@@ -1,24 +1,19 @@
 package com.netgrif.application.engine.event.events.user;
 
-import com.netgrif.application.engine.authentication.domain.IUser;
 import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.authorization.domain.Role;
 import lombok.Getter;
 
 import java.util.Collection;
 
 @Getter
-public class UserRemoveRoleEvent extends UserEvent{
+public class ActorRemoveRoleEvent extends ActorEvent {
 
     protected final Collection<Role> roles;
 
-    public UserRemoveRoleEvent(Identity user, Collection<Role> roles) {
-        super(user);
-        this.roles = roles;
-    }
-
-    public UserRemoveRoleEvent(IUser user, Collection<Role> roles) {
-        super(user.transformToLoggedUser());
+    public ActorRemoveRoleEvent(Actor actor, Collection<Role> roles) {
+        super(actor);
         this.roles = roles;
     }
 
@@ -29,8 +24,8 @@ public class UserRemoveRoleEvent extends UserEvent{
             sb.append(role.getTitleAsString());
             sb.append(",");
         });
-        sb.append(" removed from user ");
-        sb.append(user.getUsername());
+        sb.append(" removed from actor ");
+        sb.append(actor.getEmail());
         return sb.toString();
     }
 }

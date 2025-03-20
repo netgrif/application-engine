@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.orgstructure.groups;
 
-import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.RegisteredUser;
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest;
@@ -329,7 +327,7 @@ public class NextGroupService implements INextGroupService {
     protected boolean authorHasDefaultGroup(IUser author) {
         List<Case> allGroups = findAllGroups();
         for (Case group : allGroups) {
-            if (group.getAuthor().getId().equals(author.getStringId())) {
+            if (group.getAuthorId().equals(author.getStringId())) {
                 return true;
             }
         }
@@ -337,7 +335,7 @@ public class NextGroupService implements INextGroupService {
     }
 
     protected String getGroupOwnerId(Case groupCase) {
-        return groupCase.getAuthor().getId();
+        return groupCase.getAuthorId();
     }
 
     protected Case findUserDefaultGroup(IUser author) {
@@ -377,6 +375,6 @@ public class NextGroupService implements INextGroupService {
     }
 
     protected String getGroupOwnerEmail(Case groupCase) {
-        return groupCase.getAuthor().getEmail();
+        return groupCase.getAuthorId().getEmail();
     }
 }

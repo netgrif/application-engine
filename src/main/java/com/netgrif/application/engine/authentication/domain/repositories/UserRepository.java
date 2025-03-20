@@ -2,7 +2,6 @@ package com.netgrif.application.engine.authentication.domain.repositories;
 
 import com.netgrif.application.engine.authentication.domain.IdentityState;
 import com.netgrif.application.engine.authentication.domain.QUser;
-import com.netgrif.application.engine.authentication.domain.User;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

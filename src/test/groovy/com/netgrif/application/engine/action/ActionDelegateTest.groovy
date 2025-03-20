@@ -3,7 +3,7 @@ package com.netgrif.application.engine.action
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.authentication.domain.IUser
+
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest
 import com.netgrif.application.engine.configuration.PublicViewProperties

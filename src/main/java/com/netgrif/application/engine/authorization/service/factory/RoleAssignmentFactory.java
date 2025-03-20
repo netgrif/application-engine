@@ -17,7 +17,7 @@ public abstract class RoleAssignmentFactory {
         RoleAssignment assignment = createAssignmentInternal(role);
         assignment.setRoleId(role.getStringId());
         assignment.setRoleImportId(role.getImportId());
-        assignment.setUserId(userId);
+        assignment.setActorId(userId);
         return assignment;
     }
 

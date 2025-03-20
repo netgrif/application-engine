@@ -1,20 +1,20 @@
 package com.netgrif.application.engine.event.events.user;
 
-import com.netgrif.application.engine.authentication.domain.Identity;
-import lombok.Data;
+import com.netgrif.application.engine.authorization.domain.Actor;
+import lombok.Getter;
 
-@Data
-public class AdminActionEvent extends UserEvent {
+@Getter
+public class AdminActionEvent extends ActorEvent {
 
-    private String code;
+    private final String code;
 
-    public AdminActionEvent(Identity user, String code) {
-        super(user);
+    public AdminActionEvent(Actor actor, String code) {
+        super(actor);
         this.code = code;
     }
 
     @Override
     public String getMessage() {
-        return "User " + user.getUsername() + " run following script: " + code;
+        return "Actor " + actor.getEmail() + " run following script: " + code;
     }
 }

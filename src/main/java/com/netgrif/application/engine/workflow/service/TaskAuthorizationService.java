@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.authentication.domain.AnonymousUser;
-import com.netgrif.application.engine.authentication.domain.IUser;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authorization.domain.permissions.TaskPermission;
 import com.netgrif.application.engine.petrinet.domain.throwable.IllegalTaskStateException;

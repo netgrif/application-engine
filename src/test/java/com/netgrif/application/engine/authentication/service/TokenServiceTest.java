@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.authentication.service;
 
 import com.netgrif.application.engine.authentication.domain.IdentityState;
-import com.netgrif.application.engine.authentication.domain.User;
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository;
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService;
 import org.junit.jupiter.api.AfterEach;

@@ -123,9 +123,9 @@ public class ElasticCase {
         title = useCase.getTitle();
         creationDate = useCase.getCreationDate();
         creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
-        author = useCase.getAuthor().getId();
-        authorName = useCase.getAuthor().getFullName();
-        authorEmail = useCase.getAuthor().getEmail();
+        author = useCase.getAuthorId();
+        authorName = useCase.getAuthorId().getFullName();
+        authorEmail = useCase.getAuthorId().getEmail();
         taskIds = useCase.getTasks().keySet();
         taskMongoIds = useCase.getTasks().values().stream().map(TaskPair::getTaskStringId).collect(Collectors.toSet());
         tags = new HashMap<>(useCase.getProperties());

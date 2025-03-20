@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.authentication.web.responsebodies;
 
-import com.netgrif.application.engine.authentication.domain.IUser;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 
 public class UserResourceAssembler implements RepresentationModelAssembler<IUser, UserResource> {

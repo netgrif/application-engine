@@ -2,8 +2,6 @@ package com.netgrif.application.engine.authentication.service;
 
 
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.authentication.domain.RegisteredUser;
-import com.netgrif.application.engine.authentication.domain.User;
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository;
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest;

@@ -62,7 +62,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
                 authorities: [adminAuthority, systemAuthority] as Set<Authority>))
 
         Set<String> allRoleIds = roleService.findAll().stream().map { it.stringId }.collect(Collectors.toSet())
-        roleService.assignRolesToUser(this.superUser.stringId, allRoleIds)
+        roleService.assignRolesToActor(this.superUser.stringId, allRoleIds)
         log.info("Super user created")
     }
 
@@ -81,7 +81,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
 
     void setAllRoles() {
         Set<String> allRoleIds = roleService.findAll().stream().map { it.stringId }.collect(Collectors.toSet())
-        roleService.assignRolesToUser(this.superUser.stringId, allRoleIds)
+        roleService.assignRolesToActor(this.superUser.stringId, allRoleIds)
     }
 
     void setAllAuthorities() {

@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.authentication.service.interfaces;
 
 
-import com.netgrif.application.engine.authentication.domain.IUser;
 import com.netgrif.application.engine.ldap.domain.LdapUserRef;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 

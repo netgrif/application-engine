@@ -67,7 +67,7 @@ public class Case implements Serializable {
     @QueryType(PropertyType.NONE)
     private List<Field<?>> immediateData = new ArrayList<>();
     @Indexed
-    private Author author;
+    private String authorId;
     @JsonIgnore
     @QueryType(PropertyType.NONE)
     private Map<String, Integer> consumedTokens = new HashMap<>();

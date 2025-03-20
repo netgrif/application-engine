@@ -40,7 +40,7 @@ public abstract class AbstractUserService implements IUserService {
     @Override
     public void addDefaultRole(IUser user) {
         Role defaultRole = roleService.findDefaultRole();
-        roleService.assignRolesToUser(user.getStringId(), Set.of(defaultRole.getStringId()));
+        roleService.assignRolesToActor(user.getStringId(), Set.of(defaultRole.getStringId()));
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.authentication.web;
 
-import com.netgrif.application.engine.authentication.domain.IUser;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.authentication.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.application.engine.authentication.web.responsebodies.User;

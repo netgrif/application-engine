@@ -5,9 +5,9 @@ import org.springframework.context.ApplicationEvent;
 
 import java.time.LocalDateTime;
 
+@Getter
 public abstract class Event extends ApplicationEvent {
 
-    @Getter
     protected LocalDateTime time;
 
     public Event(Object source) {
