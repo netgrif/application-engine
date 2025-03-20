@@ -12,14 +12,17 @@ import java.util.Collection;
  * */
 @Getter
 public class LoggedIdentity extends org.springframework.security.core.userdetails.User {
+    protected final String fullName;
     protected final String identityId;
+
     @Setter
     protected String activeActorId;
 
     @Builder
-    public LoggedIdentity(String identityId, String activeActorId, String username, String password,
+    public LoggedIdentity(String fullName, String identityId, String activeActorId, String username, String password,
                           Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
+        this.fullName = fullName;
         this.identityId = identityId;
         this.activeActorId = activeActorId;
     }

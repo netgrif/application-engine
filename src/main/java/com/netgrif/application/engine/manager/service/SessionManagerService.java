@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.manager.service;
 
 import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,9 +46,9 @@ public class SessionManagerService implements ISessionManagerService {
         keys.forEach(username -> {
             Session session = repository.findByPrincipalName(username.toString().replace(redisUsernameKey, "")).values().stream().findFirst().orElse(null);
             if (session != null) {
-                SecurityContextImpl impl = (SecurityContextImpl) session.getAttribute(WebSessionServerSecurityContextRepository.DEFAULT_SPRING_SECURITY_CONTEXT_ATTR_NAME);
+                SecurityContextImpl impl = session.getAttribute(WebSessionServerSecurityContextRepository.DEFAULT_SPRING_SECURITY_CONTEXT_ATTR_NAME);
                 if (impl != null) {
-                    Identity user = (Identity) impl.getAuthentication().getPrincipal();
+                    LoggedIdentity user = (LoggedIdentity) impl.getAuthentication().getPrincipal();
                     if (user != null) {
                         activeUsers.add(user);
                     }

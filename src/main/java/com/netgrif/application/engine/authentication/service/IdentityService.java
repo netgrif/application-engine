@@ -129,9 +129,10 @@ public class IdentityService implements IIdentityService {
      * */
     @Override
     public Identity create(IdentityParams params) {
+        String activeActorId = getLoggedIdentity().getActiveActorId();
         Identity identity = (Identity) workflowService.createCaseByIdentifier(IdentityConstants.PROCESS_IDENTIFIER,
-                params.getFullName(), "", getLoggedIdentity());
-        identity = (Identity) dataService.setData(identity, params.toDataSet(), userService.getSystem()).getCase();
+                params.getFullName(), "", activeActorId).getCase();
+        identity = (Identity) dataService.setData(identity, params.toDataSet(), activeActorId).getCase();
         log.debug("Identity [{}][{}] was created.", identity.getStringId(), identity.getFullName());
         return identity;
     }
@@ -150,7 +151,11 @@ public class IdentityService implements IIdentityService {
      * */
     @Override
     public Identity update(Identity identity, IdentityParams params) {
-        return (Identity) dataService.setData(identity, params.toDataSet(), userService.getSystem()).getCase();
+        identity = (Identity) dataService.setData(identity, params.toDataSet(), getLoggedIdentity().getActiveActorId()).getCase();
+        if (securityContextService.isIdentityLogged(identity.getStringId())) {
+            securityContextService.reloadSecurityContext(identity.toSession());
+        }
+        return identity;
     }
 
     /**

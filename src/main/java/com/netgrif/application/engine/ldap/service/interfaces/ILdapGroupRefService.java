@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.ldap.service.interfaces;
 
-import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.ldap.domain.LdapGroup;
 import com.netgrif.application.engine.ldap.domain.LdapGroupRef;
 import com.netgrif.application.engine.authorization.domain.ProcessRole;
@@ -27,6 +27,6 @@ public interface ILdapGroupRefService {
 
     Set<ProcessRole> getRoleByLdapGroup(Set<String> groupDn);
 
-    void setRoleToLdapGroup(String groupDn, Set<String> roleIds, Identity identity);
+    void setRoleToLdapGroup(String groupDn, Set<String> roleIds, LoggedIdentity identity);
 
 }

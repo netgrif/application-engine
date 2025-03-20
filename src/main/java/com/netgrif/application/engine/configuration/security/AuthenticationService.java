@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.configuration.security;
 
 
-import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.configuration.security.interfaces.IAuthenticationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import lombok.Data;
@@ -50,7 +50,6 @@ public class AuthenticationService implements IAuthenticationService, Applicatio
         if (xHeader == null)
             return request.getRemoteAddr();
         return xHeader.split(",")[0];
-
     }
 
     @EventListener
@@ -103,21 +102,22 @@ public class AuthenticationService implements IAuthenticationService, Applicatio
 
     protected void resolveImpersonatorOnLogin(Object principal) {
         try {
-            if (principal instanceof Identity) {
-                impersonationService.removeImpersonator(((Identity) principal).getId());
+            if (principal instanceof LoggedIdentity) {
+                impersonationService.removeImpersonator(((LoggedIdentity) principal).getIdentityId());
             }
         } catch (Exception e) {
-            log.warn("Failed to resolve impersonator " + principal, e);
+            log.warn("Failed to resolve impersonator {}", principal, e);
         }
     }
 
     protected void resolveImpersonatorOnLogout(Object principal) {
+        // todo 2058 impersonation
         try {
-            if (principal instanceof Identity && ((Identity) principal).isImpersonating()) {
-                impersonationService.onSessionDestroy((Identity) principal);
+            if (principal instanceof LoggedIdentity && ((LoggedIdentity) principal).isImpersonating()) {
+                impersonationService.onSessionDestroy((LoggedIdentity) principal);
             }
         } catch (Exception e) {
-            log.warn("Failed to resolve impersonator " + principal, e);
+            log.warn("Failed to resolve impersonator {}", principal, e);
         }
     }
 

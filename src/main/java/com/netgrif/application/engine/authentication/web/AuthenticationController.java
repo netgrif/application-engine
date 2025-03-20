@@ -91,9 +91,10 @@ public class AuthenticationController {
             if (!serverAuthProperties.isOpenRegistration()) {
                 return MessageResource.errorMessage("Registration is turned off.");
             }
-            if (auth == null || !((Identity) auth.getPrincipal()).isAdmin()) {
-                return MessageResource.errorMessage("Only admin can invite new users!");
-            }
+            // todo 2058 should be preauthorize
+//            if (auth == null || !((LoggedIdentity) auth.getPrincipal()).isAdmin()) {
+//                return MessageResource.errorMessage("Only admin can invite new users!");
+//            }
 
             newIdentityRequest.email = URLDecoder.decode(newIdentityRequest.email, StandardCharsets.UTF_8);
             if (mailAttemptService.isBlocked(newIdentityRequest.email)) {
@@ -132,9 +133,9 @@ public class AuthenticationController {
     @Operation(summary = "Verify validity of an authentication token")
     @GetMapping(value = "/verify", produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource verifyAuthToken(Authentication auth) {
-        Identity identity = (Identity) auth.getPrincipal();
+        LoggedIdentity identity = (LoggedIdentity) auth.getPrincipal();
         return MessageResource.successMessage(String.format("Auth Token successfully verified, for identity [%s] %s",
-                identity.getStringId(), identity.getFullName()));
+                identity.getIdentityId(), identity.getUsername()));
     }
 
     @Operation(summary = "Login to the system", security = {@SecurityRequirement(name = "BasicAuth")})

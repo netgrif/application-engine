@@ -72,8 +72,21 @@ public class SecurityContextService implements ISecurityContextService {
                 && SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof LoggedIdentity;
     }
 
+    /**
+     * Checks whether the user is logged in
+     *
+     * @param identity the user that is needed to be checked
+     * @return true if logged user is in the security context
+     */
+    @Override
+    public boolean isIdentityLogged(String identityId) {
+        return isAuthenticatedPrincipalLoggedIdentity()
+                && ((LoggedIdentity) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                .getIdentityId().equals(identityId);
+    }
+
     private void reloadSecurityContext(LoggedIdentity identity, boolean forceRefresh) {
-        if (isUserLogged(identity) && cachedTokens.contains(identity.getIdentityId())) {
+        if (isIdentityLogged(identity.getIdentityId()) && cachedTokens.contains(identity.getIdentityId())) {
             if (forceRefresh) {
                 identity = updateSessionFromDatabase(identity);
             }
@@ -106,20 +119,8 @@ public class SecurityContextService implements ISecurityContextService {
      * @param token the token string to be removed from cache
      */
     private void clearToken(String token) {
-        if (cachedTokens.contains(token)){
+        if (cachedTokens.contains(token)) {
             this.cachedTokens.remove(token);
         }
-    }
-
-    /**
-     * Checks whether the user is logged in
-     *
-     * @param identity the user that is needed to be checked
-     * @return true if logged user is in the security context
-     */
-    private boolean isUserLogged(LoggedIdentity identity) {
-        return isAuthenticatedPrincipalLoggedIdentity()
-                && ((LoggedIdentity) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                    .getIdentityId().equals(identity.getIdentityId());
     }
 }

@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.petrinet.service.interfaces;
 
-import com.netgrif.application.engine.authentication.domain.Identity;
-import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
@@ -46,18 +44,18 @@ public interface IPetriNetService {
     Process clone(ObjectId petriNetId);
 
     @Deprecated
-    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, Actor actor) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, String actorId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
     @Deprecated
-    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, Actor actor, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, String actorId, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
-    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, Actor actor) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, String actorId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
-    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, Actor actor, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, String actorId, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
-    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, Actor actor, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, String actorId, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
-    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, Actor actor, String uriNodeId, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, String actorId, String uriNodeId, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
     Optional<Process> save(Process petriNet);
 

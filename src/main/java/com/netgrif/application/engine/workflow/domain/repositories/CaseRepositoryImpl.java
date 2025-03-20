@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.domain.repositories;
 
-import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.Reference;
@@ -28,7 +28,7 @@ public abstract class CaseRepositoryImpl implements CaseRepository {
     @Override
     public void customize(QuerydslBindings bindings, QCase qCase) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        List<PetriNetReference> nets = petriNetService.getReferencesByUsersRoles(((Identity) auth.getPrincipal()).getSelfOrImpersonated(), null);
+        List<PetriNetReference> nets = petriNetService.getReferencesByUsersRoles(((LoggedIdentity) auth.getPrincipal()).getSelfOrImpersonated(), null);
         Set<String> netIds = nets.stream().map(Reference::getStringId).collect(Collectors.toSet());
         Set<String> netIdentifiers = nets.stream().map(PetriNetReference::getIdentifier).collect(Collectors.toSet());
 

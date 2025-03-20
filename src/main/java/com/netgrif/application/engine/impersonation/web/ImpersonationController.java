@@ -14,6 +14,7 @@ import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAs
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
@@ -31,26 +32,23 @@ import javax.inject.Provider;
 import java.util.Locale;
 
 @RestController
+@RequiredArgsConstructor
+@Tag(name = "Impersonation")
 @RequestMapping("/api/impersonate")
 @ConditionalOnProperty(
         value = "nae.impersonation.web.enabled",
         havingValue = "true",
         matchIfMissing = true
 )
-@Tag(name = "Impersonation")
 public class ImpersonationController {
 
-    @Autowired
-    protected IImpersonationService impersonationService;
+    protected final IImpersonationService impersonationService;
 
-    @Autowired
-    protected IImpersonationAuthorizationService impersonationAuthorizationService;
+    protected final IImpersonationAuthorizationService impersonationAuthorizationService;
 
-    @Autowired
-    protected IUserService userService;
+    protected final IUserService userService;
 
-    @Autowired
-    protected Provider<UserResourceAssembler> userResourceAssemblerProvider;
+    protected final Provider<UserResourceAssembler> userResourceAssemblerProvider;
 
     protected UserResourceAssembler getUserResourceAssembler(String selfRel) {
         UserResourceAssembler result = userResourceAssemblerProvider.get();

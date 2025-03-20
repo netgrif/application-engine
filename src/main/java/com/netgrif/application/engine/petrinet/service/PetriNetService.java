@@ -190,33 +190,33 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     @Deprecated
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, Actor actor) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), actor, uriService.getRoot().getStringId());
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, String actorId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+        return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), actorId, uriService.getRoot().getStringId());
     }
 
     @Override
     @Deprecated
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, Actor actor, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), actor, uriNodeId);
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, String actorId, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+        return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), actorId, uriNodeId);
     }
 
     @Override
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, Actor actor) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, releaseType, actor, uriService.getRoot().getStringId());
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, String actorId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+        return importPetriNet(xmlFile, releaseType, actorId, uriService.getRoot().getStringId());
     }
 
     @Override
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, Actor actor, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, releaseType, actor, uriService.getRoot().getStringId(), params);
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, String actorId, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+        return importPetriNet(xmlFile, releaseType, actorId, uriService.getRoot().getStringId(), params);
     }
 
     @Override
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, Actor actor, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, releaseType, actor, uriNodeId, new HashMap<>());
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, String actorId, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+        return importPetriNet(xmlFile, releaseType, actorId, uriNodeId, new HashMap<>());
     }
 
     @Override
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, Actor actor, String uriNodeId, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, String actorId, String uriNodeId, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
         ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
         IOUtils.copy(xmlFile, xmlCopy);
@@ -234,7 +234,7 @@ public class PetriNetService implements IPetriNetService {
             net.incrementVersion(releaseType);
         }
         roleService.saveAll(imported.getRoles().values());
-        net.setAuthorId(actor.getStringId());
+        net.setAuthorId(actorId);
         functionCacheService.cachePetriNetFunctions(net);
         // TODO: release/8.0.0
 //        Path savedPath = getImporter().saveNetFile(net, new ByteArrayInputStream(xmlCopy.toByteArray()));

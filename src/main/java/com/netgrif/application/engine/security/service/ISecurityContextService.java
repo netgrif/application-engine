@@ -11,4 +11,6 @@ public interface ISecurityContextService {
     void forceReloadSecurityContext(LoggedIdentity identity);
 
     boolean isAuthenticatedPrincipalLoggedIdentity();
+
+    boolean isIdentityLogged(String identityId);
 }
