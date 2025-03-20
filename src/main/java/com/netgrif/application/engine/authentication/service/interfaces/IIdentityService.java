@@ -15,6 +15,7 @@ public interface IIdentityService {
 
     Optional<Identity> findById(String id);
     Optional<Identity> findByUsername(String username);
+    Optional<Identity> findByLoggedIdentity(LoggedIdentity loggedIdentity);
     boolean existsByUsername(String username);
     Set<String> findActorIds(String id);
     List<Identity> findAllByStateAndExpirationDateBefore(IdentityState state, LocalDateTime dateTime);

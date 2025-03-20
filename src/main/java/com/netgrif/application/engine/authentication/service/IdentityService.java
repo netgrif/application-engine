@@ -11,10 +11,12 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSer
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+import com.netgrif.application.engine.security.service.SecurityContextService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.LongStream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class IdentityService implements IIdentityService {
@@ -36,10 +39,17 @@ public class IdentityService implements IIdentityService {
     private final IUserService userService;
     // todo: release/8.0.0 make encoder configurable
     private final BCryptPasswordEncoder passwordEncoder;
+    private final SecurityContextService securityContextService;
 
+    /**
+     * todo javadoc
+     */
     @Override
     public LoggedIdentity getLoggedIdentity() {
-        return (LoggedIdentity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (securityContextService.isAuthenticatedPrincipalLoggedIdentity()) {
+            return (LoggedIdentity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        }
+        return null;
     }
 
     /**
@@ -66,6 +76,21 @@ public class IdentityService implements IIdentityService {
             return Optional.empty();
         }
         return findOneByQuery(usernameQuery(username));
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public Optional<Identity> findByLoggedIdentity(LoggedIdentity loggedIdentity) {
+        if (!securityContextService.isAuthenticatedPrincipalLoggedIdentity()) {
+            return Optional.empty();
+        }
+        Optional<Identity> identityOpt = findById(loggedIdentity.getIdentityId());
+        if (identityOpt.isEmpty()) {
+            log.warn("Logged identity [{}] doesn't exist in database!", loggedIdentity.getUsername());
+        }
+        return identityOpt;
     }
 
     @Override
@@ -106,7 +131,9 @@ public class IdentityService implements IIdentityService {
     public Identity create(IdentityParams params) {
         Identity identity = (Identity) workflowService.createCaseByIdentifier(IdentityConstants.PROCESS_IDENTIFIER,
                 params.getFullName(), "", getLoggedIdentity());
-        return (Identity) dataService.setData(identity, params.toDataSet(), userService.getSystem()).getCase();
+        identity = (Identity) dataService.setData(identity, params.toDataSet(), userService.getSystem()).getCase();
+        log.debug("Identity [{}][{}] was created.", identity.getStringId(), identity.getFullName());
+        return identity;
     }
 
     /**
