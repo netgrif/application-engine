@@ -102,6 +102,7 @@ public class Identity extends Case {
 
         return LoggedIdentity.builder()
                 .username(username)
+                .password(this.getPassword())
                 .identityId(this.getStringId())
                 .activeActorId(this.getMainActorId())
                 .build();

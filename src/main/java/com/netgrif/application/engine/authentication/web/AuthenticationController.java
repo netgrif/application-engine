@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.authentication.web;
 
 import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.authentication.service.IdentityService;
 import com.netgrif.application.engine.authentication.service.InvalidIdentityTokenException;
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService;
@@ -201,8 +202,8 @@ public class AuthenticationController {
             String currentPassword = new String(Base64.getDecoder().decode(request.password));
             if (registrationService.matchesIdentityPassword(identityOpt.get(), currentPassword)) {
                 registrationService.changePassword(identityOpt.get(), newPassword);
-                securityContextService.saveToken(((Identity) auth.getPrincipal()).getStringId());
-                securityContextService.reloadSecurityContext((Identity) auth.getPrincipal());
+                securityContextService.saveToken(((LoggedIdentity) auth.getPrincipal()).getIdentityId());
+                securityContextService.reloadSecurityContext((LoggedIdentity) auth.getPrincipal());
             } else {
                 return MessageResource.errorMessage("Incorrect password!");
             }
