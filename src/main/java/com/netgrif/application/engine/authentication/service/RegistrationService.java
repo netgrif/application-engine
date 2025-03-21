@@ -66,19 +66,13 @@ public class RegistrationService implements IRegistrationService {
             identity = identityService.update(identityOpt.get(), identityParams);
         } else {
             log.info("Creating new identity [{}]", request.email);
-            ActorParams actorParams = ActorParams.with()
-                    .email(new TextField(request.email))
-                    .build();
-            Actor defaultActor = actorService.create(actorParams);
-
-            identityParams.setMainActor(CaseField.withValue(List.of(defaultActor.getStringId())));
-            identity = identityService.create(identityParams);
+            identity = identityService.createWithDefaultActor(identityParams);
 
             if (request.roles != null && !request.roles.isEmpty()) {
-                roleService.assignRolesToActor(defaultActor.getStringId(), request.roles);
+                roleService.assignRolesToActor(identity.getMainActorId(), request.roles);
             }
             // todo 2058 add authorities (default app roles)
-            roleService.assignRolesToActor(defaultActor.getStringId(), Set.of(roleService.findDefaultRole().getStringId()));
+            roleService.assignRolesToActor(identity.getMainActorId(), Set.of(roleService.findDefaultRole().getStringId()));
 
             // todo 2058 groups
 //            if (newUser.groups != null && !newUser.groups.isEmpty()) {

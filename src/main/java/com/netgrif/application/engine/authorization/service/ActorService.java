@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.authorization.domain.constants.ActorConstants;
 import com.netgrif.application.engine.authorization.domain.params.ActorParams;
@@ -13,12 +12,14 @@ import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ActorService implements IActorService {
@@ -27,8 +28,6 @@ public class ActorService implements IActorService {
     private final IDataService dataService;
     private final IIdentityService identityService;
     private final IElasticCaseService elasticCaseService;
-
-    private final IUserService userService;
 
     /**
      * todo javadoc
@@ -79,9 +78,12 @@ public class ActorService implements IActorService {
      * */
     @Override
     public Actor create(ActorParams params) {
-        Actor actor = workflowService.createCaseByIdentifier(ActorConstants.PROCESS_IDENTIFIER, params.getFullName(),
-                "", identityService.getLoggedIdentity());
-        return (Actor) dataService.setData(actor, params.toDataSet(), userService.getSystem()).getCase();
+        String activeActorId = identityService.getLoggedIdentity().getActiveActorId();
+        Actor actor = (Actor) workflowService.createCaseByIdentifier(ActorConstants.PROCESS_IDENTIFIER, params.getFullName(),
+                "", activeActorId).getCase();
+        actor = (Actor) dataService.setData(actor, params.toDataSet(), activeActorId).getCase();
+        log.debug("Actor [{}][{}] was created by actor [{}].", actor.getStringId(), actor.getEmail(), activeActorId);
+        return (Actor) dataService.setData(actor, params.toDataSet(), activeActorId).getCase();
     }
 
     /**
@@ -89,7 +91,8 @@ public class ActorService implements IActorService {
      * */
     @Override
     public Actor update(Actor actor, ActorParams params) {
-        return (Actor) dataService.setData(actor, params.toDataSet(), userService.getSystem()).getCase();
+        String activeActorId = identityService.getLoggedIdentity().getActiveActorId();
+        return (Actor) dataService.setData(actor, params.toDataSet(), activeActorId).getCase();
     }
 
     private Optional<Actor> findOneByQuery(String query) {

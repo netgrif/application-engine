@@ -6,6 +6,9 @@ import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.authentication.domain.constants.IdentityConstants;
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
+import com.netgrif.application.engine.authorization.domain.Actor;
+import com.netgrif.application.engine.authorization.domain.params.ActorParams;
+import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
@@ -38,6 +41,7 @@ public class IdentityService implements IIdentityService {
     // todo: release/8.0.0 make encoder configurable
     private final BCryptPasswordEncoder passwordEncoder;
     private final SecurityContextService securityContextService;
+    private final IActorService actorService;
 
     /**
      * todo javadoc
@@ -134,8 +138,23 @@ public class IdentityService implements IIdentityService {
         Identity identity = (Identity) workflowService.createCaseByIdentifier(IdentityConstants.PROCESS_IDENTIFIER,
                 params.getFullName(), "", activeActorId).getCase();
         identity = (Identity) dataService.setData(identity, params.toDataSet(), activeActorId).getCase();
-        log.debug("Identity [{}][{}] was created.", identity.getStringId(), identity.getFullName());
+        log.debug("Identity [{}][{}] was created by actor [{}].", identity.getStringId(), identity.getFullName(), activeActorId);
         return identity;
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public Identity createWithDefaultActor(IdentityParams identityParams) {
+        if (identityParams == null) {
+            return null;
+        }
+        ActorParams actorParams = ActorParams.fromIdentityParams(identityParams);
+        Actor defaultActor = actorService.create(actorParams);
+
+        identityParams.setMainActor(CaseField.withValue(List.of(defaultActor.getStringId())));
+        return create(identityParams);
     }
 
     /**

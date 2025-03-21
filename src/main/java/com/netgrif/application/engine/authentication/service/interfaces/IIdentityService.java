@@ -21,6 +21,7 @@ public interface IIdentityService {
     List<Identity> findAllByStateAndExpirationDateBefore(IdentityState state, LocalDateTime dateTime);
 
     Identity create(IdentityParams params);
+    Identity createWithDefaultActor(IdentityParams params);
     Identity encodePasswordAndCreate(IdentityParams params);
     Identity update(Identity identity, IdentityParams params);
     Identity encodePasswordAndUpdate(Identity identity, IdentityParams params);

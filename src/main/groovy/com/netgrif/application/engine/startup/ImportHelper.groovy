@@ -1,7 +1,9 @@
 package com.netgrif.application.engine.startup
 
 import com.netgrif.application.engine.authentication.domain.*
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
@@ -40,6 +42,9 @@ class ImportHelper {
 
     @Autowired
     private IUserService userService
+
+    @Autowired
+    private IIdentityService identityService
 
     @Autowired
     private CaseRepository caseRepository
@@ -90,18 +95,20 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    Optional<Process> createNet(String fileName, String release, Identity author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().stringId) {
+    Optional<Process> createNet(String fileName, String release, LoggedIdentity author = identityService.loggedIdentity,
+                                String uriNodeId = uriService.getRoot().stringId) {
         return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author, uriNodeId)
     }
 
-    Optional<Process> createNet(String fileName, VersionType release = VersionType.MAJOR, Identity author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().stringId) {
+    Optional<Process> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedIdentity author = identityService.loggedIdentity,
+                                String uriNodeId = uriService.getRoot().stringId) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        Process petriNet = petriNetService.importPetriNet(netStream, release, author, uriNodeId).getNet()
+        Process petriNet = petriNetService.importPetriNet(netStream, release, author.activeActorId, uriNodeId).getNet()
         log.info("Imported '${petriNet?.title?.defaultValue}' ['${petriNet?.identifier}', ${petriNet?.stringId}]")
         return Optional.of(petriNet)
     }
 
-    Optional<Process> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, Identity author = userService.getSystem().transformToLoggedUser()) {
+    Optional<Process> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedIdentity author = identityService.loggedIdentity) {
         Process petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
         if (!petriNet) {
             return createNet(filename, release, author)
@@ -110,49 +117,59 @@ class ImportHelper {
         return Optional.of(petriNet)
     }
 
-    IUser createUser(User user, Authority[] authorities, ProcessRole[] roles) {
-        authorities.each { user.addAuthority(it) }
-        user.state = IdentityState.ACTIVE
-        user = userService.saveNew(user)
+    /**
+     * todo javadoc
+     * */
+    Identity createIdentity(IdentityParams params, Authority[] authorities, ProcessRole[] roles) {
+        Identity identity = identityService.createWithDefaultActor(params)
+
+        // todo 2058
+//        authorities.each { user.addAuthority(it) }
         Set<String> roleIds = Arrays.stream(roles).map { role -> role.stringId }.collect(Collectors.toSet())
-        roleService.assignRolesToActor(user.stringId, roleIds)
-        log.info("User $user.name $user.surname created")
-        return user
+        roleService.assignRolesToActor(identity.getMainActorId(), roleIds)
+        log.info("Identity [{}][{}] created with default actor [{}].", identity.getStringId(), identity.getUsername(),
+                identity.getMainActorId())
+
+        return identity
     }
 
-    Case createCase(String title, Process net, Identity user) {
-        return workflowService.createCase(net.getStringId(), title, "", user).getCase()
+    Case createCase(String title, Process net, LoggedIdentity author) {
+        return workflowService.createCase(net.getStringId(), title, "", author.activeActorId).getCase()
     }
 
     Case createCase(String title, Process net) {
-        return createCase(title, net, userService.getSystem().transformToLoggedUser())
+        return createCase(title, net, identityService.loggedIdentity)
     }
 
     Case createCaseAsSuper(String title, Process net) {
+        // todo 2058 system
         return createCase(title, net, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
-    AssignTaskEventOutcome assignTask(String taskTitle, String caseId, Identity author) {
-        return taskService.assignTask(author, getTaskId(taskTitle, caseId))
+    AssignTaskEventOutcome assignTask(String taskTitle, String caseId, LoggedIdentity assignee) {
+        return taskService.assignTask(assignee.activeActorId, getTaskId(taskTitle, caseId))
     }
 
     AssignTaskEventOutcome assignTaskToSuper(String taskTitle, String caseId) {
+        // todo 2058 system
         return assignTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
-    FinishTaskEventOutcome finishTask(String taskTitle, String caseId, Identity author) {
-        return taskService.finishTask(author, getTaskId(taskTitle, caseId))
+    FinishTaskEventOutcome finishTask(String taskTitle, String caseId, LoggedIdentity assignee) {
+        return taskService.finishTask(assignee.activeActorId, getTaskId(taskTitle, caseId))
     }
 
     FinishTaskEventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
+        // todo 2058 system
         return finishTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
-    CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, Identity user) {
-        return taskService.cancelTask(user, getTaskId(taskTitle, caseId))
+    CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, LoggedIdentity assignee) {
+        return taskService.cancelTask(assignee.activeActorId, getTaskId(taskTitle, caseId))
     }
 
     CancelTaskEventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {
+        // todo 2058 system
         return cancelTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
@@ -162,6 +179,7 @@ class ImportHelper {
     }
 
     SetDataEventOutcome setTaskData(String taskId, DataSet dataSet) {
+        // todo 2058 system
         dataService.setData(taskId, dataSet, superCreator.getSuperUser())
     }
 
@@ -170,6 +188,7 @@ class ImportHelper {
     }
 
     List<DataRef> getTaskData(String taskTitle, String caseId) {
+        // todo 2058 system
         return dataService.getData(getTaskId(taskTitle, caseId), superCreator.getSuperUser()).getData()
     }
 
