@@ -3,16 +3,16 @@ package com.netgrif.application.engine.importer.service.builder;
 import com.netgrif.application.engine.importer.model.Data;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.service.Importer;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListField;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorField;
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorFieldValue;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserListFieldBuilder extends FieldWithAllowedRolesBuilder<UserListField, UserListFieldValue> {
+public class ActorFieldBuilder extends FieldWithAllowedRolesBuilder<ActorField, ActorFieldValue> {
 
     @Override
-    public UserListField build(Data data, Importer importer) {
-        UserListField field = new UserListField();
+    public ActorField build(Data data, Importer importer) {
+        ActorField field = new ActorField();
         initialize(field);
         setRoles(field, data);
         setDefaultValue(field, data);
@@ -21,6 +21,6 @@ public class UserListFieldBuilder extends FieldWithAllowedRolesBuilder<UserListF
 
     @Override
     public DataType getType() {
-        return DataType.USER_LIST;
+        return DataType.ACTOR;
     }
 }

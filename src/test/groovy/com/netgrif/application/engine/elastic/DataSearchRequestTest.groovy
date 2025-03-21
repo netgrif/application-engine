@@ -16,8 +16,8 @@ import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.I18nField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorListFieldValue
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -126,7 +126,7 @@ class DataSearchRequestTest {
         _case.dataSet.get("number").rawValue = 7.0 as Double
         _case.dataSet.get("boolean").rawValue = true
         _case.dataSet.get("text").rawValue = "hello world" as String
-        _case.dataSet.get("user").rawValue = new UserFieldValue(testUser1.stringId, testUser1.name, testUser1.surname, testUser1.email)
+        _case.dataSet.get("user").rawValue = new ActorFieldValue(testUser1.stringId, testUser1.name, testUser1.surname, testUser1.email)
         _case.dataSet.get("date").rawValue = date
         _case.dataSet.get("datetime").rawValue = date.atTime(13, 37)
         _case.dataSet.get("enumeration").rawValue = (_case.process.dataSet.get("enumeration") as ChoiceField).choices.find({ it.defaultValue == "Alice" })
@@ -135,7 +135,7 @@ class DataSearchRequestTest {
         _case.dataSet.get("multichoice_map").rawValue = ["alice", "bob"].toSet()
         _case.dataSet.get("file").rawValue = FileFieldValue.fromString("singlefile.txt")
         _case.dataSet.get("fileList").rawValue = FileListFieldValue.fromString("multifile1.txt,multifile2.pdf")
-        _case.dataSet.get("userList").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser1.stringId), dataService.makeUserFieldValue(testUser2.stringId)])
+        _case.dataSet.get("userList").rawValue = new ActorListFieldValue([dataService.makeActorFieldValue(testUser1.stringId), dataService.makeActorFieldValue(testUser2.stringId)])
         (_case.dataSet.get("i18n_text") as I18nField).rawValue.defaultValue = "Modified i18n text value"
         (_case.dataSet.get("i18n_divider") as I18nField).rawValue.defaultValue = "Modified i18n divider value"
         workflowService.save(_case)

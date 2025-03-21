@@ -12,8 +12,8 @@ import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchReques
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorListField
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorListFieldValue
 import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -160,7 +160,7 @@ class ElasticSearchViewPermissionTest {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
         String taskId = case_.getTaskStringId("t1")
         dataService.setData(taskId, new DataSet([
-                "view_ul_pos": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
+                "view_ul_pos": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(testUser.stringId)]))
         ] as Map<String, Field<?>>), superCreator.getSuperUser())
         case_ = workflowService.findOne(case_.stringId)
         sleep(4000)
@@ -179,7 +179,7 @@ class ElasticSearchViewPermissionTest {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
         String taskId = case_.getTaskStringId("t1")
         dataService.setData(taskId, new DataSet([
-                "view_ul_neg": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
+                "view_ul_neg": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(testUser.stringId)]))
         ] as Map<String, Field<?>>), superCreator.getSuperUser())
         case_ = workflowService.findOne(case_.stringId)
         sleep(4000)
@@ -199,7 +199,7 @@ class ElasticSearchViewPermissionTest {
         userService.addRole(testUser, negViewRole.getStringId())
         String taskId = case_.getTaskStringId("t1")
         dataService.setData(taskId, new DataSet([
-                "view_ul_pos": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
+                "view_ul_pos": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(testUser.stringId)]))
         ] as Map<String, Field<?>>), superCreator.getSuperUser())
         case_ = workflowService.findOne(case_.stringId)
         sleep(4000)

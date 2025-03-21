@@ -8,21 +8,21 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UserListField extends FieldWithAllowedRoles<UserListFieldValue> {
+public class ActorListField extends FieldWithAllowedRoles<ActorListFieldValue> {
 
-    public UserListField() {
+    public ActorListField() {
         super();
     }
 
     @Override
     @QueryType(PropertyType.NONE)
     public DataType getType() {
-        return DataType.USER_LIST;
+        return DataType.ACTOR_LIST;
     }
 
     @Override
-    public UserListField clone() {
-        UserListField clone = new UserListField();
+    public ActorListField clone() {
+        ActorListField clone = new ActorListField();
         super.clone(clone);
         return clone;
     }

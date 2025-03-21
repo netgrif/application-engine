@@ -13,7 +13,7 @@ import com.netgrif.application.engine.impersonation.service.interfaces.IImperson
 import com.netgrif.application.engine.petrinet.domain.dataset.BooleanField;
 import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorFieldValue;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -123,7 +123,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
 
     @Override
     public String getImpersonatedUserId(Case config) {
-        return ((UserFieldValue) config.getDataSet().get("impersonated").getRawValue()).getId();
+        return ((ActorFieldValue) config.getDataSet().get("impersonated").getRawValue()).getId();
     }
 
     @Override

@@ -742,11 +742,10 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public UserFieldValue makeUserFieldValue(String actorId) {
-        // todo 2058 rename user field value
+    public ActorFieldValue makeActorFieldValue(String actorId) {
         Optional<Actor> actorOpt = actorService.findById(actorId);
-        return actorOpt.map(actor -> new UserFieldValue(actor.getStringId(), actor.getFirstname(),
-                actor.getLastname(), actor.getEmail())).orElseGet(UserFieldValue::new);
+        return actorOpt.map(actor -> new ActorFieldValue(actor.getStringId(), actor.getFirstname(),
+                actor.getLastname(), actor.getEmail())).orElseGet(ActorFieldValue::new);
     }
 
     // TODO: release/8.0.0 change component properties, parse object node

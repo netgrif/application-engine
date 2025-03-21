@@ -687,11 +687,11 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
             if (field instanceof NumberField) {
                 value = value as Double
             }
-            if (field instanceof UserListField && (value instanceof String[] || value instanceof List)) {
-                LinkedHashSet<UserFieldValue> users = new LinkedHashSet<>()
+            if (field instanceof ActorListField && (value instanceof String[] || value instanceof List)) {
+                LinkedHashSet<ActorFieldValue> users = new LinkedHashSet<>()
                 // todo 2058 switch to actor
-                value.each { id -> users.add(new UserFieldValue(userService.findById(id as String))) }
-                value = new UserListFieldValue(users)
+                value.each { id -> users.add(new ActorFieldValue(userService.findById(id as String))) }
+                value = new ActorListFieldValue(users)
             }
             if (value instanceof GString) {
                 value = value.toString()

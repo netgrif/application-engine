@@ -69,6 +69,9 @@ public class RoleService implements IRoleService {
      * */
     @Override
     public List<Role> findAllById(Set<String> roleIds) {
+        if (roleIds == null || roleIds.isEmpty()) {
+            return new ArrayList<>();
+        }
         return (List<Role>) repository.findAllById(roleIds);
     }
 
@@ -107,6 +110,9 @@ public class RoleService implements IRoleService {
      * */
     @Override
     public List<ProcessRole> findAllProcessRolesByImportIds(Set<String> roleImportIds) {
+        if (roleImportIds == null || roleImportIds.isEmpty()) {
+            return new ArrayList<>();
+        }
         return processRoleRepository.findAllByImportIdIn(roleImportIds);
     }
 
@@ -147,6 +153,9 @@ public class RoleService implements IRoleService {
      * */
     @Override
     public Role save(Role role) {
+        if (role == null) {
+            return null;
+        }
         return repository.save(role);
     }
 
@@ -166,6 +175,9 @@ public class RoleService implements IRoleService {
      * */
     @Override
     public void remove(Role role) {
+        if (role == null) {
+            return;
+        }
         roleAssignmentService.removeAssignmentsByRole(role.getStringId());
         repository.delete(role);
     }
@@ -175,6 +187,9 @@ public class RoleService implements IRoleService {
      * */
     @Override
     public void removeAll(Collection<Role> roles) {
+        if (roles == null || roles.isEmpty()) {
+            return;
+        }
         Set<String> roleIds = roles.stream().map(Role::getStringId).collect(Collectors.toSet());
         roleAssignmentService.removeAssignmentsByRoles(roleIds);
         repository.deleteAll(roles);
@@ -307,25 +322,25 @@ public class RoleService implements IRoleService {
     /**
      * todo javadoc
      * */
-    private <T> AccessPermissions<T> createRolesAndBuildPermissions(Case useCase, AccessPermissions<T> userRefPermissions,
+    private <T> AccessPermissions<T> createRolesAndBuildPermissions(Case useCase, AccessPermissions<T> actorRefPermissions,
                                                                     boolean saveUseCase) {
         List<Role> rolesToSave = new ArrayList<>();
         AccessPermissions<T> resultPermissions = new AccessPermissions<>();
 
-        userRefPermissions.forEach((userListId, permissions) -> {
-            CaseRole caseRole = new CaseRole(userListId, useCase.getStringId());
-            Field<?> userListField = useCase.getDataSet().getFields().get(userListId);
-            if (userListField != null) {
-                ((FieldWithAllowedRoles<?>) userListField).getCaseRoleIds().add(caseRole.getStringId());
+        actorRefPermissions.forEach((actorListId, permissions) -> {
+            CaseRole caseRole = new CaseRole(actorListId, useCase.getStringId());
+            Field<?> actorListField = useCase.getDataSet().getFields().get(actorListId);
+            if (actorListField != null) {
+                ((FieldWithAllowedRoles<?>) actorListField).getCaseRoleIds().add(caseRole.getStringId());
             } else {
                 throw new IllegalStateException(String.format("Case role [%s} in process [%s] references non existing dataField in case [%s]",
-                        userListId, useCase.getPetriNetId(), useCase.getStringId()));
+                        actorListId, useCase.getPetriNetId(), useCase.getStringId()));
             }
             rolesToSave.add(caseRole);
             resultPermissions.put(caseRole.getStringId(), new HashMap<>(permissions));
         });
 
-        if (!userRefPermissions.isEmpty() && saveUseCase) {
+        if (!actorRefPermissions.isEmpty() && saveUseCase) {
             workflowService.save(useCase);
         }
         saveAll(rolesToSave);

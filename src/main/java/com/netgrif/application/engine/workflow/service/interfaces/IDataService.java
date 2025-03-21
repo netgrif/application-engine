@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
@@ -94,7 +94,7 @@ public interface IDataService {
 
     List<Field<?>> getImmediateFields(Task task);
 
-    UserFieldValue makeUserFieldValue(String id);
+    ActorFieldValue makeActorFieldValue(String id);
 
     void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException;
 }

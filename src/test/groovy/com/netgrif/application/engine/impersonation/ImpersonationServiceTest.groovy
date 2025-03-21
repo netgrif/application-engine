@@ -13,8 +13,8 @@ import com.netgrif.application.engine.impersonation.service.interfaces.IImperson
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorListFieldValue
 import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImpersonationRunner
@@ -301,10 +301,10 @@ class ImpersonationServiceTest {
 
     def createConfigCase(IUser user, String impersonator, List<String> roles = null, List<String> auths = null) {
         def caze = helper.createCase("config", petriNetService.getNewestVersionByIdentifier(ImpersonationRunner.IMPERSONATION_CONFIG_PETRI_NET_IDENTIFIER))
-        def owner = new UserFieldValue(user)
+        def owner = new ActorFieldValue(user)
         caze.dataSet.get("impersonated").rawValue = owner
         caze.dataSet.get("impersonated_email").rawValue = owner.email
-        caze.dataSet.get("config_owner").rawValue = new UserListFieldValue([owner])
+        caze.dataSet.get("config_owner").rawValue = new ActorListFieldValue([owner])
         caze.dataSet.get("impersonators").rawValue = [impersonator]
         caze.dataSet.get("impersonated_roles").rawValue = roles ?: user.roles.stringId as List
         caze.dataSet.get("impersonated_authorities").rawValue = auths ?: user.authorities.stringId as List

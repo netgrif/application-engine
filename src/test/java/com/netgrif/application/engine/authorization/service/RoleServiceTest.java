@@ -14,8 +14,8 @@ import com.netgrif.application.engine.history.domain.baseevent.repository.EventL
 import com.netgrif.application.engine.history.domain.userevents.UserAssignRoleEventLog;
 import com.netgrif.application.engine.history.domain.userevents.UserRemoveRoleEventLog;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserField;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListField;
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorField;
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorListField;
 import com.netgrif.application.engine.startup.AnonymousRoleRunner;
 import com.netgrif.application.engine.startup.DefaultRoleRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
@@ -232,9 +232,9 @@ public class RoleServiceTest {
 
     @Test
     public void testResolveCaseRolesOnCase() {
-        UserListField userlistField = new UserListField();
+        ActorListField userlistField = new ActorListField();
         userlistField.setImportId("user_list_id");
-        UserField userField = new UserField();
+        ActorField userField = new ActorField();
         userField.setImportId("user_id");
 
         Case useCase = new Case();
@@ -276,9 +276,9 @@ public class RoleServiceTest {
 
     @Test
     public void testResolveCaseRolesOnTask() {
-        UserListField userlistField = new UserListField();
+        ActorListField userlistField = new ActorListField();
         userlistField.setImportId("user_list_id");
-        UserField userField = new UserField();
+        ActorField userField = new ActorField();
         userField.setImportId("user_id");
 
         Task task = Task.with().transitionId("transition_id").build();

@@ -5,30 +5,32 @@ import com.netgrif.application.engine.importer.model.DataType;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Data
-public class UserField extends FieldWithAllowedRoles<UserFieldValue> {
+@EqualsAndHashCode(callSuper = true)
+public class ActorField extends FieldWithAllowedRoles<ActorFieldValue> {
 
-    public UserField() {
+    public ActorField() {
         this(new HashSet<>());
     }
 
-    public UserField(Set<String> values) {
+    public ActorField(Set<String> values) {
         super(values);
     }
 
     @Override
     @QueryType(PropertyType.NONE)
     public DataType getType() {
-        return DataType.USER;
+        return DataType.ACTOR;
     }
 
     @Override
-    public UserField clone() {
-        UserField clone = new UserField();
+    public ActorField clone() {
+        ActorField clone = new ActorField();
         super.clone(clone);
         return clone;
     }
