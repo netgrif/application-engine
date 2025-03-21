@@ -6,7 +6,6 @@ import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.authentication.domain.constants.IdentityConstants;
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
@@ -36,7 +35,6 @@ public class IdentityService implements IIdentityService {
     private final IElasticCaseService elasticCaseService;
     private final IWorkflowService workflowService;
     private final IDataService dataService;
-    private final IUserService userService;
     // todo: release/8.0.0 make encoder configurable
     private final BCryptPasswordEncoder passwordEncoder;
     private final SecurityContextService securityContextService;
@@ -129,6 +127,9 @@ public class IdentityService implements IIdentityService {
      * */
     @Override
     public Identity create(IdentityParams params) {
+        if (params == null) {
+            return null;
+        }
         String activeActorId = getLoggedIdentity().getActiveActorId();
         Identity identity = (Identity) workflowService.createCaseByIdentifier(IdentityConstants.PROCESS_IDENTIFIER,
                 params.getFullName(), "", activeActorId).getCase();
@@ -151,6 +152,9 @@ public class IdentityService implements IIdentityService {
      * */
     @Override
     public Identity update(Identity identity, IdentityParams params) {
+        if (identity == null || params == null) {
+            return null;
+        }
         identity = (Identity) dataService.setData(identity, params.toDataSet(), getLoggedIdentity().getActiveActorId()).getCase();
         if (securityContextService.isIdentityLogged(identity.getStringId())) {
             securityContextService.reloadSecurityContext(identity.toSession());

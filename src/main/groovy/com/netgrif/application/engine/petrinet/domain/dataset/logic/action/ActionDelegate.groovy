@@ -2,14 +2,18 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.AsyncRunner
-
 import com.netgrif.application.engine.authentication.domain.Identity
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams
 import com.netgrif.application.engine.authentication.service.UserDetailsServiceImpl
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest
+import com.netgrif.application.engine.authorization.domain.Actor
 import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.authorization.domain.Role
+import com.netgrif.application.engine.authorization.service.interfaces.IActorService
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.configuration.PublicViewProperties
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
@@ -34,7 +38,6 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.rules.domain.RuleRepository
 import com.netgrif.application.engine.startup.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.FilterRunner
-import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.validations.interfaces.IValidationService
 import com.netgrif.application.engine.workflow.domain.*
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
@@ -65,7 +68,6 @@ import org.springframework.data.domain.Pageable
 
 import java.text.Normalizer
 import java.util.stream.Collectors
-
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -105,6 +107,12 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     @Autowired
     IWorkflowService workflowService
+
+    @Autowired
+    IIdentityService identityService
+
+    @Autowired
+    IActorService actorService
 
     @Autowired
     IUserService userService
@@ -446,10 +454,10 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         }
     }
 
-    SetDataEventOutcome setData(Field<?> field, Map changes, IUser user = userService.loggedOrSystem) {
+    SetDataEventOutcome setData(Field<?> field, Map changes, LoggedIdentity identity = identityService.loggedIdentity) {
         SetDataEventOutcome outcome = dataService.setData(useCase, new DataSet([
                 (field.stringId): field.class.newInstance(changes)
-        ] as Map<String, Field<?>>), user)
+        ] as Map<String, Field<?>>), identity.activeActorId)
         this.outcomes.add(outcome)
         updateCase()
         return outcome
@@ -528,7 +536,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     private addTaskOutcomes(Task task, DataSet dataSet) {
         this.outcomes.add(taskService.assignTask(task.stringId))
-        this.outcomes.add(dataService.setData(task.stringId, dataSet, userService.loggedOrSystem))
+        this.outcomes.add(dataService.setData(task.stringId, dataSet, identityService.loggedIdentity.activeActorId))
         this.outcomes.add(taskService.finishTask(task.stringId))
     }
 
@@ -681,6 +689,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
             }
             if (field instanceof UserListField && (value instanceof String[] || value instanceof List)) {
                 LinkedHashSet<UserFieldValue> users = new LinkedHashSet<>()
+                // todo 2058 switch to actor
                 value.each { id -> users.add(new UserFieldValue(userService.findById(id as String))) }
                 value = new UserListFieldValue(users)
             }
@@ -729,43 +738,46 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return workflowService.searchOne(predicate(qCase))
     }
 
-    Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
-        return workflowService.createCaseByIdentifier(identifier, title, color, author.transformToLoggedUser(), locale, params).getCase()
+    Case createCase(String identifier, String title = null, String color = "", LoggedIdentity author = identityService.loggedIdentity,
+                    Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
+        return workflowService.createCaseByIdentifier(identifier, title, color, author.activeActorId, locale, params).getCase()
     }
 
-    Case createCase(Process net, String title = net.defaultCaseName.getTranslation(locale), String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
-        CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser(), params)
+    Case createCase(Process net, String title = net.defaultCaseName.getTranslation(locale), String color = "", LoggedIdentity author = identityService.loggedIdentity,
+                    Locale locale = LocaleContextHolder.getLocale(), Map<String, String> params = [:]) {
+        CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, author.activeActorId, params)
         this.outcomes.add(outcome)
         return outcome.getCase()
     }
 
-    Task assignTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    Task assignTask(String transitionId, Case aCase = useCase, LoggedIdentity assignee = identityService.loggedIdentity,
+                    Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        AssignTaskEventOutcome outcome = taskService.assignTask(user.transformToLoggedUser(), taskId, params)
+        AssignTaskEventOutcome outcome = taskService.assignTask(assignee.activeActorId, taskId, params)
         this.outcomes.add(outcome)
         updateCase()
         return outcome.getTask()
     }
 
-    Task assignTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        return addTaskOutcomeAndReturnTask(taskService.assignTask(task, user, params))
+    Task assignTask(Task task, LoggedIdentity assignee = identityService.loggedIdentity, Map<String, String> params = [:]) {
+        return addTaskOutcomeAndReturnTask(taskService.assignTask(task, assignee.activeActorId, params))
     }
 
-    void assignTasks(List<Task> tasks, IUser assignee = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        this.outcomes.addAll(taskService.assignTasks(tasks, assignee, params))
+    void assignTasks(List<Task> tasks, LoggedIdentity assignee = identityService.loggedIdentity, Map<String, String> params = [:]) {
+        this.outcomes.addAll(taskService.assignTasks(tasks, assignee.activeActorId, params))
     }
 
-    Task cancelTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    Task cancelTask(String transitionId, Case aCase = useCase, LoggedIdentity assignee = identityService.loggedIdentity, Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        return addTaskOutcomeAndReturnTask(taskService.cancelTask(user.transformToLoggedUser(), taskId, params))
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(assignee.activeActorId, taskId, params))
     }
 
-    Task cancelTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, user, params))
+    Task cancelTask(Task task, LoggedIdentity assignee = identityService.loggedIdentity, Map<String, String> params = [:]) {
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, assignee.activeActorId, params))
     }
 
-    void cancelTasks(List<Task> tasks, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        this.outcomes.addAll(taskService.cancelTasks(tasks, user, params))
+    void cancelTasks(List<Task> tasks, LoggedIdentity assignee = identityService.loggedIdentity, Map<String, String> params = [:]) {
+        this.outcomes.addAll(taskService.cancelTasks(tasks, assignee.activeActorId, params))
     }
 
     private Task addTaskOutcomeAndReturnTask(TaskEventOutcome outcome) {
@@ -774,17 +786,18 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return outcome.getTask()
     }
 
-    void finishTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    void finishTask(String transitionId, Case aCase = useCase, LoggedIdentity assignee = identityService.loggedIdentity,
+                    Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
-        addTaskOutcomeAndReturnTask(taskService.finishTask(user.transformToLoggedUser(), taskId, params))
+        addTaskOutcomeAndReturnTask(taskService.finishTask(assignee.activeActorId, taskId, params))
     }
 
-    void finishTask(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        addTaskOutcomeAndReturnTask(taskService.finishTask(task, user, params))
+    void finishTask(Task task, LoggedIdentity assignee = identityService.loggedIdentity, Map<String, String> params = [:]) {
+        addTaskOutcomeAndReturnTask(taskService.finishTask(task, assignee.activeActorId, params))
     }
 
-    void finishTasks(List<Task> tasks, IUser finisher = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        this.outcomes.addAll(taskService.finishTasks(tasks, finisher, params))
+    void finishTasks(List<Task> tasks, LoggedIdentity assignee = identityService.loggedIdentity, Map<String, String> params = [:]) {
+        this.outcomes.addAll(taskService.finishTasks(tasks, assignee.activeActorId, params))
     }
 
     List<Task> findTasks(Closure<Predicate> predicate) {
@@ -816,54 +829,58 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     /**
      * todo javadoc
      * */
-    Role assignRole(String roleId, String userId = userService.loggedUser.stringId , Map<String, String> params = this.params) {
-        List<Role> roleAsList = assignRoles([roleId] as Set, userId, params)
+    Role assignRole(String roleId, String actorId = identityService.loggedIdentity.activeActorId , Map<String, String> params = this.params) {
+        List<Role> roleAsList = assignRoles([roleId] as Set, actorId, params)
         return roleAsList.isEmpty() ? null : roleAsList[0]
     }
 
     /**
      * todo javadoc
      * */
-    List<Role> assignRoles(Set<String> roleIds, String userId = userService.loggedUser.stringId, Map<String, String> params = this.params) {
-        return roleService.assignRolesToActor(userId, roleIds, params)
+    List<Role> assignRoles(Set<String> roleIds, String actorId = identityService.loggedIdentity.activeActorId, Map<String, String> params = this.params) {
+        return roleService.assignRolesToActor(actorId, roleIds, params)
     }
 
     /**
      * todo javadoc
      * */
-    Role removeRole(String roleId, String userId = userService.loggedUser.stringId, Map<String, String> params = this.params) {
-        List<Role> roleAsList = removeRoles([roleId] as Set, userId, params)
+    Role removeRole(String roleId, String actorId = identityService.loggedIdentity.activeActorId, Map<String, String> params = this.params) {
+        List<Role> roleAsList = removeRoles([roleId] as Set, actorId, params)
         return roleAsList.isEmpty() ? null : roleAsList[0]
     }
 
     /**
      * todo javadoc
      * */
-    List<Role> removeRoles(Set<String> roleIds, String userId = userService.loggedUser.stringId, Map<String, String> params = this.params) {
-        return roleService.removeRolesFromActor(userId, roleIds, params)
+    List<Role> removeRoles(Set<String> roleIds, String actorId = identityService.loggedIdentity.activeActorId, Map<String, String> params = this.params) {
+        return roleService.removeRolesFromActor(actorId, roleIds, params)
     }
 
     // TODO: release/8.0.0 merge check, params x dataset
-    SetDataEventOutcome setData(DataSet dataSet, IUser user = userService.loggedOrSystem) {
-        return addSetDataOutcomeToOutcomes(dataService.setData(useCase, dataSet, user))
+    SetDataEventOutcome setData(DataSet dataSet, String actorId = identityService.loggedIdentity.activeActorId) {
+        return addSetDataOutcomeToOutcomes(dataService.setData(useCase, dataSet, actorId))
     }
 
-    SetDataEventOutcome setData(Task task, DataSet dataSet, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        return setData(task.stringId, dataSet, user, params)
+    SetDataEventOutcome setData(Task task, DataSet dataSet, String actorId = identityService.loggedIdentity.activeActorId,
+                                Map<String, String> params = [:]) {
+        return setData(task.stringId, dataSet, actorId, params)
     }
 
-    SetDataEventOutcome setData(String taskId, DataSet dataSet, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        return addSetDataOutcomeToOutcomes(dataService.setData(taskId, dataSet, user, params))
+    SetDataEventOutcome setData(String taskId, DataSet dataSet, String actorId = identityService.loggedIdentity.activeActorId,
+                                Map<String, String> params = [:]) {
+        return addSetDataOutcomeToOutcomes(dataService.setData(taskId, dataSet, actorId, params))
     }
 
-    SetDataEventOutcome setData(Transition transition, DataSet dataSet, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        return addSetDataOutcomeToOutcomes(setData(transition.importId, this.useCase, dataSet, user, params))
+    SetDataEventOutcome setData(Transition transition, DataSet dataSet, String actorId = identityService.loggedIdentity.activeActorId,
+                                Map<String, String> params = [:]) {
+        return addSetDataOutcomeToOutcomes(setData(transition.importId, this.useCase, dataSet, actorId, params))
     }
 
-    SetDataEventOutcome setData(String transitionId, Case useCase, DataSet dataSet, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    SetDataEventOutcome setData(String transitionId, Case useCase, DataSet dataSet, String actorId = identityService.loggedIdentity.activeActorId,
+                                Map<String, String> params = [:]) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
-        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, dataSet, user, params))
+        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, dataSet, actorId, params))
     }
 
     @Deprecated
@@ -889,28 +906,30 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return outcome
     }
 
-    Map<String, Field> getData(Task task, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    Map<String, Field> getData(Task task, String actorId = identityService.loggedIdentity.activeActorId, Map<String, String> params = [:]) {
         def useCase = workflowService.findOne(task.caseId)
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, user, params)))
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, actorId, params)))
     }
 
-    Map<String, Field> getData(String taskId, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    Map<String, Field> getData(String taskId, String actorId = identityService.loggedIdentity.activeActorId, Map<String, String> params = [:]) {
         Task task = taskService.findById(taskId)
         def useCase = workflowService.findOne(task.caseId)
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, user, params)))
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, actorId, params)))
     }
 
-    Map<String, Field> getData(Transition transition, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
-        return getData(transition.stringId, this.useCase, user, params)
+    Map<String, Field> getData(Transition transition, String actorId = identityService.loggedIdentity.activeActorId,
+                               Map<String, String> params = [:]) {
+        return getData(transition.stringId, this.useCase, actorId, params)
     }
 
-    Map<String, Field> getData(String transitionId, Case useCase, IUser user = userService.loggedOrSystem, Map<String, String> params = [:]) {
+    Map<String, Field> getData(String transitionId, Case useCase, String actorId = identityService.loggedIdentity.activeActorId,
+                               Map<String, String> params = [:]) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
         if (!task) {
             return new HashMap<String, Field>()
         }
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, user, params)))
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, actorId, params)))
     }
 
     private List<DataRef> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome) {
@@ -925,8 +944,8 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         }
     }
 
-    IUser loggedUser() {
-        return userService.loggedUser
+    LoggedIdentity loggedIdentity() {
+        return identityService.loggedIdentity
     }
 
     void saveFileToField(Case targetCase, String targetTransitionId, String targetFieldId, String filename, String storagePath = null) {
@@ -961,134 +980,63 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         mailService.sendMail(mailDraft)
     }
 
-    def changeUserByEmail(String email) {
-        [email  : { cl ->
-            changeUserByEmail(email, "email", cl)
-        },
-         name   : { cl ->
-             changeUserByEmail(email, "name", cl)
-         },
-         surname: { cl ->
-             changeUserByEmail(email, "surname", cl)
-         },
-         tel    : { cl ->
-             changeUserByEmail(email, "tel", cl)
-         },
-        ]
+    // todo 2058 API methods for actor
+    // todo 2058 should AD have API for identity?
+
+    Identity changeIdentityByEmail(String email, IdentityParams identityParams) {
+        Optional<Identity> identityOpt = identityService.findByUsername(email)
+        return changeIdentity(identityOpt, identityParams)
     }
 
-    def changeUser(String id) {
-        [email  : { cl ->
-            changeUser(id, "email", cl)
-        },
-         name   : { cl ->
-             changeUser(id, "name", cl)
-         },
-         surname: { cl ->
-             changeUser(id, "surname", cl)
-         },
-         tel    : { cl ->
-             changeUser(id, "tel", cl)
-         },
-        ]
+    Identity changeIdentity(String id, IdentityParams identityParams) {
+        Optional<Identity> identityOpt = identityService.findById(id)
+        return changeIdentity(identityOpt, identityParams)
     }
 
-    def changeUser(IUser user) {
-        [email  : { cl ->
-            changeUser(user, "email", cl)
-        },
-         name   : { cl ->
-             changeUser(user, "name", cl)
-         },
-         surname: { cl ->
-             changeUser(user, "surname", cl)
-         },
-         tel    : { cl ->
-             changeUser(user, "tel", cl)
-         },
-        ]
-    }
-
-    def changeUserByEmail(String email, String attribute, def cl) {
-        IUser user = userService.findByEmail(email)
-        changeUser(user, attribute, cl)
-    }
-
-    def changeUser(String id, String attribute, def cl) {
-        IUser user = userService.findById(id)
-        changeUser(user, attribute, cl)
-    }
-
-    def changeUser(IUser user, String attribute, def cl) {
-        if (user == null) {
-            log.error("Cannot find user.")
-            return
+    Identity changeIdentity(Optional<Identity> identityOpt, IdentityParams identityParams) {
+        if (identityOpt.isEmpty()) {
+            log.error("Cannot find identity.")
+            return null
         }
 
-        if (user.hasProperty(attribute) == null) {
-            log.error("User object does not have property [" + attribute + "]")
-            return
-        }
-
-        user[attribute] = cl() as String
-        userService.save(user)
+        return identityService.update(identityOpt.get(), identityParams)
     }
 
-    MessageResource inviteUser(String email) {
-        NewIdentityRequest newUserRequest = new NewIdentityRequest()
-        newUserRequest.email = email
-        newUserRequest.groups = new HashSet<>()
-        newUserRequest.roles = new HashSet<>()
-        return inviteUser(newUserRequest)
+    MessageResource inviteIdentity(String email) {
+        NewIdentityRequest newIdentityRequest = new NewIdentityRequest()
+        newIdentityRequest.email = email
+        newIdentityRequest.groups = new HashSet<>()
+        newIdentityRequest.roles = new HashSet<>()
+        return inviteIdentity(newIdentityRequest)
     }
 
-    MessageResource inviteUser(NewIdentityRequest newUserRequest) {
-        IUser user = registrationService.createNewIdentity(newUserRequest)
-        if (user == null)
+    MessageResource inviteIdentity(NewIdentityRequest newIdentityRequest) {
+        Identity identity = registrationService.createNewIdentity(newIdentityRequest)
+        if (identity == null)
             return MessageResource.successMessage("Done")
-        mailService.sendRegistrationEmail(user)
+        mailService.sendRegistrationEmail(identity)
 
-        mailAttemptService.mailAttempt(newUserRequest.email)
+        mailAttemptService.mailAttempt(newIdentityRequest.email)
         return MessageResource.successMessage("Done")
     }
 
-    void deleteUser(String email) {
-        IUser user = userService.findByEmail(email)
-        if (user == null)
-            log.error("Cannot find user with email [" + email + "]")
-        deleteUser(user)
-    }
-
-    void deleteUser(IUser user) {
-        List<Task> tasks = taskService.findByAssignee(new FullPageRequest(), user).toList()
-        if (tasks != null && tasks.size() > 0)
-            taskService.cancelTasks(tasks, user)
-
-        QCase qCase = new QCase("case")
-        List<Case> cases = workflowService.searchAll(qCase.author.eq(user.transformToAuthor())).toList()
-        if (cases != null)
-            cases.forEach({ aCase -> aCase.setAuthorId(Author.createAnonymizedAuthor()) })
-
-        userService.deleteUser(user)
-    }
-
-    IUser findUserByEmail(String email) {
-        IUser user = userService.findByEmail(email)
-        if (user == null) {
-            log.error("Cannot find user with email [" + email + "]")
+    Actor findActorByEmail(String email) {
+        Optional<Actor> actorOpt = actorService.findByEmail(email)
+        if (actorOpt.isEmpty()) {
+            log.error("Cannot find actor with email [{}]", email)
             return null
         } else {
-            return user
+            return actorOpt.get()
         }
     }
 
-    IUser findUserById(String id) {
-        IUser user = userService.findById(id)
-        if (user == null) {
-            log.error("Cannot find user with id [" + id + "]")
+    Actor findActorById(String id) {
+        Optional<Actor> actorOpt = actorService.findById(id)
+        if (actorOpt.isEmpty()) {
+            log.error("Cannot find actor with id [{}]", id)
             return null
         } else {
-            return user
+            return actorOpt.get()
         }
     }
 
@@ -1135,22 +1083,22 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     File exportCasesToFile(List<CaseSearchRequest> requests, String pathName, ExportDataConfig config = null,
-                           Identity user = userService.loggedOrSystem.transformToLoggedUser(),
+                           LoggedIdentity identity = identityService.loggedIdentity,
                            int pageSize = exportConfiguration.getMongoPageSize(),
                            Locale locale = LocaleContextHolder.getLocale(),
                            Boolean isIntersection = false) {
         File exportFile = new File(pathName)
-        OutputStream out = exportCases(requests, exportFile, config, user, pageSize, locale, isIntersection)
+        OutputStream out = exportCases(requests, exportFile, config, identity, pageSize, locale, isIntersection)
         out.close()
         return exportFile
     }
 
     OutputStream exportCases(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config = null,
-                             Identity user = userService.loggedOrSystem.transformToLoggedUser(),
+                             LoggedIdentity identity = identityService.loggedIdentity,
                              int pageSize = exportConfiguration.getMongoPageSize(),
                              Locale locale = LocaleContextHolder.getLocale(),
                              Boolean isIntersection = false) {
-        return exportService.fillCsvCaseData(requests, outFile, config, user, pageSize, locale, isIntersection)
+        return exportService.fillCsvCaseData(requests, outFile, config, identity.activeActorId, pageSize, locale, isIntersection)
     }
 
     File exportTasksToFile(Closure<Predicate> predicate, String pathName, ExportDataConfig config = null) {
@@ -1160,28 +1108,29 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return exportFile
     }
 
-    OutputStream exportTasks(Closure<Predicate> predicate, File outFile, ExportDataConfig config = null, int pageSize = exportConfiguration.getMongoPageSize()) {
+    OutputStream exportTasks(Closure<Predicate> predicate, File outFile, ExportDataConfig config = null,
+                             int pageSize = exportConfiguration.getMongoPageSize()) {
         QTask qTask = new QTask("task")
         return exportService.fillCsvTaskData(predicate(qTask), outFile, config, pageSize)
     }
 
     File exportTasksToFile(List<ElasticTaskSearchRequest> requests, String pathName, ExportDataConfig config = null,
-                           Identity user = userService.loggedOrSystem.transformToLoggedUser(),
+                           LoggedIdentity identity = identityService.loggedIdentity,
                            int pageSize = exportConfiguration.getMongoPageSize(),
                            Locale locale = LocaleContextHolder.getLocale(),
                            Boolean isIntersection = false) {
         File exportFile = new File(pathName)
-        OutputStream out = exportTasks(requests, exportFile, config, user, pageSize, locale, isIntersection)
+        OutputStream out = exportTasks(requests, exportFile, config, identity, pageSize, locale, isIntersection)
         out.close()
         return exportFile
     }
 
     OutputStream exportTasks(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config = null,
-                             Identity user = userService.loggedOrSystem.transformToLoggedUser(),
+                             LoggedIdentity identity = identityService.loggedIdentity,
                              int pageSize = exportConfiguration.getMongoPageSize(),
                              Locale locale = LocaleContextHolder.getLocale(),
                              Boolean isIntersection = false) {
-        return exportService.fillCsvTaskData(requests, outFile, config, user, pageSize, locale, isIntersection)
+        return exportService.fillCsvTaskData(requests, outFile, config, identity.activeActorId, pageSize, locale, isIntersection)
     }
 
     FileFieldInputStream getFileFieldStream(Case useCase, Task task, FileField field, boolean forPreview = false) {
@@ -1201,6 +1150,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     }
 
     /**
+     * todo javadoc
      * Action API case search function using Elasticsearch database
      * @param requests the CaseSearchRequest list
      * @param loggedUser the user who is searching for the requests
@@ -1210,9 +1160,9 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Case> findCasesElastic(List<CaseSearchRequest> requests, Identity loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Case> findCasesElastic(List<CaseSearchRequest> requests, LoggedIdentity identity = identityService.loggedIdentity,
                                 int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
-        return elasticCaseService.search(requests, loggedUser, PageRequest.of(page, pageSize), locale, isIntersection)
+        return elasticCaseService.search(requests, identity, PageRequest.of(page, pageSize), locale, isIntersection)
     }
 
     /**
@@ -1225,10 +1175,10 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Case> findCasesElastic(Map<String, Object> request, Identity loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Case> findCasesElastic(Map<String, Object> request, LoggedIdentity identity = identityService.loggedIdentity,
                                 int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         List<CaseSearchRequest> requests = Collections.singletonList(new CaseSearchRequest(request))
-        return findCasesElastic(requests, loggedUser, page, pageSize, locale, isIntersection)
+        return findCasesElastic(requests, identity, page, pageSize, locale, isIntersection)
     }
 
     /**
@@ -1241,9 +1191,9 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Task> findTasks(List<ElasticTaskSearchRequest> requests, Identity loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Task> findTasks(List<ElasticTaskSearchRequest> requests, LoggedIdentity identity = identityService.loggedIdentity,
                          int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
-        return elasticTaskService.search(requests, loggedUser, PageRequest.of(page, pageSize), locale, isIntersection)
+        return elasticTaskService.search(requests, identity, PageRequest.of(page, pageSize), locale, isIntersection)
     }
 
     /**
@@ -1256,16 +1206,17 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    Page<Task> findTasks(Map<String, Object> request, Identity loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+    Page<Task> findTasks(Map<String, Object> request, LoggedIdentity identity = identityService.loggedIdentity,
                          int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         List<ElasticTaskSearchRequest> requests = Collections.singletonList(new ElasticTaskSearchRequest(request))
-        return findTasks(requests, loggedUser, page, pageSize, locale, isIntersection)
+        return findTasks(requests, identity, page, pageSize, locale, isIntersection)
     }
 
     List<Case> findDefaultFilters() {
         if (!createDefaultFilters) {
             return []
         }
+        // todo 2058 get system actor
         return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.setStringId.eq(userService.system.stringId)) })
     }
 
@@ -1867,6 +1818,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     List<Case> findCasesElastic(String query, Pageable pageable) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
+        // todo 2058 logged system
         List<Case> result = elasticCaseService.search([request], userService.system.transformToLoggedUser(), pageable, LocaleContextHolder.locale, false).content
         return result
     }
@@ -1874,6 +1826,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     long countCasesElastic(String query) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
+        // todo 2058 logged system
         return elasticCaseService.count([request], userService.system.transformToLoggedUser(), LocaleContextHolder.locale, false)
     }
 
