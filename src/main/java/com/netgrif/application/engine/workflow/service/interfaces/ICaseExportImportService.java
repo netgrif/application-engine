@@ -1,26 +1,25 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.netgrif.application.engine.workflow.domain.Case;
-import net.lingala.zip4j.ZipFile;
+import com.netgrif.application.engine.workflow.domain.CaseExportFiles;
 
-import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 public interface ICaseExportImportService {
 
-    void findAndExportCases(Set<String> caseIdsToExport, OutputStream exportFile);
+    void findAndExportCases(Set<String> caseIdsToExport, OutputStream exportFile) throws IOException;
 
-    void exportCases(Set<Case> casesToExport, OutputStream exportFile);
+    void findAndExportCasesWithFiles(Set<String> caseIdsToExport, OutputStream archiveFile) throws IOException;
 
-    Set<File> getFilesOfCases(Set<Case> casesToExport);
+    void exportCases(Set<Case> casesToExport, OutputStream exportFile) throws IOException;
 
-    ZipFile zipExportFileAndCaseFiles(OutputStream exportFile, Set<File> caseFiles);
-
-    File exportCasesWithFiles(Collection<Case> casesToExport, File exportFile);
+    CaseExportFiles getFileNamesOfCases(Set<Case> casesToExport);
 
     List<Case> importCases(InputStream importFile);
+
+    List<Case> importCasesWithFiles(InputStream importZipFile) throws IOException;
 }

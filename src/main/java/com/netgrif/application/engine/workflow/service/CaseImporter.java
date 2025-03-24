@@ -2,28 +2,27 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.files.StorageResolverService;
+import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.service.ComponentFactory;
-import com.netgrif.application.engine.importer.service.TriggerFactory;
+import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.Component;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
+import com.netgrif.application.engine.petrinet.domain.Transaction;
+import com.netgrif.application.engine.petrinet.domain.Transition;
+import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation;
-import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
-import com.netgrif.application.engine.petrinet.domain.policies.DataFocusPolicy;
-import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.PetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.utils.ImporterUtils;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.domain.ProcessResourceId;
 import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.application.engine.workflow.domain.triggers.TimeTrigger;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -31,7 +30,6 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,13 +52,16 @@ public class CaseImporter {
     private IUserService userService;
 
     @Autowired
-    protected ComponentFactory componentFactory;
+    private ComponentFactory componentFactory;
 
     @Autowired
-    protected TriggerFactory triggerFactory;
+    private ITaskService taskService;
 
     @Autowired
-    protected ITaskService taskService;
+    private IProcessRoleService processRoleService;
+
+    @Autowired
+    private StorageResolverService storageResolverService;
 
     private Cases xmlCases;
     private Case importedCase;
@@ -78,36 +79,36 @@ public class CaseImporter {
         }
         for (com.netgrif.application.engine.importer.model.Case xmlCase : xmlCases.getCase()) {
             importCase(xmlCase);
-            if (importedCase == null) {
+            if (this.importedCase == null) {
                 continue;
             }
-            importedCases.add(importedCase);
+            importedCases.add(workflowService.save(this.importedCase));
+            this.importedCase = null;
         }
         return importedCases;
     }
 
     @Transactional
-    protected Case importCase(com.netgrif.application.engine.importer.model.Case xmlCase) {
+    protected void importCase(com.netgrif.application.engine.importer.model.Case xmlCase) {
         this.xmlCase = xmlCase;
         Version version = new Version();
         PetriNet model = petriNetService.getPetriNet(xmlCase.getProcessIdentifier(), version);
         if (model == null) {
-//            todo throw error
-            log.error("Petri net with identifier [" + xmlCase.getProcessIdentifier() + "] not found, skipping case import");
-            return null;
+//            todo throw error?
+            log.error("Petri net with identifier [{}] not found, skipping case import", xmlCase.getProcessIdentifier());
+            return;
         }
-        String importedCaseStringId = xmlCase.getId().split("-")[1].trim();
+        ProcessResourceId importedCaseId = new ProcessResourceId(model.getStringId(), xmlCase.getId().split("-")[1].trim());
         try {
-            workflowService.findOne(importedCaseStringId);
-            this.importedCase = new Case(model, new ProcessResourceId(model.getStringId(), importedCaseStringId.split("-")[1].trim()));
-        } catch (IllegalArgumentException e) {
-            log.warn("Case with id [{}] already exists, new id will be generated for imported case", xmlCase.getId());
+            workflowService.findOne(importedCaseId.toString());
+            log.warn("Case with id [{}] already exists, new id will be generated for imported case", importedCaseId);
             this.importedCase = new Case(model);
+        } catch (IllegalArgumentException e) {
+            this.importedCase = new Case(model, importedCaseId);
         }
         importCaseMetadata();
         importDataSet();
         importTasks();
-        return importedCase;
     }
 
     @Transactional
@@ -117,49 +118,64 @@ public class CaseImporter {
             return;
         }
         this.xmlCase.getTask().forEach(task -> {
-            Task importedTask = Task.with()
+            Transition transition = this.importedCase.getPetriNet().getTransition(task.getTransitionId());
+            final Task importedTask = Task.with()
+                    .title(transition.getTitle())
+                    ._id(new ProcessResourceId(this.importedCase.getPetriNetId(), task.getId().split("-")[1].trim()))
                     .caseId(this.importedCase.getStringId())
-                    .transitionId(task.getTransitionId())
-                    .title(parseXmlI18nString(task.getTitle()))
-                    .priority(task.getPriority() != null ? task.getPriority().intValue() : null)
+                    .processId(this.importedCase.getProcessIdentifier())
+                    .transitionId(transition.getImportId())
+                    .layout(transition.getLayout())
+                    .tags(transition.getTags())
                     .userId(task.getUserId())
                     .startDate(parseDateTimeFromXml(task.getStartDate()))
                     .finishDate(parseDateTimeFromXml(task.getFinishDate()))
                     .finishedBy(task.getFinishedBy())
-                    .transactionId(task.getTransactionId())
-                    .icon(task.getIcon())
-                    .assignPolicy(AssignPolicy.valueOf(task.getAssignPolicy().value().toUpperCase()))
-                    .dataFocusPolicy(DataFocusPolicy.valueOf(task.getDataFocusPolicy().value().toUpperCase()))
-                    .finishPolicy(FinishPolicy.valueOf(task.getFinishPolicy().value().toUpperCase()))
-                    .tags(task.getTags() != null ? ImporterUtils.buildTagsMap(task.getTags().getTag()) : new HashMap<>())
-                    .viewRoles(parseStringCollection(task.getViewRoles()))
-                    .viewUserRefs(parseStringCollection(task.getViewUserRefs()))
-                    .viewUsers(parseStringCollection(task.getViewUsers()))
-                    .negativeViewRoles(parseStringCollection(task.getNegativeViewRoles()))
-                    .negativeViewUsers(parseStringCollection(task.getNegativeViewUsers()))
-                    .immediateDataFields(new LinkedHashSet<>(parseStringCollection(task.getImmediateDataFields())))
-                    .roles(parsePermissionMap(task.getRole())).userRefs(parsePermissionMap(task.getUserRef()))
-                    .users(parsePermissionMap(task.getUser()))
-                    .assignedUserPolicy(task.getAssignedUserPolicies().getAssignedUserPolicy().stream().collect(Collectors.toMap(BooleanMapEntry::getKey, BooleanMapEntry::isValue)))
-                    .triggers(parseXmlTriggers(task.getTriggers()))
+                    .caseColor(this.importedCase.getColor())
+                    .caseTitle(this.importedCase.getTitle())
+                    .priority(transition.getPriority())
+                    .icon(transition.getIcon() == null ? this.importedCase.getIcon() : transition.getIcon())
+                    .immediateDataFields(new LinkedHashSet<>(transition.getImmediateData()))
+                    .assignPolicy(transition.getAssignPolicy())
+                    .dataFocusPolicy(transition.getDataFocusPolicy())
+                    .finishPolicy(transition.getFinishPolicy())
                     .build();
+            transition.getEvents().forEach((type, event) -> importedTask.addEventTitle(type, event.getTitle()));
+            importedTask.addAssignedUserPolicy(transition.getAssignedUserPolicy());
+            for (Trigger trigger : transition.getTriggers()) {
+                Trigger taskTrigger = trigger.clone();
+                importedTask.addTrigger(taskTrigger);
+
+                if (taskTrigger instanceof TimeTrigger timeTrigger) {
+                    taskService.scheduleTaskExecution(importedTask, timeTrigger.getStartDate(), this.importedCase);
+                }
+            }
+            ProcessRole defaultRole = processRoleService.defaultRole();
+            ProcessRole anonymousRole = processRoleService.anonymousRole();
+            for (Map.Entry<String, Map<String, Boolean>> entry : transition.getRoles().entrySet()) {
+                if (this.importedCase.getEnabledRoles().contains(entry.getKey())
+                        || defaultRole.getStringId().equals(entry.getKey())
+                        || anonymousRole.getStringId().equals(entry.getKey())) {
+                    importedTask.addRole(entry.getKey(), entry.getValue());
+                }
+            }
+            transition.getNegativeViewRoles().forEach(importedTask::addNegativeViewRole);
+
+            for (Map.Entry<String, Map<String, Boolean>> entry : transition.getUserRefs().entrySet()) {
+                importedTask.addUserRef(entry.getKey(), entry.getValue());
+            }
+            importedTask.resolveViewRoles();
+            importedTask.resolveViewUserRefs();
+
+            Transaction transaction = this.importedCase.getPetriNet().getTransactionByTransition(transition);
+            if (transaction != null) {
+                importedTask.setTransactionId(transaction.getStringId());
+            }
+
             importedTasks.add(importedTask);
             importedCase.addTask(importedTask);
         });
         taskService.save(importedTasks);
-    }
-
-    private List<Trigger> parseXmlTriggers(TaskTrigger triggers) {
-        List<Trigger> triggerList = new ArrayList<>();
-        if (triggers == null) {
-            return triggerList;
-        }
-        triggers.getTrigger().forEach(trigger -> {
-            Trigger taskTrigger = triggerFactory.buildTrigger(trigger);
-            taskTrigger.set_id(new ObjectId(trigger.getId()));
-            triggerList.add(taskTrigger);
-        });
-        return triggerList;
     }
 
     @Transactional
@@ -169,10 +185,10 @@ public class CaseImporter {
             dataField.setEncryption(field.getEncryption());
             dataField.setLastModified(parseDateTimeFromXml(field.getLastModified()));
             dataField.setVersion(field.getVersion());
-            if(field.getType() == DataType.FILTER) {
+            if (field.getType() == DataType.FILTER) {
                 dataField.setFilterMetadata(parseFilterMetadata(field.getFilterMetadata()));
             }
-            dataField.setValue(parseXmlValue(field.getValues(), field.getType()));
+            dataField.setValue(parseXmlValue(field));
             dataField.setComponent(parseXmlComponent(field.getComponent()));
             field.getDataRefComponent().stream()
                     .filter(dataRefComponent -> dataRefComponent.getComponent() != null)
@@ -198,17 +214,17 @@ public class CaseImporter {
     }
 
     private Object parsePredicateMetadata(PredicateTreeMetadata predicateMetadata) {
-        if(predicateMetadata == null || predicateMetadata.getPredicate() == null) {
+        if (predicateMetadata == null || predicateMetadata.getPredicate() == null) {
             return null;
         }
         List<List<Object>> values = new ArrayList<>();
         predicateMetadata.getPredicate().forEach(predicate -> {
-            if(predicate == null) {
+            if (predicate == null) {
                 return;
             }
             List<Object> value = new ArrayList<>();
             predicate.getData().forEach(data -> {
-                if(data == null) {
+                if (data == null) {
                     return;
                 }
                 Map<String, Object> dataMap = new HashMap<>();
@@ -223,12 +239,12 @@ public class CaseImporter {
     }
 
     private Object parseConfiguration(CategoryMetadataConfiguration configuration) {
-        if(configuration == null) {
+        if (configuration == null) {
             return null;
         }
         Map<String, String> configurationMap = new HashMap<>();
         configuration.getValue().forEach(data -> {
-            if(data == null) {
+            if (data == null) {
                 return;
             }
             configurationMap.put(data.getId(), data.getValue());
@@ -236,7 +252,9 @@ public class CaseImporter {
         return configurationMap;
     }
 
-    private Object parseXmlValue(StringCollection value, DataType dataType) {
+    private Object parseXmlValue(com.netgrif.application.engine.importer.model.DataField field) {
+        StringCollection value = field.getValues();
+        DataType dataType = field.getType();
         if (value == null || value.getValue() == null || value.getValue().isEmpty()) {
             return null;
         }
@@ -245,7 +263,7 @@ public class CaseImporter {
             case DATE:
             case DATE_TIME:
                 parsedValue = parseDateTimeFromXml(value.getValue().getFirst());
-                if (dataType == DataType.DATE) {
+                if (dataType == com.netgrif.application.engine.importer.model.DataType.DATE) {
                     parsedValue = ((LocalDateTime) parsedValue).toLocalDate();
                 }
                 break;
@@ -263,8 +281,12 @@ public class CaseImporter {
             case MULTICHOICE:
             case MULTICHOICE_MAP:
                 parsedValue = parseStringCollection(value, new LinkedHashSet<>());
-                if (dataType == DataType.MULTICHOICE) {
-                    parsedValue = ((Set<String>) parsedValue).stream().map(I18nString::new).collect(Collectors.toCollection(LinkedHashSet::new));
+                if (dataType == com.netgrif.application.engine.importer.model.DataType.MULTICHOICE) {
+                    parsedValue = ((Set<String>) parsedValue).stream().map(it -> {
+                        I18nString i18nString = new I18nString(it);
+                        i18nString.setTranslations(parseTranslations(i18nString.getKey()));
+                        return i18nString;
+                    }).collect(Collectors.toCollection(LinkedHashSet::new));
                 }
                 break;
             case USER:
@@ -274,15 +296,17 @@ public class CaseImporter {
                 parsedValue = new UserListFieldValue(value.getValue().stream().map(this::parseUserFieldValue).collect(Collectors.toList()));
                 break;
             case FILE:
-//                todo path check/replace if new id for case was generated
-                parsedValue = FileFieldValue.fromString(value.getValue().getFirst());
+                parsedValue = createFileFieldValue(field, value.getValue().getFirst());
                 break;
             case FILE_LIST:
-                parsedValue = FileListFieldValue.fromString(value.getValue().getFirst());
+                FileListFieldValue fileListValue = new FileListFieldValue();
+                value.getValue().forEach(fileName -> fileListValue.getNamesPaths().add(createFileFieldValue(field, fileName)));
+                parsedValue = fileListValue;
                 break;
             case ENUMERATION:
             case I_18_N:
                 parsedValue = new I18nString(value.getValue().getFirst());
+                ((I18nString) parsedValue).setTranslations(parseTranslations(value.getId()));
                 break;
             case BUTTON:
                 parsedValue = Integer.parseInt(value.getValue().getFirst());
@@ -294,13 +318,27 @@ public class CaseImporter {
         return parsedValue;
     }
 
+    private Map<String, String> parseTranslations(String name) {
+        Map<String, String> translations = new HashMap<>();
+        this.xmlCase.getI18N().forEach(i18n -> i18n.getI18NString().stream()
+                .filter(i18nString -> i18nString.getName().equals(name))
+                .forEach(translation -> translations.put(translation.getName(), translation.getName())));
+        return translations;
+    }
+
+    private FileFieldValue createFileFieldValue(com.netgrif.application.engine.importer.model.DataField field, String fileName) {
+        IStorageService storageService = storageResolverService.resolve(((StorageField<?>) importedCase.getField(field.getId())).getStorageType());
+        String path = storageService.getPath(this.importedCase.getStringId(), field.getId(), fileName);
+        return new FileFieldValue(fileName, path);
+    }
+
     private UserFieldValue parseUserFieldValue(String xmlValue) {
         IUser user;
         try {
             user = userService.resolveById(xmlValue, true);
             return new UserFieldValue(user);
         } catch (IllegalArgumentException e) {
-            log.error("User with id [" + xmlValue + "] not found, setting empty value");
+            log.error("User with id [{}] not found, setting empty value", xmlValue);
             return new UserFieldValue();
         }
     }
@@ -312,9 +350,7 @@ public class CaseImporter {
         }
         behaviors.getTaskBehavior().forEach(taskBehavior -> {
             Set<FieldBehavior> behaviorSet = new HashSet<>();
-            taskBehavior.getBehavior().forEach(behavior -> {
-                behaviorSet.add(FieldBehavior.fromString(behavior));
-            });
+            taskBehavior.getBehavior().forEach(behavior -> behaviorSet.add(FieldBehavior.fromString(behavior)));
             behaviorMap.put(taskBehavior.getTaskId(), behaviorSet);
         });
         return behaviorMap;
@@ -325,9 +361,7 @@ public class CaseImporter {
         if (options == null || options.getOption() == null) {
             return optionsMap;
         }
-        options.getOption().forEach(option -> {
-            optionsMap.put(option.getKey(), parseXmlI18nString(option));
-        });
+        options.getOption().forEach(option -> optionsMap.put(option.getKey(), parseXmlI18nString(option)));
         return optionsMap;
     }
 
@@ -351,6 +385,7 @@ public class CaseImporter {
         I18nString parsedI18n = new I18nString();
         parsedI18n.setKey(xmlI18nString.getName());
         parsedI18n.setDefaultValue(xmlI18nString.getValue());
+        parsedI18n.setTranslations(parseTranslations(xmlI18nString.getName()));
         return parsedI18n;
     }
 
@@ -376,18 +411,21 @@ public class CaseImporter {
         importedCase.setUriNodeId(xmlCase.getUriNodeId());
         importedCase.setCreationDate(parseDateTimeFromXml(xmlCase.getCreationDate()));
         importedCase.setLastModified(parseDateTimeFromXml(xmlCase.getLastModified()));
-        importedCase.setEnabledRoles(parseStringCollection(xmlCase.getEnabledRoles(), new HashSet<>()));
-        importedCase.setViewRoles(parseStringCollection(xmlCase.getViewRoles()));
         importedCase.setViewUserRefs(parseStringCollection(xmlCase.getViewUserRefs()));
         importedCase.setViewUsers(parseStringCollection(xmlCase.getViewUsers()));
-        importedCase.setNegativeViewRoles(parseStringCollection(xmlCase.getNegativeViewRoles()));
         importedCase.setNegativeViewUsers(parseStringCollection(xmlCase.getNegativeViewUsers()));
-        importedCase.setImmediateDataFields(parseStringCollection(xmlCase.getImmediateDataFields(), new LinkedHashSet<>()));
         importedCase.setConsumedTokens(parseMapXsdType(xmlCase.getConsumedTokens()));
-        importedCase.setActivePlaces(parseMapXsdType(xmlCase.getActivePlaces()));
-        importedCase.setPermissions(parsePermissionMap(xmlCase.getPermissions()));
-        importedCase.setUserRefs(parsePermissionMap(xmlCase.getUserRefs()));
         importedCase.setUsers(parsePermissionMap(xmlCase.getUsers()));
+        importedCase.setTitle(xmlCase.getTitle());
+        importedCase.getPetriNet().initializeArcs(importedCase.getDataSet());
+        updateCaseState();
+    }
+
+    private void updateCaseState() {
+        Map<String, Integer> activePlaces = parseMapXsdType(xmlCase.getActivePlaces());
+        this.importedCase.getPetriNet().getPlaces().forEach((placeId, place) -> place.setTokens(activePlaces.getOrDefault(placeId, 0)));
+        this.importedCase.setActivePlaces(activePlaces);
+        workflowService.updateMarking(this.importedCase);
     }
 
     private List<String> parseStringCollection(StringCollection xmlCollection) {
@@ -419,9 +457,7 @@ public class CaseImporter {
         if (consumedTokens == null) {
             return map;
         }
-        consumedTokens.getEntry().forEach(entry -> {
-            map.put(entry.getKey(), entry.getValue().intValue());
-        });
+        consumedTokens.getEntry().forEach(entry -> map.put(entry.getKey(), entry.getValue().intValue()));
         return map;
     }
 
@@ -431,12 +467,6 @@ public class CaseImporter {
 
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         xmlCases = (Cases) jaxbUnmarshaller.unmarshal(xml);
-    }
-
-    private Version parseProcessVersionFromXml(String xmlVersion) {
-        String[] versionParts = xmlVersion.split("\\.");
-//        todo version validation
-        return new Version(Integer.parseInt(versionParts[0].trim()), Integer.parseInt(versionParts[1].trim()), Integer.parseInt(versionParts[2].trim()));
     }
 
     private LocalDateTime parseDateTimeFromXml(String xmlDateTimeString) {

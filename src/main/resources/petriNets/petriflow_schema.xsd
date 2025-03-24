@@ -3,6 +3,7 @@
 <xs:schema elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            version="1.1.0">
+    <!--todo use include after new schema is published-->
     <xs:element name="cases">
         <xs:complexType>
             <xs:sequence>
@@ -35,6 +36,7 @@
             <xs:element name="permissions" type="permissionMap" minOccurs="0"/>
             <xs:element name="userRefs" type="permissionMap" minOccurs="0"/>
             <xs:element name="users" type="permissionMap" minOccurs="0"/>
+            <xs:element name="i18n" type="i18n" minOccurs="0"  maxOccurs="unbounded"/>
             <xs:element name="dataField" type="dataField" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="task" type="task" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
@@ -44,6 +46,7 @@
         <xs:sequence>
             <xs:element type="xs:string" name="value" maxOccurs="unbounded"/>
         </xs:sequence>
+        <xs:attribute type="xs:string" name="id"/>
     </xs:complexType>
     <xs:complexType name="mapXsdType">
         <xs:choice>
