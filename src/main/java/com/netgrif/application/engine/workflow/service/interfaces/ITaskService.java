@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 public interface ITaskService {
@@ -126,4 +127,6 @@ public interface ITaskService {
     List<Task> save(List<Task> tasks);
 
     SetDataEventOutcome getMainOutcome(Map<String, SetDataEventOutcome> outcomes, String taskId);
+
+    void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase);
 }

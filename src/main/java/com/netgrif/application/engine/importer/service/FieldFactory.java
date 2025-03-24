@@ -12,6 +12,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.factory.StorageFac
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation;
 import com.netgrif.application.engine.petrinet.domain.views.View;
+import com.netgrif.application.engine.utils.ImporterUtils;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataValidationExpressionEvaluator;
@@ -276,13 +277,13 @@ public final class FieldFactory {
         if (data.getValid() != null) {
             List<Valid> list = data.getValid();
             for (Valid item : list) {
-                field.addValidation(makeValidation(item.getValue(), null, item.isDynamic()));
+                field.addValidation(ImporterUtils.makeValidation(item.getValue(), null, item.isDynamic()));
             }
         }
         if (data.getValidations() != null) {
             List<com.netgrif.application.engine.importer.model.Validation> list = data.getValidations().getValidation();
             for (com.netgrif.application.engine.importer.model.Validation item : list) {
-                field.addValidation(makeValidation(item.getExpression().getValue(), importer.toI18NString(item.getMessage()), item.getExpression().isDynamic()));
+                field.addValidation(ImporterUtils.makeValidation(item.getExpression().getValue(), importer.toI18NString(item.getMessage()), item.getExpression().isDynamic()));
             }
         }
 
@@ -316,10 +317,6 @@ public final class FieldFactory {
             }
         });
         return field;
-    }
-
-    private com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation makeValidation(String rule, I18nString message, boolean dynamic) {
-        return dynamic ? new DynamicValidation(rule, message) : new com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation(rule, message);
     }
 
     private TaskField buildTaskField(Data data, List<Transition> transitions) {
