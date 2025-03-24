@@ -750,6 +750,14 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return outcome.getCase()
     }
 
+    /**
+     * todo javadoc
+     * */
+    LoggedIdentity getLoggedOrSystem() {
+        LoggedIdentity identity = identityService.getLoggedIdentity()
+        return identity ?: identityService.getLoggedSystemIdentity()
+    }
+
     Task assignTask(String transitionId, Case aCase = useCase, LoggedIdentity assignee = identityService.loggedIdentity,
                     Map<String, String> params = [:]) {
         String taskId = getTaskId(transitionId, aCase)
