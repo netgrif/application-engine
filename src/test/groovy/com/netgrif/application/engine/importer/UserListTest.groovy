@@ -71,11 +71,11 @@ class UserListTest {
         Task task = taskService.findByCases(new FullPageRequest(), Collections.singletonList(caseOpt.get().getStringId())).stream().collect(Collectors.toList()).get(0)
 
         dataService.setData(task.stringId, new DataSet([
-                "users_1": new ActorListField(rawValue: new ActorListFieldValue(new ActorFieldValue(superCreator.getSuperUser())))
+                "users_1": new ActorListField(rawValue: new ActorListFieldValue(new ActorFieldValue(superCreator.getSuperIdentity())))
         ] as Map<String, Field<?>>), superCreator.getLoggedSuper())
 
 //        TODO: release/8.0.0
-        assert taskService.findById(task.stringId).processRolePermissions.get(superCreator.getSuperUser().getStringId())
-        assert caseRepository.findById(caseOpt.get().stringId).get().processRolePermissions.get(superCreator.getSuperUser().getStringId())
+        assert taskService.findById(task.stringId).processRolePermissions.get(superCreator.getSuperIdentity().getStringId())
+        assert caseRepository.findById(caseOpt.get().stringId).get().processRolePermissions.get(superCreator.getSuperIdentity().getStringId())
     }
 }

@@ -96,7 +96,7 @@ class ChangeCasePropertyTest {
         taskService.assignTask(testCaseTask.getStringId())
         dataService.setData(testCaseTask.stringId, new DataSet([
                 "bln": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>), superCreator.getSuperUser())
+        ] as Map<String, Field<?>>), superCreator.getSuperIdentity())
         taskService.finishTask(testCaseTask.getStringId())
 
         testCase = workflowService.findOne(testCase.getStringId())

@@ -7,7 +7,7 @@ import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.startup.GroupRunner
 import com.netgrif.application.engine.startup.SuperCreator
-import com.netgrif.application.engine.startup.SystemUserRunner
+import com.netgrif.application.engine.startup.SystemIdentityRunner
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -36,7 +36,7 @@ class FieldTest {
     private UserRepository userRepository
 
     @Autowired
-    private SystemUserRunner systemUserRunner
+    private SystemIdentityRunner systemUserRunner
 
     @Autowired
     private GroupRunner groupRunner

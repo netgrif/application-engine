@@ -144,7 +144,7 @@ class DataSearchRequestTest {
         assert actionTrigger != null
         dataService.setData(actionTrigger, new DataSet([
                 "testActionTrigger": new TextField(rawValue: "random value")
-        ] as Map<String, Field<?>>), superCreator.getSuperUser())
+        ] as Map<String, Field<?>>), superCreator.getSuperIdentity())
 
         10.times {
             _case = importHelper.createCase("wrong${it}", net.getNet())

@@ -180,7 +180,7 @@ class ImportHelper {
 
     SetDataEventOutcome setTaskData(String taskId, DataSet dataSet) {
         // todo 2058 system
-        dataService.setData(taskId, dataSet, superCreator.getSuperUser())
+        dataService.setData(taskId, dataSet, superCreator.getSuperIdentity())
     }
 
     SetDataEventOutcome setTaskData(String taskTitle, String caseId, DataSet data) {
@@ -189,7 +189,7 @@ class ImportHelper {
 
     List<DataRef> getTaskData(String taskTitle, String caseId) {
         // todo 2058 system
-        return dataService.getData(getTaskId(taskTitle, caseId), superCreator.getSuperUser()).getData()
+        return dataService.getData(getTaskId(taskTitle, caseId), superCreator.getSuperIdentity()).getData()
     }
 
     void updateSuperUser() {

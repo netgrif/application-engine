@@ -17,7 +17,7 @@ import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExe
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.SuperCreator;
-import com.netgrif.application.engine.startup.SystemUserRunner;
+import com.netgrif.application.engine.startup.SystemIdentityRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -76,7 +76,7 @@ public class VariableArcsTest {
     private IAuthorityService authorityService;
 
     @Autowired
-    private SystemUserRunner userRunner;
+    private SystemIdentityRunner userRunner;
 
     @Autowired
     private SuperCreator superCreator;

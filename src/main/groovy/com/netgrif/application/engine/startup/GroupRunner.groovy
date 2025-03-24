@@ -30,7 +30,7 @@ class GroupRunner extends AbstractOrderedCommandLineRunner {
     private IUserService userService
 
     @Autowired
-    private SystemUserRunner systemCreator
+    private SystemIdentityRunner systemCreator
 
     @Autowired
     private IPetriNetService petriNetService

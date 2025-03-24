@@ -135,7 +135,7 @@ class ElasticSearchTest {
                 "searchByAuthorIdAndIdentifier"          : [
                         "json": JsonOutput.toJson([
                                 "author": [
-                                        "id": superCreator.superUser.stringId
+                                        "id": superCreator.superIdentity.stringId
                                 ],
                                 "process": [
                                         "identifier": "all_data"
@@ -146,7 +146,7 @@ class ElasticSearchTest {
                 "searchByAuthorId"          : [
                         "json": JsonOutput.toJson([
                                 "author": [
-                                        "id": superCreator.superUser.stringId
+                                        "id": superCreator.superIdentity.stringId
                                 ]
                         ]),
                         "size": CASE_NUMBER + SYSTEM_CASE_NUMBER
@@ -154,7 +154,7 @@ class ElasticSearchTest {
                 "searchByAuthorName"        : [
                         "json": JsonOutput.toJson([
                                 "author": [
-                                        "name": superCreator.superUser.fullName
+                                        "name": superCreator.superIdentity.fullName
                                 ]
                         ]),
                         "size": CASE_NUMBER + SYSTEM_CASE_NUMBER
@@ -162,7 +162,7 @@ class ElasticSearchTest {
                 "searchByAuthorEmail"       : [
                         "json": JsonOutput.toJson([
                                 "author": [
-                                        "email": superCreator.superUser.email
+                                        "email": superCreator.superIdentity.email
                                 ]
                         ]),
                         "size": CASE_NUMBER + SYSTEM_CASE_NUMBER

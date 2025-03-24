@@ -161,7 +161,7 @@ class ElasticSearchViewPermissionTest {
         String taskId = case_.getTaskStringId("t1")
         dataService.setData(taskId, new DataSet([
                 "view_ul_pos": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser())
+        ] as Map<String, Field<?>>), superCreator.getSuperIdentity())
         case_ = workflowService.findOne(case_.stringId)
         sleep(4000)
 
@@ -180,7 +180,7 @@ class ElasticSearchViewPermissionTest {
         String taskId = case_.getTaskStringId("t1")
         dataService.setData(taskId, new DataSet([
                 "view_ul_neg": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser())
+        ] as Map<String, Field<?>>), superCreator.getSuperIdentity())
         case_ = workflowService.findOne(case_.stringId)
         sleep(4000)
 
@@ -200,7 +200,7 @@ class ElasticSearchViewPermissionTest {
         String taskId = case_.getTaskStringId("t1")
         dataService.setData(taskId, new DataSet([
                 "view_ul_pos": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser())
+        ] as Map<String, Field<?>>), superCreator.getSuperIdentity())
         case_ = workflowService.findOne(case_.stringId)
         sleep(4000)
 

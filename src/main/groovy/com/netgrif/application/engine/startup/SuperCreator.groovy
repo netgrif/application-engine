@@ -1,11 +1,13 @@
 package com.netgrif.application.engine.startup
 
 import com.netgrif.application.engine.authentication.domain.*
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,16 +17,16 @@ import org.springframework.stereotype.Component
 import java.util.stream.Collectors
 
 @Slf4j
-@ConditionalOnProperty(value = "admin.create-super", matchIfMissing = true)
 @Component
 @CompileStatic
+@ConditionalOnProperty(value = "admin.create-super", matchIfMissing = true)
 class SuperCreator extends AbstractOrderedCommandLineRunner {
 
     @Autowired
     private IAuthorityService authorityService
 
     @Autowired
-    private IUserService userService
+    private IIdentityService identityService
 
     @Autowired
     private INextGroupService groupService
@@ -35,11 +37,11 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     @Autowired
     private SuperAdminConfiguration configuration
 
-    private IUser superUser
+    private Identity superIdentity
 
     @Override
     void run(String... strings) {
-        log.info("Creating Super user")
+        log.info("Creating Super identity")
         createSuperUser()
     }
 
@@ -47,53 +49,56 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
         Authority adminAuthority = authorityService.getOrCreate(Authority.admin)
         Authority systemAuthority = authorityService.getOrCreate(Authority.systemAdmin)
 
-        IUser superUser = userService.findByEmail(configuration.email)
-        if (superUser != null) {
-            log.info("Super user detected")
-            this.superUser = superUser
+        Optional<Identity> superIdentityOpt = identityService.findByUsername(configuration.email)
+        if (superIdentityOpt.isPresent()) {
+            log.info("Super identity detected")
+            this.superIdentity = superIdentityOpt.get()
             return
         }
-        this.superUser = userService.saveNew(new User(
-                name: configuration.name,
-                surname: configuration.surname,
-                email: configuration.email,
-                password: configuration.password,
-                state: IdentityState.ACTIVE,
-                authorities: [adminAuthority, systemAuthority] as Set<Authority>))
+        this.superIdentity = identityService.createWithDefaultActor(IdentityParams.with()
+                .username(new TextField(configuration.email))
+                .firstname(new TextField(configuration.name))
+                .lastname(new TextField(configuration.surname))
+                .password(new TextField(configuration.password))
+                .build())
 
         Set<String> allRoleIds = roleService.findAll().stream().map { it.stringId }.collect(Collectors.toSet())
-        roleService.assignRolesToActor(this.superUser.stringId, allRoleIds)
-        log.info("Super user created")
+        roleService.assignRolesToActor(this.superIdentity.stringId, allRoleIds)
+        // todo 2058 app role (authorities)
+
+        log.info("Super identity created with actor")
     }
 
     void setAllToSuperUser() {
         setAllGroups()
         setAllRoles()
         setAllAuthorities()
-        log.info("Super user updated")
+        log.info("Super identity updated")
     }
 
     void setAllGroups() {
-        groupService.findAllGroups().each {
-            groupService.addUser(superUser, it)
-        }
+        // todo 2058 groups
+//        groupService.findAllGroups().each {
+//            groupService.addUser(superIdentity, it)
+//        }
     }
 
     void setAllRoles() {
         Set<String> allRoleIds = roleService.findAll().stream().map { it.stringId }.collect(Collectors.toSet())
-        roleService.assignRolesToActor(this.superUser.stringId, allRoleIds)
+        roleService.assignRolesToActor(this.superIdentity.stringId, allRoleIds)
     }
 
     void setAllAuthorities() {
-        superUser.setAuthorities(authorityService.findAll() as Set<Authority>)
-        superUser = userService.save(superUser) as IUser
+        // todo 2058 app role authorities
+//        superIdentity.setAuthorities(authorityService.findAll() as Set<Authority>)
+//        superIdentity = userService.save(superIdentity) as IUser
     }
 
-    IUser getSuperUser() {
-        return superUser
+    Identity getSuperIdentity() {
+        return this.superIdentity
     }
 
-    Identity getLoggedSuper() {
-        return superUser.transformToLoggedUser()
+    LoggedIdentity getLoggedSuper() {
+        return superIdentity.toSession()
     }
 }

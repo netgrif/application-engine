@@ -13,7 +13,7 @@ import com.netgrif.application.engine.authorization.service.interfaces.IRoleServ
 import com.netgrif.application.engine.event.events.user.UserRegistrationEvent;
 import com.netgrif.application.engine.orgstructure.groups.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.startup.SystemUserRunner;
+import com.netgrif.application.engine.startup.SystemIdentityRunner;
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.bson.types.ObjectId;
@@ -284,7 +284,7 @@ public class UserService extends AbstractUserService {
 
     @Override
     public IUser getSystem() {
-        IUser system = userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
+        IUser system = userRepository.findByEmail(SystemIdentityRunner.SYSTEM_IDENTITY_EMAIL);
         List<ProcessRole> roles = roleService.findAllProcessRoles();
         Set<String> roleIds = roles.stream().map(ProcessRole::getStringId).collect(Collectors.toSet());
         roleService.assignRolesToActor(system.getStringId(), roleIds);
@@ -311,7 +311,7 @@ public class UserService extends AbstractUserService {
 
     @Override
     public Identity getAnonymousLogged() {
-        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals(UserProperties.ANONYMOUS_AUTH_KEY)) {
+        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals(IdentityProperties.ANONYMOUS_AUTH_KEY)) {
             return getLoggedUser().transformToLoggedUser();
         }
         return getLoggedUserFromContext();

@@ -293,7 +293,7 @@ class TaskAuthorizationServiceTest {
         String taskId = case_.getTaskStringId("t1")
         case_ = dataService.setData(taskId, new DataSet([
                 "assign_pos_ul":new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+        ] as Map<String, Field<?>>), superCreator.getSuperIdentity()).getCase()
         workflowService.save(case_)
         sleep(4000)
 
@@ -307,7 +307,7 @@ class TaskAuthorizationServiceTest {
         String taskId = case_.getTaskStringId("t1")
         case_ = dataService.setData(taskId, new DataSet([
                 "assign_neg_ul": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+        ] as Map<String, Field<?>>), superCreator.getSuperIdentity()).getCase()
         sleep(4000)
 
         assert !taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), taskId)
@@ -363,7 +363,7 @@ class TaskAuthorizationServiceTest {
         String taskId = case_.getTaskStringId("t1")
         case_ = dataService.setData(taskId, new DataSet([
                 "finish_pos_ul": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+        ] as Map<String, Field<?>>), superCreator.getSuperIdentity()).getCase()
         sleep(4000)
 
         taskService.assignTask(testUser.transformToLoggedUser(), taskId)
@@ -377,7 +377,7 @@ class TaskAuthorizationServiceTest {
         String taskId = case_.getTaskStringId("t1")
         case_ = dataService.setData(taskId, new DataSet([
                 "finish_neg_ul": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+        ] as Map<String, Field<?>>), superCreator.getSuperIdentity()).getCase()
         sleep(4000)
 
         taskService.assignTask(testUser.transformToLoggedUser(), taskId)
@@ -393,7 +393,7 @@ class TaskAuthorizationServiceTest {
         String taskId = case_.getTaskStringId("t1")
         case_ = dataService.setData(taskId, new DataSet([
                 "finish_pos_ul": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+        ] as Map<String, Field<?>>), superCreator.getSuperIdentity()).getCase()
         sleep(4000)
 
         taskService.assignTask(testUser.transformToLoggedUser(), taskId)

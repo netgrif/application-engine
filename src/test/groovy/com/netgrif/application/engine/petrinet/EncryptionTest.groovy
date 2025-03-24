@@ -93,6 +93,6 @@ class EncryptionTest {
 
     Identity mockLoggedUser() {
         def authorityUser = authorityService.getOrCreate(Authority.user)
-        return new Identity(superCreator.getSuperUser().getStringId(), configuration.email, configuration.password, [authorityUser])
+        return new Identity(superCreator.getSuperIdentity().getStringId(), configuration.email, configuration.password, [authorityUser])
     }
 }

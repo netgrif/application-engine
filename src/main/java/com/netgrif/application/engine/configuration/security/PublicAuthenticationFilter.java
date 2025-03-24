@@ -61,7 +61,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
 
     private void authenticate(HttpServletRequest request, String jwtToken) {
         AnonymousAuthenticationToken authRequest = new AnonymousAuthenticationToken(
-                UserProperties.ANONYMOUS_AUTH_KEY,
+                IdentityProperties.ANONYMOUS_AUTH_KEY,
                 jwtService.getLoggedUser(jwtToken, this.anonymousAuthority),
                 Collections.singleton(this.anonymousAuthority)
         );

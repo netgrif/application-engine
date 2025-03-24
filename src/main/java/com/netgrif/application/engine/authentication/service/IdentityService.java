@@ -154,7 +154,7 @@ public class IdentityService implements IIdentityService {
         Actor defaultActor = actorService.create(actorParams);
 
         identityParams.setMainActor(CaseField.withValue(List.of(defaultActor.getStringId())));
-        return create(identityParams);
+        return encodePasswordAndCreate(identityParams);
     }
 
     /**

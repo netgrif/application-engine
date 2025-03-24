@@ -287,11 +287,11 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
         }
 
         // TODO: release/8.0.0 join setData to one call
-        this.dataService.setData(newFilterTask, dataSet, superCreator.getSuperUser())
+        this.dataService.setData(newFilterTask, dataSet, superCreator.getSuperIdentity())
         if (isImported) {
             this.dataService.setData(newFilterTask, new DataSet([
                     (IS_IMPORTED): new NumberField(rawValue: 1)
-            ] as Map<String, Field<?>>), superCreator.getSuperUser())
+            ] as Map<String, Field<?>>), superCreator.getSuperIdentity())
         }
 
         I18nString translatedTitle = new I18nString(title)

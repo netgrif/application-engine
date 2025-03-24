@@ -18,6 +18,5 @@ class FinisherRunnerSuperCreator extends AbstractOrderedCommandLineRunner {
     @Override
     void run(String... strings) throws Exception {
         superCreator.setAllToSuperUser()
-        log.info("Super Creator update")
     }
 }

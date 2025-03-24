@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.netgrif.application.engine.startup.SystemUserRunner.*;
-
 public abstract class AbstractUserService implements IUserService {
 
     @Autowired
@@ -64,7 +62,7 @@ public abstract class AbstractUserService implements IUserService {
 
     @Override
     public Identity getAnonymousLogged() {
-        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals(UserProperties.ANONYMOUS_AUTH_KEY)) {
+        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals(IdentityProperties.ANONYMOUS_AUTH_KEY)) {
             getLoggedUser().transformToLoggedUser();
         }
         return (Identity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -72,9 +70,9 @@ public abstract class AbstractUserService implements IUserService {
 
     @Override
     public IUser createSystemUser() {
-        User system = repository.findByEmail(SYSTEM_USER_EMAIL);
+        User system = repository.findByEmail(SYSTEM_IDENTITY_EMAIL);
         if (system == null) {
-            system = new User(SYSTEM_USER_EMAIL, "n/a", SYSTEM_USER_NAME, SYSTEM_USER_SURNAME);
+            system = new User(SYSTEM_IDENTITY_EMAIL, "n/a", SYSTEM_IDENTITY_NAME, SYSTEM_IDENTITY_SURNAME);
             system.setState(IdentityState.ACTIVE);
             repository.save(system);
         }

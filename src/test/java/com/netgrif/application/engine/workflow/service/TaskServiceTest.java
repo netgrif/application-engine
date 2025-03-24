@@ -15,7 +15,7 @@ import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetM
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.SuperCreator;
-import com.netgrif.application.engine.startup.SystemUserRunner;
+import com.netgrif.application.engine.startup.SystemIdentityRunner;
 import com.netgrif.application.engine.startup.UriRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -68,7 +68,7 @@ public class TaskServiceTest {
     private IAuthorityService authorityService;
 
     @Autowired
-    private SystemUserRunner userRunner;
+    private SystemIdentityRunner userRunner;
 
     @Autowired
     private UriRunner uriRunner;
