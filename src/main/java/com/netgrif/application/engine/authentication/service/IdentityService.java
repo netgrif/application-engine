@@ -14,6 +14,7 @@ import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchReques
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.security.service.SecurityContextService;
+import com.netgrif.application.engine.startup.SystemIdentityRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -42,6 +43,7 @@ public class IdentityService implements IIdentityService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final SecurityContextService securityContextService;
     private final IActorService actorService;
+    private final SystemIdentityRunner systemIdentityRunner;
 
     /**
      * todo javadoc
@@ -52,6 +54,14 @@ public class IdentityService implements IIdentityService {
             return (LoggedIdentity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         }
         return null;
+    }
+
+    /**
+     * todo javadoc
+     */
+    @Override
+    public LoggedIdentity getLoggedSystemIdentity() {
+        return systemIdentityRunner.getLoggedSystem();
     }
 
     /**

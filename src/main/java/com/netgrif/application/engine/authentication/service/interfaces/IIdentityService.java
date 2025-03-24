@@ -12,6 +12,7 @@ import java.util.Set;
 
 public interface IIdentityService {
     LoggedIdentity getLoggedIdentity();
+    LoggedIdentity getLoggedSystemIdentity();
 
     Optional<Identity> findById(String id);
     Optional<Identity> findByUsername(String username);
