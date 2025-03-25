@@ -2,6 +2,9 @@ package com.netgrif.application.engine.configuration.security;
 
 import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
@@ -9,10 +12,10 @@ import org.springframework.security.authentication.AnonymousAuthenticationProvid
 import org.springframework.security.authentication.ProviderManager;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 public abstract class PublicJwtAuthenticationFilter extends PublicAuthenticationFilter {
@@ -21,20 +24,24 @@ public abstract class PublicJwtAuthenticationFilter extends PublicAuthentication
 
     protected final IJwtService jwtService;
 
-    public PublicJwtAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider,
-                                         Authority anonymousAuthority, String[] urls, String[] exceptions, IJwtService jwtService) {
-        super(authenticationManager, provider, anonymousAuthority, urls, exceptions);
+    public PublicJwtAuthenticationFilter(IIdentityService identityService, IRoleService roleService, ProviderManager authenticationManager,
+                                         AnonymousAuthenticationProvider provider, Authority anonymousAuthority,
+                                         String[] urls, String[] exceptions, IJwtService jwtService) {
+        super(identityService, roleService, authenticationManager, provider, anonymousAuthority, urls, exceptions);
         this.jwtService = jwtService;
     }
 
-    protected String resolveValidToken(HttpServletRequest request, HttpServletResponse response) {
+    /**
+     * todo javadoc
+     */
+    protected String resolveValidToken(HttpServletRequest request) {
         Map<String, Object> claims = new HashMap<>();
         String jwtHeader = request.getHeader(JWT_HEADER_NAME);
         String jwtToken;
 
         if (jwtHeader == null || !jwtHeader.startsWith(BEARER)) {
             log.warn("There is no JWT token or token is invalid.");
-            resolveClaims(claims, request);
+            resolveClaims(claims);
             jwtToken = jwtService.tokenFrom(claims);
         } else {
             jwtToken = jwtHeader.replace(BEARER, "");
@@ -44,23 +51,28 @@ public abstract class PublicJwtAuthenticationFilter extends PublicAuthentication
             jwtService.isExpired(jwtToken);
         } catch (ExpiredJwtException e) {
             claims = e.getClaims();
-            resolveClaims(claims, request);
+            resolveClaims(claims);
             jwtToken = jwtService.tokenFrom(claims);
         }
 
         return jwtToken;
     }
 
-    protected void resolveClaims(Map<String, Object> claims, HttpServletRequest request) {
-        Identity identity = createAnonymousIdentityWithActor();
+    /**
+     * todo javadoc
+     */
+    protected void resolveClaims(Map<String, Object> claims) {
+        Optional<Identity> identityOpt = Optional.empty();
 
-        if (claims.containsKey("user")) {
-            IUser user = userService.findAnonymousByEmail((String) ((LinkedHashMap) claims.get("user")).get("email"));
-            if (user != null) {
-                identity = user.transformToLoggedUser();
-            }
+        if (claims.containsKey("identity")) {
+            identityOpt = identityService.findByUsername((String) ((LinkedHashMap) claims.get("identity")).get("username"));
         }
-        identity.eraseCredentials();
-        claims.put("user", identity);
+
+        Identity identity = identityOpt.orElseGet(this::createAnonymousIdentityWithActor);
+
+        LoggedIdentity loggedIdentity = identity.toSession();
+        loggedIdentity.eraseCredentials();
+
+        claims.put("identity", loggedIdentity);
     }
 }
