@@ -19,7 +19,7 @@ class ImpersonationRunner extends AbstractOrderedCommandLineRunner {
     protected ImportHelper helper
 
     @Autowired
-    protected SystemUserRunner systemCreator
+    protected SystemIdentityRunner systemCreator
 
     protected static final String IMPERSONATION_CONFIG_FILE_NAME = "engine-processes/impersonation_config.xml"
     public static final String IMPERSONATION_CONFIG_PETRI_NET_IDENTIFIER = "impersonation_config"

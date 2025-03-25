@@ -3,9 +3,9 @@ package com.netgrif.application.engine.importer
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorListField
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorListFieldValue
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
@@ -71,11 +71,11 @@ class UserListTest {
         Task task = taskService.findByCases(new FullPageRequest(), Collections.singletonList(caseOpt.get().getStringId())).stream().collect(Collectors.toList()).get(0)
 
         dataService.setData(task.stringId, new DataSet([
-                "users_1": new UserListField(rawValue: new UserListFieldValue(new UserFieldValue(superCreator.getSuperUser())))
+                "users_1": new ActorListField(rawValue: new ActorListFieldValue(new ActorFieldValue(superCreator.getSuperIdentity())))
         ] as Map<String, Field<?>>), superCreator.getLoggedSuper())
 
 //        TODO: release/8.0.0
-        assert taskService.findById(task.stringId).processRolePermissions.get(superCreator.getSuperUser().getStringId())
-        assert caseRepository.findById(caseOpt.get().stringId).get().processRolePermissions.get(superCreator.getSuperUser().getStringId())
+        assert taskService.findById(task.stringId).processRolePermissions.get(superCreator.getSuperIdentity().getStringId())
+        assert caseRepository.findById(caseOpt.get().stringId).get().processRolePermissions.get(superCreator.getSuperIdentity().getStringId())
     }
 }

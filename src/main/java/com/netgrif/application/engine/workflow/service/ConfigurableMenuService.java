@@ -1,8 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.authentication.domain.Author;
-import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
@@ -42,7 +40,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
      */
     @Override
     public Map<String, I18nString> getNetsByAuthorAsMapOptions(IUser author, Locale locale) {
-        LoggedUser loggedAuthor = author.transformToLoggedUser();
+        Identity loggedAuthor = author.transformToLoggedUser();
         PetriNetSearch requestQuery = new PetriNetSearch();
         Author authorQuery = new Author();
         authorQuery.setEmail(author.getEmail());

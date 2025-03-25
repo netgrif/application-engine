@@ -1,13 +1,13 @@
 package com.netgrif.application.engine.authentication.web;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
-import com.netgrif.application.engine.authentication.domain.RegisteredUser;
-import com.netgrif.application.engine.authentication.service.InvalidUserTokenException;
-import com.netgrif.application.engine.authentication.service.UserDetailsServiceImpl;
+import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
+import com.netgrif.application.engine.authentication.service.IdentityService;
+import com.netgrif.application.engine.authentication.service.InvalidIdentityTokenException;
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.authentication.web.requestbodies.ChangePasswordRequest;
-import com.netgrif.application.engine.authentication.web.requestbodies.NewUserRequest;
+import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest;
 import com.netgrif.application.engine.authentication.web.requestbodies.RegistrationRequest;
 import com.netgrif.application.engine.authentication.web.responsebodies.User;
 import com.netgrif.application.engine.authentication.web.responsebodies.UserResource;
@@ -20,8 +20,8 @@ import freemarker.template.TemplateException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
@@ -34,9 +34,11 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Locale;
+import java.util.Optional;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/auth")
 @ConditionalOnProperty(
         value = "nae.auth.web.enabled",
@@ -46,42 +48,37 @@ import java.util.Locale;
 @Tag(name = "Authentication")
 public class AuthenticationController {
 
-    @Autowired
-    private IRegistrationService registrationService;
+    private final IRegistrationService registrationService;
 
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private final IMailService mailService;
 
-    @Autowired
-    private IMailService mailService;
+    private final IUserService userService;
 
-    @Autowired
-    private IUserService userService;
+    private final IMailAttemptService mailAttemptService;
 
-    @Autowired
-    private IMailAttemptService mailAttemptService;
+    private final ServerAuthProperties serverAuthProperties;
 
-    @Autowired
-    private ServerAuthProperties serverAuthProperties;
+    private final ISecurityContextService securityContextService;
+    private final IdentityService identityService;
 
-    @Autowired
-    private ISecurityContextService securityContextService;
-
-    @Operation(summary = "New user registration")
+    @Operation(summary = "New identity registration")
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource signup(@RequestBody RegistrationRequest regRequest) {
         try {
-            String email = registrationService.decodeToken(regRequest.token)[0];
-            if (!registrationService.verifyToken(regRequest.token))
-                return MessageResource.errorMessage("Registration of " + email + " has failed! Invalid token!");
+            if (!registrationService.verifyToken(regRequest.token)) {
+                String email = registrationService.decodeToken(regRequest.token)[0];
+                return MessageResource.errorMessage(String.format("Registration of %s has failed! Invalid token!", email));
+            }
 
             regRequest.password = new String(Base64.getDecoder().decode(regRequest.password));
-            RegisteredUser user = registrationService.registerUser(regRequest);
-            if (user == null)
-                return MessageResource.errorMessage("Registration of " + email + " has failed! No user with this email was found.");
+            Identity identity = registrationService.registerIdentity(regRequest);
+            if (identity == null) {
+                String email = registrationService.decodeToken(regRequest.token)[0];
+                return MessageResource.errorMessage(String.format("Registration of %s has failed! No identity with this email was found.", email));
+            }
 
             return MessageResource.successMessage("Registration complete");
-        } catch (InvalidUserTokenException e) {
+        } catch (InvalidIdentityTokenException e) {
             log.error(e.getMessage());
             return MessageResource.errorMessage("Invalid token!");
         }
@@ -89,23 +86,28 @@ public class AuthenticationController {
 
     @Operation(summary = "Send invitation to a new user", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/invite", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public MessageResource invite(@RequestBody NewUserRequest newUserRequest, Authentication auth) {
+    public MessageResource invite(@RequestBody NewIdentityRequest newIdentityRequest, Authentication auth) {
         try {
-            if (!serverAuthProperties.isOpenRegistration() && (auth == null || !((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated().isAdmin())) {
-                return MessageResource.errorMessage("Only admin can invite new users!");
+            if (!serverAuthProperties.isOpenRegistration()) {
+                return MessageResource.errorMessage("Registration is turned off.");
             }
+            // todo 2058 should be preauthorize
+//            if (auth == null || !((LoggedIdentity) auth.getPrincipal()).isAdmin()) {
+//                return MessageResource.errorMessage("Only admin can invite new users!");
+//            }
 
-            newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());
-            if (mailAttemptService.isBlocked(newUserRequest.email)) {
+            newIdentityRequest.email = URLDecoder.decode(newIdentityRequest.email, StandardCharsets.UTF_8);
+            if (mailAttemptService.isBlocked(newIdentityRequest.email)) {
                 return MessageResource.successMessage("Done");
             }
 
-            RegisteredUser user = registrationService.createNewUser(newUserRequest);
-            if (user == null)
+            Identity identity = registrationService.createNewIdentity(newIdentityRequest);
+            if (identity == null) {
                 return MessageResource.successMessage("Done");
-            mailService.sendRegistrationEmail(user);
+            }
+            mailService.sendRegistrationEmail(identity);
+            mailAttemptService.mailAttempt(newIdentityRequest.email);
 
-            mailAttemptService.mailAttempt(newUserRequest.email);
             return MessageResource.successMessage("Done");
         } catch (IOException | TemplateException | MessagingException e) {
             log.error(e.toString());
@@ -117,11 +119,12 @@ public class AuthenticationController {
     @PostMapping(value = "/token/verify", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource verifyToken(@RequestBody String token) {
         try {
-            if (registrationService.verifyToken(token))
+            if (registrationService.verifyToken(token)) {
                 return MessageResource.successMessage(registrationService.decodeToken(token)[0]);
-            else
+            } else {
                 return MessageResource.errorMessage("Invalid token!");
-        } catch (InvalidUserTokenException e) {
+            }
+        } catch (InvalidIdentityTokenException e) {
             log.error(e.getMessage());
             return MessageResource.errorMessage("Invalid token!");
         }
@@ -130,8 +133,9 @@ public class AuthenticationController {
     @Operation(summary = "Verify validity of an authentication token")
     @GetMapping(value = "/verify", produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource verifyAuthToken(Authentication auth) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        return MessageResource.successMessage("Auth Token successfully verified, for user [" + loggedUser.getId() + "] " + loggedUser.getFullName());
+        LoggedIdentity identity = (LoggedIdentity) auth.getPrincipal();
+        return MessageResource.successMessage(String.format("Auth Token successfully verified, for identity [%s] %s",
+                identity.getIdentityId(), identity.getUsername()));
     }
 
     @Operation(summary = "Login to the system", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -147,14 +151,12 @@ public class AuthenticationController {
             return MessageResource.successMessage("Done");
         }
         try {
-            RegisteredUser user = registrationService.resetPassword(recoveryEmail);
-            if (user != null) {
-                mailService.sendPasswordResetEmail(user);
-                mailAttemptService.mailAttempt(user.getEmail());
-                return MessageResource.successMessage("Done");
-            } else {
-                return MessageResource.successMessage("Done");
+            Identity identity = registrationService.resetPassword(recoveryEmail);
+            if (identity != null) {
+                mailService.sendPasswordResetEmail(identity);
+                mailAttemptService.mailAttempt(identity.getUsername());
             }
+            return MessageResource.successMessage("Done");
         } catch (MessagingException | IOException | TemplateException e) {
             log.error(e.toString());
             return MessageResource.errorMessage("Failed");
@@ -165,13 +167,17 @@ public class AuthenticationController {
     @PostMapping(value = "/recover", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource recoverAccount(@RequestBody RegistrationRequest request) {
         try {
-            if (!registrationService.verifyToken(request.token))
+            if (!registrationService.verifyToken(request.token)) {
                 return MessageResource.errorMessage("Invalid token!");
-            RegisteredUser user = registrationService.recover(registrationService.decodeToken(request.token)[0], new String(Base64.getDecoder().decode(request.password)));
-            if (user == null)
+            }
+            String email = registrationService.decodeToken(request.token)[0];
+            String password = new String(Base64.getDecoder().decode(request.password));
+            Identity identity = registrationService.recover(email, password);
+            if (identity == null) {
                 return MessageResource.errorMessage("Recovery of account has failed!");
+            }
             return MessageResource.successMessage("Account is successfully recovered. You can login now.");
-        } catch (InvalidUserTokenException e) {
+        } catch (InvalidIdentityTokenException e) {
             log.error(e.getMessage());
             return MessageResource.errorMessage("Invalid token!");
         }
@@ -181,8 +187,11 @@ public class AuthenticationController {
     @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource changePassword(Authentication auth, @RequestBody ChangePasswordRequest request) {
         try {
-            RegisteredUser user = (RegisteredUser) userService.findByEmail(request.login);
-            if (user == null || request.password == null || request.newPassword == null) {
+            if (request.password == null || request.newPassword == null) {
+                return MessageResource.errorMessage("Insufficient password!");
+            }
+            Optional<Identity> identityOpt = identityService.findByUsername(request.login);
+            if (identityOpt.isEmpty()) {
                 return MessageResource.errorMessage("Incorrect login!");
             }
 
@@ -191,12 +200,11 @@ public class AuthenticationController {
                 return MessageResource.errorMessage("Insufficient password!");
             }
 
-            String password = new String(Base64.getDecoder().decode(request.password));
-            if (registrationService.stringMatchesUserPassword(user, password)) {
-                registrationService.changePassword(user, newPassword);
-                securityContextService.saveToken(((LoggedUser) auth.getPrincipal()).getId());
-                securityContextService.reloadSecurityContext((LoggedUser) auth.getPrincipal());
-
+            String currentPassword = new String(Base64.getDecoder().decode(request.password));
+            if (registrationService.matchesIdentityPassword(identityOpt.get(), currentPassword)) {
+                registrationService.changePassword(identityOpt.get(), newPassword);
+                securityContextService.saveToken(((LoggedIdentity) auth.getPrincipal()).getIdentityId());
+                securityContextService.reloadSecurityContext((LoggedIdentity) auth.getPrincipal());
             } else {
                 return MessageResource.errorMessage("Incorrect password!");
             }

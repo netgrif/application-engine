@@ -1,8 +1,7 @@
 package com.netgrif.application.engine.impersonation.service;
 
 import com.netgrif.application.engine.authentication.domain.Authority;
-import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.authorization.domain.Role;
@@ -14,7 +13,7 @@ import com.netgrif.application.engine.impersonation.service.interfaces.IImperson
 import com.netgrif.application.engine.petrinet.domain.dataset.BooleanField;
 import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorFieldValue;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -53,7 +52,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     protected IRoleService roleService;
 
     @Override
-    public Page<IUser> getConfiguredImpersonationUsers(String query, LoggedUser impersonator, Pageable pageable) {
+    public Page<IUser> getConfiguredImpersonationUsers(String query, Identity impersonator, Pageable pageable) {
         if (impersonator.isAdmin()) {
             return userService.searchAllCoMembers(query, impersonator, pageable);
 
@@ -69,13 +68,13 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     }
 
     @Override
-    public boolean canImpersonate(LoggedUser impersonator, String configId) {
+    public boolean canImpersonate(Identity impersonator, String configId) {
         Case config = getConfig(configId);
         return isValidAndContainsUser(config, impersonator.getId());
     }
 
     @Override
-    public boolean canImpersonateUser(LoggedUser impersonator, String userId) {
+    public boolean canImpersonateUser(Identity impersonator, String userId) {
         IUser impersonated = userService.findById(userId);
         return impersonator.isAdmin() || !searchConfigs(impersonator.getId(), impersonated.getStringId()).isEmpty();
     }
@@ -124,7 +123,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
 
     @Override
     public String getImpersonatedUserId(Case config) {
-        return ((UserFieldValue) config.getDataSet().get("impersonated").getRawValue()).getId();
+        return ((ActorFieldValue) config.getDataSet().get("impersonated").getRawValue()).getId();
     }
 
     @Override

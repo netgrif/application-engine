@@ -21,7 +21,7 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
     private ImportHelper helper
 
     @Autowired
-    private SystemUserRunner systemCreator
+    private SystemIdentityRunner systemCreator
 
     private static final String FILTER_FILE_NAME = "engine-processes/filter.xml"
     public static final String FILTER_PETRI_NET_IDENTIFIER = "filter"

@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -26,21 +25,21 @@ public interface IWorkflowService {
 
     Page<Case> getAll(Pageable pageable);
 
-    CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale, Map<String, String> params);
+    CreateCaseEventOutcome createCase(String netId, String title, String color, String actorId, Locale locale, Map<String, String> params);
 
-    CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale);
+    CreateCaseEventOutcome createCase(String netId, String title, String color, String actorId, Locale locale);
 
-    CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Map<String, String> params);
+    CreateCaseEventOutcome createCase(String netId, String title, String color, String actorId, Map<String, String> params);
 
-    CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user);
+    CreateCaseEventOutcome createCase(String netId, String title, String color, String actorId);
 
-    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Map<String, String> params);
+    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, String actorId, Map<String, String> params);
 
-    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user);
+    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, String actorId);
 
-    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale, Map<String, String> params);
+    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, String actorId, Locale locale, Map<String, String> params);
 
-    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale);
+    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, String actorId, Locale locale);
 
     Page<Case> findAllByAuthor(String authorId, String petriNet, Pageable pageable);
 

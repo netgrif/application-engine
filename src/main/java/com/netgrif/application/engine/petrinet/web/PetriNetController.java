@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.web;
 
 import com.netgrif.application.engine.AsyncRunner;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
@@ -89,7 +89,8 @@ public class PetriNetController {
             Authentication auth, Locale locale) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
             VersionType release = releaseType == null ? VersionType.MAJOR : VersionType.valueOf(releaseType.trim().toUpperCase());
-            ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(multipartFile.getInputStream(), release, (LoggedUser) auth.getPrincipal(), uriNodeId);
+            ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(multipartFile.getInputStream(), release,
+                    ((LoggedIdentity) auth.getPrincipal()).getActiveActorId(), uriNodeId);
             return EventOutcomeWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully", importPetriNetOutcome);
         } catch (IOException e) {
             log.error("Importing Petri net failed: ", e);
@@ -100,15 +101,14 @@ public class PetriNetController {
     @Operation(summary = "Get all processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public PetriNetReferenceResources getAll(@RequestParam(value = "identifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Authentication auth, Locale locale) {
-        LoggedUser user = (LoggedUser) auth.getPrincipal();
         if (identifier != null && version == null) {
-            return new PetriNetReferenceResources(service.getReferencesByIdentifier(identifier, user, locale));
+            return new PetriNetReferenceResources(service.getReferencesByIdentifier(identifier, locale));
         } else if (identifier == null && version != null) {
-            return new PetriNetReferenceResources(service.getReferencesByVersion(converter.convert(version), user, locale));
+            return new PetriNetReferenceResources(service.getReferencesByVersion(converter.convert(version), locale));
         } else if (identifier != null && version != null) {
-            return new PetriNetReferenceResources(Collections.singletonList(service.getReference(identifier, converter.convert(version), user, locale)));
+            return new PetriNetReferenceResources(Collections.singletonList(service.getReference(identifier, converter.convert(version), locale)));
         } else {
-            return new PetriNetReferenceResources(service.getReferences(user, locale));
+            return new PetriNetReferenceResources(service.getReferences(locale));
         }
     }
 
@@ -122,14 +122,14 @@ public class PetriNetController {
     @GetMapping(value = "/{identifier}/{version}", produces = MediaTypes.HAL_JSON_VALUE)
     public PetriNetReferenceResource getOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Authentication auth, Locale locale) {
         String resolvedIdentifier = Base64.isBase64(identifier) ? new String(Base64.decodeBase64(identifier)) : identifier;
-        return new PetriNetReferenceResource(service.getReference(resolvedIdentifier, converter.convert(version), (LoggedUser) auth.getPrincipal(), locale));
+        return new PetriNetReferenceResource(service.getReference(resolvedIdentifier, converter.convert(version), locale));
     }
 
     @Operation(summary = "Get transitions of processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/transitions", produces = MediaTypes.HAL_JSON_VALUE)
     public TransitionReferencesResource getTransitionReferences(@RequestParam List<String> ids, Authentication auth, Locale locale) {
         ids.forEach(id -> id = decodeUrl(id));
-        return new TransitionReferencesResource(service.getTransitionReferences(ids, (LoggedUser) auth.getPrincipal(), locale));
+        return new TransitionReferencesResource(service.getTransitionReferences(ids, locale));
     }
 
     @Operation(summary = "Get data fields of transitions", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -154,8 +154,7 @@ public class PetriNetController {
     @PostMapping(value = "/search", produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
     PagedModel<PetriNetReferenceResource> searchPetriNets(@RequestBody PetriNetSearch criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
-        LoggedUser user = (LoggedUser) auth.getPrincipal();
-        Page<PetriNetReference> nets = service.search(criteria, user, pageable, locale);
+        Page<PetriNetReference> nets = service.search(criteria, pageable, locale);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetriNetController.class)
                 .searchPetriNets(criteria, auth, pageable, assembler, locale)).withRel("search");
         PagedModel<PetriNetReferenceResource> resources = assembler.toModel(nets, new PetriNetReferenceResourceAssembler(), selfLink);

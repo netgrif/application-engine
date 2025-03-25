@@ -3,8 +3,8 @@ package com.netgrif.application.engine.elastic
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.authentication.domain.Authority
-import com.netgrif.application.engine.authentication.domain.User
-import com.netgrif.application.engine.authentication.domain.UserState
+
+import com.netgrif.application.engine.authentication.domain.IdentityState
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepository
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField
@@ -110,7 +110,7 @@ class ElasticSearchTest {
         netId2 = net2.getStringId()
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
+        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSW, state: IdentityState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [net.roles.values().find { it.importId == "process_role" }] as ProcessRole[])
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSW)
@@ -135,7 +135,7 @@ class ElasticSearchTest {
                 "searchByAuthorIdAndIdentifier"          : [
                         "json": JsonOutput.toJson([
                                 "author": [
-                                        "id": superCreator.superUser.stringId
+                                        "id": superCreator.superIdentity.stringId
                                 ],
                                 "process": [
                                         "identifier": "all_data"
@@ -146,7 +146,7 @@ class ElasticSearchTest {
                 "searchByAuthorId"          : [
                         "json": JsonOutput.toJson([
                                 "author": [
-                                        "id": superCreator.superUser.stringId
+                                        "id": superCreator.superIdentity.stringId
                                 ]
                         ]),
                         "size": CASE_NUMBER + SYSTEM_CASE_NUMBER
@@ -154,7 +154,7 @@ class ElasticSearchTest {
                 "searchByAuthorName"        : [
                         "json": JsonOutput.toJson([
                                 "author": [
-                                        "name": superCreator.superUser.fullName
+                                        "name": superCreator.superIdentity.fullName
                                 ]
                         ]),
                         "size": CASE_NUMBER + SYSTEM_CASE_NUMBER
@@ -162,7 +162,7 @@ class ElasticSearchTest {
                 "searchByAuthorEmail"       : [
                         "json": JsonOutput.toJson([
                                 "author": [
-                                        "email": superCreator.superUser.email
+                                        "email": superCreator.superIdentity.email
                                 ]
                         ]),
                         "size": CASE_NUMBER + SYSTEM_CASE_NUMBER

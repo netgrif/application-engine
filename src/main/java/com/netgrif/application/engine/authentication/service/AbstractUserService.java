@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.netgrif.application.engine.startup.SystemUserRunner.*;
-
 public abstract class AbstractUserService implements IUserService {
 
     @Autowired
@@ -40,7 +38,7 @@ public abstract class AbstractUserService implements IUserService {
     @Override
     public void addDefaultRole(IUser user) {
         Role defaultRole = roleService.findDefaultRole();
-        roleService.assignRolesToUser(user.getStringId(), Set.of(defaultRole.getStringId()));
+        roleService.assignRolesToActor(user.getStringId(), Set.of(defaultRole.getStringId()));
     }
 
     @Override
@@ -63,19 +61,19 @@ public abstract class AbstractUserService implements IUserService {
     }
 
     @Override
-    public LoggedUser getAnonymousLogged() {
-        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals(UserProperties.ANONYMOUS_AUTH_KEY)) {
+    public Identity getAnonymousLogged() {
+        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals(IdentityProperties.ANONYMOUS_AUTH_KEY)) {
             getLoggedUser().transformToLoggedUser();
         }
-        return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return (Identity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     @Override
     public IUser createSystemUser() {
-        User system = repository.findByEmail(SYSTEM_USER_EMAIL);
+        User system = repository.findByEmail(SYSTEM_IDENTITY_EMAIL);
         if (system == null) {
-            system = new User(SYSTEM_USER_EMAIL, "n/a", SYSTEM_USER_NAME, SYSTEM_USER_SURNAME);
-            system.setState(UserState.ACTIVE);
+            system = new User(SYSTEM_IDENTITY_EMAIL, "n/a", SYSTEM_IDENTITY_NAME, SYSTEM_IDENTITY_SURNAME);
+            system.setState(IdentityState.ACTIVE);
             repository.save(system);
         }
         return system;
@@ -90,9 +88,9 @@ public abstract class AbstractUserService implements IUserService {
     }
 
     @Override
-    public IUser getUserFromLoggedUser(LoggedUser loggedUser) {
-        IUser user = resolveById(loggedUser.getId());
-        IUser fromLogged = loggedUser.transformToUser();
+    public IUser getUserFromLoggedUser(Identity identity) {
+        IUser user = resolveById(identity.getId());
+        IUser fromLogged = identity.transformToUser();
         user.setImpersonated(fromLogged.getImpersonated());
         return user;
     }

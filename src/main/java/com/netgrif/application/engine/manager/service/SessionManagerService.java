@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.manager.service;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,12 +33,12 @@ public class SessionManagerService implements ISessionManagerService {
     }
 
     @Override
-    public List<LoggedUser> getAllLoggedUsers() {
+    public List<Identity> getAllLoggedUsers() {
         RedisOperations<Object, Object> redisOps = repository.getSessionRedisOperations();
         if (redisOps == null) {
             throw new IllegalStateException("Redis session management is not configured!");
         }
-        List<LoggedUser> activeUsers = new ArrayList<>();
+        List<Identity> activeUsers = new ArrayList<>();
         Set<Object> keys = redisOps.keys(redisUsernameKey + "*");
         if (keys == null || keys.isEmpty()) {
             return activeUsers;
@@ -45,9 +46,9 @@ public class SessionManagerService implements ISessionManagerService {
         keys.forEach(username -> {
             Session session = repository.findByPrincipalName(username.toString().replace(redisUsernameKey, "")).values().stream().findFirst().orElse(null);
             if (session != null) {
-                SecurityContextImpl impl = (SecurityContextImpl) session.getAttribute(WebSessionServerSecurityContextRepository.DEFAULT_SPRING_SECURITY_CONTEXT_ATTR_NAME);
+                SecurityContextImpl impl = session.getAttribute(WebSessionServerSecurityContextRepository.DEFAULT_SPRING_SECURITY_CONTEXT_ATTR_NAME);
                 if (impl != null) {
-                    LoggedUser user = (LoggedUser) impl.getAuthentication().getPrincipal();
+                    LoggedIdentity user = (LoggedIdentity) impl.getAuthentication().getPrincipal();
                     if (user != null) {
                         activeUsers.add(user);
                     }
@@ -64,7 +65,7 @@ public class SessionManagerService implements ISessionManagerService {
 
     @Override
     public void logoutAllSession() {
-        List<LoggedUser> users = getAllLoggedUsers();
+        List<Identity> users = getAllLoggedUsers();
         users.forEach(loggedUser -> repository.findByPrincipalName(loggedUser.getEmail()).keySet().forEach(repository::deleteById));
     }
 

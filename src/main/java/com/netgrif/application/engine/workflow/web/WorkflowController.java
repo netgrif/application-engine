@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
@@ -74,9 +74,10 @@ public class WorkflowController {
     @Operation(summary = "Create new case", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        LoggedIdentity identity = (LoggedIdentity) auth.getPrincipal();
         try {
-            CreateCaseEventOutcome outcome = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
+            CreateCaseEventOutcome outcome = workflowService.createCase(body.netId, body.title, body.color,
+                    identity.getActiveActorId(), locale);
             return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getCase().getStringId() + " was created succesfully", outcome);
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
             log.error("Creating case failed:", e);
@@ -110,8 +111,8 @@ public class WorkflowController {
     @Operation(summary = "Generic case search on Elasticsearch database", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> search(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
-        LoggedUser user = (LoggedUser) auth.getPrincipal();
-        Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, locale, operation == MergeFilterOperation.AND);
+        LoggedIdentity identity = (LoggedIdentity) auth.getPrincipal();
+        Page<Case> cases = elasticCaseService.search(searchBody.getList(), identity, pageable, locale, operation == MergeFilterOperation.AND);
 
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
                 .search(searchBody, operation, pageable, assembler, auth, locale)).withRel("search");
@@ -124,7 +125,7 @@ public class WorkflowController {
     @Operation(summary = "Get count of the cases", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/count", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CountResponse count(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth, Locale locale) {
-        long count = elasticCaseService.count(searchBody.getList(), (LoggedUser) auth.getPrincipal(), locale, operation == MergeFilterOperation.AND);
+        long count = elasticCaseService.count(searchBody.getList(), (LoggedIdentity) auth.getPrincipal(), locale, operation == MergeFilterOperation.AND);
         return CountResponse.caseCount(count);
     }
 

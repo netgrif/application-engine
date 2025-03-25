@@ -36,40 +36,40 @@ public class RBACController {
     private final IRoleService roleService;
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
-    @Operation(summary = "Assign roles to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "BasicAuth")})
-    @PostMapping(value = "/{userId}/assign", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @Operation(summary = "Assign roles to the actor", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "BasicAuth")})
+    @PostMapping(value = "/{actorId}/assign", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public MessageResource assignRolesToUser(@PathVariable("userId") String userId, @RequestBody Set<String> roleIds) {
+    public MessageResource assignRolesToUser(@PathVariable("actorId") String actorId, @RequestBody Set<String> roleIds) {
         try {
-            List<Role> assignedRoles = roleService.assignRolesToUser(userId, roleIds);
+            List<Role> assignedRoles = roleService.assignRolesToActor(actorId, roleIds);
             Set<String> assignedRoleIds = assignedRoles.stream().map(Role::getStringId).collect(Collectors.toSet());
-            log.info("Roles [{}] assigned to user [{}]", assignedRoleIds, userId);
-            return MessageResource.successMessage(String.format("Selected roles assigned to user [%s]", userId));
+            log.info("Roles [{}] assigned to actor [{}]", assignedRoleIds, actorId);
+            return MessageResource.successMessage(String.format("Selected roles assigned to actor [%s]", actorId));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return MessageResource.errorMessage(String.format("Assigning roles to user [%s] has failed!", userId));
+            return MessageResource.errorMessage(String.format("Assigning roles to actor [%s] has failed!", actorId));
         }
     }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Remove roles from the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "BasicAuth")})
-    @PostMapping(value = "/{userId}/remove", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/{actorId}/remove", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public MessageResource removeRolesFromUser(@PathVariable("userId") String userId, @RequestBody Set<String> roleIds) {
+    public MessageResource removeRolesFromUser(@PathVariable("actorId") String actorId, @RequestBody Set<String> roleIds) {
         try {
-            List<Role> removedRoles = roleService.removeRolesFromUser(userId, roleIds);
+            List<Role> removedRoles = roleService.removeRolesFromActor(actorId, roleIds);
             Set<String> removedRoleIds = removedRoles.stream().map(Role::getStringId).collect(Collectors.toSet());
-            log.info("Roles [{}] removed from user [{}]", removedRoleIds, userId);
-            return MessageResource.successMessage(String.format("Selected roles removed from user [%s]", userId));
+            log.info("Roles [{}] removed from actor [{}]", removedRoleIds, actorId);
+            return MessageResource.successMessage(String.format("Selected roles removed from actor [%s]", actorId));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return MessageResource.errorMessage(String.format("Removing roles from user [%s] has failed!", userId));
+            return MessageResource.errorMessage(String.format("Removing roles from actor [%s] has failed!", actorId));
         }
     }
 }

@@ -61,7 +61,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
 
     private void authenticate(HttpServletRequest request, String jwtToken) {
         AnonymousAuthenticationToken authRequest = new AnonymousAuthenticationToken(
-                UserProperties.ANONYMOUS_AUTH_KEY,
+                IdentityProperties.ANONYMOUS_AUTH_KEY,
                 jwtService.getLoggedUser(jwtToken, this.anonymousAuthority),
                 Collections.singleton(this.anonymousAuthority)
         );
@@ -95,19 +95,19 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void resolveClaims(Map<String, Object> claims, HttpServletRequest request) {
-        LoggedUser loggedUser = createAnonymousUser(request);
+        Identity identity = createAnonymousUser(request);
 
         if (claims.containsKey("user")) {
             IUser user = userService.findAnonymousByEmail((String) ((LinkedHashMap) claims.get("user")).get("email"));
             if (user != null) {
-                loggedUser = user.transformToLoggedUser();
+                identity = user.transformToLoggedUser();
             }
         }
-        loggedUser.eraseCredentials();
-        claims.put("user", loggedUser);
+        identity.eraseCredentials();
+        claims.put("user", identity);
     }
 
-    private LoggedUser createAnonymousUser(HttpServletRequest request) {
+    private Identity createAnonymousUser(HttpServletRequest request) {
         String hash = new ObjectId().toString();
 
         // TODO: release/8.0.0 string constants, properties?
@@ -119,7 +119,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
                     "User",
                     "Anonymous"
             );
-            anonymousUser.setState(UserState.ACTIVE);
+            anonymousUser.setState(IdentityState.ACTIVE);
             userService.saveNewAnonymous(anonymousUser);
         }
         return anonymousUser.transformToLoggedUser();

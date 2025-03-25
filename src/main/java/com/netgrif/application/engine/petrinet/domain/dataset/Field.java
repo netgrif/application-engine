@@ -56,8 +56,8 @@ import static com.netgrif.application.engine.petrinet.domain.dataset.logic.Field
         @JsonSubTypes.Type(value = StringCollectionField.class, name = "STRINGCOLLECTION"),
         @JsonSubTypes.Type(value = TaskField.class, name = "TASK_REF"),
         @JsonSubTypes.Type(value = TextField.class, name = "TEXT"),
-        @JsonSubTypes.Type(value = UserField.class, name = "USER"),
-        @JsonSubTypes.Type(value = UserListField.class, name = "USER_LIST"),
+        @JsonSubTypes.Type(value = ActorField.class, name = "ACTOR"),
+        @JsonSubTypes.Type(value = ActorListField.class, name = "ACTOR_LIST"),
 })
 @EqualsAndHashCode(callSuper = true)
 public abstract class Field<T> extends Imported {

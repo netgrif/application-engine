@@ -1,0 +1,85 @@
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
+	<id>actor</id>
+	<version>1.0.0</version>
+	<title>Actor</title>
+	<icon>person</icon>
+	<defaultRole>false</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<roleRef>
+		<id>admin</id>
+		<permission>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</permission>
+	</roleRef>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
+	<data type="text" immediate="true">
+		<id>email</id>
+		<title>Email</title>
+	</data>
+	<data type="text">
+		<id>firstname</id>
+		<title>First name</title>
+	</data>
+	<data type="text">
+		<id>lastname</id>
+		<title>Last name</title>
+	</data>
+<!--	todo preklady-->
+	<transition>
+		<id>t1</id>
+		<x>368</x>
+		<y>208</y>
+		<title>Data</title>
+		<roleRef>
+			<id>admin</id>
+			<permission>
+				<perform>true</perform>
+			</permission>
+		</roleRef>
+		<flex>
+			<id>t1_flex</id>
+			<item>
+				<dataRef>
+					<id>email</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+			</item>
+			<item>
+				<dataRef>
+					<id>firstname</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+			</item>
+			<item>
+				<dataRef>
+					<id>lastname</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+			</item>
+		</flex>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>368</x>
+		<y>304</y>
+		<tokens>1</tokens>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>read</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</process>

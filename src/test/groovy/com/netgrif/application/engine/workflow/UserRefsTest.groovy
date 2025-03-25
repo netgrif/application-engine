@@ -6,8 +6,8 @@ import com.netgrif.application.engine.configuration.properties.SuperAdminConfigu
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorListField
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorListFieldValue
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -79,7 +79,7 @@ class UserRefsTest {
             String id = userService.findByEmail(userEmails[it % 2]).getStringId()
             String taskId = _case.getTaskStringId("t1")
             dataService.setData(taskId, new DataSet([
-                    "user_list_1": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(id)]))
+                    "user_list_1": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(id)]))
             ] as Map<String, Field<?>>), superCreator.getLoggedSuper()).getCase()
             userIds.add(id)
         }

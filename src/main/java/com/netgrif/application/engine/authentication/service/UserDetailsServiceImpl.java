@@ -1,13 +1,12 @@
 package com.netgrif.application.engine.authentication.service;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
-import com.netgrif.application.engine.authentication.domain.User;
-import com.netgrif.application.engine.authentication.domain.UserState;
+import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.IdentityState;
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository;
 import com.netgrif.application.engine.authentication.service.interfaces.ILoginAttemptService;
 import com.netgrif.application.engine.event.events.user.UserLoginEvent;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,41 +18,38 @@ import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    @Autowired
-    protected UserRepository userRepository;
+    protected final UserRepository userRepository;
 
-    @Autowired
-    protected ApplicationEventPublisher publisher;
+    protected final ApplicationEventPublisher publisher;
 
-    @Autowired
-    protected ILoginAttemptService loginAttemptService;
+    protected final ILoginAttemptService loginAttemptService;
 
-    @Autowired
-    protected HttpServletRequest request;
+    protected final HttpServletRequest request;
 
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         String ip = getClientIP();
         if (loginAttemptService.isBlocked(ip)) {
-            log.info("User " + email + " with IP Address " + ip + " is blocked.");
+            log.info("User {} with IP address {} is blocked.", email, ip);
             throw new RuntimeException("blocked");
         }
 
-        LoggedUser loggedUser = getLoggedUser(email);
+        Identity identity = getLoggedUser(email);
 
-        publisher.publishEvent(new UserLoginEvent(loggedUser));
+        publisher.publishEvent(new UserLoginEvent(identity));
 
-        return loggedUser;
+        return identity;
     }
 
-    protected LoggedUser getLoggedUser(String email) throws UsernameNotFoundException {
+    protected Identity getLoggedUser(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);
         if (user == null)
             throw new UsernameNotFoundException("No user was found for login: " + email);
-        if (user.getPassword() == null || user.getState() != UserState.ACTIVE)
+        if (user.getPassword() == null || user.getState() != IdentityState.ACTIVE)
             throw new UsernameNotFoundException("User with login " + email + " cannot be logged in!");
 
         return user.transformToLoggedUser();

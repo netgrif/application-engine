@@ -5,7 +5,6 @@ import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -13,6 +12,15 @@ public class CaseField extends FieldWithAllowedNets<List<String>> {
 
     public CaseField(List<String> allowedNets) {
         super(allowedNets);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public static CaseField withValue(List<String> value) {
+        CaseField field = new CaseField();
+        field.setRawValue(value);
+        return field;
     }
 
     @Override

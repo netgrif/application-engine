@@ -2,7 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.authentication.domain.IUser
+
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.importer.service.Importer

@@ -1,8 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
@@ -19,7 +18,6 @@ import com.netgrif.application.engine.petrinet.domain.arcs.ReferenceType;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionRunner;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
-import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
@@ -84,9 +82,6 @@ public class WorkflowService implements IWorkflowService {
     protected ActionRunner actionsRunner;
 
     @Autowired
-    protected IUserService userService;
-
-    @Autowired
     protected IInitValueExpressionEvaluator initValueExpressionEvaluator;
 
     @Lazy
@@ -100,6 +95,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     private DataSetInitializer dataSetInitializer;
+
+    @Autowired
+    private IIdentityService identityService;
 
     @Autowired
     public void setElasticCaseService(IElasticCaseService elasticCaseService) {
@@ -179,100 +177,74 @@ public class WorkflowService implements IWorkflowService {
         return page;
     }
 
-    private void resolveUserRefPermissions(Case useCase, String userListId, Map<CasePermission, Boolean> permission) {
-        List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(userListId).getRawValue());
-        if (userIds != null && !userIds.isEmpty()) {
-            if (permission.containsKey(CasePermission.VIEW) && !permission.get(CasePermission.VIEW)) {
-//                TODO: release/8.0.0
-//                useCase.getNegativeViewUsers().addAll(userIds);
-            } else {
-//                useCase.addUsers(new HashSet<>(userIds), permission);
-            }
-        }
-    }
-
-    private List<String> getExistingUsers(UserListFieldValue userListValue) {
-        if (userListValue == null) {
-            return null;
-        }
-        // TODO: release/8.0.0 fix null set as user value
-        // TODO: release/8.0.0  .filter(id -> userService.resolveById(id, false) != null)
-        return userListValue.getUserValues().stream()
-                .filter(Objects::nonNull)
-                .map(UserFieldValue::getId)
-                .filter(id -> id != null && userService.existsById(id))
-                .collect(Collectors.toList());
-    }
-
     @Override
-    public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale, Map<String, String> params) {
+    public CreateCaseEventOutcome createCase(String netId, String title, String color, String actorId, Locale locale, Map<String, String> params) {
         if (locale == null) {
             locale = LocaleContextHolder.getLocale();
         }
         if (title == null) {
             title = resolveDefaultCaseTitle(netId, locale, params);
         }
-        return this.createCase(netId, title, color, user, params);
+        return this.createCase(netId, title, color, actorId, params);
     }
 
     @Override
-    public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale) {
-        return this.createCase(netId, title, color, user, locale, new HashMap<>());
+    public CreateCaseEventOutcome createCase(String netId, String title, String color, String actorId, Locale locale) {
+        return this.createCase(netId, title, color, actorId, locale, new HashMap<>());
     }
 
     @Override
-    public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Map<String, String> params) {
-        return createCase(netId, (u) -> title, color, user, params);
+    public CreateCaseEventOutcome createCase(String netId, String title, String color, String actorId, Map<String, String> params) {
+        return createCase(netId, (u) -> title, color, actorId, params);
     }
 
     @Override
-    public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user) {
-        return this.createCase(netId, (u) -> title, color, user);
+    public CreateCaseEventOutcome createCase(String netId, String title, String color, String actorId) {
+        return this.createCase(netId, (u) -> title, color, actorId);
     }
 
     @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale, Map<String, String> params) {
+    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, String actorId, Locale locale, Map<String, String> params) {
         Process net = petriNetService.getNewestVersionByIdentifier(identifier);
         if (net == null) {
             throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
         }
-        return this.createCase(net.getStringId(), title != null && !title.equals("") ? title : net.getDefaultCaseName().getTranslation(locale), color, user, params);
+        return this.createCase(net.getStringId(), title != null && !title.isEmpty() ? title : net.getDefaultCaseName().getTranslation(locale), color, actorId, params);
     }
 
     @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale) {
-        return this.createCaseByIdentifier(identifier, title, color, user, locale, new HashMap<>());
+    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, String actorId, Locale locale) {
+        return this.createCaseByIdentifier(identifier, title, color, actorId, locale, new HashMap<>());
     }
 
     @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Map<String, String> params) {
+    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, String actorId, Map<String, String> params) {
         Process net = petriNetService.getNewestVersionByIdentifier(identifier);
         if (net == null) {
             throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
         }
-        return this.createCase(net.getStringId(), title, color, user, params);
+        return this.createCase(net.getStringId(), title, color, actorId, params);
     }
 
     @Override
-    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user) {
+    public CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, String actorId) {
         Process net = petriNetService.getNewestVersionByIdentifier(identifier);
         if (net == null) {
             throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
         }
-        return this.createCase(net.getStringId(), title, color, user);
+        return this.createCase(net.getStringId(), title, color, actorId);
     }
 
-    public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
-        return this.createCase(netId, makeTitle, color, user, new HashMap<>());
+    public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, String actorId) {
+        return this.createCase(netId, makeTitle, color, actorId, new HashMap<>());
     }
 
     // TODO: release/8.0.0 remove color
-    public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user, Map<String, String> params) {
-        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+    public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, String actorId, Map<String, String> params) {
         Process petriNet = petriNetService.clone(new ObjectId(netId));
         int rulesExecuted;
         Case useCase = new Case(petriNet);
-        useCase.setAuthor(loggedOrImpersonated.transformToAuthor());
+        useCase.setAuthorId(actorId);
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(makeTitle.apply(useCase));
         useCase = taskService.createTasks(useCase);
@@ -325,7 +297,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Page<Case> findAllByAuthor(String authorId, String petriNet, Pageable pageable) {
-        Predicate query = QCase.case$.author.id.eq(authorId).and(QCase.case$.petriNetId.eq(petriNet));
+        Predicate query = QCase.case$.authorId.eq(authorId).and(QCase.case$.petriNetId.eq(petriNet));
         Page<Case> cases = repository.findAll(query, pageable);
         cases.forEach(this::initialize);
         return cases;
@@ -346,7 +318,8 @@ public class WorkflowService implements IWorkflowService {
     public DeleteCaseEventOutcome deleteCase(Case useCase, Map<String, String> params) {
         DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getProcess().getPreDeleteActions(), useCase, Optional.empty(), params));
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
-        log.info("[{}]: User [{}] is deleting case {}", useCase.getStringId(), userService.getLoggedOrSystem().getStringId(), useCase.getTitle());
+        log.info("[{}]: Actor [{}] is deleting case {}", useCase.getStringId(),
+                identityService.getLoggedIdentity().getActiveActorId(), useCase.getTitle());
 
         roleService.removeAllByCase(useCase.getStringId());
         taskService.deleteTasksByCase(useCase.getStringId());
@@ -365,20 +338,24 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public void deleteInstancesOfPetriNet(Process net) {
-        log.info("[{}]: User {} is deleting all cases and tasks of Petri net {} version {}", net.getStringId(), userService.getLoggedOrSystem().getStringId(), net.getIdentifier(), net.getVersion().toString());
+        log.info("[{}]: Actor {} is deleting all cases and tasks of Petri net {} version {}", net.getStringId(),
+                identityService.getLoggedIdentity().getActiveActorId(), net.getIdentifier(), net.getVersion().toString());
 
         taskService.deleteTasksByPetriNetId(net.getStringId());
         CaseSearchRequest request = new CaseSearchRequest();
         CaseSearchRequest.PetriNet netRequest = new CaseSearchRequest.PetriNet();
         netRequest.processId = net.getStringId();
         request.process = Collections.singletonList(netRequest);
-        long countCases = elasticCaseService.count(Collections.singletonList(request), userService.getLoggedOrSystem().transformToLoggedUser(), Locale.getDefault(), false);
-        log.info("[{}]: User {} is deleting {} cases of Petri net {} version {}", net.getStringId(), userService.getLoggedOrSystem().getStringId(), countCases, net.getIdentifier(), net.getVersion().toString());
+        long countCases = elasticCaseService.count(Collections.singletonList(request), identityService.getLoggedIdentity(),
+                Locale.getDefault(), false);
+        log.info("[{}]: Actor {} is deleting {} cases of Petri net {} version {}", net.getStringId(),
+                identityService.getLoggedIdentity().getActiveActorId(), countCases, net.getIdentifier(),
+                net.getVersion().toString());
         long pageCount = (countCases / 100) + 1;
         LongStream.range(0, pageCount)
                 .forEach(i -> elasticCaseService.search(
                                 Collections.singletonList(request),
-                                userService.getLoggedOrSystem().transformToLoggedUser(),
+                                identityService.getLoggedIdentity(),
                                 PageRequest.of((int) i, 100),
                                 Locale.getDefault(),
                                 false)

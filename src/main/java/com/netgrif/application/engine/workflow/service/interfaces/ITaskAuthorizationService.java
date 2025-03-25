@@ -1,36 +1,35 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
-import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authorization.domain.permissions.TaskPermission;
 import com.netgrif.application.engine.petrinet.domain.throwable.IllegalTaskStateException;
 import com.netgrif.application.engine.workflow.domain.Task;
 
 public interface ITaskAuthorizationService {
-    Boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, TaskPermission... permissions);
+    Boolean userHasAtLeastOneRolePermission(Identity identity, String taskId, TaskPermission... permissions);
 
     Boolean userHasAtLeastOneRolePermission(IUser user, Task task, TaskPermission... permissions);
 
-    Boolean userHasUserListPermission(LoggedUser loggedUser, String taskId, TaskPermission... permissions);
+    Boolean userHasUserListPermission(Identity identity, String taskId, TaskPermission... permissions);
 
     Boolean userHasUserListPermission(IUser user, Task task, TaskPermission... permissions);
 
-    boolean isAssignee(LoggedUser loggedUser, String taskId);
+    boolean isAssignee(Identity identity, String taskId);
 
     boolean isAssignee(IUser user, String taskId);
 
     boolean isAssignee(IUser user, Task task);
 
-    boolean canCallAssign(LoggedUser loggedUser, String taskId);
+    boolean canCallAssign(Identity identity, String taskId);
 
-    boolean canCallDelegate(LoggedUser loggedUser, String taskId);
+    boolean canCallDelegate(Identity identity, String taskId);
 
-    boolean canCallFinish(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException;
+    boolean canCallFinish(Identity identity, String taskId) throws IllegalTaskStateException;
 
-    boolean canCallCancel(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException;
+    boolean canCallCancel(Identity identity, String taskId) throws IllegalTaskStateException;
 
-    boolean canCallSaveData(LoggedUser loggedUser, String taskId);
+    boolean canCallSaveData(Identity identity, String taskId);
 
-    boolean canCallSaveFile(LoggedUser loggedUser, String taskId);
+    boolean canCallSaveFile(Identity identity, String taskId);
 
 }

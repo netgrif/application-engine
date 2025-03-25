@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.history.domain.dataevents;
 
-import com.netgrif.application.engine.authentication.domain.IUser;
 import com.netgrif.application.engine.history.domain.taskevents.TaskEventLog;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -24,8 +23,8 @@ public class SetDataEventLog extends TaskEventLog {
         super();
     }
 
-    public SetDataEventLog(Task task, Case useCase, EventPhase eventPhase, DataSet changedFields, IUser user) {
-        super(task, useCase, eventPhase, user.getStringId(), user.isImpersonating() ? user.getImpersonated().getStringId() : null);
+    public SetDataEventLog(Task task, Case useCase, EventPhase eventPhase, DataSet changedFields, String actorId) {
+        super(task, useCase, eventPhase, actorId, null);
         this.changedFields = changedFields;
     }
 }

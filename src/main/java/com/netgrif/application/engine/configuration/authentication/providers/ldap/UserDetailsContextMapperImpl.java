@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.configuration.authentication.providers.ldap;
 
-import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.service.interfaces.ILdapUserRefService;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import com.netgrif.application.engine.ldap.domain.LdapUser;
@@ -54,12 +53,12 @@ public class UserDetailsContextMapperImpl implements UserDetailsContextMapper {
            user = ldapUserRefService.updateById(dirContextOperations.getDn(), user);
         }
         assert user != null;
-        LoggedUser loggedUser = user.transformToLoggedUser();
+        Identity identity = user.transformToLoggedUser();
         if (user instanceof LdapUser && (!((LdapUser) user).getMemberOf().isEmpty())) {
             // todo 2058
 //                loggedUser.addRoleAssignments(ldapGroupRefService.getRoleByLdapGroup(((LdapUser) user).getMemberOf()));
             }
-        return loggedUser;
+        return identity;
     }
 
     @Override

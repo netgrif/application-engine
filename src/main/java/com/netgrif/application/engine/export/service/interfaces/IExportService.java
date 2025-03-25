@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.export.service.interfaces;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.application.engine.export.domain.ExportDataConfig;
@@ -31,13 +31,13 @@ public interface IExportService {
 
     OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config) throws FileNotFoundException;
 
-    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user) throws FileNotFoundException;
+    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config, Identity user) throws FileNotFoundException;
 
-    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user, int pageSize) throws FileNotFoundException;
+    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config, Identity user, int pageSize) throws FileNotFoundException;
 
-    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user, int pageSize, Locale locale) throws FileNotFoundException;
+    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config, Identity user, int pageSize, Locale locale) throws FileNotFoundException;
 
-    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user, int pageSize, Locale locale, Boolean isIntersection) throws FileNotFoundException;
+    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config, Identity user, int pageSize, Locale locale, Boolean isIntersection) throws FileNotFoundException;
 
     OutputStream fillCsvTaskData(Predicate predicate, File outFile) throws FileNotFoundException;
 
@@ -51,13 +51,13 @@ public interface IExportService {
 
     OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config) throws FileNotFoundException;
 
-    OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user) throws FileNotFoundException;
+    OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config, Identity user) throws FileNotFoundException;
 
-    OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user, int pageSize) throws FileNotFoundException;
+    OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config, Identity user, int pageSize) throws FileNotFoundException;
 
-    OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user, int pageSize, Locale locale) throws FileNotFoundException;
+    OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config, Identity user, int pageSize, Locale locale) throws FileNotFoundException;
 
-    OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user, int pageSize, Locale locale, Boolean isIntersection) throws FileNotFoundException;
+    OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config, Identity user, int pageSize, Locale locale, Boolean isIntersection) throws FileNotFoundException;
 
     OutputStream buildTaskCsv(List<Task> exportTasks, ExportDataConfig config, File outFile) throws FileNotFoundException;
 

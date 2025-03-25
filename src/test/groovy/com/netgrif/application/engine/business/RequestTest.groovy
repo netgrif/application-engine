@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectWriter
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.Authority
-import com.netgrif.application.engine.authentication.domain.User
-import com.netgrif.application.engine.authentication.domain.UserState
+
+import com.netgrif.application.engine.authentication.domain.IdentityState
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
@@ -311,11 +311,11 @@ class RequestTest {
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         def processRoles = roleService.findAllProcessRolesByImportIds(["first", "second", "system", "user", "registration"] as Set)
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password", state: IdentityState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
                 processRoles as ProcessRole[])
         List<ProcessRole> roles = roleService.findAllProcessRoles()
-        roleService.assignRolesToUser(userService.findByEmail(USER_EMAIL).stringId, roles.findAll { it.importId in ["1", "2"] }.collect { it.stringId } as Set)
+        roleService.assignRolesToActor(userService.findByEmail(USER_EMAIL).stringId, roles.findAll { it.importId in ["1", "2"] }.collect { it.stringId } as Set)
 
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
         auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));

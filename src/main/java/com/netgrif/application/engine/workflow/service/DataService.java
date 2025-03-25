@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
+import com.netgrif.application.engine.authorization.domain.Actor;
+import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
 import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
 import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
@@ -88,6 +88,9 @@ public class DataService implements IDataService {
     @Autowired
     protected IValidationService validationService;
 
+    @Autowired
+    protected IActorService actorService;
+
     @Value("${nae.image.preview.scaling.px:400}")
     protected int imageScale;
 
@@ -95,25 +98,25 @@ public class DataService implements IDataService {
     protected boolean validationEnable;
 
     @Override
-    public GetDataEventOutcome getData(String taskId, IUser user) {
-        return getData(taskId, user, new HashMap<>());
+    public GetDataEventOutcome getData(String taskId, String actorId) {
+        return getData(taskId, actorId, new HashMap<>());
     }
 
     @Override
-    public GetDataEventOutcome getData(String taskId, IUser user, Map<String, String> params) {
+    public GetDataEventOutcome getData(String taskId, String actorId, Map<String, String> params) {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
 
-        return getData(task, useCase, user, params);
+        return getData(task, useCase, actorId, params);
     }
 
     @Override
-    public GetDataEventOutcome getData(Task task, Case useCase, IUser user) {
-        return getData(task, useCase, user, new HashMap<>());
+    public GetDataEventOutcome getData(Task task, Case useCase, String actorId) {
+        return getData(task, useCase, actorId, new HashMap<>());
     }
 
     @Override
-    public GetDataEventOutcome getData(Task task, Case useCase, IUser user, Map<String, String> params) {
+    public GetDataEventOutcome getData(Task task, Case useCase, String actorId, Map<String, String> params) {
         log.info("[{}]: Getting data of task {} [{}]", useCase.getStringId(), task.getTransitionId(), task.getStringId());
         Transition transition = useCase.getProcess().getTransition(task.getTransitionId());
         Map<String, DataRef> dataRefs = transition.getDataSet();
@@ -128,7 +131,7 @@ public class DataService implements IDataService {
                 return;
             }
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, null, params));
-            historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE, user));
+            historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE, actorId));
 
             if (outcome.getMessage() == null) {
                 setOutcomeMessage(task, useCase, outcome, fieldId, field, DataEventType.GET);
@@ -139,7 +142,7 @@ public class DataService implements IDataService {
             dataSetFields.add(dataRef);
             // TODO: release/8.0.0 params into outcome?
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task, null, params));
-            historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST, user));
+            historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST, actorId));
         });
 
         workflowService.save(useCase);
@@ -148,45 +151,34 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public SetDataEventOutcome setData(String taskId, DataSet dataSet, IUser user) {
-        return setData(taskId, dataSet, user, new HashMap<>());
+    public SetDataEventOutcome setData(String taskId, DataSet dataSet, String actorId) {
+        return setData(taskId, dataSet, actorId, new HashMap<>());
     }
 
     @Override
-    public SetDataEventOutcome setData(String taskId, DataSet dataSet, IUser user, Map<String, String> params) {
+    public SetDataEventOutcome setData(String taskId, DataSet dataSet, String actorId, Map<String, String> params) {
         Task task = taskService.findOne(taskId);
-        return setData(task, dataSet, user, params);
+        return setData(task, dataSet, actorId, params);
     }
 
     @Override
-    public SetDataEventOutcome setData(String taskId, DataSet values, LoggedUser loggedUser) {
-        return setData(taskId, values, loggedUser, new HashMap<>());
+    public SetDataEventOutcome setData(Case target, DataSet dataSet, String actorId) {
+        return setData(target, dataSet, actorId, new HashMap<>());
     }
 
     @Override
-    public SetDataEventOutcome setData(String taskId, DataSet dataSet, LoggedUser loggedUser, Map<String, String> params) {
-        IUser user = userService.getUserFromLoggedUser(loggedUser);
-        return setData(taskId, dataSet, user, params);
-    }
-
-    @Override
-    public SetDataEventOutcome setData(Case target, DataSet dataSet, IUser user) {
-        return setData(target, dataSet, user, new HashMap<>());
-    }
-
-    @Override
-    public SetDataEventOutcome setData(Case target, DataSet dataSet, IUser user, Map<String, String> params) {
+    public SetDataEventOutcome setData(Case target, DataSet dataSet, String actorId, Map<String, String> params) {
         Task fake = Task.with().id(new ObjectId()).caseId(target.getStringId()).title(new I18nString("Fake")).transitionId("fake").build();
-        return setData(fake, dataSet, user, params);
+        return setData(fake, dataSet, actorId, params);
     }
 
     @Override
-    public SetDataEventOutcome setData(Task task, DataSet dataSet, IUser user) {
-        return setData(task, dataSet, user, new HashMap<>());
+    public SetDataEventOutcome setData(Task task, DataSet dataSet, String actorId) {
+        return setData(task, dataSet, actorId, new HashMap<>());
     }
 
     @Override
-    public SetDataEventOutcome setData(Task task, DataSet dataSet, IUser user, Map<String, String> params) {
+    public SetDataEventOutcome setData(Task task, DataSet dataSet, String actorId, Map<String, String> params) {
         log.info("[{}]: Setting data of task {} [{}]", task.getStringId(), task.getTransitionId(), task.getStringId());
         // TODO: release/8.0.0 check?
 //        if (task.getAssigneeId() != null) {
@@ -196,20 +188,20 @@ public class DataService implements IDataService {
         for (Map.Entry<String, Field<?>> stringFieldEntry : dataSet.getFields().entrySet()) {
             String fieldId = stringFieldEntry.getKey();
             Field<?> newDataField = stringFieldEntry.getValue();
-            outcomes.add(setDataField(task, fieldId, newDataField, user));
+            outcomes.add(setDataField(task, fieldId, newDataField, actorId));
         }
         Case useCase = workflowService.findOne(task.getCaseId());
         return new SetDataEventOutcome(useCase, task, outcomes);
     }
 
     @Override
-    public SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField, IUser user) {
-        return setDataField(task, fieldId, newDataField, user, new HashMap<>());
+    public SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField, String actorId) {
+        return setDataField(task, fieldId, newDataField, actorId, new HashMap<>());
     }
 
     // TODO: release/8.0.0 check
     @Override
-    public SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField, IUser user, Map<String, String> params) {
+    public SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField, String actorId, Map<String, String> params) {
         // TODO: NAE-1859 permissions?
         Case useCase = workflowService.findOne(task.getCaseId());
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
@@ -221,7 +213,7 @@ public class DataService implements IDataService {
         // PRE
         outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task, newDataField, params));
         useCase = workflowService.findOne(task.getCaseId());
-        historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE, DataSet.of(fieldId, newDataField), user));
+        historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE, DataSet.of(fieldId, newDataField), actorId));
         // EXECUTION
         if (outcome.getMessage() == null) {
             setOutcomeMessage(task, useCase, outcome, fieldId, field, DataEventType.SET);
@@ -231,11 +223,11 @@ public class DataService implements IDataService {
 
         useCase = workflowService.save(useCase);
         outcome.addChangedField(fieldId, newDataField);
-        historyService.save(new SetDataEventLog(task, useCase, EventPhase.EXECUTION, DataSet.of(fieldId, newDataField), user));
+        historyService.save(new SetDataEventLog(task, useCase, EventPhase.EXECUTION, DataSet.of(fieldId, newDataField), actorId));
         // POST
         outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, newDataField, params));
         useCase = workflowService.findOne(task.getCaseId());
-        historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, DataSet.of(fieldId, newDataField), user));
+        historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, DataSet.of(fieldId, newDataField), actorId));
         outcome.setCase(useCase);
 
         return outcome;
@@ -253,25 +245,19 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public GetLayoutsEventOutcome getLayouts(String taskId, Locale locale, LoggedUser loggedUser) {
-        IUser user = userService.getUserFromLoggedUser(loggedUser);
-        return getLayouts(taskId, locale, user);
-    }
-
-    @Override
-    public GetLayoutsEventOutcome getLayouts(String taskId, Locale locale, IUser user) {
+    public GetLayoutsEventOutcome getLayouts(String taskId, Locale locale, String actorId) {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
 
         GetLayoutsEventOutcome outcome = new GetLayoutsEventOutcome(useCase, task);
         outcome.setLayout(
-                this.processLayoutContainer(useCase.getProcess().getTransition(task.getTransitionId()).getLayoutContainer().clone(), task, useCase, user,
+                this.processLayoutContainer(useCase.getProcess().getTransition(task.getTransitionId()).getLayoutContainer().clone(), task, useCase, actorId,
                         outcome, locale, false, new LinkedHashSet<>())
         );
         return outcome;
     }
 
-    private LayoutContainer processLayoutContainer(LayoutContainer container, Task task, Case useCase, IUser user,
+    private LayoutContainer processLayoutContainer(LayoutContainer container, Task task, Case useCase, String actorId,
                                                    GetLayoutsEventOutcome outcome, Locale locale, Boolean forceVisible, Set<String> collectedTaskIds) {
         Map<String, DataRef> dataRefs = useCase.getProcess().getTransition(task.getTransitionId()).getDataSet();
 
@@ -294,7 +280,7 @@ public class DataService implements IDataService {
                     continue;
                 }
                 outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, null, new HashMap<>()));
-                historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE, user));
+                historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE, actorId));
 
                 if (outcome.getMessage() == null) {
                     setOutcomeMessage(task, useCase, outcome, item.getDataRefId(), field, DataEventType.GET);
@@ -304,18 +290,18 @@ public class DataService implements IDataService {
                 item.getDataRef().setBehavior(behavior);
 
                 outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task, null, new HashMap<>()));
-                historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST, user));
+                historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST, actorId));
 
                 if (forceVisible && item.getDataRef().getBehavior().getBehavior() == FieldBehavior.EDITABLE) {
                     item.getDataRef().getBehavior().setBehavior(FieldBehavior.VISIBLE);
                 }
                 if (useCase.getProcess().getDataSet().get(item.getDataRefId()).getType() == DataType.TASK_REF) {
-                    item.setContainer(this.processTaskRefLayoutContainer(item.getDataRef(), user, locale, collectedTaskIds, outcome));
+                    item.setContainer(this.processTaskRefLayoutContainer(item.getDataRef(), actorId, locale, collectedTaskIds, outcome));
                 }
             } else if (item.getContainer() != null) {
                 item.setContainer(
                         this.processLayoutContainer(
-                                item.getContainer(), task, useCase, user,
+                                item.getContainer(), task, useCase, actorId,
                                 outcome, locale, forceVisible, collectedTaskIds
                         )
                 );
@@ -332,7 +318,7 @@ public class DataService implements IDataService {
                 && component.getProperties().get(propertyName).equals(propertyValue);
     }
 
-    private LayoutContainer processTaskRefLayoutContainer(DataRef taskRefField, IUser user, Locale locale, Set<String> collectedTaskIds, GetLayoutsEventOutcome outcome) {
+    private LayoutContainer processTaskRefLayoutContainer(DataRef taskRefField, String actorId, Locale locale, Set<String> collectedTaskIds, GetLayoutsEventOutcome outcome) {
         List<String> taskIds = ((TaskField) taskRefField.getField()).getRawValue();
         if (taskIds == null) {
             return null;
@@ -347,7 +333,7 @@ public class DataService implements IDataService {
                     Task task = taskService.findOne(taskId);
                     Case useCase = workflowService.findOne(task.getCaseId());
                     LayoutContainer container = this.processLayoutContainer(
-                            useCase.getProcess().getTransition(task.getTransitionId()).getLayoutContainer().clone(), task, useCase, user,
+                            useCase.getProcess().getTransition(task.getTransitionId()).getLayoutContainer().clone(), task, useCase, actorId,
                             outcome, locale, taskRefField.getBehavior().getBehavior() == FieldBehavior.VISIBLE, collectedTaskIds
                     );
                     wrapperItem.setContainer(container);
@@ -756,9 +742,10 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public UserFieldValue makeUserFieldValue(String id) {
-        IUser user = userService.resolveById(id);
-        return new UserFieldValue(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
+    public ActorFieldValue makeActorFieldValue(String actorId) {
+        Optional<Actor> actorOpt = actorService.findById(actorId);
+        return actorOpt.map(actor -> new ActorFieldValue(actor.getStringId(), actor.getFirstname(),
+                actor.getLastname(), actor.getEmail())).orElseGet(ActorFieldValue::new);
     }
 
     // TODO: release/8.0.0 change component properties, parse object node

@@ -2,16 +2,15 @@ package com.netgrif.application.engine.authentication
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.Authority
-import com.netgrif.application.engine.authentication.domain.IUser
-import com.netgrif.application.engine.authentication.domain.User
-import com.netgrif.application.engine.authentication.domain.UserState
+
+import com.netgrif.application.engine.authentication.domain.IdentityState
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorListField
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorListFieldValue
 import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -119,7 +118,7 @@ class TaskAuthorizationServiceTest {
         this.netWithUserRefs = netWithUserRefs.getNet()
 
         def auths = importHelper.createAuthorities(["user": Authority.user])
-        testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+        testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: IdentityState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[]
         )
@@ -293,8 +292,8 @@ class TaskAuthorizationServiceTest {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test assign", "", testUser.transformToLoggedUser()).getCase()
         String taskId = case_.getTaskStringId("t1")
         case_ = dataService.setData(taskId, new DataSet([
-                "assign_pos_ul":new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+                "assign_pos_ul":new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(testUser.stringId)]))
+        ] as Map<String, Field<?>>), superCreator.getSuperIdentity()).getCase()
         workflowService.save(case_)
         sleep(4000)
 
@@ -307,8 +306,8 @@ class TaskAuthorizationServiceTest {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test assign", "", testUser.transformToLoggedUser()).getCase()
         String taskId = case_.getTaskStringId("t1")
         case_ = dataService.setData(taskId, new DataSet([
-                "assign_neg_ul": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+                "assign_neg_ul": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(testUser.stringId)]))
+        ] as Map<String, Field<?>>), superCreator.getSuperIdentity()).getCase()
         sleep(4000)
 
         assert !taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), taskId)
@@ -323,7 +322,7 @@ class TaskAuthorizationServiceTest {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test assign", "", testUser.transformToLoggedUser()).getCase()
         String taskId = case_.getTaskStringId("t1")
         case_ = dataService.setData(taskId, new DataSet([
-                "assign_pos_ul": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
+                "assign_pos_ul": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(testUser.stringId)]))
         ] as Map<String, Field<?>>), superCreator.getLoggedSuper()).getCase()
         sleep(4000)
 
@@ -363,8 +362,8 @@ class TaskAuthorizationServiceTest {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", testUser.transformToLoggedUser()).getCase()
         String taskId = case_.getTaskStringId("t1")
         case_ = dataService.setData(taskId, new DataSet([
-                "finish_pos_ul": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+                "finish_pos_ul": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(testUser.stringId)]))
+        ] as Map<String, Field<?>>), superCreator.getSuperIdentity()).getCase()
         sleep(4000)
 
         taskService.assignTask(testUser.transformToLoggedUser(), taskId)
@@ -377,8 +376,8 @@ class TaskAuthorizationServiceTest {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", testUser.transformToLoggedUser()).getCase()
         String taskId = case_.getTaskStringId("t1")
         case_ = dataService.setData(taskId, new DataSet([
-                "finish_neg_ul": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+                "finish_neg_ul": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(testUser.stringId)]))
+        ] as Map<String, Field<?>>), superCreator.getSuperIdentity()).getCase()
         sleep(4000)
 
         taskService.assignTask(testUser.transformToLoggedUser(), taskId)
@@ -393,8 +392,8 @@ class TaskAuthorizationServiceTest {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", testUser.transformToLoggedUser()).getCase()
         String taskId = case_.getTaskStringId("t1")
         case_ = dataService.setData(taskId, new DataSet([
-                "finish_pos_ul": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+                "finish_pos_ul": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(testUser.stringId)]))
+        ] as Map<String, Field<?>>), superCreator.getSuperIdentity()).getCase()
         sleep(4000)
 
         taskService.assignTask(testUser.transformToLoggedUser(), taskId)

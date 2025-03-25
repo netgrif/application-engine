@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.configuration.security;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,10 +29,10 @@ public class ImpersonationRequestFilter extends OncePerRequestFilter {
     @Override
     public void doFilterInternal(HttpServletRequest servletRequest, HttpServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         try {
-            LoggedUser loggedUser = getPrincipal();
-            if (loggedUser != null) {
-                handleImpersonated(loggedUser, servletRequest);
-                handleImpersonator(loggedUser, servletRequest, servletResponse);
+            Identity identity = getPrincipal();
+            if (identity != null) {
+                handleImpersonated(identity, servletRequest);
+                handleImpersonator(identity, servletRequest, servletResponse);
             }
         } catch (Exception e) {
             log.error("Filter error", e);
@@ -41,14 +41,14 @@ public class ImpersonationRequestFilter extends OncePerRequestFilter {
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
-    protected void handleImpersonator(LoggedUser loggedUser, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+    protected void handleImpersonator(Identity identity, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         try {
-            if (!loggedUser.isImpersonating()) {
+            if (!identity.isImpersonating()) {
                 return;
             }
-            Optional<Impersonator> imp = impersonationService.findImpersonator(loggedUser.getId());
-            if (loggedUser.isImpersonating() && (imp.isEmpty() || !isValid(imp.get()))) {
-                imp.ifPresent(imper -> impersonationService.removeImpersonator(loggedUser.getId()));
+            Optional<Impersonator> imp = impersonationService.findImpersonator(identity.getId());
+            if (identity.isImpersonating() && (imp.isEmpty() || !isValid(imp.get()))) {
+                imp.ifPresent(imper -> impersonationService.removeImpersonator(identity.getId()));
                 logout(servletRequest, servletResponse);
             }
         } catch (Exception e) {
@@ -56,12 +56,12 @@ public class ImpersonationRequestFilter extends OncePerRequestFilter {
         }
     }
 
-    protected void handleImpersonated(LoggedUser loggedUser, HttpServletRequest servletRequest) {
+    protected void handleImpersonated(Identity identity, HttpServletRequest servletRequest) {
         try {
-            log.debug("Filtering request {}, {}", servletRequest.getRequestURI(), loggedUser.getUsername());
-            impersonationService.removeImpersonatorByImpersonated(loggedUser.getId());
+            log.debug("Filtering request {}, {}", servletRequest.getRequestURI(), identity.getUsername());
+            impersonationService.removeImpersonatorByImpersonated(identity.getId());
         } catch (Exception e) {
-            log.error("Failed to resolve impersonators for {}, {}", loggedUser.getUsername(), e.getMessage(), e);
+            log.error("Failed to resolve impersonators for {}, {}", identity.getUsername(), e.getMessage(), e);
         }
     }
 
@@ -72,19 +72,19 @@ public class ImpersonationRequestFilter extends OncePerRequestFilter {
         return !LocalDateTime.now().isAfter(impersonator.getImpersonatingUntil());
     }
 
-    protected LoggedUser getPrincipal() {
+    protected Identity getPrincipal() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) {
             return null;
         }
 
         Object principal = auth.getPrincipal();
-        if (!(principal instanceof LoggedUser)) {
+        if (!(principal instanceof Identity)) {
             log.warn("{} is not an instance of LoggedUser", principal);
             return null;
         }
 
-        return (LoggedUser) auth.getPrincipal();
+        return (Identity) auth.getPrincipal();
     }
 
     protected void logout(HttpServletRequest request, HttpServletResponse response) {

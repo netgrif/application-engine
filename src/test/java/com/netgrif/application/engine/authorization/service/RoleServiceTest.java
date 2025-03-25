@@ -2,7 +2,6 @@ package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Authority;
-import com.netgrif.application.engine.authentication.domain.User;
 import com.netgrif.application.engine.authorization.domain.CaseRole;
 import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.domain.Role;
@@ -15,8 +14,8 @@ import com.netgrif.application.engine.history.domain.baseevent.repository.EventL
 import com.netgrif.application.engine.history.domain.userevents.UserAssignRoleEventLog;
 import com.netgrif.application.engine.history.domain.userevents.UserRemoveRoleEventLog;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserField;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListField;
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorField;
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorListField;
 import com.netgrif.application.engine.startup.AnonymousRoleRunner;
 import com.netgrif.application.engine.startup.DefaultRoleRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
@@ -233,9 +232,9 @@ public class RoleServiceTest {
 
     @Test
     public void testResolveCaseRolesOnCase() {
-        UserListField userlistField = new UserListField();
+        ActorListField userlistField = new ActorListField();
         userlistField.setImportId("user_list_id");
-        UserField userField = new UserField();
+        ActorField userField = new ActorField();
         userField.setImportId("user_id");
 
         Case useCase = new Case();
@@ -277,9 +276,9 @@ public class RoleServiceTest {
 
     @Test
     public void testResolveCaseRolesOnTask() {
-        UserListField userlistField = new UserListField();
+        ActorListField userlistField = new ActorListField();
         userlistField.setImportId("user_list_id");
-        UserField userField = new UserField();
+        ActorField userField = new ActorField();
         userField.setImportId("user_id");
 
         Task task = Task.with().transitionId("transition_id").build();
@@ -326,7 +325,7 @@ public class RoleServiceTest {
         repository.saveAll(List.of(processRole, caseRole));
 
         eventLogRepository.deleteAll();
-        List<Role> assignedRoles = roleService.assignRolesToUser(user.getStringId(),
+        List<Role> assignedRoles = roleService.assignRolesToActor(user.getStringId(),
                 Set.of(processRole.getStringId(), caseRole.getStringId()));
 
         assert assignedRoles.size() == 2;
@@ -339,7 +338,7 @@ public class RoleServiceTest {
 
         Role processRole2 = new ProcessRole("import_id3");
         repository.save(processRole2);
-        assignedRoles = roleService.assignRolesToUser(user.getStringId(),
+        assignedRoles = roleService.assignRolesToActor(user.getStringId(),
                 Set.of(processRole.getStringId(), processRole2.getStringId()));
 
         assert assignedRoles.size() == 1;
@@ -354,10 +353,10 @@ public class RoleServiceTest {
 
         Role processRole3 = new ProcessRole("import_id4");
         repository.save(processRole3);
-        assertThrows(IllegalArgumentException.class, () -> roleService.assignRolesToUser(user.getStringId(),
+        assertThrows(IllegalArgumentException.class, () -> roleService.assignRolesToActor(user.getStringId(),
                 Set.of("nonExistingId", processRole3.getStringId())));
 
-        assertThrows(IllegalArgumentException.class, () -> roleService.assignRolesToUser("nonExistingId",
+        assertThrows(IllegalArgumentException.class, () -> roleService.assignRolesToActor("nonExistingId",
                 Set.of(processRole3.getStringId())));
     }
 
@@ -369,10 +368,10 @@ public class RoleServiceTest {
         Role processRole2 = new ProcessRole("import_id2");
         Role caseRole = new CaseRole("import_id3", "case_id");
         repository.saveAll(List.of(processRole, processRole2, caseRole));
-        roleService.assignRolesToUser(user.getStringId(), Set.of(processRole.getStringId(), caseRole.getStringId()));
+        roleService.assignRolesToActor(user.getStringId(), Set.of(processRole.getStringId(), caseRole.getStringId()));
 
         eventLogRepository.deleteAll();
-        List<Role> removedRoles = roleService.removeRolesFromUser(user.getStringId(),
+        List<Role> removedRoles = roleService.removeRolesFromActor(user.getStringId(),
                 Set.of(processRole.getStringId(), processRole2.getStringId()));
         assert removedRoles.size() == 1;
         assert removedRoles.get(0).getStringId().equals(processRole.getStringId());
@@ -381,10 +380,10 @@ public class RoleServiceTest {
         UserRemoveRoleEventLog eventLogAfterFirstRemoval = (UserRemoveRoleEventLog) eventLogs.get(0);
         assert eventLogAfterFirstRemoval.getRoles().size() == 1;
 
-        assertThrows(IllegalArgumentException.class, () -> roleService.removeRolesFromUser(user.getStringId(),
+        assertThrows(IllegalArgumentException.class, () -> roleService.removeRolesFromActor(user.getStringId(),
                 Set.of("nonExistingId")));
 
-        assertThrows(IllegalArgumentException.class, () -> roleService.assignRolesToUser("nonExistingId",
+        assertThrows(IllegalArgumentException.class, () -> roleService.assignRolesToActor("nonExistingId",
                 Set.of(caseRole.getStringId())));
     }
 }

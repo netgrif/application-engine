@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.manager.responseclass;
 
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.manager.web.body.response.AllLoggedUsersResponse;
 import com.netgrif.application.engine.manager.web.body.response.MessageLogoutResponse;
 import com.netgrif.application.engine.startup.SuperCreator;
@@ -34,7 +34,7 @@ class ResponseTest {
 
     @Test
     void allLoggedUsersResponseTest() {
-        Collection<LoggedUser> content = new ArrayList<>();
+        Collection<Identity> content = new ArrayList<>();
         content.add(superCreator.getLoggedSuper());
         AllLoggedUsersResponse response = new AllLoggedUsersResponse(content);
         assert response != null;

@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.authentication.service;
 
-import com.netgrif.application.engine.authentication.domain.User;
-import com.netgrif.application.engine.authentication.domain.UserState;
+import com.netgrif.application.engine.authentication.domain.IdentityState;
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository;
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService;
 import org.junit.jupiter.api.AfterEach;
@@ -42,15 +41,15 @@ public class TokenServiceTest {
         User expired = new User("test@test.com", null, User.UNKNOWN, User.UNKNOWN);
         expired.setToken("token");
         expired.setExpirationDate(LocalDateTime.now().minusDays(10));
-        expired.setState(UserState.INVITED);
+        expired.setState(IdentityState.INVITED);
         repository.save(expired);
 
         User expired2 = new User("test2@test.com", null, User.UNKNOWN, User.UNKNOWN);
         expired2.setToken("token2");
-        expired2.setState(UserState.INVITED);
+        expired2.setState(IdentityState.INVITED);
         repository.save(expired2);
 
-        service.removeExpiredUsers();
+        service.removeExpiredIdentities();
 
         assert repository.findAll().size() == 1;
     }
@@ -60,7 +59,7 @@ public class TokenServiceTest {
         User expired = new User("test3@test.com", null, User.UNKNOWN, User.UNKNOWN);
         expired.setToken("token3");
         expired.setExpirationDate(LocalDateTime.now().plusMinutes(10));
-        expired.setState(UserState.INVITED);
+        expired.setState(IdentityState.INVITED);
         repository.save(expired);
 
         boolean authorized = service.verifyToken(service.encodeToken("test3@test.com", "token3"));

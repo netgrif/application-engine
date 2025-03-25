@@ -1,16 +1,25 @@
 package com.netgrif.application.engine.elastic.service;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authorization.domain.RoleAssignment;
+import com.netgrif.application.engine.authorization.service.RoleAssignmentService;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+import java.util.Set;
+
+import static java.util.stream.Collectors.toUnmodifiableSet;
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
 public abstract class ElasticViewPermissionService {
 
+    @Autowired
+    protected RoleAssignmentService roleAssignmentService;
+
     /**
      * todo javadoc
      * */
-    protected void buildViewPermissionQuery(BoolQueryBuilder query, LoggedUser user) {
+    protected void buildViewPermissionQuery(BoolQueryBuilder query, String actorId) {
         // Check if processRoles or caseRoles exist
         BoolQueryBuilder viewPermsExists = boolQuery()
                 .should(existsQuery("viewProcessRoles"))
@@ -19,12 +28,15 @@ public abstract class ElasticViewPermissionService {
         BoolQueryBuilder viewPermNotExists = boolQuery()
                 .mustNot(viewPermsExists);
 
-        // Build queries for each role type
-        BoolQueryBuilder positiveProcessRole = buildPositiveProcessRoleQuery(viewPermNotExists, user);
-        BoolQueryBuilder negativeProcessRole = buildNegativeProcessRoleQuery(user);
-        BoolQueryBuilder positiveCaseRole = buildPositiveCaseRoleQuery(viewPermNotExists, user);
-        BoolQueryBuilder negativeCaseRole = buildNegativeCaseRoleQuery(user);
+        // Collect assigned roles to user
+        List<RoleAssignment> assignments = roleAssignmentService.findAllByActorId(actorId);
+        final Set<String> assignedRoleIds = assignments.stream().map(RoleAssignment::getRoleId).collect(toUnmodifiableSet());
 
+        // Build queries for each role type
+        BoolQueryBuilder positiveProcessRole = buildPositiveProcessRoleQuery(viewPermNotExists, assignedRoleIds);
+        BoolQueryBuilder negativeProcessRole = buildNegativeProcessRoleQuery(assignedRoleIds);
+        BoolQueryBuilder positiveCaseRole = buildPositiveCaseRoleQuery(viewPermNotExists, assignedRoleIds);
+        BoolQueryBuilder negativeCaseRole = buildNegativeCaseRoleQuery(assignedRoleIds);
         // Calculate final query
         BoolQueryBuilder permissionQuery = collectQueriesByFormula(positiveProcessRole, negativeProcessRole,
                 positiveCaseRole, negativeCaseRole);
@@ -36,10 +48,10 @@ public abstract class ElasticViewPermissionService {
      * Build a positive view role query using termsQuery for efficiency.
      * This reduces the number of clauses by sending all roles at once.
      */
-    private BoolQueryBuilder buildPositiveProcessRoleQuery(BoolQueryBuilder viewPermNotExists, LoggedUser user) {
+    private BoolQueryBuilder buildPositiveProcessRoleQuery(BoolQueryBuilder viewPermNotExists, Set<String> roleIds) {
         BoolQueryBuilder positiveProcessRole = boolQuery();
-        if (!user.getRoles().isEmpty()) {
-            positiveProcessRole.should(termsQuery("positiveViewProcessRoles", user.getRoles()));
+        if (!roleIds.isEmpty()) {
+            positiveProcessRole.should(termsQuery("positiveViewProcessRoles", roleIds));
         }
         positiveProcessRole.should(viewPermNotExists);
         return positiveProcessRole;
@@ -49,10 +61,10 @@ public abstract class ElasticViewPermissionService {
      * todo javadoc
      * Build a negative view role query by excluding negative roles.
      */
-    private BoolQueryBuilder buildNegativeProcessRoleQuery(LoggedUser user) {
+    private BoolQueryBuilder buildNegativeProcessRoleQuery(Set<String> roleIds) {
         BoolQueryBuilder negativeProcessRole = boolQuery();
-        if (!user.getRoles().isEmpty()) {
-            negativeProcessRole.mustNot(termsQuery("negativeViewProcessRoles", user.getRoles()));
+        if (!roleIds.isEmpty()) {
+            negativeProcessRole.mustNot(termsQuery("negativeViewProcessRoles", roleIds));
         }
         return negativeProcessRole;
     }
@@ -61,10 +73,10 @@ public abstract class ElasticViewPermissionService {
      * todo javadoc
      * Build a positive view user query using filter (as score is not needed).
      */
-    private BoolQueryBuilder buildPositiveCaseRoleQuery(BoolQueryBuilder viewPermNotExists, LoggedUser user) {
+    private BoolQueryBuilder buildPositiveCaseRoleQuery(BoolQueryBuilder viewPermNotExists, Set<String> roleIds) {
         BoolQueryBuilder positiveCaseRole = boolQuery();
-        if (!user.getRoles().isEmpty()) {
-            positiveCaseRole.should(termsQuery("positiveViewCaseRoles", user.getRoles()));
+        if (!roleIds.isEmpty()) {
+            positiveCaseRole.should(termsQuery("positiveViewCaseRoles", roleIds));
         }
         positiveCaseRole.should(viewPermNotExists);
         return positiveCaseRole;
@@ -73,10 +85,10 @@ public abstract class ElasticViewPermissionService {
     /**
      * todo javadoc
      * */
-    private BoolQueryBuilder buildNegativeCaseRoleQuery(LoggedUser user) {
+    private BoolQueryBuilder buildNegativeCaseRoleQuery(Set<String> roleIds) {
         BoolQueryBuilder negativeCaseRole = boolQuery();
-        if (!user.getRoles().isEmpty()) {
-            negativeCaseRole.mustNot(termsQuery("negativeViewCaseRoles", user.getRoles()));
+        if (!roleIds.isEmpty()) {
+            negativeCaseRole.mustNot(termsQuery("negativeViewCaseRoles", roleIds));
         }
         return negativeCaseRole;
     }

@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.history.domain.taskevents;
 
-import com.netgrif.application.engine.authentication.domain.IUser;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -15,7 +14,8 @@ public class CancelTaskEventLog extends TaskEventLog {
         super();
     }
 
-    public CancelTaskEventLog(Task task, Case useCase, EventPhase eventPhase, IUser user) {
-        super(task, useCase, eventPhase, user.getStringId(), user.isImpersonating() ? user.getImpersonated().getStringId() : null);
+    public CancelTaskEventLog(Task task, Case useCase, EventPhase eventPhase, String actorId) {
+        // todo 2058 impersonating
+        super(task, useCase, eventPhase, actorId, null);
     }
 }

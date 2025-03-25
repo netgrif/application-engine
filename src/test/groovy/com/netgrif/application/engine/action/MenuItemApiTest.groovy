@@ -302,7 +302,7 @@ class MenuItemApiTest extends EngineTest {
     }
 
     def setData(Case caze, DataSet dataSet) {
-        dataService.setData(caze.tasks["t1"].taskStringId, dataSet, superCreator.superUser)
+        dataService.setData(caze.tasks["t1"].taskStringId, dataSet, superCreator.superIdentity)
         return workflowService.findOne(caze.stringId)
     }
 }

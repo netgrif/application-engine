@@ -52,7 +52,7 @@ class TaskStateTest {
         assert netOptional.isPresent()
         Process net = netOptional.get()
 
-        Case useCase = workflowService.createCase(net.stringId, "Test Case", "", superCreator.superUser.transformToLoggedUser())?.case
+        Case useCase = workflowService.createCase(net.stringId, "Test Case", "", superCreator.superIdentity.transformToLoggedUser())?.case
         assert useCase
 
         List<Task> tasks = taskService.findAllByCase(useCase.stringId)
@@ -67,7 +67,7 @@ class TaskStateTest {
         assert netOptional.isPresent()
         Process net = netOptional.get()
 
-        Case useCase = workflowService.createCase(net.stringId, "Test Case", "", superCreator.superUser.transformToLoggedUser())?.case
+        Case useCase = workflowService.createCase(net.stringId, "Test Case", "", superCreator.superIdentity.transformToLoggedUser())?.case
         assert useCase
 
         4.times { index ->

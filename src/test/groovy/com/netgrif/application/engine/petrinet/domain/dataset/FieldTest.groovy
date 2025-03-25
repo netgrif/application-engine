@@ -7,7 +7,7 @@ import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.startup.GroupRunner
 import com.netgrif.application.engine.startup.SuperCreator
-import com.netgrif.application.engine.startup.SystemUserRunner
+import com.netgrif.application.engine.startup.SystemIdentityRunner
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -36,7 +36,7 @@ class FieldTest {
     private UserRepository userRepository
 
     @Autowired
-    private SystemUserRunner systemUserRunner
+    private SystemIdentityRunner systemUserRunner
 
     @Autowired
     private GroupRunner groupRunner
@@ -171,7 +171,7 @@ class FieldTest {
     }
 
     private void assertUserField() {
-        UserField field = net.dataSet["user"] as UserField
+        ActorField field = net.dataSet["user"] as ActorField
         assert field.description.defaultValue == "User field description"
         assert field.title.defaultValue == "User"
         assert field.placeholder.defaultValue == "User field placeholder"
@@ -192,7 +192,7 @@ class FieldTest {
     }
 
     private void assertUserList() {
-        UserListField field = net.dataSet["emptyUserList"] as UserListField
+        ActorListField field = net.dataSet["emptyUserList"] as ActorListField
         assert field.title.defaultValue == "Empty user list"
         assert field.description.defaultValue == "User list description"
         assert field.defaultValue == null

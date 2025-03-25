@@ -1,12 +1,12 @@
 package com.netgrif.application.engine.manager.service.interfaces;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 
 import java.util.Collection;
 
 public interface ISessionManagerService {
 
-    Collection<LoggedUser> getAllLoggedUsers();
+    Collection<Identity> getAllLoggedUsers();
 
     void logoutSessionByUsername(String username);
 

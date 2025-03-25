@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.workflow.domain;
 
-import com.netgrif.application.engine.authentication.domain.Author;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import lombok.Data;
 import org.bson.types.ObjectId;

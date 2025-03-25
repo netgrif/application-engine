@@ -2,7 +2,6 @@ package com.netgrif.application.engine;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
-import com.netgrif.application.engine.authentication.domain.User;
 import com.netgrif.application.engine.mail.EmailType;
 import com.netgrif.application.engine.mail.domain.MailDraft;
 import com.netgrif.application.engine.mail.interfaces.IMailService;

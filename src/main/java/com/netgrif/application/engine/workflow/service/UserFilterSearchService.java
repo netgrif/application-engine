@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.startup.FilterRunner;
@@ -17,12 +17,13 @@ import java.util.List;
 
 @Service
 public class UserFilterSearchService implements IUserFilterSearchService {
+    // todo 2058 rename class
 
     @Autowired
     private IElasticCaseService caseSearchService;
 
     @Autowired
-    private IUserService userService;
+    private IIdentityService identityService;
 
     @Override
     public List<Case> autocompleteFindFilters(String userInput) {
@@ -32,12 +33,12 @@ public class UserFilterSearchService implements IUserFilterSearchService {
                                 .query(
                                         String.format("(title:%s*) AND ((dataSet.visibility.keyValue:private AND authorEmail:%s) OR (dataSet.visibility.keyValue:public))",
                                                 userInput,
-                                                userService.getLoggedUser().getEmail())
+                                                identityService.getLoggedIdentity().getUsername())
                                 )
                                 .transition(Collections.singletonList("view_filter"))
                                 .build()
                 ),
-                this.userService.getLoggedOrSystem().transformToLoggedUser(),
+                identityService.getLoggedIdentity(),
                 PageRequest.of(0, 100),
                 LocaleContextHolder.getLocale(),
                 true);

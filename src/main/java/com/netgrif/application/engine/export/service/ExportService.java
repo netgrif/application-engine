@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.export.service;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
@@ -108,25 +108,25 @@ public class ExportService implements IExportService {
 
     @Override
     public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config,
-                                        LoggedUser user) throws FileNotFoundException {
+                                        Identity user) throws FileNotFoundException {
         return fillCsvCaseData(requests, outFile, config, user, exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
     }
 
     @Override
     public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config,
-                                        LoggedUser user, int pageSize) throws FileNotFoundException {
+                                        Identity user, int pageSize) throws FileNotFoundException {
         return fillCsvCaseData(requests, outFile, config, user, pageSize, LocaleContextHolder.getLocale(), false);
     }
 
     @Override
     public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config,
-                                        LoggedUser user, int pageSize, Locale locale) throws FileNotFoundException {
+                                        Identity user, int pageSize, Locale locale) throws FileNotFoundException {
         return fillCsvCaseData(requests, outFile, config, user, pageSize, locale, false);
     }
 
     @Override
     public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config,
-                                        LoggedUser user, int pageSize, Locale locale, Boolean isIntersection) throws FileNotFoundException {
+                                        Identity user, int pageSize, Locale locale, Boolean isIntersection) throws FileNotFoundException {
         int numOfPages = (int) ((elasticCaseService.count(requests, user, locale, isIntersection) / pageSize) + 1);
         List<Case> exportCases = new ArrayList<>();
         for (int i = 0; i < numOfPages; i++) {
@@ -166,25 +166,25 @@ public class ExportService implements IExportService {
 
     @Override
     public OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config,
-                                        LoggedUser user) throws FileNotFoundException {
+                                        Identity user) throws FileNotFoundException {
         return fillCsvTaskData(requests, outFile, config, user, exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
     }
 
     @Override
     public OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config,
-                                        LoggedUser user, int pageSize) throws FileNotFoundException {
+                                        Identity user, int pageSize) throws FileNotFoundException {
         return fillCsvTaskData(requests, outFile, config, user, pageSize, LocaleContextHolder.getLocale(), false);
     }
 
     @Override
     public OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config,
-                                        LoggedUser user, int pageSize, Locale locale) throws FileNotFoundException {
+                                        Identity user, int pageSize, Locale locale) throws FileNotFoundException {
         return fillCsvTaskData(requests, outFile, config, user, pageSize, locale, false);
     }
 
     @Override
     public OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config,
-                                        LoggedUser user, int pageSize, Locale locale, Boolean isIntersection) throws FileNotFoundException {
+                                        Identity user, int pageSize, Locale locale, Boolean isIntersection) throws FileNotFoundException {
         int numberOfTasks = (int) ((elasticTaskService.count(requests, user, locale, isIntersection) / pageSize) + 1);
         List<Task> exportTasks = new ArrayList<>();
 

@@ -3,9 +3,7 @@ package com.netgrif.application.engine.workflow.web;
 import com.netgrif.application.engine.MockService;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Authority;
-import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.User;
-import com.netgrif.application.engine.authentication.domain.UserState;
+import com.netgrif.application.engine.authentication.domain.IdentityState;
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
@@ -19,7 +17,7 @@ import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExe
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.SuperCreator;
-import com.netgrif.application.engine.startup.SystemUserRunner;
+import com.netgrif.application.engine.startup.SystemIdentityRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -78,7 +76,7 @@ public class VariableArcsTest {
     private IAuthorityService authorityService;
 
     @Autowired
-    private SystemUserRunner userRunner;
+    private SystemIdentityRunner userRunner;
 
     @Autowired
     private SuperCreator superCreator;
@@ -110,7 +108,7 @@ public class VariableArcsTest {
         user.setName("Test");
         user.setSurname("Test");
         user.setPassword("password");
-        user.setState(UserState.ACTIVE);
+        user.setState(IdentityState.ACTIVE);
         user.setEmail("VariableArcsTest@test.com");
         testUser = importHelper.createUser(user,
                 new Authority[]{authorityService.getOrCreate(Authority.user)},

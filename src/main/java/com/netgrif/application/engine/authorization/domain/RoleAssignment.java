@@ -12,7 +12,7 @@ public abstract class RoleAssignment {
     @Id
     protected ObjectId id;
     @Indexed
-    protected String userId;
+    protected String actorId;
     @Indexed
     protected String roleId;
     protected String roleImportId;

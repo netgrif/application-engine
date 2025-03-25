@@ -2,9 +2,8 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Authority;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
-import com.netgrif.application.engine.authentication.domain.User;
-import com.netgrif.application.engine.authentication.domain.UserState;
+import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.IdentityState;
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository;
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration;
@@ -16,7 +15,7 @@ import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetM
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.SuperCreator;
-import com.netgrif.application.engine.startup.SystemUserRunner;
+import com.netgrif.application.engine.startup.SystemIdentityRunner;
 import com.netgrif.application.engine.startup.UriRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -69,7 +68,7 @@ public class TaskServiceTest {
     private IAuthorityService authorityService;
 
     @Autowired
-    private SystemUserRunner userRunner;
+    private SystemIdentityRunner userRunner;
 
     @Autowired
     private UriRunner uriRunner;
@@ -97,14 +96,14 @@ public class TaskServiceTest {
     @Test
     public void resetArcTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
         Process net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet();
-        LoggedUser loggedUser = mockLoggedUser();
-        CreateCaseEventOutcome outcome = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);
+        Identity identity = mockLoggedUser();
+        CreateCaseEventOutcome outcome = workflowService.createCase(net.getStringId(), "Reset test", "color", identity);
         User user = new User();
         user.setName("name");
         user.setPassword("password");
         user.setSurname("surname");
         user.setEmail("email@email.com");
-        user.setState(UserState.ACTIVE);
+        user.setState(IdentityState.ACTIVE);
         user = userRepository.save(user);
 
         assert outcome.getCase().getConsumedTokens().size() == 0;
@@ -130,8 +129,8 @@ public class TaskServiceTest {
         assert useCase.getActivePlaces().values().contains(5);
     }
 
-    public LoggedUser mockLoggedUser() {
+    public Identity mockLoggedUser() {
         Authority authorityUser = authorityService.getOrCreate(Authority.user);
-        return new LoggedUser(new ObjectId().toString(), configuration.getEmail(), configuration.getPassword(), Collections.singleton(authorityUser));
+        return new Identity(new ObjectId().toString(), configuration.getEmail(), configuration.getPassword(), Collections.singleton(authorityUser));
     }
 }

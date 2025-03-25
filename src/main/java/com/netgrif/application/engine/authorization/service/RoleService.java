@@ -1,11 +1,6 @@
 package com.netgrif.application.engine.authorization.service;
 
-import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
-import com.netgrif.application.engine.authorization.domain.CaseRole;
-import com.netgrif.application.engine.authorization.domain.ProcessRole;
-import com.netgrif.application.engine.authorization.domain.Role;
-import com.netgrif.application.engine.authorization.domain.RoleAssignment;
+import com.netgrif.application.engine.authorization.domain.*;
 import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
 import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
 import com.netgrif.application.engine.authorization.domain.permissions.TaskPermission;
@@ -13,10 +8,11 @@ import com.netgrif.application.engine.authorization.domain.repositories.CaseRole
 import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository;
 import com.netgrif.application.engine.authorization.domain.repositories.RoleRepository;
 import com.netgrif.application.engine.authorization.domain.throwable.NotAllRolesAssignedException;
+import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
-import com.netgrif.application.engine.event.events.user.UserAssignRoleEvent;
-import com.netgrif.application.engine.event.events.user.UserRemoveRoleEvent;
+import com.netgrif.application.engine.event.events.user.ActorAssignRoleEvent;
+import com.netgrif.application.engine.event.events.user.ActorRemoveRoleEvent;
 import com.netgrif.application.engine.importer.model.EventPhaseType;
 import com.netgrif.application.engine.importer.model.RoleEventType;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
@@ -46,7 +42,7 @@ public class RoleService implements IRoleService {
     private final ProcessRoleRepository processRoleRepository;
     private final CaseRoleRepository caseRoleRepository;
     private final IRoleAssignmentService roleAssignmentService;
-    private final IUserService userService;
+    private final IActorService actorService;
     private final ActionRunner actionRunner;
     private final ApplicationEventPublisher eventPublisher;
     private IWorkflowService workflowService;
@@ -73,6 +69,9 @@ public class RoleService implements IRoleService {
      * */
     @Override
     public List<Role> findAllById(Set<String> roleIds) {
+        if (roleIds == null || roleIds.isEmpty()) {
+            return new ArrayList<>();
+        }
         return (List<Role>) repository.findAllById(roleIds);
     }
 
@@ -111,6 +110,9 @@ public class RoleService implements IRoleService {
      * */
     @Override
     public List<ProcessRole> findAllProcessRolesByImportIds(Set<String> roleImportIds) {
+        if (roleImportIds == null || roleImportIds.isEmpty()) {
+            return new ArrayList<>();
+        }
         return processRoleRepository.findAllByImportIdIn(roleImportIds);
     }
 
@@ -151,6 +153,9 @@ public class RoleService implements IRoleService {
      * */
     @Override
     public Role save(Role role) {
+        if (role == null) {
+            return null;
+        }
         return repository.save(role);
     }
 
@@ -170,6 +175,9 @@ public class RoleService implements IRoleService {
      * */
     @Override
     public void remove(Role role) {
+        if (role == null) {
+            return;
+        }
         roleAssignmentService.removeAssignmentsByRole(role.getStringId());
         repository.delete(role);
     }
@@ -179,6 +187,9 @@ public class RoleService implements IRoleService {
      * */
     @Override
     public void removeAll(Collection<Role> roles) {
+        if (roles == null || roles.isEmpty()) {
+            return;
+        }
         Set<String> roleIds = roles.stream().map(Role::getStringId).collect(Collectors.toSet());
         roleAssignmentService.removeAssignmentsByRoles(roleIds);
         repository.deleteAll(roles);
@@ -215,16 +226,19 @@ public class RoleService implements IRoleService {
      * todo javadoc
      * */
     @Override
-    public List<Role> assignRolesToUser(String userId, Set<String> roleIds) {
-        return assignRolesToUser(userId, roleIds, new HashMap<>());
+    public List<Role> assignRolesToActor(String actorId, Set<String> roleIds) {
+        return assignRolesToActor(actorId, roleIds, new HashMap<>());
     }
 
     /**
      * todo javadoc
      * */
     @Override
-    public List<Role> assignRolesToUser(String userId, Set<String> roleIds, Map<String, String> params) {
-        IUser user = userService.findById(userId);
+    public List<Role> assignRolesToActor(String actorId, Set<String> roleIds, Map<String, String> params) {
+        Optional<Actor> actorOpt = actorService.findById(actorId);
+        if (actorOpt.isEmpty()) {
+            throw new IllegalArgumentException(String.format("Actor with id [%s] does not exist.", actorId));
+        }
 
         List<Role> roles = findAllById(roleIds);
         if (roles.isEmpty() && !roleIds.isEmpty()) {
@@ -234,14 +248,14 @@ public class RoleService implements IRoleService {
             throw new IllegalArgumentException("Not all roles were found!");
         }
 
-        roles = filterNotAssignedRoles(user.getStringId(), roles);
+        roles = filterNotAssignedRoles(actorId, roles);
 
         runAllSuitableActionsOnRoles(roles, RoleEventType.ASSIGN, EventPhaseType.PRE, params);
-        List<RoleAssignment> newRoleAssignments = roleAssignmentService.createAssignments(userId, roles);
+        List<RoleAssignment> newRoleAssignments = roleAssignmentService.createAssignments(actorId, roles);
         if (roles.size() > newRoleAssignments.size()) {
             throw new NotAllRolesAssignedException(roles.size() - newRoleAssignments.size());
         }
-        eventPublisher.publishEvent(new UserAssignRoleEvent(user, roles));
+        eventPublisher.publishEvent(new ActorAssignRoleEvent(actorOpt.get(), roles));
         runAllSuitableActionsOnRoles(roles, RoleEventType.ASSIGN, EventPhaseType.POST, params);
 
         return roles;
@@ -251,15 +265,15 @@ public class RoleService implements IRoleService {
      * todo javadoc
      * */
     @Override
-    public List<Role> removeRolesFromUser(String userId, Set<String> roleIds) {
-        return removeRolesFromUser(userId, roleIds, new HashMap<>());
+    public List<Role> removeRolesFromActor(String actorId, Set<String> roleIds) {
+        return removeRolesFromActor(actorId, roleIds, new HashMap<>());
     }
 
     /**
      * todo javadoc
      * */
     @Override
-    public List<Role> removeRolesFromUser(String userId, Set<String> roleIds, Map<String, String> params) {
+    public List<Role> removeRolesFromActor(String actorId, Set<String> roleIds, Map<String, String> params) {
         List<Role> roles = findAllById(roleIds);
         if (roles.isEmpty() && !roleIds.isEmpty()) {
             throw new IllegalArgumentException("No roles found.");
@@ -268,17 +282,21 @@ public class RoleService implements IRoleService {
             throw new IllegalArgumentException("Not all roles were found!");
         }
 
-        roles = filterAssignedRoles(userId, roles);
+        roles = filterAssignedRoles(actorId, roles);
 
         runAllSuitableActionsOnRoles(roles, RoleEventType.REMOVE, EventPhaseType.PRE, params);
         Set<String> roleIdsToRemove = roles.stream().map(Role::getStringId).collect(Collectors.toSet());
-        List<RoleAssignment> removedAssignments = roleAssignmentService.removeAssignments(userId, roleIdsToRemove);
+        List<RoleAssignment> removedAssignments = roleAssignmentService.removeAssignments(actorId, roleIdsToRemove);
         if (roles.size() > removedAssignments.size()) {
             throw new NotAllRolesAssignedException(roles.size() - removedAssignments.size());
         }
         if (!removedAssignments.isEmpty()) {
-            IUser user = userService.findById(userId);
-            eventPublisher.publishEvent(new UserRemoveRoleEvent(user, roles));
+            Optional<Actor> actorOpt = actorService.findById(actorId);
+            if (actorOpt.isPresent()) {
+                eventPublisher.publishEvent(new ActorRemoveRoleEvent(actorOpt.get(), roles));
+            } else {
+                log.warn("Removed {} roles from non-existing actor with id [{}]", removedAssignments.size(), actorId);
+            }
         }
         runAllSuitableActionsOnRoles(roles, RoleEventType.REMOVE, EventPhaseType.POST, params);
 
@@ -304,42 +322,42 @@ public class RoleService implements IRoleService {
     /**
      * todo javadoc
      * */
-    private <T> AccessPermissions<T> createRolesAndBuildPermissions(Case useCase, AccessPermissions<T> userRefPermissions,
+    private <T> AccessPermissions<T> createRolesAndBuildPermissions(Case useCase, AccessPermissions<T> actorRefPermissions,
                                                                     boolean saveUseCase) {
         List<Role> rolesToSave = new ArrayList<>();
         AccessPermissions<T> resultPermissions = new AccessPermissions<>();
 
-        userRefPermissions.forEach((userListId, permissions) -> {
-            CaseRole caseRole = new CaseRole(userListId, useCase.getStringId());
-            Field<?> userListField = useCase.getDataSet().getFields().get(userListId);
-            if (userListField != null) {
-                ((FieldWithAllowedRoles<?>) userListField).getCaseRoleIds().add(caseRole.getStringId());
+        actorRefPermissions.forEach((actorListId, permissions) -> {
+            CaseRole caseRole = new CaseRole(actorListId, useCase.getStringId());
+            Field<?> actorListField = useCase.getDataSet().getFields().get(actorListId);
+            if (actorListField != null) {
+                ((FieldWithAllowedRoles<?>) actorListField).getCaseRoleIds().add(caseRole.getStringId());
             } else {
                 throw new IllegalStateException(String.format("Case role [%s} in process [%s] references non existing dataField in case [%s]",
-                        userListId, useCase.getPetriNetId(), useCase.getStringId()));
+                        actorListId, useCase.getPetriNetId(), useCase.getStringId()));
             }
             rolesToSave.add(caseRole);
             resultPermissions.put(caseRole.getStringId(), new HashMap<>(permissions));
         });
 
-        if (!userRefPermissions.isEmpty() && saveUseCase) {
+        if (!actorRefPermissions.isEmpty() && saveUseCase) {
             workflowService.save(useCase);
         }
         saveAll(rolesToSave);
         return resultPermissions;
     }
 
-    private List<Role> filterAssignedRoles(String userId, List<Role> rolesToBeNotAssigned) {
-        return filterRoles(userId, rolesToBeNotAssigned, true);
+    private List<Role> filterAssignedRoles(String actorId, List<Role> rolesToBeNotAssigned) {
+        return filterRoles(actorId, rolesToBeNotAssigned, true);
     }
 
-    private List<Role> filterNotAssignedRoles(String userId, List<Role> rolesToBeNotAssigned) {
-        return filterRoles(userId, rolesToBeNotAssigned, false);
+    private List<Role> filterNotAssignedRoles(String actorId, List<Role> rolesToBeNotAssigned) {
+        return filterRoles(actorId, rolesToBeNotAssigned, false);
     }
 
-    private List<Role> filterRoles(String userId, List<Role> roles, boolean filterAssigned) {
+    private List<Role> filterRoles(String actorId, List<Role> roles, boolean filterAssigned) {
         Set<String> roleIds = roles.stream().map(Role::getStringId).collect(Collectors.toSet());
-        List<RoleAssignment> assignments = roleAssignmentService.findAllByUserIdAndRoleIdIn(userId, roleIds);
+        List<RoleAssignment> assignments = roleAssignmentService.findAllByActorIdAndRoleIdIn(actorId, roleIds);
 
         if (!assignments.isEmpty()) {
             Set<String> assignedRoleIds = assignments.stream().map(RoleAssignment::getRoleId).collect(Collectors.toSet());

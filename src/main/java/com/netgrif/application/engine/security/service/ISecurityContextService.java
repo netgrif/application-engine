@@ -1,14 +1,16 @@
 package com.netgrif.application.engine.security.service;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 
 public interface ISecurityContextService {
 
     void saveToken(String token);
 
-    void reloadSecurityContext(LoggedUser loggedUser);
+    void reloadSecurityContext(LoggedIdentity identity);
 
-    void forceReloadSecurityContext(LoggedUser loggedUser);
+    void forceReloadSecurityContext(LoggedIdentity identity);
 
-    boolean isAuthenticatedPrincipalLoggedUser();
+    boolean isAuthenticatedPrincipalLoggedIdentity();
+
+    boolean isIdentityLogged(String identityId);
 }

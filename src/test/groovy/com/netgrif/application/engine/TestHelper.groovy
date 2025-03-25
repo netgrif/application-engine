@@ -30,7 +30,7 @@ class TestHelper {
     @Autowired
     private RoleService roleService
     @Autowired
-    private SystemUserRunner systemUserRunner
+    private SystemIdentityRunner systemUserRunner
     @Autowired
     private DefaultRoleRunner defaultRoleRunner
     @Autowired

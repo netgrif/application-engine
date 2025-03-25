@@ -44,11 +44,11 @@ class DynamicDefaultValueTest {
         ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_init.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
         Case useCase = importHelper.createCase("test", optNet.getNet())
 
-        assert useCase.dataSet.get("text").rawValue == superCreator.superUser.name
-        assert useCase.dataSet.get("number").rawValue as Integer == superCreator.superUser.name.length()
+        assert useCase.dataSet.get("text").rawValue == superCreator.superIdentity.name
+        assert useCase.dataSet.get("number").rawValue as Integer == superCreator.superIdentity.name.length()
         assert useCase.dataSet.get("date").rawValue != null
         assert useCase.dataSet.get("dateTime").rawValue != null
-        assert (useCase.dataSet.get("user").rawValue as UserFieldValue) != null
+        assert (useCase.dataSet.get("user").rawValue as ActorFieldValue) != null
         assert (useCase.dataSet.get("multichoice").rawValue as List) == ["ABC", "DEF"]
         assert (useCase.dataSet.get("multichoice_map").rawValue as List) == ["ABC", "DEF"]
     }

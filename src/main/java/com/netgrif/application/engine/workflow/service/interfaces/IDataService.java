@@ -1,11 +1,9 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
-import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.petrinet.domain.dataset.ActorFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
@@ -25,33 +23,29 @@ import java.util.Map;
 
 public interface IDataService {
 
-    GetDataEventOutcome getData(String taskId, IUser user);
+    GetDataEventOutcome getData(String taskId, String actorId);
 
-    GetDataEventOutcome getData(String taskId, IUser user, Map<String, String> params);
+    GetDataEventOutcome getData(String taskId, String actorId, Map<String, String> params);
 
-    GetDataEventOutcome getData(Task task, Case useCase, IUser user);
+    GetDataEventOutcome getData(Task task, Case useCase, String actorId);
 
-    GetDataEventOutcome getData(Task task, Case useCase, IUser user, Map<String, String> params);
+    GetDataEventOutcome getData(Task task, Case useCase, String actorId, Map<String, String> params);
 
-    SetDataEventOutcome setData(String taskId, DataSet values, IUser user);
+    SetDataEventOutcome setData(String taskId, DataSet values, String actorId);
 
-    SetDataEventOutcome setData(String taskId, DataSet values, IUser user, Map<String, String> params);
+    SetDataEventOutcome setData(String taskId, DataSet values, String actorId, Map<String, String> params);
 
-    SetDataEventOutcome setData(String taskId, DataSet values, LoggedUser loggedUser);
+    SetDataEventOutcome setData(Case useCase, DataSet dataSet, String actorId);
 
-    SetDataEventOutcome setData(String taskId, DataSet values, LoggedUser loggedUser, Map<String, String> params);
+    SetDataEventOutcome setData(Case useCase, DataSet dataSet, String actorId, Map<String, String> params);
 
-    SetDataEventOutcome setData(Case useCase, DataSet dataSet, IUser user);
+    SetDataEventOutcome setData(Task task, DataSet values, String actorId);
 
-    SetDataEventOutcome setData(Case useCase, DataSet dataSet, IUser user, Map<String, String> params);
+    SetDataEventOutcome setData(Task task, DataSet values, String actorId, Map<String, String> params);
 
-    SetDataEventOutcome setData(Task task, DataSet values, IUser user);
-
-    SetDataEventOutcome setData(Task task, DataSet values, IUser user, Map<String, String> params);
-
-    SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField, IUser user);
+    SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField, String actorId);
     
-    SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField, IUser user, Map<String, String> params);
+    SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField, String actorId, Map<String, String> params);
 
     FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview);
 
@@ -93,16 +87,14 @@ public interface IDataService {
     SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name, Map<String, String> params);
 
     // TODO: release/8.0.0 deprecated by forms
-    GetLayoutsEventOutcome getLayouts(String taskId, Locale locale, IUser user);
-
-    GetLayoutsEventOutcome getLayouts(String taskId, Locale locale, LoggedUser loggedUser);
+    GetLayoutsEventOutcome getLayouts(String taskId, Locale locale, String actorId);
 
     // TODO: release/8.0.0 revision
     Page<Task> setImmediateFields(Page<Task> tasks);
 
     List<Field<?>> getImmediateFields(Task task);
 
-    UserFieldValue makeUserFieldValue(String id);
+    ActorFieldValue makeActorFieldValue(String id);
 
     void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException;
 }

@@ -1,10 +1,8 @@
 package com.netgrif.application.engine.orgstructure.groups;
 
-import com.netgrif.application.engine.authentication.domain.IUser;
-import com.netgrif.application.engine.authentication.domain.RegisteredUser;
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
-import com.netgrif.application.engine.authentication.web.requestbodies.NewUserRequest;
+import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
@@ -176,15 +174,15 @@ public class NextGroupService implements INextGroupService {
             return addUser(user, existingUsers);
         } else {
             log.info("Inviting new user to group.");
-            NewUserRequest newUserRequest = new NewUserRequest();
-            newUserRequest.email = email;
-            RegisteredUser regUser = registrationService.createNewUser(newUserRequest);
+            NewIdentityRequest newIdentityRequest = new NewIdentityRequest();
+            newIdentityRequest.email = email;
+            RegisteredUser regUser = registrationService.createNewIdentity(newIdentityRequest);
             regUser.addGroup(groupCase.getStringId());
             userService.save(regUser);
 
             try {
                 mailService.sendRegistrationEmail(regUser);
-                mailAttemptService.mailAttempt(newUserRequest.email);
+                mailAttemptService.mailAttempt(newIdentityRequest.email);
             } catch (MessagingException | IOException | TemplateException e) {
                 log.error(e.getMessage());
             }
@@ -329,7 +327,7 @@ public class NextGroupService implements INextGroupService {
     protected boolean authorHasDefaultGroup(IUser author) {
         List<Case> allGroups = findAllGroups();
         for (Case group : allGroups) {
-            if (group.getAuthor().getId().equals(author.getStringId())) {
+            if (group.getAuthorId().equals(author.getStringId())) {
                 return true;
             }
         }
@@ -337,7 +335,7 @@ public class NextGroupService implements INextGroupService {
     }
 
     protected String getGroupOwnerId(Case groupCase) {
-        return groupCase.getAuthor().getId();
+        return groupCase.getAuthorId();
     }
 
     protected Case findUserDefaultGroup(IUser author) {
@@ -377,6 +375,6 @@ public class NextGroupService implements INextGroupService {
     }
 
     protected String getGroupOwnerEmail(Case groupCase) {
-        return groupCase.getAuthor().getEmail();
+        return groupCase.getAuthorId().getEmail();
     }
 }

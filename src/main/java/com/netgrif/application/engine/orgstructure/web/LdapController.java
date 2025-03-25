@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.orgstructure.web;
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.ldap.domain.LdapGroup;
 import com.netgrif.application.engine.ldap.domain.LdapGroupRef;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
@@ -15,8 +15,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
@@ -35,13 +35,13 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
+@Tag(name = "Ldap")
+@RequiredArgsConstructor
 @RequestMapping("/api/ldap")
 @ConditionalOnExpression("${nae.ldap.enabled:false}")
-@Tag(name = "Ldap")
 public class LdapController {
 
-    @Autowired
-    protected ILdapGroupRefService service;
+    protected final ILdapGroupRefService service;
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Get all ldap groups",
@@ -54,7 +54,7 @@ public class LdapController {
     })
     public LdapGroupsResource getAllLdapGroups(@RequestBody LdapGroupSearchBody body, Authentication auth) {
         List<LdapGroupRef> groups;
-        if (body == null || body.getFulltext().equals("")) {
+        if (body == null || body.getFulltext().isEmpty()) {
             groups = service.findAllGroups();
         } else {
             groups = service.searchGroups(body.getFulltext());
@@ -62,7 +62,10 @@ public class LdapController {
         List<LdapGroup> groupRoles = service.getAllLdapGroupRoles();
         Set<LdapGroupResponseBody> ldapGroupResponse = groups.stream()
                 .map(group -> {
-                    Set<ProcessRole> processRoleSet = groupRoles.stream().filter(ldapGroup -> ldapGroup.getDn().equals(group.getDn().toString())).map(LdapGroup::getProcessesProcessRoles).flatMap(Collection::stream).collect(Collectors.toSet());
+                    Set<ProcessRole> processRoleSet = groupRoles.stream()
+                            .filter(ldapGroup -> ldapGroup.getDn().equals(group.getDn().toString()))
+                            .map(LdapGroup::getProcessesProcessRoles).flatMap(Collection::stream)
+                            .collect(Collectors.toSet());
                     return new LdapGroupResponseBody(group.getDn().toString(), group.getCn(), group.getDescription(), processRoleSet);
                 })
                 .collect(Collectors.toCollection(HashSet::new));
@@ -80,8 +83,8 @@ public class LdapController {
     })
     public MessageResource assignRolesToLdapGroup(@RequestBody LdapGroupRoleAssignRequestBody requestBody, Authentication auth) {
         try {
-            service.setRoleToLdapGroup(requestBody.getGroupDn(), requestBody.getRoleIds(), (LoggedUser) auth.getPrincipal());
-            log.info("Process roles " + requestBody.getRoleIds() + " assigned to group " + requestBody.getGroupDn());
+            service.setRoleToLdapGroup(requestBody.getGroupDn(), requestBody.getRoleIds(), (LoggedIdentity) auth.getPrincipal());
+            log.info("Process roles {} assigned to group {}", requestBody.getRoleIds(), requestBody.getGroupDn());
             return MessageResource.successMessage("Selected roles assigned to group " + requestBody.getGroupDn());
         } catch (IllegalArgumentException e) {
             log.error(e.getMessage());

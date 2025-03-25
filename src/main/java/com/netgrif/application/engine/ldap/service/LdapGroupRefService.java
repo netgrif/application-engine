@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.ldap.service;
 
 
-import com.netgrif.application.engine.authentication.domain.LoggedUser;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authorization.domain.Role;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.ldap.LdapConfiguration;
@@ -106,7 +106,7 @@ public class LdapGroupRefService implements ILdapGroupRefService {
     }
 
     @Override
-    public void setRoleToLdapGroup(String groupDn, Set<String> requestedRolesIds, LoggedUser loggedUser) {
+    public void setRoleToLdapGroup(String groupDn, Set<String> requestedRolesIds, Identity identity) {
         List<Role> requestedProcessRoles = roleService.findAllById(requestedRolesIds);
         if (requestedProcessRoles.isEmpty() && !requestedRolesIds.isEmpty())
             throw new IllegalArgumentException("No process roles found.");

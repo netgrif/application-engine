@@ -21,7 +21,7 @@ class DashboardRunner extends AbstractOrderedCommandLineRunner {
     private ImportHelper helper
 
     @Autowired
-    private SystemUserRunner systemCreator
+    private SystemIdentityRunner systemCreator
 
     public static final String DASHBOARD_NET_IDENTIFIER = "dashboard"
     private static final String DASHBOARD_FILE_NAME = "engine-processes/dashboard.xml"

@@ -9,7 +9,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.DefaultRoleRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
-import com.netgrif.application.engine.startup.SystemUserRunner
+import com.netgrif.application.engine.startup.SystemIdentityRunner
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
@@ -70,7 +70,7 @@ class EventTest {
     private UserRepository userRepository
 
     @Autowired
-    private SystemUserRunner userRunner
+    private SystemIdentityRunner userRunner
 
     @Autowired
     private IPetriNetService petriNetService;

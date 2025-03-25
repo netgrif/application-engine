@@ -35,23 +35,23 @@ public class RoleAssignmentServiceTest {
     }
 
     @Test
-    public void testFindAllByUserIdAndRoleIdIn() {
+    public void testFindAllByActorIdAndRoleIdIn() {
         String userId = "userId";
         String roleId1 = "roleId1";
         String roleId2 = "roleId2";
         String roleId3 = "roleId3";
         RoleAssignment assignment1 = new ProcessRoleAssignment();
-        assignment1.setUserId(userId);
+        assignment1.setActorId(userId);
         assignment1.setRoleId(roleId1);
         RoleAssignment assignment2 = new ProcessRoleAssignment();
-        assignment2.setUserId(userId);
+        assignment2.setActorId(userId);
         assignment2.setRoleId(roleId2);
         RoleAssignment assignment3 = new ProcessRoleAssignment();
-        assignment3.setUserId(userId);
+        assignment3.setActorId(userId);
         assignment3.setRoleId(roleId3);
         repository.saveAll(List.of(assignment1, assignment2, assignment3));
 
-        List<RoleAssignment> assignments = roleAssignmentService.findAllByUserIdAndRoleIdIn(userId, Set.of(roleId1, roleId2));
+        List<RoleAssignment> assignments = roleAssignmentService.findAllByActorIdAndRoleIdIn(userId, Set.of(roleId1, roleId2));
 
         assert assignments.size() == 2;
         assert assignments.stream().noneMatch(assignment -> assignment.getStringId().equals(assignment3.getStringId()));
@@ -64,13 +64,13 @@ public class RoleAssignmentServiceTest {
         String roleId2 = "roleId2";
         String roleId3 = "roleId3";
         RoleAssignment assignment1 = new ProcessRoleAssignment();
-        assignment1.setUserId(userId);
+        assignment1.setActorId(userId);
         assignment1.setRoleId(roleId1);
         RoleAssignment assignment2 = new ProcessRoleAssignment();
-        assignment2.setUserId(userId);
+        assignment2.setActorId(userId);
         assignment2.setRoleId(roleId2);
         RoleAssignment assignment3 = new ProcessRoleAssignment();
-        assignment3.setUserId(userId);
+        assignment3.setActorId(userId);
         assignment3.setRoleId(roleId3);
         repository.saveAll(List.of(assignment1, assignment2, assignment3));
 
@@ -81,19 +81,19 @@ public class RoleAssignmentServiceTest {
     }
 
     @Test
-    public void testFindAllByUserId() {
+    public void testFindAllByActorId() {
         String userId = "userId";
         String roleId1 = "roleId1";
         String roleId2 = "roleId2";
         RoleAssignment assignment1 = new ProcessRoleAssignment();
-        assignment1.setUserId(userId);
+        assignment1.setActorId(userId);
         assignment1.setRoleId(roleId1);
         RoleAssignment assignment2 = new ProcessRoleAssignment();
-        assignment2.setUserId(userId);
+        assignment2.setActorId(userId);
         assignment2.setRoleId(roleId2);
         repository.saveAll(List.of(assignment1, assignment2));
 
-        assert roleAssignmentService.findAllByUserId(userId).size() == 2;
+        assert roleAssignmentService.findAllByActorId(userId).size() == 2;
     }
 
     @Test
@@ -113,7 +113,7 @@ public class RoleAssignmentServiceTest {
         RoleAssignment assignment = roleAssignmentService.createAssignment(userId, processRole);
         assert assignment != null;
         assert assignment instanceof ProcessRoleAssignment;
-        assert assignment.getUserId().equals(userId);
+        assert assignment.getActorId().equals(userId);
         assert assignment.getRoleId().equals(processRole.getStringId());
         assert assignment.getRoleImportId().equals(processRole.getImportId());
         assert repository.existsById(assignment.getStringId());
@@ -122,7 +122,7 @@ public class RoleAssignmentServiceTest {
         assignment = roleAssignmentService.createAssignment(userId, caseRole);
         assert assignment != null;
         assert assignment instanceof CaseRoleAssignment;
-        assert assignment.getUserId().equals(userId);
+        assert assignment.getActorId().equals(userId);
         assert assignment.getRoleId().equals(caseRole.getStringId());
         assert assignment.getRoleImportId().equals(caseRole.getImportId());
         assert ((CaseRoleAssignment) assignment).getCaseId().equals(caseRole.getCaseId());
@@ -136,13 +136,13 @@ public class RoleAssignmentServiceTest {
         String processRoleId2 = "role2";
         String caseRoleId = "role3";
         RoleAssignment processRoleAssignment = new ProcessRoleAssignment();
-        processRoleAssignment.setUserId(userId);
+        processRoleAssignment.setActorId(userId);
         processRoleAssignment.setRoleId(processRoleId);
         RoleAssignment processRoleAssignment2 = new ProcessRoleAssignment();
-        processRoleAssignment2.setUserId("someOtherUserId");
+        processRoleAssignment2.setActorId("someOtherUserId");
         processRoleAssignment2.setRoleId(processRoleId2);
         CaseRoleAssignment caseRoleAssignment = new CaseRoleAssignment();
-        caseRoleAssignment.setUserId(userId);
+        caseRoleAssignment.setActorId(userId);
         caseRoleAssignment.setRoleId(caseRoleId);
         repository.saveAll(List.of(processRoleAssignment, processRoleAssignment2, caseRoleAssignment));
 
@@ -163,7 +163,7 @@ public class RoleAssignmentServiceTest {
         String userId = "user_id";
         String roleId = "role1";
         RoleAssignment processRoleAssignment = new ProcessRoleAssignment();
-        processRoleAssignment.setUserId(userId);
+        processRoleAssignment.setActorId(userId);
         processRoleAssignment.setRoleId(roleId);
         repository.save(processRoleAssignment);
 
@@ -173,24 +173,24 @@ public class RoleAssignmentServiceTest {
     }
 
     @Test
-    public void testRemoveAssignmentsByUser() {
+    public void testRemoveAssignmentsByActor() {
         String userId = "user_id";
         String processRoleId = "role1";
         String processRoleId2 = "role2";
         String caseRoleId = "role3";
         RoleAssignment processRoleAssignment = new ProcessRoleAssignment();
-        processRoleAssignment.setUserId(userId);
+        processRoleAssignment.setActorId(userId);
         processRoleAssignment.setRoleId(processRoleId);
         RoleAssignment processRoleAssignment2 = new ProcessRoleAssignment();
-        processRoleAssignment2.setUserId("someOtherUserId");
+        processRoleAssignment2.setActorId("someOtherUserId");
         processRoleAssignment2.setRoleId(processRoleId2);
         CaseRoleAssignment caseRoleAssignment = new CaseRoleAssignment();
-        caseRoleAssignment.setUserId(userId);
+        caseRoleAssignment.setActorId(userId);
         caseRoleAssignment.setRoleId(caseRoleId);
         repository.saveAll(List.of(processRoleAssignment, processRoleAssignment2, caseRoleAssignment));
 
         assert repository.count() == 3;
-        List<RoleAssignment> removedAssignments = roleAssignmentService.removeAssignmentsByUser(userId);
+        List<RoleAssignment> removedAssignments = roleAssignmentService.removeAssignmentsByActor(userId);
 
         assert removedAssignments.size() == 2;
         assert removedAssignments.stream().noneMatch(assignment ->

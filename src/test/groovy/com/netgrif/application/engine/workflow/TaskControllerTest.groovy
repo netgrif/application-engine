@@ -2,8 +2,8 @@ package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.Authority
-import com.netgrif.application.engine.authentication.domain.User
-import com.netgrif.application.engine.authentication.domain.UserState
+
+import com.netgrif.application.engine.authentication.domain.IdentityState
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import com.netgrif.application.engine.authorization.domain.Role
@@ -11,7 +11,6 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskSer
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
-import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -104,7 +103,7 @@ class TaskControllerTest {
                 surname: "Netgrif",
                 email: DUMMY_USER_MAIL,
                 password: "superAdminPassword",
-                state: UserState.ACTIVE,
+                state: IdentityState.ACTIVE,
                 authorities: [authorityService.getOrCreate(Authority.user)] as Set<Authority>))
                 // todo 2058
 //                roles: [] as Set<ProcessRole>))
@@ -211,7 +210,7 @@ class TaskControllerTest {
                 this.role = role
             }
         }
-        roleService.assignRolesToUser(userService.findByEmail(DUMMY_USER_MAIL).getStringId(), [role.id.toString()] as Set)
+        roleService.assignRolesToActor(userService.findByEmail(DUMMY_USER_MAIL).getStringId(), [role.id.toString()] as Set)
     }
 
     Page<Task> findTasksByMongo() {

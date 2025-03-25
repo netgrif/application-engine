@@ -37,8 +37,8 @@ public interface IRoleService {
     void resolveCaseRolesOnCase(Case useCase, AccessPermissions<CasePermission> caseRolePermissions, boolean saveUseCase);
     void resolveCaseRolesOnTask(Case useCase, Task task, AccessPermissions<TaskPermission> caseRolePermissions, boolean saveUseCase);
 
-    List<Role> assignRolesToUser(String userId, Set<String> roleIds);
-    List<Role> assignRolesToUser(String userId, Set<String> roleIds, Map<String, String> params);
-    List<Role> removeRolesFromUser(String userId, Set<String> roleIds);
-    List<Role> removeRolesFromUser(String userId, Set<String> roleIds, Map<String, String> params);
+    List<Role> assignRolesToActor(String actorId, Set<String> roleIds);
+    List<Role> assignRolesToActor(String actorId, Set<String> roleIds, Map<String, String> params);
+    List<Role> removeRolesFromActor(String actorId, Set<String> roleIds);
+    List<Role> removeRolesFromActor(String actorId, Set<String> roleIds, Map<String, String> params);
 }

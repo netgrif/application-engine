@@ -12,6 +12,11 @@ public class TextField extends Field<String> {
         super();
     }
 
+    public TextField(String value) {
+        this();
+        setRawValue(value);
+    }
+
     @Override
     @QueryType(PropertyType.NONE)
     public DataType getType() {
