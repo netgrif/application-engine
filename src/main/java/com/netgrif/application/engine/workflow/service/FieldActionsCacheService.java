@@ -78,7 +78,8 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     public Closure getCompiledAction(Action action, boolean shouldRewriteCachedActions) {
         String stringId = action.getId().toString();
         if (shouldRewriteCachedActions || !actionsCache.containsKey(stringId)) {
-            Closure code = (Closure) shell.evaluate("{-> " + action.getDefinition() + "}");
+            // TODO: release/8.0.0 actions and expressions
+            Closure code = (Closure) shell.evaluate("{-> " + action.getDefinition() + "}", action.getImportId());
             actionsCache.put(stringId, code);
         }
         return actionsCache.get(stringId);
