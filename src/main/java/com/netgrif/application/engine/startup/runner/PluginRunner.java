@@ -78,23 +78,25 @@ public class PluginRunner implements ApplicationEngineStartupRunner {
         log.info("Registering new plugins.");
         Map<String, Plugin> pluginMap = new HashMap<>();
 
-        entryPointLoaderService.getAll().forEach(entryPoint -> {
-            if (!pluginMap.containsKey(entryPoint.getPluginName())) {
-                Plugin plugin = Plugin.builder()
-                        .identifier(entryPoint.getPluginName())
-                        .name(entryPoint.getPluginName())
-                        .version("0.0.1")
-                        .url(StringUtils.EMPTY)
-                        .port(0)
-                        .description(StringUtils.EMPTY)
-                        .entryPoints(new HashMap<>())
-                        .build();
-                pluginMap.put(entryPoint.getPluginName(), plugin);
-            }
-            pluginMap.get(entryPoint.getPluginName()).getEntryPoints().put(entryPoint.getName(), entryPoint);
-        });
-        pluginMap.values().forEach(pluginService::registerOrActivate);
-        log.info("All new plugins are registered.");
+        if (entryPointLoaderService != null) {
+            entryPointLoaderService.getAll().forEach(entryPoint -> {
+                if (!pluginMap.containsKey(entryPoint.getPluginName())) {
+                    Plugin plugin = Plugin.builder()
+                            .identifier(entryPoint.getPluginName())
+                            .name(entryPoint.getPluginName())
+                            .version("0.0.1")
+                            .url(StringUtils.EMPTY)
+                            .port(0)
+                            .description(StringUtils.EMPTY)
+                            .entryPoints(new HashMap<>())
+                            .build();
+                    pluginMap.put(entryPoint.getPluginName(), plugin);
+                }
+                pluginMap.get(entryPoint.getPluginName()).getEntryPoints().put(entryPoint.getName(), entryPoint);
+            });
+            pluginMap.values().forEach(pluginService::registerOrActivate);
+            log.info("All new plugins are registered.");
+        }
     }
 
     private void importPluginNets() {

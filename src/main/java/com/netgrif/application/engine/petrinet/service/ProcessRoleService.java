@@ -28,7 +28,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-@Service
 public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.ProcessRoleService {
 
     private static final Logger log = LoggerFactory.getLogger(ProcessRoleService.class);
