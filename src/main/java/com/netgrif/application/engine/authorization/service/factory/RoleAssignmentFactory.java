@@ -8,13 +8,13 @@ public abstract class RoleAssignmentFactory {
     /**
      * todo javadoc
      * */
-    protected abstract RoleAssignment createAssignmentInternal(Role role);
+    protected abstract RoleAssignment doCreateAssignment(Role role);
 
     /**
      * todo javadoc
      * */
     public RoleAssignment createAssignment(Role role, String userId) {
-        RoleAssignment assignment = createAssignmentInternal(role);
+        RoleAssignment assignment = doCreateAssignment(role);
         assignment.setRoleId(role.getStringId());
         assignment.setRoleImportId(role.getImportId());
         assignment.setActorId(userId);

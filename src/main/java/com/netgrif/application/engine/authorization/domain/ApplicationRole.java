@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.authorization.domain;
 
+import com.netgrif.application.engine.authorization.service.factory.ApplicationRoleAssignmentFactory;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
@@ -34,7 +35,7 @@ public class ApplicationRole extends Role {
 
     @Override
     public Class<?> getAssignmentFactoryClass() {
-        return null;
+        return ApplicationRoleAssignmentFactory.class;
     }
 
     @Override
