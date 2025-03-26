@@ -7,6 +7,7 @@ import com.netgrif.application.engine.configuration.security.factory.SimplePubli
 /**
  * todo javadoc
  * identity vs actor
+ * warning for changing strategy in running system
  */
 public enum PublicStrategy {
     /** todo javadoc */

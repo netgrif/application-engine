@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.authorization.domain;
 
-import com.netgrif.application.engine.authorization.service.factory.CaseRoleAssignmentFactory;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
@@ -12,33 +11,34 @@ import java.util.HashMap;
 @Data
 @Document(collection = "role")
 @EqualsAndHashCode(callSuper = true)
-public class CaseRole extends Role {
+public class ApplicationRole extends Role {
 
     @Indexed
-    private String caseId;
+    private String applicationId;
 
-    public CaseRole() {
+    public ApplicationRole() {
         this(new ObjectId(), null, null);
     }
 
-    public CaseRole(String importId, String caseId) {
-        this(new ObjectId(), importId, caseId);
+    public ApplicationRole(String importId, String applicationId) {
+        this(new ObjectId(), importId, applicationId);
     }
 
-    public CaseRole(ObjectId id, String importId, String caseId) {
+    public ApplicationRole(ObjectId id, String importId, String applicationId) {
         super(id);
         this.importId = importId;
-        this.caseId = caseId;
-        this.events = new HashMap<>(); // case role has no events for now, can be changed in future releases
+        this.events = new HashMap<>(); // application role has no events for now, can be changed in future releases
+        this.applicationId = applicationId;
     }
+
 
     @Override
     public Class<?> getAssignmentFactoryClass() {
-        return CaseRoleAssignmentFactory.class;
+        return null;
     }
 
     @Override
     public String getTitleAsString() {
-        return String.format("CASEROLE[%s-%s]", caseId, importId);
+        return String.format("APPROLE[%s-%s]", applicationId, importId);
     }
 }
