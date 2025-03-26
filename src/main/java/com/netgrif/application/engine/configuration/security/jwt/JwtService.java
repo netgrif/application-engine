@@ -2,7 +2,6 @@ package com.netgrif.application.engine.configuration.security.jwt;
 
 import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
-import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -26,7 +25,6 @@ public class JwtService implements IJwtService {
     private String secret = "";
 
     private final JwtProperties properties;
-    private final IRoleService roleService;
 
     @PostConstruct
     private void resolveSecret() {
@@ -51,18 +49,15 @@ public class JwtService implements IJwtService {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public LoggedIdentity getLoggedIdentity(String token, Authority anonymousAuthority) {
         LinkedHashMap<String, Object> loggedIdentityMap = (LinkedHashMap<String, Object>) getAllClaimsFromToken(token).get("identity");
-        LoggedIdentity loggedIdentity = LoggedIdentity.builder()
+        return LoggedIdentity.builder()
                 .identityId(loggedIdentityMap.get("identityId").toString())
                 .username(loggedIdentityMap.get("username").toString())
                 .fullName(loggedIdentityMap.get("fullName").toString())
                 .activeActorId(loggedIdentityMap.get("activeActorId").toString())
                 .build();
-
-        // todo 2058 app roles and process roles
-//        user.setRoles(Collections.singleton(roleService.anonymousRole().getStringId()));
-        return loggedIdentity;
     }
 
     private void getExpirationDateFromToken(String token) throws ExpiredJwtException {

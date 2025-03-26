@@ -8,10 +8,15 @@ import com.netgrif.application.engine.authorization.service.interfaces.IRoleServ
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -29,6 +34,20 @@ public abstract class PublicJwtAuthenticationFilter extends PublicAuthentication
                                          String[] urls, String[] exceptions, IJwtService jwtService) {
         super(identityService, roleService, authenticationManager, provider, anonymousAuthority, urls, exceptions);
         this.jwtService = jwtService;
+    }
+
+    /**
+     * todo javadoc
+     */
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+        if (isPublicApi(request.getRequestURI())) {
+            String jwtToken = resolveValidToken(request);
+            authenticate(request, jwtService.getLoggedIdentity(jwtToken, this.anonymousAuthority));
+            response.setHeader(JWT_HEADER_NAME, BEARER + jwtToken);
+            log.info("Anonymous identity was authenticated.");
+        }
+        filterChain.doFilter(request, response);
     }
 
     /**
@@ -65,7 +84,7 @@ public abstract class PublicJwtAuthenticationFilter extends PublicAuthentication
         Optional<Identity> identityOpt = Optional.empty();
 
         if (claims.containsKey("identity")) {
-            identityOpt = identityService.findByUsername((String) ((LinkedHashMap) claims.get("identity")).get("username"));
+            identityOpt = identityService.findByUsername((String) ((LinkedHashMap<?, ?>) claims.get("identity")).get("username"));
         }
 
         Identity identity = identityOpt.orElseGet(this::createAnonymousIdentityWithActor);

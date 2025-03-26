@@ -48,7 +48,6 @@ public class PublicSimpleAuthenticationFilter extends PublicAuthenticationFilter
 
     /**
      * todo javadoc
-     * @return
      */
     @Override
     protected Identity createAnonymousIdentityWithActor() {
