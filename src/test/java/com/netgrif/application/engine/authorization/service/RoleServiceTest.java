@@ -2,6 +2,7 @@ package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Authority;
+import com.netgrif.application.engine.authorization.domain.ApplicationRole;
 import com.netgrif.application.engine.authorization.domain.CaseRole;
 import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.domain.Role;
@@ -120,6 +121,44 @@ public class RoleServiceTest {
     }
 
     @Test
+    public void testFindAllApplicationRoles() {
+        Role processRole1 = new ProcessRole("import_id1");
+        Role appRole1 = new ApplicationRole("import_id2", "application1");
+        Role appRole2 = new ApplicationRole("import_id3", "application1");
+        Role caseRole = new CaseRole("import_id4", "case_id");
+        repository.saveAll(List.of(processRole1, appRole1, appRole2, caseRole));
+
+        List<ApplicationRole> appRoles = roleService.findAllApplicationRoles();
+        assert appRoles.size() == 2;
+        assert appRoles.stream().allMatch(role -> role.getStringId().equals(appRole1.getStringId())
+                || role.getStringId().equals(appRole2.getStringId()));
+    }
+
+    @Test
+    public void testExistsApplicationRoleByImportId() {
+        Role appRole = new ApplicationRole("import_id1", "application1");
+        Role caseRole = new CaseRole("import_id2", "case_id");
+        Role processRole = new ProcessRole("import_id3");
+        repository.saveAll(List.of(appRole, caseRole, processRole));
+
+        assert roleService.existsApplicationRoleByImportId(appRole.getImportId());
+        assert !roleService.existsApplicationRoleByImportId(caseRole.getImportId());
+        assert !roleService.existsApplicationRoleByImportId(processRole.getImportId());
+    }
+
+    @Test
+    public void testFindApplicationRoleByImportId() {
+        Role appRole = new ApplicationRole("import_id1", "application1");
+        Role caseRole = new CaseRole("import_id2", "case_id");
+        Role processRole = new ProcessRole("import_id3");
+        repository.saveAll(List.of(appRole, caseRole, processRole));
+
+        assert roleService.findApplicationRoleByImportId(appRole.getImportId()) != null;
+        assert roleService.findApplicationRoleByImportId(caseRole.getImportId()) == null;
+        assert roleService.findApplicationRoleByImportId(processRole.getImportId()) == null;
+    }
+
+    @Test
     public void testFindAllProcessRoles() {
         Role processRole1 = new ProcessRole("import_id1");
         Role processRole2 = new ProcessRole("import_id2");
@@ -162,20 +201,22 @@ public class RoleServiceTest {
     public void testExistsProcessRoleByImportId() {
         Role processRole = new ProcessRole("import_id1");
         Role caseRole = new CaseRole("import_id2", "case_id");
+        // todo 2058 app role
         repository.saveAll(List.of(processRole, caseRole));
 
-        assert roleService.existsProcessRoleByImportId("import_id1");
-        assert !roleService.existsProcessRoleByImportId("import_id2");
+        assert roleService.existsProcessRoleByImportId(processRole.getImportId());
+        assert !roleService.existsProcessRoleByImportId(caseRole.getImportId());
     }
 
     @Test
     public void testFindProcessRoleByImportId() {
         Role processRole = new ProcessRole("import_id1");
         Role caseRole = new CaseRole("import_id2", "case_id");
+        // todo 2058 app role
         repository.saveAll(List.of(processRole, caseRole));
 
-        assert roleService.findProcessRoleByImportId("import_id1") != null;
-        assert roleService.findProcessRoleByImportId("import_id2") == null;
+        assert roleService.findProcessRoleByImportId(processRole.getImportId()) != null;
+        assert roleService.findProcessRoleByImportId(caseRole.getImportId()) == null;
     }
 
     @Test

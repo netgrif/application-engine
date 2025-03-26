@@ -4,6 +4,7 @@ import com.netgrif.application.engine.authorization.domain.*;
 import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
 import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
 import com.netgrif.application.engine.authorization.domain.permissions.TaskPermission;
+import com.netgrif.application.engine.authorization.domain.repositories.ApplicationRoleRepository;
 import com.netgrif.application.engine.authorization.domain.repositories.CaseRoleRepository;
 import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository;
 import com.netgrif.application.engine.authorization.domain.repositories.RoleRepository;
@@ -40,6 +41,7 @@ public class RoleService implements IRoleService {
 
     private final RoleRepository repository;
     private final ProcessRoleRepository processRoleRepository;
+    private final ApplicationRoleRepository applicationRoleRepository;
     private final CaseRoleRepository caseRoleRepository;
     private final IRoleAssignmentService roleAssignmentService;
     private final IActorService actorService;
@@ -95,6 +97,30 @@ public class RoleService implements IRoleService {
             anonymousProcessRole = findSystemRoleByImportId(ProcessRole.ANONYMOUS_ROLE);
         }
         return anonymousProcessRole;
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public List<ApplicationRole> findAllApplicationRoles() {
+        return applicationRoleRepository.findAll();
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public boolean existsApplicationRoleByImportId(String importId) {
+        return applicationRoleRepository.existsByImportId(importId);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public ApplicationRole findApplicationRoleByImportId(String importId) {
+        return applicationRoleRepository.findByImportId(importId);
     }
 
     /**
