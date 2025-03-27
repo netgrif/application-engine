@@ -2,7 +2,6 @@ package com.netgrif.application.engine.authentication.web;
 
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.throwable.UnauthorisedRequestException;
-import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.authentication.web.requestbodies.UpdateUserRequest;
 import com.netgrif.application.engine.authentication.web.requestbodies.UserSearchRequestBody;

@@ -4,7 +4,6 @@ package com.netgrif.application.engine.startup
 import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams
-import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import com.netgrif.application.engine.authorization.domain.Role

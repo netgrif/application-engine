@@ -4,7 +4,6 @@ import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.IdentityState;
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository;
-import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Process;

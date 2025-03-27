@@ -1,7 +1,6 @@
 package com.netgrif.application.engine;
 
 import com.netgrif.application.engine.authentication.domain.Identity;
-import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;

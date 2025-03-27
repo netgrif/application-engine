@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.impersonation.service;
 
 import com.netgrif.application.engine.authentication.domain.Identity;
-import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.authorization.domain.Role;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;

@@ -3,7 +3,7 @@ package com.netgrif.application.engine.impersonation
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.IdentityState
 
-import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService
+
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest

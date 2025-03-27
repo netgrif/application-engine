@@ -3,7 +3,6 @@ package com.netgrif.application.engine.workflow.web;
 import com.netgrif.application.engine.MockService;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.IdentityState;
-import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;

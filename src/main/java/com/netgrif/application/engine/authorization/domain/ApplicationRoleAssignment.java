@@ -11,11 +11,4 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class ApplicationRoleAssignment extends RoleAssignment {
     @Indexed
     private String applicationId;
-
-    /**
-     * todo javadoc
-     */
-    public SessionRole toSessionAuthority() {
-        return new SessionRole(getStringId(), roleId);
-    }
 }
