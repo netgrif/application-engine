@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.authorization.service.interfaces;
 
+import com.netgrif.application.engine.authorization.domain.ApplicationRoleAssignment;
 import com.netgrif.application.engine.authorization.domain.CaseRoleAssignment;
 import com.netgrif.application.engine.authorization.domain.Role;
 import com.netgrif.application.engine.authorization.domain.RoleAssignment;
@@ -12,6 +13,8 @@ public interface IRoleAssignmentService {
     List<RoleAssignment> findAllByActorIdAndRoleIdIn(String actorId, Set<String> roleIds);
     List<RoleAssignment> findAllByRoleIdIn(Set<String> roleIds);
     List<RoleAssignment> findAllByActorId(String actorId);
+
+    List<ApplicationRoleAssignment> findApplicationAssignmentsByActor(String actorId);
 
     List<RoleAssignment> createAssignments(String actorId, List<Role> roles);
     RoleAssignment createAssignment(String actorId, Role role);
