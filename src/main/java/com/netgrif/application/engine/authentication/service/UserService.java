@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.authentication.service;
 
 import com.netgrif.application.engine.authentication.domain.*;
-import com.netgrif.application.engine.authentication.domain.repositories.AuthorityRepository;
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository;
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.authentication.web.requestbodies.UpdateUserRequest;
