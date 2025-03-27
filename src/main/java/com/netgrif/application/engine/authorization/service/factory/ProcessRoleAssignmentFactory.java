@@ -15,7 +15,7 @@ public class ProcessRoleAssignmentFactory extends RoleAssignmentFactory {
     private final RBACProperties properties;
 
     @Override
-    protected RoleAssignment createAssignmentInternal(Role role) {
+    protected RoleAssignment doCreateAssignment(Role role) {
         if (properties.getDefaultAssignmentSessionDuration() != null) {
             return new ProcessRoleAssignment(Session.withDuration(properties.getDefaultAssignmentSessionDuration()));
         }

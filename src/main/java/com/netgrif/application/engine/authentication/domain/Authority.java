@@ -1,78 +1,32 @@
 package com.netgrif.application.engine.authentication.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
-import lombok.Setter;
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 
-import javax.validation.constraints.NotNull;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.Serializable;
 
-@Document
-public class Authority implements GrantedAuthority {
+/**
+ * todo javadoc
+ */
+@Getter
+public class Authority implements GrantedAuthority, Serializable {
 
-    public static final long serialVersionUID = 2839744057647464485L;
+    private static final long serialVersionUID = 2839744057647464485L;
 
-    public static final String PERMISSION = "PERM_";
-    public static final String ROLE = "ROLE_";
+    private final String applicationAssignmentId;
+    private final String applicationRoleId;
 
-    public static final String admin = ROLE + "ADMIN";
-    public static final String systemAdmin = ROLE + "SYSTEMADMIN";
-    public static final String user = ROLE + "USER";
-    public static final String anonymous = ROLE + "ANONYMOUS";
-
-    @Id
-    @Getter
-    private ObjectId id;
-
-    @NotNull
-    @JsonIgnore
-    @Getter
-    @Setter
-    private String name;
-
-    @JsonIgnore
-    @Getter
-    @Setter
-    private Set<String> users;
-
-    public Authority() {
+    public Authority(String applicationAssignmentId, String applicationRoleId) {
+        this.applicationAssignmentId = applicationAssignmentId;
+        this.applicationRoleId = applicationRoleId;
     }
 
-    public Authority(String name) {
-        this.name = name;
-    }
-
-    public static Authority createRole(String name) {
-        return new Authority(ROLE + name);
-    }
-
-    public static Authority createPermission(String name) {
-        return new Authority(PERMISSION + name);
-    }
-
-    public void addUser(IUser user) {
-        if (users == null) {
-            users = new HashSet<>();
-        }
-        users.add(user.getStringId());
-    }
-
-    public String getStringId() {
-        return id.toString();
-    }
-
+    /**
+     * todo javadoc
+     */
     @Override
     public String getAuthority() {
-        return this.name;
-    }
-
-    public void setAuthority(String authority) {
-        this.name = authority;
+        return this.applicationRoleId;
     }
 
     @Override
@@ -82,19 +36,20 @@ public class Authority implements GrantedAuthority {
 
         Authority authority = (Authority) o;
 
-        return name.equals(authority.name);
+        return this.applicationRoleId.equals(authority.getApplicationRoleId())
+                && this.applicationAssignmentId.equals(authority.getApplicationAssignmentId());
     }
 
     @Override
     public String toString() {
         return "Authority{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
+                "assignmentId=" + applicationAssignmentId +
+                ", roleId='" + applicationRoleId + '\'' +
                 '}';
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return applicationRoleId.hashCode();
     }
 }

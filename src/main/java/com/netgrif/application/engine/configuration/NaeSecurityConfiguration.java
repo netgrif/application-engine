@@ -1,28 +1,23 @@
 package com.netgrif.application.engine.configuration;
 
-import com.netgrif.application.engine.authentication.domain.Authority;
-import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
+import com.netgrif.application.engine.authentication.domain.PublicStrategy;
 import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigProperties;
-import com.netgrif.application.engine.configuration.security.ImpersonationRequestFilter;
-import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
-import com.netgrif.application.engine.configuration.security.RestAuthenticationEntryPoint;
-import com.netgrif.application.engine.configuration.security.SecurityContextFilter;
+import com.netgrif.application.engine.configuration.security.*;
+import com.netgrif.application.engine.configuration.security.factory.PublicAuthenticationFilterFactory;
 import com.netgrif.application.engine.configuration.security.filter.HostValidationRequestFilter;
-import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -37,7 +32,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 
-import java.util.HashSet;
 import java.util.List;
 
 import static org.springframework.http.HttpMethod.OPTIONS;
@@ -47,38 +41,27 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 @Controller
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 @Order(SecurityProperties.DEFAULT_FILTER_ORDER)
 public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
-    @Autowired
-    private Environment env;
+    private final Environment env;
 
-    @Autowired
-    private RestAuthenticationEntryPoint authenticationEntryPoint;
+    private final RestAuthenticationEntryPoint authenticationEntryPoint;
 
-    @Autowired
-    private IAuthorityService authorityService;
+    private final ApplicationContext applicationContext;
 
-    @Autowired
-    private IJwtService jwtService;
+    private final NaeAuthProperties naeAuthProperties;
 
-    @Autowired
-    private IUserService userService;
+    private final SecurityConfigProperties properties;
 
-    @Autowired
-    private NaeAuthProperties naeAuthProperties;
+    private final PublicViewProperties publicProperties;
 
-    @Autowired
-    private SecurityConfigProperties properties;
+    private final ISecurityContextService securityContextService;
 
-    @Autowired
-    private ISecurityContextService securityContextService;
+    protected final NaeLdapProperties ldapProperties;
 
-    @Autowired
-    protected NaeLdapProperties ldapProperties;
-
-    @Autowired
-    protected IImpersonationService impersonationService;
+    protected final IImpersonationService impersonationService;
 
     private static final String ANONYMOUS_USER = "anonymousUser";
 
@@ -178,17 +161,9 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     }
 
     protected PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
-        Authority authority = authorityService.getOrCreate(Authority.anonymous);
-        authority.setUsers(new HashSet<>());
-        return new PublicAuthenticationFilter(
-                authenticationManager(),
-                new AnonymousAuthenticationProvider(ANONYMOUS_USER),
-                authority,
-                this.naeAuthProperties.getServerPatterns(),
-                this.naeAuthProperties.getAnonymousExceptions(),
-                this.jwtService,
-                this.userService
-        );
+        PublicStrategy strategy = publicProperties.getStrategy();
+        PublicAuthenticationFilterFactory filterFactory = (PublicAuthenticationFilterFactory) applicationContext.getBean(strategy.factoryClass);
+        return filterFactory.createFilter(authenticationManager());
     }
 
     private SecurityContextFilter createSecurityContextFilter() {

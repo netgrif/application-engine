@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class CaseRoleAssignmentFactory extends RoleAssignmentFactory {
 
     @Override
-    protected RoleAssignment createAssignmentInternal(Role role) {
+    protected RoleAssignment doCreateAssignment(Role role) {
         CaseRole caseRole = (CaseRole) role;
         CaseRoleAssignment assignment = new CaseRoleAssignment();
         assignment.setCaseId(caseRole.getCaseId());

@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.authorization.service.interfaces;
 
+import com.netgrif.application.engine.authorization.domain.ApplicationRole;
 import com.netgrif.application.engine.authorization.domain.CaseRole;
 import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.domain.Role;
@@ -19,6 +20,10 @@ public interface IRoleService {
     List<Role> findAllById(Set<String> roleIds);
     Role findDefaultRole();
     Role findAnonymousRole();
+
+    List<ApplicationRole> findAllApplicationRoles();
+    boolean existsApplicationRoleByImportId(String importId);
+    ApplicationRole findApplicationRoleByImportId(String importId);
 
     List<ProcessRole> findAllProcessRoles();
     List<ProcessRole> findAllProcessRolesByImportIds(Set<String> roleImportIds);

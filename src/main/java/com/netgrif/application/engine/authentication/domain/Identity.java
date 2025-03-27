@@ -14,14 +14,6 @@ public class Identity extends Case {
     /**
      * todo javadoc
      * */
-    public boolean isAdmin() {
-        // todo 2058 ApplicationRole
-        return true;
-    }
-
-    /**
-     * todo javadoc
-     * */
     public boolean isActive() {
         String state = (String) getDataSet().get(IdentityConstants.STATE_FIELD_ID).getRawValue();
         return state.equalsIgnoreCase(IdentityState.ACTIVE.name());
@@ -98,7 +90,18 @@ public class Identity extends Case {
      * todo javadoc
      * */
     public LoggedIdentity toSession() {
+        return toSession(new HashSet<>());
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public LoggedIdentity toSession(Set<Authority> authorities) {
         String username = (String) getDataSet().get(IdentityConstants.USERNAME_FIELD_ID).getRawValue();
+
+        if (authorities == null) {
+            authorities = new HashSet<>();
+        }
 
         return LoggedIdentity.builder()
                 .username(username)
@@ -106,6 +109,7 @@ public class Identity extends Case {
                 .fullName(this.getFullName())
                 .identityId(this.getStringId())
                 .activeActorId(this.getMainActorId())
+                .authorities(authorities)
                 .build();
     }
 }

@@ -1,8 +1,10 @@
 package com.netgrif.application.engine.authorization.service;
 
+import com.netgrif.application.engine.authorization.domain.ApplicationRoleAssignment;
 import com.netgrif.application.engine.authorization.domain.CaseRoleAssignment;
 import com.netgrif.application.engine.authorization.domain.Role;
 import com.netgrif.application.engine.authorization.domain.RoleAssignment;
+import com.netgrif.application.engine.authorization.domain.repositories.ApplicationRoleAssignmentRepository;
 import com.netgrif.application.engine.authorization.domain.repositories.CaseRoleAssignmentRepository;
 import com.netgrif.application.engine.authorization.domain.repositories.RoleAssignmentRepository;
 import com.netgrif.application.engine.authorization.service.factory.RoleAssignmentFactory;
@@ -22,6 +24,7 @@ public class RoleAssignmentService implements IRoleAssignmentService {
 
     private final RoleAssignmentRepository repository;
     private final CaseRoleAssignmentRepository caseRoleAssignmentRepository;
+    private final ApplicationRoleAssignmentRepository applicationRoleAssignmentRepository;
     private final ApplicationContext applicationContext;
 
     /**
@@ -55,6 +58,14 @@ public class RoleAssignmentService implements IRoleAssignmentService {
             return new ArrayList<>();
         }
         return (List<RoleAssignment>) repository.findAllByActorId(actorId);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public List<ApplicationRoleAssignment> findApplicationAssignmentsByActor(String actorId) {
+        return applicationRoleAssignmentRepository.findAllByActor(actorId);
     }
 
     /**

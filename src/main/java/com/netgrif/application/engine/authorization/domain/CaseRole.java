@@ -13,6 +13,7 @@ import java.util.HashMap;
 @Document(collection = "role")
 @EqualsAndHashCode(callSuper = true)
 public class CaseRole extends Role {
+
     @Indexed
     private String caseId;
 
@@ -38,6 +39,6 @@ public class CaseRole extends Role {
 
     @Override
     public String getTitleAsString() {
-        return caseId + "-" + importId;
+        return String.format("CASEROLE[%s-%s]", caseId, importId);
     }
 }
