@@ -1,6 +1,5 @@
 package com.netgrif.application.engine;
 
-import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration;
@@ -22,7 +21,7 @@ public class MockService {
     private SuperAdminConfiguration configuration;
 
     public Identity mockLoggedUser() {
-        Authority authorityUser = authorityService.getOrCreate(Authority.user);
-        return new Identity(new ObjectId().toString(), configuration.getEmail(), configuration.getPassword(), Collections.singleton(authorityUser));
+        SessionRole sessionRoleUser = authorityService.getOrCreate(SessionRole.user);
+        return new Identity(new ObjectId().toString(), configuration.getEmail(), configuration.getPassword(), Collections.singleton(sessionRoleUser));
     }
 }

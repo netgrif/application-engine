@@ -1,13 +1,12 @@
 package com.netgrif.application.engine.authentication.web.responsebodies;
 
 
-import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.web.UserController;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
-public class AuthoritiesResources extends CollectionModel<Authority> {
-    public AuthoritiesResources(Iterable<Authority> content) {
+public class AuthoritiesResources extends CollectionModel<SessionRole> {
+    public AuthoritiesResources(Iterable<SessionRole> content) {
         super(content);
         buildLinks();
     }

@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.configuration.security.jwt;
 
-import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -50,7 +49,7 @@ public class JwtService implements IJwtService {
 
     @Override
     @SuppressWarnings("unchecked")
-    public LoggedIdentity getLoggedIdentity(String token, Authority anonymousAuthority) {
+    public LoggedIdentity getLoggedIdentity(String token) {
         LinkedHashMap<String, Object> loggedIdentityMap = (LinkedHashMap<String, Object>) getAllClaimsFromToken(token).get("identity");
         return LoggedIdentity.builder()
                 .identityId(loggedIdentityMap.get("identityId").toString())

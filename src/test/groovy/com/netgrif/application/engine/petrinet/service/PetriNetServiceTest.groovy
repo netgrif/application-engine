@@ -1,10 +1,8 @@
 package com.netgrif.application.engine.petrinet.service
 
 import com.netgrif.application.engine.TestHelper
-
-import com.netgrif.application.engine.authentication.domain.Authority
-
 import com.netgrif.application.engine.authentication.domain.IdentityState
+
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticPetriNetRepository
@@ -90,9 +88,9 @@ class PetriNetServiceTest {
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
-        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+        def auths = importHelper.createAuthorities(["user": SessionRole.user, "admin": SessionRole.admin])
         importHelper.createUser(new User(name: "Customer", surname: "User", email: CUSTOMER_USER_MAIL, password: "password", state: IdentityState.ACTIVE),
-                [auths.get("user")] as Authority[],
+                [auths.get("user")] as SessionRole[],
                 [] as ProcessRole[])
     }
 

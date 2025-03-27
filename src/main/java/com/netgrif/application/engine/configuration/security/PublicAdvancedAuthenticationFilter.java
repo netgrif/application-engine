@@ -1,10 +1,11 @@
 package com.netgrif.application.engine.configuration.security;
 
-import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.constants.AnonymIdentityConstants;
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
+import com.netgrif.application.engine.authorization.domain.ApplicationRole;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
@@ -23,9 +24,11 @@ import java.util.Set;
 public class PublicAdvancedAuthenticationFilter extends PublicJwtAuthenticationFilter {
 
     public PublicAdvancedAuthenticationFilter(IIdentityService identityService, IRoleService roleService, ProviderManager authenticationManager,
-                                              AnonymousAuthenticationProvider provider, Authority anonymousAuthority,
-                                              String[] urls, String[] exceptions, IJwtService jwtService) {
-        super(identityService, roleService, authenticationManager, provider, anonymousAuthority, urls, exceptions, jwtService);
+                                              AnonymousAuthenticationProvider provider, ApplicationRole anonymousAppRole,
+                                              ProcessRole anonymousProcessRole, String[] urls, String[] exceptions,
+                                              IJwtService jwtService) {
+        super(identityService, roleService, authenticationManager, provider, anonymousAppRole, anonymousProcessRole, urls,
+                exceptions, jwtService);
     }
 
     /**
@@ -47,8 +50,8 @@ public class PublicAdvancedAuthenticationFilter extends PublicJwtAuthenticationF
                 .password(new TextField("n/a"))
                 .build());
 
-        roleService.assignRolesToActor(identity.getMainActorId(), Set.of(roleService.findAnonymousRole().getStringId()));
-        // todo 2058 app role
+        Set<String> roleIds = Set.of(anonymousAppRole.getStringId(), anonymousProcessRole.getStringId());
+        roleService.assignRolesToActor(identity.getMainActorId(), roleIds);
 
         return identity;
     }

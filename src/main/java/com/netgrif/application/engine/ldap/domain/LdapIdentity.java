@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.ldap.domain;
 
 
-import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.IdentityState;
 import lombok.Getter;
@@ -65,7 +64,7 @@ public class LdapIdentity extends Identity {
         user.setHomeDirectory(homeDirectory);
         user.setState(IdentityState.ACTIVE);
         user.setPassword("n/a");
-        user.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
+        user.setAuthorities(getAuthorities().stream().map(a -> ((SessionRole) a)).collect(Collectors.toSet()));
         // todo 2058
 //        user.setRoles(this.getRoles().stream().map(roleId -> {
 //            Role role = new Role();

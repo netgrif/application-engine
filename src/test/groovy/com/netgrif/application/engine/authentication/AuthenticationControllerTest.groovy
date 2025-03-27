@@ -3,7 +3,6 @@ package com.netgrif.application.engine.authentication
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.authentication.domain.Authority
 
 import com.netgrif.application.engine.authentication.domain.repositories.AuthorityRepository
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository
@@ -80,7 +79,7 @@ class AuthenticationControllerTest {
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
         if (authorityRepository.count() == 0) {
-            importHelper.createAuthority(Authority.user)
+            importHelper.createAuthority(SessionRole.user)
         }
     }
 

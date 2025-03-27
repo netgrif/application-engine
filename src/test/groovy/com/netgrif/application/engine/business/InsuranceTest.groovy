@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectWriter
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.authentication.domain.Authority
-
 import com.netgrif.application.engine.authentication.domain.IdentityState
+
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -124,10 +123,10 @@ class InsuranceTest {
 
         netId = net.getNet().getStringId()
 
-        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+        def auths = importHelper.createAuthorities(["user": SessionRole.user, "admin": SessionRole.admin])
         def processRoles = importHelper.getRolesByImportId(net.getNet(), ["agent": "1", "company": "2"])
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password", state: IdentityState.ACTIVE),
-                [auths.get("user"), auths.get("admin")] as Authority[],
+                [auths.get("user"), auths.get("admin")] as SessionRole[],
                 [processRoles.get("agent"), processRoles.get("company")] as ProcessRole[])
         List<ProcessRole> roles = roleService.findAll(netId)
         roleService.assignRolesToActor(userService.findByEmail(USER_EMAIL, false).stringId, roles.findAll { it.importId in ["1", "2"] }.collect { it.stringId } as Set, userService.getLoggedOrSystem().transformToLoggedUser())

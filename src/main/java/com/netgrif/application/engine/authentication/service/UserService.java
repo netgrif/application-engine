@@ -118,8 +118,8 @@ public class UserService extends AbstractUserService {
         if (!user.getAuthorities().isEmpty()) {
             return;
         }
-        HashSet<Authority> authorities = new HashSet<>();
-        authorities.add(authorityRepository.findByName(Authority.user));
+        HashSet<SessionRole> authorities = new HashSet<>();
+        authorities.add(authorityRepository.findByName(SessionRole.user));
         user.setAuthorities(authorities);
     }
 
@@ -127,8 +127,8 @@ public class UserService extends AbstractUserService {
         if (!user.getAuthorities().isEmpty()) {
             return;
         }
-        HashSet<Authority> authorities = new HashSet<>();
-        authorities.add(authorityRepository.findByName(Authority.anonymous));
+        HashSet<SessionRole> authorities = new HashSet<>();
+        authorities.add(authorityRepository.findByName(SessionRole.anonymous));
         user.setAuthorities(authorities);
     }
 
@@ -255,7 +255,7 @@ public class UserService extends AbstractUserService {
     @Override
     public IUser assignAuthority(String userId, String authorityId) {
         Optional<User> user = userRepository.findById(userId);
-        Optional<Authority> authority = authorityRepository.findById(authorityId);
+        Optional<SessionRole> authority = authorityRepository.findById(authorityId);
 
         if (user.isEmpty()) {
             throw new IllegalArgumentException(String.format("Could not find user with id [%s]", userId));

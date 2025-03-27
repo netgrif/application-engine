@@ -1,24 +1,22 @@
 package com.netgrif.application.engine.authentication.service.interfaces;
 
-import com.netgrif.application.engine.authentication.domain.Authority;
-
 import java.util.List;
 
 public interface IAuthorityService {
 
-    List<Authority> findAll();
+    List<SessionRole> findAll();
 
-    Authority getOrCreate(String name);
+    SessionRole getOrCreate(String name);
 
-    Authority getOrCreatePermission(String name);
+    SessionRole getOrCreatePermission(String name);
 
-    Authority getOrCreateRole(String name);
+    SessionRole getOrCreateRole(String name);
 
-    List<Authority> getAllPermissions();
+    List<SessionRole> getAllPermissions();
 
-    List<Authority> getAllRoles();
+    List<SessionRole> getAllRoles();
 
-    Authority getOne(String id);
+    SessionRole getOne(String id);
 
-    List<Authority> findAllByIds(List<String> ids);
+    List<SessionRole> findAllByIds(List<String> ids);
 }

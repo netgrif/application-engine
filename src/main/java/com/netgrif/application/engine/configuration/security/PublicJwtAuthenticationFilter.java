@@ -1,9 +1,10 @@
 package com.netgrif.application.engine.configuration.security;
 
-import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
+import com.netgrif.application.engine.authorization.domain.ApplicationRole;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -30,9 +31,10 @@ public abstract class PublicJwtAuthenticationFilter extends PublicAuthentication
     protected final IJwtService jwtService;
 
     public PublicJwtAuthenticationFilter(IIdentityService identityService, IRoleService roleService, ProviderManager authenticationManager,
-                                         AnonymousAuthenticationProvider provider, Authority anonymousAuthority,
-                                         String[] urls, String[] exceptions, IJwtService jwtService) {
-        super(identityService, roleService, authenticationManager, provider, anonymousAuthority, urls, exceptions);
+                                         AnonymousAuthenticationProvider provider, ApplicationRole anonymousAppRole,
+                                         ProcessRole anonymousProcessRole, String[] urls, String[] exceptions,
+                                         IJwtService jwtService) {
+        super(identityService, roleService, authenticationManager, provider, anonymousAppRole, anonymousProcessRole, urls, exceptions);
         this.jwtService = jwtService;
     }
 
@@ -43,7 +45,7 @@ public abstract class PublicJwtAuthenticationFilter extends PublicAuthentication
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         if (isPublicApi(request.getRequestURI())) {
             String jwtToken = resolveValidToken(request);
-            authenticate(request, jwtService.getLoggedIdentity(jwtToken, this.anonymousAuthority));
+            authenticate(request, jwtService.getLoggedIdentity(jwtToken));
             response.setHeader(JWT_HEADER_NAME, BEARER + jwtToken);
             log.info("Anonymous identity was authenticated.");
         }

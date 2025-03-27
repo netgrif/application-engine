@@ -1,11 +1,13 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.authentication.domain.*
+
+import com.netgrif.application.engine.authentication.domain.Identity
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
-import com.netgrif.application.engine.authorization.domain.ProcessRole
+import com.netgrif.application.engine.authorization.domain.Role
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.DataRef
@@ -79,22 +81,6 @@ class ImportHelper {
     @Autowired
     private IUriService uriService
 
-    @SuppressWarnings("GroovyAssignabilityCheck")
-    Map<String, Authority> createAuthorities(Map<String, String> authorities) {
-        HashMap<String, Authority> authoritities = new HashMap<>()
-        authorities.each { authority ->
-            authoritities.put(authority.key, authorityService.getOrCreate(authority.value))
-        }
-
-        log.info("Creating ${authoritities.size()} authorities")
-        return authoritities
-    }
-
-    Authority createAuthority(String name) {
-        log.info("Creating authority $name")
-        return authorityService.getOrCreate(name)
-    }
-
     Optional<Process> createNet(String fileName, String release, LoggedIdentity author = identityService.loggedIdentity,
                                 String uriNodeId = uriService.getRoot().stringId) {
         return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author, uriNodeId)
@@ -120,13 +106,12 @@ class ImportHelper {
     /**
      * todo javadoc
      * */
-    Identity createIdentity(IdentityParams params, Authority[] authorities, ProcessRole[] roles) {
+    Identity createIdentity(IdentityParams params, Role[] roles) {
         Identity identity = identityService.createWithDefaultActor(params)
 
-        // todo 2058
-//        authorities.each { user.addAuthority(it) }
         Set<String> roleIds = Arrays.stream(roles).map { role -> role.stringId }.collect(Collectors.toSet())
         roleService.assignRolesToActor(identity.getMainActorId(), roleIds)
+
         log.info("Identity [{}][{}] created with default actor [{}].", identity.getStringId(), identity.getUsername(),
                 identity.getMainActorId())
 
@@ -142,8 +127,7 @@ class ImportHelper {
     }
 
     Case createCaseAsSuper(String title, Process net) {
-        // todo 2058 system
-        return createCase(title, net, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
+        return createCase(title, net, superCreator.loggedSuper ?: identityService.getLoggedSystemIdentity())
     }
 
     AssignTaskEventOutcome assignTask(String taskTitle, String caseId, LoggedIdentity assignee) {
@@ -151,8 +135,7 @@ class ImportHelper {
     }
 
     AssignTaskEventOutcome assignTaskToSuper(String taskTitle, String caseId) {
-        // todo 2058 system
-        return assignTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
+        return assignTask(taskTitle, caseId, superCreator.loggedSuper ?: identityService.getLoggedSystemIdentity())
     }
 
     FinishTaskEventOutcome finishTask(String taskTitle, String caseId, LoggedIdentity assignee) {
@@ -160,8 +143,7 @@ class ImportHelper {
     }
 
     FinishTaskEventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
-        // todo 2058 system
-        return finishTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
+        return finishTask(taskTitle, caseId, superCreator.loggedSuper ?: identityService.getLoggedSystemIdentity())
     }
 
     CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, LoggedIdentity assignee) {
@@ -169,8 +151,7 @@ class ImportHelper {
     }
 
     CancelTaskEventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {
-        // todo 2058 system
-        return cancelTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
+        return cancelTask(taskTitle, caseId, superCreator.loggedSuper ?: identityService.getLoggedSystemIdentity())
     }
 
     String getTaskId(String taskTitle, String caseId) {
@@ -179,8 +160,7 @@ class ImportHelper {
     }
 
     SetDataEventOutcome setTaskData(String taskId, DataSet dataSet) {
-        // todo 2058 system
-        dataService.setData(taskId, dataSet, superCreator.getSuperIdentity())
+        dataService.setData(taskId, dataSet, identityService.getLoggedSystemIdentity().activeActorId)
     }
 
     SetDataEventOutcome setTaskData(String taskTitle, String caseId, DataSet data) {
@@ -188,8 +168,7 @@ class ImportHelper {
     }
 
     List<DataRef> getTaskData(String taskTitle, String caseId) {
-        // todo 2058 system
-        return dataService.getData(getTaskId(taskTitle, caseId), superCreator.getSuperIdentity()).getData()
+        return dataService.getData(getTaskId(taskTitle, caseId), identityService.getLoggedSystemIdentity().activeActorId).getData()
     }
 
     void updateSuperUser() {

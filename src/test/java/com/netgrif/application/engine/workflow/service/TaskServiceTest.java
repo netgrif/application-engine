@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.IdentityState;
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository;
@@ -130,7 +129,7 @@ public class TaskServiceTest {
     }
 
     public Identity mockLoggedUser() {
-        Authority authorityUser = authorityService.getOrCreate(Authority.user);
-        return new Identity(new ObjectId().toString(), configuration.getEmail(), configuration.getPassword(), Collections.singleton(authorityUser));
+        SessionRole sessionRoleUser = authorityService.getOrCreate(SessionRole.user);
+        return new Identity(new ObjectId().toString(), configuration.getEmail(), configuration.getPassword(), Collections.singleton(sessionRoleUser));
     }
 }

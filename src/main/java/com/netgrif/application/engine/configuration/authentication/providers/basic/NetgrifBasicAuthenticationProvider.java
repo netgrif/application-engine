@@ -1,11 +1,8 @@
 package com.netgrif.application.engine.configuration.authentication.providers.basic;
 
 
-import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
-import com.netgrif.application.engine.authorization.domain.ApplicationRoleAssignment;
-import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
 import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -32,8 +26,6 @@ import java.util.stream.Collectors;
 public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationProvider {
 
     protected final IIdentityService identityService;
-
-    protected final IRoleAssignmentService roleAssignmentService;
 
     protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
 
@@ -68,12 +60,7 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
 
-        List<ApplicationRoleAssignment> appAssignments = roleAssignmentService.findApplicationAssignmentsByActor(identity.getMainActorId());
-        Set<Authority> authorities = appAssignments.stream()
-                .map(ApplicationRoleAssignment::toSessionAuthority)
-                .collect(Collectors.toSet());
-
-        UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(identity.toSession(authorities),
+        UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(identity.toSession(),
                 presentedPassword, new HashSet<>());
 
         result.setDetails(authentication.getDetails());

@@ -44,8 +44,8 @@ public abstract class AbstractUserService implements IUserService {
     @Override
     public void addDefaultAuthorities(IUser user) {
         if (user.getAuthorities().isEmpty()) {
-            HashSet<Authority> authorities = new HashSet<>();
-            authorities.add(authorityService.getOrCreate(Authority.user));
+            HashSet<SessionRole> authorities = new HashSet<>();
+            authorities.add(authorityService.getOrCreate(SessionRole.user));
             user.setAuthorities(authorities);
         }
     }
@@ -53,9 +53,9 @@ public abstract class AbstractUserService implements IUserService {
     @Override
     public IUser assignAuthority(String userId, String authorityId) {
         IUser user = resolveById(userId);
-        Authority authority = authorityService.getOne(authorityId);
-        user.addAuthority(authority);
-        authority.addUser(user);
+        SessionRole sessionRole = authorityService.getOne(authorityId);
+        user.addAuthority(sessionRole);
+        sessionRole.addUser(user);
 
         return save(user);
     }

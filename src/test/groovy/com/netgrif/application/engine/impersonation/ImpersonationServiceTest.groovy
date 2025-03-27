@@ -1,9 +1,8 @@
 package com.netgrif.application.engine.impersonation
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.authentication.domain.Authority
-
 import com.netgrif.application.engine.authentication.domain.IdentityState
+
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
@@ -122,26 +121,26 @@ class ImpersonationServiceTest {
         mvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(filter).apply(springSecurity()).build()
 
         testNet = helper.createNet("impersonation_test.xml").get()
-        def authority = authorityService.getOrCreate(Authority.user)
-        def authorityAnon = authorityService.getOrCreate(Authority.anonymous)
-        def authorityAdmin = authorityService.getOrCreate(Authority.admin)
+        def authority = authorityService.getOrCreate(SessionRole.user)
+        def authorityAnon = authorityService.getOrCreate(SessionRole.anonymous)
+        def authorityAdmin = authorityService.getOrCreate(SessionRole.admin)
 
         user1 = helper.createUser(new User(name: "Test", surname: "User", email: "test@netgrif.com", password: "password", state: IdentityState.ACTIVE),
-                [authority] as Authority[],
+                [authority] as SessionRole[],
                 [] as ProcessRole[])
 
         auth1 = new UsernamePasswordAuthenticationToken(user1.transformToLoggedUser(), (user1 as User).password, user1.authorities)
         auth1.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
         user2 = helper.createUser(new User(name: "Test", surname: "User2", email: "test2@netgrif.com", password: "password", state: IdentityState.ACTIVE),
-                [authority, authorityAnon] as Authority[],
+                [authority, authorityAnon] as SessionRole[],
                 testNet.roles.values() as ProcessRole[])
 
         auth2 = new UsernamePasswordAuthenticationToken(user2.transformToLoggedUser(), (user2 as User).password, user2.authorities)
         auth2.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
         adminUser = helper.createUser(new User(name: "Admin", surname: "User", email: "admin@netgrif.com", password: "password", state: IdentityState.ACTIVE),
-                [authority, authorityAdmin] as Authority[],
+                [authority, authorityAdmin] as SessionRole[],
                 testNet.roles.values() as ProcessRole[])
 
         adminUserAuth = new UsernamePasswordAuthenticationToken(adminUser.transformToLoggedUser(), (adminUser as User).password, adminUser.authorities)
@@ -175,8 +174,8 @@ class ImpersonationServiceTest {
     @Test
     void testImpersonationRolesAndAuths() {
         def role = user2.roles.find { it.importId == "test_role" }
-        def auth = user2.authorities.find { it.name == Authority.user }
-        def config = setup([role.stringId], [auth.stringId, authorityService.getOrCreate(Authority.admin).stringId])
+        def auth = user2.authorities.find { it.name == SessionRole.user }
+        def config = setup([role.stringId], [auth.stringId, authorityService.getOrCreate(SessionRole.admin).stringId])
 
         impersonationService.impersonateByConfig(config.stringId)
         def impersonatedRoles = userService.loggedUser.getImpersonated().getRoles()
@@ -190,7 +189,7 @@ class ImpersonationServiceTest {
         assert transformedUser.isImpersonating()
         assert transformedUserImpersonated.getRoles().size() == 2 && transformedUserImpersonated.getRoles().any { it == role.stringId }
         // default role counts
-        assert transformedUserImpersonated.getAuthorities().size() == 1 && (transformedUserImpersonated.getAuthorities()[0] as Authority).stringId == auth.stringId
+        assert transformedUserImpersonated.getAuthorities().size() == 1 && (transformedUserImpersonated.getAuthorities()[0] as SessionRole).stringId == auth.stringId
     }
 
     @Test

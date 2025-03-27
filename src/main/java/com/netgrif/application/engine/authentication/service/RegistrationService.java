@@ -8,15 +8,16 @@ import com.netgrif.application.engine.authentication.service.interfaces.IRegistr
 import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest;
 import com.netgrif.application.engine.authentication.web.requestbodies.RegistrationRequest;
 import com.netgrif.application.engine.authorization.domain.Actor;
+import com.netgrif.application.engine.authorization.domain.Role;
 import com.netgrif.application.engine.authorization.domain.params.ActorParams;
 import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
+import com.netgrif.application.engine.startup.ApplicationRoleRunner;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -38,6 +39,7 @@ public class RegistrationService implements IRegistrationService {
     private final INextGroupService groupService;
     private final IRoleService roleService;
     private final IActorService actorService;
+    private final ApplicationRoleRunner applicationRoleRunner;
     private final ServerAuthProperties serverAuthProperties;
     private final IIdentityService identityService;
 
@@ -71,8 +73,10 @@ public class RegistrationService implements IRegistrationService {
             if (request.roles != null && !request.roles.isEmpty()) {
                 roleService.assignRolesToActor(identity.getMainActorId(), request.roles);
             }
-            // todo 2058 add authorities (default app roles)
-            roleService.assignRolesToActor(identity.getMainActorId(), Set.of(roleService.findDefaultRole().getStringId()));
+            Role defaultAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.DEFAULT_APP_ROLE);
+            Role defaultProcessRole = roleService.findDefaultRole();
+            roleService.assignRolesToActor(identity.getMainActorId(), Set.of(defaultAppRole.getStringId(),
+                    defaultProcessRole.getStringId()));
 
             // todo 2058 groups
 //            if (newUser.groups != null && !newUser.groups.isEmpty()) {

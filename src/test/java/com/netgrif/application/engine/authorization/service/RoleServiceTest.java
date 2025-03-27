@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authorization.domain.ApplicationRole;
 import com.netgrif.application.engine.authorization.domain.CaseRole;
 import com.netgrif.application.engine.authorization.domain.ProcessRole;
@@ -359,7 +358,7 @@ public class RoleServiceTest {
     @Test
     public void testAssignRolesToUser() {
         User user = new User("email", "password", "username", "surname");
-        importHelper.createUser(user, new Authority[]{}, new ProcessRole[]{});
+        importHelper.createUser(user, new SessionRole[]{}, new ProcessRole[]{});
 
         Role processRole = new ProcessRole("import_id1");
         Role caseRole = new CaseRole("import_id2", "case_id");
@@ -404,7 +403,7 @@ public class RoleServiceTest {
     @Test
     public void testRemoveRolesFromUser() {
         User user = new User("email", "password", "username", "surname");
-        importHelper.createUser(user, new Authority[]{}, new ProcessRole[]{});
+        importHelper.createUser(user, new SessionRole[]{}, new ProcessRole[]{});
         Role processRole = new ProcessRole("import_id1");
         Role processRole2 = new ProcessRole("import_id2");
         Role caseRole = new CaseRole("import_id3", "case_id");

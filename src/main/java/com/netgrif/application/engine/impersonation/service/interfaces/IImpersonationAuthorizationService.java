@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.impersonation.service.interfaces;
 
-import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authorization.domain.Role;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -22,7 +21,7 @@ public interface IImpersonationAuthorizationService {
 
     List<Case> searchConfigs(String impersonatorId, String impersonatedId);
 
-    List<Authority> getAuthorities(List<Case> configs, IUser impersonated);
+    List<SessionRole> getAuthorities(List<Case> configs, IUser impersonated);
 
     List<Role> getRoles(List<Case> configs, IUser impersonated);
 

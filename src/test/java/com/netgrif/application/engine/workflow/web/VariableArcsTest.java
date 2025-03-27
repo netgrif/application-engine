@@ -2,7 +2,6 @@ package com.netgrif.application.engine.workflow.web;
 
 import com.netgrif.application.engine.MockService;
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.IdentityState;
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.authorization.domain.ProcessRole;
@@ -111,7 +110,7 @@ public class VariableArcsTest {
         user.setState(IdentityState.ACTIVE);
         user.setEmail("VariableArcsTest@test.com");
         testUser = importHelper.createUser(user,
-                new Authority[]{authorityService.getOrCreate(Authority.user)},
+                new SessionRole[]{authorityService.getOrCreate(SessionRole.user)},
                 new ProcessRole[]{});
 
         finishCase = importHelper.createCase("finish case", loaded);

@@ -1,9 +1,8 @@
 package com.netgrif.application.engine.filters
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.authentication.domain.Authority
-
 import com.netgrif.application.engine.authentication.domain.IdentityState
+
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
@@ -296,9 +295,9 @@ class FilterImportExportTest {
     }
 
     private User createDummyUser() {
-        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+        def auths = importHelper.createAuthorities(["user": SessionRole.user, "admin": SessionRole.admin])
         return importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: IdentityState.ACTIVE),
-                [auths.get("user")] as Authority[],
+                [auths.get("user")] as SessionRole[],
                 [] as ProcessRole[])
     }
 

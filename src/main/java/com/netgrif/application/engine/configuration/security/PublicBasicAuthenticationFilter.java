@@ -1,11 +1,12 @@
 package com.netgrif.application.engine.configuration.security;
 
-import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.constants.AnonymIdentityConstants;
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authorization.domain.Actor;
+import com.netgrif.application.engine.authorization.domain.ApplicationRole;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.domain.params.ActorParams;
 import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
@@ -31,9 +32,11 @@ public class PublicBasicAuthenticationFilter extends PublicJwtAuthenticationFilt
     private final IActorService actorService;
 
     public PublicBasicAuthenticationFilter(IIdentityService identityService, IRoleService roleService, ProviderManager authenticationManager,
-                                           AnonymousAuthenticationProvider provider, Authority anonymousAuthority,
-                                           String[] urls, String[] exceptions, IJwtService jwtService, IActorService actorService) {
-        super(identityService, roleService, authenticationManager, provider, anonymousAuthority, urls, exceptions, jwtService);
+                                           AnonymousAuthenticationProvider provider, ApplicationRole anonymousAppRole,
+                                           ProcessRole anonymousProcessRole, String[] urls, String[] exceptions,
+                                           IJwtService jwtService, IActorService actorService) {
+        super(identityService, roleService, authenticationManager, provider, anonymousAppRole, anonymousProcessRole, urls,
+                exceptions, jwtService);
         this.actorService = actorService;
     }
 
@@ -56,8 +59,8 @@ public class PublicBasicAuthenticationFilter extends PublicJwtAuthenticationFilt
                 .lastname(new TextField(AnonymIdentityConstants.LASTNAME))
                 .build()));
 
-        roleService.assignRolesToActor(anonymActor.getStringId(), Set.of(roleService.findAnonymousRole().getStringId()));
-        // todo 2058 app role
+        Set<String> roleIds = Set.of(anonymousAppRole.getStringId(), anonymousProcessRole.getStringId());
+        roleService.assignRolesToActor(anonymActor.getStringId(), roleIds);
 
         return identityService.encodePasswordAndCreate(IdentityParams.with()
                 .username(new TextField(AnonymIdentityConstants.usernameOf(hash)))

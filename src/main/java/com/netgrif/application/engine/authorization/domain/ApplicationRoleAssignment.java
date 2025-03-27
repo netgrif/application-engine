@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.authorization.domain;
 
-import com.netgrif.application.engine.authentication.domain.Authority;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -16,7 +15,7 @@ public class ApplicationRoleAssignment extends RoleAssignment {
     /**
      * todo javadoc
      */
-    public Authority toSessionAuthority() {
-        return new Authority(getStringId(), roleId);
+    public SessionRole toSessionAuthority() {
+        return new SessionRole(getStringId(), roleId);
     }
 }

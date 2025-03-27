@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.impersonation.service;
 
-import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.authorization.domain.Role;
@@ -152,7 +151,7 @@ public class ImpersonationService implements IImpersonationService {
         if (userService.findById(impersonatorId).transformToLoggedUser().isAdmin()) {
             return impersonated;
         }
-        List<Authority> authorities = impersonationAuthorizationService.getAuthorities(configs, impersonated);
+        List<SessionRole> authorities = impersonationAuthorizationService.getAuthorities(configs, impersonated);
         List<Role> roles = impersonationAuthorizationService.getRoles(configs, impersonated);
 
         impersonated.setAuthorities(new HashSet<>(authorities));

@@ -63,8 +63,6 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     protected final IImpersonationService impersonationService;
 
-    private static final String ANONYMOUS_USER = "anonymousUser";
-
     @Bean
     public HttpSessionIdResolver httpSessionIdResolver() {
         return HeaderHttpSessionIdResolver.xAuthToken();

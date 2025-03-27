@@ -1,9 +1,8 @@
 package com.netgrif.application.engine.petrinet.web
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.authentication.domain.Authority
-
 import com.netgrif.application.engine.authentication.domain.IdentityState
+
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -86,10 +85,10 @@ class PetriNetControllerTest {
                 .apply(springSecurity())
                 .build()
 
-        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+        def auths = importHelper.createAuthorities(["user": SessionRole.user, "admin": SessionRole.admin])
 
         importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: IdentityState.ACTIVE),
-                [auths.get("user")] as Authority[],
+                [auths.get("user")] as SessionRole[],
 //                [] as Group[],
                 [] as ProcessRole[])
 
@@ -97,7 +96,7 @@ class PetriNetControllerTest {
         userAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
         importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: IdentityState.ACTIVE),
-                [auths.get("admin")] as Authority[],
+                [auths.get("admin")] as SessionRole[],
 //                [] as Group[],
                 [] as ProcessRole[])
 

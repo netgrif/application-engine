@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.authorization.service;
 
-import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authorization.service.interfaces.IAuthorizationService;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
@@ -16,6 +15,6 @@ public class AuthorizationService implements IAuthorizationService {
     @Override
     public boolean hasAuthority(String authority) {
         Identity identity = userService.getLoggedUserFromContext().getSelfOrImpersonated();
-        return identity.getAuthorities().stream().anyMatch(it -> it.getAuthority().equals(Authority.ROLE + authority));
+        return identity.getAuthorities().stream().anyMatch(it -> it.getAuthority().equals(SessionRole.ROLE + authority));
     }
 }

@@ -1,37 +1,31 @@
 package com.netgrif.application.engine.configuration.security.factory;
 
-import com.netgrif.application.engine.authentication.domain.Authority;
-import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
+import com.netgrif.application.engine.authorization.domain.ApplicationRole;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
 import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
+import com.netgrif.application.engine.startup.ApplicationRoleRunner;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.ProviderManager;
 
-import java.util.HashSet;
-
+@RequiredArgsConstructor
 public abstract class PublicAuthenticationFilterFactory {
 
-    private final IAuthorityService authorityService;
-    
+    private final ApplicationRoleRunner applicationRoleRunner;
+
     protected final IIdentityService identityService;
     protected final IRoleService roleService;
     protected final NaeAuthProperties naeAuthProperties;
     
     private PublicAuthenticationFilter singletonFilter;
 
-    public PublicAuthenticationFilterFactory(IAuthorityService authorityService, IIdentityService identityService,
-                                             IRoleService roleService, NaeAuthProperties naeAuthProperties) {
-        this.authorityService = authorityService;
-        this.identityService = identityService;
-        this.roleService = roleService;
-        this.naeAuthProperties = naeAuthProperties;
-    }
-
     /**
      * todo javadoc
      * */
-    protected abstract PublicAuthenticationFilter doCreateFilter(ProviderManager authManager, Authority authority);
+    protected abstract PublicAuthenticationFilter doCreateFilter(ProviderManager authManager, ApplicationRole anonymousAppRole,
+                                                                 ProcessRole anonymousProcessRole);
 
     /**
      * todo javadoc
@@ -40,9 +34,11 @@ public abstract class PublicAuthenticationFilterFactory {
         if (this.singletonFilter != null) {
             return this.singletonFilter;
         }
-        Authority authority = authorityService.getOrCreate(Authority.anonymous);
-        authority.setUsers(new HashSet<>());
-        this.singletonFilter = doCreateFilter(authManager, authority);
+
+        ApplicationRole anonymousAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.ANONYMOUS_APP_ROLE);
+        ProcessRole anonymousProcessRole = (ProcessRole) roleService.findAnonymousRole();
+
+        this.singletonFilter = doCreateFilter(authManager, anonymousAppRole, anonymousProcessRole);
         return this.singletonFilter;
     }
 }

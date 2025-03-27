@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.authentication.service;
 
-import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.repositories.AuthorityRepository;
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
 import org.bson.types.ObjectId;
@@ -21,43 +20,43 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
-    public List<Authority> findAll() {
+    public List<SessionRole> findAll() {
         return repository.findAll();
     }
 
     @Override
     @Transactional
-    public Authority getOrCreate(String name) {
-        Authority authority = repository.findByName(name);
-        if (authority == null) {
-            authority = repository.save(new Authority(name));
+    public SessionRole getOrCreate(String name) {
+        SessionRole sessionRole = repository.findByName(name);
+        if (sessionRole == null) {
+            sessionRole = repository.save(new SessionRole(name));
         }
-        return authority;
+        return sessionRole;
     }
 
     @Override
-    public Authority getOrCreatePermission(String name) {
-        return getOrCreate(Authority.PERMISSION + name);
+    public SessionRole getOrCreatePermission(String name) {
+        return getOrCreate(SessionRole.PERMISSION + name);
     }
 
     @Override
-    public Authority getOrCreateRole(String name) {
-        return getOrCreate(Authority.ROLE + name);
+    public SessionRole getOrCreateRole(String name) {
+        return getOrCreate(SessionRole.ROLE + name);
     }
 
     @Override
-    public List<Authority> getAllPermissions() {
-        return repository.findAllByNameStartsWith(Authority.PERMISSION);
+    public List<SessionRole> getAllPermissions() {
+        return repository.findAllByNameStartsWith(SessionRole.PERMISSION);
     }
 
     @Override
-    public List<Authority> getAllRoles() {
-        return repository.findAllByNameStartsWith(Authority.ROLE);
+    public List<SessionRole> getAllRoles() {
+        return repository.findAllByNameStartsWith(SessionRole.ROLE);
     }
 
     @Override
-    public Authority getOne(String id) {
-        Optional<Authority> authority = repository.findById(id);
+    public SessionRole getOne(String id) {
+        Optional<SessionRole> authority = repository.findById(id);
         if (authority.isEmpty()) {
             throw new IllegalArgumentException("Could not find authority with id [" + id + "]");
         }
@@ -65,7 +64,7 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
-    public List<Authority> findAllByIds(List<String> ids) {
+    public List<SessionRole> findAllByIds(List<String> ids) {
         return repository.findAllByIdIn(ids.stream().map(ObjectId::new).collect(Collectors.toList()));
     }
 }

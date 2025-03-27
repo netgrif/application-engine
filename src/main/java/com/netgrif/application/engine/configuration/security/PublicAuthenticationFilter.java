@@ -2,6 +2,8 @@ package com.netgrif.application.engine.configuration.security;
 
 import com.netgrif.application.engine.authentication.domain.*;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
+import com.netgrif.application.engine.authorization.domain.ApplicationRole;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
@@ -14,7 +16,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
+import java.util.HashSet;
 
 @Slf4j
 public abstract class PublicAuthenticationFilter extends OncePerRequestFilter {
@@ -23,18 +25,20 @@ public abstract class PublicAuthenticationFilter extends OncePerRequestFilter {
     protected final IRoleService roleService;
     protected final ProviderManager authenticationManager;
     protected final AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
-    protected final Authority anonymousAuthority;
+    protected final ApplicationRole anonymousAppRole;
+    protected final ProcessRole anonymousProcessRole;
     protected final String[] anonymousAccessUrls;
     protected final String[] exceptions;
 
     public PublicAuthenticationFilter(IIdentityService identityService, IRoleService roleService, ProviderManager authenticationManager,
-                                      AnonymousAuthenticationProvider provider, Authority anonymousAuthority,
-                                      String[] urls, String[] exceptions) {
+                                      AnonymousAuthenticationProvider provider, ApplicationRole anonymousAppRole,
+                                      ProcessRole anonymousProcessRole, String[] urls, String[] exceptions) {
         this.identityService = identityService;
         this.roleService = roleService;
         this.authenticationManager = authenticationManager;
         this.authenticationManager.getProviders().add(provider);
-        this.anonymousAuthority = anonymousAuthority;
+        this.anonymousProcessRole = anonymousProcessRole;
+        this.anonymousAppRole = anonymousAppRole;
         this.anonymousAccessUrls = urls;
         this.exceptions = exceptions;
     }
@@ -45,7 +49,7 @@ public abstract class PublicAuthenticationFilter extends OncePerRequestFilter {
         AnonymousAuthenticationToken authRequest = new AnonymousAuthenticationToken(
                 IdentityProperties.ANONYMOUS_AUTH_KEY,
                 loggedIdentity,
-                Collections.singleton(this.anonymousAuthority)
+                new HashSet<>()
         );
         authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
         Authentication authResult = this.authenticationManager.authenticate(authRequest);

@@ -1,9 +1,11 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.authentication.domain.*
+
+import com.netgrif.application.engine.authentication.domain.Identity
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams
-import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
+import com.netgrif.application.engine.authorization.domain.Role
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
@@ -23,7 +25,7 @@ import java.util.stream.Collectors
 class SuperCreator extends AbstractOrderedCommandLineRunner {
 
     @Autowired
-    private IAuthorityService authorityService
+    private ApplicationRoleRunner applicationRoleRunner
 
     @Autowired
     private IIdentityService identityService
@@ -46,9 +48,6 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     }
 
     private void createSuperUser() {
-        Authority adminAuthority = authorityService.getOrCreate(Authority.admin)
-        Authority systemAuthority = authorityService.getOrCreate(Authority.systemAdmin)
-
         Optional<Identity> superIdentityOpt = identityService.findByUsername(configuration.email)
         if (superIdentityOpt.isPresent()) {
             log.info("Super identity detected")
@@ -63,8 +62,11 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
                 .build())
 
         Set<String> allRoleIds = roleService.findAll().stream().map { it.stringId }.collect(Collectors.toSet())
+        Role adminAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.ADMIN_APP_ROLE)
+        Role systemAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.SYSTEM_ADMIN_APP_ROLE)
+        allRoleIds.add(adminAppRole.getStringId())
+        allRoleIds.add(systemAppRole.getStringId())
         roleService.assignRolesToActor(this.superIdentity.stringId, allRoleIds)
-        // todo 2058 app role (authorities)
 
         log.info("Super identity created with actor")
     }
@@ -72,7 +74,6 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     void setAllToSuperUser() {
         setAllGroups()
         setAllRoles()
-        setAllAuthorities()
         log.info("Super identity updated")
     }
 
@@ -86,12 +87,6 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     void setAllRoles() {
         Set<String> allRoleIds = roleService.findAll().stream().map { it.stringId }.collect(Collectors.toSet())
         roleService.assignRolesToActor(this.superIdentity.stringId, allRoleIds)
-    }
-
-    void setAllAuthorities() {
-        // todo 2058 app role authorities
-//        superIdentity.setAuthorities(authorityService.findAll() as Set<Authority>)
-//        superIdentity = userService.save(superIdentity) as IUser
     }
 
     Identity getSuperIdentity() {

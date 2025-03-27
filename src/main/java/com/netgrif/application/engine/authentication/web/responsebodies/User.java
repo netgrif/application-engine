@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.authentication.web.responsebodies;
 
-import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import lombok.Data;
 
@@ -23,7 +22,7 @@ public class User {
 
     private String fullName;
 
-    private Set<Authority> authorities;
+    private Set<SessionRole> authorities;
 
     // process roles are set with the factory
     private Set<ProcessRole> processRoles;

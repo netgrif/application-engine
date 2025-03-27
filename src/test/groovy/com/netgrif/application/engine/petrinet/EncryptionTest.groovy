@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet
 
-import com.netgrif.application.engine.authentication.domain.Authority
+
 import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
@@ -92,7 +92,7 @@ class EncryptionTest {
     }
 
     Identity mockLoggedUser() {
-        def authorityUser = authorityService.getOrCreate(Authority.user)
+        def authorityUser = authorityService.getOrCreate(SessionRole.user)
         return new Identity(superCreator.getSuperIdentity().getStringId(), configuration.email, configuration.password, [authorityUser])
     }
 }

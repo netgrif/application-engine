@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.impersonation.service;
 
-import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
@@ -91,7 +90,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     }
 
     @Override
-    public List<Authority> getAuthorities(List<Case> configs, IUser impersonated) {
+    public List<SessionRole> getAuthorities(List<Case> configs, IUser impersonated) {
         if (configs.isEmpty()) {
             return new ArrayList<>();
         }

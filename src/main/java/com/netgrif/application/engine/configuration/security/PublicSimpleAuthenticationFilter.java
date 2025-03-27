@@ -1,10 +1,11 @@
 package com.netgrif.application.engine.configuration.security;
 
-import com.netgrif.application.engine.authentication.domain.Authority;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.constants.AnonymIdentityConstants;
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
+import com.netgrif.application.engine.authorization.domain.ApplicationRole;
+import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +28,11 @@ import java.util.Set;
 public class PublicSimpleAuthenticationFilter extends PublicAuthenticationFilter  {
     private static final String USERNAME = "anonymous";
 
-    public PublicSimpleAuthenticationFilter(IIdentityService identityService, IRoleService roleService, ProviderManager authenticationManager, AnonymousAuthenticationProvider provider,
-                                            Authority anonymousAuthority, String[] urls, String[] exceptions) {
-        super(identityService, roleService, authenticationManager, provider, anonymousAuthority, urls, exceptions);
+    public PublicSimpleAuthenticationFilter(IIdentityService identityService, IRoleService roleService, ProviderManager authenticationManager,
+                                            AnonymousAuthenticationProvider provider, ApplicationRole anonymousAppRole,
+                                            ProcessRole anonymousProcessRole, String[] urls, String[] exceptions) {
+        super(identityService, roleService, authenticationManager, provider, anonymousAppRole, anonymousProcessRole,
+                urls, exceptions);
     }
 
     /**
@@ -63,8 +66,8 @@ public class PublicSimpleAuthenticationFilter extends PublicAuthenticationFilter
                         .lastname(new TextField(AnonymIdentityConstants.LASTNAME))
                 .build());
 
-        roleService.assignRolesToActor(anonymIdentity.getMainActorId(), Set.of(roleService.findAnonymousRole().getStringId()));
-        // todo 2058 app role
+        Set<String> roleIds = Set.of(anonymousAppRole.getStringId(), anonymousProcessRole.getStringId());
+        roleService.assignRolesToActor(anonymIdentity.getMainActorId(), roleIds);
 
         return anonymIdentity;
     }

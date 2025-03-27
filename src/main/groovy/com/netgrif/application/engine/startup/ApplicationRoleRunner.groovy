@@ -1,10 +1,8 @@
 package com.netgrif.application.engine.startup
 
-
 import com.netgrif.application.engine.authorization.domain.ApplicationRole
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import groovy.transform.CompileStatic
-import lombok.Getter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -17,7 +15,6 @@ class ApplicationRoleRunner extends AbstractOrderedCommandLineRunner {
     public static final String SYSTEM_ADMIN_APP_ROLE = "system_admin"
     public static final String ANONYMOUS_APP_ROLE = "anonymous"
 
-    @Getter
     private Map<String, ApplicationRole> applicationRoles
 
     @Autowired
@@ -35,6 +32,23 @@ class ApplicationRoleRunner extends AbstractOrderedCommandLineRunner {
         appRoles.put(ANONYMOUS_APP_ROLE, createAndSaveApplicationRole(applicationId, ANONYMOUS_APP_ROLE))
 
         this.applicationRoles = Collections.unmodifiableMap(appRoles)
+    }
+
+    /**
+     * todo javadoc
+     * */
+    ApplicationRole getAppRole(String roleName) {
+        if (roleName == null) {
+            return null
+        }
+        return applicationRoles.get(roleName)
+    }
+
+    /**
+     * todo javadoc
+     * */
+    Collection<ApplicationRole> getAllAppRoles() {
+        return applicationRoles.values()
     }
 
     private ApplicationRole createAndSaveApplicationRole(String applicationId, String importId) {

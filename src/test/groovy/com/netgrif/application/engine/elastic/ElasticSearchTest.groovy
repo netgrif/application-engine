@@ -2,9 +2,8 @@ package com.netgrif.application.engine.elastic
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
-import com.netgrif.application.engine.authentication.domain.Authority
-
 import com.netgrif.application.engine.authentication.domain.IdentityState
+
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepository
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField
@@ -109,9 +108,9 @@ class ElasticSearchTest {
         netId = net.getStringId()
         netId2 = net2.getStringId()
 
-        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+        def auths = importHelper.createAuthorities(["user": SessionRole.user, "admin": SessionRole.admin])
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSW, state: IdentityState.ACTIVE),
-                [auths.get("user")] as Authority[],
+                [auths.get("user")] as SessionRole[],
                 [net.roles.values().find { it.importId == "process_role" }] as ProcessRole[])
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSW)
         auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));

@@ -1,9 +1,8 @@
 package com.netgrif.application.engine.permissions
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.authentication.domain.Authority
-
 import com.netgrif.application.engine.authentication.domain.IdentityState
+
 import com.netgrif.application.engine.authentication.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
@@ -78,7 +77,7 @@ class ElasticSearchViewPermissionTest {
     private Process net
     private Process netWithUserRefs
     private IUser testUser
-    private Authority userAuthority
+    private SessionRole userAuthority
 
     @BeforeEach
     void inti() {
@@ -91,10 +90,10 @@ class ElasticSearchViewPermissionTest {
         assert netWithUserRefs.getNet() != null
         this.netWithUserRefs = netWithUserRefs.getNet()
 
-        userAuthority = authorityService.getOrCreate(Authority.user)
+        userAuthority = authorityService.getOrCreate(SessionRole.user)
 
         testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: IdentityState.ACTIVE),
-                [userAuthority] as Authority[], [] as ProcessRole[])
+                [userAuthority] as SessionRole[], [] as ProcessRole[])
     }
 
     @Test

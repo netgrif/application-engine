@@ -2,9 +2,8 @@ package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.authentication.domain.Authority
-
 import com.netgrif.application.engine.authentication.domain.IdentityState
+
 import com.netgrif.application.engine.authentication.domain.repositories.UserRepository
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.importer.service.Importer
@@ -110,9 +109,9 @@ class RemoveActionTest {
 
         this.petriNet = net.getNet()
 
-        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+        def auths = importHelper.createAuthorities(["user": SessionRole.user, "admin": SessionRole.admin])
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: IdentityState.ACTIVE),
-                [auths.get("user")] as Authority[],
+                [auths.get("user")] as SessionRole[],
                 [] as ProcessRole[])
         auth = new UsernamePasswordAuthenticationToken(configuration.email, configuration.password)
         auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
