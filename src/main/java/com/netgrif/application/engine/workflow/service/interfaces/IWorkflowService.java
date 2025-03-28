@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
-import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
-import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -22,8 +20,6 @@ public interface IWorkflowService {
     Case findOne(String caseId);
 
     Case findOneNoNet(String caseId);
-
-    AccessPermissions<CasePermission> findPermissionsById(String caseId);
 
     List<Case> findAllById(List<String> ids);
 

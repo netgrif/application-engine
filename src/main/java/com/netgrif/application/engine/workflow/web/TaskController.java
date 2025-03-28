@@ -81,7 +81,7 @@ public class TaskController extends AbstractTaskController {
         return super.getOne(taskId, locale);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallAssign(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallAssign(#taskId)")
     @Operation(summary = "Assign task",
             description = "Caller must be able to perform the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -95,7 +95,6 @@ public class TaskController extends AbstractTaskController {
         return super.assign(identity, taskId);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallDelegate(#auth.getPrincipal(), #taskId)")
     @Operation(summary = "Delegate task",
             description = "Caller must be able to delegate the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -105,11 +104,12 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody String delegatedId) {
+        // TODO: release/8.0.0 remove delegate
         LoggedIdentity identity = (LoggedIdentity) auth.getPrincipal();
         return super.delegate(identity, taskId, delegatedId);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallFinish(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallFinish(#taskId)")
     @Operation(summary = "Finish task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -123,7 +123,7 @@ public class TaskController extends AbstractTaskController {
         return super.finish(identity, taskId);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallCancel(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallCancel(#taskId)")
     @Operation(summary = "Cancel task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -138,14 +138,14 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Override
-    @Operation(summary = "Get all tasks assigned to logged user", security = {@SecurityRequirement(name = "BasicAuth")})
+    @Operation(summary = "Get all tasks assigned to actor", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/my", produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<TaskResource> getMy(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
         return super.getMy(auth, pageable, assembler, locale);
     }
 
     @Override
-    @Operation(summary = "Get all finished tasks by logged user", security = {@SecurityRequirement(name = "BasicAuth")})
+    @Operation(summary = "Get all finished tasks by actor", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/my/finished", produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<TaskResource> getMyFinished(Pageable pageable, Authentication auth, PagedResourcesAssembler<Task> assembler, Locale locale) {
         return super.getMyFinished(pageable, auth, assembler, locale);
@@ -181,7 +181,7 @@ public class TaskController extends AbstractTaskController {
         return super.getData(taskId, locale, auth);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveData(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSetData(#taskId)")
     @Operation(summary = "Set task data",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -194,7 +194,7 @@ public class TaskController extends AbstractTaskController {
         return super.setData(taskId, dataBody, auth);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#taskId)")
     @Operation(summary = "Upload file into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -213,7 +213,7 @@ public class TaskController extends AbstractTaskController {
         return super.getFile(taskId, fieldId);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#taskId)")
     @Operation(summary = "Remove file from the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -226,7 +226,7 @@ public class TaskController extends AbstractTaskController {
         return super.deleteFile(requestBody.getParentTaskId(), requestBody.getFieldId());
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#taskId)")
     @Operation(summary = "Upload multiple files into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -245,7 +245,7 @@ public class TaskController extends AbstractTaskController {
         return super.getNamedFile(taskId, fieldId, fileName);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#taskId)")
     @Operation(summary = "Remove file from tasks file list field value",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})

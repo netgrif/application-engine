@@ -659,6 +659,14 @@ public class TaskService implements ITaskService {
         return loadUsers(taskRepository.findByAssigneeId(pageable, actorId));
     }
 
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public boolean existsByTaskAndAssignee(String taskId, String assigneeId) {
+        return taskRepository.existsByStringIdAndAssigneeId(taskId, assigneeId);
+    }
+
     @Override
     public Page<Task> findByTransitions(Pageable pageable, List<String> transitions) {
         return loadUsers(taskRepository.findByTransitionIdIn(pageable, transitions));

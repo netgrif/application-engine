@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.workflow.domain.repositories;
 
-import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
-import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QCase;
 import org.bson.types.ObjectId;
@@ -28,15 +26,7 @@ public interface CaseRepository extends MongoRepository<Case, String>, QuerydslP
 
     void deleteAllByPetriNetObjectId(ObjectId petriNetObjectId);
 
-    Permissions findPermissionsByStringId(String caseId);
-
-
     @Override
     default void customize(QuerydslBindings bindings, QCase qCase) {
-    }
-
-    interface Permissions {
-        AccessPermissions<CasePermission> getProcessRolePermissions();
-        AccessPermissions<CasePermission> getCaseRolePermissions();
     }
 }

@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.netgrif.application.engine.authentication.domain.Identity;
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -46,12 +46,12 @@ import java.util.Locale;
 public class PublicTaskController extends AbstractTaskController {
 
     final ITaskService taskService;
-    final IUserService userService;
+    final IIdentityService identityService;
 
-    public PublicTaskController(ITaskService taskService, IDataService dataService, IUserService userService) {
+    public PublicTaskController(ITaskService taskService, IDataService dataService, IIdentityService identityService) {
         super(taskService, dataService, null);
         this.taskService = taskService;
-        this.userService = userService;
+        this.identityService = identityService;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class PublicTaskController extends AbstractTaskController {
         return this.taskService.findAllByCase(caseId, locale);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallAssign(@userService.getAnonymousLogged(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallAssign(#taskId)")
     @GetMapping(value = "/assign/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Assign task", description = "Caller must be able to perform the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
@@ -72,11 +72,11 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> assign(@PathVariable("id") String taskId) {
-        Identity identity = userService.getAnonymousLogged();
+        LoggedIdentity identity = identityService.getLoggedIdentity();
         return super.assign(identity, taskId);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallFinish(@userService.getAnonymousLogged(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallFinish(#taskId)")
     @GetMapping(value = "/finish/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Finish task", description = "Caller must be assigned to the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
@@ -87,11 +87,11 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> finish(@PathVariable("id") String taskId) {
-        Identity identity = userService.getAnonymousLogged();
+        LoggedIdentity identity = identityService.getLoggedIdentity();
         return super.finish(identity, taskId);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallCancel(@userService.getAnonymousLogged(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallCancel(#taskId)")
     @GetMapping(value = "/cancel/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Cancel task", description = "Caller must be assigned to the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
@@ -102,7 +102,7 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> cancel(@PathVariable("id") String taskId) {
-        Identity identity = userService.getAnonymousLogged();
+        LoggedIdentity identity = identityService.getLoggedIdentity();
         return super.cancel(identity, taskId);
     }
 
@@ -115,7 +115,7 @@ public class PublicTaskController extends AbstractTaskController {
 //    }
 
     @Override
-    @PreAuthorize("@taskAuthorizationService.canCallSaveData(@userService.getAnonymousLogged(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSetData(#taskId)")
     @PostMapping(value = "/{id}/data", consumes = "application/json;charset=UTF-8", produces = "application/json;charset=UTF-8")
     @Operation(summary = "Set task data", description = "Caller must be assigned to the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
@@ -129,7 +129,7 @@ public class PublicTaskController extends AbstractTaskController {
         return super.setData(taskId, dataBody, auth);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#taskId)")
     @Operation(summary = "Upload file into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN")
     @PostMapping(value = "/{id}/file", produces = MediaTypes.HAL_JSON_VALUE)
@@ -148,7 +148,7 @@ public class PublicTaskController extends AbstractTaskController {
         return super.getFile(taskId, fieldId);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#taskId)")
     @Operation(summary = "Remove file from the task",
             description = "Caller must be assigned to the task, or must be an ADMIN")
     @DeleteMapping(value = "/{id}/file", produces = MediaTypes.HAL_JSON_VALUE)
@@ -168,7 +168,7 @@ public class PublicTaskController extends AbstractTaskController {
     }
 
     @Override
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#taskId)")
     @Operation(summary = "Upload multiple files into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN")
     @PostMapping(value = "/{id}/files", produces = MediaTypes.HAL_JSON_VALUE)
@@ -187,7 +187,7 @@ public class PublicTaskController extends AbstractTaskController {
         return super.getNamedFile(taskId, fieldId, fileName);
     }
 
-    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#taskId)")
     @Operation(summary = "Remove file from tasks file list field value",
             description = "Caller must be assigned to the task, or must be an ADMIN")
     @DeleteMapping(value = "/{id}/file/named", produces = MediaTypes.HAL_JSON_VALUE)
@@ -202,6 +202,6 @@ public class PublicTaskController extends AbstractTaskController {
     @Operation(summary = "Generic task search on Mongo database")
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<TaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<com.netgrif.application.engine.workflow.domain.Task> assembler, Locale locale) {
-        return super.searchPublic(userService.getAnonymousLogged(), pageable, searchBody, operation, assembler, locale);
+        return super.searchPublic(identityService.getLoggedIdentity(), pageable, searchBody, operation, assembler, locale);
     }
 }

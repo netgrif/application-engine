@@ -39,6 +39,8 @@ public interface ITaskService {
 
     Page<Task> findByAssignee(Pageable pageable, String actorId);
 
+    boolean existsByTaskAndAssignee(String taskId, String assigneeId);
+
     Task findById(String id);
 
     Page<Task> findByTransitions(Pageable pageable, List<String> transitions);

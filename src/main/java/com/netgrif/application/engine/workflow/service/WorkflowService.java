@@ -2,8 +2,6 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
-import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
-import com.netgrif.application.engine.authorization.domain.permissions.CasePermission;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
@@ -137,24 +135,6 @@ public class WorkflowService implements IWorkflowService {
         }
         // TODO: release/8.0.0 get or throw?
         return caseOptional.get();
-    }
-
-    /**
-     * todo javadoc
-     * */
-    @Override
-    public AccessPermissions<CasePermission> findPermissionsById(String caseId) {
-        AccessPermissions<CasePermission> mergedPermissions = new AccessPermissions<>();
-
-        if (caseId == null) {
-            return mergedPermissions;
-        }
-
-        CaseRepository.Permissions result = repository.findPermissionsByStringId(caseId);
-        mergedPermissions.addPermissions(result.getProcessRolePermissions());
-        mergedPermissions.addPermissions(result.getCaseRolePermissions());
-
-        return mergedPermissions;
     }
 
     protected void initialize(Case useCase) {
