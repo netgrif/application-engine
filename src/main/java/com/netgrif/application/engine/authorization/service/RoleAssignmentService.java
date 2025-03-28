@@ -64,6 +64,26 @@ public class RoleAssignmentService implements IRoleAssignmentService {
      * todo javadoc
      * */
     @Override
+    public Set<String> findAllRoleIdsByActorId(String actorId) {
+        if (actorId == null) {
+            return new HashSet<>();
+        }
+        List<RoleAssignmentRepository.RoleOnly> result = (List<RoleAssignmentRepository.RoleOnly>) repository.findAllRoleIdsByActorId(actorId);
+        return result.stream().map(RoleAssignmentRepository.RoleOnly::getRoleId).collect(Collectors.toSet());
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public boolean existsByActorAndRole(String actorId, String roleId) {
+        return repository.existsByActorIdAndRoleId(actorId, roleId);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
     public List<ApplicationRoleAssignment> findApplicationAssignmentsByActor(String actorId) {
         return applicationRoleAssignmentRepository.findAllByActor(actorId);
     }

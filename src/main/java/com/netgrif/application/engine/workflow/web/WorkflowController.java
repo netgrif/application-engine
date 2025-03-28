@@ -55,7 +55,7 @@ import java.util.Locale;
         havingValue = "true",
         matchIfMissing = true
 )
-@Tag(name = "Workflow")
+@Tag(name = "Workflow Controller")
 public class WorkflowController {
 
     private final IWorkflowService workflowService;
@@ -70,7 +70,7 @@ public class WorkflowController {
         this.dataService = dataService;
     }
 
-    @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
+    @PreAuthorize("@caseAuthorizationService.canCallCreate(#body.netId)")
     @Operation(summary = "Create new case", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
@@ -78,7 +78,7 @@ public class WorkflowController {
         try {
             CreateCaseEventOutcome outcome = workflowService.createCase(body.netId, body.title, body.color,
                     identity.getActiveActorId(), locale);
-            return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getCase().getStringId() + " was created succesfully", outcome);
+            return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getCase().getStringId() + " was created successfully", outcome);
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
             log.error("Creating case failed:", e);
             return EventOutcomeWithMessageResource.errorMessage("Creating case failed" + e.getMessage());
@@ -149,9 +149,9 @@ public class WorkflowController {
         return resources;
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@applicationAuthorizationService.hasApplicationRole('admin')")
     @Operation(summary = "Reload tasks of case",
-            description = "Caller must have the ADMIN role",
+            description = "Caller must have the admin role",
             security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/reload/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
@@ -171,7 +171,7 @@ public class WorkflowController {
         }
     }
 
-    @PreAuthorize("@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
+    @PreAuthorize("@caseAuthorizationService.canCallDelete(#caseId)")
     @Operation(summary = "Delete case", security = {@SecurityRequirement(name = "BasicAuth")})
     @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
