@@ -1,17 +1,17 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.petrinet.domain.DataFieldLogic;
-import com.netgrif.application.engine.petrinet.domain.Transition;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.core.petrinet.domain.DataFieldLogic;
+import com.netgrif.core.petrinet.domain.Transition;
+import com.netgrif.core.petrinet.domain.dataset.Field;
+import com.netgrif.core.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
-import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
-import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
-import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
+import com.netgrif.core.petrinet.domain.events.DataEvent;
+import com.netgrif.core.petrinet.domain.events.DataEventType;
+import com.netgrif.core.petrinet.domain.events.EventPhase;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Task;
+import com.netgrif.core.workflow.domain.eventoutcomes.EventOutcome;
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
@@ -115,8 +115,8 @@ public class EventService implements IEventService {
             if (changedField.getAttributes().containsKey("value") && trigger == DataEventType.SET) {
                 Field field = outcome.getCase().getField(s);
                 log.info("[" + outcome.getCase().getStringId() + "] " + outcome.getCase().getTitle() + ": Running actions on changed field " + s);
-                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, outcome.getCase(), outcome.getTask(), params));
-                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.POST, outcome.getCase(), outcome.getTask(), params));
+                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, (Case) outcome.getCase(), (Task) outcome.getTask(), params));
+                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.POST, (Case) outcome.getCase(), (Task) outcome.getTask(), params));
             }
         });
     }

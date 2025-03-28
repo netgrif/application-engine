@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes;
 
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
+import com.netgrif.application.engine.workflow.web.responsebodies.DataFieldsResource;
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataGroup;
 import com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes.base.LocalisedTaskEventOutcome;
 
@@ -16,7 +17,7 @@ public class LocalisedGetDataGroupsEventOutcome extends LocalisedTaskEventOutcom
         super(outcome, locale);
         this.data = outcome.getData().stream()
                 .map(dg -> {
-                    DataGroup dataGroup = new DataGroup(dg.getFields(), dg.getTranslatedTitle(locale), dg.getAlignment(), dg.getStretch(), dg.getLayout(), dg.getParentTaskId(), dg.getParentCaseId(), dg.getParentTaskRefId(), dg.getNestingLevel());
+                    DataGroup dataGroup = new DataGroup((DataFieldsResource) dg.getFields(), dg.getTranslatedTitle(locale), dg.getAlignment(), dg.getStretch(), dg.getLayout(), dg.getParentTaskId(), dg.getParentCaseId(), dg.getParentTaskRefId(), dg.getNestingLevel());
                     dataGroup.setParentTransitionId(dg.getParentTransitionId());
                     return dataGroup;
                 })

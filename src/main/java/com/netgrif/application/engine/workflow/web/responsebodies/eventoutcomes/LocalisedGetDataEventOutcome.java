@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes;
 
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField;
 import com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes.base.LocalisedTaskEventOutcome;
 

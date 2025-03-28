@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.elastic.domain.ElasticCase;
-import com.netgrif.application.engine.elastic.domain.ElasticPetriNet;
-import com.netgrif.application.engine.elastic.domain.ElasticTask;
+import com.netgrif.adapter.elastic.domain.ElasticCase;
+import com.netgrif.adapter.elastic.domain.ElasticPetriNet;
+import com.netgrif.adapter.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;

@@ -1,24 +1,25 @@
 package com.netgrif.application.engine.impersonation.service;
 
-import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.adapter.auth.domain.AuthorityImpl;
+import com.netgrif.core.auth.domain.Authority;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;
-import com.netgrif.application.engine.history.domain.impersonationevents.ImpersonationEndEventLog;
-import com.netgrif.application.engine.history.domain.impersonationevents.ImpersonationStartEventLog;
-import com.netgrif.application.engine.history.service.IHistoryService;
+import com.netgrif.core.event.events.user.ImpersonationEvent;
+import com.netgrif.core.event.events.user.ImpersonationPhase;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
 import com.netgrif.application.engine.impersonation.domain.repository.ImpersonatorRepository;
 import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserHasSessionException;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationSessionService;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
-import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -33,10 +34,10 @@ public class ImpersonationService implements IImpersonationService {
     protected ImpersonationProperties properties;
 
     @Autowired
-    protected IUserService userService;
+    protected UserService userService;
 
     @Autowired
-    protected IHistoryService historyService;
+    protected ApplicationEventPublisher publisher;
 
     @Autowired
     protected IImpersonationSessionService sessionService;
@@ -55,11 +56,11 @@ public class ImpersonationService implements IImpersonationService {
         if (!properties.isEnabled()) {
             throw new IllegalArgumentException("Impersonation is not enabled in app properties");
         }
-        LoggedUser loggedUser = userService.getLoggedUser().transformToLoggedUser();
-        IUser impersonated = userService.findById(impersonatedId, false);
+        LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedUser());
+        IUser impersonated = userService.findById(impersonatedId, null);
 
         List<Case> configs = impersonationAuthorizationService.searchConfigs(loggedUser.getId(), impersonated.getStringId());
-        LoggedUser impersonatedLogged = applyRolesAndAuthorities(impersonated, loggedUser.getId(), configs).transformToLoggedUser();
+        LoggedUser impersonatedLogged = userService.transformToLoggedUser(applyRolesAndAuthorities(impersonated, loggedUser.getId(), configs));
 
         return doImpersonate(loggedUser, impersonatedLogged, configs);
     }
@@ -70,10 +71,10 @@ public class ImpersonationService implements IImpersonationService {
             throw new IllegalArgumentException("Impersonation is not enabled in app properties");
         }
         Case config = impersonationAuthorizationService.getConfig(configId);
-        LoggedUser loggedUser = userService.getLoggedUser().transformToLoggedUser();
-        IUser impersonated = userService.findById(impersonationAuthorizationService.getImpersonatedUserId(config), false);
+        LoggedUser loggedUser = userService.transformToLoggedUser(userService.getLoggedUser());
+        IUser impersonated = userService.findById(impersonationAuthorizationService.getImpersonatedUserId(config), null);
 
-        LoggedUser impersonatedLogged = applyRolesAndAuthorities(impersonated, loggedUser.getId(), Collections.singletonList(config)).transformToLoggedUser();
+        LoggedUser impersonatedLogged = userService.transformToLoggedUser(applyRolesAndAuthorities(impersonated, loggedUser.getId(), Collections.singletonList(config)));
         return doImpersonate(loggedUser, impersonatedLogged, Collections.singletonList(config));
     }
 
@@ -89,11 +90,7 @@ public class ImpersonationService implements IImpersonationService {
         securityContextService.saveToken(loggedUser.getId());
         securityContextService.reloadSecurityContext(loggedUser);
         log.info(loggedUser.getFullName() + " has just impersonated user " + impersonatedLogged.getFullName());
-        historyService.save(
-                new ImpersonationStartEventLog(loggedUser.getId(), impersonatedLogged.getId(),
-                        new ArrayList<>(impersonatedLogged.getProcessRoles()),
-                        impersonatedLogged.getAuthorities().stream().map(au -> ((Authority) au).getStringId()).collect(Collectors.toList()))
-        );
+        publisher.publishEvent(new ImpersonationEvent(loggedUser, impersonatedLogged, ImpersonationPhase.START));
         return loggedUser;
     }
 
@@ -125,7 +122,7 @@ public class ImpersonationService implements IImpersonationService {
         log.info(impersonator.getFullName() + " has stopped impersonating user " + impersonated.getFullName());
         securityContextService.saveToken(impersonator.getId());
         securityContextService.reloadSecurityContext(impersonator);
-        historyService.save(new ImpersonationEndEventLog(impersonator.getId(), impersonated.getId()));
+        publisher.publishEvent(new ImpersonationEvent(impersonator, impersonated, ImpersonationPhase.STOP));
         return impersonator;
     }
 
@@ -133,7 +130,7 @@ public class ImpersonationService implements IImpersonationService {
     public void onSessionDestroy(LoggedUser impersonator) {
         removeImpersonator(impersonator.getId());
         log.info(impersonator.getFullName() + " has logged out and stopped impersonating user " + impersonator.getImpersonated().getFullName());
-        historyService.save(new ImpersonationEndEventLog(impersonator.getId(), impersonator.getImpersonated().getId()));
+        publisher.publishEvent(new ImpersonationEvent(impersonator, impersonator.getImpersonated(), ImpersonationPhase.STOP));
     }
 
     @Override
@@ -150,7 +147,7 @@ public class ImpersonationService implements IImpersonationService {
 
     @Override
     public IUser applyRolesAndAuthorities(IUser impersonated, String impersonatorId, List<Case> configs) {
-        if (userService.findById(impersonatorId, true).transformToLoggedUser().isAdmin()) {
+        if ((Boolean) userService.findById(impersonatorId, null).getAuthorities().contains(new AuthorityImpl(Authority.admin))) {
             return impersonated;
         }
         List<Authority> authorities = impersonationAuthorizationService.getAuthorities(configs, impersonated);
@@ -169,7 +166,7 @@ public class ImpersonationService implements IImpersonationService {
                 .entrySet().stream()
                 .filter(it -> it.getValue() != null)
                 .min(Map.Entry.comparingByValue());
-            updateImpersonatedId(loggedUser, id, configs, earliestEndingConfig.map(Map.Entry::getValue).orElse(null));
+        updateImpersonatedId(loggedUser, id, configs, earliestEndingConfig.map(Map.Entry::getValue).orElse(null));
     }
 
     protected void updateImpersonatedId(LoggedUser loggedUser, String id, List<Case> configs, LocalDateTime validUntil) {

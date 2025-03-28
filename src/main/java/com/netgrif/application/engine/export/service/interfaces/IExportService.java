@@ -1,11 +1,11 @@
 package com.netgrif.application.engine.export.service.interfaces;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.application.engine.export.domain.ExportDataConfig;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.core.workflow.domain.Task;
 import com.querydsl.core.types.Predicate;
 
 import java.io.File;

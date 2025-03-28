@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.core.petrinet.domain.PetriNet;
 import org.springframework.hateoas.CollectionModel;
 
 import java.util.Collections;

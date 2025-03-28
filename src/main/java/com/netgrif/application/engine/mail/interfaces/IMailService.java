@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.mail.interfaces;
 
-import com.netgrif.application.engine.auth.domain.RegisteredUser;
+import com.netgrif.core.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.mail.domain.MailDraft;
 import freemarker.template.TemplateException;
 import jakarta.mail.MessagingException;

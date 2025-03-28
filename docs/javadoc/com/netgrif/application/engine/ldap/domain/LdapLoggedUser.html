@@ -128,7 +128,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>org.springframework.security.core.userdetails.User</li>
 <li>
 <ul class="inheritance">
-<li><a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">com.netgrif.application.engine.auth.domain.LoggedUser</a></li>
+<li><a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">com.netgrif.core.auth.domain.Authority;.LoggedUser</a></li>
 <li>
 <ul class="inheritance">
 <li>com.netgrif.application.engine.ldap.domain.LdapLoggedUser</li>
@@ -149,7 +149,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <hr>
 <pre>@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class <span class="typeNameLabel">LdapLoggedUser</span>
-extends <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a></pre>
+extends <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a></pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../../../serialized-form.html#com.netgrif.application.engine.ldap.domain.LdapLoggedUser">Serialized Form</a></dd>
@@ -185,10 +185,10 @@ extends <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.
 </a>
 <h3>Field Summary</h3>
 <ul class="blockList">
-<li class="blockList"><a id="fields.inherited.from.class.com.netgrif.application.engine.auth.domain.LoggedUser">
+<li class="blockList"><a id="fields.inherited.from.class.com.netgrif.core.auth.domain.Authority;.LoggedUser">
 <!--   -->
 </a>
-<h3>Fields inherited from class&nbsp;com.netgrif.application.engine.auth.domain.<a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a></h3>
+<h3>Fields inherited from class&nbsp;com.netgrif.core.auth.domain.Authority;.<a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a></h3>
 <code><a href="../../auth/domain/LoggedUser.html#anonymous">anonymous</a>, <a href="../../auth/domain/LoggedUser.html#fullName">fullName</a>, <a href="../../auth/domain/LoggedUser.html#groups">groups</a>, <a href="../../auth/domain/LoggedUser.html#id">id</a>, <a href="../../auth/domain/LoggedUser.html#processRoles">processRoles</a>, <a href="../../auth/domain/LoggedUser.html#serialVersionUID">serialVersionUID</a></code></li>
 </ul>
 </li>
@@ -245,17 +245,17 @@ extends <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code><a href="../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a></code></td>
+<td class="colFirst"><code><a href="../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transformToUser()">transformToUser</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.com.netgrif.application.engine.auth.domain.LoggedUser">
+<li class="blockList"><a id="methods.inherited.from.class.com.netgrif.core.auth.domain.Authority;.LoggedUser">
 <!--   -->
 </a>
-<h3>Methods inherited from class&nbsp;com.netgrif.application.engine.auth.domain.<a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a></h3>
-<code><a href="../../auth/domain/LoggedUser.html#clearImpersonated()">clearImpersonated</a>, <a href="../../auth/domain/LoggedUser.html#getEmail()">getEmail</a>, <a href="../../auth/domain/LoggedUser.html#getSelfOrImpersonated()">getSelfOrImpersonated</a>, <a href="../../auth/domain/LoggedUser.html#impersonate(com.netgrif.application.engine.auth.domain.LoggedUser)">impersonate</a>, <a href="../../auth/domain/LoggedUser.html#isAdmin()">isAdmin</a>, <a href="../../auth/domain/LoggedUser.html#isImpersonating()">isImpersonating</a>, <a href="../../auth/domain/LoggedUser.html#parseProcessRoles(java.util.Set)">parseProcessRoles</a>, <a href="../../auth/domain/LoggedUser.html#toString()">toString</a>, <a href="../../auth/domain/LoggedUser.html#transformToAnonymousUser()">transformToAnonymousUser</a>, <a href="../../auth/domain/LoggedUser.html#transformToAuthor()">transformToAuthor</a></code></li>
+<h3>Methods inherited from class&nbsp;com.netgrif.core.auth.domain.Authority;.<a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a></h3>
+<code><a href="../../auth/domain/LoggedUser.html#clearImpersonated()">clearImpersonated</a>, <a href="../../auth/domain/LoggedUser.html#getEmail()">getEmail</a>, <a href="../../auth/domain/LoggedUser.html#getSelfOrImpersonated()">getSelfOrImpersonated</a>, <a href="../../auth/domain/LoggedUser.html#impersonate(com.netgrif.core.auth.domain.Authority;.LoggedUser)">impersonate</a>, <a href="../../auth/domain/LoggedUser.html#isAdmin()">isAdmin</a>, <a href="../../auth/domain/LoggedUser.html#isImpersonating()">isImpersonating</a>, <a href="../../auth/domain/LoggedUser.html#parseProcessRoles(java.util.Set)">parseProcessRoles</a>, <a href="../../auth/domain/LoggedUser.html#toString()">toString</a>, <a href="../../auth/domain/LoggedUser.html#transformToAnonymousUser()">transformToAnonymousUser</a>, <a href="../../auth/domain/LoggedUser.html#transformToAuthor()">transformToAuthor</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.org.springframework.security.core.userdetails.User">
@@ -332,10 +332,10 @@ extends <a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.
 <ul class="blockListLast">
 <li class="blockList">
 <h4>transformToUser</h4>
-<pre class="methodSignature">public&nbsp;<a href="../../auth/domain/IUser.html" title="interface in com.netgrif.application.engine.auth.domain">IUser</a>&nbsp;transformToUser()</pre>
+<pre class="methodSignature">public&nbsp;<a href="../../auth/domain/IUser.html" title="interface in com.netgrif.core.auth.domain.Authority;">IUser</a>&nbsp;transformToUser()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="../../auth/domain/LoggedUser.html#transformToUser()">transformToUser</a></code>&nbsp;in class&nbsp;<code><a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.application.engine.auth.domain">LoggedUser</a></code></dd>
+<dd><code><a href="../../auth/domain/LoggedUser.html#transformToUser()">transformToUser</a></code>&nbsp;in class&nbsp;<code><a href="../../auth/domain/LoggedUser.html" title="class in com.netgrif.core.auth.domain.Authority;">LoggedUser</a></code></dd>
 </dl>
 </li>
 </ul>

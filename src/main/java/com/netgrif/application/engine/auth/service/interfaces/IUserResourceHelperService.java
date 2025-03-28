@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.auth.service.interfaces;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 

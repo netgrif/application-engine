@@ -1,23 +1,23 @@
 //package com.netgrif.application.engine.rules.service;
 //
 //import com.netgrif.application.engine.TestHelper;
-//import com.netgrif.application.engine.auth.domain.IUser;
-//import com.netgrif.application.engine.auth.domain.LoggedUser;
-//import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+//import com.netgrif.core.auth.domain.IUser;
+//import com.netgrif.core.auth.domain.LoggedUser;
+//import com.netgrif.auth.service.UserService;
 //import com.netgrif.application.engine.configuration.drools.RefreshableKieBase;
 //import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
-//import com.netgrif.application.engine.petrinet.domain.VersionType;
-//import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
-//import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
+//import com.netgrif.core.petrinet.domain.VersionType;
+//import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+//import com.netgrif.core.petrinet.domain.throwable.TransitionNotExecutableException;
 //import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 //import com.netgrif.application.engine.rules.domain.FactRepository;
 //import com.netgrif.application.engine.rules.domain.RuleRepository;
 //import com.netgrif.application.engine.rules.domain.StoredRule;
 //import com.netgrif.application.engine.rules.domain.facts.*;
-//import com.netgrif.application.engine.workflow.domain.Case;
-//import com.netgrif.application.engine.workflow.domain.Task;
-//import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-//import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+//import com.netgrif.core.workflow.domain.Case;
+//import com.netgrif.core.workflow.domain.Task;
+//import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+//import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 //import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 //import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 //import lombok.extern.slf4j.Slf4j;
@@ -63,7 +63,7 @@
 //    @Autowired
 //    private FactRepository factRepository;
 //    @Autowired
-//    private IUserService userService;
+//    private UserService userService;
 //
 //    private LoggedUser superUser;
 //
@@ -90,7 +90,7 @@
 //        StoredRule rule = StoredRule.builder()
 //                .when("$net: PetriNet() $event: NetImportedFact(netId == $net.stringId, eventPhase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.PRE)")
 //                .then("$net.title.defaultValue = \"" + NET_TITLE_PRE + "\"; \n" +
-//                        "$net.dataSet.put(\"" + TEST_FIELD + "\", new com.netgrif.application.engine.petrinet.domain.dataset.TextField()); \n" +
+//                        "$net.dataSet.put(\"" + TEST_FIELD + "\", new com.netgrif.core.petrinet.domain.dataset.TextField()); \n" +
 //                        "factRepository.save($event)")
 //                .identifier("rule1")
 //                .lastUpdate(LocalDateTime.now())
@@ -253,7 +253,7 @@
 //        Task task = findTask(caze, TRANS_1);
 //        IUser user = superUser.transformToUser();
 //        taskService.assignTask(task, user);
-//        taskService.delegateTask(user.transformToLoggedUser(), user.getStringId(), task.getStringId());
+//        taskService.delegateTask(userService.transformToLoggedUser(user), user.getStringId(), task.getStringId());
 //        caze = workflowService.findOne(caze.getStringId());
 //
 //        assert caze.getDataSet().get("text_data").getValue().equals(TEXT_VALUE);

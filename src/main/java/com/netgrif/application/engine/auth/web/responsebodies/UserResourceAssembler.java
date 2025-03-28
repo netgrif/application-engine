@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.auth.web.responsebodies;
 
-import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.core.auth.domain.IUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 

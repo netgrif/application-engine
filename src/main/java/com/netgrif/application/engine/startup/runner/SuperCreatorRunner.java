@@ -1,12 +1,13 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.auth.domain.*;
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.auth.service.AuthorityService;
+import com.netgrif.core.auth.domain.*;
+import com.netgrif.auth.service.UserService;
+import com.netgrif.auth.service.GroupService;
+import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
+import com.netgrif.core.auth.domain.enums.UserState;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -30,10 +33,10 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     @Value("${nae.admin.password}")
     private String superAdminPassword;
 
-    private final IAuthorityService authorityService;
-    private final IUserService userService;
-    private final INextGroupService groupService;
-    private final IProcessRoleService processRoleService;
+    private final AuthorityService authorityService;
+    private final UserService userService;
+    private final GroupService groupService;
+    private final ProcessRoleService processRoleService;
 
     @Getter
     private IUser superUser;
@@ -47,22 +50,26 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     private IUser createSuperUser() {
         Authority adminAuthority = authorityService.getOrCreate(Authority.admin);
         Authority systemAuthority = authorityService.getOrCreate(Authority.systemAdmin);
+        Set<Authority> authorities = new HashSet<>();
+        authorities.add(adminAuthority);
+        authorities.add(systemAuthority);
 
-        IUser superUser = userService.findByEmail(SUPER_ADMIN_EMAIL, false);
-        if (superUser == null) {
-            User user = new User();
-            user.setName("Admin");
-            user.setSurname("Netgrif");
+        Optional<IUser> superUser = userService.findUserByUsername(SUPER_ADMIN_EMAIL, null);
+        if (superUser.isEmpty()) {
+            User user = new com.netgrif.adapter.auth.domain.User();
+            user.setFirstName("Admin");
+            user.setLastName("Netgrif");
+            user.setUsername(SUPER_ADMIN_EMAIL);
             user.setEmail(SUPER_ADMIN_EMAIL);
             user.setPassword(superAdminPassword);
             user.setState(UserState.ACTIVE);
-            user.setAuthorities(Set.of(adminAuthority, systemAuthority));
-            user.setProcessRoles(Set.copyOf(processRoleService.findAll()));
-            this.superUser = userService.saveNew(user);
+            user.setAuthorities(authorities);
+            user.setProcessRoles(new HashSet<>(processRoleService.findAll()));
+            this.superUser = userService.createUser(user, null);
             log.info("Super user created");
         } else {
             log.info("Super user detected");
-            this.superUser = superUser;
+            this.superUser = superUser.get();
         }
 
         return this.superUser;
@@ -76,21 +83,21 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     }
 
     public void setAllGroups() {
-        groupService.findAllGroups().forEach(caze -> groupService.addUser(getSuperUser(), caze));
+        groupService.findAll().forEach(g -> groupService.addUser(getSuperUser(), g));
     }
 
     public void setAllProcessRoles() {
         superUser.setProcessRoles(Set.copyOf(processRoleService.findAll()));
-        superUser = userService.save(superUser);
+        superUser = userService.saveUser(superUser, null);
     }
 
     public void setAllAuthorities() {
         superUser.setAuthorities(Set.copyOf(authorityService.findAll()));
-        superUser = userService.save(superUser);
+        superUser = userService.saveUser(superUser, null);
     }
 
     public LoggedUser getLoggedSuper() {
-        return superUser.transformToLoggedUser();
+        return userService.transformToLoggedUser(superUser);
     }
 
 }

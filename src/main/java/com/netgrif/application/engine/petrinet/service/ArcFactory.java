@@ -1,17 +1,17 @@
 package com.netgrif.application.engine.petrinet.service;
 
-import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
-import com.netgrif.application.engine.petrinet.domain.arcs.InhibitorArc;
-import com.netgrif.application.engine.petrinet.domain.arcs.ReadArc;
-import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc;
-import com.netgrif.application.engine.petrinet.domain.arcs.reference.Reference;
-import com.netgrif.application.engine.petrinet.domain.arcs.reference.Type;
+import com.netgrif.core.petrinet.domain.arcs.Arc;
+import com.netgrif.core.petrinet.domain.arcs.InhibitorArc;
+import com.netgrif.core.petrinet.domain.arcs.ReadArc;
+import com.netgrif.core.petrinet.domain.arcs.ResetArc;
+import com.netgrif.core.petrinet.domain.arcs.reference.Reference;
+import com.netgrif.core.petrinet.domain.arcs.reference.Type;
 import org.springframework.stereotype.Component;
 
 @Component
 public final class ArcFactory {
 
-    public Arc getArc(com.netgrif.application.engine.importer.model.Arc arc) throws IllegalArgumentException {
+    public Arc getArc(com.netgrif.core.importer.model.Arc arc) throws IllegalArgumentException {
         switch (arc.getType()) {
             case REGULAR:
                 return new Arc();

@@ -1,10 +1,5 @@
 package com.netgrif.application.engine.integration.plugins.security;
 
-import com.netgrif.application.engine.integration.plugins.config.PluginProperties;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-
 //import javax.annotation.PostConstruct;
 //import java.security.Policy;
 

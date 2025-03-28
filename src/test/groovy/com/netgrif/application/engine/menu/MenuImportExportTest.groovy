@@ -1,28 +1,31 @@
 package com.netgrif.application.engine.menu
 
+import com.netgrif.adapter.workflow.domain.QCase
+import com.netgrif.adapter.workflow.domain.QTask
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.auth.service.UserService
-import com.netgrif.application.engine.orgstructure.groups.NextGroupService
-import com.netgrif.application.engine.petrinet.domain.I18nString
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.startup.runner.*
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.QCase
-import com.netgrif.application.engine.workflow.domain.QTask
-import com.netgrif.application.engine.workflow.domain.Task
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
-import com.netgrif.application.engine.workflow.domain.menu.MenuAndFilters
+import com.netgrif.application.engine.startup.runner.DefaultFiltersRunner
+import com.netgrif.application.engine.startup.runner.FilterRunner
+import com.netgrif.application.engine.startup.runner.GroupRunner
+import com.netgrif.application.engine.startup.runner.SuperCreatorRunner
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.UserFilterSearchService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IMenuImportExportService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.auth.service.GroupService
+import com.netgrif.auth.service.UserService
+import com.netgrif.core.auth.domain.Authority
+import com.netgrif.core.auth.domain.User
+import com.netgrif.core.auth.domain.enums.UserState
+import com.netgrif.core.petrinet.domain.I18nString
+import com.netgrif.core.petrinet.domain.dataset.FileFieldValue
+import com.netgrif.core.petrinet.domain.roles.ProcessRole
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.core.workflow.domain.Task
+import com.netgrif.core.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.core.workflow.domain.menu.MenuAndFilters
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -34,7 +37,6 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
-
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -112,7 +114,7 @@ class MenuImportExportTest {
     private CaseRepository caseRepository
 
     @Autowired
-    private NextGroupService nextGroupService
+    private GroupService groupService
 
     @Autowired
     private SuperCreatorRunner superCreator
@@ -132,7 +134,7 @@ class MenuImportExportTest {
     @Test
     @Disabled("Fix IllegalArgument")
     void testMenuImportExport() {
-        userAuth = new UsernamePasswordAuthenticationToken(dummyUser.transformToLoggedUser(), DUMMY_USER_PASSWORD)
+        userAuth = new UsernamePasswordAuthenticationToken(userService.transformToLoggedUser(dummyUser), DUMMY_USER_PASSWORD)
         SecurityContextHolder.getContext().setAuthentication(userAuth)
 
         def testNet = importHelper.createNet(TEST_NET)
@@ -201,7 +203,7 @@ class MenuImportExportTest {
 
     private User createDummyUser() {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        return importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: UserState.ACTIVE),
+        return importHelper.createUser(new com.netgrif.adapter.auth.domain.User(firstName: "Dummy", lastName: "User", email: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
     }

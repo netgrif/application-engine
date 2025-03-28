@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.domain.eventoutcomes.response;
 
+
 import com.netgrif.application.engine.workflow.web.responsebodies.eventoutcomes.base.LocalisedEventOutcome;
 import org.springframework.hateoas.EntityModel;
 

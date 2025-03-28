@@ -1,20 +1,21 @@
 package com.netgrif.application.engine.startup.runner;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.core.auth.domain.IUser;
+import com.netgrif.auth.service.UserService;
+import com.netgrif.core.petrinet.domain.I18nString;
+import com.netgrif.core.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.QCase;
-import com.netgrif.application.engine.workflow.domain.QTask;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.core.workflow.domain.Case;
+import com.netgrif.adapter.workflow.domain.QCase;
+import com.netgrif.adapter.workflow.domain.QTask;
+import com.netgrif.core.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.netgrif.core.auth.domain.LoggedUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,7 +51,7 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
 
     private final IPetriNetService petriNetService;
     private final IWorkflowService workflowService;
-    private final IUserService userService;
+    private final UserService userService;
     private final ITaskService taskService;
     private final IDataService dataService;
 
@@ -434,7 +435,7 @@ public class DefaultFiltersRunner implements ApplicationEngineStartupRunner {
         }
 
         try {
-            Case filterCase = this.workflowService.createCase(filterNet.getStringId(), title, null, loggedUser.transformToLoggedUser()).getCase();
+            Case filterCase = this.workflowService.createCase(filterNet.getStringId(), title, null, (LoggedUser) userService.transformToLoggedUser(loggedUser)).getCase();
             filterCase.setIcon(icon);
             filterCase = this.workflowService.save(filterCase);
             Task newFilterTask = this.taskService.searchOne(QTask.task.transitionId.eq(AUTO_CREATE_TRANSITION).and(QTask.task.caseId.eq(filterCase.getStringId())));

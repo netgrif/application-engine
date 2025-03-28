@@ -3,7 +3,7 @@ package com.netgrif.application.engine.workflow.domain.menu;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-import com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList;
+import com.netgrif.core.workflow.domain.filter.FilterImportExportList;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

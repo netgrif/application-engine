@@ -1,11 +1,11 @@
 package com.netgrif.application.engine.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.auth.service.UserService;
+import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
-import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -14,6 +14,7 @@ import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.Si
 import com.netgrif.application.engine.workflow.web.responsebodies.CountResponse;
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
+import com.netgrif.core.workflow.domain.Task;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -51,8 +52,11 @@ public class TaskController extends AbstractTaskController {
 
     public static final Logger log = LoggerFactory.getLogger(TaskController.class);
 
-    public TaskController(ITaskService taskService, IDataService dataService, IElasticTaskService searchService) {
-        super(taskService, dataService, searchService);
+    public TaskController(ITaskService taskService,
+                          IDataService dataService,
+                          IElasticTaskService searchService,
+                          UserService userService) {
+        super(taskService, dataService, searchService, userService);
     }
 
     @Override
@@ -149,21 +153,21 @@ public class TaskController extends AbstractTaskController {
     @Override
     @Operation(summary = "Get all finished tasks by logged user", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/my/finished", produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> getMyFinished(Pageable pageable, Authentication auth, PagedResourcesAssembler<Task> assembler, Locale locale) {
+    public PagedModel<LocalisedTaskResource> getMyFinished(Pageable pageable, Authentication auth,  PagedResourcesAssembler<Task> assembler, Locale locale) {
         return super.getMyFinished(pageable, auth, assembler, locale);
     }
 
     @Override
     @Operation(summary = "Generic task search on Mongo database", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
+    public PagedModel<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation,  PagedResourcesAssembler<Task> assembler, Locale locale) {
         return super.search(auth, pageable, searchBody, operation, assembler, locale);
     }
 
     @Override
     @Operation(summary = "Generic task search on Elasticsearch database", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search_es", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> searchElastic(Authentication auth, Pageable pageable, @RequestBody SingleElasticTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
+    public PagedModel<LocalisedTaskResource> searchElastic(Authentication auth, Pageable pageable, @RequestBody SingleElasticTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation,  PagedResourcesAssembler<Task> assembler, Locale locale) {
         return super.searchElastic(auth, pageable, searchBody, operation, assembler, locale);
     }
 

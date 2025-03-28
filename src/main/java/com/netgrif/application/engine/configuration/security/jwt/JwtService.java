@@ -1,8 +1,10 @@
 package com.netgrif.application.engine.configuration.security.jwt;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.adapter.auth.domain.LoggedUserImpl;
+import com.netgrif.core.auth.domain.Attribute;
+import com.netgrif.core.auth.domain.LoggedUser;
+import com.netgrif.auth.service.AuthorityService;
+import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -29,8 +31,8 @@ import java.util.function.Function;
 public class JwtService implements IJwtService {
     private byte[] secret;
     private final JwtProperties properties;
-    private final IProcessRoleService roleService;
-    private final IAuthorityService authorityService;
+    private final ProcessRoleService roleService;
+    private final AuthorityService authorityService;
 
     @PostConstruct
     private void resolveSecret() {
@@ -68,15 +70,16 @@ public class JwtService implements IJwtService {
     @Override
     public LoggedUser getLoggedUser(String token, String authority) {
         LinkedHashMap<String, Object> userMap = (LinkedHashMap<String, Object>) extractAllClaims(token).get("user");
-        LoggedUser user = new LoggedUser(
+        LoggedUser user = new LoggedUserImpl(
                 userMap.get("id").toString(),
                 userMap.get("username").toString(),
-                "n/a",
-                Collections.singleton(authorityService.getOrCreate(authority))
+                userMap.get("password").toString(),
+                Collections.singleton(authorityService.getOrCreate(authority)),
+                Collections.singleton(roleService.anonymousRole())
         );
-        user.setFullName(userMap.get("fullName").toString());
-        user.setAnonymous((boolean) userMap.get("anonymous"));
-        user.setProcessRoles(Collections.singleton(roleService.anonymousRole().getStringId()));
+        user.setFirstName(userMap.get("firstName").toString());
+        user.getAttributes().put("anonymous", new Attribute<>(true, false));
+        user.setProcessRoles(Collections.singleton(roleService.anonymousRole()));
         return user;
     }
 

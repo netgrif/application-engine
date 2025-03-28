@@ -2,7 +2,7 @@
 //
 //import com.netgrif.application.engine.rules.domain.facts.ScheduledRuleFact;
 //import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
-//import com.netgrif.application.engine.workflow.domain.Case;
+//import com.netgrif.core.workflow.domain.Case;
 //import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 //import org.quartz.JobExecutionContext;
 //import org.slf4j.Logger;

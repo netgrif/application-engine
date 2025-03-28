@@ -2,18 +2,18 @@ package com.netgrif.application.engine.action
 
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.auth.service.GroupService
+import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
-import com.netgrif.application.engine.petrinet.domain.I18nString
-import com.netgrif.application.engine.petrinet.domain.UriContentType
-import com.netgrif.application.engine.petrinet.domain.UriNode
+import com.netgrif.core.petrinet.domain.I18nString
+import com.netgrif.core.petrinet.domain.UriContentType
+import com.netgrif.core.petrinet.domain.UriNode
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.runner.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.QCase
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.adapter.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -48,7 +48,7 @@ class MenuItemApiTest {
     private FilterRunner filterRunner
 
     @Autowired
-    private IUserService userService
+    private UserService userService
 
     @Autowired
     private IWorkflowService workflowService
@@ -60,7 +60,7 @@ class MenuItemApiTest {
     private IUriService uriService
 
     @Autowired
-    private INextGroupService nextGroupService
+    private GroupService groupService
 
     @Autowired
     private IElasticCaseService elasticCaseService

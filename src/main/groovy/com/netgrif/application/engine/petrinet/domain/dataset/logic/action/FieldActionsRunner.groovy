@@ -3,10 +3,11 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 import com.netgrif.application.engine.business.IPostalCodeService
 import com.netgrif.application.engine.business.orsr.IOrsrService
 import com.netgrif.application.engine.importer.service.FieldFactory
-import com.netgrif.application.engine.petrinet.domain.Function
-import com.netgrif.application.engine.workflow.domain.*
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
+import com.netgrif.core.petrinet.domain.Function
+import com.netgrif.core.workflow.domain.Case
+import com.netgrif.core.workflow.domain.Task
+import com.netgrif.core.workflow.domain.eventoutcomes.EventOutcome
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,11 +37,11 @@ abstract class FieldActionsRunner {
 
     private Map<String, Object> actionsCache = new HashMap<>()
 
-    List<EventOutcome> run(Action action, Case useCase, Map<String, String> params, List<Function> functions = []) {
+    List<EventOutcome> run(com.netgrif.core.petrinet.domain.dataset.logic.action.Action action, Case useCase, Map<String, String> params, List<Function> functions = []) {
         return run(action, useCase, Optional.empty(), params, functions)
     }
 
-    List<EventOutcome> run(Action action, Case useCase, Optional<Task> task, Map<String, String> params, List<Function> functions = []) {
+    List<EventOutcome> run(com.netgrif.core.petrinet.domain.dataset.logic.action.Action action, Case useCase, Optional<Task> task, Map<String, String> params, List<Function> functions = []) {
         if (!actionsCache)
             actionsCache = new HashMap<>()
 
@@ -56,7 +57,7 @@ abstract class FieldActionsRunner {
         return ((ActionDelegate) code.delegate).outcomes
     }
 
-    Closure getActionCode(Action action, List<Function> functions, boolean shouldRewriteCachedActions = false) {
+    Closure getActionCode(com.netgrif.core.petrinet.domain.dataset.logic.action.Action action, List<Function> functions, boolean shouldRewriteCachedActions = false) {
         return getActionCode(actionsCacheService.getCompiledAction(action, shouldRewriteCachedActions), functions)
     }
 
