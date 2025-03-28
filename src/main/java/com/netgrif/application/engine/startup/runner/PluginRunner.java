@@ -94,7 +94,7 @@ public class PluginRunner implements ApplicationEngineStartupRunner {
                 }
                 pluginMap.get(entryPoint.getPluginName()).getEntryPoints().put(entryPoint.getName(), entryPoint);
             });
-            pluginMap.values().forEach(pluginService::registerOrActivate);
+            pluginMap.values().forEach(pluginService::register);
             log.info("All new plugins are registered.");
         }
     }
