@@ -11,8 +11,10 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -64,6 +66,17 @@ public class ActorService implements IActorService {
         } catch (IllegalArgumentException ignored) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public boolean existsById(String id) {
+        if (id == null) {
+            return false;
+        }
+        return workflowService.count(QCase.case$.id.eq(new ObjectId(id))) > 0;
     }
 
     @Override

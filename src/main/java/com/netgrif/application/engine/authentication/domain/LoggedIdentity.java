@@ -3,6 +3,7 @@ package com.netgrif.application.engine.authentication.domain;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.core.userdetails.User;
 
 import java.util.HashSet;
 
@@ -17,7 +18,7 @@ public class LoggedIdentity extends org.springframework.security.core.userdetail
     @Setter
     protected String activeActorId;
 
-    @Builder
+    @Builder(builderMethodName = "with")
     public LoggedIdentity(String fullName, String identityId, String activeActorId, String username, String password) {
         super(username, password, new HashSet<>());
         this.fullName = fullName;

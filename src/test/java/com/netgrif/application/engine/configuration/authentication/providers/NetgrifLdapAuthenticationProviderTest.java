@@ -3,7 +3,6 @@ package com.netgrif.application.engine.configuration.authentication.providers;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.ldap.domain.LdapGroupRef;
-import com.netgrif.application.engine.ldap.domain.LdapUser;
 import com.netgrif.application.engine.ldap.service.LdapUserService;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
 import com.netgrif.application.engine.orgstructure.web.requestbodies.LdapGroupRoleAssignRequestBody;

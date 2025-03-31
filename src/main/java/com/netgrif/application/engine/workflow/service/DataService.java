@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
 import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
@@ -66,9 +65,6 @@ public class DataService implements IDataService {
 
     @Autowired
     protected IWorkflowService workflowService;
-
-    @Autowired
-    protected IUserService userService;
 
     @Autowired
     protected FieldFactory fieldFactory;

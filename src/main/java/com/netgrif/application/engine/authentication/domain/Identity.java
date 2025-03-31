@@ -104,7 +104,7 @@ public class Identity extends Case {
     public LoggedIdentity toSession() {
         String username = (String) getDataSet().get(IdentityConstants.USERNAME_FIELD_ID).getRawValue();
 
-        return LoggedIdentity.builder()
+        return LoggedIdentity.with()
                 .username(username)
                 .password(this.getPassword())
                 .fullName(this.getFullName())

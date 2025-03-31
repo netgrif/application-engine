@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
@@ -55,7 +55,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
     private IWorkflowService workflowService
 
     @Autowired
-    private IUserService userService
+    private IIdentityService identityService
 
     @Autowired
     private ITaskService taskService
@@ -261,20 +261,22 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
             return Optional.empty()
         }
 
-        def loggedUser = this.userService.getLoggedOrSystem()
+        def loggedIdentity = this.identityService.loggedSystemIdentity
 
-        if (loggedUser.getStringId() == this.userService.getSystem().getStringId()) {
-            Case filterCase = this.workflowService.searchOne(QCase.case$.processIdentifier.eq("filter").and(QCase.case$.title.eq(title)).and(QCase.case$.author.id.eq(userService.getSystem().getStringId())))
-            if (filterCase != null) {
-                return Optional.of(filterCase)
-            }
+        Case filterCase = this.workflowService.searchOne((QCase.case$.processIdentifier.eq("filter")
+                & QCase.case$.title.eq(title))
+                & QCase.case$.authorId.eq(loggedIdentity.getIdentityId()))
+        if (filterCase != null) {
+            return Optional.of(filterCase)
         }
 
-        Case filterCase = this.workflowService.createCase(filterNet.getStringId(), title, null, loggedUser.transformToLoggedUser()).getCase()
+        filterCase = this.workflowService.createCase(filterNet.getStringId(), title, null,
+                loggedIdentity.getActiveActorId()).getCase()
         filterCase.setIcon(icon)
         filterCase = this.workflowService.save(filterCase)
-        Task newFilterTask = this.taskService.searchOne(QTask.task.transitionId.eq(AUTO_CREATE_TRANSITION).and(QTask.task.caseId.eq(filterCase.getStringId())))
-        this.taskService.assignTask(newFilterTask, this.userService.getLoggedOrSystem())
+        Task newFilterTask = this.taskService.searchOne(QTask.task.transitionId.eq(AUTO_CREATE_TRANSITION)
+                & QTask.task.caseId.eq(filterCase.getStringId()))
+        this.taskService.assignTask(newFilterTask, loggedIdentity.activeActorId)
 
         DataSet dataSet = new DataSet([
                 (FILTER_TYPE_FIELD_ID): new EnumerationMapField(rawValue: filterType),
@@ -287,11 +289,11 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
         }
 
         // TODO: release/8.0.0 join setData to one call
-        this.dataService.setData(newFilterTask, dataSet, superCreator.getSuperIdentity())
+        this.dataService.setData(newFilterTask, dataSet, loggedIdentity.activeActorId)
         if (isImported) {
             this.dataService.setData(newFilterTask, new DataSet([
                     (IS_IMPORTED): new NumberField(rawValue: 1)
-            ] as Map<String, Field<?>>), superCreator.getSuperIdentity())
+            ] as Map<String, Field<?>>), loggedIdentity.activeActorId)
         }
 
         I18nString translatedTitle = new I18nString(title)
@@ -301,7 +303,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
         filterCase.dataSet.get(FILTER_I18N_TITLE_FIELD_ID).rawValue = translatedTitle
         workflowService.save(filterCase)
 
-        this.taskService.finishTask(newFilterTask, this.userService.getLoggedOrSystem())
+        this.taskService.finishTask(newFilterTask, loggedIdentity.activeActorId)
         return Optional.of(this.workflowService.findOne(filterCase.getStringId()))
     }
 }

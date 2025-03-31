@@ -69,7 +69,7 @@ public class ElasticCase {
     private String mongoId;
 
     @Field(type = Keyword)
-    private String authorName;
+    private String authorId;
 
     @Field(type = Keyword)
     private String authorEmail;
@@ -124,8 +124,9 @@ public class ElasticCase {
         creationDate = useCase.getCreationDate();
         creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
         author = useCase.getAuthorId();
-        authorName = useCase.getAuthorId().getFullName();
-        authorEmail = useCase.getAuthorId().getEmail();
+        authorId = useCase.getAuthorId();
+        // todo 2058
+//        authorEmail = useCase.getAuthorId().getEmail();
         taskIds = useCase.getTasks().keySet();
         taskMongoIds = useCase.getTasks().values().stream().map(TaskPair::getTaskStringId).collect(Collectors.toSet());
         tags = new HashMap<>(useCase.getProperties());

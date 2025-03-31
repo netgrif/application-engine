@@ -8,11 +8,11 @@ import java.util.Collection;
 import java.util.List;
 
 @Getter
-public class UserAssignRoleEventLog extends UserEventLog implements IRolesEvent {
+public class ActorRemoveRoleEventLog extends ActorEventLog implements IRolesEvent {
 
     private final List<Role> roles;
 
-    public UserAssignRoleEventLog(String email, Collection<Role> roles) {
+    public ActorRemoveRoleEventLog(String email, Collection<Role> roles) {
         super(email);
         this.roles = new ArrayList<>(roles);
     }

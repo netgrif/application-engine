@@ -191,7 +191,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         buildTransitionQuery(request, query);
         buildTagsQuery(request, query);
         buildStringQuery(request, query, identity);
-        boolean resultAlwaysEmpty = buildGroupQuery(request, identity, locale, query);
+        boolean resultAlwaysEmpty = buildGroupQuery(request, locale, query);
 
         if (resultAlwaysEmpty)
             return null;
@@ -425,14 +425,14 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
      * ]
      * }
      */
-    public boolean buildGroupQuery(TaskSearchRequest request, LoggedIdentity identity, Locale locale, BoolQueryBuilder query) {
+    public boolean buildGroupQuery(TaskSearchRequest request, Locale locale, BoolQueryBuilder query) {
         if (request.group == null || request.group.isEmpty())
             return false;
 
         PetriNetSearch processQuery = new PetriNetSearch();
         processQuery.setGroup(request.group);
-        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, identity, new FullPageRequest(), locale).getContent();
-        if (groupProcesses.size() == 0)
+        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, new FullPageRequest(), locale).getContent();
+        if (groupProcesses.isEmpty())
             return true;
 
         BoolQueryBuilder groupProcessQuery = boolQuery();

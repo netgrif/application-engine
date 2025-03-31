@@ -25,6 +25,6 @@ public class ActorFieldTransformer extends ElasticDataFieldTransformer<ActorFiel
 
     @Override
     public DataType getType() {
-        return DataType.USER;
+        return DataType.ACTOR;
     }
 }

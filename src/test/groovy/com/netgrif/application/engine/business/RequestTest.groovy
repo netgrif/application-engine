@@ -6,7 +6,7 @@ import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.IdentityState
 
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService
+
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
 import com.netgrif.application.engine.petrinet.domain.dataset.NumberField

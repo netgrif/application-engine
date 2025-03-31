@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.orgstructure.groups.interfaces;
 
+import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
@@ -9,11 +10,11 @@ import java.util.*;
 
 public interface INextGroupService {
 
-    CreateCaseEventOutcome createDefaultSystemGroup(IUser author);
+    CreateCaseEventOutcome createDefaultSystemGroup(Actor author);
 
-    CreateCaseEventOutcome createGroup(IUser author);
+    CreateCaseEventOutcome createGroup(Actor author);
 
-    CreateCaseEventOutcome createGroup(String title, IUser author);
+    CreateCaseEventOutcome createGroup(String title, Actor author);
 
     Case findGroup(String groupID);
 
@@ -29,21 +30,21 @@ public interface INextGroupService {
 
     Map<String, I18nString> inviteUser(String email, Map<String, I18nString> existingUsers, Case groupCase);
 
-    void addUserToDefaultGroup(IUser user);
+    void addUserToDefaultGroup(Actor actor);
 
-    void addUser(IUser user, String groupCase);
+    void addUser(Actor actor, String groupCase);
 
-    void addUser(IUser user, Case groupCase);
+    void addUser(Actor actor, Case groupCase);
 
-    Map<String, I18nString> addUser(IUser user, Map<String, I18nString> existingUsers);
+    Map<String, I18nString> addUser(Actor actor, Map<String, I18nString> existingUsers);
 
-    void removeUser(IUser user, Case groupCase);
+    void removeUser(Actor actor, Case groupCase);
 
     Map<String, I18nString> removeUser(HashSet<String> usersToRemove, Map<String, I18nString> existingUsers, Case groupCase);
 
-    List<IUser> getMembers(Case groupCase);
+    List<Actor> getMembers(Case groupCase);
 
-    Set<String> getAllGroupsOfUser(IUser groupUser);
+    Set<String> getAllGroupsOfUser(Actor actor);
 
     String getGroupOwnerId(String groupId);
 
@@ -53,6 +54,6 @@ public interface INextGroupService {
 
     Collection<String> getGroupsOwnerEmails(Collection<String> groupIds);
 
-    Set<String> getAllCoMembers(IUser user);
+    Set<String> getAllCoMembers(Actor actor);
 
 }

@@ -8,7 +8,7 @@ import com.netgrif.application.engine.authentication.domain.params.IdentityParam
 import com.netgrif.application.engine.authentication.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService
+
 import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest
 import com.netgrif.application.engine.authorization.domain.Actor
 import com.netgrif.application.engine.authorization.domain.ProcessRole
@@ -24,7 +24,6 @@ import com.netgrif.application.engine.export.configuration.ExportConfiguration
 import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.history.service.IHistoryService
-import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
@@ -115,9 +114,6 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     IActorService actorService
 
     @Autowired
-    IUserService userService
-
-    @Autowired
     IPetriNetService petriNetService
 
     @Autowired
@@ -173,9 +169,6 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
 
     @Autowired
     IUriService uriService
-
-    @Autowired
-    IImpersonationService impersonationService
 
     @Autowired
     IHistoryService historyService
@@ -688,10 +681,13 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
                 value = value as Double
             }
             if (field instanceof ActorListField && (value instanceof String[] || value instanceof List)) {
-                LinkedHashSet<ActorFieldValue> users = new LinkedHashSet<>()
-                // todo 2058 switch to actor
-                value.each { id -> users.add(new ActorFieldValue(userService.findById(id as String))) }
-                value = new ActorListFieldValue(users)
+                LinkedHashSet<ActorFieldValue> actors = new LinkedHashSet<>()
+                value.each { id ->
+                    Optional<Actor> actorOpt = actorService.findById(id as String)
+                    ActorFieldValue actorFieldValue = actorOpt.isPresent() ? new ActorFieldValue(actorOpt.get()) : new ActorFieldValue()
+                    actors.add(actorFieldValue)
+                }
+                value = new ActorListFieldValue(actors)
             }
             if (value instanceof GString) {
                 value = value.toString()
@@ -1224,8 +1220,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         if (!createDefaultFilters) {
             return []
         }
-        // todo 2058 get system actor
-        return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.setStringId.eq(userService.system.stringId)) })
+        return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.setStringId.eq(identityService.getLoggedSystemIdentity().activeActorId)) })
     }
 
     /**
@@ -1826,16 +1821,14 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     List<Case> findCasesElastic(String query, Pageable pageable) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
-        // todo 2058 logged system
-        List<Case> result = elasticCaseService.search([request], userService.system.transformToLoggedUser(), pageable, LocaleContextHolder.locale, false).content
+        List<Case> result = elasticCaseService.search([request], identityService.getLoggedSystemIdentity(), pageable, LocaleContextHolder.locale, false).content
         return result
     }
 
     long countCasesElastic(String query) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
-        // todo 2058 logged system
-        return elasticCaseService.count([request], userService.system.transformToLoggedUser(), LocaleContextHolder.locale, false)
+        return elasticCaseService.count([request], identityService.getLoggedSystemIdentity(), LocaleContextHolder.locale, false)
     }
 
     @Deprecated

@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
@@ -18,9 +19,8 @@ public class TaskSearchService extends MongoSearchService<Task> {
     @Autowired
     private IPetriNetService petriNetService;
 
-    public Predicate buildQuery(List<TaskSearchRequest> requests, Identity user, Locale locale, Boolean isIntersection) {
-        Identity loggedOrImpersonated = user.getSelfOrImpersonated();
-        List<Predicate> singleQueries = requests.stream().map(r -> this.buildSingleQuery(r, loggedOrImpersonated, locale)).collect(Collectors.toList());
+    public Predicate buildQuery(List<TaskSearchRequest> requests, String actorId, Locale locale, Boolean isIntersection) {
+        List<Predicate> singleQueries = requests.stream().map(r -> this.buildSingleQuery(r, actorId, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
             // one of the queries evaluates to empty set => the entire result is an empty set
@@ -94,7 +94,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
 //    }
 
 
-    private Predicate buildSingleQuery(TaskSearchRequest request, Identity user, Locale locale) {
+    private Predicate buildSingleQuery(TaskSearchRequest request, String actorId, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
 
 //        buildStringIdQuery(request, builder);

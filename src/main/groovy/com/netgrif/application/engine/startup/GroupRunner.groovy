@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
+import com.netgrif.application.engine.authorization.domain.Actor
+import com.netgrif.application.engine.authorization.service.interfaces.IActorService
 import com.netgrif.application.engine.orgstructure.groups.config.GroupConfigurationProperties
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.Process
@@ -27,7 +29,10 @@ class GroupRunner extends AbstractOrderedCommandLineRunner {
     private INextGroupService nextGroupService
 
     @Autowired
-    private IUserService userService
+    private IIdentityService identityService
+
+    @Autowired
+    private IActorService actorService
 
     @Autowired
     private SystemIdentityRunner systemCreator
@@ -61,7 +66,12 @@ class GroupRunner extends AbstractOrderedCommandLineRunner {
             return groupNet
         }
         if (groupProperties.isSystemEnabled()) {
-            nextGroupService.createDefaultSystemGroup(userService.getLoggedOrSystem())
+            Optional<Actor> actorOpt = actorService.findById(identityService.loggedSystemIdentity.activeActorId)
+            if (actorOpt.isEmpty()) {
+                log.error("System actor does not exist!")
+                return groupNet
+            }
+            nextGroupService.createDefaultSystemGroup(actorOpt.get())
         }
         return groupNet;
     }

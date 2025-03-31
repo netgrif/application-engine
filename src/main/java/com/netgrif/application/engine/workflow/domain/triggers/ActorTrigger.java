@@ -4,22 +4,22 @@ import com.netgrif.application.engine.importer.model.TriggerType;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 
-import static com.netgrif.application.engine.importer.model.TriggerType.USER;
+import static com.netgrif.application.engine.importer.model.TriggerType.ACTOR;
 
-public class UserTrigger extends Trigger {
+public class ActorTrigger extends Trigger {
 
-    public UserTrigger() {
+    public ActorTrigger() {
         super();
     }
 
     @Override
     @QueryType(PropertyType.NONE)
     public TriggerType getType() {
-        return USER;
+        return ACTOR;
     }
 
     @Override
     public Trigger clone() {
-        return new UserTrigger();
+        return new ActorTrigger();
     }
 }

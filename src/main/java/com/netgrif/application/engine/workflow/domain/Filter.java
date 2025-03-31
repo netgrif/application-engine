@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.domain;
 
+import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import lombok.Data;
 import org.bson.types.ObjectId;
@@ -32,7 +33,7 @@ public class Filter {
 
     private Integer visibility;
 
-    private Author author;
+    private Actor author;
 
     private LocalDateTime created;
 
@@ -46,7 +47,7 @@ public class Filter {
         this.created = LocalDateTime.now();
     }
 
-    public Filter(I18nString title, I18nString description, Integer visibility, Author author, String type, String query, MergeFilterOperation mergeOperation) {
+    public Filter(I18nString title, I18nString description, Integer visibility, Actor author, String type, String query, MergeFilterOperation mergeOperation) {
         this();
         this.title = title;
         this.description = description;

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.startup
 
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService
+
 import com.netgrif.application.engine.validations.interfaces.IValidationService
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
@@ -24,9 +24,6 @@ class ValidationRunner extends AbstractOrderedCommandLineRunner {
 
     @Autowired
     private ImportHelper helper
-
-    @Autowired
-    private IUserService userService
 
     @Autowired
     private IValidationService validationService

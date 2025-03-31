@@ -5,7 +5,7 @@ import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService
+
 import com.netgrif.application.engine.authorization.domain.Role
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
@@ -42,16 +42,10 @@ class ImportHelper {
     private PetriNetRepository petriNetRepository
 
     @Autowired
-    private IUserService userService
-
-    @Autowired
     private IIdentityService identityService
 
     @Autowired
     private CaseRepository caseRepository
-
-    @Autowired
-    private IAuthorityService authorityService
 
     @Autowired
     private ITaskService taskService

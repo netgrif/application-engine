@@ -3,8 +3,6 @@ package com.netgrif.application.engine.petrinet.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
-import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.properties.CacheProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
@@ -106,9 +104,6 @@ public class PetriNetService implements IPetriNetService {
 
     @Autowired
     private IFieldActionsCacheService functionCacheService;
-
-    @Autowired
-    private IUserService userService;
 
     @Autowired
     private IEventService eventService;

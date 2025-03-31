@@ -5,6 +5,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserEventLogRepository extends MongoRepository<IUserEventLog, ObjectId> {
+public interface ActorEventLogRepository extends MongoRepository<IActorEventLog, ObjectId> {
 
 }

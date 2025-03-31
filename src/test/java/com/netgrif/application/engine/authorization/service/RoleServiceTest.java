@@ -11,8 +11,8 @@ import com.netgrif.application.engine.authorization.domain.permissions.TaskPermi
 import com.netgrif.application.engine.authorization.domain.repositories.RoleRepository;
 import com.netgrif.application.engine.history.domain.baseevent.EventLog;
 import com.netgrif.application.engine.history.domain.baseevent.repository.EventLogRepository;
-import com.netgrif.application.engine.history.domain.userevents.UserAssignRoleEventLog;
-import com.netgrif.application.engine.history.domain.userevents.UserRemoveRoleEventLog;
+import com.netgrif.application.engine.history.domain.userevents.ActorAssignRoleEventLog;
+import com.netgrif.application.engine.history.domain.userevents.ActorRemoveRoleEventLog;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.ActorField;
 import com.netgrif.application.engine.petrinet.domain.dataset.ActorListField;
@@ -373,7 +373,7 @@ public class RoleServiceTest {
         assert assignedRoles.stream().anyMatch(role -> role.getStringId().equals(caseRole.getStringId()));
         List<EventLog> eventLogs = eventLogRepository.findAll();
         assert eventLogs.size() == 1;
-        UserAssignRoleEventLog eventLogAfterFirstAssign = (UserAssignRoleEventLog) eventLogs.get(0);
+        ActorAssignRoleEventLog eventLogAfterFirstAssign = (ActorAssignRoleEventLog) eventLogs.get(0);
         assert eventLogAfterFirstAssign.getRoles().size() == 2;
 
         Role processRole2 = new ProcessRole("import_id3");
@@ -389,7 +389,7 @@ public class RoleServiceTest {
                 .filter(log -> !log.getStringId().equals(eventLogAfterFirstAssign.getStringId()))
                 .findFirst();
         assert eventLogAfterSecondAssignOpt.isPresent();
-        assert ((UserAssignRoleEventLog) eventLogAfterSecondAssignOpt.get()).getRoles().size() == 1;
+        assert ((ActorAssignRoleEventLog) eventLogAfterSecondAssignOpt.get()).getRoles().size() == 1;
 
         Role processRole3 = new ProcessRole("import_id4");
         repository.save(processRole3);
@@ -417,7 +417,7 @@ public class RoleServiceTest {
         assert removedRoles.get(0).getStringId().equals(processRole.getStringId());
         List<EventLog> eventLogs = eventLogRepository.findAll();
         assert eventLogs.size() == 1;
-        UserRemoveRoleEventLog eventLogAfterFirstRemoval = (UserRemoveRoleEventLog) eventLogs.get(0);
+        ActorRemoveRoleEventLog eventLogAfterFirstRemoval = (ActorRemoveRoleEventLog) eventLogs.get(0);
         assert eventLogAfterFirstRemoval.getRoles().size() == 1;
 
         assertThrows(IllegalArgumentException.class, () -> roleService.removeRolesFromActor(user.getStringId(),

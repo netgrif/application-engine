@@ -3,7 +3,7 @@ package com.netgrif.application.engine.petrinet.service
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.IdentityState
 
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService
+
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest

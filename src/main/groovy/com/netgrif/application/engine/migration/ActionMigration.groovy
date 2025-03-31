@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.migration
 
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -20,11 +20,12 @@ class ActionMigration {
     private IPetriNetService petriNetService
 
     @Autowired
-    private IUserService userService;
+    private IIdentityService identityService;
 
     void migrateActions(String petriNetPath) {
         InputStream netStream = new ClassPathResource(petriNetPath).inputStream
-        ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(netStream, VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser())
+        ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(netStream, VersionType.MAJOR,
+                identityService.getLoggedSystemIdentity().activeActorId)
         List<Process> oldPetriNets
 
         if(newPetriNet.getNet() != null) {

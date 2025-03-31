@@ -2,7 +2,6 @@ package com.netgrif.application.engine.rules.service;
 
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Identity;
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.drools.RefreshableKieBase;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.VersionType;

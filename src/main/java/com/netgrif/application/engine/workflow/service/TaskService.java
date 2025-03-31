@@ -2,7 +2,6 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
 import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
@@ -69,9 +68,6 @@ public class TaskService implements ITaskService {
 
     @Autowired
     protected TaskRepository taskRepository;
-
-    @Autowired
-    protected IUserService userService;
 
     @Autowired
     protected MongoTemplate mongoTemplate;
@@ -248,10 +244,10 @@ public class TaskService implements ITaskService {
         }
         Task task = taskOptional.get();
 
+        // todo 2058 should be on preauthorize
         if (task.getAssigneeId() == null) {
             throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any actor.");
         }
-        // todo: release/8.0.0 should be on preauthorize
         if (!task.getAssigneeId().equals(actorId)) {
             throw new IllegalArgumentException("User that is not assigned tried to finish task");
         }
@@ -547,7 +543,7 @@ public class TaskService implements ITaskService {
             log.info("assignTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
             outcomes.add(assignTask(task.getStringId()));
             log.info("getData [{}] in case [{}]", task.getTitle(), useCase.getTitle());
-            outcomes.add(dataService.getData(task.getStringId(), userService.getSystem()));
+            outcomes.add(dataService.getData(task.getStringId(), identityService.getLoggedSystemIdentity().getActiveActorId()));
             log.info("finishTask [{}] in case [{}]", task.getTitle(), useCase.getTitle());
             outcomes.add(finishTask(task.getStringId()));
         } catch (TransitionNotExecutableException e) {
@@ -727,7 +723,7 @@ public class TaskService implements ITaskService {
         return userListValue.getActorValues().stream()
                 .filter(Objects::nonNull)
                 .map(ActorFieldValue::getId)
-                .filter(id -> id != null && userService.existsById(id))
+                .filter(id -> id != null && actorService.existsById(id))
                 .collect(Collectors.toList());
     }
 
@@ -755,7 +751,7 @@ public class TaskService implements ITaskService {
                 TimeTrigger timeTrigger = (TimeTrigger) taskTrigger;
                 scheduleTaskExecution(task, timeTrigger.getStartDate(), useCase);
             } else if (taskTrigger instanceof AutoTrigger) {
-                task.setAssigneeId(userService.getSystem().getStringId());
+                task.setAssigneeId(identityService.getLoggedSystemIdentity().getActiveActorId());
             }
         }
         task.setProcessRolePermissions(new AccessPermissions<>(transition.getProcessRolePermissions()));

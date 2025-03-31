@@ -6,7 +6,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.google.common.collect.Lists;
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
+import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.configuration.properties.FilterProperties;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
@@ -60,9 +61,6 @@ public class FilterImportExportService implements IFilterImportExportService {
     private static final String FIELD_MISSING_NETS_TRANSLATION = "missing_nets_translation";
 
     @Autowired
-    IUserService userService;
-
-    @Autowired
     IWorkflowService workflowService;
 
     @Autowired
@@ -75,6 +73,9 @@ public class FilterImportExportService implements IFilterImportExportService {
     private ITaskService taskService;
 
     @Autowired
+    private IIdentityService identityService;
+
+    @Autowired
     private IDataService dataService;
 
     @Autowired
@@ -84,13 +85,13 @@ public class FilterImportExportService implements IFilterImportExportService {
     private FilterProperties filterProperties;
 
     @Override
-    public void createFilterImport(IUser author) {
-        workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER, "Import filters " + author.getFullName(), "", author.transformToLoggedUser());
+    public void createFilterImport(Actor author) {
+        workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER, "Import filters " + author.getFullName(), "", author.getStringId());
     }
 
     @Override
-    public void createFilterExport(IUser author) {
-        workflowService.createCaseByIdentifier(EXPORT_NET_IDENTIFIER, "Export filters " + author.getFullName(), "", author.transformToLoggedUser());
+    public void createFilterExport(Actor author) {
+        workflowService.createCaseByIdentifier(EXPORT_NET_IDENTIFIER, "Export filters " + author.getFullName(), "", author.getStringId());
     }
 
     /**
@@ -235,7 +236,8 @@ public class FilterImportExportService implements IFilterImportExportService {
 //            filterCase.get().getDataSet().get(FIELD_FILTER).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.VISIBLE));
             workflowService.save(filterCase.get());
         });
-        taskService.assignTasks(taskService.findAllById(new ArrayList<>(importedFilterTaskIds.values())), userService.getLoggedUser());
+        taskService.assignTasks(taskService.findAllById(new ArrayList<>(importedFilterTaskIds.values())),
+                identityService.getLoggedIdentity().getActiveActorId());
         changeFilterField(importedFilterTaskIds.values());
         return importedFilterTaskIds;
     }
@@ -289,7 +291,7 @@ public class FilterImportExportService implements IFilterImportExportService {
     protected FilterImportExportList loadFromXML() throws IOException, IllegalFilterFileException {
         Case exportCase = workflowService.searchOne(
                 QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER)
-                        .and(QCase.case$.author.id.eq(userService.getLoggedUser().getStringId()))
+                        .and(QCase.case$.authorId.eq(identityService.getLoggedIdentity().getActiveActorId()))
         );
 
         FileFieldValue ffv = ((FileField) exportCase.getDataSet().get(UPLOAD_FILE_FIELD)).getValue().getValue();
@@ -307,7 +309,7 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Transactional
     protected FileFieldValue createXML(FilterImportExportList filters) throws IOException {
-        String filePath = fileStorageConfiguration.getStoragePath() + "/filterExport/" + userService.getLoggedUser().getStringId() + "/" + filterProperties.getFileName();
+        String filePath = fileStorageConfiguration.getStoragePath() + "/filterExport/" + identityService.getLoggedIdentity().getActiveActorId() + "/" + filterProperties.getFileName();
         File f = new File(filePath);
         f.getParentFile().mkdirs();
 

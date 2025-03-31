@@ -10,6 +10,7 @@ public interface IActorService {
     Optional<Actor> findByEmail(String email);
     boolean existsByEmail(String email);
     Optional<Actor> findById(String id);
+    boolean existsById(String id);
     List<Actor> findAll();
 
     Actor create(ActorParams params);

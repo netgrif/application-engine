@@ -3,12 +3,12 @@ package com.netgrif.application.engine.history.domain.userevents;
 import com.netgrif.application.engine.history.domain.baseevent.EventLog;
 import lombok.Getter;
 
-public class UserEventLog extends EventLog implements IUserEventLog {
+@Getter
+public class ActorEventLog extends EventLog implements IActorEventLog {
 
-    @Getter
     private final String email;
 
-    public UserEventLog(String email) {
+    public ActorEventLog(String email) {
         this.email = email;
     }
 }

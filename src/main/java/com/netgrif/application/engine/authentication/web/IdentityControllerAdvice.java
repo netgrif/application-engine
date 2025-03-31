@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
-@RestControllerAdvice(assignableTypes = {UserController.class})
-public class UserControllerAdvice {
+@RestControllerAdvice(assignableTypes = {IdentityController.class})
+public class IdentityControllerAdvice {
 
     @ExceptionHandler(NumberFormatException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public @ResponseBody
     MessageResource handleException(NumberFormatException e) {
-        log.error("Long could not be parsed from request. " + e.getMessage(), e);
+        log.error("Long could not be parsed from request. {}", e.getMessage(), e);
         return MessageResource.errorMessage(e.getMessage());
     }
 }

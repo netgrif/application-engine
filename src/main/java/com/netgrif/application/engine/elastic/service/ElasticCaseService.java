@@ -210,7 +210,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         buildCaseIdQuery(request, query);
         buildUriNodeIdQuery(request, query);
         buildTagsQuery(request, query);
-        boolean resultAlwaysEmpty = buildGroupQuery(request, identity, locale, query);
+        boolean resultAlwaysEmpty = buildGroupQuery(request, locale, query);
 
         // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch
 
@@ -467,15 +467,15 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
      * }
      * </pre>
      */
-    protected boolean buildGroupQuery(CaseSearchRequest request, LoggedIdentity identity, Locale locale, BoolQueryBuilder query) {
+    protected boolean buildGroupQuery(CaseSearchRequest request, Locale locale, BoolQueryBuilder query) {
         if (request.group == null || request.group.isEmpty()) {
             return false;
         }
 
         PetriNetSearch processQuery = new PetriNetSearch();
         processQuery.setGroup(request.group);
-        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, identity, new FullPageRequest(), locale).getContent();
-        if (groupProcesses.size() == 0)
+        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, new FullPageRequest(), locale).getContent();
+        if (groupProcesses.isEmpty())
             return true;
 
         BoolQueryBuilder groupQuery = boolQuery();

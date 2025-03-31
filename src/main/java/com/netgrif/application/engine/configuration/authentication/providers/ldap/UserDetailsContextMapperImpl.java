@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.configuration.authentication.providers.ldap;
 
 import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.authentication.service.interfaces.ILdapUserRefService;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
-import com.netgrif.application.engine.ldap.domain.LdapUser;
 import com.netgrif.application.engine.ldap.domain.LdapUserRef;
 import com.netgrif.application.engine.ldap.service.LdapUserService;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
@@ -41,24 +41,24 @@ public class UserDetailsContextMapperImpl implements UserDetailsContextMapper {
     @Synchronized
     public UserDetails mapUserFromContext(DirContextOperations dirContextOperations, String username, Collection<? extends GrantedAuthority> authorities) {
         dirContextOperations.setAttributeValues("objectClass", properties.getPeopleClass());
-        IUser user = ldapUserService.findByDn(dirContextOperations.getDn());
-        if (user == null) {
+        Identity identity = ldapUserService.findByDn(dirContextOperations.getDn());
+        if (identity == null) {
             LdapUserRef ldapUserOptional = ldapUserRefService.findById(dirContextOperations.getDn());
             if (ldapUserOptional == null) {
                 log.warn("Unknown user [{}] tried to log in", username);
                 return null;
             }
-            user = ldapUserRefService.createUser(ldapUserOptional);
-        } else if (user instanceof LdapUser) {
-           user = ldapUserRefService.updateById(dirContextOperations.getDn(), user);
+//            identity = ldapUserRefService.createUser(ldapUserOptional);
+        } else if (true/*user instanceof LdapUser*/) {
+//            identity = ldapUserRefService.updateById(dirContextOperations.getDn(), user);
         }
-        assert user != null;
-        Identity identity = user.transformToLoggedUser();
-        if (user instanceof LdapUser && (!((LdapUser) user).getMemberOf().isEmpty())) {
+        assert identity != null;
+        LoggedIdentity loggedIdentity = identity.toSession();
+//        if (user instanceof LdapUser && (!((LdapUser) user).getMemberOf().isEmpty())) {
             // todo 2058
 //                loggedUser.addRoleAssignments(ldapGroupRefService.getRoleByLdapGroup(((LdapUser) user).getMemberOf()));
-            }
-        return identity;
+//            }
+        return loggedIdentity;
     }
 
     @Override

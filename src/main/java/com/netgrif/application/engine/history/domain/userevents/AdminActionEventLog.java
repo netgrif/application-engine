@@ -5,15 +5,15 @@ import lombok.Getter;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@Getter
 @TypeAlias("adminActionEventLog")
 @Document(collection = "eventLogs")
-public class AdminActionEventLog extends UserEventLog {
+public class AdminActionEventLog extends ActorEventLog {
 
-    @Getter
     private final String code;
 
     public AdminActionEventLog(AdminActionEvent event) {
-        super(event.getUser().getEmail());
+        super(event.getActor().getEmail());
         this.code = event.getCode();
     }
 }

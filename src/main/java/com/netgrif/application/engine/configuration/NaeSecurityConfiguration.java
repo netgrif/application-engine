@@ -7,7 +7,6 @@ import com.netgrif.application.engine.configuration.properties.SecurityConfigPro
 import com.netgrif.application.engine.configuration.security.*;
 import com.netgrif.application.engine.configuration.security.factory.PublicAuthenticationFilterFactory;
 import com.netgrif.application.engine.configuration.security.filter.HostValidationRequestFilter;
-import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,8 +60,6 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     protected final NaeLdapProperties ldapProperties;
 
-    protected final IImpersonationService impersonationService;
-
     @Bean
     public HttpSessionIdResolver httpSessionIdResolver() {
         return HeaderHttpSessionIdResolver.xAuthToken();
@@ -100,7 +97,6 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .addFilterBefore(new ForwardedHeaderFilter(), WebAsyncManagerIntegrationFilter.class)
                 .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
-                .addFilterAfter(impersonationRequestFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(hostValidationRequestFilter(), BasicAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
@@ -170,9 +166,5 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     private HostValidationRequestFilter hostValidationRequestFilter() {
         return new HostValidationRequestFilter(properties);
-    }
-
-    private ImpersonationRequestFilter impersonationRequestFilter() {
-        return new ImpersonationRequestFilter(impersonationService);
     }
 }

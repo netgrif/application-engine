@@ -51,7 +51,7 @@ public class JwtService implements IJwtService {
     @SuppressWarnings("unchecked")
     public LoggedIdentity getLoggedIdentity(String token) {
         LinkedHashMap<String, Object> loggedIdentityMap = (LinkedHashMap<String, Object>) getAllClaimsFromToken(token).get("identity");
-        return LoggedIdentity.builder()
+        return LoggedIdentity.with()
                 .identityId(loggedIdentityMap.get("identityId").toString())
                 .username(loggedIdentityMap.get("username").toString())
                 .fullName(loggedIdentityMap.get("fullName").toString())
