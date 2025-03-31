@@ -14,6 +14,7 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.ICaseImportExportService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -30,6 +31,7 @@ import java.time.format.DateTimeFormatter
 
 @Slf4j
 @SpringBootTest
+@CompileStatic
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
 class CaseImportExportTest {
@@ -84,7 +86,7 @@ class CaseImportExportTest {
             assert outputFile.exists() && !outputFile.isDirectory()
             assert outputFile.length() > 0
         } catch (IOException e) {
-            log.error("IO exception occured", e)
+            throw new RuntimeException(e)
         }
         workflowService.deleteCase(toExport)
     }
@@ -130,7 +132,7 @@ class CaseImportExportTest {
                 "stringCollection_field"  : ["type": "stringCollection", "value": ["test_value_1", "test_value_2"]],
         ]
         setFiles(testCase, dataSet)
-        return importHelper.setTaskData(testCase.tasks.find { it.transition == "1" }.task, dataSet).getCase()
+        return importHelper.setTaskData(testCase.tasks.find { it.transition == "1" }.task, dataSet as Map<String, Map<String, String>>).getCase()
     }
 
     void setFiles(Case testCase, Map dataSet) {
@@ -147,10 +149,10 @@ class CaseImportExportTest {
         assert importedCase.dataSet["text"].value == "test text"
         assert importedCase.dataSet["password_data"].value == "password"
         assert importedCase.dataSet["text_area"].value == "text area"
-        assert importedCase.dataSet["enumeration_autocomplete"].value.defaultValue == "Alice"
-        assert importedCase.dataSet["enumeration"].value.defaultValue == "changed_option"
+        assert (importedCase.dataSet["enumeration_autocomplete"].value as I18nString).defaultValue == "Alice"
+        assert (importedCase.dataSet["enumeration"].value as I18nString).defaultValue == "changed_option"
         assert importedCase.dataSet["enumeration"].choices[0].defaultValue == "changed_option"
-        assert importedCase.dataSet["enumeration_list"].value.defaultValue == "Alice"
+        assert (importedCase.dataSet["enumeration_list"].value as I18nString).defaultValue == "Alice"
         assert importedCase.dataSet["enumeration_map"].value == "al"
         assert (importedCase.dataSet["multichoice"].value as Set<I18nString>).size() == 2 && (importedCase.dataSet["multichoice"].value as Set<I18nString>).stream().filter { ["Alice", "Carol"].contains(it.defaultValue) }.toList().size() == 2
         assert (importedCase.dataSet["multichoice_list"].value as Set<I18nString>).size() == 2 && (importedCase.dataSet["multichoice_list"].value as Set<I18nString>).stream().filter { ["Alice", "Carol"].contains(it.defaultValue) }.toList().size() == 2
@@ -158,13 +160,13 @@ class CaseImportExportTest {
         assert importedCase.dataSet["boolean"].value == true
         assert importedCase.dataSet["date"].value.equals(LocalDate.of(2025, Month.APRIL, 1))
         assert importedCase.dataSet["datetime"].value.equals(LocalDateTime.of(2025, Month.APRIL, 1, 17, 23))
-        assert importedCase.dataSet["taskRef"].value.contains(importedCase.tasks.find { it.transition == "t2" }.task)
-        assert importedCase.dataSet["test_i18n"].value.defaultValue == "test i18n"
+        assert (importedCase.dataSet["taskRef"].value as List<String>).contains(importedCase.tasks.find { it.transition == "t2" }.task)
+        assert (importedCase.dataSet["test_i18n"].value as I18nString).defaultValue == "test i18n"
         assert importedCase.dataSet["user"].value == null
         assert importedCase.dataSet["userList1"].value == null
         assert importedCase.dataSet["button"].value == 45
-        assert importedCase.dataSet["caseRef_field"].value.contains(importedCase.stringId)
-        assert importedCase.dataSet["stringCollection_field"].value.containsAll(["test_value_1", "test_value_2"])
+        assert (importedCase.dataSet["caseRef_field"].value as List<String>).contains(importedCase.stringId)
+        assert (importedCase.dataSet["stringCollection_field"].value as List<String>).containsAll(["test_value_1", "test_value_2"])
         assert importedCase.dataSet["caseRef_change_allowed_nets"].allowedNets.containsAll(["changed_allowed_nets"])
         assert importedCase.dataSet["text"].validations.find { validation -> validation.validationRule == "email" } != null
     }
