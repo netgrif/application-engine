@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.authentication.web.responsebodies;
 
 
-import com.netgrif.application.engine.authentication.web.UserController;
 import com.netgrif.application.engine.authorization.web.RBACController;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
