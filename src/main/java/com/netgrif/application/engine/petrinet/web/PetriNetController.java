@@ -72,7 +72,7 @@ public class PetriNetController {
     @Autowired
     private AsyncRunner asyncRunner;
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@applicationAuthorizationService.hasApplicationRole('admin')")
     @Operation(summary = "Import new process",
             description = "Caller must have the ADMIN role. Imports an entirely new process or a new version of an existing process.",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -138,7 +138,7 @@ public class PetriNetController {
         return new DataFieldReferencesResource(service.getDataFieldReferences(referenceBody, locale));
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@applicationAuthorizationService.hasApplicationRole('admin')")
     @Operation(summary = "Download process model", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{netId}/file", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public FileSystemResource getNetFile(@PathVariable("netId") String netId, @RequestParam(value = "title", required = false) String title, Authentication auth, HttpServletResponse response) {
@@ -162,7 +162,7 @@ public class PetriNetController {
         return resources;
     }
 
-    @PreAuthorize("@petriNetAuthorizationService.canCallProcessDelete(#auth.getPrincipal(), #processId)")
+    @PreAuthorize("@applicationAuthorizationService.hasApplicationRole('admin')")
     @Operation(summary = "Delete process",
             description = "Caller must have the ADMIN role. Removes the specified process, along with it's cases, tasks and process roles.",
             security = {@SecurityRequirement(name = "BasicAuth")})
