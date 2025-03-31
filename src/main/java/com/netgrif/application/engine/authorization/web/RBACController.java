@@ -40,7 +40,7 @@ public class RBACController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public MessageResource assignRolesToUser(@PathVariable("actorId") String actorId, @RequestBody Set<String> roleIds) {
+    public MessageResource assignRolesToActor(@PathVariable("actorId") String actorId, @RequestBody Set<String> roleIds) {
         try {
             List<Role> assignedRoles = roleService.assignRolesToActor(actorId, roleIds);
             Set<String> assignedRoleIds = assignedRoles.stream().map(Role::getStringId).collect(Collectors.toSet());

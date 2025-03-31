@@ -6,8 +6,8 @@ import com.netgrif.application.engine.authentication.service.interfaces.IUserSer
 import com.netgrif.application.engine.authentication.web.requestbodies.UpdateUserRequest;
 import com.netgrif.application.engine.authentication.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.application.engine.authentication.web.responsebodies.AuthoritiesResources;
-import com.netgrif.application.engine.authentication.web.responsebodies.User;
-import com.netgrif.application.engine.authentication.web.responsebodies.UserResource;
+import com.netgrif.application.engine.authentication.web.responsebodies.IdentityDTO;
+import com.netgrif.application.engine.authentication.web.responsebodies.IdentityResource;
 import com.netgrif.application.engine.authentication.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
@@ -71,11 +71,11 @@ public class UserController {
 
     @Operation(summary = "Get all users", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<UserResource> getAll(Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
+    public PagedModel<IdentityResource> getAll(Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
         Page<IUser> page = userService.findAllCoMembers((Identity) auth.getPrincipal(), pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .getAll(pageable, assembler, auth, locale)).withRel("all");
-        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler("all"), selfLink);
+        PagedModel<IdentityResource> resources = assembler.toModel(page, getUserResourceAssembler("all"), selfLink);
         ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
         return resources;
     }
@@ -83,7 +83,7 @@ public class UserController {
 
     @Operation(summary = "Generic user search", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<UserResource> search(@RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
+    public PagedModel<IdentityResource> search(@RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
         List<ObjectId> roles = query.getRoles() == null ? null : query.getRoles().stream().map(ObjectId::new).collect(Collectors.toList());
         List<ObjectId> negativeRoles = query.getNegativeRoles() == null ? null : query.getNegativeRoles().stream().map(ObjectId::new).collect(Collectors.toList());
         Page<IUser> page = userService.searchAllCoMembers(query.getFulltext(),
@@ -92,14 +92,14 @@ public class UserController {
                 (Identity) auth.getPrincipal(), pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .search(query, pageable, assembler, auth, locale)).withRel("search");
-        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler("search"), selfLink);
+        PagedModel<IdentityResource> resources = assembler.toModel(page, getUserResourceAssembler("search"), selfLink);
         ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
         return resources;
     }
 
     @Operation(summary = "Get user by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public UserResource getUser(@PathVariable("id") String userId, Locale locale) {
+    public IdentityResource getUser(@PathVariable("id") String userId, Locale locale) {
         Identity actualUser = userService.getLoggedUserFromContext();
         Identity identity = actualUser.getSelfOrImpersonated();
         if (!identity.isAdmin() && !Objects.equals(identity.getId(), userId)) {
@@ -107,18 +107,18 @@ public class UserController {
             throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
         }
         IUser user = userService.resolveById(userId);
-        return new UserResource(new User(user), "profile");
+        return new IdentityResource(new IdentityDTO(user), "profile");
     }
 
     @Operation(summary = "Get logged user", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)
-    public UserResource getLoggedUser(Authentication auth, Locale locale) {
-        return new UserResource(new User(((Identity)auth.getPrincipal()).transformToUser()), "me");
+    public IdentityResource getLoggedUser(Authentication auth, Locale locale) {
+        return new IdentityResource(new IdentityDTO(((Identity)auth.getPrincipal()).transformToUser()), "me");
     }
 
     @Operation(summary = "Update user", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public UserResource updateUser(@PathVariable("id") String userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) throws UnauthorisedRequestException {
+    public IdentityResource updateUser(@PathVariable("id") String userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) throws UnauthorisedRequestException {
         if (!serverAuthProperties.isEnableProfileEdit()) return null;
 
         Identity identity = (Identity) auth.getPrincipal();
@@ -133,16 +133,16 @@ public class UserController {
             securityContextService.reloadSecurityContext(identity);
         }
         log.info("Updating user {} with data {}", user.getEmail(), updates.toString());
-        return new UserResource(new User(user), "profile");
+        return new IdentityResource(new IdentityDTO(user), "profile");
     }
 
     @Operation(summary = "Get all users with specified roles", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/role", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<UserResource> getAllWithRole(@RequestBody Set<String> roleIds, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Locale locale) {
+    public PagedModel<IdentityResource> getAllWithRole(@RequestBody Set<String> roleIds, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Locale locale) {
         Page<IUser> page = userService.findAllActiveByRoles(roleIds, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .getAllWithRole(roleIds, pageable, assembler, locale)).withRel("role");
-        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler("role"), selfLink);
+        PagedModel<IdentityResource> resources = assembler.toModel(page, getUserResourceAssembler("role"), selfLink);
         ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
         return resources;
     }

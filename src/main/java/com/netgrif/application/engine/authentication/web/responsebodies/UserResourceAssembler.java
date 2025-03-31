@@ -2,7 +2,7 @@ package com.netgrif.application.engine.authentication.web.responsebodies;
 
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 
-public class UserResourceAssembler implements RepresentationModelAssembler<IUser, UserResource> {
+public class UserResourceAssembler implements RepresentationModelAssembler<IUser, IdentityResource> {
 
     private String selfRel;
 
@@ -17,11 +17,11 @@ public class UserResourceAssembler implements RepresentationModelAssembler<IUser
     }
 
     @Override
-    public UserResource toModel(IUser entity) {
+    public IdentityResource toModel(IUser entity) {
         if (!initialized) {
             throw new IllegalStateException("You must initialize the UserResourceAssembler before calling the toResource method! To initialize the assembler call the initialize method.");
         }
 
-        return new UserResource(new User(entity), selfRel);
+        return new IdentityResource(new IdentityDTO(entity), selfRel);
     }
 }

@@ -22,10 +22,22 @@ public class Identity extends Case {
     /**
      * todo javadoc
      * */
+    public String getFirstname() {
+        return (String) getDataSet().get(IdentityConstants.FIRSTNAME_FIELD_ID).getRawValue();
+    }
+
+    /**
+     * todo javadoc
+     * */
+    public String getLastname() {
+        return (String) getDataSet().get(IdentityConstants.LASTNAME_FIELD_ID).getRawValue();
+    }
+
+    /**
+     * todo javadoc
+     * */
     public String getFullName() {
-        String firstname = (String) getDataSet().get(IdentityConstants.FIRSTNAME_FIELD_ID).getRawValue();
-        String lastname = (String) getDataSet().get(IdentityConstants.LASTNAME_FIELD_ID).getRawValue();
-        return String.join(" ", firstname, lastname);
+        return String.join(" ", getFirstname(), getLastname());
     }
 
     /**

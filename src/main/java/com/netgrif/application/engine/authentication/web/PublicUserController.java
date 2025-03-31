@@ -2,8 +2,8 @@ package com.netgrif.application.engine.authentication.web;
 
 import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.authentication.web.requestbodies.UserSearchRequestBody;
-import com.netgrif.application.engine.authentication.web.responsebodies.User;
-import com.netgrif.application.engine.authentication.web.responsebodies.UserResource;
+import com.netgrif.application.engine.authentication.web.responsebodies.IdentityDTO;
+import com.netgrif.application.engine.authentication.web.responsebodies.IdentityResource;
 import com.netgrif.application.engine.authentication.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.settings.domain.Preferences;
 import com.netgrif.application.engine.settings.service.IPreferencesService;
@@ -61,13 +61,13 @@ public class PublicUserController {
 
     @Operation(summary = "Get logged user")
     @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)
-    public UserResource getLoggedUser() {
-        return new UserResource(new User(userService.getAnonymousLogged().transformToUser()), "profile");
+    public IdentityResource getLoggedUser() {
+        return new IdentityResource(new IdentityDTO(userService.getAnonymousLogged().transformToUser()), "profile");
     }
 
     @Operation(summary = "Generic user search")
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<UserResource> search(@RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Locale locale) {
+    public PagedModel<IdentityResource> search(@RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Locale locale) {
         Page<IUser> page = userService.searchAllCoMembers(query.getFulltext(),
                 query.getRoles().stream().map(ObjectId::new).collect(Collectors.toList()),
                 query.getNegativeRoles().stream().map(ObjectId::new).collect(Collectors.toList()),
@@ -75,7 +75,7 @@ public class PublicUserController {
 
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicUserController.class)
                 .search(query, pageable, assembler, locale)).withRel("search");
-        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler("search"), selfLink);
+        PagedModel<IdentityResource> resources = assembler.toModel(page, getUserResourceAssembler("search"), selfLink);
         ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel().toString());
         return resources;
     }

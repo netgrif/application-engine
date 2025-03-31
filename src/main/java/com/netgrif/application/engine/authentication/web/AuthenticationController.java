@@ -2,15 +2,14 @@ package com.netgrif.application.engine.authentication.web;
 
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
-import com.netgrif.application.engine.authentication.service.IdentityService;
 import com.netgrif.application.engine.authentication.service.InvalidIdentityTokenException;
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService;
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.authentication.web.requestbodies.ChangePasswordRequest;
 import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest;
 import com.netgrif.application.engine.authentication.web.requestbodies.RegistrationRequest;
-import com.netgrif.application.engine.authentication.web.responsebodies.User;
-import com.netgrif.application.engine.authentication.web.responsebodies.UserResource;
+import com.netgrif.application.engine.authentication.web.responsebodies.IdentityDTO;
+import com.netgrif.application.engine.authentication.web.responsebodies.IdentityResource;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
@@ -34,7 +33,6 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Locale;
 import java.util.Optional;
 
 @Slf4j
@@ -53,14 +51,13 @@ public class AuthenticationController {
 
     private final IMailService mailService;
 
-    private final IUserService userService;
-
     private final IMailAttemptService mailAttemptService;
 
     private final ServerAuthProperties serverAuthProperties;
 
     private final ISecurityContextService securityContextService;
-    private final IdentityService identityService;
+
+    private final IIdentityService identityService;
 
     @Operation(summary = "New identity registration")
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
@@ -138,8 +135,14 @@ public class AuthenticationController {
 
     @Operation(summary = "Login to the system", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/login", produces = MediaTypes.HAL_JSON_VALUE)
-    public UserResource login(Authentication auth, Locale locale) {
-        return new UserResource(new User(userService.findByAuth(auth)), "profile");
+    public IdentityResource login(Authentication auth) {
+        LoggedIdentity loggedIdentity = (LoggedIdentity) auth.getPrincipal();
+        Optional<Identity> identityOpt = identityService.findByUsername(loggedIdentity.getUsername());
+        if (identityOpt.isEmpty()) {
+            log.error("Unexpected: identity [{}] was not found after authentication", loggedIdentity.getUsername());
+            throw new IllegalStateException("Login has failed");
+        }
+        return new IdentityResource(new IdentityDTO(identityOpt.get(), loggedIdentity.getActiveActorId()), "profile");
     }
 
     @Operation(summary = "Reset password")

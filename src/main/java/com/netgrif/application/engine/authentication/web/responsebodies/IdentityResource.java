@@ -7,23 +7,23 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
-// TODO: release/8.0.0 remove User, replace with IUser
-public class UserResource extends EntityModel<User> {
+public class IdentityResource extends EntityModel<IdentityDTO> {
 
-    public UserResource(User content, String selfRel) {
+    public IdentityResource(IdentityDTO content, String selfRel) {
         super(content, new ArrayList<>());
         buildLinks(selfRel);
     }
 
     private void buildLinks(String selfRel) {
         WebMvcLinkBuilder getLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
-                .getUser(getContent().getId(), null));
+                .getUser(Objects.requireNonNull(getContent()).getId(), null));
         add(selfRel.equalsIgnoreCase("profile") ? getLink.withSelfRel() : getLink.withRel("profile"));
 
         WebMvcLinkBuilder roleLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(RBACController.class)
-                .assignRolesToUser(getContent().getId(), null));
-        add(selfRel.equalsIgnoreCase("assignProcessRole") ? roleLink.withSelfRel() : roleLink.withRel("assignProcessRole"));
+                .assignRolesToActor(getContent().getId(), null));
+        add(selfRel.equalsIgnoreCase("assignRolesToActor") ? roleLink.withSelfRel() : roleLink.withRel("assignRolesToActor"));
 
         WebMvcLinkBuilder authorityLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .assignAuthorityToUser(getContent().getId(), null));
