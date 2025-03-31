@@ -6,6 +6,7 @@ import com.netgrif.application.engine.authorization.domain.permissions.TaskPermi
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
 import com.netgrif.application.engine.authorization.service.interfaces.ITaskAuthorizationService;
 import com.netgrif.application.engine.startup.ApplicationRoleRunner;
+import com.netgrif.application.engine.workflow.domain.State;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import org.springframework.stereotype.Service;
@@ -80,6 +81,21 @@ public class TaskAuthorizationService extends AuthorizationService implements IT
     @Override
     public boolean canCallSetData(String taskId) {
         return taskId != null && isAssignee(taskId);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    public boolean canCallGetData(String taskId) {
+        if (taskId == null) {
+            return false;
+        }
+
+        Task task = taskService.findById(taskId);
+        TaskPermission permission = task.getState().equals(State.ENABLED) ? TaskPermission.VIEW : TaskPermission.VIEW_DISABLED;
+
+        return canCallEvent(task.getProcessRolePermissions(), task.getCaseRolePermissions(), permission);
     }
 
     /**

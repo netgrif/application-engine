@@ -6,5 +6,6 @@ public interface ITaskAuthorizationService {
     boolean canCallReassign(String taskId);
     boolean canCallFinish(String taskId);
     boolean canCallSetData(String taskId);
+    boolean canCallGetData(String taskId);
     boolean canCallSaveFile(String taskId);
 }
