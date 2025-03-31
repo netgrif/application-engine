@@ -37,10 +37,10 @@ public class ZipService implements IArchiveService {
     public void pack(OutputStream archiveStream, CaseExportFiles caseExportFiles, String... additionalFiles) throws IOException {
         ZipOutputStream zipStream = new ZipOutputStream(archiveStream);
         for (String caseId : caseExportFiles.getCaseIds()) {
-            for (ImmutablePair<StorageField<?>, Set<String>> fields : caseExportFiles.getFieldsOfCase(caseId)) {
-                StorageField<?> storageField = fields.left;
+            for (ImmutablePair<StorageField<?>, Set<String>> field : caseExportFiles.getFieldsOfCase(caseId)) {
+                StorageField<?> storageField = field.left;
                 IStorageService storageService = storageResolverService.resolve(storageField.getStorageType());
-                for (String fileName : fields.right) {
+                for (String fileName : field.right) {
                     String filePath = storageService.getPath(caseId, storageField.getStringId(), fileName);
                     InputStream fis = storageService.get(storageField, filePath);
                     String newFileName = caseId.concat(File.separator).concat(storageField.getStringId()).concat(File.separator).concat(fileName);

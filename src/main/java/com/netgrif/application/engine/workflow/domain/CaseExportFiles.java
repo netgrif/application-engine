@@ -10,12 +10,10 @@ public class CaseExportFiles {
     private final Map<String, List<ImmutablePair<StorageField<?>, Set<String>>>> caseFileMapping = new HashMap<>();
 
     public void addFieldFilenames(String caseId, StorageField<?> storageField, Set<String> filenames) {
-        if (!caseFileMapping.containsKey(caseId)) {
-            caseFileMapping.put(caseId, new ArrayList<>());
-        }
-        List<ImmutablePair<StorageField<?>, Set<String>>> fieldMapping = caseFileMapping.get(caseId);
+        List<ImmutablePair<StorageField<?>, Set<String>>> emptyFieldMapping = new ArrayList<>();
+        List<ImmutablePair<StorageField<?>, Set<String>>> fieldMapping = caseFileMapping.putIfAbsent(caseId, emptyFieldMapping);
         if (fieldMapping == null) {
-            fieldMapping = new ArrayList<>();
+            fieldMapping = emptyFieldMapping;
         }
         fieldMapping.add(new ImmutablePair<>(storageField, filenames));
     }

@@ -1,7 +1,10 @@
 package com.netgrif.application.engine.workflow.web;
 
+import com.netgrif.application.engine.configuration.properties.CaseImportExportProperties;
+import com.netgrif.application.engine.files.throwable.StorageException;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.service.interfaces.ICaseExportImportService;
+import com.netgrif.application.engine.workflow.exceptions.ImportXmlFileMissingException;
+import com.netgrif.application.engine.workflow.service.interfaces.ICaseImportExportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
@@ -27,13 +30,13 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class CaseImportExportController {
 
-    private final ICaseExportImportService caseExportImportService;
+    private final ICaseImportExportService caseExportImportService;
+    private final CaseImportExportProperties properties;
 
     @Operation(summary = "Download xml file containing data of requested cases", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/export", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> exportCases(@RequestParam("caseIds") Set<String> caseIds) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-//        todo exception handling
         try {
             caseExportImportService.findAndExportCases(caseIds, outputStream);
         } catch (IOException e) {
@@ -41,7 +44,7 @@ public class CaseImportExportController {
         }
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"case_export.xml\"");
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + properties.getExport().getFileName() + "\"");
         return ResponseEntity
                 .ok()
                 .headers(headers)
@@ -52,7 +55,6 @@ public class CaseImportExportController {
     @GetMapping(value = "/exportWithFiles", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> exportCasesWithFiles(@RequestParam("caseIds") Set<String> caseIds) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-//        todo exception handling
         try {
             caseExportImportService.findAndExportCasesWithFiles(caseIds, outputStream);
         } catch (IOException e) {
@@ -90,8 +92,10 @@ public class CaseImportExportController {
         List<Case> importedCases;
         try {
             importedCases = caseExportImportService.importCasesWithFiles(multipartZipFile.getInputStream());
-        } catch (IOException e) {
+        } catch (IOException | StorageException e) {
             throw new RuntimeException(e);
+        } catch (ImportXmlFileMissingException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);

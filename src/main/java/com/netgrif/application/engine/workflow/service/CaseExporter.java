@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
+import com.netgrif.application.engine.configuration.properties.SchemaProperties;
 import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.model.Properties;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
@@ -32,8 +33,8 @@ public class CaseExporter {
     @Autowired
     private ITaskService taskService;
 
-    @Value("${nae.schema.location}")
-    private String schemaLocation;
+    @Autowired
+    private SchemaProperties properties;
 
     private final ObjectFactory objectFactory = new ObjectFactory();
 
@@ -64,7 +65,7 @@ public class CaseExporter {
         JAXBContext jaxbContext = JAXBContext.newInstance(com.netgrif.application.engine.importer.model.Cases.class);
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
+        marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, properties.getLocation());
         marshaller.marshal(caseToExport, this.outputStream);
     }
 
@@ -159,7 +160,12 @@ public class CaseExporter {
         xmlDataField.setComponent(exportComponent(dataFieldToExport.getComponent()));
         xmlDataField.getDataRefComponent().addAll(exportDataRefComponents(dataFieldToExport.getDataRefComponents()));
         xmlDataField.setValidations(exportValidations(dataFieldToExport.getValidations()));
-        xmlDataField.setOptions(exportOptions(dataFieldToExport.getOptions()));
+        if(dataFieldToExport.getOptions() != null) {
+            xmlDataField.setOptions(exportOptions(dataFieldToExport.getOptions()));
+        }
+        if(dataFieldToExport.getChoices() != null) {
+            xmlDataField.setOptions(exportChoices(dataFieldToExport.getChoices()));
+        }
         xmlDataField.setBehaviors(exportTaskBehaviors(dataFieldToExport.getBehavior()));
         return xmlDataField;
     }
@@ -248,6 +254,21 @@ public class CaseExporter {
         return xmlOptions;
     }
 
+    private Options exportChoices(Set<I18nString> options) {
+        if (options == null || options.isEmpty()) {
+            return null;
+        }
+        Options xmlOptions = objectFactory.createOptions();
+        options.forEach( option -> {
+            Option xmlOption = objectFactory.createOption();
+            xmlOption.setName(option.getKey());
+            xmlOption.setValue(option.getDefaultValue());
+            xmlOptions.getOption().add(xmlOption);
+            exportTranslations(option.getTranslations(), option.getKey());
+        });
+        return xmlOptions;
+    }
+
     private void exportTranslations(Map<String, String> translations, String name) {
         translations.forEach((locale, translation) -> {
             I18N localeTranslations = this.translations.get(locale);
@@ -272,6 +293,9 @@ public class CaseExporter {
 //            todo resolve other Validation object properties after NAE-1892 is merged into 7.0.0
             Validation xmlValidation = objectFactory.createValidation();
             xmlValidation.setMessage(exportI18NString(validation.getValidationMessage()));
+            Valid rule = objectFactory.createValid();
+            rule.setValue(validation.getValidationRule());
+            xmlValidation.setExpression(rule);
             xmlValidations.getValidation().add(xmlValidation);
         });
         return xmlValidations;

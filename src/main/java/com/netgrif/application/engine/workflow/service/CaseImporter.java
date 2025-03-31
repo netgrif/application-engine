@@ -29,6 +29,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,7 +67,10 @@ public class CaseImporter {
     private Cases xmlCases;
     private Case importedCase;
     private com.netgrif.application.engine.importer.model.Case xmlCase;
-
+    @Getter
+    private final Map<String, List<Task>> importedTasksMap = new HashMap<>();
+    @Getter
+    private final Map<String, String> importedIdsMapping = new HashMap<>();
 
     @Transactional
     public List<Case> importCases(InputStream xml) {
@@ -75,22 +79,19 @@ public class CaseImporter {
             unmarshallXml(xml);
         } catch (JAXBException e) {
             log.error("Error unmarshalling input xml file: ", e);
-            return Collections.emptyList();
+            return importedCases;
         }
         for (com.netgrif.application.engine.importer.model.Case xmlCase : xmlCases.getCase()) {
-            importCase(xmlCase);
-            if (this.importedCase == null) {
-                continue;
-            }
-            importedCases.add(workflowService.save(this.importedCase));
+            this.xmlCase = xmlCase;
             this.importedCase = null;
+            importCase();
+            importedCases.add(this.importedCase);
         }
         return importedCases;
     }
 
     @Transactional
-    protected void importCase(com.netgrif.application.engine.importer.model.Case xmlCase) {
-        this.xmlCase = xmlCase;
+    protected void importCase() {
         Version version = new Version();
         PetriNet model = petriNetService.getPetriNet(xmlCase.getProcessIdentifier(), version);
         if (model == null) {
@@ -106,9 +107,10 @@ public class CaseImporter {
         } catch (IllegalArgumentException e) {
             this.importedCase = new Case(model, importedCaseId);
         }
+        importedIdsMapping.put(xmlCase.getId(), importedCase.get_id().toString());
         importCaseMetadata();
-        importDataSet();
         importTasks();
+        importDataSet();
     }
 
     @Transactional
@@ -174,8 +176,9 @@ public class CaseImporter {
 
             importedTasks.add(importedTask);
             importedCase.addTask(importedTask);
+            importedIdsMapping.put(task.getId(), importedTask.get_id().toString());
         });
-        taskService.save(importedTasks);
+        importedTasksMap.put(this.importedCase.getStringId(), importedTasks);
     }
 
     @Transactional
@@ -194,8 +197,16 @@ public class CaseImporter {
                     .filter(dataRefComponent -> dataRefComponent.getComponent() != null)
                     .forEach(dataRefComponent -> dataField.getDataRefComponents().put(dataRefComponent.getTaskId(), parseXmlComponent(dataRefComponent.getComponent())));
             dataField.setValidations(parseXmlValidations(field.getValidations()));
-            dataField.setOptions(parseXmlOptions(field.getOptions()));
+            if(field.getType() == DataType.ENUMERATION || field.getType() == DataType.MULTICHOICE) {
+                dataField.setChoices(new HashSet<>(parseXmlOptions(field.getOptions()).values()));
+            }
+            if(field.getType() == DataType.ENUMERATION_MAP || field.getType() == DataType.MULTICHOICE_MAP) {
+                dataField.setOptions(parseXmlOptions(field.getOptions()));
+            }
             dataField.setBehavior(parseXmlBehaviors(field.getBehaviors()));
+            if(field.getType() == DataType.CASE_REF) {
+                dataField.setAllowedNets(parseStringCollection(field.getAllowedNets()));
+            }
             importedCase.getDataSet().put(field.getId(), dataField);
         });
     }
@@ -268,9 +279,13 @@ public class CaseImporter {
                 }
                 break;
             case STRING_COLLECTION:
+                parsedValue = parseStringCollection(value);
+                break;
             case CASE_REF:
             case TASK_REF:
-                parsedValue = parseStringCollection(value);
+                parsedValue = parseStringCollection(value).stream()
+                        .filter(this.importedIdsMapping::containsKey)
+                        .map(this.importedIdsMapping::get).toList();
                 break;
             case NUMBER:
                 parsedValue = Double.parseDouble(value.getValue().getFirst());
@@ -293,7 +308,15 @@ public class CaseImporter {
                 parsedValue = parseUserFieldValue(value.getValue().getFirst());
                 break;
             case USER_LIST:
-                parsedValue = new UserListFieldValue(value.getValue().stream().map(this::parseUserFieldValue).collect(Collectors.toList()));
+                List<UserFieldValue> userFieldValues = value.getValue().stream()
+                    .map(this::parseUserFieldValue)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+                if (userFieldValues.isEmpty()) {
+                    parsedValue = null;
+                } else {
+                    parsedValue = new UserListFieldValue(userFieldValues);
+                }
                 break;
             case FILE:
                 parsedValue = createFileFieldValue(field, value.getValue().getFirst());
@@ -338,8 +361,8 @@ public class CaseImporter {
             user = userService.resolveById(xmlValue, true);
             return new UserFieldValue(user);
         } catch (IllegalArgumentException e) {
-            log.error("User with id [{}] not found, setting empty value", xmlValue);
-            return new UserFieldValue();
+            log.warn("User with id [{}] not found, setting empty value", xmlValue);
+            return null;
         }
     }
 
