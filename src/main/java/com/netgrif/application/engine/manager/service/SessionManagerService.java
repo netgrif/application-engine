@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.manager.service;
 
-import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,36 +25,39 @@ public class SessionManagerService implements ISessionManagerService {
 
     protected final String redisUsernameKey;
 
-    public SessionManagerService(RedisIndexedSessionRepository repository, SessionRegistry sessionRegistry, @Value("${spring.session.redis.namespace}") String redisNamespace) {
+    public SessionManagerService(RedisIndexedSessionRepository repository, SessionRegistry sessionRegistry,
+                                 @Value("${spring.session.redis.namespace}") String redisNamespace) {
         this.repository = repository;
         this.sessionRegistry = sessionRegistry;
-        this.redisUsernameKey = RedisIndexedSessionRepository.DEFAULT_NAMESPACE + ":" + redisNamespace + ":index:org.springframework.session.FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME:";
+        this.redisUsernameKey = RedisIndexedSessionRepository.DEFAULT_NAMESPACE + ":" + redisNamespace
+                + ":index:org.springframework.session.FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME:";
     }
 
     @Override
-    public List<Identity> getAllLoggedUsers() {
+    public List<LoggedIdentity> getAllLoggedIdentities() {
         RedisOperations<Object, Object> redisOps = repository.getSessionRedisOperations();
         if (redisOps == null) {
             throw new IllegalStateException("Redis session management is not configured!");
         }
-        List<Identity> activeUsers = new ArrayList<>();
+        List<LoggedIdentity> activeIdentities = new ArrayList<>();
         Set<Object> keys = redisOps.keys(redisUsernameKey + "*");
         if (keys == null || keys.isEmpty()) {
-            return activeUsers;
+            return activeIdentities;
         }
         keys.forEach(username -> {
-            Session session = repository.findByPrincipalName(username.toString().replace(redisUsernameKey, "")).values().stream().findFirst().orElse(null);
+            Session session = repository.findByPrincipalName(username.toString().replace(redisUsernameKey, ""))
+                    .values().stream().findFirst().orElse(null);
             if (session != null) {
                 SecurityContextImpl impl = session.getAttribute(WebSessionServerSecurityContextRepository.DEFAULT_SPRING_SECURITY_CONTEXT_ATTR_NAME);
                 if (impl != null) {
-                    LoggedIdentity user = (LoggedIdentity) impl.getAuthentication().getPrincipal();
-                    if (user != null) {
-                        activeUsers.add(user);
+                    LoggedIdentity identity = (LoggedIdentity) impl.getAuthentication().getPrincipal();
+                    if (identity != null) {
+                        activeIdentities.add(identity);
                     }
                 }
             }
         });
-        return activeUsers;
+        return activeIdentities;
     }
 
     @Override
@@ -65,8 +67,9 @@ public class SessionManagerService implements ISessionManagerService {
 
     @Override
     public void logoutAllSession() {
-        List<Identity> users = getAllLoggedUsers();
-        users.forEach(loggedUser -> repository.findByPrincipalName(loggedUser.getEmail()).keySet().forEach(repository::deleteById));
+        List<LoggedIdentity> loggedIdentities = getAllLoggedIdentities();
+        loggedIdentities.forEach(loggedUser -> repository.findByPrincipalName(loggedUser.getUsername())
+                .keySet().forEach(repository::deleteById));
     }
 
 }

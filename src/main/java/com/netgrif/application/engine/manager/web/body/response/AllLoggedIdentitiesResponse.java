@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.manager.web.body.response;
 
-import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.manager.web.SessionManagerController;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -8,9 +8,9 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import java.util.Collection;
 
 
-public class AllLoggedUsersResponse extends CollectionModel<Identity> {
+public class AllLoggedIdentitiesResponse extends CollectionModel<LoggedIdentity> {
 
-    public AllLoggedUsersResponse(Collection<Identity> content) {
+    public AllLoggedIdentitiesResponse(Collection<LoggedIdentity> content) {
         super(content);
         buildLinks();
     }

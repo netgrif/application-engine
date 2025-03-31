@@ -2,7 +2,7 @@ package com.netgrif.application.engine.manager.responseclass;
 
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Identity;
-import com.netgrif.application.engine.manager.web.body.response.AllLoggedUsersResponse;
+import com.netgrif.application.engine.manager.web.body.response.AllLoggedIdentitiesResponse;
 import com.netgrif.application.engine.manager.web.body.response.MessageLogoutResponse;
 import com.netgrif.application.engine.startup.SuperCreator;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +36,7 @@ class ResponseTest {
     void allLoggedUsersResponseTest() {
         Collection<Identity> content = new ArrayList<>();
         content.add(superCreator.getLoggedSuper());
-        AllLoggedUsersResponse response = new AllLoggedUsersResponse(content);
+        AllLoggedIdentitiesResponse response = new AllLoggedIdentitiesResponse(content);
         assert response != null;
         assert response.getContent().size() == 1;
     }

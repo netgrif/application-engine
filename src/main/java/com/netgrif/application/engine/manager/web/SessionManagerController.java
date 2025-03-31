@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.manager.web;
 
-import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import com.netgrif.application.engine.manager.web.body.request.LogoutRequest;
-import com.netgrif.application.engine.manager.web.body.response.AllLoggedUsersResponse;
+import com.netgrif.application.engine.manager.web.body.response.AllLoggedIdentitiesResponse;
 import com.netgrif.application.engine.manager.web.body.response.MessageLogoutResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,9 +42,9 @@ public class SessionManagerController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public AllLoggedUsersResponse getAllSessions() {
-        Collection<Identity> identities = sessionManagerService.getAllLoggedUsers();
-        return new AllLoggedUsersResponse(identities);
+    public AllLoggedIdentitiesResponse getAllSessions() {
+        Collection<LoggedIdentity> identities = sessionManagerService.getAllLoggedIdentities();
+        return new AllLoggedIdentitiesResponse(identities);
     }
 
     @PreAuthorize("@applicationAuthorizationService.hasApplicationRole('admin')")
@@ -58,7 +58,7 @@ public class SessionManagerController {
     })
     public MessageLogoutResponse logoutCurrentSession(@RequestBody LogoutRequest requestBody) {
 
-        requestBody.getUsers().forEach(sessionManagerService::logoutSessionByUsername);
+        requestBody.getIdentities().forEach(sessionManagerService::logoutSessionByUsername);
         return new MessageLogoutResponse(true);
     }
 

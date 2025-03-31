@@ -28,8 +28,8 @@ class SessionManagerServiceTest {
     }
 
     @Test
-    void getAllLoggedUsersTest() {
-        assert managerService.getAllLoggedUsers() != null;
+    void getAllLoggedIdentitiesTest() {
+        assert managerService.getAllLoggedIdentities() != null;
     }
 
     @Test
