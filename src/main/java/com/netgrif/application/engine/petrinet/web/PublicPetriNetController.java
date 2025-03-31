@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.petrinet.web;
 
-import com.netgrif.application.engine.authentication.service.interfaces.IUserService;
 import com.netgrif.application.engine.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -39,7 +38,6 @@ import static com.netgrif.application.engine.petrinet.web.PetriNetController.dec
 public class PublicPetriNetController {
 
     private final IPetriNetService petriNetService;
-    private final IUserService userService;
     private final StringToVersionConverter converter;
 
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
@@ -53,13 +51,13 @@ public class PublicPetriNetController {
     @ResponseBody
     public PetriNetReferenceResource getOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Locale locale) {
         String resolvedIdentifier = Base64.isBase64(identifier) ? new String(Base64.decodeBase64(identifier)) : identifier;
-        return new PetriNetReferenceResource(this.petriNetService.getReference(resolvedIdentifier, this.converter.convert(version), userService.getAnonymousLogged(), locale));
+        return new PetriNetReferenceResource(this.petriNetService.getReference(resolvedIdentifier, this.converter.convert(version), locale));
     }
 
     @Operation(summary = "Search processes")
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<PetriNetReferenceResource> searchPetriNets(@RequestBody PetriNetSearch criteria, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
-        Page<PetriNetReference> nets = petriNetService.search(criteria, userService.getAnonymousLogged(), pageable, locale);
+        Page<PetriNetReference> nets = petriNetService.search(criteria, pageable, locale);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicPetriNetController.class)
                 .searchPetriNets(criteria, pageable, assembler, locale)).withRel("search");
         PagedModel<PetriNetReferenceResource> resources = assembler.toModel(nets, new PetriNetReferenceResourceAssembler(), selfLink);
@@ -77,6 +75,6 @@ public class PublicPetriNetController {
     @GetMapping(value = "/transitions", produces = MediaTypes.HAL_JSON_VALUE)
     public TransitionReferencesResource getTransitionReferences(@RequestParam List<String> ids, Locale locale) {
         ids.forEach(PetriNetController::decodeUrl);
-        return new TransitionReferencesResource(petriNetService.getTransitionReferences(ids, userService.getAnonymousLogged(), locale));
+        return new TransitionReferencesResource(petriNetService.getTransitionReferences(ids, locale));
     }
 }

@@ -178,6 +178,7 @@ public class TaskController extends AbstractTaskController {
     @GetMapping(value = "/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> getData(@PathVariable("id") String taskId, Locale locale, Authentication auth) {
         // TODO: release/8.0.0 6.2.5 set order?
+        // TODO: release/8.0.0 authorization? Get actions can modify database
         return super.getData(taskId, locale, auth);
     }
 

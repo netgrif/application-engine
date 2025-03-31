@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.authorization.web;
 
 import com.netgrif.application.engine.authorization.domain.Role;
-import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,10 +31,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/authorization")
 @Tag(name = "RBAC", description = "With this API you can manage roles and assignments")
 public class RBACController {
-    private final IRoleAssignmentService roleAssignmentService;
     private final IRoleService roleService;
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@applicationAuthorizationService.hasApplicationRole('admin')")
     @Operation(summary = "Assign roles to the actor", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/{actorId}/assign", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
@@ -54,7 +52,7 @@ public class RBACController {
         }
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@applicationAuthorizationService.hasApplicationRole('admin')")
     @Operation(summary = "Remove roles from the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/{actorId}/remove", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {

@@ -43,7 +43,7 @@ public class LdapController {
 
     protected final ILdapGroupRefService service;
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@applicationAuthorizationService.hasApplicationRole('admin')")
     @Operation(summary = "Get all ldap groups",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -72,7 +72,7 @@ public class LdapController {
         return new LdapGroupsResource(ldapGroupResponse);
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@applicationAuthorizationService.hasApplicationRole('admin')")
     @Operation(summary = "Assign role to the ldap group",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})

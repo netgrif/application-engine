@@ -147,7 +147,7 @@ public class UserController {
         return resources;
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@applicationAuthorizationService.hasApplicationRole('admin')")
     @Operation(summary = "Get all authorities of the system",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -160,7 +160,7 @@ public class UserController {
         return new AuthoritiesResources(authorityService.findAll());
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@applicationAuthorizationService.hasApplicationRole('admin')")
     @Operation(summary = "Assign authority to the user",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})

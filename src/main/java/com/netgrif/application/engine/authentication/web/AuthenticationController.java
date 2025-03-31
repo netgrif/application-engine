@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -84,17 +85,14 @@ public class AuthenticationController {
         }
     }
 
-    @Operation(summary = "Send invitation to a new user", security = {@SecurityRequirement(name = "BasicAuth")})
+    @PreAuthorize("@applicationAuthorizationService.hasApplicationRole('admin')")
+    @Operation(summary = "Send invitation to a new identity", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/invite", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource invite(@RequestBody NewIdentityRequest newIdentityRequest, Authentication auth) {
         try {
             if (!serverAuthProperties.isOpenRegistration()) {
                 return MessageResource.errorMessage("Registration is turned off.");
             }
-            // todo 2058 should be preauthorize
-//            if (auth == null || !((LoggedIdentity) auth.getPrincipal()).isAdmin()) {
-//                return MessageResource.errorMessage("Only admin can invite new users!");
-//            }
 
             newIdentityRequest.email = URLDecoder.decode(newIdentityRequest.email, StandardCharsets.UTF_8);
             if (mailAttemptService.isBlocked(newIdentityRequest.email)) {

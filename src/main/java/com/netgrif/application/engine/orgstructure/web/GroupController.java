@@ -37,7 +37,7 @@ public class GroupController {
         this.service = service;
     }
 
-    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@applicationAuthorizationService.hasApplicationRole('admin')")
     @Operation(summary = "Get all groups in the system",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})
