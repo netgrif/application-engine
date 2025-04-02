@@ -47,8 +47,8 @@ class TaskRefPropagationTest {
 
     @BeforeEach
     void beforeAll() {
-        def parent = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_parent.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        def child = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_child.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def parent = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_parent.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        def child = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_child.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
 
         assert parent.getNet() != null
         assert child.getNet() != null
@@ -107,7 +107,7 @@ class TaskRefPropagationTest {
 
         /* validate getDataGroups object and taskRef field ids */
         // TODO: NAE-1969 fix
-//        List<DataGroup> parentData = dataService.getDataGroups(parentTaskId, Locale.forLanguageTag("SK"), superCreator.getLoggedSuper()).data
+//        List<DataGroup> parentData = dataService.getDataGroups(parentTaskId, Locale.forLanguageTag("SK"), superCreator.getLoggedSuper().getActiveActorId()).data
         // TODO: release/8.0.0 fix
 //        LocalisedField parentText = findField(parentData, PARENT_FIELD_TEXT_TITLE)
 //        LocalisedField parentMultichoice = findField(parentData, PARENT_FIELD_MULTICHOICE_TITLE)

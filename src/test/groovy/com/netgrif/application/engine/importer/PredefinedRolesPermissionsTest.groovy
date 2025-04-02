@@ -457,13 +457,13 @@ class PredefinedRolesPermissionsTest {
     }
 
     private NetCaseTask importAndCreate(Resource model) {
-        ImportPetriNetEventOutcome importOutcome = petriNetService.importPetriNet(model.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        ImportPetriNetEventOutcome importOutcome = petriNetService.importPetriNet(model.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
 
         assert importOutcome.getNet() != null
 
         Process net = importOutcome.getNet()
 
-        CreateCaseEventOutcome createCaseOutcome = workflowService.createCase(net.stringId, '', '', superCreator.loggedSuper)
+        CreateCaseEventOutcome createCaseOutcome = workflowService.createCase(net.stringId, '', '', superCreator.loggedSuper.activeActorId)
         assert createCaseOutcome.getCase() != null
         Case aCase = createCaseOutcome.getCase()
 

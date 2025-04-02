@@ -2,8 +2,8 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
-
-
+import com.netgrif.application.engine.authentication.domain.Identity
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.Process
@@ -62,13 +62,13 @@ class FileListFieldTest {
     private IWorkflowService workflowService
 
     @Autowired
-    private IUserService userService
-
-    @Autowired
     private WebApplicationContext context
 
     @Autowired
     private IPetriNetService petriNetService
+
+    @Autowired
+    private IIdentityService identityService
 
     @Autowired
     private SuperCreator superCreator
@@ -85,7 +85,8 @@ class FileListFieldTest {
     }
 
     Process getNet() {
-        def netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/remoteFileListField.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/remoteFileListField.xml"), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId)
         assert netOptional.getNet() != null
         return netOptional.getNet()
     }
@@ -101,11 +102,12 @@ class FileListFieldTest {
     void downloadFileByCaseAndName() {
         Process net = getNet()
 
-        IUser user = userService.findByEmail(configuration.email)
-        assert user != null
+        Optional<Identity> identityOpt = identityService.findByUsername(configuration.email)
+        assert identityOpt.isPresent()
 
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getCase()
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black",
+                identityOpt.get().toSession().activeActorId).getCase()
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), identityOpt.get().toSession())
 
         mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/named")
                 .param("fieldId", FIELD_ID)
@@ -122,11 +124,12 @@ class FileListFieldTest {
     void downloadFileByTask() {
         Process net = getNet()
 
-        IUser user = userService.findByEmail(configuration.email)
-        assert user != null
+        Optional<Identity> identityOpt = identityService.findByUsername(configuration.email)
+        assert identityOpt.isPresent()
 
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getCase()
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black",
+                identityOpt.get().toSession().activeActorId).getCase()
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), identityOpt.get().toSession())
 
         // TODO: release/8.0.0 '/test-file-list.txt' or  "test-file.txt" ?
         mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file/named")

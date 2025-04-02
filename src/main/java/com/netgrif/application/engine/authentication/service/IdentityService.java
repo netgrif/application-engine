@@ -127,6 +127,9 @@ public class IdentityService implements IIdentityService {
         return Set.of();
     }
 
+    /**
+     * todo javadoc
+     * */
     @Override
     @SuppressWarnings("unchecked")
     public List<Identity> findAllByStateAndExpirationDateBefore(IdentityState state, LocalDateTime dateTime) {
@@ -134,6 +137,15 @@ public class IdentityService implements IIdentityService {
             return List.of();
         }
         return (List<Identity>) findAllByQuery(stateAndExpirationDateBeforeQuery(state, dateTime));
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Identity> findAll() {
+        return (List<Identity>) findAllByQuery(null);
     }
 
     /**
@@ -268,8 +280,9 @@ public class IdentityService implements IIdentityService {
     }
 
     private List<? extends Case> findAllByQuery(String query) {
+        Set<String> singletonQuerySet = query != null ? Set.of(query) : Set.of();
         CaseSearchRequest request = CaseSearchRequest.builder()
-                .query(buildQuery(Set.of(query)))
+                .query(buildQuery(singletonQuerySet))
                 .build();
 
         List<Case> result = new ArrayList<>();

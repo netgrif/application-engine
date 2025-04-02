@@ -20,6 +20,7 @@ public interface IIdentityService {
     boolean existsByUsername(String username);
     Set<String> findActorIds(String id);
     List<Identity> findAllByStateAndExpirationDateBefore(IdentityState state, LocalDateTime dateTime);
+    List<Identity> findAll();
 
     Identity create(IdentityParams params);
     Identity createWithDefaultActor(IdentityParams params);

@@ -1,12 +1,12 @@
 package com.netgrif.application.engine.petrinet.domain.roles
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.authentication.domain.IdentityState
-
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams
 import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -87,30 +87,33 @@ class ProcessRoleTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rolref_view.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rolref_view.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
         assert net.getNet() != null
 
-        String netId = net.getNet().getStringId()
+        ProcessRole viewRole = userRoleRepository.findByImportId("role1")
+        ProcessRole performRole = userRoleRepository.findByImportId("role2")
 
-        def auths = importHelper.createAuthorities(["user": SessionRole.user, "admin": SessionRole.admin])
-        def roles = userRoleRepository.findAllByNetId(netId)
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_VIEW, password: "password", state: IdentityState.ACTIVE),
-                [auths.get("user")] as SessionRole[],
-                [roles.find {
-                    // TODO: release/8.0.0 roles
-                    it.getStringId() == net.getNet().roles.values().find {
-                        it.name.defaultValue == "View"
-                    }.stringId
-                }] as ProcessRole[])
+        importHelper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Test"))
+                .lastname(new TextField("Integration"))
+                .username(new TextField(USER_EMAIL_VIEW))
+                .password(new TextField("password"))
+                .build(), List.of(viewRole))
 
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_PERFORM, password: "password", state: IdentityState.ACTIVE),
-                [auths.get("user")] as SessionRole[],
-                [roles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
+        importHelper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Test"))
+                .lastname(new TextField("Integration"))
+                .username(new TextField(USER_EMAIL_PERFORM))
+                .password(new TextField("password"))
+                .build(), List.of(performRole))
 
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_BOTH, password: "password", state: IdentityState.ACTIVE),
-                [auths.get("user")] as SessionRole[],
-                [roles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "View" }.stringId },
-                 roles.find { it.getStringId() == net.getNet().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
+        importHelper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Test"))
+                .lastname(new TextField("Integration"))
+                .username(new TextField(USER_EMAIL_BOTH))
+                .password(new TextField("password"))
+                .build(), List.of(viewRole, performRole))
     }
 
     private String caseId

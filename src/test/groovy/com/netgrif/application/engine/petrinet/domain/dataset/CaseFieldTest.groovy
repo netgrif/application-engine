@@ -63,7 +63,7 @@ class CaseFieldTest {
 
     @Test
     void testAllowedNets() {
-        def testNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def testNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
         assert testNet.getNet() != null
 
         Case aCase = importHelper.createCase("Case 1", testNet.getNet())
@@ -113,7 +113,7 @@ class CaseFieldTest {
 
     @Test
     void testImmediateAllowedNets() {
-        def testNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def testNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
         assert testNet.getNet() != null
 
         Case aCase = importHelper.createCase("Case 1", testNet.getNet())
@@ -159,10 +159,10 @@ class CaseFieldTest {
 
     @Test
     void testChangeValueAction() {
-        def notAllowedNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def notAllowedNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
         assert notAllowedNet.getNet() != null
 
-        def testNet = petriNetService.importPetriNet(stream(CHANGE_VALUE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def testNet = petriNetService.importPetriNet(stream(CHANGE_VALUE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
         assert testNet.getNet() != null
 
         Case aCase = importHelper.createCase("Case 1", testNet.getNet())

@@ -1,13 +1,12 @@
 package com.netgrif.application.engine.menu
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.authentication.domain.IdentityState
-
-
+import com.netgrif.application.engine.authentication.domain.Identity
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams
 import com.netgrif.application.engine.orgstructure.groups.NextGroupService
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
-import com.netgrif.application.engine.authorization.domain.ProcessRole
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.startup.*
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
@@ -32,7 +31,6 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
-
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -104,9 +102,6 @@ class MenuImportExportTest {
     private GroupRunner groupRunner
 
     @Autowired
-    private UserService userService
-
-    @Autowired
     private CaseRepository caseRepository
 
     @Autowired
@@ -115,7 +110,7 @@ class MenuImportExportTest {
     @Autowired
     private SuperCreator superCreator
 
-    private User dummyUser;
+    private Identity dummyIdentity;
 
     private Authentication userAuth
 
@@ -123,14 +118,14 @@ class MenuImportExportTest {
     void beforeTest() {
         this.testHelper.truncateDbs();
         this.defaultFiltersRunner.run()
-        this.dummyUser = createDummyUser();
+        this.dummyIdentity = createDummyIdentity();
     }
 
 
     @Test
     @Disabled("Fix IllegalArgument")
     void testMenuImportExport() {
-        userAuth = new UsernamePasswordAuthenticationToken(dummyUser.transformToLoggedUser(), DUMMY_USER_PASSWORD)
+        userAuth = new UsernamePasswordAuthenticationToken(dummyIdentity.toSession(), DUMMY_USER_PASSWORD)
         SecurityContextHolder.getContext().setAuthentication(userAuth)
 
         def testNet = importHelper.createNet(TEST_NET)
@@ -152,7 +147,7 @@ class MenuImportExportTest {
                         "value": "1",
                         "type" : "button"
                 ]
-        ]))
+        ]), dummyIdentity.toSession().activeActorId)
         Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq(DUMMY_USER_GROUP_TITLE))
         assert caseOpt.isPresent()
         groupCase = caseOpt.get()
@@ -197,16 +192,18 @@ class MenuImportExportTest {
         assert Objects.equals(original, exported);
     }
 
-    private User createDummyUser() {
-        def auths = importHelper.createAuthorities(["user": SessionRole.user, "admin": SessionRole.admin])
-        return importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: IdentityState.ACTIVE),
-                [auths.get("user")] as SessionRole[],
-                [] as ProcessRole[])
+    private Identity createDummyIdentity() {
+        return importHelper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Dummy"))
+                .lastname(new TextField("Identity"))
+                .username(new TextField(DUMMY_USER_MAIL))
+                .password(new TextField(DUMMY_USER_PASSWORD))
+                .build(), new ArrayList<>())
     }
 
 
     private SetDataEventOutcome setData(task, Map<String, Map<String, Object>> values) {
-        return dataService.setData(task, ImportHelper.populateDataset(values))
+        return dataService.setData(task, ImportHelper.populateDataset(values), dummyIdentity.toSession().activeActorId)
     }
 
 

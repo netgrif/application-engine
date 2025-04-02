@@ -1,20 +1,22 @@
 package com.netgrif.application.engine.workflow.service;
 
+import com.netgrif.application.engine.MockService;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Identity;
-import com.netgrif.application.engine.authentication.domain.IdentityState;
-import com.netgrif.application.engine.authentication.domain.repositories.UserRepository;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
+import com.netgrif.application.engine.authorization.domain.Role;
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Process;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.SuperCreator;
-import com.netgrif.application.engine.startup.SystemIdentityRunner;
-import com.netgrif.application.engine.startup.UriRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
@@ -28,13 +30,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -43,6 +44,9 @@ public class TaskServiceTest {
 
     @Autowired
     private ITaskService service;
+
+    @Autowired
+    private MockService mockService;
 
     @Autowired
     private IWorkflowService workflowService;
@@ -57,19 +61,7 @@ public class TaskServiceTest {
     private TaskRepository taskRepository;
 
     @Autowired
-    private MongoTemplate mongoTemplate;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private IAuthorityService authorityService;
-
-    @Autowired
-    private SystemIdentityRunner userRunner;
-
-    @Autowired
-    private UriRunner uriRunner;
+    private ImportHelper importHelper;
 
     @Autowired
     private IPetriNetService petriNetService;
@@ -86,49 +78,47 @@ public class TaskServiceTest {
     public void setUp() throws Exception {
         testHelper.truncateDbs();
 
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR,
+                superCreator.getLoggedSuper().getActiveActorId());
         Process net = petriNetRepository.findAll().get(0);
-        workflowService.createCase(net.getStringId(), "Storage Unit", "color", mockLoggedUser());
+        workflowService.createCase(net.getStringId(), "Storage Unit", "color", mockService.mockLoggedIdentity().getActiveActorId());
     }
 
     @Test
     public void resetArcTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        Process net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet();
-        Identity identity = mockLoggedUser();
-        CreateCaseEventOutcome outcome = workflowService.createCase(net.getStringId(), "Reset test", "color", identity);
-        User user = new User();
-        user.setName("name");
-        user.setPassword("password");
-        user.setSurname("surname");
-        user.setEmail("email@email.com");
-        user.setState(IdentityState.ACTIVE);
-        user = userRepository.save(user);
+        Process net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getNet();
+        LoggedIdentity mockedLoggedIdentity = mockService.mockLoggedIdentity();
+        CreateCaseEventOutcome outcome = workflowService.createCase(net.getStringId(), "Reset test", "color",
+                mockedLoggedIdentity.getActiveActorId());
 
-        assert outcome.getCase().getConsumedTokens().size() == 0;
+        Identity identity = importHelper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("firstname"))
+                .lastname(new TextField("lastname"))
+                .password(new TextField("password"))
+                .username(new TextField("email@email.com"))
+                .build(), new ArrayList<>());
+
+        assert outcome.getCase().getConsumedTokens().isEmpty();
         assert outcome.getCase().getActivePlaces().size() == 1;
-        assert outcome.getCase().getActivePlaces().values().contains(5);
+        assert outcome.getCase().getActivePlaces().containsValue(5);
 
         Task task = taskRepository.findAll().stream().filter(t -> t.getTitle().getDefaultValue().equalsIgnoreCase("reset")).findFirst().orElse(null);
 
         assert task != null;
 
-        service.assignTask(user.transformToLoggedUser(), task.getStringId());
+        service.assignTask(identity.toSession().getActiveActorId(), task.getStringId());
         Case useCase = caseRepository.findById(outcome.getCase().getStringId()).get();
 
         assert useCase.getConsumedTokens().size() == 1;
-        assert useCase.getConsumedTokens().values().contains(5);
-        assert useCase.getActivePlaces().size() == 0;
+        assert useCase.getConsumedTokens().containsValue(5);
+        assert useCase.getActivePlaces().isEmpty();
 
-        service.cancelTask(user.transformToLoggedUser(), task.getStringId());
+        service.cancelTask(identity.toSession().getActiveActorId(), task.getStringId());
         useCase = caseRepository.findById(useCase.getStringId()).get();
 
-        assert useCase.getConsumedTokens().size() == 0;
+        assert useCase.getConsumedTokens().isEmpty();
         assert useCase.getActivePlaces().size() == 1;
-        assert useCase.getActivePlaces().values().contains(5);
-    }
-
-    public Identity mockLoggedUser() {
-        SessionRole sessionRoleUser = authorityService.getOrCreate(SessionRole.user);
-        return new Identity(new ObjectId().toString(), configuration.getEmail(), configuration.getPassword(), Collections.singleton(sessionRoleUser));
+        assert useCase.getActivePlaces().containsValue(5);
     }
 }

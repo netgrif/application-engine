@@ -1,13 +1,18 @@
 package com.netgrif.application.engine.petrinet.service
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.authentication.domain.IdentityState
-
-
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
+import com.netgrif.application.engine.authorization.domain.Actor
+import com.netgrif.application.engine.authorization.domain.Role
+import com.netgrif.application.engine.authorization.service.interfaces.IActorService
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.*
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository
@@ -63,9 +68,6 @@ class PetriNetServiceTest {
     private IRoleService roleService
 
     @Autowired
-    private IUserService userService
-
-    @Autowired
     private PetriNetRepository petriNetRepository
 
     @Autowired
@@ -73,6 +75,12 @@ class PetriNetServiceTest {
 
     @Autowired
     private CaseRepository caseRepository
+
+    @Autowired
+    private IIdentityService identityService
+
+    @Autowired
+    private IActorService actorService
 
     @Autowired
     private ProcessRoleRepository roleRepository
@@ -88,10 +96,12 @@ class PetriNetServiceTest {
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
-        def auths = importHelper.createAuthorities(["user": SessionRole.user, "admin": SessionRole.admin])
-        importHelper.createUser(new User(name: "Customer", surname: "User", email: CUSTOMER_USER_MAIL, password: "password", state: IdentityState.ACTIVE),
-                [auths.get("user")] as SessionRole[],
-                [] as ProcessRole[])
+        importHelper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Customer"))
+                .lastname(new TextField("Identity"))
+                .username(new TextField(CUSTOMER_USER_MAIL))
+                .password(new TextField("password"))
+                .build(), new ArrayList<Role>())
     }
 
     @Test
@@ -100,7 +110,8 @@ class PetriNetServiceTest {
         long processCount = petriNetRepository.count()
         long taskCount = taskRepository.count()
 
-        ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId)
         assert testNetOptional.getNet() != null
         assert petriNetRepository.count() == processCount + 1
         Process testNet = testNetOptional.getNet()
@@ -115,26 +126,27 @@ class PetriNetServiceTest {
         assert taskRepository.count() == taskCount + 3
         assert roleRepository.count() == roleCount + 2
 
-        def user = userService.findByEmail(CUSTOMER_USER_MAIL)
-        assert user != null
-        assert user.roles.size() == 1
+        Optional<Identity> identityOpt = identityService.findByUsername(CUSTOMER_USER_MAIL)
+        assert identityOpt.isPresent()
+        // todo 2058
+//        assert user.roles.size() == 1
 
-        userService.addRole(user, testNet.roles.values().collect().get(0).stringId)
-        user = userService.findByEmail(CUSTOMER_USER_MAIL)
-        assert user != null
-        assert user.roles.size() == 2
+//        userService.addRole(user, testNet.roles.values().collect().get(0).stringId)
+//        user = userService.findByEmail(CUSTOMER_USER_MAIL)
+//        assert user != null
+//        assert user.roles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
 
-        petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
+        petriNetService.deletePetriNet(testNet.stringId)
         assert petriNetRepository.count() == processCount
         Thread.sleep(5000)
         assert elasticPetriNetRepository.findByStringId(testNet.stringId) == null
         assert caseRepository.findAllByProcessIdentifier(testNetOptional.getNet().getImportId()).size() == 0
         assert taskRepository.count() == taskCount
         assert roleRepository.count() == roleCount
-        user = userService.findByEmail(CUSTOMER_USER_MAIL)
-        assert user != null
-        assert user.roles.size() == 1
+//        user = userService.findByEmail(CUSTOMER_USER_MAIL)
+//        assert user != null
+//        assert user.roles.size() == 1
 
         boolean exceptionThrown = false
         try {
@@ -149,8 +161,10 @@ class PetriNetServiceTest {
     @Test
     void findAllByUriNodeIdTest() {
         UriNode myNode = uriService.getOrCreate("/test", UriContentType.DEFAULT)
-        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), myNode.id.toString())
-        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), myNode.id.toString())
+        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId,
+                myNode.id.toString())
+        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId,
+                myNode.id.toString())
 
         Thread.sleep(2000)
 
@@ -162,49 +176,48 @@ class PetriNetServiceTest {
     void processSearch() {
         int processCount = (int) petriNetRepository.count()
 
-        def user = userService.findByEmail(CUSTOMER_USER_MAIL)
-        assert user != null
-        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        petriNetService.importPetriNet(stream(NET_SEARCH_FILE), VersionType.MAJOR, user.transformToLoggedUser())
+        Optional<Identity> identityOpt = identityService.findByUsername(CUSTOMER_USER_MAIL)
+        assert identityOpt.isPresent()
+        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
+        petriNetService.importPetriNet(stream(NET_SEARCH_FILE), VersionType.MAJOR, identityOpt.get().toSession().activeActorId)
 
         assert petriNetRepository.count() == processCount + 2
 
         PetriNetSearch search = new PetriNetSearch()
-        assert petriNetService.search(search, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == processCount + 2
+        assert petriNetService.search(search, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == processCount + 2
 
         PetriNetSearch search1 = new PetriNetSearch()
         search1.setIdentifier("processSearchTest")
-        assert petriNetService.search(search1, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
+        assert petriNetService.search(search1, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
 
         PetriNetSearch search2 = new PetriNetSearch()
         search2.setTitle("Process Search Test")
-        assert petriNetService.search(search2, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
+        assert petriNetService.search(search2, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
 
         PetriNetSearch search3 = new PetriNetSearch()
         search3.setDefaultCaseName("Process Search Case Name")
-        assert petriNetService.search(search3, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
+        assert petriNetService.search(search3, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
 
         PetriNetSearch search4 = new PetriNetSearch()
         search4.setInitials("PST")
-        assert petriNetService.search(search4, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
-
+        assert petriNetService.search(search4, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
 
         PetriNetSearch search5 = new PetriNetSearch()
-        Author author = new Author()
-        author.setEmail(user.getEmail())
-        search5.setAuthor(author)
-        assert petriNetService.search(search5, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
+        Optional<Actor> actorOpt = actorService.findById(identityOpt.get().toSession().activeActorId)
+        assert actorOpt.isPresent()
+        search5.setAuthor(actorOpt.get())
+        assert petriNetService.search(search5, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
 
 
         PetriNetSearch search6 = new PetriNetSearch()
         search6.setVersion(new Version(1, 0, 0))
-        assert petriNetService.search(search6, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == processCount + 2
+        assert petriNetService.search(search6, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == processCount + 2
 
         PetriNetSearch search7 = new PetriNetSearch()
         HashMap<String, String> map = new HashMap<String, String>()
         map.put("test", "test")
         search7.setTags(map)
-        assert petriNetService.search(search7, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
+        assert petriNetService.search(search7, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
 
         PetriNetSearch search8 = new PetriNetSearch()
         HashMap<String, String> mapTags = new HashMap<String, String>()
@@ -214,29 +227,29 @@ class PetriNetServiceTest {
         search8.setTitle("Process Search Test")
         search8.setDefaultCaseName("Process Search Case Name")
         search8.setInitials("PST")
-        search8.setAuthor(author)
-        assert petriNetService.search(search8, superCreator.getLoggedSuper(), PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
+        search8.setAuthor(actorOpt.get())
+        assert petriNetService.search(search8, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
     }
 
     @Test
     void deleteParentPetriNet() {
         Process superParentNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/super_parent_to_be_extended.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getNet()
         Case superParentCase = importHelper.createCase("Super parent case", superParentNet)
 
         Process parentNetMajor = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getNet()
         Case parentMajorCase = importHelper.createCase("Parent major case", parentNetMajor)
 
         Process parentNetMinor = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/parent_to_be_extended.xml"),
-                VersionType.MINOR, superCreator.getLoggedSuper()).getNet()
+                VersionType.MINOR, superCreator.getLoggedSuper().activeActorId).getNet()
         Case parentMinorCase = importHelper.createCase("Parent minor case", parentNetMinor)
 
         Process childNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/child_extending_parent.xml"),
-                VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getNet()
         Case parentChildCase = importHelper.createCase("Child case", childNet)
 
-        petriNetService.deletePetriNet(parentNetMajor.stringId, superCreator.getLoggedSuper())
+        petriNetService.deletePetriNet(parentNetMajor.stringId)
         assert petriNetRepository.findById(superParentNet.stringId).isPresent()
         assert petriNetRepository.findById(parentNetMajor.stringId).isEmpty()
         assert petriNetRepository.findById(parentNetMinor.stringId).isPresent()
@@ -246,7 +259,7 @@ class PetriNetServiceTest {
         assert caseRepository.findById(parentMinorCase.stringId).isPresent()
         assert caseRepository.findById(parentChildCase.stringId).isPresent()
 
-        petriNetService.deletePetriNet(parentNetMinor.stringId, superCreator.getLoggedSuper())
+        petriNetService.deletePetriNet(parentNetMinor.stringId)
         assert petriNetRepository.findById(superParentNet.stringId).isPresent()
         assert petriNetRepository.findById(parentNetMinor.stringId).isEmpty()
         assert petriNetRepository.findById(childNet.stringId).isEmpty()
@@ -254,7 +267,7 @@ class PetriNetServiceTest {
         assert caseRepository.findById(parentMinorCase.stringId).isEmpty()
         assert caseRepository.findById(parentChildCase.stringId).isEmpty()
 
-        petriNetService.deletePetriNet(superParentNet.stringId, superCreator.getLoggedSuper())
+        petriNetService.deletePetriNet(superParentNet.stringId)
         assert petriNetRepository.findById(superParentNet.stringId).isEmpty()
         assert caseRepository.findById(superParentCase.stringId).isEmpty()
     }

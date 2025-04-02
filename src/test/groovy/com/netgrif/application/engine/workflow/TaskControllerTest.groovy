@@ -1,14 +1,14 @@
 package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.authentication.domain.IdentityState
-
-
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.authorization.domain.Role
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -62,9 +62,6 @@ class TaskControllerTest {
     private IDataService dataService
 
     @Autowired
-    private IUserService userService
-
-    @Autowired
     private IPetriNetService petriNetService
 
     @Autowired
@@ -77,10 +74,10 @@ class TaskControllerTest {
     private ImportHelper helper
 
     @Autowired
-    private IAuthorityService authorityService
+    private IWorkflowService workflowService
 
     @Autowired
-    private IWorkflowService workflowService
+    private IIdentityService identityService
 
     @Autowired
     private TaskController taskController
@@ -96,15 +93,12 @@ class TaskControllerTest {
     @BeforeEach
     void init() {
         testHelper.truncateDbs()
-        userService.saveNew(new User(
-                name: "Dummy",
-                surname: "Netgrif",
-                email: DUMMY_USER_MAIL,
-                password: "superAdminPassword",
-                state: IdentityState.ACTIVE,
-                authorities: [authorityService.getOrCreate(SessionRole.user)] as Set<SessionRole>))
-                // todo 2058
-//                roles: [] as Set<ProcessRole>))
+        helper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Dummy"))
+                .lastname(new TextField("Netgrif"))
+                .username(new TextField(DUMMY_USER_MAIL))
+                .password(new TextField("superAdminPassword"))
+                .build(), new ArrayList<Role>())
         importNet()
     }
 
@@ -150,14 +144,14 @@ class TaskControllerTest {
         createCase()
         findTask()
         setUserListValue()
-        setUserRole()
+        setActorRole()
         assert !findTasksByMongo().empty
     }
 
     void testWithRole() {
         createCase()
         findTask()
-        setUserRole()
+        setActorRole()
         assert !findTasksByMongo().empty
     }
 
@@ -180,6 +174,15 @@ class TaskControllerTest {
         assert useCase != null
     }
 
+    void setUserListValue() {
+        assert task != null
+        // TODO: release/8.0.0 field 'performable_users' does not exist
+//        String userId = userService.findByEmail(DUMMY_USER_MAIL).getStringId()
+//        dataService.setData(task.stringId, new DataSet([
+//                "performable_users": new UserListField(rawValue: new UserListFieldValue(dataService.makeUserFieldValue(userId)))
+//        ] as Map<String, Field<?>>))
+    }
+
     void findTask() {
         List<TaskReference> taskReferences = taskService.findAllByCase(useCase.stringId, new Locale("en"))
         assert taskReferences.size() > 0
@@ -191,30 +194,17 @@ class TaskControllerTest {
         assert task != null
     }
 
-    void setUserListValue() {
-        assert task != null
-        String userId = userService.findByEmail(DUMMY_USER_MAIL).getStringId()
-        // TODO: release/8.0.0 field 'performable_users' does not exist
-//        dataService.setData(task.stringId, new DataSet([
-//                "performable_users": new UserListField(rawValue: new UserListFieldValue(dataService.makeUserFieldValue(userId)))
-//        ] as Map<String, Field<?>>))
-    }
-
-    void setUserRole() {
-        List<Role> roles = roleService.findAll()
-
-        for (Role role : roles) {
-            if (role.importId == "process_role") {
-                this.role = role
-            }
-        }
-        roleService.assignRolesToActor(userService.findByEmail(DUMMY_USER_MAIL).getStringId(), [role.id.toString()] as Set)
+    void setActorRole() {
+        this.role = roleService.findProcessRoleByImportId("process_role")
+        roleService.assignRolesToActor(identityService.findByUsername(DUMMY_USER_MAIL).get().toSession().activeActorId,
+                [role.id.toString()] as Set)
     }
 
     Page<Task> findTasksByMongo() {
         List<TaskSearchRequest> taskSearchRequestList = new ArrayList<>()
         taskSearchRequestList.add(new TaskSearchRequest())
-        Page<Task> tasks = taskService.search(taskSearchRequestList, new FullPageRequest(), userService.findByEmail(DUMMY_USER_MAIL).transformToLoggedUser(), new Locale("en"), false)
+        String actorId = identityService.findByUsername(DUMMY_USER_MAIL).get().toSession().activeActorId
+        Page<Task> tasks = taskService.search(taskSearchRequestList, new FullPageRequest(), actorId, new Locale("en"), false)
         return tasks
     }
 }

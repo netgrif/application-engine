@@ -42,9 +42,6 @@ class ChangeCasePropertyTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private IUserService userService
-
-    @Autowired
     private TestHelper testHelper
 
     @Autowired
@@ -61,7 +58,8 @@ class ChangeCasePropertyTest {
     @BeforeEach
     void initNet() {
         testHelper.truncateDbs()
-        net = petriNetService.importPetriNet(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).getNet()
+        net = petriNetService.importPetriNet(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId).getNet()
         assert net != null
     }
 
@@ -96,7 +94,7 @@ class ChangeCasePropertyTest {
         taskService.assignTask(testCaseTask.getStringId())
         dataService.setData(testCaseTask.stringId, new DataSet([
                 "bln": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>), superCreator.getSuperIdentity())
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().activeActorId)
         taskService.finishTask(testCaseTask.getStringId())
 
         testCase = workflowService.findOne(testCase.getStringId())

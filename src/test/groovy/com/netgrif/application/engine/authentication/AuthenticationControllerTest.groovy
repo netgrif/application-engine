@@ -3,9 +3,7 @@ package com.netgrif.application.engine.authentication
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.application.engine.TestHelper
-
-
-import com.netgrif.application.engine.authentication.domain.repositories.UserRepository
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.authentication.web.AuthenticationController
 import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest
 import com.netgrif.application.engine.authentication.web.requestbodies.RegistrationRequest
@@ -54,13 +52,10 @@ class AuthenticationControllerTest {
     private ImportHelper importHelper
 
     @Autowired
-    private UserRepository userRepository
-
-    @Autowired
-    private AuthorityRepository authorityRepository
-
-    @Autowired
     private IPetriNetService petriNetService
+
+    @Autowired
+    private IIdentityService identityService
 
     @Autowired
     private TestHelper testHelper
@@ -76,11 +71,9 @@ class AuthenticationControllerTest {
         smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
         smtpServer.start()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
         assert net.getNet() != null
-        if (authorityRepository.count() == 0) {
-            importHelper.createAuthority(SessionRole.user)
-        }
     }
 
     @Test
@@ -94,10 +87,9 @@ class AuthenticationControllerTest {
         String content = getTextFromMimeMultipart(messages[0].content as MimeMultipart)
         String token = content.substring(content.indexOf("/signup/") + "/signup/".length(), content.lastIndexOf(" This is"))
 
-        controller.signup(new RegistrationRequest(token: token, name: NAME, surname: SURNAME, password: PASSWORD))
+        controller.signup(new RegistrationRequest(token: token, firstname: NAME, lastname: SURNAME, password: PASSWORD))
 
-        User user = userRepository.findByEmail(EMAIL)
-        assert user
+        assert identityService.existsByUsername(EMAIL)
 
     }
 

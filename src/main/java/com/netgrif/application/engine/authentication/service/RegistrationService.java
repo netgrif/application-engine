@@ -106,8 +106,8 @@ public class RegistrationService implements IRegistrationService {
         Identity identity = identityOpt.get();
         IdentityParams identityParams = IdentityParams.with()
                 .password(new TextField(registrationRequest.password))
-                .firstname(new TextField(registrationRequest.name))
-                .lastname(new TextField(registrationRequest.surname))
+                .firstname(new TextField(registrationRequest.firstname))
+                .lastname(new TextField(registrationRequest.lastname))
                 .registrationToken(new TextField(null))
                 .expirationDateTime(new DateTimeField(null))
                 .state(new EnumerationMapField(IdentityState.ACTIVE.name()))
@@ -120,8 +120,8 @@ public class RegistrationService implements IRegistrationService {
         }
 
         ActorParams actorParams = ActorParams.with()
-                .firstname(new TextField(registrationRequest.name))
-                .lastname(new TextField(registrationRequest.surname))
+                .firstname(new TextField(registrationRequest.firstname))
+                .lastname(new TextField(registrationRequest.lastname))
                 .build();
         actorService.update(actorOpt.get(), actorParams);
 

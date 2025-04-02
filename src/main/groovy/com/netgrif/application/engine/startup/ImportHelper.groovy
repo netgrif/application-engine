@@ -99,10 +99,10 @@ class ImportHelper {
     /**
      * todo javadoc
      * */
-    Identity createIdentity(IdentityParams params, Role[] roles) {
+    Identity createIdentity(IdentityParams params, List<Role> roles) {
         Identity identity = identityService.createWithDefaultActor(params)
 
-        Set<String> roleIds = Arrays.stream(roles).map { role -> role.stringId }.collect(Collectors.toSet())
+        Set<String> roleIds = roles.stream().map { role -> role.stringId }.collect(Collectors.toSet())
         roleService.assignRolesToActor(identity.getMainActorId(), roleIds)
 
         log.info("Identity [{}][{}] created with default actor [{}].", identity.getStringId(), identity.getUsername(),

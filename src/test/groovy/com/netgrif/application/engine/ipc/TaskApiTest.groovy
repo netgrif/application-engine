@@ -45,9 +45,6 @@ class TaskApiTest {
     private TaskRepository taskRepository
 
     @Autowired
-    private IUserService userService
-
-    @Autowired
     private EventLogRepository eventLogRepository
 
     @Autowired
@@ -77,7 +74,8 @@ class TaskApiTest {
     @Test
     @Disabled("GroovyRuntime Could not find matching constructor")
     void testTaskSearch() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_SEARCH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(stream(TASK_SEARCH_NET_FILE),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
 
         assert netOptional.getNet() != null
 
@@ -108,7 +106,8 @@ class TaskApiTest {
     @Test
     @Disabled()
     void testTaskEventActions() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_EVENTS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(stream(TASK_EVENTS_NET_FILE),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
 
         assert netOptional.getNet() != null
 
@@ -141,8 +140,8 @@ class TaskApiTest {
     @Test
     @Disabled("spusta 2 krat")
     void testTaskExecution() {
-        def limitsNetOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        def leasingNetOptional = petriNetService.importPetriNet(stream(LEASING_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def limitsNetOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
+        def leasingNetOptional = petriNetService.importPetriNet(stream(LEASING_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
 
         assert limitsNetOptional.getNet() != null
         assert leasingNetOptional.getNet() != null
@@ -217,7 +216,8 @@ class TaskApiTest {
 
     @Test
     void testTaskBulkActions() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_BULK_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(stream(TASK_BULK_NET_FILE),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
 
         assert netOptional.getNet() != null
         Process net = netOptional.getNet()
@@ -242,7 +242,8 @@ class TaskApiTest {
 
     @Test
     void testGetData() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_GETTER_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(stream(TASK_GETTER_NET_FILE),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
 
         assert netOptional.getNet() != null
         Process net = netOptional.getNet()
@@ -271,7 +272,8 @@ class TaskApiTest {
 
     @Test
     void testSetData() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_SETTER_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(stream(TASK_SETTER_NET_FILE),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
 
         assert netOptional.getNet() != null
         Process net = netOptional.getNet()

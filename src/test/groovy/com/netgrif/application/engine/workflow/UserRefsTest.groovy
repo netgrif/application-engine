@@ -1,7 +1,8 @@
 package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
-
+import com.netgrif.application.engine.authentication.domain.Identity
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -39,9 +40,6 @@ class UserRefsTest {
     private ImportHelper importHelper
 
     @Autowired
-    private IUserService userService
-
-    @Autowired
     private IWorkflowService workflowService
 
     @Autowired
@@ -57,31 +55,36 @@ class UserRefsTest {
     private SuperCreator superCreator
 
     @Autowired
+    private IIdentityService identityService
+
+    @Autowired
     private TestHelper helper
 
     List<Case> newCases
 
-    List<String> userIds
+    List<String> actorIds
 
     private String netId
 
     @BeforeEach
     void before() {
         helper.truncateDbs()
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/userrefs_test.xml"), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).getNet()
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/userrefs_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getNet()
         assert net
         netId = net.getStringId()
         def userEmails = [configuration.email, "engine@netgrif.com"]
         newCases = new ArrayList<>()
-        userIds = new ArrayList<>()
+        actorIds = new ArrayList<>()
         10.times {
             def _case = importHelper.createCase("$it" as String, net)
-            String id = userService.findByEmail(userEmails[it % 2]).getStringId()
+            Identity identity = identityService.findByUsername(userEmails[it % 2]).get()
+            String actorId = identity.toSession().activeActorId
             String taskId = _case.getTaskStringId("t1")
             dataService.setData(taskId, new DataSet([
-                    "user_list_1": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(id)]))
-            ] as Map<String, Field<?>>), superCreator.getLoggedSuper()).getCase()
-            userIds.add(id)
+                    "user_list_1": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(actorId)]))
+            ] as Map<String, Field<?>>), superCreator.getLoggedSuper().activeActorId).getCase()
+            actorIds.add(actorId)
         }
     }
 

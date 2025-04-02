@@ -1,10 +1,11 @@
 package com.netgrif.application.engine.authentication
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.authentication.domain.IdentityState
-
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams
+import com.netgrif.application.engine.authorization.domain.ApplicationRole
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.configuration.properties.SecurityLimitsProperties
-import com.netgrif.application.engine.authorization.domain.ProcessRole
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.startup.ImportHelper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -50,6 +51,9 @@ class LoginAttemptsTest {
     private ImportHelper importHelper
 
     @Autowired
+    private IRoleService roleService
+
+    @Autowired
     private SecurityLimitsProperties securityLimitsProperties;
 
     @BeforeEach
@@ -60,10 +64,15 @@ class LoginAttemptsTest {
                 .apply(springSecurity())
                 .build()
 
-        def auths = importHelper.createAuthorities(["user": SessionRole.user, "admin": SessionRole.admin])
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: IdentityState.ACTIVE),
-                [auths.get("user"), auths.get("admin")] as SessionRole[],
-                [] as ProcessRole[])
+        List<ApplicationRole> appRoles = new ArrayList<>()
+        appRoles.add(roleService.findApplicationRoleByImportId("admin"))
+        appRoles.add(roleService.findApplicationRoleByImportId("identity"))
+        importHelper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Test"))
+                .lastname(new TextField("Integration"))
+                .username(new TextField(USER_EMAIL))
+                .password(new TextField(USER_PASSWORD))
+                .build(), appRoles)
     }
 
 

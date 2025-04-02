@@ -2,6 +2,7 @@ package com.netgrif.application.engine.manager.responseclass;
 
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.manager.web.body.response.AllLoggedIdentitiesResponse;
 import com.netgrif.application.engine.manager.web.body.response.MessageLogoutResponse;
 import com.netgrif.application.engine.startup.SuperCreator;
@@ -33,8 +34,8 @@ class ResponseTest {
     }
 
     @Test
-    void allLoggedUsersResponseTest() {
-        Collection<Identity> content = new ArrayList<>();
+    void allLoggedIdentitiesResponseTest() {
+        Collection<LoggedIdentity> content = new ArrayList<>();
         content.add(superCreator.getLoggedSuper());
         AllLoggedIdentitiesResponse response = new AllLoggedIdentitiesResponse(content);
         assert response != null;

@@ -57,7 +57,7 @@ class AssignCancelFinishWithCaseTest {
 
     @Test
     void testAssignCancelFinish() {
-        def testNet = petriNetService.importPetriNet(stream(ASSIGN_CANCEL_FINISH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def testNet = petriNetService.importPetriNet(stream(ASSIGN_CANCEL_FINISH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
 
         assert testNet.getNet() != null
 

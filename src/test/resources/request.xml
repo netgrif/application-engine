@@ -24,8 +24,8 @@
         <title>System</title>
     </role>
     <role>
-        <id>user</id>
-        <title>User</title>
+        <id>identity</id>
+        <title>Identity</title>
     </role>
     <data type="enumeration_map">
         <id>request_origin</id>
@@ -88,7 +88,7 @@
         <y>208</y>
         <title>Submit request</title>
         <roleRef>
-            <id>user</id>
+            <id>identity</id>
             <permission>
                 <perform>true</perform>
             </permission>

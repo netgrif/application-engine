@@ -47,24 +47,22 @@ class AssignRemoveTest {
     @Autowired
     private CaseRepository caseRepository
 
-    @Autowired
-    private IUserService userService
-
     private Authentication auth
 
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
-        def user = userService.system
+//        def user = userService.system
 
-        auth = new UsernamePasswordAuthenticationToken(user.transformToLoggedUser(), user)
+//        auth = new UsernamePasswordAuthenticationToken(user.transformToLoggedUser(), user)
         SecurityContextHolder.getContext().setAuthentication(auth)
     }
 
     @Test
     @Disabled("Create functions or update test")
     void testAssignAndRemoveRole() throws MissingPetriNetMetaDataException, IOException {
-        ImportPetriNetEventOutcome netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/role_assign_remove_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/role_assign_remove_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
 
         assert netOptional.getNet() != null
         def net = netOptional.getNet()

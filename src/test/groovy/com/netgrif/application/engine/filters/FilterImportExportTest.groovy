@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.filters
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.authentication.domain.IdentityState
-
+import com.netgrif.application.engine.authentication.domain.Identity
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
@@ -10,7 +10,6 @@ import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.FilterField
 import com.netgrif.application.engine.petrinet.domain.dataset.TaskField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
-import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.startup.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
@@ -97,7 +96,7 @@ class FilterImportExportTest {
     private IDataService dataService
 
     private Authentication userAuth
-    private User dummyUser
+    private Identity dummyIdentity
     private Case importCase
     private Case exportCase
 
@@ -106,8 +105,8 @@ class FilterImportExportTest {
         this.testHelper.truncateDbs()
         this.defaultFiltersRunner.run()
         createTestFilter()
-        dummyUser = createDummyUser()
-        userAuth = new UsernamePasswordAuthenticationToken(dummyUser.transformToLoggedUser(), DUMMY_USER_PASSWORD)
+        dummyIdentity = createDummyIdentity()
+        userAuth = new UsernamePasswordAuthenticationToken(createDummyIdentity().toSession(), DUMMY_USER_PASSWORD)
         SecurityContextHolder.getContext().setAuthentication(userAuth)
 
         Optional<Process> importNet = this.filterRunner.createImportFiltersNet()
@@ -116,10 +115,10 @@ class FilterImportExportTest {
         assert exportNet.isPresent()
 
         importCase = this.workflowService.searchOne(
-                QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER).and(QCase.case$.author.email.eq(DUMMY_USER_MAIL))
+                QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER).and(QCase.case$.authorId.eq(dummyIdentity.stringId))
         )
         exportCase = this.workflowService.searchOne(
-                QCase.case$.processIdentifier.eq(EXPORT_NET_IDENTIFIER).and(QCase.case$.author.email.eq(DUMMY_USER_MAIL))
+                QCase.case$.processIdentifier.eq(EXPORT_NET_IDENTIFIER).and(QCase.case$.authorId.eq(dummyIdentity.stringId))
         )
         assert importCase != null
         assert exportCase != null
@@ -150,13 +149,13 @@ class FilterImportExportTest {
             this.dataService.setData(filterTask, new DataSet([
                     (VISIBILITY_FIELD): new EnumerationMapField(rawValue: FILTER_VISIBILITY_PRIVATE),
                     (NEW_TITLE_FIELD) : new TextField(rawValue: this.workflowService.findOne(filterTask.caseId).title + " new")
-            ] as Map<String, Field<?>>))
+            ] as Map<String, Field<?>>), dummyIdentity.toSession().activeActorId)
         })
         Task importTask = this.taskService.searchOne(QTask.task.caseId.eq(importCase.stringId).and(QTask.task.transitionId.eq("importFilter")))
         this.dataService.setData(importTask, new DataSet([
                 (IMPORTED_FILTERS_FIELD): new TaskField(rawValue: importedTasksIds)
-        ] as Map<String, Field<?>>))
-        this.taskService.finishTask(importTask, dummyUser)
+        ] as Map<String, Field<?>>), dummyIdentity.toSession().activeActorId)
+        this.taskService.finishTask(importTask, dummyIdentity.toSession().activeActorId)
         Thread.sleep(1000)
         filterCases = this.userFilterSearchService.autocompleteFindFilters("")
         List<String> filterCasesNames = filterCases.stream().map({ filterCase -> filterCase.title }).collect(Collectors.toList())
@@ -294,11 +293,13 @@ class FilterImportExportTest {
         })
     }
 
-    private User createDummyUser() {
-        def auths = importHelper.createAuthorities(["user": SessionRole.user, "admin": SessionRole.admin])
-        return importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: IdentityState.ACTIVE),
-                [auths.get("user")] as SessionRole[],
-                [] as ProcessRole[])
+    private Identity createDummyIdentity() {
+        return importHelper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Dummy"))
+                .lastname(new TextField("Identity"))
+                .username(new TextField(DUMMY_USER_MAIL))
+                .password(new TextField(DUMMY_USER_PASSWORD))
+                .build(), new ArrayList<>())
     }
 
     private static void validateFilterXML(InputStream xml) throws IllegalFilterFileException {

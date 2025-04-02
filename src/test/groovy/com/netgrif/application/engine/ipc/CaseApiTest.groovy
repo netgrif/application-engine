@@ -55,7 +55,7 @@ class CaseApiTest {
 
     @Test
     void testCreate() {
-        testNet = petriNetService.importPetriNet(stream(CREATE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        testNet = petriNetService.importPetriNet(stream(CREATE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
 
         assert testNet.getNet() != null
 
@@ -72,7 +72,7 @@ class CaseApiTest {
     void testSearch() {
         testHelper.truncateDbs()
 
-        testNet = petriNetService.importPetriNet(stream(SEARCH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        testNet = petriNetService.importPetriNet(stream(SEARCH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
 
         assert testNet.getNet() != null
 

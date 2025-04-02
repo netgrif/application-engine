@@ -45,7 +45,7 @@ class MapFieldTest {
 
     @Test
     void testImport() {
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
         assert netOptional.getNet() != null
 
         def net = netOptional.getNet()
@@ -69,7 +69,7 @@ class MapFieldTest {
 
     @Test
     void testValue() {
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
         assert netOptional.getNet() != null
 
         Case aCase = importHelper.createCase("Case", netOptional.getNet())
@@ -106,7 +106,7 @@ class MapFieldTest {
 
     @Test
     void testImportMultichoice() {
-        def netOptional = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
         assert netOptional.getNet() != null
 
         def net = netOptional.getNet()
@@ -131,7 +131,7 @@ class MapFieldTest {
 
     @Test
     void testValueMultichoice() {
-        def netOptional = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
         assert netOptional.getNet() != null
 
         Case aCase = importHelper.createCase("Case", netOptional.getNet())

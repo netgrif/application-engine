@@ -2,11 +2,10 @@ package com.netgrif.application.engine.authentication.service;
 
 
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.authentication.domain.repositories.UserRepository;
+import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest;
 import com.netgrif.application.engine.authentication.web.requestbodies.RegistrationRequest;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,20 +27,11 @@ public class RegistrationServiceTest {
     IRegistrationService service;
 
     @Autowired
-    UserRepository repository;
-
-    @Autowired
     private TestHelper testHelper;
 
     @BeforeEach
     void before() {
         testHelper.truncateDbs();
-    }
-
-
-    @AfterEach
-    public void cleanUp() {
-        repository.deleteAll();
     }
 
     @Test
@@ -50,19 +40,19 @@ public class RegistrationServiceTest {
         NewIdentityRequest request = new NewIdentityRequest();
         request.email = "test@test.com";
 
-        RegisteredUser user = service.createNewIdentity(request);
+        Identity identity = service.createNewIdentity(request);
 
         RegistrationRequest registrationRequest = new RegistrationRequest();
-        registrationRequest.token = service.encodeToken(user.getEmail(), user.getToken());
+        registrationRequest.token = service.encodeToken(identity.getUsername(), identity.getRegistrationToken());
         registrationRequest.password = "password";
-        registrationRequest.name = "User";
-        registrationRequest.surname = "Test";
+        registrationRequest.firstname = "Identity";
+        registrationRequest.lastname = "Test";
 
         Authentication auth = Mockito.mock(Authentication.class);
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         Mockito.when(securityContext.getAuthentication()).thenReturn(auth);
         SecurityContextHolder.setContext(securityContext);
-        User registered = (User) service.registerIdentity(registrationRequest);
+        Identity registered = service.registerIdentity(registrationRequest);
 
         assert registered != null;
     }

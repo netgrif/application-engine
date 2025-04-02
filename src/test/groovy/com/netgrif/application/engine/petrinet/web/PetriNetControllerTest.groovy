@@ -2,12 +2,16 @@ package com.netgrif.application.engine.petrinet.web
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.IdentityState
-
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams
+import com.netgrif.application.engine.authorization.domain.ApplicationRole
+import com.netgrif.application.engine.authorization.domain.Role
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.authorization.domain.ProcessRole
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.startup.ApplicationRoleRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import org.junit.jupiter.api.BeforeEach
@@ -62,6 +66,9 @@ class PetriNetControllerTest {
     @Autowired
     private TestHelper testHelper
 
+    @Autowired
+    private ApplicationRoleRunner applicationRoleRunner
+
     private Process net
 
     private Authentication userAuth
@@ -75,7 +82,8 @@ class PetriNetControllerTest {
     void before() {
         testHelper.truncateDbs()
 
-        def net = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId)
         assert net.getNet() != null
 
         this.net = net.getNet()
@@ -85,20 +93,23 @@ class PetriNetControllerTest {
                 .apply(springSecurity())
                 .build()
 
-        def auths = importHelper.createAuthorities(["user": SessionRole.user, "admin": SessionRole.admin])
-
-        importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: IdentityState.ACTIVE),
-                [auths.get("user")] as SessionRole[],
-//                [] as Group[],
-                [] as ProcessRole[])
+        importHelper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Role"))
+                .lastname(new TextField("Identity"))
+                .username(new TextField(USER_EMAIL))
+                .password(new TextField("password"))
+                .build(), new ArrayList<Role>())
 
         userAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
         userAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: IdentityState.ACTIVE),
-                [auths.get("admin")] as SessionRole[],
-//                [] as Group[],
-                [] as ProcessRole[])
+        ApplicationRole adminAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.ADMIN_APP_ROLE)
+        importHelper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Admin"))
+                .lastname(new TextField("Identity"))
+                .username(new TextField(ADMIN_EMAIL))
+                .password(new TextField("password"))
+                .build(), List.of(adminAppRole))
 
         adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
         adminAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))

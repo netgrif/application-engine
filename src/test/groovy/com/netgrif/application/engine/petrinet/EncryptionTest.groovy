@@ -1,8 +1,6 @@
 package com.netgrif.application.engine.petrinet
 
-
-import com.netgrif.application.engine.authentication.domain.Identity
-
+import com.netgrif.application.engine.MockService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -38,13 +36,13 @@ class EncryptionTest {
     private Importer importer
 
     @Autowired
-    private IAuthorityService authorityService
-
-    @Autowired
     private IPetriNetService petriNetService
 
     @Autowired
     private SuperCreator superCreator
+
+    @Autowired
+    private MockService mockService
 
     @Autowired
     private SuperAdminConfiguration configuration
@@ -82,17 +80,14 @@ class EncryptionTest {
     }
 
     private String createCase() {
-        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
         assert net.getNet() != null
-        def useCase = workflowService.createCase(net.getNet().stringId, "Encryption test", "color", mockLoggedUser()).getCase()
+        def useCase = workflowService.createCase(net.getNet().stringId, "Encryption test", "color",
+                mockService.mockLoggedIdentity().activeActorId).getCase()
         def nameField = useCase.process.dataSet.values().find { v -> v.title.defaultValue == FIELD_NAME }
 //        TODO: release/8.0.0
 //        useCase.dataSet.put(nameField.stringId, new DataField(FIELD_VALUE))
         return workflowService.save(useCase).stringId
-    }
-
-    Identity mockLoggedUser() {
-        def authorityUser = authorityService.getOrCreate(SessionRole.user)
-        return new Identity(superCreator.getSuperIdentity().getStringId(), configuration.email, configuration.password, [authorityUser])
     }
 }

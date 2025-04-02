@@ -70,9 +70,6 @@ class DataSearchRequestTest {
     private IWorkflowService workflowService
 
     @Autowired
-    private IUserService userService
-
-    @Autowired
     private MockService mockService
 
     @Autowired
@@ -108,7 +105,8 @@ class DataSearchRequestTest {
 
         repository.deleteAll()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
         assert net.getNet() != null
 
         def users = userService.findAll(true)
@@ -144,7 +142,7 @@ class DataSearchRequestTest {
         assert actionTrigger != null
         dataService.setData(actionTrigger, new DataSet([
                 "testActionTrigger": new TextField(rawValue: "random value")
-        ] as Map<String, Field<?>>), superCreator.getSuperIdentity())
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().activeActorId)
 
         10.times {
             _case = importHelper.createCase("wrong${it}", net.getNet())
@@ -237,7 +235,7 @@ class DataSearchRequestTest {
 
             log.info(String.format("Testing %s == %s", testCase.getKey(), testCase.getValue()))
 
-            Page<Case> result = searchService.search([request] as List, mockService.mockLoggedUser(), PageRequest.of(0, 100), null, false)
+            Page<Case> result = searchService.search([request] as List, mockService.mockLoggedIdentity(), PageRequest.of(0, 100), null, false)
             assert result
             assert result.size() == 1
         }

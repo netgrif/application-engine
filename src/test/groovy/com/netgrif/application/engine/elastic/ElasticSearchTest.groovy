@@ -3,11 +3,13 @@ package com.netgrif.application.engine.elastic
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.authentication.domain.IdentityState
-
+import com.netgrif.application.engine.authentication.domain.params.IdentityParams
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepository
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField
 import com.netgrif.application.engine.authorization.domain.ProcessRole
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -85,6 +87,9 @@ class ElasticSearchTest {
     private SuperCreator superCreator
 
     @Autowired
+    private IRoleService roleService
+
+    @Autowired
     private TestHelper testHelper
 
     private Authentication auth
@@ -100,18 +105,22 @@ class ElasticSearchTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
-        def net2 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getNet()
+        def net2 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getNet()
+
         assert net
         assert net2
 
         netId = net.getStringId()
         netId2 = net2.getStringId()
 
-        def auths = importHelper.createAuthorities(["user": SessionRole.user, "admin": SessionRole.admin])
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSW, state: IdentityState.ACTIVE),
-                [auths.get("user")] as SessionRole[],
-                [net.roles.values().find { it.importId == "process_role" }] as ProcessRole[])
+        importHelper.createIdentity(IdentityParams.with()
+                .firstname(new TextField("Test"))
+                .lastname(new TextField("Integration"))
+                .username(new TextField(USER_EMAIL))
+                .password(new TextField(USER_PASSW))
+                .build(), List.of(roleService.findProcessRoleByImportId("process_role")))
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSW)
         auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
 

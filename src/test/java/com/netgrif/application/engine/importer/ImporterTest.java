@@ -34,30 +34,35 @@ public class ImporterTest extends EngineTest {
 
     @Test
     public void importPetriNet() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
         assertNetProperlyImported();
     }
 
     @Test
     public void priorityTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/priority_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/priority_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
         assert outcome.getNet() != null;
 
-        CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), outcome.getNet().getTitle().getDefaultValue(), "color", superCreator.getLoggedSuper());
+        CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), outcome.getNet().getTitle().getDefaultValue(),
+                "color", superCreator.getLoggedSuper().getActiveActorId());
 
         assert caseOutcome.getCase() != null;
     }
 
     @Test
     public void dataGroupTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
 
         assert outcome.getNet() != null;
     }
 
     @Test
     public void readArcImportTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/read_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/read_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
     }
 
     private void assertNetProperlyImported() {

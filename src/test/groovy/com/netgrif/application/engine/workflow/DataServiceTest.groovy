@@ -51,18 +51,18 @@ class DataServiceTest {
 //    @BeforeEach
 //    void beforeAll() {
 //        testHelper.truncateDbs()
-//        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_referenced.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+//        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_referenced.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
 //        assert net.getNet() != null
 //
-//        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_taskref.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+//        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_taskref.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
 //        assert net.getNet() != null
 //        this.net = net.getNet()
 //
-//        ImportPetriNetEventOutcome agreementNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/agreement.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+//        ImportPetriNetEventOutcome agreementNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/agreement.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
 //        assert agreementNet.getNet() != null
 //        this.agreementNet = agreementNet.getNet()
 //
-//        ImportPetriNetEventOutcome netoutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/test_setData.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+//        ImportPetriNetEventOutcome netoutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/test_setData.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
 //        assert netoutcome.getNet() != null;
 //        this.setDataNet = netoutcome.getNet();
 //    }
@@ -77,7 +77,7 @@ class DataServiceTest {
 //        assert taskId != null
 //
 //        importHelper.assignTaskToSuper(TASK_TITLE, aCase.stringId)
-//        List<DataGroup> datagroups = dataService.getLayouts(taskId, Locale.ENGLISH, superCreator.getLoggedSuper()).getData()
+//        List<DataGroup> datagroups = dataService.getLayouts(taskId, Locale.ENGLISH, superCreator.getLoggedSuper().getActiveActorId()).getData()
 //
 //        assert datagroups.stream().filter({ it -> it.dataRefs.size() > 0 }).count() == 3
 //        DataRef fileField = findField(datagroups, FILE_FIELD_TITLE)
@@ -107,7 +107,7 @@ class DataServiceTest {
 //
 //        importHelper.assignTaskToSuper("summary A", aCase.stringId)
 //
-//        List<DataGroup> dataGroups = dataService.getLayouts(taskId, Locale.ENGLISH, superCreator.getLoggedSuper()).getData()
+//        List<DataGroup> dataGroups = dataService.getLayouts(taskId, Locale.ENGLISH, superCreator.getLoggedSuper().getActiveActorId()).getData()
 //        assert dataGroups.get(1).getParentTaskRefId() == "taskRef_result"
 //        assert dataGroups.get(2).getParentTaskRefId() == "taskRef_1"
 //        assert dataGroups.get(3).getParentTaskRefId() == "taskRef_0"

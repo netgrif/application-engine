@@ -1,6 +1,5 @@
 package com.netgrif.application.engine
 
-import com.netgrif.application.engine.authentication.domain.repositories.UserRepository
 import com.netgrif.application.engine.authorization.domain.repositories.RoleAssignmentRepository
 import com.netgrif.application.engine.authorization.domain.repositories.RoleRepository
 import com.netgrif.application.engine.authorization.service.RoleService
@@ -21,8 +20,6 @@ class TestHelper {
     private SuperCreator superCreator
     @Autowired
     private MongoTemplate template
-    @Autowired
-    private UserRepository userRepository
     @Autowired
     private RoleRepository roleRepository
     @Autowired
@@ -50,8 +47,6 @@ class TestHelper {
     @Autowired
     private FinisherRunner finisherRunner
     @Autowired
-    private ImpersonationRunner impersonationRunner
-    @Autowired
     private UriRunner uriRunner
     @Autowired
     private IPetriNetService petriNetService
@@ -63,7 +58,6 @@ class TestHelper {
         elasticTaskRepository.deleteAll()
         elasticCaseRepository.deleteAll()
         uriNodeRepository.deleteAll()
-        userRepository.deleteAll()
         roleAssignmentRepository.deleteAll()
         roleRepository.deleteAll()
         roleService.clearCache()
@@ -78,7 +72,6 @@ class TestHelper {
         uriRunner.run()
         groupRunner.run()
         filterRunner.run()
-        impersonationRunner.run()
         superCreator.run()
         validationRunner.run()
         finisherRunner.run()

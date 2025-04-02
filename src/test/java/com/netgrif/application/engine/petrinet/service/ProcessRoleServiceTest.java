@@ -55,8 +55,10 @@ class ProcessRoleServiceTest {
     void shouldFindAllRoles() throws IOException, MissingPetriNetMetaDataException {
         List<Role> processRoles = roleService.findAll();
         int originalRoles = processRoles.size();
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/role_all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR,
+                superCreator.getLoggedSuper().getActiveActorId());
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/role_all_data.xml"), VersionType.MAJOR,
+                superCreator.getLoggedSuper().getActiveActorId());
         processRoles = roleService.findAll();
         assertNotNull(processRoles);
         assertFalse(processRoles.isEmpty());
@@ -81,7 +83,7 @@ class ProcessRoleServiceTest {
 
 //    @Test
 //    void shouldFindAllRolesByImportId() throws IOException, MissingPetriNetMetaDataException {
-//        petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+//        petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
 //        Set<Role> processRoles = roleService.findAllByImportId(ROLE_IMPORT_ID);
 //        assertNotNull(processRoles);
 //        assertFalse(processRoles.isEmpty());
@@ -91,7 +93,8 @@ class ProcessRoleServiceTest {
 
     @Test
     void shouldFindAllRolesByName() throws IOException, MissingPetriNetMetaDataException {
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR,
+                superCreator.getLoggedSuper().getActiveActorId());
         List<ProcessRole> processRoles = roleService.findProcessRolesByDefaultTitle("Process role");
         assertNotNull(processRoles);
         assertFalse(processRoles.isEmpty());

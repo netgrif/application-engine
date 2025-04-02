@@ -43,9 +43,6 @@ class SetDataOnButtonTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private IUserService userService
-
-    @Autowired
     private TestHelper testHelper
 
     @Autowired
@@ -71,7 +68,8 @@ class SetDataOnButtonTest {
     @BeforeEach
     void initNet() {
         testHelper.truncateDbs()
-        net = petriNetService.importPetriNet(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).getNet()
+        net = petriNetService.importPetriNet(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId).getNet()
         assert net != null
     }
 
@@ -107,7 +105,7 @@ class SetDataOnButtonTest {
 //                "button_0": new ButtonField(rawValue: 42),
 //                "button_1": new ButtonField(rawValue: 42),
 //                "button_2": new ButtonField(rawValue: 42)
-//        ] as Map<String, Field<?>>), superCreator.getLoggedSuper())
+//        ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId())
 //
 //        testCase = workflowService.findOne(testCase.getStringId())
 //

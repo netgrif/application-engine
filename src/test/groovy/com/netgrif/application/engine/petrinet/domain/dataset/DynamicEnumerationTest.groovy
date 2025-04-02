@@ -24,7 +24,7 @@ class DynamicEnumerationTest extends EngineTest {
 
     @Test
     void testDynamicEnum() {
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/test_autocomplete_dynamic.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/test_autocomplete_dynamic.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
 
         assert optNet.getNet() != null;
         def net = optNet.getNet()
@@ -38,7 +38,7 @@ class DynamicEnumerationTest extends EngineTest {
         def dataSet = new DataSet([
                 "autocomplete": new EnumerationField(rawValue: new I18nString("Case"))
         ] as Map<String, Field<?>>)
-        dataService.setData(task.stringId, dataSet, superCreator.getSuperIdentity())
+        dataService.setData(task.stringId, dataSet, superCreator.getLoggedSuper().activeActorId)
 
         def caseOpt = caseRepository.findById(aCase.stringId)
         assert caseOpt.isPresent()

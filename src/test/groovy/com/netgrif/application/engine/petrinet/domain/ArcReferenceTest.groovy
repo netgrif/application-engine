@@ -31,9 +31,6 @@ class ArcReferenceTest {
     @Autowired
     private ImportHelper helper
 
-    @Autowired
-    private IUserService userService
-
     private def stream = { String name ->
         return ArcOrderTest.getClassLoader().getResourceAsStream(name)
     }

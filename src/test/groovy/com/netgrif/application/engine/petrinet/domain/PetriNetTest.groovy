@@ -57,7 +57,7 @@ class PetriNetTest {
     void testClone() {
         int beforeImportNet = roleRepository.count()
 
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
 
         assert netOptional.getNet() != null
 
@@ -78,15 +78,15 @@ class PetriNetTest {
 
     @Test
     void testVersioning() {
-        def outcome1 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def outcome1 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
         Process net1 = outcome1.getNet()
         assert net1
 
-        def outcome2 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def outcome2 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
         Process net2 = outcome2.getNet()
         assert net2
 
-        def outcome3 = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def outcome3 = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
         Process net3 = outcome3.getNet()
         assert net3
 

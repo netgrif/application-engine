@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.authentication.domain.repositories.UserRepository
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
@@ -67,9 +66,6 @@ class EventTest {
     private MongoTemplate template
 
     @Autowired
-    private UserRepository userRepository
-
-    @Autowired
     private SystemIdentityRunner userRunner
 
     @Autowired
@@ -88,7 +84,8 @@ class EventTest {
     void testEventImport() {
         testHelper.truncateDbs()
 
-        Process net = petriNetService.importPetriNet(stream(EVENT_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        Process net = petriNetService.importPetriNet(stream(EVENT_NET_FILE), VersionType.MAJOR,
+                superCreator.getLoggedSuper().activeActorId).getNet()
         instance = helper.createCase(EVENT_NET_CASE, net)
 
         outcome = helper.assignTaskToSuper(EVENT_NET_TASK, instance.stringId)

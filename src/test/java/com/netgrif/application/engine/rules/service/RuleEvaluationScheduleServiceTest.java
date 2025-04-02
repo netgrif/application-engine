@@ -66,8 +66,8 @@ class RuleEvaluationScheduleServiceTest {
     @Test
     @Disabled
     void testScheduledRule() throws IOException, MissingPetriNetMetaDataException, RuleEvaluationScheduleException, InterruptedException, MissingIconKeyException {
-        Identity user = superCreator.getLoggedSuper();
-        ImportPetriNetEventOutcome importOutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, user);
+        ImportPetriNetEventOutcome importOutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
 
         StoredRule rule = StoredRule.builder()
                 .when("$case: Case() $event: ScheduledRuleFact(instanceId == $case.stringId, ruleIdentifier == \"rule2\")")
@@ -78,7 +78,8 @@ class RuleEvaluationScheduleServiceTest {
                 .build();
         ruleRepository.save(rule);
 
-        CreateCaseEventOutcome caseOutcome = workflowService.createCase(importOutcome.getNet().getStringId(), "Original title", "original color", user);
+        CreateCaseEventOutcome caseOutcome = workflowService.createCase(importOutcome.getNet().getStringId(), "Original title",
+                "original color", superCreator.getLoggedSuper().getActiveActorId());
         ScheduleOutcome outcome = ruleEvaluationScheduleService.scheduleRuleEvaluationForCase(caseOutcome.getCase(), "rule2", TriggerBuilder.newTrigger().withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1).withRepeatCount(5)));
 
         assert outcome.getJobDetail() != null;

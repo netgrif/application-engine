@@ -49,7 +49,7 @@ class ChangeFieldValueInitTest {
 
     @Test
     void testInitValues() {
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/change_field_value_init.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/change_field_value_init.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
         Case useCase = importHelper.createCase("test", optNet.getNet())
 
         assert useCase.dataSet.get("text_static").rawValue == "TEST VALUE"
