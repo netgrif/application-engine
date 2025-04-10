@@ -26,10 +26,12 @@ import com.netgrif.application.engine.mail.interfaces.IMailService
 import com.netgrif.application.engine.menu.domain.FilterBody
 import com.netgrif.application.engine.menu.domain.MenuItemBody
 import com.netgrif.application.engine.menu.domain.MenuItemConstants
-import com.netgrif.application.engine.menu.domain.MenuItemView
 import com.netgrif.application.engine.menu.domain.configurations.TabbedCaseViewBody
 import com.netgrif.application.engine.menu.domain.configurations.TabbedTaskViewBody
 import com.netgrif.application.engine.menu.domain.configurations.ViewBody
+import com.netgrif.application.engine.menu.domain.dashboard.DashboardItemBody
+import com.netgrif.application.engine.menu.domain.dashboard.DashboardManagementBody
+import com.netgrif.application.engine.menu.services.interfaces.DashboardManagementService
 import com.netgrif.application.engine.menu.services.interfaces.IMenuItemService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.pdf.generator.config.PdfResource
@@ -82,6 +84,7 @@ import org.springframework.data.domain.Pageable
 
 import java.time.ZoneId
 import java.util.stream.Collectors
+
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -196,6 +199,9 @@ class ActionDelegate {
 
     @Autowired
     IMenuItemService menuItemService
+
+    @Autowired
+    DashboardManagementService dashboardManagementService
 
     FrontendActionOutcome Frontend
 
@@ -1872,13 +1878,13 @@ class ActionDelegate {
      * @param item {@link Case} instance of menu_item.xml
      */
     def changeMenuItem(Case item) {
-        [allowedRoles          : { cl ->
+        [allowedRoles      : { cl ->
             updateMenuItemRoles(item, cl as Closure, MenuItemConstants.FIELD_ALLOWED_ROLES)
         },
-         bannedRoles           : { cl ->
+         bannedRoles       : { cl ->
              updateMenuItemRoles(item, cl as Closure, MenuItemConstants.FIELD_BANNED_ROLES)
          },
-         uri                   : { cl ->
+         uri               : { cl ->
              def uri = cl() as String
              def aCase = useCase
              if (useCase == null || item.stringId != useCase.stringId) {
@@ -1886,32 +1892,32 @@ class ActionDelegate {
              }
              moveMenuItem(aCase, uri)
          },
-         title                 : { cl ->
+         title             : { cl ->
              def value = cl()
              I18nString newName = (value instanceof I18nString) ? value : new I18nString(value as String)
              setData(MenuItemConstants.TRANS_SETTINGS_ID, item, [
                      (MenuItemConstants.FIELD_MENU_NAME): ["type": "i18n", "value": newName]
              ])
          },
-         menuIcon              : { cl ->
+         menuIcon          : { cl ->
              def value = cl()
              setData(MenuItemConstants.TRANS_SETTINGS_ID, item, [
                      (MenuItemConstants.FIELD_MENU_ICON): ["type": "text", "value": value]
              ])
          },
-         tabIcon               : { cl ->
+         tabIcon           : { cl ->
              def value = cl()
              setData(MenuItemConstants.TRANS_SETTINGS_ID, item, [
                      (MenuItemConstants.FIELD_TAB_ICON): ["type": "text", "value": value]
              ])
          },
-         useCustomView         : { cl ->
+         useCustomView     : { cl ->
              def value = cl()
              setData(MenuItemConstants.TRANS_SETTINGS_ID, item, [
                      (MenuItemConstants.FIELD_USE_CUSTOM_VIEW): ["type": "boolean", "value": value]
              ])
          },
-         customViewSelector    : { cl ->
+         customViewSelector: { cl ->
              def value = cl()
              setData(MenuItemConstants.TRANS_SETTINGS_ID, item, [
                      (MenuItemConstants.FIELD_CUSTOM_VIEW_SELECTOR): ["type": "text", "value": value]
@@ -2113,7 +2119,7 @@ class ActionDelegate {
             caseView.setChainedView(taskView)
 
             return caseView
-        } else if (filterBody.getType() == "Task"){
+        } else if (filterBody.getType() == "Task") {
             ViewBody taskView = new TabbedTaskViewBody()
             taskView.setFilterBody(filterBody)
             taskView.setDefaultHeaders(taskDefaultHeaders)
@@ -2226,6 +2232,30 @@ class ActionDelegate {
     @Deprecated
     Case findMenuItemInGroup(String uri, String name, Case orgGroup) {
         return findMenuItem(uri, name)
+    }
+
+    Case createDashboardManagement(DashboardManagementBody body) {
+        return dashboardManagementService.createDashboardManagement(body)
+    }
+
+    Case createDashboardItem(DashboardItemBody body) {
+        return dashboardManagementService.createDashboardItem(body)
+    }
+
+    Case findDashboardManagement(String identifier) {
+        return dashboardManagementService.findDashboardManagement(identifier)
+    }
+
+    Case findDashboardItem(String identifier) {
+        return dashboardManagementService.findDashboardItem(identifier)
+    }
+
+    Case updateDashboardManagement(Case managementCase, DashboardManagementBody body) {
+        return dashboardManagementService.updateDashboardManagement(managementCase, body)
+    }
+
+    Case updateDashboardItem(Case itemCase, DashboardItemBody body) {
+        return dashboardManagementService.updateDashboardItem(itemCase, body)
     }
 
     /**
