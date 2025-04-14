@@ -95,8 +95,6 @@ public class RoleServiceTest {
 
     @Test
     public void testFindDefaultRole() {
-        assertThrows(IllegalStateException.class, () -> roleService.findDefaultRole());
-
         Role defaultRole = roleService.findDefaultRole();
         assert defaultRole != null;
         assert defaultRole.getImportId().equals(ProcessRole.DEFAULT_ROLE);
@@ -104,8 +102,6 @@ public class RoleServiceTest {
 
     @Test
     public void testFindAnonymousRole() {
-        assertThrows(IllegalStateException.class, () -> roleService.findAnonymousRole());
-
         Role anonymousRole = roleService.findAnonymousRole();
         assert anonymousRole != null;
         assert anonymousRole.getImportId().equals(ProcessRole.ANONYMOUS_ROLE);
