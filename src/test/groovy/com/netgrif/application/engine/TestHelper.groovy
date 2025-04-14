@@ -31,6 +31,8 @@ class TestHelper {
     @Autowired
     private SystemProcessRunner systemProcessRunner
     @Autowired
+    private ApplicationRoleRunner applicationRoleRunner
+    @Autowired
     private ElasticTaskRepository elasticTaskRepository
     @Autowired
     private ElasticCaseRepository elasticCaseRepository
@@ -66,6 +68,7 @@ class TestHelper {
 
         uriRunner.run()
         systemProcessRunner.run()
+        applicationRoleRunner.run()
         systemIdentityRunner.run()
         groupRunner.run()
         filterRunner.run()
