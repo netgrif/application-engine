@@ -27,7 +27,9 @@ class TestHelper {
     @Autowired
     private RoleService roleService
     @Autowired
-    private SystemIdentityRunner systemUserRunner
+    private SystemIdentityRunner systemIdentityRunner
+    @Autowired
+    private SystemProcessRunner systemProcessRunner
     @Autowired
     private ElasticTaskRepository elasticTaskRepository
     @Autowired
@@ -62,10 +64,9 @@ class TestHelper {
         actionsCacheService.clearNamespaceFunctionCache()
         petriNetService.evictAllCaches()
 
-        defaultRoleRunner.run()
-        anonymousRoleRunner.run()
-        systemUserRunner.run()
         uriRunner.run()
+        systemProcessRunner.run()
+        systemIdentityRunner.run()
         groupRunner.run()
         filterRunner.run()
         superCreator.run()
