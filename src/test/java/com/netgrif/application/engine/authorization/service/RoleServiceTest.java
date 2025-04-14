@@ -19,8 +19,6 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.ActorField;
 import com.netgrif.application.engine.petrinet.domain.dataset.ActorListField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
-import com.netgrif.application.engine.startup.AnonymousRoleRunner;
-import com.netgrif.application.engine.startup.DefaultRoleRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -57,12 +55,6 @@ public class RoleServiceTest {
 
     @Autowired
     private RoleService roleService;
-
-    @Autowired
-    private DefaultRoleRunner defaultRoleRunner;
-
-    @Autowired
-    private AnonymousRoleRunner anonymousRoleRunner;
 
     @Autowired
     private ImportHelper importHelper;
@@ -102,10 +94,8 @@ public class RoleServiceTest {
     }
 
     @Test
-    public void testFindDefaultRole() throws Exception {
+    public void testFindDefaultRole() {
         assertThrows(IllegalStateException.class, () -> roleService.findDefaultRole());
-
-        defaultRoleRunner.run();
 
         Role defaultRole = roleService.findDefaultRole();
         assert defaultRole != null;
@@ -113,10 +103,8 @@ public class RoleServiceTest {
     }
 
     @Test
-    public void testFindAnonymousRole() throws Exception {
+    public void testFindAnonymousRole() {
         assertThrows(IllegalStateException.class, () -> roleService.findAnonymousRole());
-
-        anonymousRoleRunner.run();
 
         Role anonymousRole = roleService.findAnonymousRole();
         assert anonymousRole != null;

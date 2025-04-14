@@ -42,7 +42,4 @@ class SystemIdentityRunner extends AbstractOrderedCommandLineRunner {
     LoggedIdentity getLoggedSystem() {
         return this.systemIdentity.toSession()
     }
-
-
-
 }

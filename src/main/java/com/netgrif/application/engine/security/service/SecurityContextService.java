@@ -4,6 +4,7 @@ import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class SecurityContextService implements ISecurityContextService {
     private final Set<String> cachedTokens;
     private final IIdentityService identityService;
 
-    protected SecurityContextService(IIdentityService identityService) {
+    protected SecurityContextService(@Lazy IIdentityService identityService) {
         this.cachedTokens = ConcurrentHashMap.newKeySet();
         this.identityService = identityService;
     }

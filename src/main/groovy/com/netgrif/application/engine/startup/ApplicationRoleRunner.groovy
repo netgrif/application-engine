@@ -14,6 +14,9 @@ class ApplicationRoleRunner extends AbstractOrderedCommandLineRunner {
     public static final String ADMIN_APP_ROLE = "admin"
     public static final String SYSTEM_ADMIN_APP_ROLE = "system_admin"
     public static final String ANONYMOUS_APP_ROLE = "anonymous"
+    // TODO: release/8.0.0 application id should be from configuration
+    private static final String APPLICATION_ID = "application"
+
 
     private Map<String, ApplicationRole> applicationRoles
 
@@ -22,14 +25,12 @@ class ApplicationRoleRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... strings) throws Exception {
-        // TODO: release/8.0.0 application id should be from configuration
-        final String applicationId = "application"
         Map<String, ApplicationRole> appRoles = new HashMap<>()
 
-        appRoles.put(DEFAULT_APP_ROLE, createAndSaveApplicationRole(applicationId, DEFAULT_APP_ROLE))
-        appRoles.put(ADMIN_APP_ROLE, createAndSaveApplicationRole(applicationId, ADMIN_APP_ROLE))
-        appRoles.put(SYSTEM_ADMIN_APP_ROLE, createAndSaveApplicationRole(applicationId, SYSTEM_ADMIN_APP_ROLE))
-        appRoles.put(ANONYMOUS_APP_ROLE, createAndSaveApplicationRole(applicationId, ANONYMOUS_APP_ROLE))
+        appRoles.put(DEFAULT_APP_ROLE, createAndSaveApplicationRole(APPLICATION_ID, DEFAULT_APP_ROLE))
+        appRoles.put(ADMIN_APP_ROLE, createAndSaveApplicationRole(APPLICATION_ID, ADMIN_APP_ROLE))
+        appRoles.put(SYSTEM_ADMIN_APP_ROLE, createAndSaveApplicationRole(APPLICATION_ID, SYSTEM_ADMIN_APP_ROLE))
+        appRoles.put(ANONYMOUS_APP_ROLE, createAndSaveApplicationRole(APPLICATION_ID, ANONYMOUS_APP_ROLE))
 
         this.applicationRoles = Collections.unmodifiableMap(appRoles)
     }
@@ -41,7 +42,10 @@ class ApplicationRoleRunner extends AbstractOrderedCommandLineRunner {
         if (roleName == null) {
             return null
         }
-        return applicationRoles.get(roleName)
+        if (applicationRoles && applicationRoles.containsKey(roleName)) {
+            return applicationRoles.get(roleName)
+        }
+        return createAndSaveApplicationRole(APPLICATION_ID, roleName)
     }
 
     /**
@@ -55,6 +59,6 @@ class ApplicationRoleRunner extends AbstractOrderedCommandLineRunner {
         if (!service.existsApplicationRoleByImportId(importId)) {
             return (ApplicationRole) service.save(new ApplicationRole(importId, applicationId))
         }
-        return null
+        return service.findApplicationRoleByImportId(importId)
     }
 }

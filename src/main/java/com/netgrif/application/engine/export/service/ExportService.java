@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.export.service;
 
-import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;

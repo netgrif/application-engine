@@ -9,7 +9,7 @@ import com.netgrif.application.engine.authentication.service.interfaces.IIdentit
 import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.authorization.domain.params.ActorParams;
 import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSearchService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
@@ -18,8 +18,8 @@ import com.netgrif.application.engine.startup.SystemIdentityRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,21 +29,34 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class IdentityService implements IIdentityService {
 
-    private final IElasticCaseService elasticCaseService;
-    private final IWorkflowService workflowService;
-    private final IDataService dataService;
     // todo: release/8.0.0 make encoder configurable
     private final BCryptPasswordEncoder passwordEncoder;
     private final SecurityContextService securityContextService;
-    private final IActorService actorService;
     private final SystemIdentityRunner systemIdentityRunner;
+    private final IDataService dataService;
+    private final IWorkflowService workflowService;
+    private final IElasticCaseSearchService elasticCaseSearchService;
+    private final IActorService actorService;
+
+    public IdentityService(BCryptPasswordEncoder passwordEncoder, SecurityContextService securityContextService,
+                           @Lazy SystemIdentityRunner systemIdentityRunner, @Lazy IDataService dataService,
+                           @Lazy IWorkflowService workflowService, @Lazy IElasticCaseSearchService elasticCaseSearchService,
+                           @Lazy IActorService actorService) {
+        this.passwordEncoder = passwordEncoder;
+        this.securityContextService = securityContextService;
+        this.systemIdentityRunner = systemIdentityRunner;
+        this.dataService = dataService;
+        this.workflowService = workflowService;
+        this.elasticCaseSearchService = elasticCaseSearchService;
+        this.actorService = actorService;
+    }
 
     /**
      * todo javadoc
@@ -73,7 +86,7 @@ public class IdentityService implements IIdentityService {
             return Optional.empty();
         }
         try {
-            return Optional.of((Identity) workflowService.findOne(id));
+            return Optional.of(new Identity(workflowService.findOne(id)));
         } catch (IllegalArgumentException ignored) {
             return Optional.empty();
         }
@@ -131,21 +144,21 @@ public class IdentityService implements IIdentityService {
      * todo javadoc
      * */
     @Override
-    @SuppressWarnings("unchecked")
     public List<Identity> findAllByStateAndExpirationDateBefore(IdentityState state, LocalDateTime dateTime) {
         if (state == null || dateTime == null) {
             return List.of();
         }
-        return (List<Identity>) findAllByQuery(stateAndExpirationDateBeforeQuery(state, dateTime));
+        return findAllByQuery(stateAndExpirationDateBeforeQuery(state, dateTime)).stream()
+                .map(Identity::new)
+                .collect(Collectors.toList());
     }
 
     /**
      * todo javadoc
      * */
     @Override
-    @SuppressWarnings("unchecked")
     public List<Identity> findAll() {
-        return (List<Identity>) findAllByQuery(null);
+        return findAllByQuery(null).stream().map(Identity::new).collect(Collectors.toList());
     }
 
     /**
@@ -156,10 +169,14 @@ public class IdentityService implements IIdentityService {
         if (params == null) {
             return null;
         }
-        String activeActorId = getLoggedIdentity().getActiveActorId();
-        Identity identity = (Identity) workflowService.createCaseByIdentifier(IdentityConstants.PROCESS_IDENTIFIER,
+        LoggedIdentity loggedIdentity = getLoggedIdentity();
+        String activeActorId = null;
+        if (loggedIdentity != null) {
+            activeActorId = loggedIdentity.getActiveActorId();
+        }
+        Case identityCase = workflowService.createCaseByIdentifier(IdentityConstants.PROCESS_IDENTIFIER,
                 params.getFullName(), "", activeActorId).getCase();
-        identity = (Identity) dataService.setData(identity, params.toDataSet(), activeActorId).getCase();
+        Identity identity = new Identity(dataService.setData(identityCase, params.toDataSet(), activeActorId).getCase());
         log.debug("Identity [{}][{}] was created by actor [{}].", identity.getStringId(), identity.getFullName(), activeActorId);
         return identity;
     }
@@ -196,7 +213,13 @@ public class IdentityService implements IIdentityService {
         if (identity == null || params == null) {
             return null;
         }
-        identity = (Identity) dataService.setData(identity, params.toDataSet(), getLoggedIdentity().getActiveActorId()).getCase();
+        LoggedIdentity loggedIdentity = getLoggedIdentity();
+        String activeActorId = null;
+        if (loggedIdentity != null) {
+            activeActorId = loggedIdentity.getActiveActorId();
+        }
+        identity = new Identity(dataService.setData(identity.getCase(), params.toDataSet(), activeActorId)
+                .getCase());
         if (securityContextService.isIdentityLogged(identity.getStringId())) {
             securityContextService.reloadSecurityContext(identity.toSession());
         }
@@ -245,15 +268,16 @@ public class IdentityService implements IIdentityService {
      * todo javadoc
      * */
     @Override
-    @SuppressWarnings("unchecked")
     public List<Identity> removeAllByStateAndExpirationDateBefore(IdentityState state, LocalDateTime dateTime) {
         if (state == null || dateTime == null) {
             return List.of();
         }
 
-        List<Identity> identities = (List<Identity>) findAllByQuery(stateAndExpirationDateBeforeQuery(state, dateTime));
+        List<Identity> identities = findAllByQuery(stateAndExpirationDateBeforeQuery(state, dateTime)).stream()
+                .map(Identity::new)
+                .collect(Collectors.toList());;
         for (Identity identity : identities) {
-            workflowService.deleteCase(identity);
+            workflowService.deleteCase(identity.getCase());
         }
 
         return identities;
@@ -271,10 +295,10 @@ public class IdentityService implements IIdentityService {
         CaseSearchRequest request = CaseSearchRequest.builder()
                 .query(buildQuery(Set.of(query)))
                 .build();
-        Page<Case> resultAsPage = elasticCaseService.search(List.of(request), getLoggedIdentity(), PageRequest.of(0, 1),
-                Locale.getDefault(), false);
+        Page<Case> resultAsPage = elasticCaseSearchService.search(List.of(request), getLoggedIdentity(), PageRequest.of(0, 1),
+                Locale.getDefault(), false, null);
         if (resultAsPage.hasContent()) {
-            return Optional.of((Identity) resultAsPage.getContent().get(0));
+            return Optional.of(new Identity(resultAsPage.getContent().get(0)));
         }
         return Optional.empty();
     }
@@ -287,11 +311,12 @@ public class IdentityService implements IIdentityService {
 
         List<Case> result = new ArrayList<>();
 
-        long identityCount = elasticCaseService.count(List.of(request), getLoggedIdentity(), Locale.getDefault(), false);
+        long identityCount = elasticCaseSearchService.count(List.of(request), getLoggedIdentity(), Locale.getDefault(),
+                false, null);
         long pageCount = (identityCount / 100) + 1;
         LongStream.range(0, pageCount).forEach(pageIdx -> {
-            Page<Case> pageResult = elasticCaseService.search(List.of(request), getLoggedIdentity(), PageRequest.of((int) pageIdx, 100),
-                    Locale.getDefault(), false);
+            Page<Case> pageResult = elasticCaseSearchService.search(List.of(request), getLoggedIdentity(), PageRequest.of((int) pageIdx, 100),
+                    Locale.getDefault(), false, null);
             result.addAll(pageResult.getContent());
         });
 
@@ -302,7 +327,8 @@ public class IdentityService implements IIdentityService {
         CaseSearchRequest request = CaseSearchRequest.builder()
                 .query(buildQuery(Set.of(query)))
                 .build();
-        return elasticCaseService.count(List.of(request), getLoggedIdentity(), Locale.getDefault(), false);
+        return elasticCaseSearchService.count(List.of(request), getLoggedIdentity(), Locale.getDefault(),
+                false, null);
     }
 
     private static String buildQuery(Set<String> andQueries) {

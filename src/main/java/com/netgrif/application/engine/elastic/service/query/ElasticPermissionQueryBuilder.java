@@ -1,25 +1,28 @@
-package com.netgrif.application.engine.elastic.service;
+package com.netgrif.application.engine.elastic.service.query;
 
 import com.netgrif.application.engine.authorization.domain.RoleAssignment;
-import com.netgrif.application.engine.authorization.service.RoleAssignmentService;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
+import lombok.RequiredArgsConstructor;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toUnmodifiableSet;
 import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 
-public abstract class ElasticViewPermissionService {
+@Service
+@RequiredArgsConstructor
+public class ElasticPermissionQueryBuilder {
 
-    @Autowired
-    protected RoleAssignmentService roleAssignmentService;
+    private final IRoleAssignmentService roleAssignmentService;
 
     /**
      * todo javadoc
      * */
-    protected void buildViewPermissionQuery(BoolQueryBuilder query, String actorId) {
+    public BoolQueryBuilder buildSingleQuery(String actorId) {
         // Check if processRoles or caseRoles exist
         BoolQueryBuilder viewPermsExists = boolQuery()
                 .should(existsQuery("viewProcessRoles"))
@@ -38,9 +41,8 @@ public abstract class ElasticViewPermissionService {
         BoolQueryBuilder positiveCaseRole = buildPositiveCaseRoleQuery(viewPermNotExists, assignedRoleIds);
         BoolQueryBuilder negativeCaseRole = buildNegativeCaseRoleQuery(assignedRoleIds);
         // Calculate final query
-        BoolQueryBuilder permissionQuery = collectQueriesByFormula(positiveProcessRole, negativeProcessRole,
+        return collectQueriesByFormula(positiveProcessRole, negativeProcessRole,
                 positiveCaseRole, negativeCaseRole);
-        query.filter(permissionQuery);
     }
 
     /**

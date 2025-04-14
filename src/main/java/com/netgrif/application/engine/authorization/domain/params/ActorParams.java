@@ -33,13 +33,13 @@ public class ActorParams implements CaseParams {
         TextField email = null, firstname = null, lastname = null;
 
         if (identityParams.getUsername() != null) {
-            email = identityParams.getUsername().clone();
+            email = new TextField(identityParams.getUsername().getRawValue());
         }
         if (identityParams.getFirstname() != null) {
-            firstname = identityParams.getFirstname().clone();
+            firstname = new TextField(identityParams.getFirstname().getRawValue());
         }
         if (identityParams.getLastname() != null) {
-            lastname = identityParams.getLastname().clone();
+            lastname = new TextField(identityParams.getLastname().getRawValue());
         }
 
         return ActorParams.with()

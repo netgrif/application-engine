@@ -16,6 +16,7 @@ import com.netgrif.application.engine.event.events.user.ActorAssignRoleEvent;
 import com.netgrif.application.engine.event.events.user.ActorRemoveRoleEvent;
 import com.netgrif.application.engine.importer.model.EventPhaseType;
 import com.netgrif.application.engine.importer.model.RoleEventType;
+import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldWithAllowedRoles;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
@@ -44,10 +45,10 @@ public class RoleService implements IRoleService {
     private final ApplicationRoleRepository applicationRoleRepository;
     private final CaseRoleRepository caseRoleRepository;
     private final IRoleAssignmentService roleAssignmentService;
-    private final IActorService actorService;
     private final ActionRunner actionRunner;
     private final ApplicationEventPublisher eventPublisher;
     private IWorkflowService workflowService;
+    private IActorService actorService;
 
     private ProcessRole defaultProcessRole;
     private ProcessRole anonymousProcessRole;
@@ -56,6 +57,12 @@ public class RoleService implements IRoleService {
     @Autowired
     public void setWorkflowService(IWorkflowService workflowService) {
         this.workflowService = workflowService;
+    }
+
+    @Lazy
+    @Autowired
+    public void setActorService(IActorService actorService) {
+        this.actorService = actorService;
     }
 
     /**
@@ -83,7 +90,19 @@ public class RoleService implements IRoleService {
     @Override
     public Role findDefaultRole() {
         if (defaultProcessRole == null) {
-            defaultProcessRole = findSystemRoleByImportId(ProcessRole.DEFAULT_ROLE);
+            Optional<ProcessRole> defaultOpt = findSystemRoleByImportId(ProcessRole.DEFAULT_ROLE);
+            if (defaultOpt.isPresent()) {
+                defaultProcessRole = defaultOpt.get();
+            } else {
+                ProcessRole defaultRole = new ProcessRole(ProcessRole.DEFAULT_ROLE);
+                defaultRole.setTitle(new I18nString(ProcessRole.DEFAULT_ROLE));
+                defaultRole.setDescription(new I18nString("Default system process role"));
+                defaultRole.setEvents(new LinkedHashMap<>());
+                defaultProcessRole = (ProcessRole) save(defaultRole);
+                if (defaultProcessRole != null) {
+                    log.info("Default process role created.");
+                }
+            }
         }
         return defaultProcessRole;
     }
@@ -94,7 +113,19 @@ public class RoleService implements IRoleService {
     @Override
     public Role findAnonymousRole() {
         if (anonymousProcessRole == null) {
-            anonymousProcessRole = findSystemRoleByImportId(ProcessRole.ANONYMOUS_ROLE);
+            Optional<ProcessRole> anonymousOpt = findSystemRoleByImportId(ProcessRole.ANONYMOUS_ROLE);
+            if (anonymousOpt.isPresent()) {
+                anonymousProcessRole = anonymousOpt.get();
+            } else {
+                ProcessRole anonymousRole = new ProcessRole(ProcessRole.ANONYMOUS_ROLE);
+                anonymousRole.setTitle(new I18nString(ProcessRole.ANONYMOUS_ROLE));
+                anonymousRole.setDescription(new I18nString("Anonymous system process role"));
+                anonymousRole.setEvents(new LinkedHashMap<>());
+                anonymousProcessRole = (ProcessRole) save(anonymousRole);
+                if (anonymousProcessRole != null) {
+                    log.info("Anonymous process role created.");
+                }
+            }
         }
         return anonymousProcessRole;
     }
@@ -334,15 +365,12 @@ public class RoleService implements IRoleService {
         this.anonymousProcessRole = null;
     }
 
-    private ProcessRole findSystemRoleByImportId(String importId) {
+    private Optional<ProcessRole> findSystemRoleByImportId(String importId) {
         List<ProcessRole> processRoles = processRoleRepository.findAllByImportId(importId);
-        if (processRoles.isEmpty()) {
-            throw new IllegalStateException(String.format("No %s process role has been found!", importId));
-        }
         if (processRoles.size() > 1) {
             throw new IllegalStateException(String.format("More than 1 %s process role exists!", importId));
         }
-        return processRoles.stream().findFirst().orElse(null);
+        return processRoles.stream().findFirst();
     }
 
     /**

@@ -66,7 +66,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
         Role systemAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.SYSTEM_ADMIN_APP_ROLE)
         allRoleIds.add(adminAppRole.getStringId())
         allRoleIds.add(systemAppRole.getStringId())
-        roleService.assignRolesToActor(this.superIdentity.stringId, allRoleIds)
+        roleService.assignRolesToActor(this.superIdentity.toSession().activeActorId, allRoleIds)
 
         log.info("Super identity created with actor")
     }
@@ -86,7 +86,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
 
     void setAllRoles() {
         Set<String> allRoleIds = roleService.findAll().stream().map { it.stringId }.collect(Collectors.toSet())
-        roleService.assignRolesToActor(this.superIdentity.stringId, allRoleIds)
+        roleService.assignRolesToActor(this.superIdentity.toSession().activeActorId, allRoleIds)
     }
 
     Identity getSuperIdentity() {

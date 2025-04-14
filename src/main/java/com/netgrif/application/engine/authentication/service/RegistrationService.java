@@ -13,13 +13,12 @@ import com.netgrif.application.engine.authorization.domain.params.ActorParams;
 import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
-import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.startup.ApplicationRoleRunner;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,11 +31,9 @@ import java.util.*;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class RegistrationService implements IRegistrationService {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final INextGroupService groupService;
     private final IRoleService roleService;
     private final IActorService actorService;
     private final ApplicationRoleRunner applicationRoleRunner;
@@ -44,6 +41,17 @@ public class RegistrationService implements IRegistrationService {
     private final IIdentityService identityService;
 
     private static final String TOKEN_DELIMITER = ":";
+
+    public RegistrationService(BCryptPasswordEncoder bCryptPasswordEncoder, IRoleService roleService,
+                               @Lazy IActorService actorService, ApplicationRoleRunner applicationRoleRunner,
+                               ServerAuthProperties serverAuthProperties, IIdentityService identityService) {
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.roleService = roleService;
+        this.actorService = actorService;
+        this.applicationRoleRunner = applicationRoleRunner;
+        this.serverAuthProperties = serverAuthProperties;
+        this.identityService = identityService;
+    }
 
     /**
      * todo javadoc

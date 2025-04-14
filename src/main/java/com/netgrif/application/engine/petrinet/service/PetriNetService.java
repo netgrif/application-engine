@@ -495,9 +495,9 @@ public class PetriNetService implements IPetriNetService {
             if (criteriaClass.getAuthor().getEmail() != null) {
                 this.addValueCriteria(query, queryTotal, Criteria.where("author.email").is(criteriaClass.getAuthor().getEmail()));
             }
-            if (criteriaClass.getAuthor().getId() != null) {
+            if (criteriaClass.getAuthor().getCase().getId() != null) {
                 // todo 2058 overit ci funguje
-                this.addValueCriteria(query, queryTotal, Criteria.where("author.id").is(criteriaClass.getAuthor().getId()));
+                this.addValueCriteria(query, queryTotal, Criteria.where("author.id").is(criteriaClass.getAuthor().getCase().getId()));
             }
             if (criteriaClass.getAuthor().getFullName() != null) {
                 this.addValueCriteria(query, queryTotal, Criteria.where("author.fullName").is(criteriaClass.getAuthor().getFullName()));

@@ -59,9 +59,9 @@
 		<title>State</title>
 <!--		todo: release/8.0.0 init dynamic by java enum?-->
 		<options>
-			<option id="active">Active</option>
-			<option id="blocked">Blocked</option>
-			<option id="invited">Invited</option>
+			<option key="active">Active</option>
+			<option key="blocked">Blocked</option>
+			<option key="invited">Invited</option>
 		</options>
 	</data>
 	<data type="text">

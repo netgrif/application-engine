@@ -24,11 +24,12 @@ public interface IElasticTaskService {
 
     void indexNow(ElasticTask task);
 
-    Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedIdentity identity, Pageable pageable, Locale locale, Boolean isIntersection);
-
-    long count(List<ElasticTaskSearchRequest> requests, LoggedIdentity identity, Locale locale, Boolean isIntersection);
-
     void remove(String taskId);
 
     void removeByPetriNetId(String petriNetId);
+
+    Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedIdentity identity, Pageable pageable, Locale locale,
+                      Boolean isIntersection);
+
+    long count(List<ElasticTaskSearchRequest> requests, LoggedIdentity identity, Locale locale, Boolean isIntersection);
 }

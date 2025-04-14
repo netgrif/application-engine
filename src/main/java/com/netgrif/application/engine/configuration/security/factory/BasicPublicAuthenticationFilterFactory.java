@@ -11,13 +11,13 @@ import com.netgrif.application.engine.configuration.security.PublicAuthenticatio
 import com.netgrif.application.engine.configuration.security.PublicBasicAuthenticationFilter;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import com.netgrif.application.engine.startup.ApplicationRoleRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.stereotype.Service;
 
 @Service
-@ConditionalOnExpression("${nae.public.strategy}.equals(#(T(com.netgrif.application.engine.authentication.domain.PublicStrategy).BASIC.name()))")
+@ConditionalOnProperty(prefix = "nae.public", name = "strategy", havingValue = "basic")
 public class BasicPublicAuthenticationFilterFactory extends PublicAuthenticationFilterFactory {
 
     private final IJwtService jwtService;

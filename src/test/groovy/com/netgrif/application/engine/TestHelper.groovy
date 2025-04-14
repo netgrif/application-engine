@@ -29,10 +29,6 @@ class TestHelper {
     @Autowired
     private SystemIdentityRunner systemUserRunner
     @Autowired
-    private DefaultRoleRunner defaultRoleRunner
-    @Autowired
-    private AnonymousRoleRunner anonymousRoleRunner
-    @Autowired
     private ElasticTaskRepository elasticTaskRepository
     @Autowired
     private ElasticCaseRepository elasticCaseRepository

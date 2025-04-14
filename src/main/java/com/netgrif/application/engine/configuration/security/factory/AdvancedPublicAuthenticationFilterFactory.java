@@ -10,13 +10,13 @@ import com.netgrif.application.engine.configuration.security.PublicAdvancedAuthe
 import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import com.netgrif.application.engine.startup.ApplicationRoleRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.stereotype.Service;
 
 @Service
-@ConditionalOnExpression("${nae.public.strategy}.equals(#(T(com.netgrif.application.engine.authentication.domain.PublicStrategy).ADVANCED.name()))")
+@ConditionalOnProperty(prefix = "nae.public", name = "strategy", havingValue = "advanced")
 public class AdvancedPublicAuthenticationFilterFactory extends PublicAuthenticationFilterFactory {
 
     private final IJwtService jwtService;

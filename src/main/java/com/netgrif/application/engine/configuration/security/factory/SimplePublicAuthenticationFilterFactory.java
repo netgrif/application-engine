@@ -9,13 +9,13 @@ import com.netgrif.application.engine.configuration.authentication.providers.Nae
 import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.application.engine.configuration.security.PublicSimpleAuthenticationFilter;
 import com.netgrif.application.engine.startup.ApplicationRoleRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.stereotype.Service;
 
 @Service
-@ConditionalOnExpression("${nae.public.strategy}.equals(#(T(com.netgrif.application.engine.authentication.domain.PublicStrategy).SIMPLE.name()))")
+@ConditionalOnProperty(prefix = "nae.public", name = "strategy", havingValue = "simple")
 public class SimplePublicAuthenticationFilterFactory extends PublicAuthenticationFilterFactory {
 
     public SimplePublicAuthenticationFilterFactory(ApplicationRoleRunner applicationRoleRunner, IIdentityService identityService,
