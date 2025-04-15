@@ -20,13 +20,13 @@ public class ActorParams implements CaseParams {
         DataSet dataSet = new DataSet();
 
         dataSet.put(ActorConstants.EMAIL_FIELD_ID, this.email);
-        dataSet.put(ActorConstants.FIRSTNAME_FIELD_ID, this.lastname);
-        dataSet.put(ActorConstants.LASTNAME_FIELD_ID, this.firstname);
+        dataSet.put(ActorConstants.FIRSTNAME_FIELD_ID, this.firstname);
+        dataSet.put(ActorConstants.LASTNAME_FIELD_ID, this.lastname);
 
         return dataSet;
     }
 
-    /**
+    /**S
      * todo javadoc
      * */
     public static ActorParams fromIdentityParams(IdentityParams identityParams) {

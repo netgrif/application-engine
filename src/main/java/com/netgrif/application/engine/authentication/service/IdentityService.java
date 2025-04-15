@@ -81,6 +81,18 @@ public class IdentityService implements IIdentityService {
      * todo javadoc
      */
     @Override
+    public String getActiveActorId() {
+        LoggedIdentity loggedIdentity = getLoggedIdentity();
+        if (loggedIdentity != null) {
+            return loggedIdentity.getActiveActorId();
+        }
+        return null;
+    }
+
+    /**
+     * todo javadoc
+     */
+    @Override
     public Optional<Identity> findById(String id) {
         if (id == null) {
             return Optional.empty();
@@ -169,11 +181,8 @@ public class IdentityService implements IIdentityService {
         if (params == null) {
             return null;
         }
-        LoggedIdentity loggedIdentity = getLoggedIdentity();
-        String activeActorId = null;
-        if (loggedIdentity != null) {
-            activeActorId = loggedIdentity.getActiveActorId();
-        }
+
+        String activeActorId = getActiveActorId();
         Case identityCase = workflowService.createCaseByIdentifier(IdentityConstants.PROCESS_IDENTIFIER,
                 params.getFullName(), "", activeActorId).getCase();
         Identity identity = new Identity(dataService.setData(identityCase, params.toDataSet(), activeActorId).getCase());
@@ -213,11 +222,7 @@ public class IdentityService implements IIdentityService {
         if (identity == null || params == null) {
             return null;
         }
-        LoggedIdentity loggedIdentity = getLoggedIdentity();
-        String activeActorId = null;
-        if (loggedIdentity != null) {
-            activeActorId = loggedIdentity.getActiveActorId();
-        }
+        String activeActorId = getActiveActorId();
         identity = new Identity(dataService.setData(identity.getCase(), params.toDataSet(), activeActorId)
                 .getCase());
         if (securityContextService.isIdentityLogged(identity.getStringId())) {
