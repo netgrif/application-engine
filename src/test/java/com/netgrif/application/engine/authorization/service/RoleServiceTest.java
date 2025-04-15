@@ -188,34 +188,50 @@ public class RoleServiceTest {
     public void testExistsProcessRoleByImportId() {
         Role processRole = new ProcessRole("import_id1");
         Role caseRole = new CaseRole("import_id2", "case_id");
-        // todo 2058 app role
-        repository.saveAll(List.of(processRole, caseRole));
+        Role appRole = new ApplicationRole("import_id3", "application_id");
+        repository.saveAll(List.of(processRole, caseRole, appRole));
 
         assert roleService.existsProcessRoleByImportId(processRole.getImportId());
         assert !roleService.existsProcessRoleByImportId(caseRole.getImportId());
+        assert !roleService.existsProcessRoleByImportId(appRole.getImportId());
     }
 
     @Test
     public void testFindProcessRoleByImportId() {
         Role processRole = new ProcessRole("import_id1");
         Role caseRole = new CaseRole("import_id2", "case_id");
-        // todo 2058 app role
-        repository.saveAll(List.of(processRole, caseRole));
+        Role appRole = new ApplicationRole("import_id3", "application_id");
+        repository.saveAll(List.of(processRole, caseRole, appRole));
 
         assert roleService.findProcessRoleByImportId(processRole.getImportId()) != null;
         assert roleService.findProcessRoleByImportId(caseRole.getImportId()) == null;
+        assert roleService.findProcessRoleByImportId(appRole.getImportId()) == null;
+    }
+
+    @Test
+    public void testFindAllCaseRoles() {
+        Role caseRole1 = new CaseRole("import_id1", "case_id");
+        Role caseRole2 = new CaseRole("import_id2", "case_id");
+        Role processRole = new ProcessRole("import_id3");
+        repository.saveAll(List.of(processRole, caseRole1, caseRole2));
+
+        List<CaseRole> caseRoles = roleService.findAllCaseRoles();
+        assert caseRoles.size() == 2;
+        assert caseRoles.stream().noneMatch(role -> role.getStringId().equals(processRole.getStringId()));
     }
 
     @Test
     public void testSave() {
         assert roleService.save(new ProcessRole("import_id")).getId() != null;
         assert roleService.save(new CaseRole("import_id", "case_id")).getId() != null;
+        assert roleService.save(new ApplicationRole("import_id", "application_id")).getId() != null;
     }
 
     @Test
     public void testSaveAll() {
-        List<Role> roles = List.of(new ProcessRole("import_id"), new CaseRole("import_id", "case_id"));
-        assert roleService.saveAll(roles).size() == 2;
+        List<Role> roles = List.of(new ProcessRole("import_id"), new CaseRole("import_id", "case_id"),
+                new ApplicationRole("import_id", "application_id"));
+        assert roleService.saveAll(roles).size() == 3;
     }
 
     @Test
@@ -262,37 +278,37 @@ public class RoleServiceTest {
     public void testResolveCaseRolesOnCase() {
         ActorListField actorListField = new ActorListField();
         actorListField.setImportId("actor_list_id");
-        ActorField userField = new ActorField();
-        userField.setImportId("actor_id");
+        ActorField actorField = new ActorField();
+        actorField.setImportId("actor_id");
 
         Case useCase = new Case();
         useCase.getDataSet().put(actorListField.getImportId(), actorListField);
-        useCase.getDataSet().put(userField.getImportId(), userField);
+        useCase.getDataSet().put(actorField.getImportId(), actorField);
 
         AccessPermissions<CasePermission> netPermissions = new AccessPermissions<>();
         netPermissions.addPermission(actorListField.getImportId(), CasePermission.VIEW, true);
-        netPermissions.addPermission(userField.getImportId(), CasePermission.VIEW, true);
+        netPermissions.addPermission(actorField.getImportId(), CasePermission.VIEW, true);
 
         roleService.resolveCaseRolesOnCase(useCase, netPermissions, false);
 
         List<CaseRole> roles = roleService.findAllCaseRoles();
         assert roles.size() == 2;
         assert roles.stream().allMatch(role -> role.getCaseId().equals(useCase.getStringId()));
-        Optional<CaseRole> userFieldCaseRoleOpt = roles.stream()
-                .filter(role -> role.getImportId().equals(userField.getImportId()))
+        Optional<CaseRole> actorFieldCaseRoleOpt = roles.stream()
+                .filter(role -> role.getImportId().equals(actorField.getImportId()))
                 .findFirst();
-        assert userFieldCaseRoleOpt.isPresent();
-        Optional<CaseRole> userListFieldCaseRoleOpt = roles.stream()
+        assert actorFieldCaseRoleOpt.isPresent();
+        Optional<CaseRole> actorListFieldCaseRoleOpt = roles.stream()
                 .filter(role -> role.getImportId().equals(actorListField.getImportId()))
                 .findFirst();
-        assert userListFieldCaseRoleOpt.isPresent();
+        assert actorListFieldCaseRoleOpt.isPresent();
 
-        assert userField.getCaseRoleIds().size() == 1;
-        assert userField.getCaseRoleIds().contains(userFieldCaseRoleOpt.get().getStringId());
+        assert actorField.getCaseRoleIds().size() == 1;
+        assert actorField.getCaseRoleIds().contains(actorFieldCaseRoleOpt.get().getStringId());
         assert actorListField.getCaseRoleIds().size() == 1;
-        assert actorListField.getCaseRoleIds().contains(userListFieldCaseRoleOpt.get().getStringId());
-        assert useCase.getCaseRolePermissions().containsKey(userFieldCaseRoleOpt.get().getStringId());
-        assert useCase.getCaseRolePermissions().containsKey(userListFieldCaseRoleOpt.get().getStringId());
+        assert actorListField.getCaseRoleIds().contains(actorListFieldCaseRoleOpt.get().getStringId());
+        assert useCase.getCaseRolePermissions().containsKey(actorFieldCaseRoleOpt.get().getStringId());
+        assert useCase.getCaseRolePermissions().containsKey(actorListFieldCaseRoleOpt.get().getStringId());
 
         Case emptyUseCase = new Case();
         emptyUseCase.setPetriNetObjectId(new ObjectId());
@@ -306,45 +322,45 @@ public class RoleServiceTest {
     public void testResolveCaseRolesOnTask() {
         ActorListField actorListField = new ActorListField();
         actorListField.setImportId("actor_list_id");
-        ActorField userField = new ActorField();
-        userField.setImportId("actor_id");
+        ActorField actorField = new ActorField();
+        actorField.setImportId("actor_id");
 
         Task task = Task.with().transitionId("transition_id").build();
 
         Case useCase = new Case();
         useCase.getDataSet().put(actorListField.getImportId(), actorListField);
-        useCase.getDataSet().put(userField.getImportId(), userField);
+        useCase.getDataSet().put(actorField.getImportId(), actorField);
         useCase.addTask(task);
 
         AccessPermissions<TaskPermission> transitionPermissions = new AccessPermissions<>();
         transitionPermissions.addPermission(actorListField.getImportId(), TaskPermission.VIEW, true);
-        transitionPermissions.addPermission(userField.getImportId(), TaskPermission.VIEW, true);
+        transitionPermissions.addPermission(actorField.getImportId(), TaskPermission.VIEW, true);
 
         roleService.resolveCaseRolesOnTask(useCase, task, transitionPermissions, false);
 
         List<CaseRole> roles = roleService.findAllCaseRoles();
         assert roles.size() == 2;
         assert roles.stream().allMatch(role -> role.getCaseId().equals(useCase.getStringId()));
-        Optional<CaseRole> userFieldCaseRoleOpt = roles.stream()
-                .filter(role -> role.getImportId().equals(userField.getImportId()))
+        Optional<CaseRole> actorFieldCaseRoleOpt = roles.stream()
+                .filter(role -> role.getImportId().equals(actorField.getImportId()))
                 .findFirst();
-        assert userFieldCaseRoleOpt.isPresent();
-        Optional<CaseRole> userListFieldCaseRoleOpt = roles.stream()
+        assert actorFieldCaseRoleOpt.isPresent();
+        Optional<CaseRole> actorListFieldCaseRoleOpt = roles.stream()
                 .filter(role -> role.getImportId().equals(actorListField.getImportId()))
                 .findFirst();
-        assert userListFieldCaseRoleOpt.isPresent();
+        assert actorListFieldCaseRoleOpt.isPresent();
 
-        assert userField.getCaseRoleIds().size() == 1;
-        assert userField.getCaseRoleIds().contains(userFieldCaseRoleOpt.get().getStringId());
+        assert actorField.getCaseRoleIds().size() == 1;
+        assert actorField.getCaseRoleIds().contains(actorFieldCaseRoleOpt.get().getStringId());
         assert actorListField.getCaseRoleIds().size() == 1;
-        assert actorListField.getCaseRoleIds().contains(userListFieldCaseRoleOpt.get().getStringId());
+        assert actorListField.getCaseRoleIds().contains(actorListFieldCaseRoleOpt.get().getStringId());
         assert useCase.getCaseRolePermissions().isEmpty();
-        assert task.getCaseRolePermissions().containsKey(userFieldCaseRoleOpt.get().getStringId());
-        assert task.getCaseRolePermissions().containsKey(userListFieldCaseRoleOpt.get().getStringId());
+        assert task.getCaseRolePermissions().containsKey(actorFieldCaseRoleOpt.get().getStringId());
+        assert task.getCaseRolePermissions().containsKey(actorListFieldCaseRoleOpt.get().getStringId());
     }
 
     @Test
-    public void testAssignRolesToUser() {
+    public void testAssignRolesToActor() {
         Identity identity = importHelper.createIdentity(IdentityParams.with()
                 .firstname(new TextField("firstname"))
                 .lastname(new TextField("lastname"))
@@ -393,7 +409,7 @@ public class RoleServiceTest {
     }
 
     @Test
-    public void testRemoveRolesFromUser() {
+    public void testRemoveRolesFromActor() {
         Identity identity = importHelper.createIdentity(IdentityParams.with()
                 .firstname(new TextField("firstname"))
                 .lastname(new TextField("lastname"))

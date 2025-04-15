@@ -3,7 +3,6 @@ package com.netgrif.application.engine.authorization.service;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.authorization.domain.params.ActorParams;
-import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.SystemIdentityRunner;
@@ -44,7 +43,7 @@ public class ActorServiceTest {
     private IDataService dataService;
 
     @Autowired
-    private IActorService actorService;
+    private ActorService actorService;
 
     @Autowired
     private SystemIdentityRunner systemIdentityRunner;
