@@ -68,8 +68,8 @@ public class RoleAssignmentService implements IRoleAssignmentService {
         if (actorId == null) {
             return new HashSet<>();
         }
-        List<RoleAssignmentRepository.RoleOnly> result = (List<RoleAssignmentRepository.RoleOnly>) repository.findAllRoleIdsByActorId(actorId);
-        return result.stream().map(RoleAssignmentRepository.RoleOnly::getRoleId).collect(Collectors.toSet());
+        List<RoleAssignment> result = repository.findAllRoleIdsByActorId(actorId);
+        return result.stream().map(RoleAssignment::getRoleId).collect(Collectors.toSet());
     }
 
     /**

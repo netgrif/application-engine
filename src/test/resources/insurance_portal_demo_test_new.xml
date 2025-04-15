@@ -5521,19 +5521,20 @@
 					<flex-shrink>1</flex-shrink>
 				</properties>
 			</item>
-			<item>
-				<dataRef>
-					<id>pocet_deti</id>
-					<logic>
-						<behavior>visible</behavior>
-					</logic>
-				</dataRef>
-				<properties>
-					<order>0</order>
-					<flex-grow>0</flex-grow>
-					<flex-shrink>1</flex-shrink>
-				</properties>
-			</item>
+			<!-- TODO: release/8.0.0 why duplicate? -->
+			<!--<item>-->
+			<!--	<dataRef>-->
+			<!--		<id>pocet_deti</id>-->
+			<!--		<logic>-->
+			<!--			<behavior>visible</behavior>-->
+			<!--		</logic>-->
+			<!--	</dataRef>-->
+			<!--	<properties>-->
+			<!--		<order>0</order>-->
+			<!--		<flex-grow>0</flex-grow>-->
+			<!--		<flex-shrink>1</flex-shrink>-->
+			<!--	</properties>-->
+			<!--</item>-->
 			<item>
 				<dataRef>
 					<id>domace_zviera</id>

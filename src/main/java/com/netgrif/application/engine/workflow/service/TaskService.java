@@ -660,7 +660,7 @@ public class TaskService implements ITaskService {
      * */
     @Override
     public boolean existsByTaskAndAssignee(String taskId, String assigneeId) {
-        return taskRepository.existsByStringIdAndAssigneeId(taskId, assigneeId);
+        return taskRepository.existsByIdAndAssigneeId(taskId, assigneeId);
     }
 
     @Override

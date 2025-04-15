@@ -117,16 +117,16 @@ class InsuranceTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(TestHelper.stream("insurance_portal_demo_test.xml"),
+        def net = petriNetService.importPetriNet(TestHelper.stream("insurance_portal_demo_test_new.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
         assert net.getNet() != null
 
         netId = net.getNet().getStringId()
 
         List<ApplicationRole> applicationRoles = new ArrayList<>()
-        applicationRoles.add(roleService.findApplicationRoleByImportId("identity"))
+        applicationRoles.add(roleService.findApplicationRoleByImportId("default"))
         applicationRoles.add(roleService.findApplicationRoleByImportId("admin"))
-        List<ProcessRole> processRoles = roleService.findAllProcessRolesByImportIds(["1", "2"] as Set)
+        List<ProcessRole> processRoles = roleService.findAllProcessRolesByImportIds(["agent", "company"] as Set)
         importHelper.createIdentity(IdentityParams.with()
                 .firstname(new TextField("Test"))
                 .lastname(new TextField("Integration"))

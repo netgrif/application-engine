@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Set;
 
 @Repository
@@ -12,7 +13,8 @@ public interface RoleAssignmentRepository extends MongoRepository<RoleAssignment
     Iterable<RoleAssignment> findAllByActorIdAndRoleIdIn(String actorId, Set<String> roleIds);
     Iterable<RoleAssignment> findAllByRoleIdIn(Set<String> roleIds);
     Iterable<RoleAssignment> findAllByActorId(String actorId);
-    Iterable<RoleOnly> findAllRoleIdsByActorId(String actorId);
+    // TODO: NAE-2058 - fix projection
+    List<RoleAssignment> findAllRoleIdsByActorId(String actorId);
     boolean existsByActorIdAndRoleId(String actorId, String roleId);
 
     Iterable<RoleAssignment> removeAllByActorIdAndRoleIdIn(String actorId, Set<String> roleIds);
@@ -20,8 +22,4 @@ public interface RoleAssignmentRepository extends MongoRepository<RoleAssignment
     Iterable<RoleAssignment> removeAllByActorId(String actorId);
     Iterable<RoleAssignment> removeAllByRoleId(String roleId);
     Iterable<RoleAssignment> removeAllByRoleIdIn(Set<String> roleIds);
-
-    interface RoleOnly {
-        String getRoleId();
-    }
 }
