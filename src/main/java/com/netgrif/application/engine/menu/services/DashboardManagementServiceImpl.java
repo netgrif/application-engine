@@ -58,7 +58,7 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
         LoggedUser loggedUser = userService.getLoggedOrSystem().transformToLoggedUser();
         managementCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier(DashboardManagementConstants.PROCESS_IDENTIFIER).getStringId(), body.getName().getDefaultValue(), "", loggedUser).getCase();
         ToDataSetOutcome outcome = body.toDataSet();
-        setData(managementCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());
+        managementCase = setData(managementCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());
         return managementCase;
     }
 
@@ -85,7 +85,7 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
         MenuItemUtils.sanitize(body.getId());
         addReferencedMenuItems(body);
         ToDataSetOutcome outcome = body.toDataSet();
-        setData(managementCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());
+        managementCase = setData(managementCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());
         return managementCase;
     }
 

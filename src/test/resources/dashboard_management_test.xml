@@ -1,7 +1,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-    <id>menu_import</id>
+    <id>dashboard_import</id>
     <initials>MEI</initials>
-    <title>Menu import</title>
+    <title>Dashboard import</title>
     <icon>device_hub</icon>
     <defaultRole>true</defaultRole>
     <anonymousRole>true</anonymousRole>
