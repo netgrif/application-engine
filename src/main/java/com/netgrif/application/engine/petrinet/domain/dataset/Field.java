@@ -74,7 +74,7 @@ public abstract class Field<T> extends Imported {
     protected Expression<T> defaultValue;
     protected List<Validation> validations;
     @JsonIgnore
-    private boolean immediate;
+    private Boolean immediate;
     @JsonIgnore
     private String encryption;
     private Component component;

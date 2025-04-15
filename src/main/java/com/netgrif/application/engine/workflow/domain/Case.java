@@ -131,7 +131,9 @@ public class Case implements Serializable {
     }
 
     public void resolveImmediateDataFields() {
-        immediateData = dataSet.getFields().values().stream().filter(Field::isImmediate).collect(Collectors.toList());
+        immediateData = dataSet.getFields().values().stream()
+                .filter((field) -> field.getImmediate() != null && field.getImmediate())
+                .collect(Collectors.toList());
         immediateDataFields = immediateData.stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 

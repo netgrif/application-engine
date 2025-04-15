@@ -199,7 +199,9 @@ public class Process extends ProcessObject {
     }
 
     public List<Field<?>> getImmediateFields() {
-        return this.dataSet.values().stream().filter(Field::isImmediate).collect(Collectors.toList());
+        return this.dataSet.values().stream()
+                .filter((field) -> field.getImmediate() != null && field.getImmediate())
+                .collect(Collectors.toList());
     }
 
     public void incrementVersion(VersionType type) {

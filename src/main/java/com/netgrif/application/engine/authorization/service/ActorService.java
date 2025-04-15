@@ -1,13 +1,13 @@
 package com.netgrif.application.engine.authorization.service;
 
-import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.authorization.domain.constants.ActorConstants;
 import com.netgrif.application.engine.authorization.domain.params.ActorParams;
 import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSearchService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -28,14 +28,14 @@ public class ActorService implements IActorService {
 
     private final IDataService dataService;
     private final IIdentityService identityService;
-    private final IElasticCaseService elasticCaseService;
+    private final IElasticCaseSearchService elasticCaseSearchService;
     private final IWorkflowService workflowService;
 
     public ActorService(@Lazy IDataService dataService, IIdentityService identityService,
-                        @Lazy IElasticCaseService elasticCaseService, @Lazy IWorkflowService workflowService) {
+                        @Lazy IElasticCaseSearchService elasticCaseSearchService, @Lazy IWorkflowService workflowService) {
         this.dataService = dataService;
         this.identityService = identityService;
-        this.elasticCaseService = elasticCaseService;
+        this.elasticCaseSearchService = elasticCaseSearchService;
         this.workflowService = workflowService;
     }
 
@@ -70,7 +70,11 @@ public class ActorService implements IActorService {
             return Optional.empty();
         }
         try {
-            return Optional.of(new Actor(workflowService.findOne(id)));
+            Case actorCase = workflowService.findOne(id);
+            if (!actorCase.getProcessIdentifier().equals("actor")) {
+                return Optional.empty();
+            }
+            return Optional.of(new Actor(actorCase));
         } catch (IllegalArgumentException ignored) {
             return Optional.empty();
         }
@@ -84,7 +88,8 @@ public class ActorService implements IActorService {
         if (id == null) {
             return false;
         }
-        return workflowService.count(QCase.case$.id.eq(new ObjectId(id))) > 0;
+        return workflowService.count(QCase.case$.processIdentifier.eq("actor")
+                .and(QCase.case$.id.eq(new ObjectId(id)))) > 0;
     }
 
     @Override
@@ -98,11 +103,11 @@ public class ActorService implements IActorService {
      * */
     @Override
     public Actor create(ActorParams params) {
-        LoggedIdentity loggedIdentity = identityService.getLoggedIdentity();
-        String activeActorId = null;
-        if (loggedIdentity != null) {
-            activeActorId = loggedIdentity.getActiveActorId();
+        if (isTextFieldValueEmpty(params.getEmail())) {
+            throw new IllegalArgumentException("Actor must have an email!");
         }
+
+        String activeActorId = identityService.getActiveActorId();
         Case actorCase = workflowService.createCaseByIdentifier(ActorConstants.PROCESS_IDENTIFIER, params.getFullName(),
                 "", activeActorId).getCase();
         actorCase = dataService.setData(actorCase, params.toDataSet(), activeActorId).getCase();
@@ -115,20 +120,23 @@ public class ActorService implements IActorService {
      * */
     @Override
     public Actor update(Actor actor, ActorParams params) {
-        LoggedIdentity loggedIdentity = identityService.getLoggedIdentity();
-        String activeActorId = null;
-        if (loggedIdentity != null) {
-            activeActorId = loggedIdentity.getActiveActorId();
+        if (isTextFieldValueEmpty(params.getEmail())) {
+            throw new IllegalArgumentException("Actor must have an email!");
         }
+        String activeActorId = identityService.getActiveActorId();
         return new Actor(dataService.setData(actor.getCase(), params.toDataSet(), activeActorId).getCase());
+    }
+
+    private boolean isTextFieldValueEmpty(TextField field) {
+        return field == null || field.getRawValue() == null || field.getRawValue().trim().isEmpty();
     }
 
     private Optional<Actor> findOneByQuery(String query) {
         CaseSearchRequest request = CaseSearchRequest.builder()
                 .query(buildQuery(Set.of(query)))
                 .build();
-        Page<Case> resultAsPage = elasticCaseService.search(List.of(request), identityService.getLoggedIdentity(), PageRequest.of(0, 1),
-                Locale.getDefault(), false);
+        Page<Case> resultAsPage = elasticCaseSearchService.search(List.of(request), identityService.getLoggedIdentity(), PageRequest.of(0, 1),
+                Locale.getDefault(), false, null);
         if (resultAsPage.hasContent()) {
             return Optional.of(new Actor(resultAsPage.getContent().get(0)));
         }
@@ -139,11 +147,12 @@ public class ActorService implements IActorService {
         CaseSearchRequest request = CaseSearchRequest.builder()
                 .query(buildQuery(Set.of(query)))
                 .build();
-        return elasticCaseService.count(List.of(request), identityService.getLoggedIdentity(), Locale.getDefault(), false);
+        return elasticCaseSearchService.count(List.of(request), identityService.getLoggedIdentity(), Locale.getDefault(),
+                false, null);
     }
 
     private static String buildQuery(Set<String> andQueries) {
-        StringBuilder queryBuilder = new StringBuilder("processIdentifier:identity");
+        StringBuilder queryBuilder = new StringBuilder("processIdentifier:actor");
         for (String query : andQueries) {
             queryBuilder.append(" AND ");
             queryBuilder.append(query);

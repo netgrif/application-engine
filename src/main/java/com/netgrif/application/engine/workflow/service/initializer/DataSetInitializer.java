@@ -27,7 +27,7 @@ public class DataSetInitializer {
         useCase.getProcess().getDataSet().forEach((fieldId, field) -> {
             Field<?> useCaseField = field.clone();
             useCase.getDataSet().put(fieldId, useCaseField);
-            if (field.isImmediate()) {
+            if (field.getImmediate() != null && field.getImmediate()) {
                 useCase.getImmediateDataFields().add(field.getStringId());
                 useCase.getImmediateData().add(useCaseField);
             }
