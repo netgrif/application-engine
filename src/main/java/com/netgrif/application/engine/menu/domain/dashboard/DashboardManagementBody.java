@@ -6,11 +6,13 @@ import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Map;
+import java.util.HashMap;
 
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class DashboardManagementBody {
     /**
@@ -27,25 +29,29 @@ public class DashboardManagementBody {
      */
     private String logo;
     /**
-     * menuItemId
+     * dashboardItems
      */
-    private String menuItemId;
+    private HashMap<String, I18nString> dashboardItems;
+    /**
+     * mapping for menuItems to DashboardItems
+     */
+    private HashMap<String, I18nString> menuItemsToDashboardItems;
     /**
      * should dashboard toolbar contains menu with options.
      */
-    private boolean simpleDashboard;
+    private boolean simpleDashboard = false;
     /**
      * should dashboard toolbar menu with profile.
      */
-    private boolean profileDashboard;
+    private boolean profileDashboard = false;
     /**
      * should dashboard toolbar contains menu with language selection
      */
-    private boolean languageDashboard;
+    private boolean languageDashboard = false;
     /**
      * should dashboard toolbar contains logout button.
      */
-    private boolean logoutDashboard;
+    private boolean logoutDashboard = false;
 
 
     public DashboardManagementBody(String id, I18nString name) {
@@ -55,16 +61,23 @@ public class DashboardManagementBody {
 
     public ToDataSetOutcome toDataSet() {
         DashboardToDataSetOutcome outcome = new DashboardToDataSetOutcome();
-        outcome.putDataSetEntry(DashboardManagementConstants.FIELD_ID, FieldType.TEXT, this.id);
-        outcome.putDataSetEntry(DashboardManagementConstants.FIELD_NAME, FieldType.I18N, this.name);
-        outcome.putDataSetEntry(DashboardManagementConstants.FIELD_LOGO, FieldType.TEXT, this.logo);
+        if (this.id != null) {
+            outcome.putDataSetEntry(DashboardManagementConstants.FIELD_ID, FieldType.TEXT, this.id);
+        }
+        if (this.id != null) {
+            outcome.putDataSetEntry(DashboardManagementConstants.FIELD_NAME, FieldType.I18N, this.name);
+        }
+        if (this.logo != null) {
+            outcome.putDataSetEntry(DashboardManagementConstants.FIELD_LOGO, FieldType.TEXT, this.logo);
+        }
         outcome.putDataSetEntry(DashboardManagementConstants.FIELD_SIMPLE_DASHBOARD, FieldType.BOOLEAN, this.simpleDashboard);
         outcome.putDataSetEntry(DashboardManagementConstants.FIELD_PROFILE_DASHBOARD, FieldType.BOOLEAN, this.profileDashboard);
         outcome.putDataSetEntry(DashboardManagementConstants.FIELD_LANGUAGE_DASHBOARD, FieldType.BOOLEAN, this.profileDashboard);
         outcome.putDataSetEntry(DashboardManagementConstants.FIELD_LOGOUT_DASHBOARD, FieldType.BOOLEAN, this.logoutDashboard);
-        if (menuItemId != null) {
-            outcome.putDataSetEntryWithOptions(DashboardManagementConstants.FIELD_EXISTING_MENU_ITEMS, FieldType.ENUMERATION_MAP, Map.of(this.menuItemId, new I18nString("")), this.menuItemId);
-            outcome.putDataSetEntry(DashboardManagementConstants.FIELD_ADD_NEW_ITEM, FieldType.BUTTON, 1);
+        if (this.dashboardItems != null) {
+            outcome.putDataSetEntryWithOptions(DashboardManagementConstants.FIELD_DASHBOARD_ITEM_LIST, FieldType.ENUMERATION_MAP, this.dashboardItems, "");
+            outcome.putDataSetEntryWithOptions(DashboardManagementConstants.FIELD_DASHBOARD_ITEM_TO_MENU_ITEM_LIST, FieldType.ENUMERATION_MAP, this.menuItemsToDashboardItems, "");
+            outcome.putDataSetEntry(DashboardManagementConstants.FIELD_ITEMS_ORDER, FieldType.TEXT, String.join(",", this.dashboardItems.keySet()));
         }
         return outcome;
     }

@@ -12,6 +12,7 @@ import com.netgrif.application.engine.menu.domain.dashboard.DashboardManagementB
 import com.netgrif.application.engine.menu.domain.dashboard.DashboardManagementConstants;
 import com.netgrif.application.engine.menu.services.interfaces.DashboardManagementService;
 import com.netgrif.application.engine.menu.utils.MenuItemUtils;
+import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.ImportHelper;
@@ -27,6 +28,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -52,6 +54,15 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
             log.info("Dashboard management with id:{} already exists", body.getId());
             return managementCase;
         }
+        if (body.getDashboardItems() != null && !body.getDashboardItems().isEmpty()) {
+            HashMap<String, I18nString> menuItemToDashboardItem = new HashMap<>();
+            body.getDashboardItems().keySet().forEach(dashboardItemId -> {
+                Case dashboardItem = workflowService.findOne(dashboardItemId);
+                menuItemToDashboardItem.put(dashboardItemId, new I18nString(String.valueOf(dashboardItem.getFieldValue(DashboardItemConstants.FIELD_MENU_ITEM_LIST))));
+            });
+            body.setMenuItemsToDashboardItems(menuItemToDashboardItem);
+        }
+
 
         LoggedUser loggedUser = userService.getLoggedOrSystem().transformToLoggedUser();
         managementCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier(DashboardManagementConstants.PROCESS_IDENTIFIER).getStringId(), body.getName().getDefaultValue(), "", loggedUser).getCase();
@@ -81,6 +92,16 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
     @Override
     public Case updateDashboardManagement(Case managementCase, DashboardManagementBody body) {
         MenuItemUtils.sanitize(body.getId());
+
+        if (body.getDashboardItems() != null && !body.getDashboardItems().isEmpty()) {
+            HashMap<String, I18nString> menuItemToDashboardItem = new HashMap<>();
+            body.getDashboardItems().keySet().forEach(dashboardItemId -> {
+                Case dashboardItem = workflowService.findOne(dashboardItemId);
+                menuItemToDashboardItem.put(dashboardItemId, new I18nString(String.valueOf(dashboardItem.getFieldValue(DashboardItemConstants.FIELD_MENU_ITEM_LIST))));
+            });
+            body.setMenuItemsToDashboardItems(menuItemToDashboardItem);
+        }
+
         ToDataSetOutcome outcome = body.toDataSet();
         setData(managementCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());
         return managementCase;
@@ -98,15 +119,15 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
     @Override
     public Case findDashboardItem(String identifier) {
         String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
-                DashboardManagementConstants.PROCESS_IDENTIFIER, DashboardManagementConstants.FIELD_ID, identifier);
-        return findCase(DashboardManagementConstants.PROCESS_IDENTIFIER, query);
+                DashboardItemConstants.PROCESS_IDENTIFIER, DashboardItemConstants.FIELD_ID, identifier);
+        return findCase(DashboardItemConstants.PROCESS_IDENTIFIER, query);
     }
 
     @Override
     public Case findDashboardManagement(String identifier) {
         String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
-                DashboardItemConstants.PROCESS_IDENTIFIER, DashboardItemConstants.FIELD_ID, identifier);
-        return findCase(DashboardItemConstants.PROCESS_IDENTIFIER, query);
+                DashboardManagementConstants.PROCESS_IDENTIFIER, DashboardManagementConstants.FIELD_ID, identifier);
+        return findCase(DashboardManagementConstants.PROCESS_IDENTIFIER, query);
     }
 
     protected Case setData(Case useCase, String transId, Map<String, Map<String, Object>> dataSet) {
