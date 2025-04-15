@@ -68,7 +68,7 @@ public class RoleAssignmentService implements IRoleAssignmentService {
         if (actorId == null) {
             return new HashSet<>();
         }
-        List<RoleAssignment> result = repository.findAllRoleIdsByActorId(actorId);
+        List<RoleAssignment> result = (List<RoleAssignment>) repository.findAllByActorId(actorId);
         return result.stream().map(RoleAssignment::getRoleId).collect(Collectors.toSet());
     }
 

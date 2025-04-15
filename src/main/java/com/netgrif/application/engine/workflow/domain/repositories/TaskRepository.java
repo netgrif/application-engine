@@ -26,7 +26,6 @@ public interface TaskRepository extends MongoRepository<Task, String>, QuerydslP
 
     List<Task> findAllByIdIn(Iterable<String> id);
 
-    // TODO: NAE-2058 - check if change to Id didnt break anything
     boolean existsByIdAndAssigneeId(String taskId, String actorId);
 
     void deleteAllByProcessId(String processId);
