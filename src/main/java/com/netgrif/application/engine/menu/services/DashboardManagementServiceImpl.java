@@ -54,16 +54,7 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
             log.info("Dashboard management with id:{} already exists", body.getId());
             return managementCase;
         }
-        if (body.getDashboardItems() != null && !body.getDashboardItems().isEmpty()) {
-            HashMap<String, I18nString> menuItemToDashboardItem = new HashMap<>();
-            body.getDashboardItems().keySet().forEach(dashboardItemId -> {
-                Case dashboardItem = workflowService.findOne(dashboardItemId);
-                menuItemToDashboardItem.put(dashboardItemId, new I18nString(String.valueOf(dashboardItem.getFieldValue(DashboardItemConstants.FIELD_MENU_ITEM_LIST))));
-            });
-            body.setMenuItemsToDashboardItems(menuItemToDashboardItem);
-        }
-
-
+        addReferencedMenuItems(body);
         LoggedUser loggedUser = userService.getLoggedOrSystem().transformToLoggedUser();
         managementCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier(DashboardManagementConstants.PROCESS_IDENTIFIER).getStringId(), body.getName().getDefaultValue(), "", loggedUser).getCase();
         ToDataSetOutcome outcome = body.toDataSet();
@@ -92,16 +83,7 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
     @Override
     public Case updateDashboardManagement(Case managementCase, DashboardManagementBody body) {
         MenuItemUtils.sanitize(body.getId());
-
-        if (body.getDashboardItems() != null && !body.getDashboardItems().isEmpty()) {
-            HashMap<String, I18nString> menuItemToDashboardItem = new HashMap<>();
-            body.getDashboardItems().keySet().forEach(dashboardItemId -> {
-                Case dashboardItem = workflowService.findOne(dashboardItemId);
-                menuItemToDashboardItem.put(dashboardItemId, new I18nString(String.valueOf(dashboardItem.getFieldValue(DashboardItemConstants.FIELD_MENU_ITEM_LIST))));
-            });
-            body.setMenuItemsToDashboardItems(menuItemToDashboardItem);
-        }
-
+        addReferencedMenuItems(body);
         ToDataSetOutcome outcome = body.toDataSet();
         setData(managementCase, DashboardItemConstants.TASK_CONFIGURE, outcome.getDataSet());
         return managementCase;
@@ -154,5 +136,16 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
                 PageRequest.of(0, 1), Locale.getDefault(), false);
 
         return resultPage.hasContent() ? resultPage.getContent().get(0) : null;
+    }
+
+    private void addReferencedMenuItems(DashboardManagementBody body) {
+        if (body.getDashboardItems() != null && !body.getDashboardItems().isEmpty()) {
+            HashMap<String, I18nString> menuItemToDashboardItem = new HashMap<>();
+            body.getDashboardItems().keySet().forEach(dashboardItemId -> {
+                Case dashboardItem = workflowService.findOne(dashboardItemId);
+                menuItemToDashboardItem.put(dashboardItemId, new I18nString(String.valueOf(dashboardItem.getFieldValue(DashboardItemConstants.FIELD_MENU_ITEM_LIST))));
+            });
+            body.setMenuItemsToDashboardItems(menuItemToDashboardItem);
+        }
     }
 }
