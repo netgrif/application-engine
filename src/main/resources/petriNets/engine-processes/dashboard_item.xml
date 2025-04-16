@@ -46,12 +46,19 @@
 
     <function scope="process" name="removeRefFromParent">
         { ->
-            def cases = findCasesElastic("processIdentifier:\"dashboard_management\" AND dataSet.dashboard_item_list.keyValue:\"$useCase.stringId\"")
+            def cases = findCasesElastic("processIdentifier:\"dashboard_management\" AND dataSet.items_order.textValue:\"$useCase.stringId\"")
             cases.each { refCase ->
                 def refTask = refCase.tasks.find { it.transition == "configuration" }.task
+                def itemsOrder = refCase.dataSet["items_order"].value.split(",") as ArrayList
+                itemsOrder.remove(useCase.stringId)
+
+                def dashboardItemsListOptions = refCase.dataSet["dashboard_item_list"].options
+                dashboardItemsListOptions.remove(useCase.stringId)
+
                 setData(refTask,[
                         "dashboard_item_list": ["type": "text", "value": ""],
-                        "dashboard_item_taskRef": ["type": "taskRef", "value": []]
+                        "existing_menu_items": ["type": "existing_menu_items", "value": "", "options": dashboardItemsListOptions],
+                        "items_order": ["type": "text", "value": itemsOrder.join(",")]
                 ])
             }
 
