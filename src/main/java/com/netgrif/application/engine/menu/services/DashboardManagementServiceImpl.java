@@ -44,6 +44,14 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
     protected final IPetriNetService petriNetService;
     protected final IElasticCaseService elasticCaseService;
 
+
+    /**
+     * Creates a new dashboard management case if it does not already exist.
+     * If a case with the same ID is found, it is returned instead of creating a new one.
+     *
+     * @param body The {@link DashboardManagementBody} containing data for the dashboard management.
+     * @return The created or existing {@link Case} representing the dashboard management.
+     */
     @Override
     public Case createDashboardManagement(DashboardManagementBody body) {
         Case managementCase;
@@ -62,6 +70,14 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
         return managementCase;
     }
 
+    /**
+     * Creates a new dashboard item case if it does not already exist.
+     * If a case with the same ID is found, it is returned instead of creating a new one.
+     *
+     * @param body The {@link DashboardItemBody} containing data for the dashboard item.
+     * @return The created or existing {@link Case} representing the dashboard item.
+     * @throws TransitionNotExecutableException if the task transition is not executable.
+     */
     @Override
     public Case createDashboardItem(DashboardItemBody body) throws TransitionNotExecutableException {
         MenuItemUtils.sanitize(body.getId());
@@ -80,6 +96,13 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
         return itemCase;
     }
 
+    /**
+     * Updates an existing dashboard management case with new data.
+     *
+     * @param managementCase The existing {@link Case} to update.
+     * @param body The {@link DashboardManagementBody} containing updated data.
+     * @return The updated {@link Case} representing the dashboard management.
+     */
     @Override
     public Case updateDashboardManagement(Case managementCase, DashboardManagementBody body) {
         MenuItemUtils.sanitize(body.getId());
@@ -90,6 +113,14 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
     }
 
 
+    /**
+     * Updates an existing dashboard item case with new data.
+     *
+     * @param itemCase The existing {@link Case} to update.
+     * @param body The {@link DashboardItemBody} containing updated data.
+     * @return The updated {@link Case} representing the dashboard item.
+     * @throws TransitionNotExecutableException if the task transition is not executable.
+     */
     @Override
     public Case updateDashboardItem(Case itemCase, DashboardItemBody body) throws TransitionNotExecutableException {
         MenuItemUtils.sanitize(body.getId());
@@ -98,6 +129,13 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
         return itemCase;
     }
 
+
+    /**
+     * Finds an existing dashboard item case by its identifier.
+     *
+     * @param identifier The unique identifier of the dashboard item.
+     * @return The {@link Case} representing the dashboard item, or null if not found.
+     */
     @Override
     public Case findDashboardItem(String identifier) {
         String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
@@ -105,6 +143,12 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
         return findCase(DashboardItemConstants.PROCESS_IDENTIFIER, query);
     }
 
+    /**
+     * Finds an existing dashboard management case by its identifier.
+     *
+     * @param identifier The unique identifier of the dashboard management.
+     * @return The {@link Case} representing the dashboard management, or null if not found.
+     */
     @Override
     public Case findDashboardManagement(String identifier) {
         String query = String.format("processIdentifier:%s AND dataSet.%s.textValue.keyword:\"%s\"",
