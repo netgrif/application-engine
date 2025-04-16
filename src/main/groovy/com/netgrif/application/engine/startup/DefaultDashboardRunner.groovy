@@ -19,7 +19,7 @@ class DefaultDashboardRunner extends AbstractOrderedCommandLineRunner {
     }
 
     def createMainDashboardManagementItem() {
-        def dashboardItemBody = new DashboardManagementBody("main_dashboard", new I18nString("Main Dashboard",Map.of("sk","Hlavný Dashboard","en","Haupt-Dashboard")))
+        def dashboardItemBody = new DashboardManagementBody("main_dashboard", new I18nString("Main Dashboard",Map.of("sk","Hlavný Dashboard","de","Haupt-Dashboard")))
         dashboardItemBody.setLogoutDashboard(true)
 
         return dashboardManagementService.createDashboardManagement(dashboardItemBody)
