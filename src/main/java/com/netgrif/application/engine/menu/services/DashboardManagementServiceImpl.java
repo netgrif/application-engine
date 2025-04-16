@@ -112,7 +112,6 @@ public class DashboardManagementServiceImpl implements DashboardManagementServic
         return managementCase;
     }
 
-
     /**
      * Updates an existing dashboard item case with new data.
      *
