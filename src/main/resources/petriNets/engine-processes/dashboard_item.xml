@@ -56,8 +56,7 @@
                 dashboardItemsListOptions.remove(useCase.stringId)
 
                 setData(refTask,[
-                        "dashboard_item_list": ["type": "text", "value": ""],
-                        "existing_menu_items": ["type": "existing_menu_items", "value": "", "options": dashboardItemsListOptions],
+                        "dashboard_item_list": ["type": "enumeration_map", "value": "", "options": dashboardItemsListOptions],
                         "items_order": ["type": "text", "value": itemsOrder.join(",")]
                 ])
             }
