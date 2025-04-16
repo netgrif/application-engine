@@ -31,6 +31,7 @@ import com.netgrif.application.engine.menu.domain.configurations.TabbedTaskViewB
 import com.netgrif.application.engine.menu.domain.configurations.ViewBody
 import com.netgrif.application.engine.menu.domain.dashboard.DashboardItemBody
 import com.netgrif.application.engine.menu.domain.dashboard.DashboardManagementBody
+import com.netgrif.application.engine.menu.services.interfaces.DashboardItemService
 import com.netgrif.application.engine.menu.services.interfaces.DashboardManagementService
 import com.netgrif.application.engine.menu.services.interfaces.IMenuItemService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
@@ -202,6 +203,9 @@ class ActionDelegate {
 
     @Autowired
     DashboardManagementService dashboardManagementService
+
+    @Autowired
+    DashboardItemService dashboardItemService
 
     FrontendActionOutcome Frontend
 
@@ -2239,7 +2243,7 @@ class ActionDelegate {
     }
 
     Case createDashboardItem(DashboardItemBody body) {
-        return dashboardManagementService.createDashboardItem(body)
+        return dashboardItemService.getOrCreate(body)
     }
 
     Case findDashboardManagement(String identifier) {
@@ -2247,7 +2251,7 @@ class ActionDelegate {
     }
 
     Case findDashboardItem(String identifier) {
-        return dashboardManagementService.findDashboardItem(identifier)
+        return dashboardItemService.findById(identifier)
     }
 
     Case updateDashboardManagement(Case managementCase, DashboardManagementBody body) {
@@ -2255,7 +2259,7 @@ class ActionDelegate {
     }
 
     Case updateDashboardItem(Case itemCase, DashboardItemBody body) {
-        return dashboardManagementService.updateDashboardItem(itemCase, body)
+        return dashboardItemService.update(itemCase, body)
     }
 
     /**

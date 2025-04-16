@@ -35,7 +35,7 @@
 			<id>menu_item_delete</id>
 			<actions phase="pre">
 				<action id="0">
-					removeRefFromParent()
+					removeRefFromDashboardItem()
 					removeItemChildCases()
 					removeViewCase()
 				</action>
@@ -81,10 +81,9 @@
 			}
 		}
 	</function>
-	<function scope="process" name="removeRefFromParent">
+	<function scope="process" name="removeRefFromDashboardItem">
 		{ ->
 			def cases = findCasesElastic("processIdentifier:\"dashboard_item\" AND dataSet.menu_items_list.keyValue:\"$useCase.stringId\"")
-			print(cases.size())
 			cases.each { refCase ->
 				def refTask = refCase.tasks.find { it.transition == "configuration" }.task
 				setData(refTask,[
