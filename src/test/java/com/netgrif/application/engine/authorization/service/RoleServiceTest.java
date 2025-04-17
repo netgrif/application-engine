@@ -221,6 +221,18 @@ public class RoleServiceTest {
     }
 
     @Test
+    public void testFindCaseRoleByCaseIdAndImportId() {
+        CaseRole caseRole1 = new CaseRole("import_id1", "case_id");
+        Role caseRole2 = new CaseRole("import_id2", "case_id");
+        Role processRole = new ProcessRole("import_id1");
+        repository.saveAll(List.of(processRole, caseRole1, caseRole2));
+
+        CaseRole foundCaseRole = roleService.findCaseRoleByCaseIdAndImportId("case_id", "import_id1");
+        assert foundCaseRole.getImportId().equals(caseRole1.getImportId());
+        assert foundCaseRole.getCaseId().equals(caseRole1.getCaseId());
+    }
+
+    @Test
     public void testSave() {
         assert roleService.save(new ProcessRole("import_id")).getId() != null;
         assert roleService.save(new CaseRole("import_id", "case_id")).getId() != null;

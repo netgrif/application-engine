@@ -32,6 +32,7 @@ public interface IRoleService {
     ProcessRole findProcessRoleByImportId(String importId);
 
     List<CaseRole> findAllCaseRoles();
+    CaseRole findCaseRoleByCaseIdAndImportId(String caseId, String importId);
 
     Role save(Role role);
     List<Role> saveAll(Collection<Role> roles);

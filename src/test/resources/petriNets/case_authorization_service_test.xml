@@ -1,0 +1,78 @@
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>case_authorization_service_test</id>
+    <version>1.0.0</version>
+    <title>CaseAuthorizationService test</title>
+    <defaultRole>false</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">WST</property>
+    </properties>
+    <roleRef>
+        <id>create_neg_role</id>
+        <permission>
+            <create>false</create>
+        </permission>
+    </roleRef>
+    <roleRef>
+        <id>create_pos_role</id>
+        <permission>
+            <create>true</create>
+        </permission>
+    </roleRef>
+    <roleRef>
+        <id>delete_neg_role</id>
+        <permission>
+            <delete>false</delete>
+        </permission>
+    </roleRef>
+    <roleRef>
+        <id>delete_pos_role</id>
+        <permission>
+            <delete>true</delete>
+        </permission>
+    </roleRef>
+    <roleRef type="case">
+        <id>delete_neg_case_role</id>
+        <permission>
+            <delete>false</delete>
+        </permission>
+    </roleRef>
+    <roleRef type="case">
+        <id>delete_pos_case_role</id>
+        <permission>
+            <delete>true</delete>
+        </permission>
+    </roleRef>
+    <role>
+        <id>create_neg_role</id>
+        <title>create role</title>
+    </role>
+    <role>
+        <id>create_pos_role</id>
+        <title>create role</title>
+    </role>
+    <role>
+        <id>delete_neg_role</id>
+        <title>delete role</title>
+    </role>
+    <role>
+        <id>delete_pos_role</id>
+        <title>delete role</title>
+    </role>
+    <data type="actorList">
+        <id>create_neg_case_role</id>
+        <title/>
+    </data>
+    <data type="actorList">
+        <id>create_pos_case_role</id>
+        <title/>
+    </data>
+    <data type="actorList">
+        <id>delete_neg_case_role</id>
+        <title/>
+    </data>
+    <data type="actorList">
+        <id>delete_pos_case_role</id>
+        <title/>
+    </data>
+</process>

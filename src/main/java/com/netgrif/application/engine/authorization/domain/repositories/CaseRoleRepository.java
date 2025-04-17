@@ -6,4 +6,5 @@ import java.util.List;
 public interface CaseRoleRepository {
     void removeAllByCaseId(String caseId);
     List<CaseRole> findAll();
+    CaseRole findByCaseIdAndImportId(String caseId, String importId);
 }

@@ -209,6 +209,17 @@ public class RoleService implements IRoleService {
      * todo javadoc
      * */
     @Override
+    public CaseRole findCaseRoleByCaseIdAndImportId(String caseId, String importId) {
+        if (caseId == null || importId == null) {
+            return null;
+        }
+        return caseRoleRepository.findByCaseIdAndImportId(caseId, importId);
+    }
+
+    /**
+     * todo javadoc
+     * */
+    @Override
     public Role save(Role role) {
         if (role == null) {
             return null;

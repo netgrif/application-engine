@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
@@ -18,7 +19,7 @@ public class CaseRoleRepositoryImpl implements CaseRoleRepository{
 
     @Override
     public void removeAllByCaseId(String caseId) {
-        Query query = buildMatchQuery("caseId", caseId);
+        Query query = buildMatchQuery(Map.of("caseId", caseId));
         mongoTemplate.remove(query, CaseRole.class);
     }
 
@@ -27,8 +28,17 @@ public class CaseRoleRepositoryImpl implements CaseRoleRepository{
         return mongoTemplate.find(buildBasicQuery(), CaseRole.class);
     }
 
-    private Query buildMatchQuery(String field, Object value) {
-        return buildBasicQuery().addCriteria(Criteria.where(field).is(value));
+    @Override
+    public CaseRole findByCaseIdAndImportId(String caseId, String importId) {
+        Query query = buildMatchQuery(Map.of("caseId", caseId, "importId", importId));
+        return mongoTemplate.findOne(query, CaseRole.class);
+    }
+
+    private Query buildMatchQuery(Map<String, Object> attributesAndValues) {
+        Query query = buildBasicQuery();
+        attributesAndValues.forEach((attribute, value) ->
+                query.addCriteria(Criteria.where(attribute).is(value)));
+        return query;
     }
 
     private Query buildBasicQuery() {

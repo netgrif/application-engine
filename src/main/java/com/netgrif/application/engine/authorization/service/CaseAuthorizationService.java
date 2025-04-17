@@ -49,6 +49,6 @@ public class CaseAuthorizationService extends AuthorizationService implements IC
         }
 
         Case targetCase = workflowService.findOne(caseId);
-        return canCallEvent(targetCase.getProcessRolePermissions(), targetCase.getCaseRolePermissions(), CasePermission.CREATE);
+        return canCallEvent(targetCase.getProcessRolePermissions(), targetCase.getCaseRolePermissions(), CasePermission.DELETE);
     }
 }
