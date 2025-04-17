@@ -4,6 +4,10 @@ import com.netgrif.application.engine.business.IPostalCodeService
 import com.netgrif.application.engine.business.orsr.IOrsrService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
+import com.netgrif.core.event.events.action.ActionEvent
+import com.netgrif.core.event.events.RunPhase
+import com.netgrif.core.event.events.action.ActionStartEvent
+import com.netgrif.core.event.events.action.ActionStopEvent
 import com.netgrif.core.petrinet.domain.Function
 import com.netgrif.core.workflow.domain.Case
 import com.netgrif.core.workflow.domain.Task
@@ -12,6 +16,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Lookup
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 
 @Component
@@ -35,6 +40,9 @@ abstract class FieldActionsRunner {
     @Autowired
     private IFieldActionsCacheService actionsCacheService
 
+    @Autowired
+    private ApplicationEventPublisher publisher
+
     private Map<String, Object> actionsCache = new HashMap<>()
 
     List<EventOutcome> run(com.netgrif.core.petrinet.domain.dataset.logic.action.Action action, Case useCase, Map<String, String> params, List<Function> functions = []) {
@@ -47,11 +55,15 @@ abstract class FieldActionsRunner {
 
         log.debug("Action: $action")
         def code = getActionCode(action, functions)
+        final ActionStartEvent actionStart = new ActionStartEvent(action)
         try {
+            publisher.publishEvent(actionStart)
             code.init(action, useCase, task, this, params)
             code()
+            publisher.publishEvent(new ActionStopEvent(action, actionStart, true))
         } catch (Exception e) {
             log.error("Action: $action.definition")
+            publisher.publishEvent(new ActionStopEvent(action, actionStart, false))
             throw e
         }
         return ((ActionDelegate) code.delegate).outcomes
