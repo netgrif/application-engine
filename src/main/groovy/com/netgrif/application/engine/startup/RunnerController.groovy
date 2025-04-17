@@ -26,6 +26,7 @@ class RunnerController {
             FlushSessionsRunner,
             MailRunner,
             PostalCodeImporter,
+            DefaultDashboardRunner,
             DemoRunner,
             QuartzSchedulerRunner,
             PdfRunner,

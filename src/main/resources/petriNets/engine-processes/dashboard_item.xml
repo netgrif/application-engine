@@ -24,6 +24,17 @@
         </caseLogic>
     </roleRef>
 
+    <caseEvents>
+        <event type="delete">
+            <id>menu_item_delete</id>
+            <actions phase="pre">
+                <action id="0">
+                    removeRefFromParent()
+                </action>
+            </actions>
+        </event>
+    </caseEvents>
+
     <role>
         <id>system</id>
         <title>System</title>
@@ -32,6 +43,26 @@
         <id>admin</id>
         <title>Admin</title>
     </role>
+
+    <function scope="process" name="removeRefFromParent">
+        { ->
+            def cases = findCasesElastic("processIdentifier:\"dashboard_management\" AND dataSet.items_order.textValue:\"$useCase.stringId\"")
+            cases.each { refCase ->
+                def refTask = refCase.tasks.find { it.transition == "configuration" }.task
+                def itemsOrder = refCase.dataSet["items_order"].value.split(",") as ArrayList
+                itemsOrder.remove(useCase.stringId)
+
+                def dashboardItemsListOptions = refCase.dataSet["dashboard_item_list"].options
+                dashboardItemsListOptions.remove(useCase.stringId)
+
+                setData(refTask,[
+                        "dashboard_item_list": ["type": "enumeration_map", "value": "", "options": dashboardItemsListOptions],
+                        "items_order": ["type": "text", "value": itemsOrder.join(",")]
+                ])
+            }
+
+        }
+    </function>
 
     <data type="text" immediate="true">
         <id>item_id</id>
