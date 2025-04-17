@@ -103,9 +103,7 @@ public class ActorService implements IActorService {
      * */
     @Override
     public Actor create(ActorParams params) {
-        if (isTextFieldValueEmpty(params.getEmail())) {
-            throw new IllegalArgumentException("Actor must have an email!");
-        }
+        throwIfInvalidParams(params);
 
         String activeActorId = identityService.getActiveActorId();
         Case actorCase = workflowService.createCaseByIdentifier(ActorConstants.PROCESS_IDENTIFIER, params.getFullName(),
@@ -120,11 +118,22 @@ public class ActorService implements IActorService {
      * */
     @Override
     public Actor update(Actor actor, ActorParams params) {
+        throwIfInvalidParams(params);
+        if (actor == null) {
+            throw new IllegalArgumentException("Please provide actor to be updated");
+        }
+
+        String activeActorId = identityService.getActiveActorId();
+        return new Actor(dataService.setData(actor.getCase(), params.toDataSet(), activeActorId).getCase());
+    }
+
+    private void throwIfInvalidParams(ActorParams params) {
+        if (params == null) {
+            throw new IllegalArgumentException("Please provide input values for actor");
+        }
         if (isTextFieldValueEmpty(params.getEmail())) {
             throw new IllegalArgumentException("Actor must have an email!");
         }
-        String activeActorId = identityService.getActiveActorId();
-        return new Actor(dataService.setData(actor.getCase(), params.toDataSet(), activeActorId).getCase());
     }
 
     private boolean isTextFieldValueEmpty(TextField field) {

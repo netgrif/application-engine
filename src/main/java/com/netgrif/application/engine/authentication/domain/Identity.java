@@ -67,7 +67,7 @@ public class Identity implements SystemCase {
      * todo javadoc
      * */
     public List<String> getAdditionalActorIds() {
-        return ((CaseField) identityCase.getDataSet().get(IdentityConstants.MAIN_ACTOR_FIELD_ID)).getRawValue();
+        return ((CaseField) identityCase.getDataSet().get(IdentityConstants.ADDITIONAL_ACTORS_FIELD_ID)).getRawValue();
     }
 
     /**

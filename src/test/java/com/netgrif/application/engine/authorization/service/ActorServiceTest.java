@@ -136,6 +136,8 @@ public class ActorServiceTest {
                 .firstname(new TextField(firstname))
                 .lastname(new TextField(lastname))
                 .build()));
+
+        assertThrows(IllegalArgumentException.class, () -> actorService.create(null));
     }
 
     @Test
@@ -160,6 +162,12 @@ public class ActorServiceTest {
         assert updatedActor.getLastname().equals(newLastname);
 
         assertThrows(IllegalArgumentException.class, () -> actorService.update(actor, ActorParams.with()
+                .firstname(new TextField("firstname"))
+                .lastname(new TextField("lastname"))
+                .build()));
+
+        assertThrows(IllegalArgumentException.class, () -> actorService.update(actor, null));
+        assertThrows(IllegalArgumentException.class, () -> actorService.update(null, ActorParams.with()
                 .firstname(new TextField("firstname"))
                 .lastname(new TextField("lastname"))
                 .build()));

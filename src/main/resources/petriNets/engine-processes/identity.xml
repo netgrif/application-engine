@@ -68,7 +68,7 @@
 		<id>registration_token</id>
 		<title>Registration token</title>
 	</data>
-	<data type="dateTime">
+	<data type="dateTime" immediate="true">
 		<id>expiration_date</id>
 		<title>Expiration date</title>
 	</data>

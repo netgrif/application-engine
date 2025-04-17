@@ -178,9 +178,7 @@ public class IdentityService implements IIdentityService {
      * */
     @Override
     public Identity create(IdentityParams params) {
-        if (params == null) {
-            return null;
-        }
+        throwIfInvalidParams(params);
 
         String activeActorId = getActiveActorId();
         Case identityCase = workflowService.createCaseByIdentifier(IdentityConstants.PROCESS_IDENTIFIER,
@@ -195,9 +193,8 @@ public class IdentityService implements IIdentityService {
      * */
     @Override
     public Identity createWithDefaultActor(IdentityParams identityParams) {
-        if (identityParams == null) {
-            return null;
-        }
+        throwIfInvalidParams(identityParams);
+
         ActorParams actorParams = ActorParams.fromIdentityParams(identityParams);
         Actor defaultActor = actorService.create(actorParams);
 
@@ -219,9 +216,13 @@ public class IdentityService implements IIdentityService {
      * */
     @Override
     public Identity update(Identity identity, IdentityParams params) {
-        if (identity == null || params == null) {
-            return null;
+        if (params == null || (params.getUsername() != null && isTextFieldValueEmpty(params.getUsername()))) {
+            throw new IllegalArgumentException("Identity must have an username!");
         }
+        if (identity == null) {
+            throw new IllegalArgumentException("Please provide identity to be updated");
+        }
+
         String activeActorId = getActiveActorId();
         identity = new Identity(dataService.setData(identity.getCase(), params.toDataSet(), activeActorId)
                 .getCase());
@@ -248,6 +249,9 @@ public class IdentityService implements IIdentityService {
         if (identity == null) {
             throw new IllegalArgumentException("Provided identity is null");
         }
+        if (actorId == null) {
+            throw new IllegalArgumentException("Provided actorId is null");
+        }
 
         return addAdditionalActors(identity, Set.of(actorId));
     }
@@ -260,9 +264,17 @@ public class IdentityService implements IIdentityService {
         if (identity == null) {
             throw new IllegalArgumentException("Provided identity is null");
         }
+        if (actorIds == null || actorIds.isEmpty()) {
+            throw new IllegalArgumentException("Additional actors are not provided");
+        }
 
-        List<String> additionalActorIds = new ArrayList<>(identity.getAdditionalActorIds());
-        additionalActorIds.addAll(actorIds);
+        List<String> additionalActorIds;
+        if (identity.getAdditionalActorIds() != null) {
+            additionalActorIds = new ArrayList<>(identity.getAdditionalActorIds());
+            additionalActorIds.addAll(actorIds);
+        } else {
+            additionalActorIds = new ArrayList<>(actorIds);
+        }
 
         return update(identity, IdentityParams.with()
                 .additionalActors(CaseField.withValue(additionalActorIds))
@@ -275,17 +287,32 @@ public class IdentityService implements IIdentityService {
     @Override
     public List<Identity> removeAllByStateAndExpirationDateBefore(IdentityState state, LocalDateTime dateTime) {
         if (state == null || dateTime == null) {
-            return List.of();
+            throw new IllegalArgumentException("Identity state or expiration date is null");
         }
 
-        List<Identity> identities = findAllByQuery(stateAndExpirationDateBeforeQuery(state, dateTime)).stream()
-                .map(Identity::new)
-                .collect(Collectors.toList());;
+        List<Identity> identities = findAllByStateAndExpirationDateBefore(state, dateTime);
         for (Identity identity : identities) {
             workflowService.deleteCase(identity.getCase());
         }
 
         return identities;
+    }
+
+    private void throwIfInvalidParams(IdentityParams params) {
+        if (params == null) {
+            throw new IllegalArgumentException("Please provide input values for actor");
+        }
+        if (isTextFieldOrValueEmpty(params.getUsername())) {
+            throw new IllegalArgumentException("Identity must have an username!");
+        }
+    }
+
+    private boolean isTextFieldOrValueEmpty(TextField field) {
+        return field == null || isTextFieldValueEmpty(field);
+    }
+
+    private boolean isTextFieldValueEmpty(TextField field) {
+        return field.getRawValue() == null || field.getRawValue().trim().isEmpty();
     }
 
     private void encodePassword(IdentityParams params) {
@@ -352,7 +379,8 @@ public class IdentityService implements IIdentityService {
     private static String stateAndExpirationDateBeforeQuery(IdentityState state, LocalDateTime dateTime) {
         long timestamp = Timestamp.valueOf(dateTime).getTime();
         return String.format("dataSet.%s.keyValue:\"%s\" AND dataSet.%s.timestampValue:<=%d",
-                IdentityConstants.STATE_FIELD_ID, state.name(), IdentityConstants.EXPIRATION_DATE_FIELD_ID, timestamp);
+                IdentityConstants.STATE_FIELD_ID, state.name().toLowerCase(), IdentityConstants.EXPIRATION_DATE_FIELD_ID,
+                timestamp);
     }
 
 }

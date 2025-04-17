@@ -30,8 +30,11 @@ public class IdentityParams implements CaseParams {
         dataSet.put(IdentityConstants.LASTNAME_FIELD_ID, this.lastname);
         dataSet.put(IdentityConstants.PASSWORD_FIELD_ID, this.password);
         if (this.canForceActiveState()) {
-            dataSet.put(IdentityConstants.STATE_FIELD_ID, new TextField(IdentityState.ACTIVE.name()));
+            dataSet.put(IdentityConstants.STATE_FIELD_ID, new TextField(IdentityState.ACTIVE.name().toLowerCase()));
         } else {
+            if (this.state != null && this.state.getRawValue() != null) {
+                this.state.setRawValue(this.state.getRawValue().toLowerCase());
+            }
             dataSet.put(IdentityConstants.STATE_FIELD_ID, this.state);
         }
         dataSet.put(IdentityConstants.EXPIRATION_DATE_FIELD_ID, this.expirationDateTime);
