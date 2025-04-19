@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.integration.plugins.service;
 
 import com.netgrif.application.engine.configuration.ApplicationContextProvider;
+import com.netgrif.application.engine.integration.plugins.exceptions.PluginDoesNotExistException;
 import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.auth.service.UserService;
@@ -102,20 +103,38 @@ public class PluginServiceImpl implements PluginService {
     }
 
     /**
-     * Registers provided plugin into repository. If the plugin already exists, it's activated.
+     * Registers provided plugin into repository
      *
-     * @param plugin - plugin to be registered or if already registered, then activated
-     * @return activation or registration string message is returned
+     * @param plugin - plugin to be registered
+     * @return registration string message is returned
      */
     @Override
-    public String registerOrActivate(Plugin plugin) throws PluginIsAlreadyActiveException {
+    public String register(Plugin plugin) {
+        Case pluginCase;
+        try {
+            pluginCase = createOrUpdatePluginCase(plugin, Optional.empty());
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+
+        pluginInjector.inject(pluginCase);
+
+        String responseMsg = String.format("Plugin with identifier \"%s\" was registered", getPluginIdentifier(pluginCase));
+        log.info(responseMsg);
+        return responseMsg;
+    }
+
+    /**
+     * Activates provided plugin.
+     *
+     * @param plugin - plugin to be activated
+     * @return activation  string message is returned
+     */
+    @Override
+    public String activate(Plugin plugin) throws PluginDoesNotExistException {
         Optional<Case> existingPluginOpt = findByIdentifier(plugin.getIdentifier());
         try {
-            if (existingPluginOpt.isPresent()) {
-                return activate(existingPluginOpt.get(), plugin);
-            } else {
-                return register(plugin);
-            }
+            return activate(existingPluginOpt.orElseThrow(() -> new PluginDoesNotExistException("Plugin with identifier [%s] cannot be found.".formatted(plugin.getIdentifier()))), plugin);
         } catch (TransitionNotExecutableException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
@@ -227,17 +246,6 @@ public class PluginServiceImpl implements PluginService {
         Page<Case> result = elasticCaseService.search(requestAsList, loggedUser, PageRequest.ofSize(1), Locale.getDefault(), false);
 
         return result.hasContent() ? Optional.of(result.getContent().getFirst()) : Optional.empty();
-    }
-
-    private String register(Plugin plugin) throws TransitionNotExecutableException, NoSuchAlgorithmException {
-        Case pluginCase = createOrUpdatePluginCase(plugin, Optional.empty());
-        pluginCase = doActivation(pluginCase);
-
-        pluginInjector.inject(pluginCase);
-
-        String responseMsg = String.format("Plugin with identifier \"%s\" was registered", getPluginIdentifier(pluginCase));
-        log.info(responseMsg);
-        return responseMsg;
     }
 
     private String activate(Case pluginCase, Plugin plugin) throws TransitionNotExecutableException,

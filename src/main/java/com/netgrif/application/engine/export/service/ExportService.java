@@ -273,7 +273,7 @@ public class ExportService implements IExportService {
                 fieldValue = String.join(";", ((TaskField) fieldData).getValue());
                 break;
             case USER:
-                fieldValue = ((UserFieldValue) fieldData).getEmail();
+                fieldValue = ((UserFieldValue) fieldData).getUsername();
                 break;
             case DATE:
                 fieldValue = ((LocalDate) fieldData).toString();

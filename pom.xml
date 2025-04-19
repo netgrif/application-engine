@@ -132,18 +132,12 @@
         <dependency>
             <groupId>com.netgrif</groupId>
             <artifactId>nae-user-common</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.netgrif</groupId>
-            <artifactId>nae-ce-user</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>provided</scope>
+            <version>0.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.netgrif</groupId>
             <artifactId>plugin-core</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.2.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
 
