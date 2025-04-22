@@ -15,7 +15,7 @@ import java.util.Map;
 @Document
 @EqualsAndHashCode(callSuper = true)
 public abstract class Role extends Imported {
-    // TODO 2058: release/8.0.0 indexed import id
+    // TODO: release/8.0.0 indexed import id
     @Id
     protected ObjectId id;
     protected Map<RoleEventType, RoleEvent> events;

@@ -15,7 +15,7 @@ import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.menu.MenuAndFilters
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
-import com.netgrif.application.engine.workflow.service.UserFilterSearchService
+import com.netgrif.application.engine.workflow.service.ActorFilterSearchService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IMenuImportExportService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -90,7 +90,7 @@ class MenuImportExportTest {
     DefaultFiltersRunner defaultFiltersRunner
 
     @Autowired
-    UserFilterSearchService userFilterSearchService
+    ActorFilterSearchService userFilterSearchService
 
     @Autowired
     ITaskService taskService

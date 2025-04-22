@@ -144,7 +144,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
     Scheduler scheduler
 
     @Autowired
-    IUserFilterSearchService filterSearchService
+    IActorFilterSearchService filterSearchService
 
     @Autowired
     IConfigurableMenuService configurableMenuService

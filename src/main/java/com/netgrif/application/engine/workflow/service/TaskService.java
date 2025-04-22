@@ -244,7 +244,6 @@ public class TaskService implements ITaskService {
         }
         Task task = taskOptional.get();
 
-        // todo 2058 should be on preauthorize
         if (task.getAssigneeId() == null) {
             throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any actor.");
         }

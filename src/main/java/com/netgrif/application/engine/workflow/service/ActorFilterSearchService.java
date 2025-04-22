@@ -5,7 +5,7 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSer
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.startup.FilterRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.service.interfaces.IUserFilterSearchService;
+import com.netgrif.application.engine.workflow.service.interfaces.IActorFilterSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-public class UserFilterSearchService implements IUserFilterSearchService {
+public class ActorFilterSearchService implements IActorFilterSearchService {
     // todo 2058 rename class
 
     @Autowired

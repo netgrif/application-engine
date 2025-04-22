@@ -15,7 +15,7 @@ import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.*
 import com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList
-import com.netgrif.application.engine.workflow.service.UserFilterSearchService
+import com.netgrif.application.engine.workflow.service.ActorFilterSearchService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
@@ -87,7 +87,7 @@ class FilterImportExportTest {
     DefaultFiltersRunner defaultFiltersRunner
 
     @Autowired
-    UserFilterSearchService userFilterSearchService
+    ActorFilterSearchService userFilterSearchService
 
     @Autowired
     ITaskService taskService

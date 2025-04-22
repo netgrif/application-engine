@@ -143,7 +143,6 @@
 				</dataRef>
 			</item>
 		</flex>
-<!--		todo 2058 reload session on finish?-->
 	</transition>
 	<place>
 		<id>p1</id>
