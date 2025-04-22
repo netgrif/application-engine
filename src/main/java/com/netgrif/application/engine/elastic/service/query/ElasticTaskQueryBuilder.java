@@ -41,7 +41,8 @@ public class ElasticTaskQueryBuilder implements ElasticQueryBuilder {
      * todo javadoc
      * */
     @Override
-    public <T> BoolQueryBuilder buildSingleQuery(T request, Locale locale, @Nullable LoggedIdentity identity) {
+    public <T> BoolQueryBuilder buildSingleQuery(T request, Locale locale, @Nullable LoggedIdentity identity,
+                                                 @Nullable BoolQueryBuilder permissionQuery) {
         if (request == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
@@ -58,6 +59,10 @@ public class ElasticTaskQueryBuilder implements ElasticQueryBuilder {
         buildTagsQuery(typedRequest, query);
         buildStringQuery(typedRequest, query, identity);
         boolean resultAlwaysEmpty = buildGroupQuery(typedRequest, locale, query);
+
+        if (permissionQuery != null) {
+            query.filter(permissionQuery);
+        }
 
         return resultAlwaysEmpty ? null : query;
     }

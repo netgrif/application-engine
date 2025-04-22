@@ -7,5 +7,6 @@ import javax.annotation.Nullable;
 import java.util.Locale;
 
 public interface ElasticQueryBuilder {
-    <T> BoolQueryBuilder buildSingleQuery(T request, Locale locale, @Nullable LoggedIdentity identity);
+    <T> BoolQueryBuilder buildSingleQuery(T request, Locale locale, @Nullable LoggedIdentity identity,
+                                          @Nullable BoolQueryBuilder permissionQuery);
 }

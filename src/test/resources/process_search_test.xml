@@ -1,16 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>processSearchTest</id>
-    <initials>PST</initials>
+    <version>1.0.0</version>
     <title>Process Search Test</title>
+    <defaultRole>false</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">PST</property>
+        <property key="test">test</property>
+    </properties>
     <caseName>Process Search Case Name</caseName>
-    <transitionRole>false</transitionRole>
-    <tags>
-        <tag key="test">test</tag>
-    </tags>
-    <!-- TRANSACTIONS -->
-    <!-- ROLES -->
     <role>
         <id>role1</id>
         <title>Role 1</title>
@@ -19,21 +17,16 @@
         <id>role2</id>
         <title>Role 2</title>
     </role>
-    <!-- DATA -->
-    <!-- I18NS -->
-    <!-- TRANSITIONS -->
     <transition>
-        <id>1</id>
+        <id>t1</id>
         <x>553</x>
         <y>304</y>
-        <label>Task 1</label>
+        <title>Task 1</title>
     </transition>
     <transition>
-        <id>2</id>
+        <id>t2</id>
         <x>653</x>
         <y>304</y>
-        <label>Task 2</label>
+        <title>Task 2</title>
     </transition>
-    <!-- PLACES -->
-    <!-- ARCS -->
-</document>
+</process>

@@ -53,6 +53,11 @@ public class ProcessRoleRepositoryImpl implements ProcessRoleRepository {
         return mongoTemplate.find(buildBasicQuery(), ProcessRole.class);
     }
 
+    @Override
+    public long count() {
+        return mongoTemplate.count(buildBasicQuery(), ProcessRole.class);
+    }
+
     private Query buildInQuery(String field, Collection<?> values) {
         return buildBasicQuery().addCriteria(Criteria.where(field).in(values));
     }

@@ -38,7 +38,6 @@ public class Process extends ProcessObject {
     private I18nString title;
     private String icon;
     private I18nExpression defaultCaseName;
-    // TODO 2058: release/8.0.0 - default + anonymous role, roleref
     private AccessPermissions<CasePermission> processRolePermissions;
     private AccessPermissions<CasePermission> caseRolePermissions;
     private Map<ProcessEventType, ProcessEvent> processEvents;

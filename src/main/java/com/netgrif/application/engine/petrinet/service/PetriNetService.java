@@ -476,7 +476,7 @@ public class PetriNetService implements IPetriNetService {
             this.addValueCriteria(query, queryTotal, Criteria.where("title.defaultValue").regex(criteriaClass.getTitle(), "i"));
         }
         if (criteriaClass.getInitials() != null) {
-            this.addValueCriteria(query, queryTotal, Criteria.where("initials").regex(criteriaClass.getInitials(), "i"));
+            this.addValueCriteria(query, queryTotal, Criteria.where("properties.initials").regex(criteriaClass.getInitials(), "i"));
         }
         if (criteriaClass.getDefaultCaseName() != null) {
             this.addValueCriteria(query, queryTotal, Criteria.where("defaultCaseName.defaultValue").regex(criteriaClass.getDefaultCaseName(), "i"));
@@ -492,22 +492,13 @@ public class PetriNetService implements IPetriNetService {
             this.addValueCriteria(query, queryTotal, Criteria.where("version").is(criteriaClass.getVersion()));
         }
         if (criteriaClass.getAuthor() != null) {
-            if (criteriaClass.getAuthor().getEmail() != null) {
-                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").is(criteriaClass.getAuthor().getEmail()));
-            }
-            if (criteriaClass.getAuthor().getCase().getId() != null) {
-                // todo 2058 overit ci funguje
-                this.addValueCriteria(query, queryTotal, Criteria.where("author.id").is(criteriaClass.getAuthor().getCase().getId()));
-            }
-            if (criteriaClass.getAuthor().getFullName() != null) {
-                this.addValueCriteria(query, queryTotal, Criteria.where("author.fullName").is(criteriaClass.getAuthor().getFullName()));
-            }
+            this.addValueCriteria(query, queryTotal, Criteria.where("authorId").is(criteriaClass.getAuthor().getCase().getStringId()));
         }
         if (criteriaClass.getNegativeViewProcessRoles() != null) {
             this.addValueCriteria(query, queryTotal, Criteria.where("negativeViewProcessRoles").in(criteriaClass.getNegativeViewProcessRoles()));
         }
         if (criteriaClass.getTags() != null) {
-            criteriaClass.getTags().entrySet().forEach(stringStringEntry -> this.addValueCriteria(query, queryTotal, Criteria.where("tags." + stringStringEntry.getKey()).is(stringStringEntry.getValue())));
+            criteriaClass.getTags().forEach((key, value) -> this.addValueCriteria(query, queryTotal, Criteria.where("properties." + key).is(value)));
         }
 
         query.with(pageable);

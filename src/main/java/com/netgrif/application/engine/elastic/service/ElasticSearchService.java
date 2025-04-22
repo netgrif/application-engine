@@ -25,7 +25,7 @@ public abstract class ElasticSearchService {
     protected <T> NativeSearchQuery buildQuery(List<T> requests, @Nullable LoggedIdentity identity, Pageable pageable,
                                          Locale locale, Boolean isIntersection, @Nullable BoolQueryBuilder permissionQuery) {
         List<BoolQueryBuilder> singleQueries = requests.stream()
-                .map(request -> queryBuilder.buildSingleQuery(request, locale, identity))
+                .map(request -> queryBuilder.buildSingleQuery(request, locale, identity, permissionQuery))
                 .collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
@@ -41,10 +41,6 @@ public abstract class ElasticSearchService {
 
         BinaryOperator<BoolQueryBuilder> reductionOperator = isIntersection ? BoolQueryBuilder::must : BoolQueryBuilder::should;
         BoolQueryBuilder query = singleQueries.stream().reduce(new BoolQueryBuilder(), reductionOperator);
-
-        if (permissionQuery != null) {
-            query.filter(permissionQuery);
-        }
 
         NativeSearchQueryBuilder builder = new NativeSearchQueryBuilder();
         return builder

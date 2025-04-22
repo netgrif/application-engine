@@ -1,5 +1,7 @@
 package com.netgrif.application.engine
 
+import com.netgrif.application.engine.authentication.domain.Identity
+import com.netgrif.application.engine.authentication.domain.LoggedIdentity
 import com.netgrif.application.engine.authorization.domain.repositories.RoleAssignmentRepository
 import com.netgrif.application.engine.authorization.domain.repositories.RoleRepository
 import com.netgrif.application.engine.authorization.service.RoleService
@@ -11,6 +13,8 @@ import com.netgrif.application.engine.startup.*
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 
 @Component
@@ -75,6 +79,17 @@ class TestHelper {
         superCreator.run()
         validationRunner.run()
         finisherRunner.run()
+    }
+
+    void login(Identity identity) {
+        LoggedIdentity loggedTest = identity.toSession();
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedTest,
+                loggedTest.getPassword(), loggedTest.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(token);
+    }
+
+    void logout() {
+        SecurityContextHolder.getContext().setAuthentication(null);
     }
 
     static InputStream stream(String resource) {

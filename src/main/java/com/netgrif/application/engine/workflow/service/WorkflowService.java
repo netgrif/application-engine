@@ -247,8 +247,8 @@ public class WorkflowService implements IWorkflowService {
         useCase.setAuthorId(actorId);
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(makeTitle.apply(useCase));
-        dataSetInitializer.populateDataSet(useCase, params);
         useCase = taskService.createTasks(useCase);
+        dataSetInitializer.populateDataSet(useCase, params);
         roleService.resolveCaseRolesOnCase(useCase, useCase.getProcess().getCaseRolePermissions(), false);
         useCase = save(useCase);
         // TODO: release/7.0.0 6.2.5
@@ -348,7 +348,7 @@ public class WorkflowService implements IWorkflowService {
         request.process = Collections.singletonList(netRequest);
         long countCases = elasticCaseService.count(Collections.singletonList(request), identityService.getLoggedIdentity(),
                 Locale.getDefault(), false);
-        log.info("[{}]: Actor {} is deleting {} cases of Petri net {} version {}", net.getStringId(),
+        log.info("[{}]: Actor [{}] is deleting {} cases of Petri net {} version {}", net.getStringId(),
                 identityService.getLoggedIdentity().getActiveActorId(), countCases, net.getIdentifier(),
                 net.getVersion().toString());
         long pageCount = (countCases / 100) + 1;

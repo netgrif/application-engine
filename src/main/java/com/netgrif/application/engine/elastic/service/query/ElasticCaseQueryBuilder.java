@@ -37,7 +37,8 @@ public class ElasticCaseQueryBuilder implements ElasticQueryBuilder {
      * todo javadoc
      * */
     @Override
-    public <T> BoolQueryBuilder buildSingleQuery(T request, Locale locale, @Nullable LoggedIdentity identity) {
+    public <T> BoolQueryBuilder buildSingleQuery(T request, Locale locale, @Nullable LoggedIdentity identity,
+                                                 @Nullable BoolQueryBuilder permissionQuery) {
         CaseSearchRequest typedRequest = (CaseSearchRequest) request;
         BoolQueryBuilder query = boolQuery();
 
@@ -54,6 +55,10 @@ public class ElasticCaseQueryBuilder implements ElasticQueryBuilder {
         boolean resultAlwaysEmpty = buildGroupQuery(typedRequest, locale, query);
 
         // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch
+
+        if (permissionQuery != null) {
+            query.filter(permissionQuery);
+        }
 
         return resultAlwaysEmpty ? null : query;
     }

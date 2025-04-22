@@ -18,4 +18,6 @@ public interface ProcessRoleRepository {
     ProcessRole findByImportId(String importId);
 
     List<ProcessRole> findAll();
+
+    long count();
 }
