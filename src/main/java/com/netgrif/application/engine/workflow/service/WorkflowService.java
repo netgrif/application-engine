@@ -247,8 +247,8 @@ public class WorkflowService implements IWorkflowService {
         useCase.setAuthorId(actorId);
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(makeTitle.apply(useCase));
-        useCase = taskService.createTasks(useCase);
         dataSetInitializer.populateDataSet(useCase, params);
+        useCase = taskService.createTasks(useCase);
         roleService.resolveCaseRolesOnCase(useCase, useCase.getProcess().getCaseRolePermissions(), false);
         useCase = save(useCase);
         // TODO: release/7.0.0 6.2.5

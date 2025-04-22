@@ -80,7 +80,7 @@ public class TaskAuthorizationService extends AuthorizationService implements IT
      * */
     @Override
     public boolean canCallSetData(String taskId) {
-        return taskId != null && isAssignee(taskId);
+        return taskId != null && (isAssignee(taskId) || isAdmin());
     }
 
     /**

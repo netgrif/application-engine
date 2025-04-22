@@ -35,8 +35,7 @@ public abstract class AuthorizationService {
             return false;
         }
 
-        ApplicationRole adminAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.ADMIN_APP_ROLE);
-        if (roleIds.contains(adminAppRole.getStringId())) {
+        if (isAdmin(roleIds)) {
             return true;
         }
 
@@ -48,6 +47,19 @@ public abstract class AuthorizationService {
         Optional<Boolean> permittedByProcessRoleOpt = isPermitted(roleIds, processRolePermissions, permission);
 
         return permittedByProcessRoleOpt.orElse(false);
+    }
+
+    protected boolean isAdmin() {
+        LoggedIdentity loggedIdentity = identityService.getLoggedIdentity();
+        if (loggedIdentity == null || loggedIdentity.getActiveActorId() == null) {
+            return false;
+        }
+        return isAdmin(roleAssignmentService.findAllRoleIdsByActorId(loggedIdentity.getActiveActorId()));
+    }
+
+    private boolean isAdmin(Set<String> roleIds) {
+        ApplicationRole adminAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.ADMIN_APP_ROLE);
+        return roleIds.contains(adminAppRole.getStringId());
     }
 
     /**
