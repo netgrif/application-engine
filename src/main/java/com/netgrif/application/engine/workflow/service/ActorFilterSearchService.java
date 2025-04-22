@@ -17,7 +17,6 @@ import java.util.List;
 
 @Service
 public class ActorFilterSearchService implements IActorFilterSearchService {
-    // todo 2058 rename class
 
     @Autowired
     private IElasticCaseService caseSearchService;

@@ -2,7 +2,6 @@ package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Identity;
-import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authorization.domain.*;
@@ -26,8 +25,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -89,7 +86,7 @@ class TaskAuthorizationServiceTest {
         testProcess = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/task_authorization_service_test.xml"),
                 VersionType.MAJOR, identityService.getLoggedSystemIdentity().getActiveActorId()).getNet();
 
-        login();
+        testHelper.login(testIdentity);
 
         testCase = importHelper.createCase("test", testProcess);
     }
@@ -127,7 +124,7 @@ class TaskAuthorizationServiceTest {
         assignAppRole(adminAppRole);
         assert authorizationService.canCallAssign(taskId);
 
-        logout();
+        testHelper.logout();
         assert !authorizationService.canCallAssign(taskId);
     }
 
@@ -166,7 +163,7 @@ class TaskAuthorizationServiceTest {
         assignAppRole(adminAppRole);
         assert authorizationService.canCallCancel(taskId);
 
-        logout();
+        testHelper.logout();
         assert !authorizationService.canCallCancel(taskId);
     }
 
@@ -202,7 +199,7 @@ class TaskAuthorizationServiceTest {
         assignAppRole(adminAppRole);
         assert authorizationService.canCallReassign(taskId);
 
-        logout();
+        testHelper.logout();
         assert !authorizationService.canCallReassign(taskId);
     }
 
@@ -241,7 +238,7 @@ class TaskAuthorizationServiceTest {
         assignAppRole(adminAppRole);
         assert authorizationService.canCallFinish(taskId);
 
-        logout();
+        testHelper.logout();
         assert !authorizationService.canCallFinish(taskId);
     }
 
@@ -266,7 +263,7 @@ class TaskAuthorizationServiceTest {
         assert authorizationService.canCallSetData(taskId);
 
         updateAssigneeOfTask(taskId, identityService.getActiveActorId());
-        logout();
+        testHelper.logout();
         assert !authorizationService.canCallSetData(taskId);
     }
 
@@ -319,7 +316,7 @@ class TaskAuthorizationServiceTest {
         assignAppRole(adminAppRole);
         assert authorizationService.canCallGetData(taskId);
 
-        logout();
+        testHelper.logout();
         assert !authorizationService.canCallGetData(taskId);
     }
 
@@ -355,16 +352,5 @@ class TaskAuthorizationServiceTest {
         assignment.setActorId(testIdentity.getMainActorId());
         assignment.setRoleId(role.getStringId());
         roleAssignmentRepository.save(assignment);
-    }
-
-    private void login() {
-        LoggedIdentity loggedTest = testIdentity.toSession();
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedTest,
-                loggedTest.getPassword(), loggedTest.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(token);
-    }
-
-    private void logout() {
-        SecurityContextHolder.getContext().setAuthentication(null);
     }
 }

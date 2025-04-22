@@ -72,7 +72,6 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
         if (net == null) {
             return null;
         }
-        // todo 2058 authorisation? must be admin?
         ElasticPetriNet elasticPetriNet = repository.findByStringId(net.getStringId());
         if (elasticPetriNet == null) {
             log.warn("[{}] PetriNet with id [{}] is not indexed.", net.getStringId(), net.getStringId());
