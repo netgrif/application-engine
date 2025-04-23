@@ -34,8 +34,8 @@ public class ElasticTaskSearchRequest extends TaskSearchRequest {
         if (request.containsKey("title") && request.get("title") instanceof List) {
             this.title = (List<String>) request.get("title");
         }
-        if (request.containsKey("user") && request.get("user") instanceof List) {
-            this.user = (List<String>) request.get("user");
+        if (request.containsKey("assigneeId") && request.get("assigneeId") instanceof List) {
+            this.assigneeId = (List<String>) request.get("assigneeId");
         }
         if (request.containsKey("process") && request.get("process") instanceof List) {
             List<String> processIdentifiers = (List<String>) request.get("process");
@@ -49,9 +49,6 @@ public class ElasticTaskSearchRequest extends TaskSearchRequest {
         }
         if (request.containsKey("group") && request.get("group") instanceof List) {
             this.group = (List<String>) request.get("group");
-        }
-        if (request.containsKey("users") && request.get("users") instanceof List) {
-            this.users = (List<String>) request.get("users");
         }
         if (request.containsKey("query") && request.get("query") instanceof String) {
             this.query = (String) request.get("query");

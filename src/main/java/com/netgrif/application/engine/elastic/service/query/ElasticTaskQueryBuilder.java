@@ -52,7 +52,7 @@ public class ElasticTaskQueryBuilder implements ElasticQueryBuilder {
         BoolQueryBuilder query = boolQuery();
         buildCaseQuery(typedRequest, query);
         buildTitleQuery(typedRequest, query);
-        buildUserQuery(typedRequest, query);
+        buildAssigneeQuery(typedRequest, query);
         buildProcessQuery(typedRequest, query);
         buildFullTextQuery(typedRequest, query);
         buildTransitionQuery(typedRequest, query);
@@ -163,6 +163,7 @@ public class ElasticTaskQueryBuilder implements ElasticQueryBuilder {
     }
 
     /**
+     * todo javadoc
      * Tasks assigned to user with id 1
      * {
      * "user": 1
@@ -170,18 +171,17 @@ public class ElasticTaskQueryBuilder implements ElasticQueryBuilder {
      * <p>
      * Tasks assigned to user with id 1 OR 2
      */
-    private void buildUserQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
-        // todo 2058
-        if (request.user == null || request.user.isEmpty()) {
+    private void buildAssigneeQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+        if (request.assigneeId == null || request.assigneeId.isEmpty()) {
             return;
         }
 
-        BoolQueryBuilder userQuery = boolQuery();
-        for (String user : request.user) {
-            userQuery.should(termQuery("userId", user));
+        BoolQueryBuilder assigneeQuery = boolQuery();
+        for (String assigneeId : request.assigneeId) {
+            assigneeQuery.should(termQuery("assigneeId", assigneeId));
         }
 
-        query.filter(userQuery);
+        query.filter(assigneeQuery);
     }
 
     /**

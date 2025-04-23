@@ -65,7 +65,7 @@ public class ElasticTask {
 
     private int priority;
 
-    private String userId;
+    private String assigneeId;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -118,7 +118,7 @@ public class ElasticTask {
         this.caseTitleSortable = this.caseTitle;
 //        if (task.getPriority() != null)
 //            this.priority = task.getPriority();
-//        this.userId = task.getUserId();
+        this.assigneeId = task.getAssigneeId();
         this.startDate = task.getLastAssigned();
         this.properties = new HashMap<>(task.getProperties());
     }
@@ -130,7 +130,7 @@ public class ElasticTask {
         this.caseTitle = task.getCaseTitle();
         this.caseTitleSortable = this.caseTitle;
         this.priority = task.getPriority();
-        this.userId = task.getUserId();
+        this.assigneeId = task.getAssigneeId();
         this.startDate = task.getStartDate();
         this.viewProcessRoles = task.getViewProcessRoles();
         this.positiveViewProcessRoles = task.getPositiveViewProcessRoles();
