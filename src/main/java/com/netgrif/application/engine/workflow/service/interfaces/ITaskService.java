@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.CreateTasksOutcome;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
@@ -23,7 +24,7 @@ public interface ITaskService {
 
     void reloadTasks(Case useCase);
 
-    Case createTasks(Case useCase);
+    CreateTasksOutcome createTasks(Case useCase);
 
     Task findOne(String taskId);
 

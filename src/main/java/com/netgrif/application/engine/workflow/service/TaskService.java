@@ -27,10 +27,7 @@ import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.validations.interfaces.IValidationService;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.State;
-import com.netgrif.application.engine.workflow.domain.Task;
-import com.netgrif.application.engine.workflow.domain.TaskNotFoundException;
+import com.netgrif.application.engine.workflow.domain.*;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.*;
@@ -481,11 +478,14 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Case createTasks(Case useCase) {
+    public CreateTasksOutcome createTasks(Case useCase) {
         Process net = useCase.getProcess();
+        List<Task> tasks = new ArrayList<>();
+
         net.getTransitions().values()
-                .forEach(transition -> createFromTransition(transition, useCase));
-        return workflowService.save(useCase);
+                .forEach(transition -> tasks.add(createFromTransition(transition, useCase)));
+
+        return new CreateTasksOutcome(workflowService.save(useCase), tasks);
     }
 
     boolean isExecutable(Transition transition, Case useCase) {
@@ -754,7 +754,6 @@ public class TaskService implements ITaskService {
             }
         }
         task.setProcessRolePermissions(new AccessPermissions<>(transition.getProcessRolePermissions()));
-        roleService.resolveCaseRolesOnTask(useCase, task, transition.getCaseRolePermissions(), true);
 
         Task savedTask = save(task);
         useCase.addTask(savedTask);

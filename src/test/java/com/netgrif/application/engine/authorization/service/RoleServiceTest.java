@@ -348,7 +348,7 @@ public class RoleServiceTest {
         transitionPermissions.addPermission(actorListField.getImportId(), TaskPermission.VIEW, true);
         transitionPermissions.addPermission(actorField.getImportId(), TaskPermission.VIEW, true);
 
-        roleService.resolveCaseRolesOnTask(useCase, task, transitionPermissions, false);
+        roleService.resolveCaseRolesOnTask(useCase, task, transitionPermissions, false, false);
 
         List<CaseRole> roles = roleService.findAllCaseRoles();
         assert roles.size() == 2;

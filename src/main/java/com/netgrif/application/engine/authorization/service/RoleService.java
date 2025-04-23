@@ -24,6 +24,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 import com.netgrif.application.engine.petrinet.domain.events.RoleEvent;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,11 +48,18 @@ public class RoleService implements IRoleService {
     private final IRoleAssignmentService roleAssignmentService;
     private final ActionRunner actionRunner;
     private final ApplicationEventPublisher eventPublisher;
+    private ITaskService taskService;
     private IWorkflowService workflowService;
     private IActorService actorService;
 
     private ProcessRole defaultProcessRole;
     private ProcessRole anonymousProcessRole;
+
+    @Lazy
+    @Autowired
+    public void setTaskService(ITaskService taskService) {
+        this.taskService = taskService;
+    }
 
     @Lazy
     @Autowired
@@ -286,8 +294,11 @@ public class RoleService implements IRoleService {
      * */
     @Override
     public void resolveCaseRolesOnTask(Case useCase, Task task, AccessPermissions<TaskPermission> caseRolePermissions,
-                                       boolean saveUseCase) {
+                                       boolean saveUseCase, boolean saveTask) {
         task.addCaseRolePermissions(createRolesAndBuildPermissions(useCase, caseRolePermissions, saveUseCase));
+        if (!caseRolePermissions.isEmpty() && saveTask) {
+            taskService.save(task);
+        }
     }
 
     /**

@@ -13,6 +13,7 @@ import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.I18nExpression;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Process;
+import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.ReferenceType;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
@@ -23,9 +24,7 @@ import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.security.service.EncryptionService;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.DataFieldValue;
-import com.netgrif.application.engine.workflow.domain.QCase;
+import com.netgrif.application.engine.workflow.domain.*;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
@@ -247,9 +246,14 @@ public class WorkflowService implements IWorkflowService {
         useCase.setAuthorId(actorId);
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(makeTitle.apply(useCase));
-        useCase = taskService.createTasks(useCase);
+        CreateTasksOutcome createTasksOutcome = taskService.createTasks(useCase);
+        useCase = createTasksOutcome.getUseCase();
         dataSetInitializer.populateDataSet(useCase, params);
         roleService.resolveCaseRolesOnCase(useCase, useCase.getProcess().getCaseRolePermissions(), false);
+        for (Task task : createTasksOutcome.getTasks()) {
+            Transition transition = petriNet.getTransition(task.getTransitionId());
+            roleService.resolveCaseRolesOnTask(useCase, task, transition.getCaseRolePermissions(), false, true);
+        }
         useCase = save(useCase);
         // TODO: release/7.0.0 6.2.5
         // TODO: release/8.0.0 useCase.setUriNodeId(petriNet.getUriNodeId());
