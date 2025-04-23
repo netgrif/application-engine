@@ -24,7 +24,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 public class RegistrationServiceTest {
 
     @Autowired
-    IRegistrationService service;
+    private IRegistrationService service;
 
     @Autowired
     private TestHelper testHelper;

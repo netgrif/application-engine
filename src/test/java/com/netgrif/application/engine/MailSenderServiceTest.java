@@ -53,6 +53,7 @@ public class MailSenderServiceTest {
     public void testSend() throws Exception {
         Identity identity = importHelper.createIdentity(IdentityParams.with()
                 .username(new TextField(RECIPIENT))
+                .password(new TextField("password"))
                 .build(), new ArrayList<>());
         service.sendRegistrationEmail(identity);
 

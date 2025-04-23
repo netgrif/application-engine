@@ -32,6 +32,7 @@ class MenuItemApiTest extends EngineTest {
     @BeforeEach
     void before() {
         super.before()
+        testHelper.login(superCreator.getSuperIdentity())
         importHelper.createNet("filter_api_test.xml")
     }
 
@@ -83,13 +84,13 @@ class MenuItemApiTest extends EngineTest {
         Thread.sleep(3000)
         def newUri = uriService.getOrCreate("/netgrif/test_new", UriContentType.DEFAULT)
         caze = setData(caze, new DataSet([
-                "uri"                   : newUri.uriPath,
-                "title"                 : "CHANGED FILTER",
-                "allowed_nets"          : "filter",
-                "query"                 : "processIdentifier:filter",
-                "type"                  : "Case",
-                "icon"                  : "",
-                "change_filter_and_menu": "0"
+                "uri"                   : new TextField(newUri.uriPath),
+                "title"                 : new TextField("CHANGED FILTER"),
+                "allowed_nets"          : new TextField("filter"),
+                "query"                 : new TextField("processIdentifier:filter"),
+//                "type"                  : "Case",
+                "icon"                  : new TextField(""),
+                "change_filter_and_menu": new ButtonField(rawValue: 0)
         ]))
         Case item = getMenuItem(caze)
         Case filter = getFilter(caze)
@@ -127,12 +128,12 @@ class MenuItemApiTest extends EngineTest {
 
         // move view
         Thread.sleep(2000)
-        apiCase = setData(apiCase, [
-                "move_dest_uri"   : "/netgrif2",
-                "move_item_id"    : viewId,
-                "move_folder_path": null,
-                "move_item"       : "0"
-        ])
+        apiCase = setData(apiCase, new DataSet([
+                "move_dest_uri"   : new TextField("/netgrif2"),
+                "move_item_id"    : new TextField(viewId),
+                "move_folder_path": new TextField(null),
+                "move_item"       : new ButtonField(rawValue: 0)
+        ]))
 
         Case viewCase = workflowService.findOne(viewId)
         Thread.sleep(2000)
@@ -147,22 +148,22 @@ class MenuItemApiTest extends EngineTest {
 
         // cyclic move
         assertThrows(IllegalArgumentException.class, () -> {
-            setData(apiCase, [
-                    "move_dest_uri"   : "/netgrif2/cyclic",
-                    "move_item_id"    : null,
-                    "move_folder_path": "/netgrif2",
-                    "move_item"       : "0"
-            ])
+            setData(apiCase, new DataSet([
+                    "move_dest_uri"   : new TextField("/netgrif2/cyclic"),
+                    "move_item_id"    : new TextField(null),
+                    "move_folder_path": new TextField("/netgrif2"),
+                    "move_item"       : new ButtonField(rawValue: 0)
+            ]))
         })
 
 
         // move folder
-        setData(apiCase, [
-                "move_dest_uri"   : "/netgrif/test3",
-                "move_item_id"    : null,
-                "move_folder_path": "/netgrif2",
-                "move_item"       : "0"
-        ])
+        setData(apiCase, new DataSet([
+                "move_dest_uri"   : new TextField("/netgrif/test3"),
+                "move_item_id"    : new TextField(null),
+                "move_folder_path": new TextField("/netgrif2"),
+                "move_item"       : new ButtonField(rawValue: 0)
+        ]))
         Thread.sleep(2000)
 
         folderCase = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.${MenuItemConstants.PREFERENCE_ITEM_FIELD_NODE_PATH.attributeId}.textValue:\"/netgrif/test3\"", PageRequest.of(0, 1))[0]
@@ -200,7 +201,7 @@ class MenuItemApiTest extends EngineTest {
         String newTitle = "New title"
         String newIdentifier = "new_identifier"
 
-        String duplicateTaskId = testFolder.tasks.find { it.transition == "duplicate_item" }.task
+        String duplicateTaskId = testFolder.getTaskStringId("duplicate_item")
         taskService.assignTask(duplicateTaskId)
 
         assertThrows(IllegalArgumentException.class, () -> {
@@ -222,8 +223,11 @@ class MenuItemApiTest extends EngineTest {
         testFolder = workflowService.save(testFolder)
         taskService.finishTask(duplicateTaskId)
 
-        Case duplicated = workflowService.searchOne(QCase.case$.processIdentifier.eq("preference_item").and(QCase.case$.dataSet.get(MenuItemConstants.PREFERENCE_ITEM_FIELD_IDENTIFIER.attributeId).value.eq(newIdentifier)))
-        assert duplicated != null
+        Thread.sleep(2000)
+        List<Case> duplicatedAsList = findCasesElastic(String.format("processIdentifier:preference_item AND dataSet.%s.fulltextValue:%s",
+                MenuItemConstants.PREFERENCE_ITEM_FIELD_IDENTIFIER.attributeId, newIdentifier), PageRequest.of(0, 1))
+        assert duplicatedAsList.size() == 1
+        Case duplicated = duplicatedAsList.get(0)
 
         UriNode leafNode = uriService.findByUri("/netgrif/" + newIdentifier)
 
@@ -243,7 +247,7 @@ class MenuItemApiTest extends EngineTest {
     List<Case> findCasesElastic(String query, Pageable pageable) {
         CaseSearchRequest request = new CaseSearchRequest()
         request.query = query
-        List<Case> result = elasticCaseService.search([request], userService.system.transformToLoggedUser(), pageable, LocaleContextHolder.locale, false).content
+        List<Case> result = elasticCaseService.search([request], superCreator.loggedSuper, pageable, LocaleContextHolder.locale, false).content
         return result
     }
 
@@ -302,7 +306,7 @@ class MenuItemApiTest extends EngineTest {
     }
 
     def setData(Case caze, DataSet dataSet) {
-        dataService.setData(caze.tasks["t1"].taskStringId, dataSet, superCreator.superIdentity)
+        dataService.setData(caze.tasks["t1"].taskStringId, dataSet, superCreator.loggedSuper.activeActorId)
         return workflowService.findOne(caze.stringId)
     }
 }

@@ -309,7 +309,7 @@ class RequestTest {
         netId = net.getNet().getStringId()
 
         List<ApplicationRole> applicationRoles = new ArrayList<>()
-        applicationRoles.add(roleService.findApplicationRoleByImportId("identity"))
+        applicationRoles.add(roleService.findApplicationRoleByImportId("default"))
         applicationRoles.add(roleService.findApplicationRoleByImportId("admin"))
         List<ProcessRole> processRoles = roleService.findAllProcessRolesByImportIds(["first", "second", "system", "user",
                                                                                      "registration"] as Set)

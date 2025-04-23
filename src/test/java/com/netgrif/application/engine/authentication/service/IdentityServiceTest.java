@@ -260,10 +260,6 @@ public class IdentityServiceTest {
 
     @Test
     void testEncodePasswordAndCreate() {
-        assertThrows(IllegalArgumentException.class, () -> identityService.encodePasswordAndCreate(IdentityParams.with()
-                .username(new TextField("username"))
-                .build()));
-
         String password = "password";
 
         Identity identity = identityService.encodePasswordAndCreate(IdentityParams.with()
@@ -291,7 +287,9 @@ public class IdentityServiceTest {
         assert identity.getLastname() == null;
 
         assertThrows(IllegalArgumentException.class, () -> identityService.update(identity, null));
-        assertThrows(IllegalArgumentException.class, () -> identityService.update(identity, IdentityParams.with().build()));
+        assertThrows(IllegalArgumentException.class, () -> identityService.update(identity, IdentityParams.with()
+                .username(new TextField(null))
+                .build()));
 
         String firstname = "firstname";
         String lastname = "lastname";
@@ -317,10 +315,6 @@ public class IdentityServiceTest {
         final Identity identity = doCreateIdentity(IdentityParams.with()
                 .username(new TextField("username"))
                 .build());
-
-        assertThrows(IllegalArgumentException.class, () -> identityService.encodePasswordAndUpdate(identity, IdentityParams.with()
-                .username(new TextField("username"))
-                .build()));
 
         String password = "password";
         Identity updatedIdentity = identityService.encodePasswordAndUpdate(identity, IdentityParams.with()

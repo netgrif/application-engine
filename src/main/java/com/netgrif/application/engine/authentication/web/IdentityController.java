@@ -60,7 +60,7 @@ public class IdentityController {
 
     @Operation(summary = "Get logged identity", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)
-    public IdentityResource getLoggedUser(Authentication auth) {
+    public IdentityResource getLoggedIdentity(Authentication auth) {
         LoggedIdentity loggedIdentity = (LoggedIdentity) auth.getPrincipal();
         return new IdentityResource(new IdentityDTO(loggedIdentity), "me");
     }

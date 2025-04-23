@@ -118,7 +118,12 @@ public class ActorService implements IActorService {
      * */
     @Override
     public Actor update(Actor actor, ActorParams params) {
-        throwIfInvalidParams(params);
+        if (params == null) {
+            throw new IllegalArgumentException("Please provide input values for actor");
+        }
+        if (params.getEmail() != null && isTextFieldValueEmpty(params.getEmail())) {
+            throw new IllegalArgumentException("Actor must have an email!");
+        }
         if (actor == null) {
             throw new IllegalArgumentException("Please provide actor to be updated");
         }
@@ -131,13 +136,17 @@ public class ActorService implements IActorService {
         if (params == null) {
             throw new IllegalArgumentException("Please provide input values for actor");
         }
-        if (isTextFieldValueEmpty(params.getEmail())) {
+        if (isTextFieldOrValueEmpty(params.getEmail())) {
             throw new IllegalArgumentException("Actor must have an email!");
         }
     }
 
+    private boolean isTextFieldOrValueEmpty(TextField field) {
+        return field == null || isTextFieldValueEmpty(field);
+    }
+
     private boolean isTextFieldValueEmpty(TextField field) {
-        return field == null || field.getRawValue() == null || field.getRawValue().trim().isEmpty();
+        return field.getRawValue() == null || field.getRawValue().trim().isEmpty();
     }
 
     private Optional<Actor> findOneByQuery(String query) {

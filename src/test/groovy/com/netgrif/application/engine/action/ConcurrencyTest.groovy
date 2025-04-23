@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.action
 
-
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -34,8 +34,12 @@ class ConcurrencyTest {
     @Autowired
     private SuperCreator superCreator
 
+    @Autowired
+    private TestHelper testHelper
+
     @Test
     void test() {
+        testHelper.login(superCreator.getSuperIdentity())
         def mainNet = importHelper.createNet("action_delegate_concurrency_test.xml")
         assert mainNet.get() != null
 
@@ -48,6 +52,7 @@ class ConcurrencyTest {
         cases.each { it ->
             String caseId = it.stringId
             threads << new Thread({
+                testHelper.login(superCreator.getSuperIdentity())
                 log.info("Running case $caseId")
                 importHelper.assignTaskToSuper("task", caseId)
             })

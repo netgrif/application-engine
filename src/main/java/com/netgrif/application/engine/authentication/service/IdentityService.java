@@ -318,7 +318,8 @@ public class IdentityService implements IIdentityService {
     private void encodePassword(IdentityParams params) {
         String password = params.getPassword();
         if (password == null) {
-            throw new IllegalArgumentException("Identity has no password");
+            params.setPassword(new TextField(null));
+            return;
         }
         params.setPassword(new TextField(passwordEncoder.encode(password)));
     }

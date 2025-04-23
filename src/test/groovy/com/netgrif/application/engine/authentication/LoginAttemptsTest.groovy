@@ -2,6 +2,7 @@ package com.netgrif.application.engine.authentication
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams
+import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.authorization.domain.ApplicationRole
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.configuration.properties.SecurityLimitsProperties
@@ -37,7 +38,7 @@ class LoginAttemptsTest {
     public static final String USER_EMAIL = "test@mail.sk"
     public static final String USER_PASSWORD = "password"
     public static final String USER_BAD_PASSWORD = "totok"
-    public static final String LOGIN_URL = "/api/user/me"
+    public static final String LOGIN_URL = "/api/identity/me"
 
     private MockMvc mvc
 
@@ -51,10 +52,13 @@ class LoginAttemptsTest {
     private ImportHelper importHelper
 
     @Autowired
+    private IIdentityService identityService
+
+    @Autowired
     private IRoleService roleService
 
     @Autowired
-    private SecurityLimitsProperties securityLimitsProperties;
+    private SecurityLimitsProperties securityLimitsProperties
 
     @BeforeEach
     void before() {
@@ -66,13 +70,15 @@ class LoginAttemptsTest {
 
         List<ApplicationRole> appRoles = new ArrayList<>()
         appRoles.add(roleService.findApplicationRoleByImportId("admin"))
-        appRoles.add(roleService.findApplicationRoleByImportId("identity"))
-        importHelper.createIdentity(IdentityParams.with()
+        appRoles.add(roleService.findApplicationRoleByImportId("default"))
+        identityService.createWithDefaultActor(IdentityParams.with()
                 .firstname(new TextField("Test"))
                 .lastname(new TextField("Integration"))
                 .username(new TextField(USER_EMAIL))
                 .password(new TextField(USER_PASSWORD))
-                .build(), appRoles)
+                .build())
+
+        Thread.sleep(2000)
     }
 
 
