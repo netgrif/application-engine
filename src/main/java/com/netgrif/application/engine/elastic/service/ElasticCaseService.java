@@ -89,10 +89,4 @@ public class ElasticCaseService implements IElasticCaseService {
             log.info("[{}]: All cases of Petri Net with id \"{}\" deleted", processId, processId);
         });
     }
-
-    @Override
-    public String findUriNodeId(Case aCase) {
-        // todo 2058 autorisation
-        return searchService.findUriNodeId(aCase);
-    }
 }

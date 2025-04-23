@@ -18,6 +18,4 @@ public interface IElasticCaseSearchService {
 
     long count(List<CaseSearchRequest> requests, LoggedIdentity identity, Locale locale, Boolean isIntersection,
                @Nullable BoolQueryBuilder permissionQuery);
-
-    String findUriNodeId(Case aCase);
 }

@@ -3,7 +3,6 @@ package com.netgrif.application.engine.elastic.service;
 import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
-import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSearchService;
 import com.netgrif.application.engine.elastic.service.query.ElasticCaseQueryBuilder;
@@ -34,16 +33,14 @@ import java.util.stream.Collectors;
 @Service
 public class ElasticCaseSearchService extends ElasticSearchService implements IElasticCaseSearchService {
 
-    private final ElasticCaseRepository repository;
     private final IWorkflowService workflowService;
     private final ElasticsearchRestTemplate template;
     private final ElasticsearchProperties properties;
 
-    public ElasticCaseSearchService(ElasticCaseRepository repository, @Lazy IWorkflowService workflowService,
-                                    ElasticsearchRestTemplate template, ElasticsearchProperties properties,
-                                    IPetriNetService petriNetService, IElasticCasePrioritySearch elasticCasePrioritySearch) {
+    public ElasticCaseSearchService(@Lazy IWorkflowService workflowService, ElasticsearchRestTemplate template,
+                                    ElasticsearchProperties properties, IPetriNetService petriNetService,
+                                    IElasticCasePrioritySearch elasticCasePrioritySearch) {
         super(new ElasticCaseQueryBuilder(petriNetService, elasticCasePrioritySearch));
-        this.repository = repository;
         this.workflowService = workflowService;
         this.template = template;
         this.properties = properties;
@@ -85,19 +82,5 @@ public class ElasticCaseSearchService extends ElasticSearchService implements IE
         NativeSearchQuery query = buildQuery(requests, identity, new FullPageRequest(), locale, isIntersection, permissionQuery);
 
         return query != null ? template.count(query, ElasticCase.class) : 0;
-    }
-
-    @Override
-    public String findUriNodeId(Case aCase) {
-        if (aCase == null) {
-            return null;
-        }
-        ElasticCase elasticCase = repository.findByStringId(aCase.getStringId());
-        if (elasticCase == null) {
-            log.warn("[{}] Case with id [{}] is not indexed.", aCase.getStringId(), aCase.getStringId());
-            return null;
-        }
-
-        return elasticCase.getUriNodeId();
     }
 }

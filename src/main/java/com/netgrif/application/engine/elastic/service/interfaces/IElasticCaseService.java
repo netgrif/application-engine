@@ -25,6 +25,4 @@ public interface IElasticCaseService {
                       Boolean isIntersection);
 
     long count(List<CaseSearchRequest> requests, LoggedIdentity identity, Locale locale, Boolean isIntersection);
-
-    String findUriNodeId(Case aCase);
 }
