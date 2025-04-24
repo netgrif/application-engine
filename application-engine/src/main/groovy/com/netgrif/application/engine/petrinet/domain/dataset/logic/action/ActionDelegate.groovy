@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.auth.service.GroupService
 import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.integration.modules.ModuleHolder
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.adapter.spring.workflow.domain.QCase
@@ -200,6 +201,8 @@ class ActionDelegate {
 
     PluginHolder Plugin
 
+    ModuleHolder Module
+
     /**
      * Reference of case and task in which current action is taking place.
      */
@@ -222,6 +225,7 @@ class ActionDelegate {
         this.outcomes = new ArrayList<>()
         this.Frontend = new FrontendActionOutcome(this.useCase, this.task, this.outcomes)
         this.Plugin = new PluginHolder()
+        this.Module = new ModuleHolder()
     }
 
     def initFieldsMap(Map<String, String> fieldIds) {
