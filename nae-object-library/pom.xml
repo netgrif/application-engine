@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.netgrif</groupId>
+        <artifactId>application-engine-parent</artifactId>
+        <version>7.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>nae-object-library</artifactId>
+    <packaging>jar</packaging>
+
+    <name>NETGRIF Application Engine Objects library</name>
+    <description>Library of common objects for all NAE ecosystem</description>
+    <url>https://engine.netgrif.com</url>
+
+    <licenses>
+        <license>
+            <name>NETGRIF Community License</name>
+            <url>https://netgrif.com/license</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <organization>
+        <name>NETGRIF, s.r.o.</name>
+        <url>https://netgrif.com</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <name>Netgrif</name>
+            <email>oss@netgrif.com</email>
+            <organization>NETGRIF, s.r.o.</organization>
+            <organizationUrl>https://netgrif.com</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/netgrif/application-engine.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/netgrif/application-engine.git</developerConnection>
+        <url>https://github.com/netgrif/application-engine</url>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/netgrif/application-engine/issues</url>
+    </issueManagement>
+
+    <properties>
+    </properties>
+
+    <dependencies>
+        <!-- Bson -->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>bson</artifactId>
+            <version>${bson.version}</version>
+        </dependency>
+        <!-- Jackson -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.18.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <version>${jackson.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- QRGen -->
+        <dependency>
+            <groupId>net.glxn.qrgen</groupId>
+            <artifactId>core</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <!-- Slf4j -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-to-slf4j</artifactId>
+            <version>2.21.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Jakarta API -->
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>${jakarta.validation.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>${jakarta.annotation.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-core</artifactId>
+            <version>${querydsl.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>xjc_pos</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <!-- The package of your generated sources -->
+                            <packageName>com.netgrif.application.engine.objects.importer.model</packageName>
+                            <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
+                            <sources>
+                                <source>src/main/resources/petriflow_schema.xsd</source>
+                            </sources>
+                            <generateEpisode>false</generateEpisode>
+                            <clearOutputDir>false</clearOutputDir>
+                            <noGeneratedHeaderComments>true</noGeneratedHeaderComments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>ossrh-publish</id>
+            <distributionManagement>
+                <repository>
+                    <id>ossrh</id>
+                    <name>Central Repository OSSRH</name>
+                    <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <name>Central Repository OSSRG Snapshots</name>
+                    <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>repackage</id>
+                                <goals>
+                                    <goal>repackage</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>true</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>

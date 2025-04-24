@@ -29,6 +29,16 @@ NAE provides additional components to make integration to your project/environme
 
 * License: [NETGRIF Community License](https://netgrif.com/license)
 
+## Repository Content
+
+| Name                    | Description | Dependencies |
+|-------------------------|-------------|--------------|
+| nae-object-library      |             |              |
+| nae-spring-core-adapter |             |              |
+| nae-user-common         |             |              |
+| nae-user-ce             |             |              |
+| engine                  |             |              |
+
 ## Components
 
 Netgrif Application Engine (or NAE for short) consists of several key components:
@@ -61,7 +71,7 @@ run and use the engine:
 |--------------------------------------------------------|---------|-----------------------------------------------------------------|:-----------------------------------------------------------------------|
 | [Java](https://openjdk.java.net/)                      | 21+     | Java Development Kit                                            | [OpenJDK 21](https://openjdk.java.net/install/)                        |
 | [Redis](https://redis.io/)                             | 7+      | Key-value in-memory database used for user sessions and caching | [Redis 7.2.5](https://redis.io/download)                               |
-| [MongoDB](https://www.mongodb.com/)                    | 8+      | Main document store database                                    | [MongoDB 8.0.3](hhttps://www.mongodb.com/docs/manual/installation/)        |
+| [MongoDB](https://www.mongodb.com/)                    | 8+      | Main document store database                                    | [MongoDB 8.0.3](hhttps://www.mongodb.com/docs/manual/installation/)    |
 | [Elasticsearch](https://www.elastic.co/elasticsearch/) | 8+      | Index database used for better application search               | [Elasticsearch 8.10.4](https://www.elastic.co/downloads/elasticsearch) |
 
 If you are planning on developing docker container based solution you can use our [docker-compose](docker-compose.yml)
