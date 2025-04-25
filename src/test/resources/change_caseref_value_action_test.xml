@@ -95,19 +95,6 @@
                     <flex-shrink>1</flex-shrink>
                 </properties>
             </item>
-            <item>
-                <dataRef>
-                    <id>addNew</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <order>0</order>
-                    <flex-grow>0</flex-grow>
-                    <flex-shrink>1</flex-shrink>
-                </properties>
-            </item>
         </flex>
     </transition>
 </process>

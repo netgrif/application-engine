@@ -22,10 +22,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class DashboardServiceTest {
 
     @Autowired
-    IWorkflowService workflowService
+    private IWorkflowService workflowService
 
     @Autowired
-    ImportHelper helper
+    private ImportHelper helper
 
     @Autowired
     private IPetriNetService petriNetService
@@ -42,10 +42,12 @@ class DashboardServiceTest {
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
+        testHelper.login(superCreator.superIdentity)
     }
 
     @Test
     void dashboardIntegerTest() {
+        // todo: release/8.0.0 file petriNets/all_data.xml is empty
         Process net1 = helper.createNet("all_data.xml", VersionType.MAJOR).get()
         Random random = new Random()
         (1..30).each {
@@ -57,6 +59,7 @@ class DashboardServiceTest {
 
     @Test
     void dashboardStringTest() {
+        // todo: release/8.0.0 file petriNets/all_data.xml is empty
         Process net1 = helper.createNet("all_data.xml", VersionType.MAJOR).get()
         Random random = new Random()
         (1..30).each {

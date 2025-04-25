@@ -41,10 +41,10 @@ class ChoiceFieldTest {
     private TestHelper testHelper
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreator superCreator
 
     private Closure<InputStream> stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
@@ -53,6 +53,7 @@ class ChoiceFieldTest {
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
+        testHelper.login(superCreator.superIdentity)
     }
 
     @Test

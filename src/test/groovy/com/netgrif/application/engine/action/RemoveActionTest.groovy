@@ -2,6 +2,7 @@ package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.authorization.domain.ProcessRole
@@ -114,13 +115,13 @@ class RemoveActionTest {
 
         this.petriNet = net.getNet()
 
-        importHelper.createIdentity(IdentityParams.with()
+        Identity identity = importHelper.createIdentity(IdentityParams.with()
                 .firstname(new TextField("Test"))
                 .lastname(new TextField("Integration"))
                 .password(new TextField(USER_PASSWORD))
                 .username(new TextField(USER_EMAIL))
                 .build(), new ArrayList<>())
-        auth = new UsernamePasswordAuthenticationToken(configuration.email, configuration.password)
+        auth = new UsernamePasswordAuthenticationToken(identity.toSession(), configuration.password)
         auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
     }
 

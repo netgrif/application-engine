@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.web
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams
 import com.netgrif.application.engine.authorization.domain.ApplicationRole
 import com.netgrif.application.engine.authorization.domain.Role
@@ -91,25 +92,25 @@ class PetriNetControllerTest {
                 .apply(springSecurity())
                 .build()
 
-        importHelper.createIdentity(IdentityParams.with()
+        Identity identity = importHelper.createIdentity(IdentityParams.with()
                 .firstname(new TextField("Role"))
                 .lastname(new TextField("Identity"))
                 .username(new TextField(USER_EMAIL))
                 .password(new TextField("password"))
                 .build(), new ArrayList<Role>())
 
-        userAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
+        userAuth = new UsernamePasswordAuthenticationToken(identity.toSession(), "password")
         userAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
         ApplicationRole adminAppRole = applicationRoleRunner.getAppRole(ApplicationRoleRunner.ADMIN_APP_ROLE)
-        importHelper.createIdentity(IdentityParams.with()
+        Identity adminIdentity = importHelper.createIdentity(IdentityParams.with()
                 .firstname(new TextField("Admin"))
                 .lastname(new TextField("Identity"))
                 .username(new TextField(ADMIN_EMAIL))
                 .password(new TextField("password"))
                 .build(), List.of(adminAppRole))
 
-        adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
+        adminAuth = new UsernamePasswordAuthenticationToken(adminIdentity.toSession(), "password")
         adminAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
     }
 

@@ -9,10 +9,10 @@
 	</properties>
 	<roleRef>
 		<id>netRole</id>
-		<caseLogic>
+		<permission>
 			<delete>true</delete>
 			<view>true</view>
-		</caseLogic>
+		</permission>
 	</roleRef>
 	<role>
 		<id>netRole</id>
@@ -23,15 +23,15 @@
 		<x>608</x>
 		<y>296</y>
 		<title/>
+		<roleRef>
+			<id>netRole</id>
+			<permission>
+				<view>true</view>
+				<reassign>true</reassign>
+			</permission>
+		</roleRef>
 		<flex>
 			<id>t1_flex</id>
 		</flex>
-		<roleRef>
-			<id>netRole</id>
-			<logic>
-				<view>true</view>
-				<reassign>true</reassign>
-			</logic>
-		</roleRef>
 	</transition>
 </process>

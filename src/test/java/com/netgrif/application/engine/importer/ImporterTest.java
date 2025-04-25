@@ -45,6 +45,7 @@ public class ImporterTest extends EngineTest {
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
         assert outcome.getNet() != null;
 
+        testHelper.login(superCreator.getSuperIdentity());
         CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), outcome.getNet().getTitle().getDefaultValue(),
                 "color", superCreator.getLoggedSuper().getActiveActorId());
 

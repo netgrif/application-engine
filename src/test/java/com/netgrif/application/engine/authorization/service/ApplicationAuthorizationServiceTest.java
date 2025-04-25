@@ -2,7 +2,6 @@ package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Identity;
-import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authorization.domain.ApplicationRoleAssignment;
@@ -15,8 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -53,7 +50,7 @@ public class ApplicationAuthorizationServiceTest {
                 .lastname(new TextField("lastname"))
                 .build());
 
-        login();
+        testHelper.login(testIdentity);
     }
 
     @Test
@@ -70,18 +67,7 @@ public class ApplicationAuthorizationServiceTest {
 
         assert authorizationService.hasApplicationRole(ApplicationRoleRunner.ADMIN_APP_ROLE);
 
-        logout();
+        testHelper.logout();
         assert !authorizationService.hasApplicationRole(ApplicationRoleRunner.ADMIN_APP_ROLE);
-    }
-
-    private void login() {
-        LoggedIdentity loggedTest = testIdentity.toSession();
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedTest,
-                loggedTest.getPassword(), loggedTest.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(token);
-    }
-
-    private void logout() {
-        SecurityContextHolder.getContext().setAuthentication(null);
     }
 }

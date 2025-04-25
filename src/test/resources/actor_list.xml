@@ -1,15 +1,15 @@
 <process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
-    <id>user_list</id>
+    <id>actor_list</id>
     <version>1.0.0</version>
-    <title>User list</title>
+    <title>Actor list</title>
     <defaultRole>false</defaultRole>
     <anonymousRole>false</anonymousRole>
     <properties>
-        <property key="initials">ULT</property>
+        <property key="initials">ALT</property>
     </properties>
-    <roleRef>
-        <id>users_1</id>
+    <roleRef type="case">
+        <id>actors_1</id>
         <permission>
             <create>false</create>
             <delete>true</delete>
@@ -21,7 +21,7 @@
             <actions phase="post">
                 <action id="action_0">
 					<![CDATA[
-                    createCase("user_list", "User List")
+                    createCase("actor_list", "Actor List")
                     ]]>
 				</action>
             </actions>
@@ -43,7 +43,7 @@
             <actions phase="post">
                 <action id="action_2">
 					<![CDATA[
-                    createCase("user_list", "Destruct")
+                    createCase("actor_list", "Destruct")
                     ]]>
 				</action>
             </actions>
@@ -54,8 +54,8 @@
         <title>Text</title>
         <init>text</init>
     </data>
-    <data type="userList">
-        <id>users_1</id>
+    <data type="actorList">
+        <id>actors_1</id>
         <title/>
     </data>
     <transition>
@@ -63,8 +63,8 @@
         <x>0</x>
         <y>0</y>
         <title>Title</title>
-        <roleRef>
-            <id>users_1</id>
+        <roleRef type="case">
+            <id>actors_1</id>
             <permission>
                 <perform>true</perform>
             </permission>

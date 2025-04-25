@@ -23,36 +23,39 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class DynamicChoicesTest {
 
     @Autowired
-    private TestHelper testHelper;
+    private TestHelper testHelper
 
     @Autowired
     private ImportHelper importHelper
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreator superCreator
 
     @Autowired
-    private IDataService dataService;
+    private IDataService dataService
 
     @Autowired
-    private ITaskService taskService;
+    private ITaskService taskService
 
     @Autowired
-    private CaseRepository caseRepository;
+    private CaseRepository caseRepository
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs();
+        testHelper.truncateDbs()
+        testHelper.login(superCreator.superIdentity)
     }
 
     @Test
     void testDynamicEnum() {
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_choices.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
+        // todo: release/8.0.0 choices does not exist anymore
+        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_choices.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
 
-        assert optNet.getNet() != null;
+        assert optNet.getNet() != null
         def net = optNet.getNet()
 
         def aCase = importHelper.createCase("Case", net)

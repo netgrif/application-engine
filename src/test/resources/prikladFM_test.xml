@@ -133,7 +133,7 @@
         <id>data8</id>
         <title>Miestnosť</title>
     </data>
-    <data type="user">
+    <data type="actor">
         <id>data9</id>
         <title>Odovzdávajúci</title>
         <options>
@@ -148,15 +148,15 @@
         <title>Zaevidovanie UJ</title>
         <roleRef>
             <id>role1</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
         <roleRef>
             <id>role3</id>
-            <logic>
+            <permission>
                 <reassign>true</reassign>
-            </logic>
+            </permission>
         </roleRef>
         <flex>
             <id>t1_flex</id>
@@ -345,9 +345,9 @@
         <title>Návrh miesta a termínu odovzdania</title>
         <roleRef>
             <id>role1</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -357,9 +357,9 @@
         <title>Požiadavka na scan UJ</title>
         <roleRef>
             <id>role1</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -369,9 +369,9 @@
         <title>Zaslanie scanu UJ</title>
         <roleRef>
             <id>role2</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -381,9 +381,9 @@
         <title>Vrátenie UJ</title>
         <roleRef>
             <id>role1</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -393,9 +393,9 @@
         <title>Data UJ</title>
         <roleRef>
             <id>role2</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
         <flex>
             <id>t181_flex</id>
@@ -624,9 +624,9 @@
         <title>Vypožičanie UJ</title>
         <roleRef>
             <id>role1</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
         <flex>
             <id>t19_flex</id>
@@ -695,9 +695,9 @@
         <title>Odovzdanie UJ do RS-FMS</title>
         <roleRef>
             <id>role1</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -707,9 +707,9 @@
         <title>Potvrdenie terminu</title>
         <roleRef>
             <id>role2</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -719,9 +719,9 @@
         <title>Prve zaevidovanie UJ</title>
         <roleRef>
             <id>role2</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -731,9 +731,9 @@
         <title>Upresnenie miesta a termínu odovzdania</title>
         <roleRef>
             <id>role2</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -743,9 +743,9 @@
         <title>Upresnenie miesta a termínu odovzdania</title>
         <roleRef>
             <id>role1</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -755,9 +755,9 @@
         <title>Odovzdanie</title>
         <roleRef>
             <id>role1</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -767,9 +767,9 @@
         <title>Zaevidovanie UJ</title>
         <roleRef>
             <id>role2</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -779,9 +779,9 @@
         <title>Riešenie spornej veci</title>
         <roleRef>
             <id>role2</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -791,9 +791,9 @@
         <title>Riešenie spornej veci</title>
         <roleRef>
             <id>role1</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -803,9 +803,9 @@
         <title>Požiadavka na vypožičanie</title>
         <roleRef>
             <id>role1</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -815,9 +815,9 @@
         <title>Odovzdanie vypožičanej UJ</title>
         <roleRef>
             <id>role2</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -827,9 +827,9 @@
         <title>Skartácia</title>
         <roleRef>
             <id>role2</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -839,9 +839,9 @@
         <title>Prebratie požičanej UJ</title>
         <roleRef>
             <id>role1</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -851,9 +851,9 @@
         <title>Vrátenie požičanej UJ</title>
         <roleRef>
             <id>role1</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <transition>
@@ -863,9 +863,9 @@
         <title>Založenie vrátenej UJ</title>
         <roleRef>
             <id>role2</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <place>

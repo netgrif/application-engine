@@ -37,15 +37,13 @@ class ArcReferenceTest {
 
     @Test
     void testReference() {
-        def net = importer.importPetriNet(stream(NET_FILE)).get()
-
-        assert net
+        assert importer.importPetriNet(stream(NET_FILE)).process
     }
 
     @Test
     void testInvalidReference() {
         assertThrows(IllegalArgumentException.class, () -> {
-            importer.importPetriNet(stream(NET_INVALID_FILE)).get()
+            importer.importPetriNet(stream(NET_INVALID_FILE))
         });
     }
 }

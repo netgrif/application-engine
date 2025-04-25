@@ -77,6 +77,7 @@ class ElasticTaskTest {
         assert optional.getNet() != null
 
         def net = optional.getNet()
+        testHelper.login(superCreator.superIdentity)
         10.times {
             helper.createCase("Case $it", net)
         }
@@ -95,7 +96,7 @@ class ElasticTaskTest {
         ElasticTask result = resultFuture.get()
 
         assert result != null
-        assert result.getTitle().equals("Test")
+        assert result.getTitle() == "Test"
 
         ElasticTask resultFromDB = elasticTaskRepository.findByTaskId("TestTask")
         assert resultFromDB.getTitle() == "Test"
@@ -106,7 +107,7 @@ class ElasticTaskTest {
         ElasticTask result2 = resultFuture2.get()
 
         assert result2 != null
-        assert result2.getTitle().equals("Test2")
+        assert result2.getTitle() == "Test2"
 
         task.setTitle("Test3")
 
@@ -114,7 +115,7 @@ class ElasticTaskTest {
         ElasticTask result3 = resultFuture3.get()
 
         assert result3 != null
-        assert result3.getTitle().equals("Test3")
+        assert result3.getTitle() == "Test3"
     }
 
     @Test
@@ -160,7 +161,7 @@ class ElasticTaskTest {
                     Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(taskParallel)
                     ElasticTask result = resultFuture.get()
                     assert result != null
-                    assert result.getTitle().equals("START" + index)
+                    assert result.getTitle() == "START" + index
                 } catch (Exception e) {
                     e.printStackTrace()
                 } finally {
@@ -202,7 +203,7 @@ class ElasticTaskTest {
                     Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(taskParallel)
                     ElasticTask result = resultFuture.get()
                     assert result != null
-                    assert result.getTitle().equals("START" + index)
+                    assert result.getTitle() == "START" + index
                 } catch (Exception e) {
                     e.printStackTrace()
                 } finally {
@@ -218,7 +219,7 @@ class ElasticTaskTest {
         Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(task) as CompletableFuture<ElasticTask>
         ElasticTask result = resultFuture.get()
         assert result != null
-        assert result.getTitle().equals(title)
+        assert result.getTitle() == title
     }
 
 
@@ -244,7 +245,7 @@ class ElasticTaskTest {
                     Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(taskParallel)
                     ElasticTask result = resultFuture.get()
                     assert result != null
-                    assert result.getTitle().equals("TestTask"+ index)
+                    assert result.getTitle() == "TestTask" + index
                 } catch (Exception e) {
                     e.printStackTrace()
                 } finally {
@@ -268,7 +269,7 @@ class ElasticTaskTest {
         Future<ElasticTask> resultFuture = elasticTaskService.scheduleTaskIndexing(task) as CompletableFuture<ElasticTask>
         ElasticTask result = resultFuture.get()
         assert result != null
-        assert result.getTitle().equals(title)
+        assert result.getTitle() == title
     }
 
 

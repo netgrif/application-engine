@@ -190,13 +190,13 @@
         <init>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vitae magna in libero semper
             vulputate ut eu sapien. Phasellus vel.</init>
     </data>
-    <data type="user" immediate="true">
-        <id>user</id>
-        <title>User</title>
+    <data type="actor" immediate="true">
+        <id>actor</id>
+        <title>Actor</title>
     </data>
-    <data type="userList" immediate="true">
-        <id>userList</id>
-        <title>User list</title>
+    <data type="actorList" immediate="true">
+        <id>actorList</id>
+        <title>Actor list</title>
     </data>
     <i18n locale="sk">
         <i18nString id="alice">Alica</i18nString>
@@ -319,7 +319,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>user</id>
+                    <id>actor</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>
@@ -465,7 +465,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>user</id>
+                    <id>actor</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>
@@ -560,7 +560,7 @@
                                             "felix": optionF
                                     ]
                                 }
-                                change enumMap value {
+                                change enumeration_map_changed value {
                                     "eve"
                                 }
                                 change multichoice_map_changed options {
@@ -570,7 +570,7 @@
                                             "felix": optionF
                                     ]
                                 }
-                                change multiMap value {
+                                change multichoice_map_changed value {
                                     ["eve", "felix"] as Set
                                 }
                                 ]]>

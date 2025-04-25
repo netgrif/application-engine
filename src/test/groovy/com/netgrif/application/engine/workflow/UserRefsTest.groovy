@@ -68,7 +68,9 @@ class UserRefsTest {
 
     @BeforeEach
     void before() {
+        // todo release/8.0.0 actorList is already tested in RoleServiceTest
         helper.truncateDbs()
+        helper.login(superCreator.superIdentity)
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/userrefs_test.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getNet()
         assert net
@@ -82,7 +84,7 @@ class UserRefsTest {
             String actorId = identity.toSession().activeActorId
             String taskId = _case.getTaskStringId("t1")
             dataService.setData(taskId, new DataSet([
-                    "user_list_1": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(actorId)]))
+                    "actor_list_1": new ActorListField(rawValue: new ActorListFieldValue([dataService.makeActorFieldValue(actorId)]))
             ] as Map<String, Field<?>>), superCreator.getLoggedSuper().activeActorId).getCase()
             actorIds.add(actorId)
         }

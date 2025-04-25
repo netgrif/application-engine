@@ -55,11 +55,13 @@ class WorkflowServiceTest {
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
+        testHelper.login(superCreator.superIdentity)
     }
 
     @Test
     void testFindOneImmediateData() {
-        def testNet = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
+        def testNet = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR,
+                superCreator.getLoggedSuper().getActiveActorId())
         assert testNet.getNet() != null
         Case aCase = importHelper.createCase("Case 1", testNet.getNet())
 

@@ -53,6 +53,8 @@ class TaskRefInitTest {
         autoTrigger = petriNetService.importPetriNet(new FileInputStream("src/test/resources/autotrigger_taskref.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId).getNet()
         assert net != null
+
+        testHelper.login(superCreator.superIdentity)
     }
 
     @Test

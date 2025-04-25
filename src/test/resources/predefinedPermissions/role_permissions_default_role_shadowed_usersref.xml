@@ -7,15 +7,15 @@
 	<properties>
 		<property key="initials">PTD</property>
 	</properties>
-	<userRef>
-		<id>userList</id>
-		<caseLogic>
+	<roleRef type="case">
+		<id>actorList</id>
+		<permission>
 			<delete>true</delete>
 			<view>true</view>
-		</caseLogic>
-	</userRef>
-	<data type="userList">
-		<id>userList</id>
+		</permission>
+	</roleRef>
+	<data type="actorList">
+		<id>actorList</id>
 		<title/>
 	</data>
 	<transition>
@@ -23,15 +23,15 @@
 		<x>608</x>
 		<y>296</y>
 		<title/>
+		<roleRef>
+			<id>actorList</id>
+			<permission>
+				<view>true</view>
+				<reassign>true</reassign>
+			</permission>
+		</roleRef>
 		<flex>
 			<id>t1_flex</id>
 		</flex>
-		<roleRef>
-			<id>userList</id>
-			<logic>
-				<view>true</view>
-				<reassign>true</reassign>
-			</logic>
-		</roleRef>
 	</transition>
 </process>

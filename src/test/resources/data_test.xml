@@ -92,10 +92,10 @@
         <id>emptyTaskRef</id>
         <title>Empty task ref</title>
     </data>
-    <data type="userList">
-        <id>emptyUserList</id>
-        <title>Empty user list</title>
-        <desc>User list description</desc>
+    <data type="actorList">
+        <id>emptyActorList</id>
+        <title>Empty actor list</title>
+        <desc>Actor list description</desc>
     </data>
     <data type="enumeration">
         <id>enumeration</id>
@@ -152,7 +152,7 @@
             <option key="multichoice2">multichoice2</option>
             <option key="multichoice3">multichoice3</option>
         </options>
-        <init>multichoice, multichoice2</init>
+        <init>multichoice,multichoice2</init>
     </data>
     <data type="number">
         <id>number</id>
@@ -184,11 +184,11 @@
         </validations>
         <init>text</init>
     </data>
-    <data type="user">
-        <id>user</id>
-        <title>User</title>
-        <placeholder>User field placeholder</placeholder>
-        <desc>User field description</desc>
+    <data type="actor">
+        <id>actor</id>
+        <title>Actor</title>
+        <placeholder>Actor field placeholder</placeholder>
+        <desc>Actor field description</desc>
     </data>
     <transition>
         <id>t1</id>
@@ -290,7 +290,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>user</id>
+                    <id>actor</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>
@@ -329,7 +329,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>emptyUserList</id>
+                    <id>emptyActorList</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>

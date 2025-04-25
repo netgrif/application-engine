@@ -26,12 +26,12 @@
         <title>Number</title>
     </data>
     <transition>
-        <id>1</id>
+        <id>t1</id>
         <x>0</x>
         <y>0</y>
         <title>Test</title>
         <flex>
-            <id>1_flex</id>
+            <id>t1_flex</id>
         </flex>
     </transition>
 </process>

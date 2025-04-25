@@ -10,15 +10,15 @@
     </properties>
     <roleRef>
         <id>view_neg_role</id>
-        <caseLogic>
+        <permission>
             <view>false</view>
-        </caseLogic>
+        </permission>
     </roleRef>
     <roleRef>
         <id>view_pos_role</id>
-        <caseLogic>
+        <permission>
             <view>true</view>
-        </caseLogic>
+        </permission>
     </roleRef>
     <role>
         <id>view_neg_role</id>
@@ -44,15 +44,15 @@
         <title>Transition</title>
         <roleRef>
             <id>view_neg_role</id>
-            <logic>
+            <permission>
                 <view>false</view>
-            </logic>
+            </permission>
         </roleRef>
         <roleRef>
             <id>view_pos_role</id>
-            <logic>
+            <permission>
                 <view>true</view>
-            </logic>
+            </permission>
         </roleRef>
         <flex>
             <id>t1_flex</id>

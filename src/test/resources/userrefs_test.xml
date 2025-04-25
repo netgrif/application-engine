@@ -7,12 +7,12 @@
     <properties>
         <property key="initials">TSM</property>
     </properties>
-    <userRef>
-        <id>user_list_1</id>
+    <roleRef type="case">
+        <id>actor_list_1</id>
         <permission>
             <view>true</view>
         </permission>
-    </userRef>
+    </roleRef>
     <processEvents/>
     <caseEvents/>
     <role>
@@ -39,19 +39,32 @@
         <id>remove</id>
         <title>Remove from user ref</title>
     </data>
-    <data type="userList">
-        <id>user_list_1</id>
-        <title>User list 1</title>
+    <data type="actorList">
+        <id>actor_list_1</id>
+        <title>ACtor list 1</title>
     </data>
-    <data type="userList">
-        <id>user_list_2</id>
-        <title>User list 2</title>
+    <data type="actorList">
+        <id>actor_list_2</id>
+        <title>Actor list 2</title>
     </data>
     <transition>
         <id>t1</id>
         <x>380</x>
         <y>260</y>
         <title>Initialization</title>
+        <roleRef>
+            <id>enabledTester</id>
+            <permission>
+                <perform>true</perform>
+                <view>true</view>
+            </permission>
+        </roleRef>
+        <roleRef>
+            <id>actor_list_1</id>
+            <permission>
+                <view>true</view>
+            </permission>
+        </roleRef>
         <flex>
             <id>t1_flex</id>
             <item>
@@ -114,19 +127,6 @@
                 </properties>
             </item>
         </flex>
-        <roleRef>
-            <id>enabledTester</id>
-            <permission>
-                <view>true</view>
-                <perform>true</perform>
-            </permission>
-        </roleRef>
-        <roleRef>
-            <id>user_list_1</id>
-            <permission>
-                <view>true</view>
-            </permission>
-        </roleRef>
     </transition>
     <transition>
         <id>t2</id>

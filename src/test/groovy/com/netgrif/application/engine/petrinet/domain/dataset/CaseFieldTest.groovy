@@ -59,6 +59,7 @@ class CaseFieldTest {
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
+        testHelper.login(superCreator.superIdentity)
     }
 
     @Test

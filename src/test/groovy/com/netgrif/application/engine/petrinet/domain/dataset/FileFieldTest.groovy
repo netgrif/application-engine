@@ -102,16 +102,13 @@ class FileFieldTest {
     void downloadFileByCase() {
         Process net = getNet()
 
-        Optional<Identity> identityOpt = identityService.findByUsername(configuration.email)
-        assert identityOpt.isPresent()
-
         Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black",
-                identityOpt.get().toSession().activeActorId).getCase()
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), identityOpt.get().toSession())
+                superCreator.loggedSuper.activeActorId).getCase()
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), superCreator.loggedSuper)
 
         mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file")
                 .param("fieldId", FIELD_ID)
-                .with(httpBasic(configuration.email, configuration.password)))
+                .with(httpBasic(superCreator.superIdentity.username, configuration.password)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))
@@ -123,16 +120,13 @@ class FileFieldTest {
     void downloadFileByTask() {
         Process net = getNet()
 
-        Optional<Identity> identityOpt = identityService.findByUsername(configuration.email)
-        assert identityOpt.isPresent()
-
         Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black",
-                identityOpt.get().toSession().activeActorId).getCase()
-        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), identityOpt.get().toSession())
+                superCreator.loggedSuper.activeActorId).getCase()
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), superCreator.loggedSuper)
 
         mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file")
                 .param("fieldId", FIELD_ID)
-                .with(httpBasic(configuration.email, configuration.password)))
+                .with(httpBasic(superCreator.superIdentity.username, configuration.password)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))

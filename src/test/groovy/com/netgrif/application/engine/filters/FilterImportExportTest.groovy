@@ -13,6 +13,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.startup.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.*
 import com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList
 import com.netgrif.application.engine.workflow.service.ActorFilterSearchService
@@ -69,31 +70,34 @@ class FilterImportExportTest {
     private static final String FILTER_FIELD = "filter"
 
     @Autowired
-    IFilterImportExportService importExportService
+    private IFilterImportExportService importExportService
 
     @Autowired
-    FilterRunner filterRunner
+    private FilterRunner filterRunner
 
     @Autowired
-    TestHelper testHelper
+    private TestHelper testHelper
 
     @Autowired
-    IWorkflowService workflowService
+    private IWorkflowService workflowService
 
     @Autowired
-    ImportHelper importHelper
+    private ImportHelper importHelper
 
     @Autowired
-    DefaultFiltersRunner defaultFiltersRunner
+    private DefaultFiltersRunner defaultFiltersRunner
 
     @Autowired
-    ActorFilterSearchService userFilterSearchService
+    private ActorFilterSearchService userFilterSearchService
 
     @Autowired
-    ITaskService taskService
+    private ITaskService taskService
 
     @Autowired
     private IDataService dataService
+
+    @Autowired
+    private SuperCreator superCreator
 
     private Authentication userAuth
     private Identity dummyIdentity
@@ -104,6 +108,7 @@ class FilterImportExportTest {
     void setup() {
         this.testHelper.truncateDbs()
         this.defaultFiltersRunner.run()
+        testHelper.login(superCreator.superIdentity)
         createTestFilter()
         dummyIdentity = createDummyIdentity()
         userAuth = new UsernamePasswordAuthenticationToken(createDummyIdentity().toSession(), DUMMY_USER_PASSWORD)
@@ -115,12 +120,13 @@ class FilterImportExportTest {
         assert exportNet.isPresent()
 
         importCase = this.workflowService.searchOne(
-                QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER).and(QCase.case$.authorId.eq(dummyIdentity.stringId))
+                QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER) & QCase.case$.authorId.eq(dummyIdentity.mainActorId)
         )
+        assert importCase != null // todo 2058 fails because identityService doesnt create cases
+
         exportCase = this.workflowService.searchOne(
-                QCase.case$.processIdentifier.eq(EXPORT_NET_IDENTIFIER).and(QCase.case$.authorId.eq(dummyIdentity.stringId))
+                QCase.case$.processIdentifier.eq(EXPORT_NET_IDENTIFIER) & QCase.case$.authorId.eq(dummyIdentity.mainActorId)
         )
-        assert importCase != null
         assert exportCase != null
     }
 
@@ -151,7 +157,7 @@ class FilterImportExportTest {
                     (NEW_TITLE_FIELD) : new TextField(rawValue: this.workflowService.findOne(filterTask.caseId).title + " new")
             ] as Map<String, Field<?>>), dummyIdentity.toSession().activeActorId)
         })
-        Task importTask = this.taskService.searchOne(QTask.task.caseId.eq(importCase.stringId).and(QTask.task.transitionId.eq("importFilter")))
+        Task importTask = this.taskService.searchOne(QTask.task.caseId.eq(importCase.stringId) & QTask.task.transitionId.eq("importFilter"))
         this.dataService.setData(importTask, new DataSet([
                 (IMPORTED_FILTERS_FIELD): new TaskField(rawValue: importedTasksIds)
         ] as Map<String, Field<?>>), dummyIdentity.toSession().activeActorId)

@@ -232,6 +232,7 @@ public class RoleService implements IRoleService {
         if (role == null) {
             return null;
         }
+        log.info("saving: {}", role);
         return repository.save(role);
     }
 
@@ -404,7 +405,10 @@ public class RoleService implements IRoleService {
         AccessPermissions<T> resultPermissions = new AccessPermissions<>();
 
         actorRefPermissions.forEach((actorListId, permissions) -> {
-            CaseRole caseRole = new CaseRole(actorListId, useCase.getStringId());
+            CaseRole caseRole = caseRoleRepository.findByCaseIdAndImportId(useCase.getStringId(), actorListId);
+            if (caseRole == null) {
+                caseRole = new CaseRole(actorListId, useCase.getStringId());
+            }
             Field<?> actorListField = useCase.getDataSet().getFields().get(actorListId);
             if (actorListField != null) {
                 ((FieldWithAllowedRoles<?>) actorListField).getCaseRoleIds().add(caseRole.getStringId());

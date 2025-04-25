@@ -153,8 +153,8 @@ public class ActorService implements IActorService {
         CaseSearchRequest request = CaseSearchRequest.builder()
                 .query(buildQuery(Set.of(query)))
                 .build();
-        Page<Case> resultAsPage = elasticCaseSearchService.search(List.of(request), identityService.getLoggedIdentity(), PageRequest.of(0, 1),
-                Locale.getDefault(), false, null);
+        Page<Case> resultAsPage = elasticCaseSearchService.search(List.of(request), identityService.getLoggedIdentity(),
+                PageRequest.of(0, 1), Locale.getDefault(), false, null);
         if (resultAsPage.hasContent()) {
             return Optional.of(new Actor(resultAsPage.getContent().get(0)));
         }

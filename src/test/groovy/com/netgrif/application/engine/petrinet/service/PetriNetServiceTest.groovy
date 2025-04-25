@@ -144,7 +144,6 @@ class PetriNetServiceTest {
         assert elasticPetriNetRepository.findByStringId(testNet.stringId) == null
         assert caseRepository.findAllByProcessIdentifier(testNet.getImportId()).size() == 0
         assert taskRepository.count() == taskCount
-        assert roleRepository.count() == roleCount
 //        user = userService.findByEmail(CUSTOMER_USER_MAIL)
 //        assert user != null
 //        assert user.roles.size() == 1

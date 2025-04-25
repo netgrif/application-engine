@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ImportResult {
 
-    private Process process;
+    private Process process; // todo: release/8.0.0 process as optional?
     private UniqueKeyMap<String, Role> roles = new UniqueKeyMap<>();
     // TODO: release/8.0.0 info, warn, error messages - definovat message a ich preklady
 

@@ -74,7 +74,7 @@ class ImporterTest {
     private static final String DATE_FIELD = "date"
     private static final String FILE_FIELD = "file"
     private static final String FILE_LIST_FIELD = "fileList"
-    private static final String USER_FIELD = "user"
+    private static final String ACTOR_FIELD = "actor"
     private static final String DATETIME_FIELD = "datetime"
     private static final String BUTTON_FIELD = "button"
     private static final String I18N_FIELD = "i18n"
@@ -309,7 +309,7 @@ class ImporterTest {
         assertBehaviors(testCase.dataSet.get(DATETIME_FIELD).behaviors.get("t1"), EDITABLE, true, true)
         assertBehaviors(testCase.dataSet.get(FILE_FIELD).behaviors.get("t1"), FORBIDDEN, false, true)
         assertBehaviors(testCase.dataSet.get(FILE_LIST_FIELD).behaviors.get("t1"), HIDDEN)
-        assertBehaviors(testCase.dataSet.get(USER_FIELD).behaviors.get("t1"), HIDDEN, false, true)
+        assertBehaviors(testCase.dataSet.get(ACTOR_FIELD).behaviors.get("t1"), HIDDEN, false, true)
         assertBehaviors(testCase.dataSet.get(BUTTON_FIELD).behaviors.get("t1"), EDITABLE, true, true)
         assertBehaviors(testCase.dataSet.get(I18N_FIELD).behaviors.get("t1"), HIDDEN, false, true)
     }

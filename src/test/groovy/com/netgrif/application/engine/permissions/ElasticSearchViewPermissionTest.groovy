@@ -77,7 +77,7 @@ class ElasticSearchViewPermissionTest {
     private Identity testIdentity
 
     @BeforeEach
-    void inti() {
+    void init() {
         testHelper.truncateDbs()
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/view_permission_test.xml"), 
                 VersionType.MAJOR, superCreator.getLoggedSuper().activeActorId)
@@ -95,6 +95,8 @@ class ElasticSearchViewPermissionTest {
                 .username(new TextField(USER_EMAIL))
                 .password(new TextField("password"))
                 .build(), new ArrayList<Role>())
+
+        testHelper.login(testIdentity)
     }
 
     @Test

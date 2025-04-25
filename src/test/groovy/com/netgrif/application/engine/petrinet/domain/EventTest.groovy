@@ -80,6 +80,7 @@ class EventTest {
     @Test
     void testEventImport() {
         testHelper.truncateDbs()
+        testHelper.login(superCreator.superIdentity)
 
         Process net = petriNetService.importPetriNet(stream(EVENT_NET_FILE), VersionType.MAJOR,
                 superCreator.getLoggedSuper().activeActorId).getNet()

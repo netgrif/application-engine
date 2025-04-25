@@ -25,18 +25,18 @@ import static com.netgrif.application.engine.petrinet.domain.dataset.logic.Field
 @CompileStatic
 class ChangeBehaviorTest extends EngineTest {
 
-    String TEXT_0_FIELD_ID = "text_0"
-    String TEXT_1_FIELD_ID = "text_1"
-    String BOOLEAN_0_FIELD_ID = "boolean_0"
-    String BOOLEAN_1_FIELD_ID = "boolean_1"
-    String BOOLEAN_2_FIELD_ID = "boolean_2"
-    String BOOLEAN_3_FIELD_ID = "boolean_3"
-    String TEST_CASE_NAME = "Change behavior improvements"
-    String MAIN_TRANSITION = "t1"
-    String TEST_TRANSITION_1 = "t3"
-    String TEST_TRANSITION_2 = "t4"
-    String TEST_TRANSITION_3 = "t2"
-    String RESOURCE_PATH = "src/test/resources/change_behavior_update.xml"
+    private String TEXT_0_FIELD_ID = "text_0"
+    private String TEXT_1_FIELD_ID = "text_1"
+    private String BOOLEAN_0_FIELD_ID = "boolean_0"
+    private String BOOLEAN_1_FIELD_ID = "boolean_1"
+    private String BOOLEAN_2_FIELD_ID = "boolean_2"
+    private String BOOLEAN_3_FIELD_ID = "boolean_3"
+    private String TEST_CASE_NAME = "Change behavior improvements"
+    private String MAIN_TRANSITION = "t1"
+    private String TEST_TRANSITION_1 = "t3"
+    private String TEST_TRANSITION_2 = "t4"
+    private String TEST_TRANSITION_3 = "t2"
+    private String RESOURCE_PATH = "src/test/resources/change_behavior_update.xml"
 
     Process net = null
 
@@ -47,6 +47,8 @@ class ChangeBehaviorTest extends EngineTest {
         net = petriNetService.importPetriNet(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR,
                 identityService.getLoggedSystemIdentity().activeActorId).getNet()
         assert net != null
+
+        testHelper.login(superCreator.superIdentity)
     }
 
     @Test

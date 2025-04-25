@@ -11,6 +11,7 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.context.SpringBootTest
@@ -52,6 +53,11 @@ class ValidationTest extends EngineTest {
         Process testNet = importHelper.createNet("validation/valid_number.xml", VersionType.MAJOR).get()
         assert testNet != null
         return testNet
+    }
+
+    @BeforeEach
+    void before() {
+        testHelper.login(superCreator.superIdentity)
     }
 
     // TEXT FIELD

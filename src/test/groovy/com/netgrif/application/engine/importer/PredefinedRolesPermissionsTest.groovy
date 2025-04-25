@@ -226,6 +226,7 @@ class PredefinedRolesPermissionsTest {
 
     @Test()
     void reservedDefaultRole() {
+        // todo: release/8.0.0 implementation of importer ignores system roles, should it throw an exception?
         assertThrows(IllegalArgumentException.class, () -> {
             importAndCreate(reservedDefaultRoleNet)
         });
@@ -356,6 +357,7 @@ class PredefinedRolesPermissionsTest {
 
     @Test()
     void reservedAnonymousRole() {
+        // todo: release/8.0.0 implementation of importer ignores system roles, should it throw an exception?
         assertThrows(IllegalArgumentException.class, () -> {
             importAndCreate(reservedAnonymousRoleNet)
         });

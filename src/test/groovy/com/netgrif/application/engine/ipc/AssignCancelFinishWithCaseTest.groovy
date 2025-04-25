@@ -61,6 +61,7 @@ class AssignCancelFinishWithCaseTest {
 
         assert testNet.getNet() != null
 
+        testHelper.login(superCreator.superIdentity)
         Case aCase = importHelper.createCase("Case 1", testNet.getNet())
         importHelper.assignTaskToSuper("Task", aCase.stringId)
 

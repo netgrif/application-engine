@@ -2,7 +2,10 @@ package com.netgrif.application.engine.importer
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authorization.domain.Actor
+import com.netgrif.application.engine.authorization.domain.Role
 import com.netgrif.application.engine.authorization.service.interfaces.IActorService
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.ActorFieldValue
@@ -58,17 +61,22 @@ class ActorListTest {
     @Autowired
     private IActorService actorService
 
+    @Autowired
+    private IRoleService roleService
+
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
     }
 
     @Test
-    void testUserList() throws MissingPetriNetMetaDataException, IOException {
-        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/user_list.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
+    void testActorList() throws MissingPetriNetMetaDataException, IOException {
+        testHelper.login(superCreator.superIdentity)
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/actor_list.xml"),
+                VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
 
         assert net.getNet() != null;
-        Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("User List"));
+        Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("Actor List"));
 
         assert caseOpt.isPresent();
         assert caseOpt.get().getDataSet().get("text").getRawValue() == "Its working...";
@@ -77,11 +85,11 @@ class ActorListTest {
 
         Actor actor = actorService.findById(superCreator.getLoggedSuper().activeActorId).get()
         dataService.setData(task.stringId, new DataSet([
-                "users_1": new ActorListField(rawValue: new ActorListFieldValue(new ActorFieldValue(actor)))
+                "actors_1": new ActorListField(rawValue: new ActorListFieldValue(new ActorFieldValue(actor)))
         ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId())
 
-//        TODO: release/8.0.0
-        assert taskService.findById(task.stringId).processRolePermissions.get(superCreator.getSuperIdentity().getStringId())
-        assert caseRepository.findById(caseOpt.get().stringId).get().processRolePermissions.get(superCreator.getSuperIdentity().getStringId())
+        Role caseRole = roleService.findCaseRoleByCaseIdAndImportId(caseOpt.get().stringId, "actors_1")
+        assert taskService.findById(task.stringId).caseRolePermissions.containsKey(caseRole.stringId)
+        assert caseRepository.findById(caseOpt.get().stringId).get().caseRolePermissions.containsKey(caseRole.stringId)
     }
 }

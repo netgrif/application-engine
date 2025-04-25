@@ -34,7 +34,7 @@ import javax.mail.internet.MimeMultipart
 @SpringBootTest
 class AuthenticationControllerTest {
 
-    private static final String EMAIL = "tets@test.com"
+    private static final String EMAIL = "test@test.com"
     private static final String NAME = "name"
     private static final String SURNAME = "surname"
     private static final String PASSWORD = "password"
@@ -77,8 +77,9 @@ class AuthenticationControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+//    @WithMockUser(roles = "ADMIN")
     void inviteTest() {
+        testHelper.login(superCreator.superIdentity)
         controller.invite(new NewIdentityRequest(email: EMAIL, groups: [] as Set, roles: [] as Set), null)
 
         MimeMessage[] messages = smtpServer.getReceivedMessages()
@@ -104,7 +105,7 @@ class AuthenticationControllerTest {
 
         MimeMessage message = messages[0]
 
-        assert "noreply@netgrif.com".equalsIgnoreCase(message.getFrom()[0].toString())
+        assert "test@example.com".equalsIgnoreCase(message.getFrom()[0].toString())
         assert EmailType.REGISTRATION.getSubject().equalsIgnoreCase(message.getSubject())
     }
 

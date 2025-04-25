@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet
 
 import com.netgrif.application.engine.MockService
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -47,11 +48,16 @@ class EncryptionTest {
     @Autowired
     private SuperAdminConfiguration configuration
 
+    @Autowired
+    private TestHelper testHelper
+
     private final String FIELD_NAME = "City"
     private final String FIELD_VALUE = "Bratislava"
 
     @Test
     void testEncryption() {
+        testHelper.login(superCreator.superIdentity)
+
         String id = createCase()
 
         Case useCase = loadCase(id)

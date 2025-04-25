@@ -58,7 +58,7 @@
         <title>number</title>
         <init dynamic="true">
             <![CDATA[
-			userService.findByEmail("super@netgrif.com").name.length()
+			actorService.findByEmail("super@netgrif.com").get().firstname.length()
 			]]>
         </init>
     </data>
@@ -67,17 +67,19 @@
         <title>Text</title>
         <init dynamic="true">
             <![CDATA[
-			userService.findByEmail("super@netgrif.com").name
+			actorService.findByEmail("super@netgrif.com").get().firstname
 			]]>
         </init>
     </data>
-    <data type="user" immediate="true">
-        <id>user</id>
-        <title>user</title>
+    <data type="actor" immediate="true">
+        <id>actor</id>
+        <title>Actor</title>
         <init dynamic="true">
             <![CDATA[
-			def user = userService.getLoggedOrSystem()
-			return new com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue(user.getStringId(), user.name, user.surname, user.email)
+			def loggedIdentity = identityService.getLoggedSystemIdentity()
+			def actor = actorService.findById(loggedIdentity.activeActorId).get()
+			return new com.netgrif.application.engine.petrinet.domain.dataset.ActorFieldValue(actor.stringId, actor.firstname,
+			actor.lastname, actor.email)
 			]]>
         </init>
     </data>
@@ -142,7 +144,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>user</id>
+                    <id>actor</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>

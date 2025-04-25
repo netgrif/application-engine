@@ -20,6 +20,7 @@ public class MultichoiceFieldBuilder extends ChoiceFieldBuilder<MultichoiceField
             setFieldOptions(field, data, importer);
         }
         setDefaultValue(field, data, s -> {
+            // todo: release/8.0.0 data.init string split by comma and iterate
             LinkedHashSet<I18nString> value = new LinkedHashSet<>();
             value.add(new I18nString(s));
             return value;

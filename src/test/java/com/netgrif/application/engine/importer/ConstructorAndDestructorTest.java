@@ -46,6 +46,7 @@ public class ConstructorAndDestructorTest {
 
     @Test
     public void testConstructorAndDestructor() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
+        testHelper.login(superCreator.getSuperIdentity());
         ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/constructor_destructor.xml"),
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
 

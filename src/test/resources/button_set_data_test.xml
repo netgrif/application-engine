@@ -1,57 +1,76 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
 	<id>button_set_data</id>
-	<initials>SDB</initials>
+	<version>1.0.0</version>
 	<title>Set Data Button v3</title>
 	<icon>device_hub</icon>
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
-	<transitionRole>false</transitionRole>
+	<properties>
+		<property key="initials">SDB</property>
+	</properties>
+	<processEvents/>
+	<caseEvents/>
+	<data type="button">
+		<id>button_0</id>
+		<title/>
+		<placeholder>Set Data</placeholder>
+		<event type="set">
+			<id>button_0_set</id>
+			<actions phase="post">
+				<action id="action_1">
+					<![CDATA[
+					change text_0 value { "Clicked 0!" }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>button_1</id>
+		<title/>
+		<placeholder>Set Data</placeholder>
+		<event type="set">
+			<id>button_1_set</id>
+			<actions phase="post">
+				<action id="action_2">
+					<![CDATA[
+					change text_1 value { "Clicked 1!" }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>button_2</id>
+		<title/>
+		<placeholder>Set Data</placeholder>
+		<event type="set">
+			<id>button_2_set</id>
+			<actions phase="post">
+				<action id="action_3">
+					<![CDATA[
+					change text_2 value { "Clicked 2!" }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
 	<data type="text">
 		<id>child_case_id</id>
 		<title/>
 		<event type="get">
 			<id>ref</id>
 			<actions phase="pre">
-				<action>
-					child_case_id: f.child_case_id;
-
+				<action id="action_0">
+					<![CDATA[
 					if (!child_case_id.value) {
 						def childCase = createCase("button_set_data", "Child button set data case")
 						change child_case_id value { childCase.stringId }
 					}
+					]]>
 				</action>
 			</actions>
 		</event>
-	</data>
-	<data type="button">
-		<id>button_0</id>
-		<title/>
-		<placeholder>Set Data</placeholder>
-		<action trigger="set">
-			txt: f.text_0;
-
-			change txt value { "Clicked 0!" }
-		</action>
-	</data>
-	<data type="button">
-		<id>button_1</id>
-		<title/>
-		<placeholder>Set Data</placeholder>
-		<action trigger="set">
-			txt: f.text_1;
-
-			change txt value { "Clicked 1!" }
-		</action>
-	</data>
-	<data type="button">
-		<id>button_2</id>
-		<title/>
-		<placeholder>Set Data</placeholder>
-		<action trigger="set">
-			txt: f.text_2;
-
-			change txt value { "Clicked 2!" }
-		</action>
 	</data>
 	<data type="text">
 		<id>text_0</id>
@@ -69,93 +88,115 @@
 		<id>t1</id>
 		<x>300</x>
 		<y>140</y>
-		<label>task</label>
-		<dataGroup>
-			<id>t1</id>
-			<cols>4</cols>
-			<layout>legacy</layout>
-			<dataRef>
-				<id>child_case_id</id>
-				<logic>
-					<behavior>hidden</behavior>
-				</logic>
-			</dataRef>
-			<dataRef>
-				<id>button_0</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>text_0</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>button_1</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>text_1</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>button_2</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>text_2</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
+		<title>task</title>
+		<flex>
+			<id>t1_flex</id>
+			<item>
+				<dataRef>
+					<id>child_case_id</id>
+					<logic>
+						<behavior>hidden</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>button_0</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>text_0</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>button_1</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>text_1</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>button_2</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+			<item>
+				<dataRef>
+					<id>text_2</id>
+					<logic>
+						<behavior>visible</behavior>
+					</logic>
+				</dataRef>
+				<properties>
+					<order>0</order>
+					<flex-grow>0</flex-grow>
+					<flex-shrink>1</flex-shrink>
+				</properties>
+			</item>
+		</flex>
 		<event type="finish">
 			<id>ref</id>
 			<actions phase="pre">
-				<action>
-					child_case_id: f.child_case_id;
-
+				<action id="action_4">
+					<![CDATA[
 					def childCase = workflowService.findOne(child_case_id.value as String)
-
 					setData("t1", childCase, new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
-						"button_0": new com.netgrif.application.engine.petrinet.domain.dataset.ButtonField(rawValue: 42),
-						"button_1": new com.netgrif.application.engine.petrinet.domain.dataset.ButtonField(rawValue: 42),
-						"button_2": new com.netgrif.application.engine.petrinet.domain.dataset.ButtonField(rawValue: 42)
+							"button_0": new com.netgrif.application.engine.petrinet.domain.dataset.ButtonField(rawValue: 42),
+							"button_1": new com.netgrif.application.engine.petrinet.domain.dataset.ButtonField(rawValue: 42),
+							"button_2": new com.netgrif.application.engine.petrinet.domain.dataset.ButtonField(rawValue: 42)
 					]))
+					]]>
 				</action>
 			</actions>
 		</event>
 	</transition>
-</document>
+</process>

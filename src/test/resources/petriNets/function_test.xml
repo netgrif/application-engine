@@ -87,6 +87,7 @@
         <title>Boolean</title>
         <init>false</init>
         <event type="set">
+            <id>createUser_set</id>
             <actions phase="post">
                 <action id="action_6">
                     <![CDATA[
@@ -106,6 +107,7 @@
             <option key="nie">nie</option>
         </options>
         <event type="set">
+            <id>enum_set</id>
             <actions phase="post">
                 <action id="action_5">
 					<![CDATA[
@@ -119,6 +121,7 @@
         <id>number</id>
         <title>Number</title>
         <event type="set">
+            <id>number_set</id>
             <actions phase="post">
                 <action id="action_3">
 					<![CDATA[
@@ -136,6 +139,7 @@
         <id>number3</id>
         <title>Number3</title>
         <event type="set">
+            <id>number3_set</id>
             <actions phase="post">
                 <action id="action_4">
 					<![CDATA[
@@ -149,6 +153,7 @@
         <id>text</id>
         <title>Text</title>
         <event type="set">
+            <id>text_set</id>
             <actions phase="post">
                 <action id="action_2">
 					<![CDATA[
@@ -159,12 +164,12 @@
         </event>
     </data>
     <transition>
-        <id>1</id>
+        <id>t1</id>
         <x>0</x>
         <y>0</y>
         <title>Test</title>
         <flex>
-            <id>1_flex</id>
+            <id>t1_flex</id>
             <item>
                 <dataRef>
                     <id>number</id>

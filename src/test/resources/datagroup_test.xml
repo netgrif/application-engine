@@ -45,6 +45,12 @@
         <x>362</x>
         <y>183</y>
         <title>Test data groups</title>
+        <roleRef>
+            <id>role1</id>
+            <permission>
+                <perform>true</perform>
+            </permission>
+        </roleRef>
         <flex>
             <id>t1_flex</id>
             <item>
@@ -126,12 +132,6 @@
                 </properties>
             </item>
         </flex>
-        <roleRef>
-            <id>role1</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
     </transition>
     <place>
         <id>p2</id>

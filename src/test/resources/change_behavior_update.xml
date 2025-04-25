@@ -19,7 +19,7 @@
 			<actions phase="post">
 				<action id="action_0">
 					<![CDATA[
-					log.info("boolean_3.rawValue: ${boolean_0.rawValue}")
+					log.info("boolean_0.rawValue: ${boolean_0.rawValue}")
 					make text_0, editable on t1 when { boolean_0.rawValue }
 					make text_0, required on t1 when { boolean_0.rawValue }
 					make text_0, initial on t1 when { !boolean_0.rawValue }
@@ -37,7 +37,7 @@
 			<actions phase="post">
 				<action id="action_1">
 					<![CDATA[
-					log.info("boolean_3.rawValue: ${boolean_1.rawValue}")
+					log.info("boolean_1.rawValue: ${boolean_1.rawValue}")
 					make text_0, editable on transitions when { boolean_1.rawValue }
 					make text_0, required on transitions when { boolean_1.rawValue }
 					make text_0, visible on transitions when { !boolean_1.rawValue }
@@ -56,9 +56,26 @@
 			<actions phase="post">
 				<action id="action_2">
 					<![CDATA[
-					log.info("boolean_3.rawValue: ${boolean_2.rawValue}")
-					make text_0, editable on ([t1, t2]) when { boolean_2.rawValue }
-					make text_0, visible on ([t1, t2]) when { !boolean_2.rawValue }
+					log.info("boolean_2.rawValue: ${boolean_2.rawValue}")
+					make text_0, editable on ([t1, t3]) when { boolean_2.rawValue }
+					make text_0, visible on ([t1, t3]) when { !boolean_2.rawValue }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="boolean">
+		<id>boolean_3</id>
+		<title>Edit behavior of multiple fields on multiple transitions</title>
+		<init>false</init>
+		<event type="set">
+			<id>boolean_3_set</id>
+			<actions phase="post">
+				<action id="action_2">
+					<![CDATA[
+					log.info("boolean_3.rawValue: ${boolean_3.rawValue}")
+					make [text_0, text_1], editable on ([t1, t3]) when { boolean_3.value }
+					make [text_0, text_1], visible on ([t1, t3]) when { !boolean_3.value }
 					]]>
 				</action>
 			</actions>

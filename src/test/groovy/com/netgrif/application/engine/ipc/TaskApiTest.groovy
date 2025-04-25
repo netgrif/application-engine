@@ -67,6 +67,7 @@ class TaskApiTest {
             testHelper.truncateDbs()
             initialised = true
         }
+        testHelper.login(superCreator.superIdentity)
     }
 
     public static final String TASK_SEARCH_NET_FILE = "ipc_task_search.xml"
@@ -230,7 +231,7 @@ class TaskApiTest {
         helper.assignTaskToSuper(TASK_BULK_TASK, control.stringId)
         helper.finishTaskAsSuper(TASK_BULK_TASK, control.stringId)
 
-        assert taskRepository.findAll(QTask.task.assigneeId.eq(userService.system.getStringId())).size() == 2
+        assert taskRepository.findAll(QTask.task.assigneeId.eq(superCreator.loggedSuper.activeActorId)).size() == 2
     }
 
     public static final String TASK_GETTER_NET_FILE = "ipc_data.xml"

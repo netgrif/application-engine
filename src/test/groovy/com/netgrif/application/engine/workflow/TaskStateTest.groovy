@@ -44,6 +44,7 @@ class TaskStateTest {
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
+        testHelper.login(superCreator.superIdentity)
     }
 
     @Test

@@ -16,6 +16,8 @@ class InitValuesTest extends EngineTest {
 
     @Test
     void testInitValues() {
+        testHelper.login(superCreator.superIdentity)
+
         def importResult = importHelper.createNet("init_values_test.xml")
         assert importResult.isPresent()
 

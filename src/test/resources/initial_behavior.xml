@@ -93,9 +93,9 @@
         <title>Text</title>
         <init>Lorem ipsum</init>
     </data>
-    <data type="user" immediate="true">
-        <id>user</id>
-        <title>User</title>
+    <data type="actor" immediate="true">
+        <id>actor</id>
+        <title>Actor</title>
     </data>
     <transition>
         <id>t1</id>
@@ -256,7 +256,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>user</id>
+                    <id>actor</id>
                     <logic>
                         <behavior>hidden</behavior>
                         <immediate>true</immediate>

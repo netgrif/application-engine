@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.authorization.domain.Role
@@ -90,16 +91,19 @@ class TaskControllerTest {
 
     private Task task
 
+    private Identity testIdentity
+
     @BeforeEach
     void init() {
         testHelper.truncateDbs()
-        helper.createIdentity(IdentityParams.with()
+        testIdentity = helper.createIdentity(IdentityParams.with()
                 .firstname(new TextField("Dummy"))
                 .lastname(new TextField("Netgrif"))
                 .username(new TextField(DUMMY_USER_MAIL))
                 .password(new TextField("superAdminPassword"))
                 .build(), new ArrayList<Role>())
         importNet()
+        testHelper.login(superCreator.superIdentity)
     }
 
     @Test
@@ -196,14 +200,13 @@ class TaskControllerTest {
 
     void setActorRole() {
         this.role = roleService.findProcessRoleByImportId("process_role")
-        roleService.assignRolesToActor(identityService.findByUsername(DUMMY_USER_MAIL).get().toSession().activeActorId,
-                [role.id.toString()] as Set)
+        roleService.assignRolesToActor(testIdentity.toSession().activeActorId, [role.id.toString()] as Set)
     }
 
     Page<Task> findTasksByMongo() {
         List<TaskSearchRequest> taskSearchRequestList = new ArrayList<>()
         taskSearchRequestList.add(new TaskSearchRequest())
-        String actorId = identityService.findByUsername(DUMMY_USER_MAIL).get().toSession().activeActorId
+        String actorId = testIdentity.toSession().activeActorId
         Page<Task> tasks = taskService.search(taskSearchRequestList, new FullPageRequest(), actorId, new Locale("en"), false)
         return tasks
     }

@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow
 
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -42,6 +43,9 @@ class TaskRefPropagationTest {
     @Autowired
     private ITaskService taskService
 
+    @Autowired
+    private TestHelper testHelper
+
     Process netParent
     Process netChild
 
@@ -55,6 +59,8 @@ class TaskRefPropagationTest {
 
         netParent = parent.getNet()
         netChild = child.getNet()
+
+        testHelper.login(superCreator.superIdentity)
     }
 
     public static final String PARENT_FIELD_TEXT_ID = "text"
@@ -96,8 +102,8 @@ class TaskRefPropagationTest {
         Case parent = importHelper.createCase("PARENT", netParent)
         Case child = importHelper.createCase("CHILD", netChild)
 
-        String parentTaskId = parent.getTaskStringId("4")
-        String childTaskId = child.getTaskStringId("4")
+        String parentTaskId = parent.getTaskStringId("t4")
+        String childTaskId = child.getTaskStringId("t4")
 //        TODO: release/8.0.0
 //        parent.dataSet["children_tasks"].value = [childTaskId]
 //        child.dataSet["parentId"].value = parent.stringId

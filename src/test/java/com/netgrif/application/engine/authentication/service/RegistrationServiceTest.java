@@ -57,4 +57,6 @@ public class RegistrationServiceTest {
         assert registered != null;
     }
 
+    // todo: release/8.0.0 implement more tests
+
 }

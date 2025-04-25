@@ -71,6 +71,8 @@ class SetDataOnButtonTest {
         net = petriNetService.importPetriNet(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR,
                 superCreator.getLoggedSuper().activeActorId).getNet()
         assert net != null
+
+        testHelper.login(superCreator.superIdentity)
     }
 
     @Test

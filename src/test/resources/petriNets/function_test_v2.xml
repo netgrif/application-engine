@@ -81,6 +81,7 @@
         <title>Boolean</title>
         <init>false</init>
         <event type="set">
+            <id>createUser_set</id>
             <actions phase="post">
                 <action id="action_9">
                     <![CDATA[
@@ -100,6 +101,7 @@
             <option key="nie">nie</option>
         </options>
         <event type="set">
+            <id>enum_set</id>
             <actions phase="post">
                 <action id="action_8">
 					<![CDATA[
@@ -121,6 +123,7 @@
         <id>text</id>
         <title>Text</title>
         <event type="set">
+            <id>text_set</id>
             <actions phase="post">
                 <action id="action_7">
 					<![CDATA[
@@ -143,6 +146,7 @@
         <title>Boolean</title>
         <init>false</init>
         <event type="set">
+            <id>updateOtherField_set</id>
             <actions phase="post">
                 <action id="action_10">
 					<![CDATA[
@@ -154,12 +158,12 @@
         </event>
     </data>
     <transition>
-        <id>0</id>
+        <id>t0</id>
         <x>0</x>
         <y>0</y>
         <title>Test</title>
         <flex>
-            <id>0_flex</id>
+            <id>t0_flex</id>
             <item>
                 <dataRef>
                     <id>number</id>

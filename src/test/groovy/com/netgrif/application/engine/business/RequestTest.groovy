@@ -4,17 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectWriter
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.authentication.domain.IdentityState
+import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams
 import com.netgrif.application.engine.authorization.domain.ApplicationRole
+import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.authorization.domain.Role
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
 import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
-import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
@@ -311,16 +311,18 @@ class RequestTest {
         List<ApplicationRole> applicationRoles = new ArrayList<>()
         applicationRoles.add(roleService.findApplicationRoleByImportId("default"))
         applicationRoles.add(roleService.findApplicationRoleByImportId("admin"))
-        List<ProcessRole> processRoles = roleService.findAllProcessRolesByImportIds(["first", "second", "system", "user",
+        List<ProcessRole> processRoles = roleService.findAllProcessRolesByImportIds(["first", "second", "system", "identity",
                                                                                      "registration"] as Set)
-        importHelper.createIdentity(IdentityParams.with()
+        Identity identity = importHelper.createIdentity(IdentityParams.with()
                 .firstname(new TextField("Test"))
                 .lastname(new TextField("Integration"))
                 .password(new TextField("password"))
                 .username(new TextField(USER_EMAIL))
                 .build(), processRoles + applicationRoles as List<Role>)
 
-        auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
+        Thread.sleep(2000)
+
+        auth = new UsernamePasswordAuthenticationToken(identity.toSession(), "password")
         auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
 
         objectWriter = objectMapper.writer().withDefaultPrettyPrinter()

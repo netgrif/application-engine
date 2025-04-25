@@ -49,6 +49,7 @@ class CaseApiTest {
     @BeforeEach
     void setup() {
         testHelper.truncateDbs()
+        testHelper.login(superCreator.superIdentity)
     }
 
     public static final String CREATE_NET_FILE = "ipc_createCase.xml"

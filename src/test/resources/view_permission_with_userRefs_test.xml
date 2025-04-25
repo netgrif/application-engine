@@ -10,27 +10,27 @@
     </properties>
     <roleRef>
         <id>view_neg_role</id>
-        <caseLogic>
+        <permission>
             <view>false</view>
-        </caseLogic>
+        </permission>
     </roleRef>
     <roleRef>
         <id>view_pos_role</id>
-        <caseLogic>
+        <permission>
             <view>true</view>
-        </caseLogic>
+        </permission>
     </roleRef>
-    <roleRef>
+    <roleRef type="case">
         <id>view_ul_neg</id>
-        <caseLogic>
+        <permission>
             <view>false</view>
-        </caseLogic>
+        </permission>
     </roleRef>
-    <roleRef>
+    <roleRef type="case">
         <id>view_ul_pos</id>
-        <caseLogic>
+        <permission>
             <view>true</view>
-        </caseLogic>
+        </permission>
     </roleRef>
     <role>
         <id>view_neg_role</id>
@@ -49,11 +49,11 @@
         <title>Text</title>
         <init>text</init>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>view_ul_neg</id>
         <title/>
     </data>
-    <data type="userList">
+    <data type="actorList">
         <id>view_ul_pos</id>
         <title/>
     </data>
@@ -64,27 +64,27 @@
         <title>Transition</title>
         <roleRef>
             <id>view_neg_role</id>
-            <logic>
+            <permission>
                 <view>false</view>
-            </logic>
+            </permission>
         </roleRef>
         <roleRef>
             <id>view_pos_role</id>
-            <logic>
+            <permission>
                 <view>true</view>
-            </logic>
+            </permission>
         </roleRef>
-        <roleRef>
+        <roleRef type="case">
             <id>view_ul_neg</id>
-            <logic>
+            <permission>
                 <view>false</view>
-            </logic>
+            </permission>
         </roleRef>
-        <roleRef>
+        <roleRef type="case">
             <id>view_ul_pos</id>
-            <logic>
+            <permission>
                 <view>true</view>
-            </logic>
+            </permission>
         </roleRef>
         <flex>
             <id>t1_flex</id>

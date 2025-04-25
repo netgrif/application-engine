@@ -45,10 +45,12 @@ class ChangeFieldValueInitTest {
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
+        testHelper.login(superCreator.superIdentity)
     }
 
     @Test
     void testInitValues() {
+        // todo: release/8.0.0 field text_static is not injected into expression delegate
         ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/change_field_value_init.xml"), VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId());
         Case useCase = importHelper.createCase("test", optNet.getNet())
 

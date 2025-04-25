@@ -65,7 +65,7 @@ class HistoryServiceTest {
         Case caze = workflowService.createCase(net.getStringId(), "Test assign", "", superCreator.getLoggedSuper().activeActorId).getCase()
         int count = historyService.findAllAssignTaskEventLogsByCaseId(caze.getStringId()).size()
         assert count == 0
-        String task = caze.tasks.values().find { it.transitionId == "1" }.taskStringId
+        String task = caze.getTaskStringId("t1")
         taskService.assignTask(superCreator.getLoggedSuper().activeActorId, task)
         Thread.sleep(1000) // HistoryService::save is @Async
         assert historyService.findAllAssignTaskEventLogsByCaseId(caze.getStringId()).size() == count + 2 // 2 PRE POST
@@ -76,7 +76,7 @@ class HistoryServiceTest {
         Case caze = workflowService.createCase(net.getStringId(), "Test finish", "", superCreator.getLoggedSuper().activeActorId).getCase()
         int count = historyService.findAllFinishTaskEventLogsByCaseId(caze.getStringId()).size()
         assert count == 0
-        String task = caze.tasks.values().find { it.transitionId == "1" }.taskStringId
+        String task = caze.getTaskStringId("t1")
         taskService.assignTask(superCreator.getLoggedSuper().activeActorId, task)
         assert historyService.findAllFinishTaskEventLogsByCaseId(caze.getStringId()).size() == count
         taskService.finishTask(superCreator.getLoggedSuper().activeActorId, task)
@@ -89,7 +89,7 @@ class HistoryServiceTest {
         Case caze = workflowService.createCase(net.getStringId(), "Test set data", "", superCreator.getLoggedSuper().activeActorId).getCase()
         int count = historyService.findAllSetDataEventLogsByCaseId(caze.getStringId()).size()
         assert count == 0
-        String task = caze.tasks.values().find { it.transitionId == "1" }.taskStringId
+        String task = caze.getTaskStringId("t1")
         dataService.setData(task, DataSet.of("number", new NumberField(rawValue: 110101116103114105102)),
                 superCreator.getLoggedSuper().activeActorId)
         Thread.sleep(1000) // HistoryService::save is @Async

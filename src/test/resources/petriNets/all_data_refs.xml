@@ -138,9 +138,9 @@
         <init>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vitae magna in libero semper
             vulputate ut eu sapien. Phasellus vel.</init>
     </data>
-    <data type="user">
-        <id>user</id>
-        <title>User</title>
+    <data type="actor">
+        <id>actor</id>
+        <title>Actor</title>
     </data>
     <transition>
         <id>t1</id>
@@ -340,7 +340,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>user</id>
+                    <id>actor</id>
                     <logic>
                         <behavior>editable</behavior>
                     </logic>
@@ -551,7 +551,7 @@
             </item>
             <item>
                 <dataRef>
-                    <id>user</id>
+                    <id>actor</id>
                     <logic>
                         <behavior>visible</behavior>
                     </logic>
@@ -609,123 +609,6 @@
                     <id>number</id>
                     <logic>
                         <behavior>editable</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <order>0</order>
-                    <flex-grow>0</flex-grow>
-                    <flex-shrink>1</flex-shrink>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>enumeration</id>
-                    <logic>
-                        <behavior>editable</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <order>0</order>
-                    <flex-grow>0</flex-grow>
-                    <flex-shrink>1</flex-shrink>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>text</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <order>0</order>
-                    <flex-grow>0</flex-grow>
-                    <flex-shrink>1</flex-shrink>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>number</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <order>0</order>
-                    <flex-grow>0</flex-grow>
-                    <flex-shrink>1</flex-shrink>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>enumeration</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <order>0</order>
-                    <flex-grow>0</flex-grow>
-                    <flex-shrink>1</flex-shrink>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>text</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <order>0</order>
-                    <flex-grow>0</flex-grow>
-                    <flex-shrink>1</flex-shrink>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>number</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <order>0</order>
-                    <flex-grow>0</flex-grow>
-                    <flex-shrink>1</flex-shrink>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>enumeration</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <order>0</order>
-                    <flex-grow>0</flex-grow>
-                    <flex-shrink>1</flex-shrink>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>text</id>
-                    <logic>
-                        <behavior>visible</behavior>
-                    </logic>
-                </dataRef>
-                <properties>
-                    <order>0</order>
-                    <flex-grow>0</flex-grow>
-                    <flex-shrink>1</flex-shrink>
-                </properties>
-            </item>
-            <item>
-                <dataRef>
-                    <id>number</id>
-                    <logic>
-                        <behavior>visible</behavior>
                     </logic>
                 </dataRef>
                 <properties>

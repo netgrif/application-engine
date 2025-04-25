@@ -123,7 +123,7 @@ public class ElasticCaseQueryBuilder implements ElasticQueryBuilder {
                 authorQuery.must(termQuery("authorEmail", author.email));
             }
             if (author.id != null) {
-                authorQuery.must(matchQuery("author", author.id));
+                authorQuery.must(matchQuery("authorId", author.id));
             }
             if (author.name != null) {
                 authorQuery.must(termQuery("authorName", author.name));

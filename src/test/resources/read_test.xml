@@ -18,10 +18,10 @@
         <title>Test read arc</title>
         <roleRef>
             <id>r1</id>
-            <logic>
+            <permission>
                 <perform>true</perform>
                 <assign>true</assign>
-            </logic>
+            </permission>
         </roleRef>
     </transition>
     <place>

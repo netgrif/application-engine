@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectWriter
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.authentication.domain.IdentityState
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams
 import com.netgrif.application.engine.authorization.domain.ApplicationRole
@@ -127,14 +128,16 @@ class InsuranceTest {
         applicationRoles.add(roleService.findApplicationRoleByImportId("default"))
         applicationRoles.add(roleService.findApplicationRoleByImportId("admin"))
         List<ProcessRole> processRoles = roleService.findAllProcessRolesByImportIds(["agent", "company"] as Set)
-        importHelper.createIdentity(IdentityParams.with()
+        Identity identity = importHelper.createIdentity(IdentityParams.with()
                 .firstname(new TextField("Test"))
                 .lastname(new TextField("Integration"))
                 .password(new TextField("password"))
                 .username(new TextField(USER_EMAIL))
                 .build(), processRoles + applicationRoles as List<Role>)
 
-        auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
+        Thread.sleep(2000)
+
+        auth = new UsernamePasswordAuthenticationToken(identity.toSession(), "password")
         auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
 
         objectWriter = objectMapper.writer().withDefaultPrettyPrinter()

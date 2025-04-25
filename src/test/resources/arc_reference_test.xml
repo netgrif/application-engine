@@ -24,8 +24,8 @@
     <arc>
         <id>a7</id>
         <type>reset</type>
-        <sourceId>2</sourceId>
-        <destinationId>1</destinationId>
+        <sourceId>p2</sourceId>
+        <destinationId>t1</destinationId>
         <multiplicity dynamic="true">
             <![CDATA[
 			p2

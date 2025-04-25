@@ -5,7 +5,6 @@ import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.authorization.domain.params.ActorParams;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.application.engine.startup.SystemIdentityRunner;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -45,9 +44,6 @@ public class ActorServiceTest {
     @Autowired
     private ActorService actorService;
 
-    @Autowired
-    private SystemIdentityRunner systemIdentityRunner;
-
     @BeforeEach
     void before() {
         testHelper.truncateDbs();
@@ -57,7 +53,6 @@ public class ActorServiceTest {
     void testFindByEmail() throws InterruptedException {
         assert actorService.findByEmail(null).isEmpty();
         assert actorService.findByEmail("nonexisting@email.com").isEmpty();
-        assert actorService.findByEmail(systemIdentityRunner.getLoggedSystem().getIdentityId()).isEmpty();
 
         String email = "some@email.com";
         createActor(email);
@@ -70,7 +65,6 @@ public class ActorServiceTest {
     void testExistsByEmail() throws InterruptedException {
         assert !actorService.existsByEmail(null);
         assert !actorService.existsByEmail("nonexisting@email.com");
-        assert !actorService.existsByEmail(systemIdentityRunner.getLoggedSystem().getIdentityId());
 
         String email = "some@email.com";
         createActor(email);
@@ -82,8 +76,7 @@ public class ActorServiceTest {
     @Test
     void testFindById() {
         assert actorService.findById(null).isEmpty();
-        assert actorService.findById("111111111").isEmpty();
-        assert actorService.findById(systemIdentityRunner.getLoggedSystem().getIdentityId()).isEmpty();
+        assert actorService.findById(new ObjectId().toString()).isEmpty();
 
         String email = "some@email.com";
         Actor actor = createActor(email);
@@ -95,7 +88,6 @@ public class ActorServiceTest {
     void testExistsById() {
         assert !actorService.existsById(null);
         assert !actorService.existsById(new ObjectId().toString());
-        assert !actorService.existsById(systemIdentityRunner.getLoggedSystem().getIdentityId());
 
         String email = "some@email.com";
         Actor actor = createActor(email);

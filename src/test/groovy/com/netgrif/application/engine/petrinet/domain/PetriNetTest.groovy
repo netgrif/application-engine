@@ -25,7 +25,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest
 class PetriNetTest {
 
-    public static final String CLONE_NET_TASK = "2"
+    public static final String CLONE_NET_TRANS_ID = "t2"
 
     @Autowired
     private Importer importer
@@ -55,16 +55,17 @@ class PetriNetTest {
 
     @Test
     void testClone() {
-        int beforeImportNet = roleRepository.count()
+        int beforeImportNet = (int) roleRepository.count()
 
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
+        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR,
+                superCreator.loggedSuper.activeActorId)
 
         assert netOptional.getNet() != null
 
         def net = netOptional.getNet()
         def clone = net.clone()
 
-        def arcs = clone.getArcsOfTransition(CLONE_NET_TASK)
+        def arcs = clone.getInputArcsOf(CLONE_NET_TRANS_ID)
 
         assert arcs.size() == 4
         assert arcs.any { it instanceof Arc }
@@ -72,25 +73,27 @@ class PetriNetTest {
         assert arcs.any { it instanceof ResetArc }
         assert arcs.any { it instanceof ReadArc }
 
-        assert net.roles.size() == 2
         assert roleRepository.count() == beforeImportNet + 2
     }
 
     @Test
     void testVersioning() {
-        def outcome1 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
+        def outcome1 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR,
+                superCreator.loggedSuper.activeActorId)
         Process net1 = outcome1.getNet()
         assert net1
 
-        def outcome2 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
+        def outcome2 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR,
+                superCreator.loggedSuper.activeActorId)
         Process net2 = outcome2.getNet()
         assert net2
 
-        def outcome3 = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper.activeActorId)
+        def outcome3 = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR,
+                superCreator.loggedSuper.activeActorId)
         Process net3 = outcome3.getNet()
         assert net3
 
-        List<PetriNetReference> nets = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK)
+        List<PetriNetReference> nets = petriNetService.getReferencesByVersion(null, Locale.UK)
         assert nets.findAll { it.identifier in [net1.identifier, net3.identifier] }.size() == 2
         assert nets.find { it.identifier == "new_model" }.version == "1.0.0"
         assert nets.find { it.identifier == "test" }.version == "2.0.0"

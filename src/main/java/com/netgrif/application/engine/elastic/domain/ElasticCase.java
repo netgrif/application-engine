@@ -63,9 +63,6 @@ public class ElasticCase {
     private Long creationDateSortable;
 
     @Field(type = Keyword)
-    private String author;
-
-    @Field(type = Keyword)
     private String mongoId;
 
     @Field(type = Keyword)
@@ -123,7 +120,6 @@ public class ElasticCase {
         title = useCase.getTitle();
         creationDate = useCase.getCreationDate();
         creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
-        author = useCase.getAuthorId();
         authorId = useCase.getAuthorId();
         // todo 2058
 //        authorEmail = useCase.getAuthorId().getEmail();
