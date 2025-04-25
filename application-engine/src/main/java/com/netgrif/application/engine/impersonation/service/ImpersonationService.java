@@ -6,6 +6,7 @@ import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;
+import com.netgrif.application.engine.objects.event.RunPhase;
 import com.netgrif.application.engine.objects.event.events.user.ImpersonationEvent;
 import com.netgrif.application.engine.objects.event.events.user.ImpersonationPhase;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;

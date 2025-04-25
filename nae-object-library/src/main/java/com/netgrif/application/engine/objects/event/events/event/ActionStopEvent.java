@@ -1,0 +1,33 @@
+package com.netgrif.application.engine.objects.event.events.event;
+
+import com.netgrif.application.engine.objects.event.RunPhase;
+import com.netgrif.application.engine.objects.petrinet.domain.dataset.logic.action.Action;
+import lombok.Getter;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+
+@Getter
+public class ActionStopEvent extends ActionStartEvent {
+
+    private final boolean success;
+    private final long totalDuration;
+
+    public ActionStopEvent(Action action, ActionStartEvent startEvent, boolean success) {
+        super(action);
+        setPhase(RunPhase.STOP);
+        this.success = success;
+        this.totalDuration = getTotalTime(startEvent.getTime());
+    }
+
+    @Override
+    public String getMessage() {
+        return "ActionEndEvent: " + getTrigger() + " [" + getId() + "] " + getPhase();
+    }
+
+    private long getTotalTime(LocalDateTime start) {
+        Duration duration = Duration.between(start, this.getTime());
+        return duration.toMillis();
+    }
+
+}
