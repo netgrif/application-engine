@@ -42,4 +42,9 @@ public class ApplicationRole extends Role {
     public String getTitleAsString() {
         return String.format("APPROLE[%s-%s]", applicationId, importId);
     }
+
+    @Override
+    public String toString() {
+        return getTitleAsString();
+    }
 }

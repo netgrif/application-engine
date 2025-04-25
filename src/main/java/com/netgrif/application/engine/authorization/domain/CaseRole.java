@@ -41,4 +41,9 @@ public class CaseRole extends Role {
     public String getTitleAsString() {
         return String.format("CASEROLE[%s-%s]", caseId, importId);
     }
+
+    @Override
+    public String toString() {
+        return getTitleAsString();
+    }
 }

@@ -99,7 +99,7 @@ public class ProcessRole extends Role {
 
     @Override
     public String toString() {
-        return title.getDefaultValue();
+        return getTitleAsString();
     }
 
     @Override
