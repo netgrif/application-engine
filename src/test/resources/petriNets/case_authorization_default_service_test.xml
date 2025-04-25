@@ -1,0 +1,18 @@
+<process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>case_authorization_default_service_test</id>
+    <version>1.0.0</version>
+    <title>Case authorization test</title>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <properties>
+        <property key="initials">CAT</property>
+    </properties>
+    <roleRef>
+        <id>default</id>
+        <permission>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </permission>
+    </roleRef>
+</process>
