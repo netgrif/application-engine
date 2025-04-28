@@ -58,7 +58,7 @@ class DynamicValidationTest {
     @Test
     @Disabled
     void testValidations() {
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_validations.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
+        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_validations.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), userService.getLoggedOrSystem().getWorkspaceId())
         Case useCase = importHelper.createCase("test", optNet.getNet())
         Map<String, Field> data = getData(useCase)
         assert (data["number"]).validations[0] instanceof DynamicValidation

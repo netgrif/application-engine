@@ -115,7 +115,7 @@ class CaseFieldTest {
 
     @Test
     void testImmediateAllowedNets() {
-        def testNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
+        def testNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), userService.getLoggedOrSystem().getWorkspaceId())
         assert testNet.getNet() != null
 
         Case aCase = importHelper.createCase("Case 1", testNet.getNet())
@@ -169,10 +169,10 @@ class CaseFieldTest {
     @Test
     @Disabled("Please fix this test")
     void testChangeValueAction() {
-        def notAllowedNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
+        def notAllowedNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), userService.getLoggedOrSystem().getWorkspaceId())
         assert notAllowedNet.getNet() != null
 
-        def testNet = petriNetService.importPetriNet(stream(CHANGE_VALUE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
+        def testNet = petriNetService.importPetriNet(stream(CHANGE_VALUE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), userService.getLoggedOrSystem().getWorkspaceId())
         assert testNet.getNet() != null
 
         Case aCase = importHelper.createCase("Case 1", testNet.getNet())

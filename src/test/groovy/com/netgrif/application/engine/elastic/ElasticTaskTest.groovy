@@ -80,7 +80,7 @@ class ElasticTaskTest {
 
     @Test
     void taskReindexTest() {
-        def optional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
+        def optional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), userService.getLoggedOrSystem().getWorkspaceId())
         assert optional.getNet() != null
 
         def net = optional.getNet()

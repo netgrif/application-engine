@@ -8,6 +8,7 @@ import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import com.netgrif.core.auth.domain.enums.UserState;
+import com.netgrif.core.petrinet.domain.workspace.DefaultWorkspaceService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     private final UserService userService;
     private final GroupService groupService;
     private final ProcessRoleService processRoleService;
+    private final DefaultWorkspaceService defaultWorkspaceService;
 
     @Getter
     private IUser superUser;
@@ -72,6 +74,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
             this.superUser = superUser.get();
         }
 
+        this.superUser.setWorkspaceId(defaultWorkspaceService.getDefaultWorkspace().getId());
         return this.superUser;
     }
 
@@ -97,6 +100,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     }
 
     public LoggedUser getLoggedSuper() {
+        this.superUser.setWorkspaceId(defaultWorkspaceService.getDefaultWorkspace().getId());
         return userService.transformToLoggedUser(superUser);
     }
 

@@ -22,7 +22,6 @@ import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.startup.runner.SystemUserRunner;
 import com.netgrif.application.engine.startup.runner.DefaultRoleRunner;
-import com.netgrif.core.petrinet.domain.workspace.WorkspaceConstants;
 import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.adapter.workflow.domain.QTask;
 import com.netgrif.core.workflow.domain.Task;
@@ -110,7 +109,7 @@ public class VariableArcsTest {
         repository.deleteAll();
         assertNotNull(processRoleService.defaultRole());
         testHelper.truncateDbs();
-        ImportPetriNetEventOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID);
+        ImportPetriNetEventOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), VersionType.MAJOR, superCreator.getLoggedSuper(), userService.getLoggedOrSystem().getWorkspaceId());
 
         assert outcome.getNet() != null;
         PetriNet net = outcome.getNet();

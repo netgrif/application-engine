@@ -41,7 +41,7 @@ class DynamicDefaultValueTest {
 
     @Test
     void testInitValues() {
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_init.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID);
+        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_init.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), userService.getLoggedOrSystem().getWorkspaceId());
         Case useCase = importHelper.createCase("test", optNet.getNet())
 
         assert useCase.dataSet["text"].value == superCreator.superUser.name

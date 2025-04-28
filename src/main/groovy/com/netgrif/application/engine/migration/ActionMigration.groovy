@@ -25,7 +25,7 @@ class ActionMigration {
 
     void migrateActions(String petriNetPath) {
         InputStream netStream = new ClassPathResource(petriNetPath).inputStream
-        ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(netStream, VersionType.MAJOR, userService.transformToLoggedUser(userService.getLoggedOrSystem()), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
+        ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(netStream, VersionType.MAJOR, userService.transformToLoggedUser(userService.getLoggedOrSystem()), userService.getLoggedOrSystem().getWorkspaceId())
         List<PetriNet> oldPetriNets
 
         if(newPetriNet.getNet() != null) {

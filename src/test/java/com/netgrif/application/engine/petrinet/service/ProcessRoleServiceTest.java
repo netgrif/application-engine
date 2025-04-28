@@ -7,7 +7,6 @@ import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataExcepti
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
-import com.netgrif.core.petrinet.domain.workspace.WorkspaceConstants;
 import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,8 +55,8 @@ class ProcessRoleServiceTest {
     void shouldFindAllProcessRoles() throws IOException, MissingPetriNetMetaDataException {
         List<ProcessRole> roles = processRoleService.findAll();
         int originalRoles = roles.size();
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID);
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/role_all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID);
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), superCreator.getLoggedSuper().getWorkspaceId());
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/role_all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), superCreator.getLoggedSuper().getWorkspaceId());
         roles = processRoleService.findAll();
         assertNotNull(roles);
         assertFalse(roles.isEmpty());
@@ -66,7 +65,7 @@ class ProcessRoleServiceTest {
 
     @Test
     void shouldFindAllProcessRolesByPetriNet() throws IOException, MissingPetriNetMetaDataException {
-        ImportPetriNetEventOutcome eventOutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID);
+        ImportPetriNetEventOutcome eventOutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), superCreator.getLoggedSuper().getWorkspaceId());
         List<ProcessRole> roles = processRoleService.findAll(eventOutcome.getNet().getStringId());
         assertNotNull(roles);
         assertFalse(roles.isEmpty());
@@ -93,7 +92,7 @@ class ProcessRoleServiceTest {
 
     @Test
     void shouldFindAllProcessRolesByImportId() throws IOException, MissingPetriNetMetaDataException {
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID);
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), superCreator.getLoggedSuper().getWorkspaceId());
         Set<ProcessRole> roles = processRoleService.findAllByImportId(ROLE_IMPORT_ID);
         assertNotNull(roles);
         assertFalse(roles.isEmpty());
@@ -103,7 +102,7 @@ class ProcessRoleServiceTest {
 
     @Test
     void shouldFindAllProcessRolesByName() throws IOException, MissingPetriNetMetaDataException {
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID);
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), superCreator.getLoggedSuper().getWorkspaceId());
         Collection<ProcessRole> roles = processRoleService.findAllByDefaultName("Process role");
         assertNotNull(roles);
         assertFalse(roles.isEmpty());

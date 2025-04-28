@@ -11,7 +11,6 @@ import com.netgrif.core.petrinet.domain.throwable.MissingPetriNetMetaDataExcepti
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.core.petrinet.domain.workspace.WorkspaceConstants;
 import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
@@ -64,13 +63,13 @@ public class ImporterTest {
 
     @Test
     public void importPetriNet() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID);
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), superCreator.getLoggedSuper().getWorkspaceId());
         assertNetProperlyImported();
     }
 
     @Test
     public void priorityTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/priority_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID);
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/priority_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), superCreator.getLoggedSuper().getWorkspaceId());
         assert outcome.getNet() != null;
 
         CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), outcome.getNet().getTitle().getDefaultValue(), "color", superCreator.getLoggedSuper());
@@ -80,19 +79,19 @@ public class ImporterTest {
 
     @Test
     public void dataGroupTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID);
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), superCreator.getLoggedSuper().getWorkspaceId());
 
         assert outcome.getNet() != null;
     }
 
     @Test
     public void readArcImportTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/read_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID);
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/read_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), superCreator.getLoggedSuper().getWorkspaceId());
     }
 
     @Test
     public void externalMappingTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID);
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), superCreator.getLoggedSuper().getWorkspaceId());
 
         assertExternalMappingImport(outcome.getNet());
     }
@@ -104,7 +103,7 @@ public class ImporterTest {
 
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/invalid_data_ref_layout.xml");
 
-        assertThatThrownBy(() -> petriNetService.importPetriNet(fileInputStream, VersionType.MAJOR, loggedUser, WorkspaceConstants.DEFAULT_WORKSPACE_ID))
+        assertThatThrownBy(() -> petriNetService.importPetriNet(fileInputStream, VersionType.MAJOR, loggedUser, superCreator.getLoggedSuper().getWorkspaceId()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("doesn't have a layout");
 
@@ -135,7 +134,7 @@ public class ImporterTest {
 
     private void assertNetProperlyImported() {
         assert repository.count() > 0;
-        Page<PetriNet> nets = repository.findByIdentifierAndWorkspaceId(NET_ID, WorkspaceConstants.DEFAULT_WORKSPACE_ID, new FullPageRequest());
+        Page<PetriNet> nets = repository.findByIdentifierAndWorkspaceId(NET_ID, superCreator.getLoggedSuper().getWorkspaceId(), new FullPageRequest());
         PetriNet net = nets.getContent().get(0);
         assert net.getTitle().getDefaultValue().equals(NET_TITLE);
         assert net.getInitials().equals(NET_INITIALS);

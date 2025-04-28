@@ -60,7 +60,7 @@ class ActionRefTest {
     @Disabled("TODO: deprecated action ref")
     void testEventImport() {
 
-        PetriNet net = petriNetService.importPetriNet(new FileInputStream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID).getNet()
+        PetriNet net = petriNetService.importPetriNet(new FileInputStream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), userService.getLoggedOrSystem().getWorkspaceId()).getNet()
 
         assert net.dataSet.get("text_1").events.size() == 8
         assert net.transitions.get("task").dataSet.get("text_1").events.size() == 8

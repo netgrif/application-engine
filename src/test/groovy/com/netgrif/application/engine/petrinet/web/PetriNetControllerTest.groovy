@@ -82,7 +82,7 @@ class PetriNetControllerTest {
     void before() {
         testHelper.truncateDbs()
 
-        def net = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
+        def net = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), userService.getLoggedOrSystem().getWorkspaceId())
         assert net.getNet() != null
 
         this.net = net.getNet()

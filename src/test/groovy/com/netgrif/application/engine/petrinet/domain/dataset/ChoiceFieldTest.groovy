@@ -57,7 +57,7 @@ class ChoiceFieldTest {
 
     @Test
     void testChoices() {
-        def netOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
+        def netOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), userService.getLoggedOrSystem().getWorkspaceId())
         assert netOptional.getNet() != null
         def net = netOptional.getNet()
 

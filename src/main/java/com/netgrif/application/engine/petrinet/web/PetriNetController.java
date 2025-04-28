@@ -19,7 +19,6 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.adapter.petrinet.service.ProcessRoleService;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
-import com.netgrif.core.petrinet.domain.workspace.WorkspaceConstants;
 import com.netgrif.core.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
@@ -116,7 +115,7 @@ public class PetriNetController {
         try {
             String decodedUriNodeId = new String(Base64.decodeBase64(uriNodeId));
             VersionType release = releaseType == null ? VersionType.MAJOR : VersionType.valueOf(releaseType.trim().toUpperCase());
-            ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(multipartFile.getInputStream(), release, (LoggedUser) auth.getPrincipal(), decodedUriNodeId, workspaceId == null ? WorkspaceConstants.DEFAULT_WORKSPACE_ID : workspaceId);
+            ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(multipartFile.getInputStream(), release, (LoggedUser) auth.getPrincipal(), decodedUriNodeId, workspaceId == null ? ((LoggedUser) auth.getPrincipal()).getWorkspaceId() : workspaceId);
             return EventOutcomeWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully",
                     LocalisedEventOutcomeFactory.from(importPetriNetOutcome, locale));
         } catch (IOException e) {

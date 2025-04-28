@@ -100,7 +100,7 @@ class FileFieldTest {
     }
 
     PetriNet getNet() {
-        def netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/remoteFileField.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
+        def netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/remoteFileField.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), userService.getLoggedOrSystem().getWorkspaceId())
         assert netOptional.getNet() != null
         return netOptional.getNet()
     }

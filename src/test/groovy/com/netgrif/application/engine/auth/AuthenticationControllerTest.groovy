@@ -85,7 +85,7 @@ class AuthenticationControllerTest {
         smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp")).withConfiguration(GreenMailConfiguration.aConfig().withDisabledAuthentication())
         smtpServer.start()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), userService.getLoggedOrSystem().getWorkspaceId())
         assert net.getNet() != null
         if (authorityService.findAll().size() == 0)
             importHelper.createAuthority(Authority.user)

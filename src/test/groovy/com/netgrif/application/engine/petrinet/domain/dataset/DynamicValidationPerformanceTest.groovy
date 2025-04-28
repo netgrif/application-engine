@@ -62,8 +62,8 @@ class DynamicValidationPerformanceTest {
 
     @Test
     void testValidations() {
-        ImportPetriNetEventOutcome optNet1 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_validations_performance_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
-        ImportPetriNetEventOutcome optNet2 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_validations_performance_test_comparison.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
+        ImportPetriNetEventOutcome optNet1 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_validations_performance_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), userService.getLoggedOrSystem().getWorkspaceId())
+        ImportPetriNetEventOutcome optNet2 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_validations_performance_test_comparison.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), userService.getLoggedOrSystem().getWorkspaceId())
 
         def aCase1 = importHelper.createCase("Case 1", optNet1.getNet())
         def aCase2 = importHelper.createCase("Case 2", optNet2.getNet())

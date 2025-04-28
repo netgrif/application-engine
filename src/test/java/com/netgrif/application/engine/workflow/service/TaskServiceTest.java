@@ -19,7 +19,6 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.runner.SuperCreatorRunner;
 import com.netgrif.application.engine.startup.runner.SystemUserRunner;
 import com.netgrif.application.engine.startup.runner.UriRunner;
-import com.netgrif.core.petrinet.domain.workspace.WorkspaceConstants;
 import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.core.workflow.domain.Task;
 import com.netgrif.core.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
@@ -93,14 +92,14 @@ public class TaskServiceTest {
         userRunner.run(null);
         uriRunner.run(null);
 
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID);
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), userService.getLoggedOrSystem().getWorkspaceId());
         PetriNet net = petriNetRepository.findAll().get(0);
         workflowService.createCase(net.getStringId(), "Storage Unit", "color", mockLoggedUser());
     }
 
     @Test
     public void resetArcTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID).getNet();
+        PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), userService.getLoggedOrSystem().getWorkspaceId()).getNet();
         LoggedUser loggedUser = mockLoggedUser();
         CreateCaseEventOutcome outcome = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);
         User user = new com.netgrif.adapter.auth.domain.User();

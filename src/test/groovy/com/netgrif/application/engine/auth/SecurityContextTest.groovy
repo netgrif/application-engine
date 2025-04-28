@@ -72,7 +72,7 @@ class SecurityContextTest {
         user = userService.saveUser(user, null)
         assert user != null
 
-        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, userService.transformToLoggedUser(userService.getLoggedOrSystem()), WorkspaceConstants.DEFAULT_WORKSPACE_ID).getNet()
+        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, userService.transformToLoggedUser(userService.getLoggedOrSystem()), userService.getLoggedOrSystem().getWorkspaceId()).getNet()
         assert net != null
     }
 

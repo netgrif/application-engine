@@ -59,7 +59,7 @@ class PetriNetTest {
     void testClone() {
         int beforeImportNet = processRoleRepository.count()
 
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper, WorkspaceConstants.DEFAULT_WORKSPACE_ID)
+        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper, userService.getLoggedOrSystem().getWorkspaceId())
 
         assert netOptional.getNet() != null
 
@@ -80,13 +80,13 @@ class PetriNetTest {
 
     @Test
     void testVersioning() {
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper, WorkspaceConstants.DEFAULT_WORKSPACE_ID)
+        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper, userService.getLoggedOrSystem().getWorkspaceId())
         assert netOptional.getNet() != null
 
-        def netOptional2 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper, WorkspaceConstants.DEFAULT_WORKSPACE_ID)
+        def netOptional2 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper, userService.getLoggedOrSystem().getWorkspaceId())
         assert netOptional2.getNet() != null
 
-        def netOptional3 = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper, WorkspaceConstants.DEFAULT_WORKSPACE_ID)
+        def netOptional3 = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper, userService.getLoggedOrSystem().getWorkspaceId())
         assert netOptional3.getNet() != null
 
         def nets = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK)
