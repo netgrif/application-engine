@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.configuration;
 
-import com.netgrif.application.engine.authentication.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ExpressionDelegate;
@@ -42,11 +41,5 @@ public class PrototypesConfiguration {
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public FileStorageConfiguration fileStorageConfiguration() {
         return new FileStorageConfiguration();
-    }
-
-    @Bean("userResourceAssembler")
-    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public UserResourceAssembler userResourceAssembler() {
-        return new UserResourceAssembler();
     }
 }

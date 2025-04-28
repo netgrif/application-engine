@@ -13,8 +13,8 @@ import com.netgrif.application.engine.authorization.domain.permissions.TaskPermi
 import com.netgrif.application.engine.authorization.domain.repositories.RoleRepository;
 import com.netgrif.application.engine.history.domain.baseevent.EventLog;
 import com.netgrif.application.engine.history.domain.baseevent.repository.EventLogRepository;
-import com.netgrif.application.engine.history.domain.userevents.ActorAssignRoleEventLog;
-import com.netgrif.application.engine.history.domain.userevents.ActorRemoveRoleEventLog;
+import com.netgrif.application.engine.history.domain.actorevents.ActorAssignRoleEventLog;
+import com.netgrif.application.engine.history.domain.actorevents.ActorRemoveRoleEventLog;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.ActorField;
 import com.netgrif.application.engine.petrinet.domain.dataset.ActorListField;

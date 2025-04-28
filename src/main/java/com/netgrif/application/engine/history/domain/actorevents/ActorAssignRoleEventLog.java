@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.history.domain.userevents;
+package com.netgrif.application.engine.history.domain.actorevents;
 
 import com.netgrif.application.engine.authorization.domain.Role;
 import lombok.Getter;

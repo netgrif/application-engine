@@ -12,8 +12,8 @@ import com.netgrif.application.engine.authorization.domain.throwable.NotAllRoles
 import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
-import com.netgrif.application.engine.event.events.user.ActorAssignRoleEvent;
-import com.netgrif.application.engine.event.events.user.ActorRemoveRoleEvent;
+import com.netgrif.application.engine.event.events.authorization.ActorAssignRoleEvent;
+import com.netgrif.application.engine.event.events.authorization.ActorRemoveRoleEvent;
 import com.netgrif.application.engine.importer.model.EventPhaseType;
 import com.netgrif.application.engine.importer.model.RoleEventType;
 import com.netgrif.application.engine.petrinet.domain.I18nString;

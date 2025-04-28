@@ -29,7 +29,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         String ip = getClientIP();
         if (loginAttemptService.isBlocked(ip)) {
-            log.info("User {} with IP address {} is blocked.", email, ip);
+            log.info("Identity {} with IP address {} is blocked.", email, ip);
             throw new RuntimeException("blocked");
         }
 

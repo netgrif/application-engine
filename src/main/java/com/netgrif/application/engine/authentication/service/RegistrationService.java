@@ -13,11 +13,13 @@ import com.netgrif.application.engine.authorization.domain.params.ActorParams;
 import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
+import com.netgrif.application.engine.event.events.authentication.IdentityRegistrationEvent;
 import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.startup.ApplicationRoleRunner;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -39,18 +41,21 @@ public class RegistrationService implements IRegistrationService {
     private final ApplicationRoleRunner applicationRoleRunner;
     private final ServerAuthProperties serverAuthProperties;
     private final IIdentityService identityService;
+    private final ApplicationEventPublisher publisher;
 
     private static final String TOKEN_DELIMITER = ":";
 
     public RegistrationService(BCryptPasswordEncoder bCryptPasswordEncoder, IRoleService roleService,
                                @Lazy IActorService actorService, ApplicationRoleRunner applicationRoleRunner,
-                               ServerAuthProperties serverAuthProperties, IIdentityService identityService) {
+                               ServerAuthProperties serverAuthProperties, IIdentityService identityService,
+                               ApplicationEventPublisher publisher) {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.roleService = roleService;
         this.actorService = actorService;
         this.applicationRoleRunner = applicationRoleRunner;
         this.serverAuthProperties = serverAuthProperties;
         this.identityService = identityService;
+        this.publisher = publisher;
     }
 
     /**
@@ -92,6 +97,8 @@ public class RegistrationService implements IRegistrationService {
 //                    groupService.addUser(user, group);
 //                }
 //            }
+
+            publisher.publishEvent(new IdentityRegistrationEvent(identity));
         }
 
         return identity;

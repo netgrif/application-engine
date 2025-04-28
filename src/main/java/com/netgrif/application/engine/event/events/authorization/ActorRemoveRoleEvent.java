@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.event.events.user;
+package com.netgrif.application.engine.event.events.authorization;
 
 import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.authorization.domain.Role;
@@ -7,11 +7,11 @@ import lombok.Getter;
 import java.util.Collection;
 
 @Getter
-public class ActorAssignRoleEvent extends ActorEvent {
+public class ActorRemoveRoleEvent extends ActorEvent {
 
     protected final Collection<Role> roles;
 
-    public ActorAssignRoleEvent(Actor actor, Collection<Role> roles) {
+    public ActorRemoveRoleEvent(Actor actor, Collection<Role> roles) {
         super(actor);
         this.roles = roles;
     }
@@ -23,7 +23,7 @@ public class ActorAssignRoleEvent extends ActorEvent {
             sb.append(role.getTitleAsString());
             sb.append(",");
         });
-        sb.append(" assigned to actor ");
+        sb.append(" removed from actor ");
         sb.append(actor.getEmail());
         return sb.toString();
     }

@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.event.events.user;
+package com.netgrif.application.engine.event.events.authorization;
 
 import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.event.events.Event;

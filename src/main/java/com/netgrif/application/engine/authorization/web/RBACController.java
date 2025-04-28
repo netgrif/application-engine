@@ -53,13 +53,13 @@ public class RBACController {
     }
 
     @PreAuthorize("@applicationAuthorizationService.hasApplicationRole('admin')")
-    @Operation(summary = "Remove roles from the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "BasicAuth")})
+    @Operation(summary = "Remove roles from the actor", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/{actorId}/remove", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public MessageResource removeRolesFromUser(@PathVariable("actorId") String actorId, @RequestBody Set<String> roleIds) {
+    public MessageResource removeRolesFromActor(@PathVariable("actorId") String actorId, @RequestBody Set<String> roleIds) {
         try {
             List<Role> removedRoles = roleService.removeRolesFromActor(actorId, roleIds);
             Set<String> removedRoleIds = removedRoles.stream().map(Role::getStringId).collect(Collectors.toSet());

@@ -1,0 +1,19 @@
+package com.netgrif.application.engine.event.events.authentication;
+
+import com.netgrif.application.engine.authentication.domain.Identity;
+import com.netgrif.application.engine.authorization.domain.Actor;
+import com.netgrif.application.engine.event.events.authorization.ActorEvent;
+
+public class IdentityLogoutEvent extends IdentityEvent {
+
+    // todo 2058 remove or keep (call as result of /logout ?)
+
+    public IdentityLogoutEvent(Identity identity) {
+        super(identity);
+    }
+
+    @Override
+    public String getMessage() {
+        return "";
+    }
+}

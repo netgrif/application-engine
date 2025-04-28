@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.history.domain.userevents;
+package com.netgrif.application.engine.history.domain.actorevents;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;

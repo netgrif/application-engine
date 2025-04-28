@@ -1,11 +1,10 @@
 package com.netgrif.application.engine.history.service.listener;
 
-import com.netgrif.application.engine.event.events.user.*;
+import com.netgrif.application.engine.event.events.authorization.ActorAssignRoleEvent;
+import com.netgrif.application.engine.event.events.authorization.ActorRemoveRoleEvent;
 import com.netgrif.application.engine.history.domain.baseevent.repository.EventLogRepository;
-import com.netgrif.application.engine.history.domain.userevents.ActorEventLog;
-import com.netgrif.application.engine.history.domain.userevents.ActorRemoveRoleEventLog;
-import com.netgrif.application.engine.history.domain.userevents.AdminActionEventLog;
-import com.netgrif.application.engine.history.domain.userevents.ActorAssignRoleEventLog;
+import com.netgrif.application.engine.history.domain.actorevents.ActorRemoveRoleEventLog;
+import com.netgrif.application.engine.history.domain.actorevents.ActorAssignRoleEventLog;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -19,24 +18,6 @@ public class ActorEventListener {
     }
 
     @EventListener
-    public void onUserLoginEvent(UserLoginEvent event) {
-        // todo 2058
-        repository.save(new ActorEventLog(event.getActor().getEmail()));
-    }
-
-    @EventListener
-    public void onUserLogoutEvent(UserLogoutEvent event) {
-        // todo 2058
-        repository.save(new ActorEventLog(event.getActor().getEmail()));
-    }
-
-    @EventListener
-    public void onUserRegistrationEvent(UserRegistrationEvent event) {
-        // todo 2058
-        repository.save(new ActorEventLog("email"));
-    }
-
-    @EventListener
     public void onActorRoleChangeEvent(ActorAssignRoleEvent event) {
         repository.save(new ActorAssignRoleEventLog(event.getActor().getEmail(), event.getRoles()));
     }
@@ -44,10 +25,5 @@ public class ActorEventListener {
     @EventListener
     public void onActorRoleChangeEvent(ActorRemoveRoleEvent event) {
         repository.save(new ActorRemoveRoleEventLog(event.getActor().getEmail(), event.getRoles()));
-    }
-
-    @EventListener
-    public void onAdminActionEvent(AdminActionEvent event) {
-        repository.save(new AdminActionEventLog(event));
     }
 }
