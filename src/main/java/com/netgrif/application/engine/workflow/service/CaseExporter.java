@@ -15,7 +15,6 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.OutputStream;
 import java.math.BigInteger;
@@ -48,8 +47,8 @@ public class CaseExporter {
         this.outputStream = outputStream;
 
         Cases xmlCases = objectFactory.createCases();
-        casesToExport.forEach(caseToExport -> {
-            this.caseToExport = caseToExport;
+        casesToExport.forEach(toExport -> {
+            this.caseToExport = toExport;
             this.translations = new HashMap<>();
             xmlCases.getCase().add(exportCase());
         });
@@ -57,11 +56,12 @@ public class CaseExporter {
         try {
             marshallCase(xmlCases);
         } catch (JAXBException e) {
+            log.error("Error occured during masrhalling of cases", e);
             throw new RuntimeException(e);
         }
     }
 
-    protected void marshallCase(com.netgrif.application.engine.importer.model.Cases caseToExport) throws JAXBException {
+    private void marshallCase(com.netgrif.application.engine.importer.model.Cases caseToExport) throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(com.netgrif.application.engine.importer.model.Cases.class);
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -160,10 +160,10 @@ public class CaseExporter {
         xmlDataField.setComponent(exportComponent(dataFieldToExport.getComponent()));
         xmlDataField.getDataRefComponent().addAll(exportDataRefComponents(dataFieldToExport.getDataRefComponents()));
         xmlDataField.setValidations(exportValidations(dataFieldToExport.getValidations()));
-        if(dataFieldToExport.getOptions() != null) {
+        if (dataFieldToExport.getOptions() != null) {
             xmlDataField.setOptions(exportOptions(dataFieldToExport.getOptions()));
         }
-        if(dataFieldToExport.getChoices() != null) {
+        if (dataFieldToExport.getChoices() != null) {
             xmlDataField.setOptions(exportChoices(dataFieldToExport.getChoices()));
         }
         xmlDataField.setBehaviors(exportTaskBehaviors(dataFieldToExport.getBehavior()));
@@ -259,7 +259,7 @@ public class CaseExporter {
             return null;
         }
         Options xmlOptions = objectFactory.createOptions();
-        options.forEach( option -> {
+        options.forEach(option -> {
             Option xmlOption = objectFactory.createOption();
             xmlOption.setName(option.getKey());
             xmlOption.setValue(option.getDefaultValue());
@@ -340,7 +340,7 @@ public class CaseExporter {
             });
         }
         if (optionIcons != null) {
-            optionIcons.forEach((icon) -> {
+            optionIcons.forEach(icon -> {
                 Icons xmlIcons = objectFactory.createIcons();
                 Icon xmlIcon = objectFactory.createIcon();
                 xmlIcon.setKey(icon.getKey());
@@ -360,7 +360,7 @@ public class CaseExporter {
         switch (type) {
             case DATE:
             case DATETIME:
-                LocalDateTime localDateTime = value instanceof Date ? convertDateToLocalDateTime((Date) value) : (value instanceof LocalDate ? ((LocalDate) value).atTime(LocalTime.NOON) : (LocalDateTime) value);
+                LocalDateTime localDateTime = value instanceof Date castValue ? convertDateToLocalDateTime(castValue) : (value instanceof LocalDate castLocalDateValue ? castLocalDateValue.atTime(LocalTime.NOON) : (LocalDateTime) value);
                 values.getValue().add(exportLocalDateTime(localDateTime));
                 break;
             case CASE_REF:
@@ -373,8 +373,8 @@ public class CaseExporter {
             case USER:
             case USERLIST:
                 Set<UserFieldValue> userFieldValues = new HashSet<>();
-                if (value instanceof UserFieldValue) {
-                    userFieldValues.add((UserFieldValue) value);
+                if (value instanceof UserFieldValue castValue) {
+                    userFieldValues.add(castValue);
                 } else {
                     userFieldValues = ((UserListFieldValue) value).getUserValues();
                 }
@@ -383,8 +383,8 @@ public class CaseExporter {
             case FILE:
             case FILELIST:
                 Set<FileFieldValue> fileFieldValues = new HashSet<>();
-                if (value instanceof FileFieldValue) {
-                    fileFieldValues.add((FileFieldValue) value);
+                if (value instanceof FileFieldValue castValue) {
+                    fileFieldValues.add(castValue);
                 } else {
                     fileFieldValues = ((FileListFieldValue) value).getNamesPaths();
                 }

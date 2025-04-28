@@ -5,15 +5,14 @@ import com.netgrif.application.engine.files.IStorageResolverService;
 import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.petrinet.domain.dataset.StorageField;
 import com.netgrif.application.engine.workflow.domain.CaseExportFiles;
+import com.netgrif.application.engine.workflow.domain.StorageFieldWithFileNames;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Set;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -37,13 +36,13 @@ public class ZipService implements IArchiveService {
     public void pack(OutputStream archiveStream, CaseExportFiles caseExportFiles, String... additionalFiles) throws IOException {
         ZipOutputStream zipStream = new ZipOutputStream(archiveStream);
         for (String caseId : caseExportFiles.getCaseIds()) {
-            for (ImmutablePair<StorageField<?>, Set<String>> field : caseExportFiles.getFieldsOfCase(caseId)) {
-                StorageField<?> storageField = field.left;
-                IStorageService storageService = storageResolverService.resolve(storageField.getStorageType());
-                for (String fileName : field.right) {
-                    String filePath = storageService.getPath(caseId, storageField.getStringId(), fileName);
-                    InputStream fis = storageService.get(storageField, filePath);
-                    String newFileName = caseId.concat(File.separator).concat(storageField.getStringId()).concat(File.separator).concat(fileName);
+            for (StorageFieldWithFileNames fieldWithFileNames : caseExportFiles.getFieldsOfCase(caseId)) {
+                StorageField<?> field = fieldWithFileNames.getField();
+                IStorageService storageService = storageResolverService.resolve(field.getStorageType());
+                for (String fileName : fieldWithFileNames.getFileNames()) {
+                    String filePath = storageService.getPath(caseId, field.getStringId(), fileName);
+                    InputStream fis = storageService.get(field, filePath);
+                    String newFileName = Paths.get(caseId, field.getStringId(), fileName).getFileName().toString();
                     createAndWriteZipEntry(newFileName, zipStream, fis);
                     fis.close();
                 }

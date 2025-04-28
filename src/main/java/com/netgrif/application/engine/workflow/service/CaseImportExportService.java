@@ -1,15 +1,15 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.archive.interfaces.IArchiveService;
-import com.netgrif.application.engine.configuration.properties.CaseImportExportProperties;
+import com.netgrif.application.engine.configuration.properties.CaseExportProperties;
 import com.netgrif.application.engine.files.IStorageResolverService;
 import com.netgrif.application.engine.files.interfaces.IStorageService;
 import com.netgrif.application.engine.files.throwable.StorageException;
-import com.netgrif.application.engine.petrinet.domain.dataset.*;
-import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.CaseExportFiles;
-import com.netgrif.application.engine.workflow.domain.DataField;
-import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
+import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
+import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue;
+import com.netgrif.application.engine.petrinet.domain.dataset.StorageField;
+import com.netgrif.application.engine.workflow.domain.*;
 import com.netgrif.application.engine.workflow.exceptions.ImportXmlFileMissingException;
 import com.netgrif.application.engine.workflow.service.interfaces.ICaseImportExportService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -37,7 +37,7 @@ public class CaseImportExportService implements ICaseImportExportService {
     private final IArchiveService archiveService;
     private final IWorkflowService workflowService;
     private final IStorageResolverService storageResolverService;
-    private final CaseImportExportProperties properties;
+    private final CaseExportProperties properties;
     private final ITaskService taskService;
 
     protected CaseImporter getCaseImporter() {
@@ -60,7 +60,7 @@ public class CaseImportExportService implements ICaseImportExportService {
 
     @Override
     public void exportCasesWithFiles(List<Case> casesToExport, OutputStream archiveStream) throws IOException {
-        File exportFile = new File(Files.createTempDirectory("case_export").toFile(), properties.getExport().getFileName());
+        File exportFile = new File(Files.createTempDirectory("case_export").toFile(), properties.getFileName());
         this.exportCases(casesToExport, new FileOutputStream(exportFile));
         CaseExportFiles caseFiles = this.getFileNamesOfCases(casesToExport);
         archiveService.pack(archiveStream, caseFiles, exportFile.getPath());
@@ -90,7 +90,7 @@ public class CaseImportExportService implements ICaseImportExportService {
                         } else {
                             namesPaths.add(((FileFieldValue) dataField.getValue()).getName());
                         }
-                        filesToExport.addFieldFilenames(exportCase.getStringId(), (StorageField<?>) field, namesPaths);
+                        filesToExport.addFieldFilenames(exportCase.getStringId(), new StorageFieldWithFileNames((StorageField<?>) field, namesPaths));
                     });
         }
         return filesToExport;
@@ -103,16 +103,16 @@ public class CaseImportExportService implements ICaseImportExportService {
         if (importedCases.isEmpty()) {
             return importedCases;
         }
-        return saveImportedObjects(importedCases,importer.getImportedTasksMap());
+        return saveImportedObjects(importedCases, importer.getImportedTasksMap());
     }
 
     @Override
     public List<Case> importCasesWithFiles(InputStream importZipStream) throws IOException, StorageException, ImportXmlFileMissingException {
         String directoryPath = archiveService.unpack(importZipStream, Files.createTempDirectory(UUID.randomUUID().toString()).toString());
         importZipStream.close();
-        File caseExportXmlFile = FileUtils.getFile(new File(directoryPath.concat(File.separator).concat(properties.getExport().getFileName())));
+        File caseExportXmlFile = FileUtils.getFile(new File(directoryPath.concat(File.separator).concat(properties.getFileName())));
         if (!caseExportXmlFile.exists() || caseExportXmlFile.isDirectory()) {
-            throw new ImportXmlFileMissingException("Xml import file with name [" + properties.getExport().getFileName() + "] not found in archive");
+            throw new ImportXmlFileMissingException("Xml import file with name [" + properties.getFileName() + "] not found in archive");
         }
         FileInputStream fis = new FileInputStream(caseExportXmlFile);
         CaseImporter importer = getCaseImporter();
@@ -121,7 +121,7 @@ public class CaseImportExportService implements ICaseImportExportService {
         if (importedCases.isEmpty()) {
             return importedCases;
         }
-        importedCases = saveImportedObjects(importedCases,importer.getImportedTasksMap());
+        importedCases = saveImportedObjects(importedCases, importer.getImportedTasksMap());
         List<String> caseFilesDirectories = Arrays.stream(Objects.requireNonNull(new File(directoryPath).list(DirectoryFileFilter.DIRECTORY)))
                 .map(caseDirectory -> directoryPath.concat(File.separator).concat(caseDirectory))
                 .toList();
