@@ -86,10 +86,10 @@ public class CaseAuthorizationServiceTest {
         assert !authorizationService.canCallCreate(null);
         assert !authorizationService.canCallCreate(testProcess.getStringId());
 
-        assignProcessRole(processRoleRepository.findByImportId("create_pos_role"));
+        assignProcessRole(processRoleRepository.findByImportId("pos_process_role"));
         assert authorizationService.canCallCreate(testProcess.getStringId());
 
-        assignProcessRole(processRoleRepository.findByImportId("create_neg_role"));
+        assignProcessRole(processRoleRepository.findByImportId("neg_process_role"));
         assert !authorizationService.canCallCreate(testProcess.getStringId());
 
         assignAppRole(applicationRoleRunner.getAppRole(ApplicationRoleRunner.ADMIN_APP_ROLE));
@@ -106,17 +106,17 @@ public class CaseAuthorizationServiceTest {
 
         assert !authorizationService.canCallDelete(testCase.getStringId());
 
-        assignProcessRole(processRoleRepository.findByImportId("delete_pos_role"));
+        assignProcessRole(processRoleRepository.findByImportId("pos_process_role"));
         assert authorizationService.canCallDelete(testCase.getStringId());
 
-        assignProcessRole(processRoleRepository.findByImportId("delete_neg_role"));
+        assignProcessRole(processRoleRepository.findByImportId("neg_process_role"));
         assert !authorizationService.canCallDelete(testCase.getStringId());
 
-        assignCaseRole(caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "delete_pos_case_role"),
+        assignCaseRole(caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "pos_case_role"),
                 testCase);
         assert authorizationService.canCallDelete(testCase.getStringId());
 
-        assignCaseRole(caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "delete_neg_case_role"),
+        assignCaseRole(caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "neg_case_role"),
                 testCase);
         assert !authorizationService.canCallDelete(testCase.getStringId());
 
