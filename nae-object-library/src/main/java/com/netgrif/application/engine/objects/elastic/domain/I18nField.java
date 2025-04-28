@@ -1,0 +1,21 @@
+package com.netgrif.application.engine.objects.elastic.domain;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+import java.util.Set;
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public abstract class I18nField extends TextField {
+
+    public String[] keyValue;
+
+    public I18nField(Set<String> keys, Set<String> values) {
+        super(new String[0]);
+        this.keyValue = keys.toArray(new String[0]);
+        this.textValue = values.toArray(new String[0]);
+    }
+}
