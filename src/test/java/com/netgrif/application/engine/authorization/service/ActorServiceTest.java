@@ -74,13 +74,14 @@ public class ActorServiceTest {
     }
 
     @Test
-    void testFindById() {
+    void testFindById() throws InterruptedException {
         assert actorService.findById(null).isEmpty();
         assert actorService.findById(new ObjectId().toString()).isEmpty();
 
         String email = "some@email.com";
         Actor actor = createActor(email);
 
+        Thread.sleep(2000);
         assert actorService.findById(actor.getStringId()).isPresent();
     }
 

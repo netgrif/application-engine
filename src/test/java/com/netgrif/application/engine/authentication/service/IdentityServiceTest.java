@@ -100,8 +100,9 @@ public class IdentityServiceTest {
     }
 
     @Test
-    void testFindById() {
+    void testFindById() throws InterruptedException {
         Identity identity = createIdentity("username");
+        Thread.sleep(2000);
         assert identityService.findById(identity.getStringId()).isPresent();
         assert identityService.findById(new ObjectId().toString()).isEmpty();
     }
