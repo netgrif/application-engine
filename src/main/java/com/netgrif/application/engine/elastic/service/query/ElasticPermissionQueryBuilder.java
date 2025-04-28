@@ -3,6 +3,7 @@ package com.netgrif.application.engine.elastic.service.query;
 import com.netgrif.application.engine.authorization.domain.RoleAssignment;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
+import com.netgrif.application.engine.startup.ApplicationRoleRunner;
 import lombok.RequiredArgsConstructor;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toUnmodifiableSet;
 import static org.elasticsearch.index.query.QueryBuilders.*;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 
@@ -21,11 +21,21 @@ public class ElasticPermissionQueryBuilder {
 
     private final IRoleAssignmentService roleAssignmentService;
     private final IRoleService roleService;
+    private final ApplicationRoleRunner applicationRoleRunner;
 
     /**
      * todo javadoc
      * */
     public BoolQueryBuilder buildSingleQuery(String actorId) {
+        // Collect assigned roles to user
+        List<RoleAssignment> assignments = roleAssignmentService.findAllByActorId(actorId);
+        final Set<String> assignedRoleIds = assignments.stream().map(RoleAssignment::getRoleId).collect(Collectors.toSet());
+
+        // Is actor admin?
+        if (assignedRoleIds.contains(applicationRoleRunner.getAppRole(ApplicationRoleRunner.ADMIN_APP_ROLE).getStringId())) {
+            return boolQuery();
+        }
+
         // Check if processRoles or caseRoles exist
         BoolQueryBuilder viewPermsExists = boolQuery()
                 .should(existsQuery("viewProcessRoles"))
@@ -34,9 +44,7 @@ public class ElasticPermissionQueryBuilder {
         BoolQueryBuilder viewPermNotExists = boolQuery()
                 .mustNot(viewPermsExists);
 
-        // Collect assigned roles to user
-        List<RoleAssignment> assignments = roleAssignmentService.findAllByActorId(actorId);
-        final Set<String> assignedRoleIds = assignments.stream().map(RoleAssignment::getRoleId).collect(Collectors.toSet());
+        // Add default process role
         assignedRoleIds.add(roleService.findDefaultRole().getStringId());
 
         // Build queries for each role type

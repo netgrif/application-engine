@@ -3,13 +3,17 @@ package com.netgrif.application.engine.elastic;
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
-import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
+import com.netgrif.application.engine.authorization.domain.*;
+import com.netgrif.application.engine.authorization.domain.repositories.CaseRoleRepository;
+import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository;
+import com.netgrif.application.engine.authorization.domain.repositories.RoleAssignmentRepository;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.startup.ApplicationRoleRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -40,7 +44,16 @@ public class ElasticCaseSearchPermissionTest {
     private IElasticCaseService elasticCaseService;
 
     @Autowired
-    private IRoleAssignmentService roleAssignmentService;
+    private RoleAssignmentRepository roleAssignmentRepository;
+
+    @Autowired
+    private ProcessRoleRepository processRoleRepository;
+
+    @Autowired
+    private CaseRoleRepository caseRoleRepository;
+
+    @Autowired
+    private ApplicationRoleRunner applicationRoleRunner;
 
     @Autowired
     private IPetriNetService petriNetService;
@@ -64,7 +77,6 @@ public class ElasticCaseSearchPermissionTest {
     public void before() {
         testHelper.truncateDbs();
         createActor();
-        testHelper.login(superCreator.getSuperIdentity());
     }
 
     /**
@@ -93,8 +105,7 @@ public class ElasticCaseSearchPermissionTest {
         buildSearchRequest();
         Thread.sleep(2000);
 
-        Page<Case> pagedResult = elasticCaseService.search(List.of(request), testIdentity.toSession(), PageRequest.of(0, 2),
-                Locale.getDefault(), false);
+        Page<Case> pagedResult = doSearch(request);
 
         assert pagedResult.hasContent();
         assert pagedResult.getTotalElements() == 1;
@@ -112,7 +123,9 @@ public class ElasticCaseSearchPermissionTest {
     private void createTestCase(String identifier) throws IOException, MissingPetriNetMetaDataException {
         Process process = petriNetService.importPetriNet(new FileInputStream(String.format("src/test/resources/petriNets/%s.xml", identifier)),
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId()).getNet();
+        testHelper.login(superCreator.getSuperIdentity());
         testCase = importHelper.createCase("Case permissions", process);
+        testHelper.logout();
     }
 
     private void buildSearchRequest() {
@@ -123,8 +136,7 @@ public class ElasticCaseSearchPermissionTest {
      * todo javadoc
      * */
     private void assertWithoutRole() {
-        Page<Case> pagedResult = elasticCaseService.search(List.of(request), testIdentity.toSession(), PageRequest.of(0, 2),
-                Locale.getDefault(), false);
+        Page<Case> pagedResult = doSearch(request);
         assert !pagedResult.hasContent();
     }
 
@@ -132,28 +144,81 @@ public class ElasticCaseSearchPermissionTest {
      * todo javadoc
      * */
     private void assertWithAddedPosProcessRole() {
+        assignProcessRole(processRoleRepository.findByImportId("pos_process_role"));
 
+        Page<Case> pagedResult = doSearch(request);
+        assert pagedResult.hasContent();
+        assert pagedResult.getTotalElements() == 1;
     }
 
     /**
      * todo javadoc
      * */
-    private void assertWithAddedNegProcessRole() {}
+    private void assertWithAddedNegProcessRole() {
+        assignProcessRole(processRoleRepository.findByImportId("neg_process_role"));
+
+        Page<Case> pagedResult = doSearch(request);
+        assert !pagedResult.hasContent();
+    }
 
     /**
      * todo javadoc
      * */
-    private void assertWithAddedPosCaseRole() {}
+    private void assertWithAddedPosCaseRole() {
+        assignCaseRole(caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "pos_case_role"));
+
+        Page<Case> pagedResult = doSearch(request);
+        assert pagedResult.hasContent();
+        assert pagedResult.getTotalElements() == 1;
+    }
 
     /**
      * todo javadoc
      * */
-    private void assertWithAddedNegCaseRole() {}
+    private void assertWithAddedNegCaseRole() {
+        assignCaseRole(caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "neg_case_role"));
+
+        Page<Case> pagedResult = doSearch(request);
+        assert !pagedResult.hasContent();
+    }
 
     /**
      * todo javadoc
      * */
-    private void assertWithAddedAdminAppRole() {}
+    private void assertWithAddedAdminAppRole() {
+        assignAppRole(applicationRoleRunner.getAppRole(ApplicationRoleRunner.ADMIN_APP_ROLE));
+
+        Page<Case> pagedResult = doSearch(request);
+        assert pagedResult.hasContent();
+        assert pagedResult.getTotalElements() == 1;
+    }
+
+    private Page<Case> doSearch(CaseSearchRequest request) {
+        return elasticCaseService.search(List.of(request), testIdentity.toSession(), PageRequest.of(0, 2),
+                Locale.getDefault(), false);
+    }
+
+    private void assignProcessRole(ProcessRole role) {
+        RoleAssignment assignment = new ProcessRoleAssignment();
+        assignment.setActorId(testIdentity.getMainActorId());
+        assignment.setRoleId(role.getStringId());
+        roleAssignmentRepository.save(assignment);
+    }
+
+    private void assignCaseRole(CaseRole role) {
+        CaseRoleAssignment assignment = new CaseRoleAssignment();
+        assignment.setActorId(testIdentity.getMainActorId());
+        assignment.setRoleId(role.getStringId());
+        assignment.setCaseId(testCase.getStringId());
+        roleAssignmentRepository.save(assignment);
+    }
+
+    private void assignAppRole(ApplicationRole role) {
+        ApplicationRoleAssignment assignment = new ApplicationRoleAssignment();
+        assignment.setActorId(testIdentity.getMainActorId());
+        assignment.setRoleId(role.getStringId());
+        roleAssignmentRepository.save(assignment);
+    }
 
 
 }
