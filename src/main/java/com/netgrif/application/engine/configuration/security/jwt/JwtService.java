@@ -75,7 +75,8 @@ public class JwtService implements IJwtService {
                 userMap.get("username").toString(),
                 userMap.get("password").toString(),
                 Collections.singleton(authorityService.getOrCreate(authority)),
-                Collections.singleton(roleService.anonymousRole())
+                Collections.singleton(roleService.anonymousRole()),
+                Collections.emptySet()
         );
         user.setFirstName(userMap.get("firstName").toString());
         user.getAttributes().put("anonymous", new Attribute<>(true, false));

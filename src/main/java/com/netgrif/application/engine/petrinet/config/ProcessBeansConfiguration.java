@@ -7,6 +7,8 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepositor
 import com.netgrif.application.engine.petrinet.service.PetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
+import com.netgrif.auth.service.GroupService;
+import com.netgrif.auth.service.RealmService;
 import com.netgrif.auth.service.UserService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationEventPublisher;
@@ -25,7 +27,9 @@ public class ProcessBeansConfiguration {
                                                  RoleActionsRunner roleActionsRunner,
                                                  @Lazy PetriNetService petriNetService,
                                                  @Lazy UserService userService,
-                                                 ISecurityContextService securityContextService) {
+                                                 ISecurityContextService securityContextService,
+                                                 @Lazy GroupService groupService
+                                                 ) {
         return new com.netgrif.application.engine.petrinet.service.ProcessRoleService(
                 processRoleRepository,
                 petriNetRepository,
@@ -33,7 +37,8 @@ public class ProcessBeansConfiguration {
                 roleActionsRunner,
                 petriNetService,
                 userService,
-                securityContextService
+                securityContextService,
+                groupService
         );
     }
 
