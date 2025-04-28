@@ -4,6 +4,7 @@ import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authorization.domain.permissions.TaskPermission;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.authorization.service.interfaces.ITaskAuthorizationService;
 import com.netgrif.application.engine.startup.ApplicationRoleRunner;
 import com.netgrif.application.engine.workflow.domain.State;
@@ -17,8 +18,8 @@ public class TaskAuthorizationService extends AuthorizationService implements IT
     private final ITaskService taskService;
 
     public TaskAuthorizationService(IIdentityService identityService, IRoleAssignmentService roleAssignmentService,
-                                    ApplicationRoleRunner applicationRoleRunner, ITaskService taskService) {
-        super(identityService, roleAssignmentService, applicationRoleRunner);
+                                    ApplicationRoleRunner applicationRoleRunner, ITaskService taskService, IRoleService roleService) {
+        super(identityService, roleAssignmentService, applicationRoleRunner, roleService);
         this.taskService = taskService;
     }
 

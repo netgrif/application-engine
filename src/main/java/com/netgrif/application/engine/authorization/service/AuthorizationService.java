@@ -5,6 +5,7 @@ import com.netgrif.application.engine.authentication.service.interfaces.IIdentit
 import com.netgrif.application.engine.authorization.domain.ApplicationRole;
 import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
+import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.startup.ApplicationRoleRunner;
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +19,7 @@ public abstract class AuthorizationService {
     protected final IIdentityService identityService;
     private final IRoleAssignmentService roleAssignmentService;
     private final ApplicationRoleRunner applicationRoleRunner;
+    private final IRoleService roleService;
 
     /**
      * todo javadoc
@@ -31,13 +33,12 @@ public abstract class AuthorizationService {
         }
 
         Set<String> roleIds = roleAssignmentService.findAllRoleIdsByActorId(loggedIdentity.getActiveActorId());
-        if (roleIds.isEmpty() || permission == null) {
-            return false;
-        }
 
         if (isAdmin(roleIds)) {
             return true;
         }
+
+        roleIds.add(roleService.findDefaultRole().getStringId());
 
         Optional<Boolean> permittedByCaseRoleOpt = isPermitted(roleIds, caseRolePermissions, permission);
         if (permittedByCaseRoleOpt.isPresent()) {

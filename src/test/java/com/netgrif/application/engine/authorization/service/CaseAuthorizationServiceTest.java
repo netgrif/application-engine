@@ -63,6 +63,8 @@ public class CaseAuthorizationServiceTest {
 
     private Process testProcess;
 
+    private Process testProcessWithDefault;
+
     @BeforeEach
     public void beforeEach() throws IOException, MissingPetriNetMetaDataException {
         testHelper.truncateDbs();
@@ -77,6 +79,9 @@ public class CaseAuthorizationServiceTest {
         testProcess = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/case_authorization_service_test.xml"),
                 VersionType.MAJOR, identityService.getLoggedSystemIdentity().getActiveActorId()).getNet();
 
+        testProcessWithDefault = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/case_authorization_default_service_test.xml"),
+                VersionType.MAJOR, identityService.getLoggedSystemIdentity().getActiveActorId()).getNet();
+
         testHelper.login(testIdentity);
     }
 
@@ -84,6 +89,7 @@ public class CaseAuthorizationServiceTest {
     public void canCallCreate() {
         // order of assertions is important!
         assert !authorizationService.canCallCreate(null);
+        assert authorizationService.canCallCreate(testProcessWithDefault.getStringId());
         assert !authorizationService.canCallCreate(testProcess.getStringId());
 
         assignProcessRole(processRoleRepository.findByImportId("pos_process_role"));
@@ -103,8 +109,10 @@ public class CaseAuthorizationServiceTest {
     public void canCallDelete() {
         // order of assertions is important!
         Case testCase = importHelper.createCase("test", testProcess);
+        Case testCaseWithDefault = importHelper.createCase("test with default role", testProcessWithDefault);
 
         assert !authorizationService.canCallDelete(testCase.getStringId());
+        assert authorizationService.canCallDelete(testCaseWithDefault.getStringId());
 
         assignProcessRole(processRoleRepository.findByImportId("pos_process_role"));
         assert authorizationService.canCallDelete(testCase.getStringId());
