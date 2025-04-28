@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.elastic.service;
 
+import com.netgrif.auth.service.UserService;
 import com.netgrif.core.elastic.domain.ElasticPetriNet;
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
@@ -21,12 +22,15 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
 
     private final ElasticPetriNetRepository repository;
 
+    private final UserService userService;
+
     private final Executor executors;
 
     private IPetriNetService petriNetService;
 
-    public ElasticPetriNetService(ElasticPetriNetRepository repository, Executor executors) {
+    public ElasticPetriNetService(ElasticPetriNetRepository repository, UserService userService, Executor executors) {
         this.repository = repository;
+        this.userService = userService;
         this.executors = executors;
     }
 
@@ -86,7 +90,7 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
 
     @Override
     public List<PetriNet> findAllByUriNodeId(String uriNodeId) {
-        List<com.netgrif.adapter.elastic.domain.ElasticPetriNet> elasticPetriNets = repository.findAllByUriNodeId(uriNodeId);
+        List<com.netgrif.adapter.elastic.domain.ElasticPetriNet> elasticPetriNets = repository.findAllByUriNodeIdAndWorkspaceId(uriNodeId, userService.getLoggedOrSystem().getWorkspaceId());
         return petriNetService.findAllById(elasticPetriNets.stream().map(ElasticPetriNet::getStringId).collect(Collectors.toList()));
     }
 }

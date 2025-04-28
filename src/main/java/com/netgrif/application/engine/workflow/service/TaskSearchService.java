@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
+import com.netgrif.adapter.workflow.domain.QCase;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.core.petrinet.domain.PetriNetSearch;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -113,6 +114,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
         buildFullTextQuery(request, builder);
         buildTransitionQuery(request, builder);
         buildTagsQuery(request, builder);
+        builder.and(QTask.task.workspaceId.eq(user.getWorkspaceId()));
         boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, builder);
 
         if (resultAlwaysEmpty)

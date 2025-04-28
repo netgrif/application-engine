@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.action
 
 import com.netgrif.adapter.auth.domain.AuthorityImpl
+import com.netgrif.application.engine.petrinet.service.PetriNetService
 import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.core.auth.domain.Authority
@@ -106,10 +107,10 @@ class AssignActionTest {
     }
 
     private void createMainAndSecondaryNet() {
-        def mainNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/assignRoleMainNet_test_.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def mainNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/assignRoleMainNet_test_.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
         assert mainNet.getNet() != null
 
-        def secondaryNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/assignRoleSecondaryNet_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def secondaryNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/assignRoleSecondaryNet_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
         assert secondaryNet.getNet() != null
 
         this.mainNet = mainNet.getNet()

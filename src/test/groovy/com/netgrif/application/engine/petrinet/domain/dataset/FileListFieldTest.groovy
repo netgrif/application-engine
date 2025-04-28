@@ -3,6 +3,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.petrinet.service.PetriNetService
 import com.netgrif.core.auth.domain.IUser
 import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.importer.service.Importer
@@ -163,7 +164,7 @@ class FileListFieldTest {
     }
 
     PetriNet getNet() {
-        def netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/remoteFileListField.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/remoteFileListField.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
         assert netOptional.getNet() != null
         return netOptional.getNet()
     }

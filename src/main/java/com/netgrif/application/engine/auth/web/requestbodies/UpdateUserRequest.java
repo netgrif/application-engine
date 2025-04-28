@@ -25,6 +25,8 @@ public class UpdateUserRequest implements IUser, Serializable {
 
     public String surname;
 
+    public String workspaceId;
+
     public UpdateUserRequest() {
     }
 

@@ -2,6 +2,7 @@ package com.netgrif.application.engine.importer
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.RoleFactory
+import com.netgrif.application.engine.petrinet.service.PetriNetService
 import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.core.petrinet.domain.roles.ProcessRolePermission
@@ -445,7 +446,7 @@ class PredefinedRolesPermissionsTest {
     }
 
     private NetCaseTask importAndCreate(Resource model) {
-        ImportPetriNetEventOutcome importOutcome = petriNetService.importPetriNet(model.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        ImportPetriNetEventOutcome importOutcome = petriNetService.importPetriNet(model.inputStream, VersionType.MAJOR, superCreator.loggedSuper, WorkspaceConstants.DEFAULT_WORKSPACE_ID)
 
         assert importOutcome.getNet() != null
 

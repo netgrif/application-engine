@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.action
 
+import com.netgrif.application.engine.petrinet.service.PetriNetService
 import com.netgrif.auth.service.UserService
 import com.netgrif.adapter.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.TestHelper
@@ -92,7 +93,7 @@ class RemoveActionTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/removeRole_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/removeRole_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
         assert net.getNet() != null
 
         this.petriNet = net.getNet()

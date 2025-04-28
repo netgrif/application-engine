@@ -16,17 +16,19 @@ public interface PetriNetRepository extends MongoRepository<PetriNet, String>, Q
 
     PetriNet findByImportId(String id);
 
-    List<PetriNet> findAllByIdentifier(String identifier);
+    List<PetriNet> findAllByIdentifierAndWorkspaceId(String identifier, String workspaceId);
 
-    PetriNet findByIdentifierAndVersion(String identifier, Version version);
+    PetriNet findByIdentifierAndVersionAndWorkspaceId(String identifier, Version version, String workspaceId);
 
-    Page<PetriNet> findByIdentifier(String identifier, Pageable pageable);
+    Page<PetriNet> findByIdentifierAndWorkspaceId(String identifier, String workspaceId, Pageable pageable);
 
-    Page<PetriNet> findByIdentifierIn(List<String> identifier, Pageable pageable);
+    Page<PetriNet> findByIdentifierInAndWorkspaceId(List<String> identifier, String workspaceId, Pageable pageable);
 
-    List<PetriNet> findAllByVersion(Version version);
+    List<PetriNet> findAllByVersionAndWorkspaceId(Version version, String workspaceId);
 
-    List<PetriNet> findAllByUriNodeId(String uri);
+    List<PetriNet> findAllByUriNodeIdAndWorkspaceId(String uri, String workspaceId);
+
+    List<PetriNet> findAllByWorkspaceId(String workspaceId);
 
     void deleteBy_id(ObjectId id);
 }

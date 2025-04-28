@@ -94,6 +94,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         permissionConstraints.or(buildViewUserQueryConstraint(loggedOrImpersonated));
         permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(loggedOrImpersonated));
         builder.and(permissionConstraints);
+        builder.and(QCase.case$.workspaceId.eq(loggedOrImpersonated.getWorkspaceId()));
         return builder;
     }
 

@@ -2,6 +2,7 @@ package com.netgrif.application.engine.elastic
 
 import com.netgrif.application.engine.MockService
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.petrinet.service.PetriNetService
 import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
@@ -95,7 +96,7 @@ class DataSearchRequestTest {
     void before() {
         testHelper.truncateDbs()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
         assert net.getNet() != null
 
         def users = userService.findAllUsers(null)

@@ -16,22 +16,24 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
 
     ProcessRole findByImportId(String importId);
 
+    List<ProcessRole> findAllByWorkspaceId(String workspaceId);
+
     Set<ProcessRole> findAllByProcessId(String netId);
 
     Set<ProcessRole> findAllByImportIdIn(Set<String> importIds);
 
-    Set<ProcessRole> findAllByName_DefaultValue(String name);
+    Set<ProcessRole> findAllByName_DefaultValueAndWorkspaceId(String name, String workspaceId);
 
-    Set<ProcessRole> findAllByImportId(String importId);
+    Set<ProcessRole> findAllByImportIdAndWorkspaceId(String importId, String workspaceId);
 
-    Set<ProcessRole> findAllByGlobalIsTrue();
+    Set<ProcessRole> findAllByGlobalIsTrueAndWorkspaceId(String workspaceId);
 
     @Query("{ '_id.objectId': ?0 }")
+
+
     Optional<ProcessRole> findByIdObjectId(ObjectId objectId);
 
     void deleteAllBy_idIn(Collection<ProcessResourceId> ids);
-
-
         //TODO: It goes one at a time... make bulk
     default Set<ProcessRole> findAllById(Set<String> ids) {
         return ids.stream()

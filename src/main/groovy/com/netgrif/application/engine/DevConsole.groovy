@@ -1,5 +1,6 @@
 package com.netgrif.application.engine
 
+import com.netgrif.core.auth.domain.LoggedUser
 import com.netgrif.core.importer.model.Document
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
@@ -7,6 +8,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -33,15 +35,17 @@ class DevConsole {
     private PetriNetRepository netRepository
 
     @GetMapping(value = "/dataset/{title}", produces = APPLICATION_JSON_VALUE)
-    String dataset(@PathVariable String title) {
-        def useCase = caseRepository.findAll().find { it.title == title }
+    String dataset(@PathVariable String title, Authentication auth) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        def useCase = caseRepository.findAllByWorkspaceId(loggedUser.getWorkspaceId()).find { it.title == title }
         return "{ ${useCase?.dataSet?.collect { "\"${useCase?.petriNet?.dataSet?.get(it?.key)?.importId}:${useCase?.petriNet?.dataSet?.get(it?.key)?.name?.toString()?.replaceAll("\n[ ]{2}", "")}\":\"${it?.value?.value as String}\"" }?.join(", ")} }"
     }
 
     @GetMapping(value = "/net/{title}", produces = APPLICATION_XML_VALUE)
-    String netSnapshot(@PathVariable String title) {
+    String netSnapshot(@PathVariable String title, Authentication auth) {
         try {
-            def useCase = caseRepository.findAll().find { it.title == title }
+            LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+            def useCase = caseRepository.findAllByWorkspaceId(loggedUser.getWorkspaceId()).find { it.title == title }
             def net = useCase.petriNet
             def xml = new File(net.importXmlPath)
 

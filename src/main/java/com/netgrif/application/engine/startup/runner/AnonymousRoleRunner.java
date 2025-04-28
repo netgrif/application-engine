@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.startup.runner;
 
+import com.netgrif.auth.service.UserService;
 import com.netgrif.core.petrinet.domain.I18nString;
 import com.netgrif.core.petrinet.domain.events.Event;
 import com.netgrif.core.petrinet.domain.events.EventType;
@@ -7,6 +8,7 @@ import com.netgrif.core.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
+import com.netgrif.core.petrinet.domain.workspace.WorkspaceConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -23,10 +25,12 @@ public class AnonymousRoleRunner implements ApplicationEngineStartupRunner {
 
     private final ProcessRoleRepository repository;
 
+    private final UserService userService;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("Creating anonymous process role");
-        Set<ProcessRole> role = repository.findAllByImportId(ProcessRole.ANONYMOUS_ROLE);
+        Set<ProcessRole> role = repository.findAllByImportIdAndWorkspaceId(ProcessRole.ANONYMOUS_ROLE, WorkspaceConstants.DEFAULT_WORKSPACE_ID);
         if (role != null && !role.isEmpty()) {
             log.info("Anonymous role already exists");
             return;

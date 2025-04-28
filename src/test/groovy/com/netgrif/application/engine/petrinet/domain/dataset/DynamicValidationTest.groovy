@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.petrinet.service.PetriNetService
 import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.core.petrinet.domain.dataset.Field
 import com.netgrif.core.petrinet.domain.dataset.logic.validation.DynamicValidation
@@ -57,7 +58,7 @@ class DynamicValidationTest {
     @Test
     @Disabled
     void testValidations() {
-        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_validations.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_validations.xml"), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
         Case useCase = importHelper.createCase("test", optNet.getNet())
         Map<String, Field> data = getData(useCase)
         assert (data["number"]).validations[0] instanceof DynamicValidation

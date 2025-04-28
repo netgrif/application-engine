@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.webprocessRolesAndPermissionses
 
 import com.netgrif.adapter.auth.domain.AuthorityImpl
+import com.netgrif.application.engine.petrinet.service.PetriNetService
 import com.netgrif.auth.service.UserService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.core.auth.domain.Authority
@@ -81,7 +82,7 @@ class PetriNetControllerTest {
     void before() {
         testHelper.truncateDbs()
 
-        def net = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
         assert net.getNet() != null
 
         this.net = net.getNet()

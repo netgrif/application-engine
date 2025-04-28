@@ -215,6 +215,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         buildCaseIdQuery(request, query);
         buildUriNodeIdQuery(request, query);
         buildTagsQuery(request, query);
+        buildWorkspaceQuery(query, user);
         boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
 
         // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch

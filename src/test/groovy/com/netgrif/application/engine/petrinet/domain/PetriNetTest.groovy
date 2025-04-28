@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
+import com.netgrif.application.engine.petrinet.service.PetriNetService
 import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.core.petrinet.domain.arcs.Arc
@@ -58,7 +59,7 @@ class PetriNetTest {
     void testClone() {
         int beforeImportNet = processRoleRepository.count()
 
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper, WorkspaceConstants.DEFAULT_WORKSPACE_ID)
 
         assert netOptional.getNet() != null
 
@@ -79,13 +80,13 @@ class PetriNetTest {
 
     @Test
     void testVersioning() {
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper, WorkspaceConstants.DEFAULT_WORKSPACE_ID)
         assert netOptional.getNet() != null
 
-        def netOptional2 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional2 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper, WorkspaceConstants.DEFAULT_WORKSPACE_ID)
         assert netOptional2.getNet() != null
 
-        def netOptional3 = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional3 = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper, WorkspaceConstants.DEFAULT_WORKSPACE_ID)
         assert netOptional3.getNet() != null
 
         def nets = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK)

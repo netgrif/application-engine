@@ -63,7 +63,7 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
 
     @Override
     public List<ProcessRole> getAll() {
-        return processRoleRepository.findAll();
+        return processRoleRepository.findAllByWorkspaceId(userService.getLoggedOrSystem().getWorkspaceId());
     }
 
     @Override
@@ -116,7 +116,7 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
     @Override
     public List<ProcessRole> saveAll(Iterable<ProcessRole> entities) {
         return StreamSupport.stream(entities.spliterator(), false).map(processRole -> {
-            if (!processRole.isGlobal() || processRoleRepository.findAllByImportId(processRole.getImportId()).isEmpty()) {
+            if (!processRole.isGlobal() || processRoleRepository.findAllByImportIdAndWorkspaceId(processRole.getImportId(), userService.getLoggedOrSystem().getWorkspaceId()).isEmpty()) {
                 return processRoleRepository.save(processRole);
             }
             return null;
@@ -290,12 +290,12 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
 
     @Override
     public List<ProcessRole> findAll() {
-        return processRoleRepository.findAll();
+        return processRoleRepository.findAllByWorkspaceId(userService.getLoggedOrSystem().getWorkspaceId());
     }
 
     @Override
     public Set<ProcessRole> findAllGlobalRoles() {
-        return processRoleRepository.findAllByGlobalIsTrue();
+        return processRoleRepository.findAllByGlobalIsTrueAndWorkspaceId(userService.getLoggedOrSystem().getWorkspaceId());
     }
 
     @Override
@@ -313,7 +313,7 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
     @Override
     public ProcessRole defaultRole() {
         if (defaultRole == null) {
-            Set<ProcessRole> roles = processRoleRepository.findAllByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
+            Set<ProcessRole> roles = processRoleRepository.findAllByName_DefaultValueAndWorkspaceId(ProcessRole.DEFAULT_ROLE, userService.getLoggedOrSystem().getWorkspaceId());
             if (roles.isEmpty())
                 throw new IllegalStateException("No default process role has been found!");
             if (roles.size() > 1)
@@ -326,7 +326,7 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
     @Override
     public ProcessRole anonymousRole() {
         if (anonymousRole == null) {
-            Set<ProcessRole> roles = processRoleRepository.findAllByImportId(ProcessRole.ANONYMOUS_ROLE);
+            Set<ProcessRole> roles = processRoleRepository.findAllByImportIdAndWorkspaceId(ProcessRole.ANONYMOUS_ROLE, userService.getLoggedOrSystem().getWorkspaceId());
             if (roles.isEmpty())
                 throw new IllegalStateException("No anonymous process role has been found!");
             if (roles.size() > 1)
@@ -344,17 +344,17 @@ public class ProcessRoleService implements com.netgrif.adapter.petrinet.service.
     @Deprecated(forRemoval = true, since = "6.2.0")
     @Override
     public ProcessRole findByImportId(String importId) {
-        return processRoleRepository.findAllByImportId(importId).stream().findFirst().orElse(null);
+        return processRoleRepository.findAllByImportIdAndWorkspaceId(importId, userService.getLoggedOrSystem().getWorkspaceId()).stream().findFirst().orElse(null);
     }
 
     @Override
     public Set<ProcessRole> findAllByImportId(String importId) {
-        return processRoleRepository.findAllByImportId(importId);
+        return processRoleRepository.findAllByImportIdAndWorkspaceId(importId, userService.getLoggedOrSystem().getWorkspaceId());
     }
 
     @Override
     public Set<ProcessRole> findAllByDefaultName(String name) {
-        return processRoleRepository.findAllByName_DefaultValue(name);
+        return processRoleRepository.findAllByName_DefaultValueAndWorkspaceId(name, userService.getLoggedOrSystem().getWorkspaceId());
     }
 
     @Override

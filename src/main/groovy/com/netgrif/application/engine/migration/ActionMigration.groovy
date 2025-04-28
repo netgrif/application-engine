@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.migration
 
+import com.netgrif.application.engine.petrinet.service.PetriNetService
 import com.netgrif.auth.service.UserService
 import com.netgrif.core.petrinet.domain.PetriNet
 import com.netgrif.core.petrinet.domain.VersionType
@@ -24,7 +25,7 @@ class ActionMigration {
 
     void migrateActions(String petriNetPath) {
         InputStream netStream = new ClassPathResource(petriNetPath).inputStream
-        ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(netStream, VersionType.MAJOR, userService.transformToLoggedUser(userService.getLoggedOrSystem()))
+        ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(netStream, VersionType.MAJOR, userService.transformToLoggedUser(userService.getLoggedOrSystem()), WorkspaceConstants.DEFAULT_WORKSPACE_ID)
         List<PetriNet> oldPetriNets
 
         if(newPetriNet.getNet() != null) {

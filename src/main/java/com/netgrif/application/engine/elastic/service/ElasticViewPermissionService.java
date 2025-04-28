@@ -92,4 +92,10 @@ public abstract class ElasticViewPermissionService {
         unionSet.should(setB._toQuery());
         return unionSet.build();
     }
+
+    protected void buildWorkspaceQuery(BoolQuery.Builder query, LoggedUser user) {
+        BoolQuery.Builder workspaceQuery = new BoolQuery.Builder();
+        workspaceQuery.must(termQuery("workspaceId", user.getWorkspaceId())._toQuery());
+        query.filter(workspaceQuery.build()._toQuery());
+    }
 }

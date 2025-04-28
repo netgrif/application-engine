@@ -204,6 +204,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         buildTransitionQuery(request, query);
         buildTagsQuery(request, query);
         buildStringQuery(request, query, user);
+        buildWorkspaceQuery(query, user);
         boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
 
         if (resultAlwaysEmpty)

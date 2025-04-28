@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.petrinet.service.PetriNetService
 import com.netgrif.core.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -46,7 +47,7 @@ class MapFieldTest {
 
     @Test
     void testImport() {
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper, WorkspaceConstants.DEFAULT_WORKSPACE_ID)
         assert netOptional.getNet() != null
 
         def net = netOptional.getNet()
@@ -70,7 +71,7 @@ class MapFieldTest {
 
     @Test
     void testValue() {
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper, WorkspaceConstants.DEFAULT_WORKSPACE_ID)
         assert netOptional.getNet() != null
 
         Case aCase = importHelper.createCase("Case", netOptional.getNet())
@@ -107,7 +108,7 @@ class MapFieldTest {
 
     @Test
     void testImportMultichoice() {
-        def netOptional = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper, WorkspaceConstants.DEFAULT_WORKSPACE_ID)
         assert netOptional.getNet() != null
 
         def net = netOptional.getNet()

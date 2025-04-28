@@ -19,9 +19,11 @@ import java.util.Optional;
 @Repository
 public interface CaseRepository extends MongoRepository<Case, String>, QuerydslPredicateExecutor<Case>, QuerydslBinderCustomizer<QCase> {
 
-    List<Case> findAllByProcessIdentifier(String identifier);
+    List<Case> findAllByProcessIdentifierAndWorkspaceId(String identifier, String workspaceId);
 
     List<Case> findAllBy_idIn(Iterable<String> id);
+
+    List<Case> findAllByWorkspaceId(String workspaceId);
 
     @Query("{ '_id.objectId': { $in: ?0 } }")
     List<Case> findAllByObjectIdsIn(List<ObjectId> objectIds);

@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.auth
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.petrinet.service.PetriNetService
 import com.netgrif.core.auth.domain.IUser
 import com.netgrif.core.auth.domain.LoggedUser
 import com.netgrif.core.auth.domain.PasswordCredential
@@ -71,7 +72,7 @@ class SecurityContextTest {
         user = userService.saveUser(user, null)
         assert user != null
 
-        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, userService.transformToLoggedUser(userService.getLoggedOrSystem())).getNet()
+        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, userService.transformToLoggedUser(userService.getLoggedOrSystem()), WorkspaceConstants.DEFAULT_WORKSPACE_ID).getNet()
         assert net != null
     }
 

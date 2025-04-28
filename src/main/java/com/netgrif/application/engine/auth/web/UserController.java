@@ -245,4 +245,20 @@ public class UserController {
             return MessageResource.errorMessage("Saving user preferences failed");
         }
     }
+
+    @Operation(summary = "Change Workspace", security = {@SecurityRequirement(name = "BasicAuth")})
+    @PostMapping(value = "/workspace/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public MessageResource changeWorkspace(@PathVariable("id") String workspaceId, Authentication auth, Locale locale) {
+        try {
+            LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+            loggedUser.setWorkspaceId(workspaceId);
+            securityContextService.forceReloadSecurityContext(loggedUser);
+            log.info("Changing active workspace for user " + loggedUser.getEmail());
+            return MessageResource.successMessage("User workspace changed");
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return MessageResource.errorMessage("Changing user workspace failed");
+        }
+    }
+
 }

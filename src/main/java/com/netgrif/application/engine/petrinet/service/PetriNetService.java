@@ -187,33 +187,33 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     @Deprecated
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author, uriService.getDefault().getStringId());
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author, String workspaceId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+        return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author, uriService.getDefault().getStringId(), workspaceId);
     }
 
     @Override
     @Deprecated
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author, uriNodeId);
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author, String uriNodeId, String workspaceId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+        return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author, uriNodeId, workspaceId);
     }
 
     @Override
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, releaseType, author, uriService.getDefault().getStringId());
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author, String workspaceId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+        return importPetriNet(xmlFile, releaseType, author, uriService.getDefault().getStringId(), workspaceId);
     }
 
     @Override
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, releaseType, author, uriService.getDefault().getStringId(), params);
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author, String workspaceId, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+        return importPetriNet(xmlFile, releaseType, author, uriService.getDefault().getStringId(), workspaceId, params);
     }
 
     @Override
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author, String uriNodeId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, releaseType, author, uriNodeId, new HashMap<>());
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author, String uriNodeId, String workspaceId) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+        return importPetriNet(xmlFile, releaseType, author, uriNodeId, workspaceId, new HashMap<>());
     }
 
     @Override
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author, String uriNodeId, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author, String uriNodeId, String workspaceId, Map<String, String> params) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
         ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
         IOUtils.copy(xmlFile, xmlCopy);
@@ -223,12 +223,19 @@ public class PetriNetService implements IPetriNetService {
         }
         PetriNet net = imported.get();
         net.setUriNodeId(uriNodeId);
+        if (workspaceId == null || workspaceId.isEmpty()) {
+            throw new MissingPetriNetMetaDataException(Arrays.asList("WorkspaceId"));
+        }
+        net.setWorkspaceId(workspaceId);
+        net.setUri(workspaceId + "/" + uriNodeId);
 
         PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
         if (existingNet != null) {
             net.setVersion(existingNet.getVersion());
             net.incrementVersion(releaseType);
         }
+        net.getRoles().values().forEach(role -> role.setWorkspaceId(net.getWorkspaceId()));
+        net.getTransitions().values().forEach(transition -> transition.setWorkspaceId(net.getWorkspaceId()));
         processRoleService.saveAll(net.getRoles().values());
         net.setAuthor(author.transformToAuthor());
         functionCacheService.cachePetriNetFunctions(net);
@@ -286,7 +293,7 @@ public class PetriNetService implements IPetriNetService {
     @Override
     @Cacheable(value = "petriNetByIdentifier", key = "#identifier+#version.toString()", unless = "#result == null")
     public PetriNet getPetriNet(String identifier, Version version) {
-        PetriNet net = repository.findByIdentifierAndVersion(identifier, version);
+        PetriNet net = repository.findByIdentifierAndVersionAndWorkspaceId(identifier, version, userService.getLoggedOrSystem().getWorkspaceId());
         if (net == null) {
             return null;
         }
@@ -296,7 +303,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public List<PetriNet> getByIdentifier(String identifier) {
-        List<PetriNet> nets = repository.findAllByIdentifier(identifier);
+        List<PetriNet> nets = repository.findAllByIdentifierAndWorkspaceId(identifier, userService.getLoggedOrSystem().getWorkspaceId());
         nets.forEach(PetriNet::initializeArcs);
         return nets;
     }
@@ -316,7 +323,7 @@ public class PetriNetService implements IPetriNetService {
     @Override
     @Cacheable(value = "petriNetNewest", unless = "#result == null")
     public PetriNet getNewestVersionByIdentifier(String identifier) {
-        List<PetriNet> nets = repository.findByIdentifier(identifier, PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
+        List<PetriNet> nets = repository.findByIdentifierAndWorkspaceId(identifier, userService.getLoggedOrSystem().getWorkspaceId(), PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
         if (nets.isEmpty()) {
             return null;
         }
@@ -332,7 +339,7 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public List<String> getExistingPetriNetIdentifiersFromIdentifiersList(List<String> identifiers) {
         Aggregation agg = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("identifier").in(identifiers)),
+                Aggregation.match(Criteria.where("identifier").in(identifiers).andOperator(Criteria.where("workspaceId").is(userService.getLoggedOrSystem().getWorkspaceId()))),
                 Aggregation.group("identifier"),
                 Aggregation.project("identifier").and("identifier").previousOperation()
         );
@@ -361,7 +368,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public List<PetriNet> getAll() {
-        List<PetriNet> nets = repository.findAll();
+        List<PetriNet> nets = repository.findAllByWorkspaceId(userService.getLoggedOrSystem().getWorkspaceId());
         nets.forEach(PetriNet::initializeArcs);
         return nets;
     }
@@ -395,7 +402,10 @@ public class PetriNetService implements IPetriNetService {
 
         if (version == null) {
             GroupOperation groupByIdentifier = Aggregation.group("identifier").max("version").as("version");
-            Aggregation aggregation = Aggregation.newAggregation(groupByIdentifier);
+            Aggregation aggregation = Aggregation.newAggregation(
+                    Aggregation.match(Criteria.where("workspaceId").is(userService.getLoggedOrSystem().getWorkspaceId())),
+                    groupByIdentifier
+            );
             AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, "petriNet", Document.class);
             references = results.getMappedResults().stream()
                     .map(doc -> {
@@ -405,7 +415,7 @@ public class PetriNetService implements IPetriNetService {
                     })
                     .collect(Collectors.toList());
         } else {
-            references = repository.findAllByVersion(version).stream()
+            references = repository.findAllByVersionAndWorkspaceId(version, userService.getLoggedOrSystem().getWorkspaceId()).stream()
                     .map(net -> transformToReference(net, locale)).collect(Collectors.toList());
         }
 
@@ -414,7 +424,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public List<PetriNetReference> getReferencesByUsersProcessRoles(LoggedUser user, Locale locale) {
-        Query query = Query.query(getProcessRolesCriteria(user));
+        Query query = Query.query(getProcessRolesCriteria(user)).addCriteria(Criteria.where("workspaceId").is(userService.getLoggedOrSystem().getWorkspaceId()));
         return mongoTemplate.find(query, PetriNet.class).stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
     }
 
@@ -465,6 +475,7 @@ public class PetriNetService implements IPetriNetService {
         Query query = new Query();
         Query queryTotal = new Query();
 
+        this.addValueCriteria(query, queryTotal, Criteria.where("workspaceId").is(user.getWorkspaceId()));
         if (!user.getSelfOrImpersonated().isAdmin())
             query.addCriteria(getProcessRolesCriteria(user.getSelfOrImpersonated()));
 

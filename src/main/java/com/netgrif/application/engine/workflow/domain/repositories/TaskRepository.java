@@ -22,13 +22,13 @@ public interface TaskRepository extends MongoRepository<Task, String>, QuerydslP
 
     Page<Task> findByCaseIdIn(Pageable pageable, Collection<String> ids);
 
-    Page<Task> findByTransitionIdIn(Pageable pageable, Collection<String> ids);
+    Page<Task> findByTransitionIdInAndWorkspaceId(Pageable pageable, Collection<String> ids, String workspaceId);
 
-    List<Task> findAllByTransitionIdIn(Collection<String> ids);
+    List<Task> findAllByTransitionIdInAndWorkspaceId(Collection<String> ids, String workspaceId);
 
     Page<Task> findByUserId(Pageable pageable, String userId);
 
-    List<Task> findByUserIdAndFinishDateNotNull(Long userId);
+    List<Task> findByUserIdAndWorkspaceIdAndFinishDateNotNull(Long userId, String workspaceId);
 
     Task findByTransitionIdAndCaseId(String transitionId, String caseId);
 

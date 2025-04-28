@@ -723,7 +723,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public Page<Task> findByTransitions(Pageable pageable, List<String> transitions) {
-        return loadUsers(taskRepository.findByTransitionIdIn(pageable, transitions));
+        return loadUsers(taskRepository.findByTransitionIdInAndWorkspaceId(pageable, transitions, userService.getLoggedOrSystem().getWorkspaceId()));
     }
 
     @Override
@@ -811,6 +811,7 @@ public class TaskService implements ITaskService {
                 .processId(useCase.getPetriNetId())
                 .caseId(useCase.get_id().toString())
                 .transitionId(transition.getImportId())
+                .workspaceId(transition.getWorkspaceId())
                 .layout(transition.getLayout())
                 .tags(transition.getTags())
                 .caseColor(useCase.getColor())
