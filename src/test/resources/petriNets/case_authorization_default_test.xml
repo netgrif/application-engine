@@ -1,5 +1,5 @@
 <process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
-    <id>case_authorization_default_service_test</id>
+    <id>case_authorization_default_test</id>
     <version>1.0.0</version>
     <title>Case authorization test</title>
     <defaultRole>true</defaultRole>

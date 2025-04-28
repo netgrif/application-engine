@@ -68,9 +68,9 @@ class TaskAuthorizationServiceTest {
 
     private Identity testIdentity;
 
-    private Process testProcess;
-
     private Case testCase;
+
+    private Case testCaseWithDefault;
 
     @BeforeEach
     public void beforeEach() throws IOException, MissingPetriNetMetaDataException {
@@ -83,12 +83,15 @@ class TaskAuthorizationServiceTest {
                 .lastname(new TextField("lastname"))
                 .build());
 
-        testProcess = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/task_authorization_service_test.xml"),
+        Process testProcess = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/task_authorization_test.xml"),
+                VersionType.MAJOR, identityService.getLoggedSystemIdentity().getActiveActorId()).getNet();
+        Process testProcessWithDefault = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/task_authorization_default_test.xml"),
                 VersionType.MAJOR, identityService.getLoggedSystemIdentity().getActiveActorId()).getNet();
 
         testHelper.login(testIdentity);
 
         testCase = importHelper.createCase("test", testProcess);
+        testCaseWithDefault = importHelper.createCase("test with default role", testProcessWithDefault);
     }
 
     @Test
@@ -99,8 +102,9 @@ class TaskAuthorizationServiceTest {
         String taskId = testCase.getTaskStringId("t_assign");
 
         assert !authorizationService.canCallAssign(taskId);
+        assert authorizationService.canCallAssign(testCaseWithDefault.getTaskStringId("t_assign"));
 
-        ProcessRole posProcessRole = processRoleRepository.findByImportId("assign_pos_role");
+        ProcessRole posProcessRole = processRoleRepository.findByImportId("pos_process_role");
         assignProcessRole(posProcessRole);
         assert authorizationService.canCallAssign(taskId);
 
@@ -108,15 +112,15 @@ class TaskAuthorizationServiceTest {
         assert !authorizationService.canCallAssign(taskId);
         updateAssigneeOfTask(taskId, null);
 
-        ProcessRole negProcessRole = processRoleRepository.findByImportId("assign_neg_role");
+        ProcessRole negProcessRole = processRoleRepository.findByImportId("neg_process_role");
         assignProcessRole(negProcessRole);
         assert !authorizationService.canCallAssign(taskId);
 
-        CaseRole posCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "assign_pos_case_role");
+        CaseRole posCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "pos_case_role");
         assignCaseRole(posCaseRole);
         assert authorizationService.canCallAssign(taskId);
 
-        CaseRole negCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "assign_neg_case_role");
+        CaseRole negCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "neg_case_role");
         assignCaseRole(negCaseRole);
         assert !authorizationService.canCallAssign(taskId);
 
@@ -134,28 +138,32 @@ class TaskAuthorizationServiceTest {
         assert !authorizationService.canCallAssign(null);
 
         String taskId = testCase.getTaskStringId("t_cancel");
+        String taskIdWithDefault = testCaseWithDefault.getTaskStringId("t_cancel");
 
         assert !authorizationService.canCallCancel(taskId);
+
+        updateAssigneeOfTask(taskIdWithDefault, identityService.getActiveActorId());
+        assert authorizationService.canCallCancel(taskIdWithDefault);
 
         updateAssigneeOfTask(taskId, new ObjectId().toString());
         assert !authorizationService.canCallCancel(taskId);
 
-        ProcessRole posProcessRole = processRoleRepository.findByImportId("cancel_pos_role");
+        ProcessRole posProcessRole = processRoleRepository.findByImportId("pos_process_role");
         assignProcessRole(posProcessRole);
         assert !authorizationService.canCallCancel(taskId);
 
         updateAssigneeOfTask(taskId, identityService.getActiveActorId());
         assert authorizationService.canCallCancel(taskId);
 
-        ProcessRole negProcessRole = processRoleRepository.findByImportId("cancel_neg_role");
+        ProcessRole negProcessRole = processRoleRepository.findByImportId("neg_process_role");
         assignProcessRole(negProcessRole);
         assert !authorizationService.canCallCancel(taskId);
 
-        CaseRole posCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "cancel_pos_case_role");
+        CaseRole posCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "pos_case_role");
         assignCaseRole(posCaseRole);
         assert authorizationService.canCallCancel(taskId);
 
-        CaseRole negCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "cancel_neg_case_role");
+        CaseRole negCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "neg_case_role");
         assignCaseRole(negCaseRole);
         assert !authorizationService.canCallCancel(taskId);
 
@@ -173,25 +181,29 @@ class TaskAuthorizationServiceTest {
         assert !authorizationService.canCallAssign(null);
 
         String taskId = testCase.getTaskStringId("t_reassign");
+        String taskIdWithDefault = testCaseWithDefault.getTaskStringId("t_reassign");
 
         assert !authorizationService.canCallReassign(taskId);
+
+        updateAssigneeOfTask(taskIdWithDefault, new ObjectId().toString());
+        assert authorizationService.canCallReassign(taskIdWithDefault);
 
         updateAssigneeOfTask(taskId, new ObjectId().toString());
         assert !authorizationService.canCallReassign(taskId);
 
-        ProcessRole posProcessRole = processRoleRepository.findByImportId("reassign_pos_role");
+        ProcessRole posProcessRole = processRoleRepository.findByImportId("pos_process_role");
         assignProcessRole(posProcessRole);
         assert authorizationService.canCallReassign(taskId);
 
-        ProcessRole negProcessRole = processRoleRepository.findByImportId("reassign_neg_role");
+        ProcessRole negProcessRole = processRoleRepository.findByImportId("neg_process_role");
         assignProcessRole(negProcessRole);
         assert !authorizationService.canCallReassign(taskId);
 
-        CaseRole posCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "reassign_pos_case_role");
+        CaseRole posCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "pos_case_role");
         assignCaseRole(posCaseRole);
         assert authorizationService.canCallReassign(taskId);
 
-        CaseRole negCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "reassign_neg_case_role");
+        CaseRole negCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "neg_case_role");
         assignCaseRole(negCaseRole);
         assert !authorizationService.canCallReassign(taskId);
 
@@ -209,28 +221,32 @@ class TaskAuthorizationServiceTest {
         assert !authorizationService.canCallAssign(null);
 
         String taskId = testCase.getTaskStringId("t_finish");
+        String taskIdWithDefault = testCaseWithDefault.getTaskStringId("t_finish");
 
         assert !authorizationService.canCallFinish(taskId);
+
+        updateAssigneeOfTask(taskIdWithDefault, identityService.getActiveActorId());
+        assert authorizationService.canCallFinish(taskIdWithDefault);
 
         updateAssigneeOfTask(taskId, new ObjectId().toString());
         assert !authorizationService.canCallFinish(taskId);
 
-        ProcessRole posProcessRole = processRoleRepository.findByImportId("finish_pos_role");
+        ProcessRole posProcessRole = processRoleRepository.findByImportId("pos_process_role");
         assignProcessRole(posProcessRole);
         assert !authorizationService.canCallFinish(taskId);
 
         updateAssigneeOfTask(taskId, identityService.getActiveActorId());
         assert authorizationService.canCallFinish(taskId);
 
-        ProcessRole negProcessRole = processRoleRepository.findByImportId("finish_neg_role");
+        ProcessRole negProcessRole = processRoleRepository.findByImportId("neg_process_role");
         assignProcessRole(negProcessRole);
         assert !authorizationService.canCallFinish(taskId);
 
-        CaseRole posCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "finish_pos_case_role");
+        CaseRole posCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "pos_case_role");
         assignCaseRole(posCaseRole);
         assert authorizationService.canCallFinish(taskId);
 
-        CaseRole negCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "finish_neg_case_role");
+        CaseRole negCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "neg_case_role");
         assignCaseRole(negCaseRole);
         assert !authorizationService.canCallFinish(taskId);
 
@@ -273,22 +289,27 @@ class TaskAuthorizationServiceTest {
         assert !authorizationService.canCallGetData(null);
 
         String taskId = testCase.getTaskStringId("t_getdata");
+        String taskIdWithDefault = testCaseWithDefault.getTaskStringId("t_getdata");
 
         assert !authorizationService.canCallGetData(taskId);
 
-        ProcessRole posProcessRole = processRoleRepository.findByImportId("getdata_enabled_pos_role");
+        assert authorizationService.canCallGetData(taskIdWithDefault);
+        updateStateOfTask(taskIdWithDefault, State.DISABLED);
+        assert !authorizationService.canCallGetData(taskIdWithDefault);
+
+        ProcessRole posProcessRole = processRoleRepository.findByImportId("pos_process_role");
         assignProcessRole(posProcessRole);
         assert authorizationService.canCallGetData(taskId);
 
-        ProcessRole negProcessRole = processRoleRepository.findByImportId("getdata_enabled_neg_role");
+        ProcessRole negProcessRole = processRoleRepository.findByImportId("neg_process_role");
         assignProcessRole(negProcessRole);
         assert !authorizationService.canCallGetData(taskId);
 
-        CaseRole posCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "getdata_enabled_pos_case_role");
+        CaseRole posCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "pos_case_role");
         assignCaseRole(posCaseRole);
         assert authorizationService.canCallGetData(taskId);
 
-        CaseRole negCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "getdata_enabled_neg_case_role");
+        CaseRole negCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "neg_case_role");
         assignCaseRole(negCaseRole);
         assert !authorizationService.canCallGetData(taskId);
 
@@ -296,19 +317,19 @@ class TaskAuthorizationServiceTest {
 
         assert !authorizationService.canCallGetData(taskId);
 
-        posProcessRole = processRoleRepository.findByImportId("getdata_disabled_pos_role");
+        posProcessRole = processRoleRepository.findByImportId("pos_getdata_disabled_process_role");
         assignProcessRole(posProcessRole);
         assert authorizationService.canCallGetData(taskId);
 
-        negProcessRole = processRoleRepository.findByImportId("getdata_disabled_neg_role");
+        negProcessRole = processRoleRepository.findByImportId("neg_getdata_disabled_process_role");
         assignProcessRole(negProcessRole);
         assert !authorizationService.canCallGetData(taskId);
 
-        posCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "getdata_disabled_pos_case_role");
+        posCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "pos_getdata_disabled_case_role");
         assignCaseRole(posCaseRole);
         assert authorizationService.canCallGetData(taskId);
 
-        negCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "getdata_disabled_neg_case_role");
+        negCaseRole = caseRoleRepository.findByCaseIdAndImportId(testCase.getStringId(), "neg_getdata_disabled_case_role");
         assignCaseRole(negCaseRole);
         assert !authorizationService.canCallGetData(taskId);
 
@@ -317,6 +338,15 @@ class TaskAuthorizationServiceTest {
         assert authorizationService.canCallGetData(taskId);
 
         testHelper.logout();
+        assert !authorizationService.canCallGetData(taskId);
+    }
+
+    @Test
+    public void canCallGetDataDisabled() {
+        String taskId = testCaseWithDefault.getTaskStringId("t_getdata_disabled");
+
+        assert authorizationService.canCallGetData(taskId);
+        updateStateOfTask(taskId, State.ENABLED);
         assert !authorizationService.canCallGetData(taskId);
     }
 

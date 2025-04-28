@@ -84,7 +84,7 @@ public class ElasticCaseSearchPermissionTest {
      * */
     @Test
     public void testViewPermissionsOrdered() throws InterruptedException, IOException, MissingPetriNetMetaDataException {
-        createTestCase("case_authorization_service_test");
+        createTestCase("case_authorization_test");
         buildSearchRequest();
         Thread.sleep(2000);
 
@@ -101,7 +101,7 @@ public class ElasticCaseSearchPermissionTest {
      * */
     @Test
     public void testViewWithDefaultPermission() throws IOException, MissingPetriNetMetaDataException, InterruptedException {
-        createTestCase("case_authorization_default_service_test");
+        createTestCase("case_authorization_default_est");
         buildSearchRequest();
         Thread.sleep(2000);
 

@@ -1,106 +1,42 @@
 <process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
-    <id>task_authorization_service_test</id>
+    <id>task_authorization_test</id>
     <version>1.0.0</version>
-    <title>TaskAuthorizationService test</title>
+    <title>Task authorization test</title>
     <defaultRole>false</defaultRole>
     <anonymousRole>false</anonymousRole>
     <properties>
-        <property key="initials">TAS</property>
+        <property key="initials">TAT</property>
     </properties>
     <role>
-        <id>assign_neg_role</id>
-        <title>assign neg role</title>
+        <id>neg_process_role</id>
+        <title>neg process role</title>
     </role>
     <role>
-        <id>assign_pos_role</id>
-        <title>assign pos role</title>
+        <id>pos_process_role</id>
+        <title>pos process role</title>
     </role>
     <role>
-        <id>finish_neg_role</id>
-        <title>finish neg role</title>
+        <id>neg_getdata_disabled_process_role</id>
+        <title>neg process role</title>
     </role>
     <role>
-        <id>finish_pos_role</id>
-        <title>finish pos role</title>
-    </role>
-    <role>
-        <id>cancel_neg_role</id>
-        <title>cancel neg role</title>
-    </role>
-    <role>
-        <id>cancel_pos_role</id>
-        <title>cancel pos role</title>
-    </role>
-    <role>
-        <id>reassign_neg_role</id>
-        <title>reassign neg role</title>
-    </role>
-    <role>
-        <id>reassign_pos_role</id>
-        <title>reassign pos role</title>
-    </role>
-    <role>
-        <id>getdata_enabled_neg_role</id>
-        <title>get data neg role</title>
-    </role>
-    <role>
-        <id>getdata_enabled_pos_role</id>
-        <title>get data pos role</title>
-    </role>
-    <role>
-        <id>getdata_disabled_neg_role</id>
-        <title>get data neg role</title>
-    </role>
-    <role>
-        <id>getdata_disabled_pos_role</id>
-        <title>get data pos role</title>
+        <id>pos_getdata_disabled_process_role</id>
+        <title>pos process role</title>
     </role>
     <data type="actorList">
-        <id>assign_neg_case_role</id>
+        <id>neg_case_role</id>
         <title/>
     </data>
     <data type="actorList">
-        <id>assign_pos_case_role</id>
+        <id>pos_case_role</id>
         <title/>
     </data>
     <data type="actorList">
-        <id>finish_neg_case_role</id>
+        <id>neg_getdata_disabled_case_role</id>
         <title/>
     </data>
     <data type="actorList">
-        <id>finish_pos_case_role</id>
-        <title/>
-    </data>
-    <data type="actorList">
-        <id>cancel_neg_case_role</id>
-        <title/>
-    </data>
-    <data type="actorList">
-        <id>cancel_pos_case_role</id>
-        <title/>
-    </data>
-    <data type="actorList">
-        <id>reassign_neg_case_role</id>
-        <title/>
-    </data>
-    <data type="actorList">
-        <id>reassign_pos_case_role</id>
-        <title/>
-    </data>
-    <data type="actorList">
-        <id>getdata_enabled_neg_case_role</id>
-        <title/>
-    </data>
-    <data type="actorList">
-        <id>getdata_enabled_pos_case_role</id>
-        <title/>
-    </data>
-    <data type="actorList">
-        <id>getdata_disabled_neg_case_role</id>
-        <title/>
-    </data>
-    <data type="actorList">
-        <id>getdata_disabled_pos_case_role</id>
+        <id>pos_getdata_disabled_case_role</id>
         <title/>
     </data>
     <transition>
@@ -109,25 +45,25 @@
         <y>1</y>
         <title>Test assign</title>
         <roleRef>
-            <id>assign_neg_role</id>
+            <id>neg_process_role</id>
             <permission>
                 <assign>false</assign>
             </permission>
         </roleRef>
         <roleRef>
-            <id>assign_pos_role</id>
+            <id>pos_process_role</id>
             <permission>
                 <assign>true</assign>
             </permission>
         </roleRef>
         <roleRef type="case">
-            <id>assign_neg_case_role</id>
+            <id>neg_case_role</id>
             <permission>
                 <assign>false</assign>
             </permission>
         </roleRef>
         <roleRef type="case">
-            <id>assign_pos_case_role</id>
+            <id>pos_case_role</id>
             <permission>
                 <assign>true</assign>
             </permission>
@@ -139,25 +75,25 @@
         <y>1</y>
         <title>Test finish</title>
         <roleRef>
-            <id>finish_neg_role</id>
+            <id>neg_process_role</id>
             <permission>
                 <finish>false</finish>
             </permission>
         </roleRef>
         <roleRef>
-            <id>finish_pos_role</id>
+            <id>pos_process_role</id>
             <permission>
                 <finish>true</finish>
             </permission>
         </roleRef>
         <roleRef type="case">
-            <id>finish_neg_case_role</id>
+            <id>neg_case_role</id>
             <permission>
                 <finish>false</finish>
             </permission>
         </roleRef>
         <roleRef type="case">
-            <id>finish_pos_case_role</id>
+            <id>pos_case_role</id>
             <permission>
                 <finish>true</finish>
             </permission>
@@ -169,25 +105,25 @@
         <y>1</y>
         <title>Test cancel</title>
         <roleRef>
-            <id>cancel_neg_role</id>
+            <id>neg_process_role</id>
             <permission>
                 <cancel>false</cancel>
             </permission>
         </roleRef>
         <roleRef>
-            <id>cancel_pos_role</id>
+            <id>pos_process_role</id>
             <permission>
                 <cancel>true</cancel>
             </permission>
         </roleRef>
         <roleRef type="case">
-            <id>cancel_neg_case_role</id>
+            <id>neg_case_role</id>
             <permission>
                 <cancel>false</cancel>
             </permission>
         </roleRef>
         <roleRef type="case">
-            <id>cancel_pos_case_role</id>
+            <id>pos_case_role</id>
             <permission>
                 <cancel>true</cancel>
             </permission>
@@ -199,25 +135,25 @@
         <y>1</y>
         <title>Test reassign</title>
         <roleRef>
-            <id>reassign_neg_role</id>
+            <id>neg_process_role</id>
             <permission>
                 <reassign>false</reassign>
             </permission>
         </roleRef>
         <roleRef>
-            <id>reassign_pos_role</id>
+            <id>pos_process_role</id>
             <permission>
                 <reassign>true</reassign>
             </permission>
         </roleRef>
         <roleRef type="case">
-            <id>reassign_neg_case_role</id>
+            <id>neg_case_role</id>
             <permission>
                 <reassign>false</reassign>
             </permission>
         </roleRef>
         <roleRef type="case">
-            <id>reassign_pos_case_role</id>
+            <id>pos_case_role</id>
             <permission>
                 <reassign>true</reassign>
             </permission>
@@ -235,49 +171,49 @@
         <y>1</y>
         <title>Test get data</title>
         <roleRef>
-            <id>getdata_enabled_neg_role</id>
+            <id>neg_process_role</id>
             <permission>
                 <view>false</view>
             </permission>
         </roleRef>
         <roleRef>
-            <id>getdata_enabled_pos_role</id>
+            <id>pos_process_role</id>
             <permission>
                 <view>true</view>
             </permission>
         </roleRef>
         <roleRef type="case">
-            <id>getdata_enabled_neg_case_role</id>
+            <id>neg_case_role</id>
             <permission>
                 <view>false</view>
             </permission>
         </roleRef>
         <roleRef type="case">
-            <id>getdata_enabled_pos_case_role</id>
+            <id>pos_case_role</id>
             <permission>
                 <view>true</view>
             </permission>
         </roleRef>
         <roleRef>
-            <id>getdata_disabled_neg_role</id>
+            <id>neg_getdata_disabled_process_role</id>
             <permission>
                 <view_disabled>false</view_disabled>
             </permission>
         </roleRef>
         <roleRef>
-            <id>getdata_disabled_pos_role</id>
+            <id>pos_getdata_disabled_process_role</id>
             <permission>
                 <view_disabled>true</view_disabled>
             </permission>
         </roleRef>
         <roleRef type="case">
-            <id>getdata_disabled_neg_case_role</id>
+            <id>neg_getdata_disabled_case_role</id>
             <permission>
                 <view_disabled>false</view_disabled>
             </permission>
         </roleRef>
         <roleRef type="case">
-            <id>getdata_disabled_pos_case_role</id>
+            <id>pos_getdata_disabled_case_role</id>
             <permission>
                 <view_disabled>true</view_disabled>
             </permission>
