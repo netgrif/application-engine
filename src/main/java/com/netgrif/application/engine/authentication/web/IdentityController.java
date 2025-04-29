@@ -40,7 +40,6 @@ public class IdentityController {
     private final IApplicationAuthorizationService authorizationService;
     private final IPreferencesService preferencesService;
 
-    // todo 2058
     // TODO: release/8.0.0 any more endpoints?
 
     @Operation(summary = "Get identity by id", security = {@SecurityRequirement(name = "BasicAuth")})
