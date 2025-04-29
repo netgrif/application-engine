@@ -181,12 +181,12 @@
     <data type="actor">
         <id>actor_dynamic</id>
         <title/>
-        <init dynamic="true">new ActorFieldValue(actorService.findById(loggedOrSystem.activeActorId).get())</init>
+        <init dynamic="true">new ActorFieldValue(userService.findById(loggedOrSystem.activeActorId).get())</init>
     </data>
     <data type="actorList">
         <id>actorList_dynamic</id>
         <title/>
-        <init dynamic="true">new ActorListFieldValue(new ActorFieldValue(actorService.findById(loggedOrSystem.activeActorId).get()))</init>
+        <init dynamic="true">new ActorListFieldValue(new ActorFieldValue(userService.findById(loggedOrSystem.activeActorId).get()))</init>
     </data>
 
     <transition>

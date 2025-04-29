@@ -4,7 +4,7 @@ import com.netgrif.application.engine.authentication.domain.IdentityProperties;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authorization.domain.ApplicationRole;
 import com.netgrif.application.engine.authorization.domain.ProcessRole;
-import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
 import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
@@ -21,13 +21,13 @@ import org.springframework.stereotype.Service;
 public class BasicPublicAuthenticationFilterFactory extends PublicAuthenticationFilterFactory {
 
     private final IJwtService jwtService;
-    private final IActorService actorService;
+    private final IUserService userService;
 
     public BasicPublicAuthenticationFilterFactory(ApplicationRoleRunner applicationRoleRunner, IIdentityService identityService,
-                                                  IRoleService roleService, NaeAuthProperties naeAuthProperties, IJwtService jwtService, IActorService actorService) {
+                                                  IRoleService roleService, NaeAuthProperties naeAuthProperties, IJwtService jwtService, IUserService userService) {
         super(applicationRoleRunner, identityService, roleService, naeAuthProperties);
         this.jwtService = jwtService;
-        this.actorService = actorService;
+        this.userService = userService;
     }
 
     @Override
@@ -35,6 +35,6 @@ public class BasicPublicAuthenticationFilterFactory extends PublicAuthentication
                                                         ProcessRole anonymousProcessRole) {
         return new PublicBasicAuthenticationFilter(identityService, roleService, authManager,
                 new AnonymousAuthenticationProvider(IdentityProperties.ANONYMOUS_AUTH_KEY), anonymousAppRole, anonymousProcessRole,
-                naeAuthProperties.getServerPatterns(), naeAuthProperties.getAnonymousExceptions(), jwtService, actorService);
+                naeAuthProperties.getServerPatterns(), naeAuthProperties.getAnonymousExceptions(), jwtService, userService);
     }
 }

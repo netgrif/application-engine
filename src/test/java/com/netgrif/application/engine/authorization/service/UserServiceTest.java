@@ -2,7 +2,8 @@ package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.authorization.domain.User;
-import com.netgrif.application.engine.authorization.domain.params.ActorParams;
+import com.netgrif.application.engine.authorization.domain.constants.UserConstants;
+import com.netgrif.application.engine.authorization.domain.params.UserParams;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -24,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
-public class ActorServiceTest {
+public class UserServiceTest {
 
     @Autowired
     private TestHelper testHelper;
@@ -42,7 +43,7 @@ public class ActorServiceTest {
     private IDataService dataService;
 
     @Autowired
-    private ActorService actorService;
+    private UserService userService;
 
     @BeforeEach
     void before() {
@@ -51,62 +52,62 @@ public class ActorServiceTest {
 
     @Test
     void testFindByEmail() throws InterruptedException {
-        assert actorService.findByEmail(null).isEmpty();
-        assert actorService.findByEmail("nonexisting@email.com").isEmpty();
+        assert userService.findByEmail(null).isEmpty();
+        assert userService.findByEmail("nonexisting@email.com").isEmpty();
 
         String email = "some@email.com";
-        createActor(email);
+        createUser(email);
 
         Thread.sleep(2000);
-        assert actorService.findByEmail(email).isPresent();
+        assert userService.findByEmail(email).isPresent();
     }
 
     @Test
     void testExistsByEmail() throws InterruptedException {
-        assert !actorService.existsByEmail(null);
-        assert !actorService.existsByEmail("nonexisting@email.com");
+        assert !userService.existsByEmail(null);
+        assert !userService.existsByEmail("nonexisting@email.com");
 
         String email = "some@email.com";
-        createActor(email);
+        createUser(email);
 
         Thread.sleep(2000);
-        assert actorService.existsByEmail(email);
+        assert userService.existsByEmail(email);
     }
 
     @Test
     void testFindById() throws InterruptedException {
-        assert actorService.findById(null).isEmpty();
-        assert actorService.findById(new ObjectId().toString()).isEmpty();
+        assert userService.findById(null).isEmpty();
+        assert userService.findById(new ObjectId().toString()).isEmpty();
 
         String email = "some@email.com";
-        User user = createActor(email);
+        User user = createUser(email);
 
         Thread.sleep(2000);
-        assert actorService.findById(user.getStringId()).isPresent();
+        assert userService.findById(user.getStringId()).isPresent();
     }
 
     @Test
     void testExistsById() {
-        assert !actorService.existsById(null);
-        assert !actorService.existsById(new ObjectId().toString());
+        assert !userService.existsById(null);
+        assert !userService.existsById(new ObjectId().toString());
 
         String email = "some@email.com";
-        User user = createActor(email);
+        User user = createUser(email);
 
-        assert actorService.existsById(user.getStringId());
+        assert userService.existsById(user.getStringId());
     }
 
     @Test
     void testFindAll() {
-        Process actorProcess = petriNetService.getNewestVersionByIdentifier("actor");
-        caseRepository.deleteAllByPetriNetObjectId(actorProcess.getId());
+        Process userProcess = petriNetService.getNewestVersionByIdentifier(UserConstants.PROCESS_IDENTIFIER);
+        caseRepository.deleteAllByPetriNetObjectId(userProcess.getId());
 
-        assert actorService.findAll().isEmpty();
+        assert userService.findAll().isEmpty();
 
-        createActor("some@email.com");
-        createActor("some@email2.com");
+        createUser("some@email.com");
+        createUser("some@email2.com");
 
-        assert actorService.findAll().size() == 2;
+        assert userService.findAll().size() == 2;
     }
 
     @Test
@@ -114,7 +115,7 @@ public class ActorServiceTest {
         String email = "some@email.com";
         String firstname = "firstname";
         String lastname = "lastname";
-        User user = actorService.create(ActorParams.with()
+        User user = userService.create(UserParams.with()
                 .email(new TextField(email))
                 .firstname(new TextField(firstname))
                 .lastname(new TextField(lastname))
@@ -125,25 +126,25 @@ public class ActorServiceTest {
         assert user.getFirstname().equals(firstname);
         assert user.getLastname().equals(lastname);
 
-        assertThrows(IllegalArgumentException.class, () -> actorService.create(ActorParams.with()
+        assertThrows(IllegalArgumentException.class, () -> userService.create(UserParams.with()
                 .firstname(new TextField(firstname))
                 .lastname(new TextField(lastname))
                 .build()));
 
-        assertThrows(IllegalArgumentException.class, () -> actorService.create(null));
+        assertThrows(IllegalArgumentException.class, () -> userService.create(null));
     }
 
     @Test
     void testUpdate() {
         String email = "some@email.com";
-        User user = createActor(email);
+        User user = createUser(email);
         assert user.getEmail().equals(email);
         assert user.getFirstname() == null;
         assert user.getLastname() == null;
 
         String newFirstname = "newFirstname";
         String newLastname = "newLastname";
-        User updatedUser = actorService.update(user, ActorParams.with()
+        User updatedUser = userService.update(user, UserParams.with()
                 .email(new TextField(email))
                 .firstname(new TextField(newFirstname))
                 .lastname(new TextField(newLastname))
@@ -154,23 +155,23 @@ public class ActorServiceTest {
         assert updatedUser.getFirstname().equals(newFirstname);
         assert updatedUser.getLastname().equals(newLastname);
 
-        assertThrows(IllegalArgumentException.class, () -> actorService.update(user, ActorParams.with()
+        assertThrows(IllegalArgumentException.class, () -> userService.update(user, UserParams.with()
                 .email(new TextField(null))
                 .firstname(new TextField("firstname"))
                 .lastname(new TextField("lastname"))
                 .build()));
 
-        assertThrows(IllegalArgumentException.class, () -> actorService.update(user, null));
-        assertThrows(IllegalArgumentException.class, () -> actorService.update(null, ActorParams.with()
+        assertThrows(IllegalArgumentException.class, () -> userService.update(user, null));
+        assertThrows(IllegalArgumentException.class, () -> userService.update(null, UserParams.with()
                 .email(new TextField("email"))
                 .firstname(new TextField("firstname"))
                 .lastname(new TextField("lastname"))
                 .build()));
     }
 
-    private User createActor(String email) {
-        Case actorCase = workflowService.createCaseByIdentifier("actor", email, "", null).getCase();
-        return new User(dataService.setData(actorCase, ActorParams.with()
+    private User createUser(String email) {
+        Case userCase = workflowService.createCaseByIdentifier(UserConstants.PROCESS_IDENTIFIER, email, "", null).getCase();
+        return new User(dataService.setData(userCase, UserParams.with()
                 .email(new TextField(email))
                 .build()
                 .toDataSet(), null).getCase());

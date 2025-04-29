@@ -1,7 +1,7 @@
 package com.netgrif.application.engine
 
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
-import com.netgrif.application.engine.authorization.service.interfaces.IActorService
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -37,7 +37,7 @@ abstract class EngineTest {
     @Autowired
     public IIdentityService identityService
     @Autowired
-    public IActorService actorService
+    public IUserService userService
     @Autowired
     public IWorkflowService workflowService
     @Autowired

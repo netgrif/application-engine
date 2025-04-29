@@ -3,7 +3,7 @@ package com.netgrif.application.engine.importer
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authorization.domain.Role
 import com.netgrif.application.engine.authorization.domain.User
-import com.netgrif.application.engine.authorization.service.interfaces.IActorService
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
@@ -58,7 +58,7 @@ class ActorListTest {
     private ITaskService taskService
 
     @Autowired
-    private IActorService actorService
+    private IUserService userService
 
     @Autowired
     private IRoleService roleService
@@ -82,7 +82,7 @@ class ActorListTest {
 
         Task task = taskService.findByCases(new FullPageRequest(), Collections.singletonList(caseOpt.get().getStringId())).stream().collect(Collectors.toList()).get(0)
 
-        User actor = actorService.findById(superCreator.getLoggedSuper().activeActorId).get()
+        User actor = userService.findById(superCreator.getLoggedSuper().activeActorId).get()
         dataService.setData(task.stringId, new DataSet([
                 "actors_1": new ActorListField(rawValue: new ActorListFieldValue(new ActorFieldValue(actor)))
         ] as Map<String, Field<?>>), superCreator.getLoggedSuper().getActiveActorId())

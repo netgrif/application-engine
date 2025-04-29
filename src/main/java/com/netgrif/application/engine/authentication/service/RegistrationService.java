@@ -9,8 +9,8 @@ import com.netgrif.application.engine.authentication.web.requestbodies.NewIdenti
 import com.netgrif.application.engine.authentication.web.requestbodies.RegistrationRequest;
 import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.domain.Role;
-import com.netgrif.application.engine.authorization.domain.params.ActorParams;
-import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
+import com.netgrif.application.engine.authorization.domain.params.UserParams;
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.event.events.authentication.IdentityRegistrationEvent;
@@ -37,7 +37,7 @@ public class RegistrationService implements IRegistrationService {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final IRoleService roleService;
-    private final IActorService actorService;
+    private final IUserService userService;
     private final ApplicationRoleRunner applicationRoleRunner;
     private final ServerAuthProperties serverAuthProperties;
     private final IIdentityService identityService;
@@ -46,12 +46,12 @@ public class RegistrationService implements IRegistrationService {
     private static final String TOKEN_DELIMITER = ":";
 
     public RegistrationService(BCryptPasswordEncoder bCryptPasswordEncoder, IRoleService roleService,
-                               @Lazy IActorService actorService, ApplicationRoleRunner applicationRoleRunner,
+                               @Lazy IUserService userService, ApplicationRoleRunner applicationRoleRunner,
                                ServerAuthProperties serverAuthProperties, IIdentityService identityService,
                                ApplicationEventPublisher publisher) {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.roleService = roleService;
-        this.actorService = actorService;
+        this.userService = userService;
         this.applicationRoleRunner = applicationRoleRunner;
         this.serverAuthProperties = serverAuthProperties;
         this.identityService = identityService;
@@ -129,16 +129,16 @@ public class RegistrationService implements IRegistrationService {
                 .build();
         identity = identityService.encodePasswordAndUpdate(identity, identityParams);
 
-        Optional<User> actorOpt = actorService.findById(identity.getMainActorId());
+        Optional<User> actorOpt = userService.findById(identity.getMainActorId());
         if (actorOpt.isEmpty()) {
             throw new IllegalStateException(String.format("Identity [%s] has no default actor!", identity.getStringId()));
         }
 
-        ActorParams actorParams = ActorParams.with()
+        UserParams userParams = UserParams.with()
                 .firstname(new TextField(registrationRequest.firstname))
                 .lastname(new TextField(registrationRequest.lastname))
                 .build();
-        actorService.update(actorOpt.get(), actorParams);
+        userService.update(actorOpt.get(), userParams);
 
         return identity;
     }

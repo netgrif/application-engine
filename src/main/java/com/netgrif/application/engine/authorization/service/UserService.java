@@ -3,8 +3,8 @@ package com.netgrif.application.engine.authorization.service;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.domain.constants.UserConstants;
-import com.netgrif.application.engine.authorization.domain.params.ActorParams;
-import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
+import com.netgrif.application.engine.authorization.domain.params.UserParams;
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSearchService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
@@ -24,15 +24,15 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class ActorService implements IActorService {
+public class UserService implements IUserService {
 
     private final IDataService dataService;
     private final IIdentityService identityService;
     private final IElasticCaseSearchService elasticCaseSearchService;
     private final IWorkflowService workflowService;
 
-    public ActorService(@Lazy IDataService dataService, IIdentityService identityService,
-                        @Lazy IElasticCaseSearchService elasticCaseSearchService, @Lazy IWorkflowService workflowService) {
+    public UserService(@Lazy IDataService dataService, IIdentityService identityService,
+                       @Lazy IElasticCaseSearchService elasticCaseSearchService, @Lazy IWorkflowService workflowService) {
         this.dataService = dataService;
         this.identityService = identityService;
         this.elasticCaseSearchService = elasticCaseSearchService;
@@ -70,11 +70,11 @@ public class ActorService implements IActorService {
             return Optional.empty();
         }
         try {
-            Case actorCase = workflowService.findOne(id);
-            if (!actorCase.getProcessIdentifier().equals("actor")) {
+            Case userCase = workflowService.findOne(id);
+            if (!userCase.getProcessIdentifier().equals(UserConstants.PROCESS_IDENTIFIER)) {
                 return Optional.empty();
             }
-            return Optional.of(new User(actorCase));
+            return Optional.of(new User(userCase));
         } catch (IllegalArgumentException ignored) {
             return Optional.empty();
         }
@@ -88,7 +88,7 @@ public class ActorService implements IActorService {
         if (id == null) {
             return false;
         }
-        return workflowService.count(QCase.case$.processIdentifier.eq("actor")
+        return workflowService.count(QCase.case$.processIdentifier.eq(UserConstants.PROCESS_IDENTIFIER)
                 .and(QCase.case$.id.eq(new ObjectId(id)))) > 0;
     }
 
@@ -102,42 +102,42 @@ public class ActorService implements IActorService {
      * todo javadoc
      * */
     @Override
-    public User create(ActorParams params) {
+    public User create(UserParams params) {
         throwIfInvalidParams(params);
 
         String activeActorId = identityService.getActiveActorId();
-        Case actorCase = workflowService.createCaseByIdentifier(UserConstants.PROCESS_IDENTIFIER, params.getFullName(),
+        Case userCase = workflowService.createCaseByIdentifier(UserConstants.PROCESS_IDENTIFIER, params.getFullName(),
                 "", activeActorId).getCase();
-        actorCase = dataService.setData(actorCase, params.toDataSet(), activeActorId).getCase();
-        log.debug("Actor [{}] was created by actor [{}].", actorCase, activeActorId);
-        return new User(dataService.setData(actorCase, params.toDataSet(), activeActorId).getCase());
+        userCase = dataService.setData(userCase, params.toDataSet(), activeActorId).getCase();
+        log.debug("User [{}] was created by actor [{}].", userCase, activeActorId);
+        return new User(dataService.setData(userCase, params.toDataSet(), activeActorId).getCase());
     }
 
     /**
      * todo javadoc
      * */
     @Override
-    public User update(User user, ActorParams params) {
+    public User update(User user, UserParams params) {
         if (params == null) {
-            throw new IllegalArgumentException("Please provide input values for actor");
+            throw new IllegalArgumentException("Please provide input values for user");
         }
         if (params.getEmail() != null && isTextFieldValueEmpty(params.getEmail())) {
-            throw new IllegalArgumentException("Actor must have an email!");
+            throw new IllegalArgumentException("User must have an email!");
         }
         if (user == null) {
-            throw new IllegalArgumentException("Please provide actor to be updated");
+            throw new IllegalArgumentException("Please provide user to be updated");
         }
 
         String activeActorId = identityService.getActiveActorId();
         return new User(dataService.setData(user.getCase(), params.toDataSet(), activeActorId).getCase());
     }
 
-    private void throwIfInvalidParams(ActorParams params) {
+    private void throwIfInvalidParams(UserParams params) {
         if (params == null) {
-            throw new IllegalArgumentException("Please provide input values for actor");
+            throw new IllegalArgumentException("Please provide input values for user");
         }
         if (isTextFieldOrValueEmpty(params.getEmail())) {
-            throw new IllegalArgumentException("Actor must have an email!");
+            throw new IllegalArgumentException("User must have an email!");
         }
     }
 
@@ -170,7 +170,7 @@ public class ActorService implements IActorService {
     }
 
     private static String buildQuery(Set<String> andQueries) {
-        StringBuilder queryBuilder = new StringBuilder("processIdentifier:actor");
+        StringBuilder queryBuilder = new StringBuilder("processIdentifier:").append(UserConstants.PROCESS_IDENTIFIER);
         for (String query : andQueries) {
             queryBuilder.append(" AND ");
             queryBuilder.append(query);

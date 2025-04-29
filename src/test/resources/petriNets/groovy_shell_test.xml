@@ -16,7 +16,7 @@
             <actions phase="pre">
                 <action id="action_0">
 					<![CDATA[
-                    actorService.groovyShellTestMethod("String", new I18nString("I18nString"))
+                    userService.groovyShellTestMethod("String", new I18nString("I18nString"))
                     ]]>
 				</action>
             </actions>

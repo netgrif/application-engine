@@ -5,7 +5,7 @@ import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
 import com.netgrif.application.engine.authorization.domain.User
-import com.netgrif.application.engine.authorization.service.interfaces.IActorService
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
@@ -77,7 +77,7 @@ class PetriNetServiceTest {
     private IIdentityService identityService
 
     @Autowired
-    private IActorService actorService
+    private IUserService userService
 
     @Autowired
     private ProcessRoleRepository roleRepository
@@ -198,7 +198,7 @@ class PetriNetServiceTest {
         assert petriNetService.search(search4, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
 
         PetriNetSearch search5 = new PetriNetSearch()
-        Optional<User> actorOpt = actorService.findById(testIdentity.toSession().activeActorId)
+        Optional<User> actorOpt = userService.findById(testIdentity.toSession().activeActorId)
         assert actorOpt.isPresent()
         search5.setAuthor(actorOpt.get())
         assert petriNetService.search(search5, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1

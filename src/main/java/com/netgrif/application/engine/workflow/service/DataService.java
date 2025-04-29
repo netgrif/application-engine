@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.authorization.domain.User;
-import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
 import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
 import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
@@ -85,7 +85,7 @@ public class DataService implements IDataService {
     protected IValidationService validationService;
 
     @Autowired
-    protected IActorService actorService;
+    protected IUserService userService;
 
     @Value("${nae.image.preview.scaling.px:400}")
     protected int imageScale;
@@ -739,7 +739,7 @@ public class DataService implements IDataService {
 
     @Override
     public ActorFieldValue makeActorFieldValue(String actorId) {
-        Optional<User> actorOpt = actorService.findById(actorId);
+        Optional<User> actorOpt = userService.findById(actorId);
         return actorOpt.map(actor -> new ActorFieldValue(actor.getStringId(), actor.getFirstname(),
                 actor.getLastname(), actor.getEmail())).orElseGet(ActorFieldValue::new);
     }

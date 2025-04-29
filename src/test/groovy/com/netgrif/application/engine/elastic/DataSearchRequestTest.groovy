@@ -3,7 +3,7 @@ package com.netgrif.application.engine.elastic
 import com.netgrif.application.engine.MockService
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
-import com.netgrif.application.engine.authorization.service.interfaces.IActorService
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.domain.ElasticCase
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.ElasticTask
@@ -86,7 +86,7 @@ class DataSearchRequestTest {
     private IIdentityService identityService
 
     @Autowired
-    private IActorService actorService
+    private IUserService userService
 
     @Autowired
     private IDataService dataService
@@ -113,7 +113,7 @@ class DataSearchRequestTest {
                 VersionType.MAJOR, superCreator.getLoggedSuper().getActiveActorId())
         assert net.getNet() != null
 
-        def actors = actorService.findAll()
+        def actors = userService.findAll()
         assert actors.size() >= 2
         def testActor1 = actors[0]
         def testActor2 = actors[1]

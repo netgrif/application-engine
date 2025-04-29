@@ -4,7 +4,7 @@ import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
-import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
@@ -106,7 +106,7 @@ public class TaskService implements ITaskService {
     private IIdentityService identityService;
 
     @Autowired
-    private IActorService actorService;
+    private IUserService userService;
 
     @Autowired
     public void setElasticTaskService(IElasticTaskService elasticTaskService) {
@@ -380,7 +380,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public DelegateTaskEventOutcome delegateTask(String actorId, String delegatedId, String taskId, Map<String, String> params) throws TransitionNotExecutableException {
-        Optional<User> delegatedActorOpt = actorService.findById(delegatedId);
+        Optional<User> delegatedActorOpt = userService.findById(delegatedId);
         if (delegatedActorOpt.isEmpty()) {
             throw new IllegalArgumentException(String.format("Delegated actor with id [%s] does not exist.", delegatedId));
         }
@@ -722,7 +722,7 @@ public class TaskService implements ITaskService {
         return userListValue.getActorValues().stream()
                 .filter(Objects::nonNull)
                 .map(ActorFieldValue::getId)
-                .filter(id -> id != null && actorService.existsById(id))
+                .filter(id -> id != null && userService.existsById(id))
                 .collect(Collectors.toList());
     }
 

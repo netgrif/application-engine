@@ -7,8 +7,8 @@ import com.netgrif.application.engine.authentication.domain.constants.IdentityCo
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
 import com.netgrif.application.engine.authorization.domain.User;
-import com.netgrif.application.engine.authorization.domain.params.ActorParams;
-import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
+import com.netgrif.application.engine.authorization.domain.params.UserParams;
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSearchService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
@@ -43,19 +43,19 @@ public class IdentityService implements IIdentityService {
     private final IDataService dataService;
     private final IWorkflowService workflowService;
     private final IElasticCaseSearchService elasticCaseSearchService;
-    private final IActorService actorService;
+    private final IUserService userService;
 
     public IdentityService(BCryptPasswordEncoder passwordEncoder, SecurityContextService securityContextService,
                            @Lazy SystemIdentityRunner systemIdentityRunner, @Lazy IDataService dataService,
                            @Lazy IWorkflowService workflowService, @Lazy IElasticCaseSearchService elasticCaseSearchService,
-                           @Lazy IActorService actorService) {
+                           @Lazy IUserService userService) {
         this.passwordEncoder = passwordEncoder;
         this.securityContextService = securityContextService;
         this.systemIdentityRunner = systemIdentityRunner;
         this.dataService = dataService;
         this.workflowService = workflowService;
         this.elasticCaseSearchService = elasticCaseSearchService;
-        this.actorService = actorService;
+        this.userService = userService;
     }
 
     /**
@@ -243,8 +243,8 @@ public class IdentityService implements IIdentityService {
     public Identity createWithDefaultActor(IdentityParams identityParams) {
         throwIfInvalidParams(identityParams);
 
-        ActorParams actorParams = ActorParams.fromIdentityParams(identityParams);
-        User defaultUser = actorService.create(actorParams);
+        UserParams userParams = UserParams.fromIdentityParams(identityParams);
+        User defaultUser = userService.create(userParams);
 
         identityParams.setMainActor(CaseField.withValue(List.of(defaultUser.getStringId())));
         return encodePasswordAndCreate(identityParams);

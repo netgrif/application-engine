@@ -7,8 +7,8 @@ import com.netgrif.application.engine.authentication.service.interfaces.IIdentit
 import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.domain.ApplicationRole;
 import com.netgrif.application.engine.authorization.domain.ProcessRole;
-import com.netgrif.application.engine.authorization.domain.params.ActorParams;
-import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
+import com.netgrif.application.engine.authorization.domain.params.UserParams;
+import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import com.netgrif.application.engine.petrinet.domain.dataset.CaseField;
@@ -29,15 +29,15 @@ import java.util.Set;
 public class PublicBasicAuthenticationFilter extends PublicJwtAuthenticationFilter  {
     private static final String USERNAME = "anonymous";
 
-    private final IActorService actorService;
+    private final IUserService userService;
 
     public PublicBasicAuthenticationFilter(IIdentityService identityService, IRoleService roleService, ProviderManager authenticationManager,
                                            AnonymousAuthenticationProvider provider, ApplicationRole anonymousAppRole,
                                            ProcessRole anonymousProcessRole, String[] urls, String[] exceptions,
-                                           IJwtService jwtService, IActorService actorService) {
+                                           IJwtService jwtService, IUserService userService) {
         super(identityService, roleService, authenticationManager, provider, anonymousAppRole, anonymousProcessRole, urls,
                 exceptions, jwtService);
-        this.actorService = actorService;
+        this.userService = userService;
     }
 
     /**
@@ -52,8 +52,8 @@ public class PublicBasicAuthenticationFilter extends PublicJwtAuthenticationFilt
             return anonymIdentityOpt.get();
         }
 
-        Optional<User> anonymActorOpt = actorService.findByEmail(AnonymIdentityConstants.usernameOf(USERNAME));
-        User anonymUser = anonymActorOpt.orElseGet(() -> actorService.create(ActorParams.with()
+        Optional<User> anonymActorOpt = userService.findByEmail(AnonymIdentityConstants.usernameOf(USERNAME));
+        User anonymUser = anonymActorOpt.orElseGet(() -> userService.create(UserParams.with()
                 .email(new TextField(AnonymIdentityConstants.usernameOf(USERNAME)))
                 .firstname(new TextField(AnonymIdentityConstants.FIRSTNAME))
                 .lastname(new TextField(AnonymIdentityConstants.LASTNAME))

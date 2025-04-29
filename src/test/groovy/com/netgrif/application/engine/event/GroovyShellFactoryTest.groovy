@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.event
 
 import com.netgrif.application.engine.EngineTest
-import com.netgrif.application.engine.authentication.domain.Identity
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.Process
 import com.netgrif.application.engine.authorization.domain.ProcessRole
@@ -43,9 +42,9 @@ class GroovyShellFactoryTest extends EngineTest {
 
     @Test
     void roleActionsTest() {
-        actorService.metaClass.groovyShellTestMethod = { String string, I18nString i18nString -> println("groovyShellTestMethod") }
+        userService.metaClass.groovyShellTestMethod = { String string, I18nString i18nString -> println("groovyShellTestMethod") }
 
-        def actorOpt = actorService.findById(superCreator.superIdentity.mainActorId)
+        def actorOpt = userService.findById(superCreator.superIdentity.mainActorId)
         assert actorOpt.isPresent()
 //        def roleCount = actor.roles.size()
         def roles = roleService.findAll()

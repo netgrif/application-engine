@@ -58,7 +58,7 @@
         <title>number</title>
         <init dynamic="true">
             <![CDATA[
-			actorService.findByEmail("super@netgrif.com").get().firstname.length()
+			userService.findByEmail("super@netgrif.com").get().firstname.length()
 			]]>
         </init>
     </data>
@@ -67,7 +67,7 @@
         <title>Text</title>
         <init dynamic="true">
             <![CDATA[
-			actorService.findByEmail("super@netgrif.com").get().firstname
+			userService.findByEmail("super@netgrif.com").get().firstname
 			]]>
         </init>
     </data>
@@ -77,7 +77,7 @@
         <init dynamic="true">
             <![CDATA[
 			def loggedIdentity = identityService.getLoggedSystemIdentity()
-			def user = actorService.findById(loggedIdentity.activeActorId).get()
+			def user = userService.findById(loggedIdentity.activeActorId).get()
 			return new com.netgrif.application.engine.petrinet.domain.dataset.ActorFieldValue(user.stringId, user.firstname,
 			user.lastname, user.email)
 			]]>

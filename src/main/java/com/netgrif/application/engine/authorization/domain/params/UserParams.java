@@ -10,7 +10,7 @@ import lombok.Getter;
 
 @Getter
 @Builder(builderMethodName = "with")
-public class ActorParams implements CaseParams {
+public class UserParams implements CaseParams {
     protected TextField email;
     protected TextField firstname;
     protected TextField lastname;
@@ -29,7 +29,7 @@ public class ActorParams implements CaseParams {
     /**S
      * todo javadoc
      * */
-    public static ActorParams fromIdentityParams(IdentityParams identityParams) {
+    public static UserParams fromIdentityParams(IdentityParams identityParams) {
         TextField email = null, firstname = null, lastname = null;
 
         if (identityParams.getUsername() != null) {
@@ -42,7 +42,7 @@ public class ActorParams implements CaseParams {
             lastname = new TextField(identityParams.getLastname().getRawValue());
         }
 
-        return ActorParams.with()
+        return UserParams.with()
                 .email(email)
                 .firstname(firstname)
                 .lastname(lastname)
