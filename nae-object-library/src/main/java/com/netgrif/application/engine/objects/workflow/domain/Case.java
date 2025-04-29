@@ -34,6 +34,9 @@ public abstract class Case implements Serializable {
     private String uriNodeId;
 
     @Setter
+    private String workspaceId;
+
+    @Setter
     private LocalDateTime lastModified;
 
     @Setter
@@ -153,6 +156,7 @@ public abstract class Case implements Serializable {
         icon = petriNet.getIcon();
         userRefs = petriNet.getUserRefs();
         tags = new HashMap<>(petriNet.getTags());
+        workspaceId = petriNet.getWorkspaceId();
 
         permissions = petriNet.getPermissions().entrySet().stream()
                 .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))

@@ -19,6 +19,7 @@ public class AnonymousUser extends AbstractUser implements IUser {
     private String email;
     private String firstName;
     private String lastName;
+    private String workspaceId;
 
     private transient Duration sessionTimeout = Duration.ofHours(2);
 

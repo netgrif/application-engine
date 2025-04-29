@@ -36,6 +36,11 @@ public class ElasticCase extends com.netgrif.application.engine.objects.elastic.
         return super.getUriNodeId();
     }
 
+    @Field(type = Keyword)
+    public String getWorkspaceId() {
+        return super.getWorkspaceId();
+    }
+
     @Version
     public Long getVersion() {
         return super.getVersion();

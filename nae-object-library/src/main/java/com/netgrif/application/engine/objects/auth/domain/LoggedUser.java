@@ -23,6 +23,8 @@ public abstract class LoggedUser implements Serializable {
 
     private String realmId;
 
+    private String workspaceId;
+
     private String createMethod;
 
     private String username;

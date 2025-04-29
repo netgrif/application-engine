@@ -63,7 +63,7 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
 
     @Override
     public List<ProcessRole> getAll() {
-        return processRoleRepository.findAllByWorkspaceId(userService.getLoggedOrSystem().getWorkspaceId());
+        return processRoleRepository.findAll();
     }
 
     @Override
@@ -291,6 +291,11 @@ public class ProcessRoleService implements com.netgrif.application.engine.adapte
     @Override
     public List<ProcessRole> findAll() {
         return processRoleRepository.findAllByWorkspaceId(userService.getLoggedOrSystem().getWorkspaceId());
+    }
+
+    @Override
+    public List<ProcessRole> findAllByWorkspaceId(String workspaceId) {
+        return processRoleRepository.findAllByWorkspaceId(workspaceId);
     }
 
     @Override

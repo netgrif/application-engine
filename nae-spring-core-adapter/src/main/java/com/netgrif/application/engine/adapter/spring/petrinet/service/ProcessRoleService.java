@@ -28,6 +28,7 @@ public interface ProcessRoleService {
     Set<ProcessRole> findByIds(Set<String> ids);
     ProcessRole findByImportId(String importId);
     List<ProcessRole> findAll();
+    List<ProcessRole> findAllByWorkspaceId(String workspaceId);
     Set<ProcessRole> findAllGlobalRoles();
     List<ProcessRole> findAll(String netId);
     ProcessRole defaultRole();

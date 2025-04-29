@@ -14,6 +14,10 @@ public interface IUser extends Actor {
 
     void setRealmId(String realmId);
 
+    String getWorkspaceId();
+
+    void setWorkspaceId(String workspaceId);
+
     String getUsername();
 
     void setUsername(String username);

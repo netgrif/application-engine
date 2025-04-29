@@ -33,6 +33,8 @@ public abstract class ElasticTask {
 
     private String transitionId;
 
+    private String workspaceId;
+
     private I18nString title;
 
     private String titleSortable;
@@ -81,6 +83,7 @@ public abstract class ElasticTask {
         this.taskId = task.getStringId();
         this.caseId = task.getCaseId();
         this.transitionId = task.getTransitionId();
+        this.workspaceId = task.getWorkspaceId();
         this.title = task.getTitle();
         this.titleSortable = title.getDefaultValue();
         this.caseTitle = task.getCaseTitle();
@@ -101,6 +104,7 @@ public abstract class ElasticTask {
     public void update(ElasticTask task) {
         this.title = task.getTitle();
         this.titleSortable = title.getDefaultValue();
+        this.workspaceId = task.getWorkspaceId();
         this.caseTitle = task.getCaseTitle();
         this.caseTitleSortable = this.caseTitle;
         this.priority = task.getPriority();

@@ -35,6 +35,9 @@ public abstract class ProcessRole extends Imported {
     @Getter
     private ProcessResourceId _id;
 
+    @Setter
+    private String workspaceId;
+
     @Getter
     private I18nString name;
 

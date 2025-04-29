@@ -7,6 +7,8 @@ import com.netgrif.application.engine.objects.auth.domain.Author;
 import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.auth.domain.LoggedUser;
 import com.querydsl.core.annotations.QueryEntity;
+import lombok.Getter;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Transient;
 
@@ -22,6 +24,11 @@ public class User extends com.netgrif.application.engine.objects.auth.domain.Use
     public User(ObjectId id) {
         super(id);
     }
+
+    @Getter
+    @Setter
+    @Transient
+    private String workspaceId;
 
     @Override
     public LoggedUser transformToLoggedUser() {

@@ -24,6 +24,10 @@ public class Transition extends Node {
 
     @Getter
     @Setter
+    private String workspaceId;
+
+    @Getter
+    @Setter
     private Map<String, DataGroup> dataGroups;
 
     @Getter

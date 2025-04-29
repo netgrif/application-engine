@@ -37,6 +37,14 @@ public abstract class PetriNet extends PetriNetObject {
     private String uriNodeId;
 
     @Getter
+    @Setter
+    private String uri;
+
+    @Getter
+    @Setter
+    private String workspaceId;
+
+    @Getter
     private I18nString title;
 
     @Getter

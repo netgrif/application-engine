@@ -11,6 +11,7 @@ import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 import com.netgrif.application.engine.objects.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.objects.petrinet.domain.workspace.DefaultWorkspaceService;
 import com.netgrif.application.engine.objects.workflow.domain.ProcessResourceId;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.Getter;
@@ -234,7 +235,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Admin user with username [%s] cannot be found.".formatted(username));
         }
         IUser user = userOptional.get();
-        user.setProcessRoles(new HashSet<>(processRoleService.findAll()));
+        user.setProcessRoles(new HashSet<>(processRoleService.getAll()));
         saveUser(user, user.getRealmId());
     }
 
@@ -391,6 +392,7 @@ public class UserServiceImpl implements UserService {
             impersonated.setProcessRoles(new HashSet<>(processRoleService.findAllByIds(resourceIds)));
             user.setImpersonated(impersonated);
         }
+        user.setWorkspaceId(loggedUser.getWorkspaceId());
         return user;
     }
 
@@ -399,6 +401,7 @@ public class UserServiceImpl implements UserService {
         if (systemUser == null) {
             systemUser = createSystemUser();
         }
+        systemUser.setWorkspaceId(DefaultWorkspaceService.DEFAULT_WORKSPACE_ID);
         systemUser.setProcessRoles(new HashSet<>(processRoleService.getAll()));
         return systemUser;
     }
@@ -475,6 +478,7 @@ public class UserServiceImpl implements UserService {
         user.setGroups(loggedUser.getGroups());
         user.setAuthorities(loggedUser.getAuthoritySet());
         user.setAttributes(loggedUser.getAttributes());
+        user.setWorkspaceId(loggedUser.getWorkspaceId());
         if (loggedUser.getImpersonated() != null) {
             user.setImpersonated(transformToUser((LoggedUserImpl) loggedUser.getImpersonated()));
         }
@@ -506,7 +510,7 @@ public class UserServiceImpl implements UserService {
         loggedUser.setRealmId(user.getRealmId());
         loggedUser.setGroups(user.getGroups());
         loggedUser.setMfaMethod(mfaMethods);
-
+        loggedUser.setWorkspaceId(user.getWorkspaceId());
         if (user.getImpersonated() != null) {
             loggedUser.setImpersonated(transformToLoggedUser(user.getImpersonated()));
         }

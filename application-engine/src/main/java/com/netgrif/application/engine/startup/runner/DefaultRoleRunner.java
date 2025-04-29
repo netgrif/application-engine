@@ -1,9 +1,11 @@
 package com.netgrif.application.engine.startup.runner;
 
+import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.objects.petrinet.domain.I18nString;
 import com.netgrif.application.engine.objects.petrinet.domain.events.Event;
 import com.netgrif.application.engine.objects.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.objects.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.objects.petrinet.domain.workspace.DefaultWorkspaceService;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
@@ -25,12 +27,10 @@ public class DefaultRoleRunner implements ApplicationEngineStartupRunner {
 
     private final ProcessRoleRepository repository;
 
-    private final UserService userService;
-
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("Creating default process role");
-        Set<ProcessRole> role = repository.findAllByName_DefaultValueAndWorkspaceId(ProcessRole.DEFAULT_ROLE, userService.getLoggedOrSystem().getWorkspaceId());
+        Set<ProcessRole> role = repository.findAllByName_DefaultValueAndWorkspaceId(ProcessRole.DEFAULT_ROLE, DefaultWorkspaceService.DEFAULT_WORKSPACE_ID);
         if (role != null && !role.isEmpty()) {
             log.info("Default role already exists");
             return;
@@ -41,6 +41,7 @@ public class DefaultRoleRunner implements ApplicationEngineStartupRunner {
         defaultRole.setName(new I18nString(ProcessRole.DEFAULT_ROLE));
         defaultRole.setDescription("Default system process role");
         defaultRole.setEvents(new LinkedHashMap<EventType, Event>());
+        defaultRole.setWorkspaceId(DefaultWorkspaceService.DEFAULT_WORKSPACE_ID);
         defaultRole = repository.save(defaultRole);
 
         if (defaultRole == null) {

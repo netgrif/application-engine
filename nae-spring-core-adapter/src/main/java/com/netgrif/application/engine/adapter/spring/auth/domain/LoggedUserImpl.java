@@ -22,8 +22,8 @@ public class LoggedUserImpl extends LoggedUser implements UserDetails {
     }
 
     @Builder(builderMethodName = "with")
-    public LoggedUserImpl(String id, String realmId, String createMethod, String username, String email, String password, String firstName, String lastName, Set<Authority> authoritySet, Set<Group> groups, boolean enabled, boolean emailVerified, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, LoggedUser impersonated, Set<ProcessRole> processRoles, Set<String> MFAMethod, Duration sessionTimeout, Map<String,Attribute<?>> attributes) {
-        super(id, realmId, createMethod, username, email, password, firstName, lastName, authoritySet, groups, enabled, emailVerified, accountNonExpired, accountNonLocked, credentialsNonExpired, impersonated, processRoles, MFAMethod, sessionTimeout, attributes);
+    public LoggedUserImpl(String id, String realmId, String workspaceId, String createMethod, String username, String email, String password, String firstName, String lastName, Set<Authority> authoritySet, Set<Group> groups, boolean enabled, boolean emailVerified, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, LoggedUser impersonated, Set<ProcessRole> processRoles, Set<String> MFAMethod, Duration sessionTimeout, Map<String,Attribute<?>> attributes) {
+        super(id, realmId, workspaceId, createMethod, username, email, password, firstName, lastName, authoritySet, groups, enabled, emailVerified, accountNonExpired, accountNonLocked, credentialsNonExpired, impersonated, processRoles, MFAMethod, sessionTimeout, attributes);
     }
 
     @Override

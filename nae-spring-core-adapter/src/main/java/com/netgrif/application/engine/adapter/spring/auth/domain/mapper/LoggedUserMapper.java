@@ -31,7 +31,7 @@ public class LoggedUserMapper {
         user.setProcessRoles(loggedUser.getProcessRoles());
         user.setAttributes(loggedUser.getAttributes());
         user.setAuthMethods(loggedUser.getMfaMethod());
-
+        user.setWorkspaceId(loggedUser.getWorkspaceId());
         return user;
     }
 
@@ -57,6 +57,7 @@ public class LoggedUserMapper {
         if (user.getImpersonated() != null) {
             loggedUser.setImpersonated(toLoggedUser(user.getImpersonated()));
         }
+        loggedUser.setWorkspaceId(user.getWorkspaceId());
         return loggedUser;
     }
 

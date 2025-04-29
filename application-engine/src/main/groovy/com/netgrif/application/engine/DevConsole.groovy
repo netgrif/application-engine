@@ -1,5 +1,6 @@
 package com.netgrif.application.engine
 
+import com.netgrif.application.engine.objects.auth.domain.LoggedUser
 import com.netgrif.application.engine.objects.importer.model.Document
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository

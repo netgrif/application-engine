@@ -5,6 +5,7 @@ import com.netgrif.application.engine.objects.auth.domain.*;
 import com.netgrif.application.engine.auth.service.UserService;
 import com.netgrif.application.engine.auth.service.GroupService;
 import com.netgrif.application.engine.adapter.spring.petrinet.service.ProcessRoleService;
+import com.netgrif.application.engine.objects.petrinet.domain.workspace.DefaultWorkspaceService;
 import com.netgrif.application.engine.startup.ApplicationEngineStartupRunner;
 import com.netgrif.application.engine.startup.annotation.RunnerOrder;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
@@ -65,7 +66,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
             user.setPassword(superAdminPassword);
             user.setState(UserState.ACTIVE);
             user.setAuthorities(authorities);
-            user.setProcessRoles(new HashSet<>(processRoleService.findAll()));
+            user.setProcessRoles(new HashSet<>(processRoleService.getAll()));
             this.superUser = userService.createUser(user, null);
             log.info("Super user created");
         } else {
@@ -89,7 +90,7 @@ public class SuperCreatorRunner implements ApplicationEngineStartupRunner {
     }
 
     public void setAllProcessRoles() {
-        superUser.setProcessRoles(Set.copyOf(processRoleService.findAll()));
+        superUser.setProcessRoles(Set.copyOf(processRoleService.getAll()));
         superUser = userService.saveUser(superUser, null);
     }
 
