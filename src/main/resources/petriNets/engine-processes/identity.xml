@@ -37,21 +37,21 @@
 		<id>active_actor_id</id>
 		<title/>
 		<allowedNets>
-			<allowedNet>actor</allowedNet>
+			<allowedNet>user</allowedNet>
 		</allowedNets>
 	</data>
 	<data type="caseRef">
 		<id>main_actor_id</id>
 		<title/>
 		<allowedNets>
-			<allowedNet>actor</allowedNet>
+			<allowedNet>user</allowedNet>
 		</allowedNets>
 	</data>
 	<data type="caseRef">
 		<id>additional_actor_ids</id>
 		<title/>
 		<allowedNets>
-			<allowedNet>actor</allowedNet>
+			<allowedNet>user</allowedNet>
 		</allowedNets>
 	</data>
 	<data type="enumeration_map" immediate="true">

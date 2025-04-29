@@ -2,11 +2,9 @@ package com.netgrif.application.engine.petrinet.service
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.authentication.domain.Identity
-import com.netgrif.application.engine.authentication.domain.IdentityState
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService
-import com.netgrif.application.engine.authorization.domain.Actor
-import com.netgrif.application.engine.authorization.domain.Role
+import com.netgrif.application.engine.authorization.domain.User
 import com.netgrif.application.engine.authorization.service.interfaces.IActorService
 import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
 import com.netgrif.application.engine.elastic.domain.repoitories.ElasticPetriNetRepository
@@ -14,7 +12,6 @@ import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
-import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -201,7 +198,7 @@ class PetriNetServiceTest {
         assert petriNetService.search(search4, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1
 
         PetriNetSearch search5 = new PetriNetSearch()
-        Optional<Actor> actorOpt = actorService.findById(testIdentity.toSession().activeActorId)
+        Optional<User> actorOpt = actorService.findById(testIdentity.toSession().activeActorId)
         assert actorOpt.isPresent()
         search5.setAuthor(actorOpt.get())
         assert petriNetService.search(search5, PageRequest.of(0, 50), LocaleContextHolder.locale).getNumberOfElements() == 1

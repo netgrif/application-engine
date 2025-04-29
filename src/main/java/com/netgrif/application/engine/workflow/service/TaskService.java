@@ -2,7 +2,7 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
-import com.netgrif.application.engine.authorization.domain.Actor;
+import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.domain.permissions.AccessPermissions;
 import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
@@ -380,7 +380,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public DelegateTaskEventOutcome delegateTask(String actorId, String delegatedId, String taskId, Map<String, String> params) throws TransitionNotExecutableException {
-        Optional<Actor> delegatedActorOpt = actorService.findById(delegatedId);
+        Optional<User> delegatedActorOpt = actorService.findById(delegatedId);
         if (delegatedActorOpt.isEmpty()) {
             throw new IllegalArgumentException(String.format("Delegated actor with id [%s] does not exist.", delegatedId));
         }
@@ -417,7 +417,7 @@ public class TaskService implements ITaskService {
         return null;
     }
 
-    protected void delegate(Actor delegatedActor, Task task, Case useCase) throws TransitionNotExecutableException {
+    protected void delegate(User delegatedActor, Task task, Case useCase) throws TransitionNotExecutableException {
 //        TODO: release/8.0.0
 //        if (task.getUserId() != null) {
 //            task.setAssigneeId(delegated.getStringId());

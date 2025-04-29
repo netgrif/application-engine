@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.authorization.domain.Actor;
+import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
 import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
 import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
@@ -739,7 +739,7 @@ public class DataService implements IDataService {
 
     @Override
     public ActorFieldValue makeActorFieldValue(String actorId) {
-        Optional<Actor> actorOpt = actorService.findById(actorId);
+        Optional<User> actorOpt = actorService.findById(actorId);
         return actorOpt.map(actor -> new ActorFieldValue(actor.getStringId(), actor.getFirstname(),
                 actor.getLastname(), actor.getEmail())).orElseGet(ActorFieldValue::new);
     }

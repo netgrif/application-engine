@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.orgstructure.groups.interfaces;
 
-import com.netgrif.application.engine.authorization.domain.Actor;
+import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
@@ -10,11 +10,11 @@ import java.util.*;
 
 public interface INextGroupService {
 
-    CreateCaseEventOutcome createDefaultSystemGroup(Actor author);
+    CreateCaseEventOutcome createDefaultSystemGroup(User author);
 
-    CreateCaseEventOutcome createGroup(Actor author);
+    CreateCaseEventOutcome createGroup(User author);
 
-    CreateCaseEventOutcome createGroup(String title, Actor author);
+    CreateCaseEventOutcome createGroup(String title, User author);
 
     Case findGroup(String groupID);
 
@@ -30,21 +30,21 @@ public interface INextGroupService {
 
     Map<String, I18nString> inviteUser(String email, Map<String, I18nString> existingUsers, Case groupCase);
 
-    void addUserToDefaultGroup(Actor actor);
+    void addUserToDefaultGroup(User actor);
 
-    void addUser(Actor actor, String groupCase);
+    void addUser(User actor, String groupCase);
 
-    void addUser(Actor actor, Case groupCase);
+    void addUser(User actor, Case groupCase);
 
-    Map<String, I18nString> addUser(Actor actor, Map<String, I18nString> existingUsers);
+    Map<String, I18nString> addUser(User actor, Map<String, I18nString> existingUsers);
 
-    void removeUser(Actor actor, Case groupCase);
+    void removeUser(User actor, Case groupCase);
 
     Map<String, I18nString> removeUser(HashSet<String> usersToRemove, Map<String, I18nString> existingUsers, Case groupCase);
 
-    List<Actor> getMembers(Case groupCase);
+    List<User> getMembers(Case groupCase);
 
-    Set<String> getAllGroupsOfUser(Actor actor);
+    Set<String> getAllGroupsOfUser(User actor);
 
     String getGroupOwnerId(String groupId);
 
@@ -54,6 +54,6 @@ public interface INextGroupService {
 
     Collection<String> getGroupsOwnerEmails(Collection<String> groupIds);
 
-    Set<String> getAllCoMembers(Actor actor);
+    Set<String> getAllCoMembers(User actor);
 
 }

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.event.events.authorization;
 
-import com.netgrif.application.engine.authorization.domain.Actor;
+import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.domain.Role;
 import lombok.Getter;
 
@@ -11,7 +11,7 @@ public class ActorRemoveRoleEvent extends ActorEvent {
 
     protected final Collection<Role> roles;
 
-    public ActorRemoveRoleEvent(Actor actor, Collection<Role> roles) {
+    public ActorRemoveRoleEvent(User actor, Collection<Role> roles) {
         super(actor);
         this.roles = roles;
     }

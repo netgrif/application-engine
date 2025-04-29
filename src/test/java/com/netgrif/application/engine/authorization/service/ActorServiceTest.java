@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.authorization.domain.Actor;
+import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.domain.params.ActorParams;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -79,10 +79,10 @@ public class ActorServiceTest {
         assert actorService.findById(new ObjectId().toString()).isEmpty();
 
         String email = "some@email.com";
-        Actor actor = createActor(email);
+        User user = createActor(email);
 
         Thread.sleep(2000);
-        assert actorService.findById(actor.getStringId()).isPresent();
+        assert actorService.findById(user.getStringId()).isPresent();
     }
 
     @Test
@@ -91,9 +91,9 @@ public class ActorServiceTest {
         assert !actorService.existsById(new ObjectId().toString());
 
         String email = "some@email.com";
-        Actor actor = createActor(email);
+        User user = createActor(email);
 
-        assert actorService.existsById(actor.getStringId());
+        assert actorService.existsById(user.getStringId());
     }
 
     @Test
@@ -114,16 +114,16 @@ public class ActorServiceTest {
         String email = "some@email.com";
         String firstname = "firstname";
         String lastname = "lastname";
-        Actor actor = actorService.create(ActorParams.with()
+        User user = actorService.create(ActorParams.with()
                 .email(new TextField(email))
                 .firstname(new TextField(firstname))
                 .lastname(new TextField(lastname))
                 .build());
 
-        assert actor != null && actor.getCase() != null;
-        assert actor.getEmail().equals(email);
-        assert actor.getFirstname().equals(firstname);
-        assert actor.getLastname().equals(lastname);
+        assert user != null && user.getCase() != null;
+        assert user.getEmail().equals(email);
+        assert user.getFirstname().equals(firstname);
+        assert user.getLastname().equals(lastname);
 
         assertThrows(IllegalArgumentException.class, () -> actorService.create(ActorParams.with()
                 .firstname(new TextField(firstname))
@@ -136,31 +136,31 @@ public class ActorServiceTest {
     @Test
     void testUpdate() {
         String email = "some@email.com";
-        Actor actor = createActor(email);
-        assert actor.getEmail().equals(email);
-        assert actor.getFirstname() == null;
-        assert actor.getLastname() == null;
+        User user = createActor(email);
+        assert user.getEmail().equals(email);
+        assert user.getFirstname() == null;
+        assert user.getLastname() == null;
 
         String newFirstname = "newFirstname";
         String newLastname = "newLastname";
-        Actor updatedActor = actorService.update(actor, ActorParams.with()
+        User updatedUser = actorService.update(user, ActorParams.with()
                 .email(new TextField(email))
                 .firstname(new TextField(newFirstname))
                 .lastname(new TextField(newLastname))
                 .build());
 
-        assert actor.getStringId().equals(updatedActor.getStringId());
-        assert updatedActor.getEmail().equals(email);
-        assert updatedActor.getFirstname().equals(newFirstname);
-        assert updatedActor.getLastname().equals(newLastname);
+        assert user.getStringId().equals(updatedUser.getStringId());
+        assert updatedUser.getEmail().equals(email);
+        assert updatedUser.getFirstname().equals(newFirstname);
+        assert updatedUser.getLastname().equals(newLastname);
 
-        assertThrows(IllegalArgumentException.class, () -> actorService.update(actor, ActorParams.with()
+        assertThrows(IllegalArgumentException.class, () -> actorService.update(user, ActorParams.with()
                 .email(new TextField(null))
                 .firstname(new TextField("firstname"))
                 .lastname(new TextField("lastname"))
                 .build()));
 
-        assertThrows(IllegalArgumentException.class, () -> actorService.update(actor, null));
+        assertThrows(IllegalArgumentException.class, () -> actorService.update(user, null));
         assertThrows(IllegalArgumentException.class, () -> actorService.update(null, ActorParams.with()
                 .email(new TextField("email"))
                 .firstname(new TextField("firstname"))
@@ -168,9 +168,9 @@ public class ActorServiceTest {
                 .build()));
     }
 
-    private Actor createActor(String email) {
+    private User createActor(String email) {
         Case actorCase = workflowService.createCaseByIdentifier("actor", email, "", null).getCase();
-        return new Actor(dataService.setData(actorCase, ActorParams.with()
+        return new User(dataService.setData(actorCase, ActorParams.with()
                 .email(new TextField(email))
                 .build()
                 .toDataSet(), null).getCase());

@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
-import com.netgrif.application.engine.authorization.domain.Actor;
+import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import lombok.Data;
 
@@ -24,7 +24,7 @@ public class Filter {
 
     private Integer visibility;
 
-    private Actor author;
+    private User author;
 
     private LocalDateTime created;
 

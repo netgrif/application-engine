@@ -77,9 +77,9 @@
         <init dynamic="true">
             <![CDATA[
 			def loggedIdentity = identityService.getLoggedSystemIdentity()
-			def actor = actorService.findById(loggedIdentity.activeActorId).get()
-			return new com.netgrif.application.engine.petrinet.domain.dataset.ActorFieldValue(actor.stringId, actor.firstname,
-			actor.lastname, actor.email)
+			def user = actorService.findById(loggedIdentity.activeActorId).get()
+			return new com.netgrif.application.engine.petrinet.domain.dataset.ActorFieldValue(user.stringId, user.firstname,
+			user.lastname, user.email)
 			]]>
         </init>
     </data>

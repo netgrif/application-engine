@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.authorization.service;
 
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
-import com.netgrif.application.engine.authorization.domain.Actor;
-import com.netgrif.application.engine.authorization.domain.constants.ActorConstants;
+import com.netgrif.application.engine.authorization.domain.User;
+import com.netgrif.application.engine.authorization.domain.constants.UserConstants;
 import com.netgrif.application.engine.authorization.domain.params.ActorParams;
 import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSearchService;
@@ -43,7 +43,7 @@ public class ActorService implements IActorService {
      * todo javadoc
      * */
     @Override
-    public Optional<Actor> findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
         if (email == null) {
             return Optional.empty();
         }
@@ -65,7 +65,7 @@ public class ActorService implements IActorService {
      * todo javadoc
      * */
     @Override
-    public Optional<Actor> findById(String id) {
+    public Optional<User> findById(String id) {
         if (id == null) {
             return Optional.empty();
         }
@@ -74,7 +74,7 @@ public class ActorService implements IActorService {
             if (!actorCase.getProcessIdentifier().equals("actor")) {
                 return Optional.empty();
             }
-            return Optional.of(new Actor(actorCase));
+            return Optional.of(new User(actorCase));
         } catch (IllegalArgumentException ignored) {
             return Optional.empty();
         }
@@ -93,43 +93,43 @@ public class ActorService implements IActorService {
     }
 
     @Override
-    public List<Actor> findAll() {
-        List<Case> result = workflowService.searchAll(QCase.case$.processIdentifier.eq(ActorConstants.PROCESS_IDENTIFIER)).getContent();
-        return result.stream().map(Actor::new).collect(Collectors.toList());
+    public List<User> findAll() {
+        List<Case> result = workflowService.searchAll(QCase.case$.processIdentifier.eq(UserConstants.PROCESS_IDENTIFIER)).getContent();
+        return result.stream().map(User::new).collect(Collectors.toList());
     }
 
     /**
      * todo javadoc
      * */
     @Override
-    public Actor create(ActorParams params) {
+    public User create(ActorParams params) {
         throwIfInvalidParams(params);
 
         String activeActorId = identityService.getActiveActorId();
-        Case actorCase = workflowService.createCaseByIdentifier(ActorConstants.PROCESS_IDENTIFIER, params.getFullName(),
+        Case actorCase = workflowService.createCaseByIdentifier(UserConstants.PROCESS_IDENTIFIER, params.getFullName(),
                 "", activeActorId).getCase();
         actorCase = dataService.setData(actorCase, params.toDataSet(), activeActorId).getCase();
         log.debug("Actor [{}] was created by actor [{}].", actorCase, activeActorId);
-        return new Actor(dataService.setData(actorCase, params.toDataSet(), activeActorId).getCase());
+        return new User(dataService.setData(actorCase, params.toDataSet(), activeActorId).getCase());
     }
 
     /**
      * todo javadoc
      * */
     @Override
-    public Actor update(Actor actor, ActorParams params) {
+    public User update(User user, ActorParams params) {
         if (params == null) {
             throw new IllegalArgumentException("Please provide input values for actor");
         }
         if (params.getEmail() != null && isTextFieldValueEmpty(params.getEmail())) {
             throw new IllegalArgumentException("Actor must have an email!");
         }
-        if (actor == null) {
+        if (user == null) {
             throw new IllegalArgumentException("Please provide actor to be updated");
         }
 
         String activeActorId = identityService.getActiveActorId();
-        return new Actor(dataService.setData(actor.getCase(), params.toDataSet(), activeActorId).getCase());
+        return new User(dataService.setData(user.getCase(), params.toDataSet(), activeActorId).getCase());
     }
 
     private void throwIfInvalidParams(ActorParams params) {
@@ -149,14 +149,14 @@ public class ActorService implements IActorService {
         return field.getRawValue() == null || field.getRawValue().trim().isEmpty();
     }
 
-    private Optional<Actor> findOneByQuery(String query) {
+    private Optional<User> findOneByQuery(String query) {
         CaseSearchRequest request = CaseSearchRequest.builder()
                 .query(buildQuery(Set.of(query)))
                 .build();
         Page<Case> resultAsPage = elasticCaseSearchService.search(List.of(request), identityService.getLoggedIdentity(),
                 PageRequest.of(0, 1), Locale.getDefault(), false, null);
         if (resultAsPage.hasContent()) {
-            return Optional.of(new Actor(resultAsPage.getContent().get(0)));
+            return Optional.of(new User(resultAsPage.getContent().get(0)));
         }
         return Optional.empty();
     }
@@ -179,6 +179,6 @@ public class ActorService implements IActorService {
     }
 
     private static String emailQuery(String email) {
-        return String.format("dataSet.%s.fulltextValue:\"%s\"", ActorConstants.EMAIL_FIELD_ID, email);
+        return String.format("dataSet.%s.fulltextValue:\"%s\"", UserConstants.EMAIL_FIELD_ID, email);
     }
 }

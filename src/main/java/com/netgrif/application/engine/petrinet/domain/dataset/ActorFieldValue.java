@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset;
 
-import com.netgrif.application.engine.authorization.domain.Actor;
+import com.netgrif.application.engine.authorization.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,11 +16,11 @@ public class ActorFieldValue {
     private String lastname;
     private String email;
 
-    public ActorFieldValue(Actor actor) {
-        this.id = actor.getStringId();
-        this.firstname = actor.getFirstname();
-        this.lastname = actor.getLastname();
-        this.email = actor.getEmail();
+    public ActorFieldValue(User user) {
+        this.id = user.getStringId();
+        this.firstname = user.getFirstname();
+        this.lastname = user.getLastname();
+        this.email = user.getEmail();
     }
 
     public String getFullName() {

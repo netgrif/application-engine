@@ -1,7 +1,7 @@
 <process xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
-	<id>actor</id>
+	<id>user</id>
 	<version>1.0.0</version>
-	<title>Actor</title>
+	<title>User</title>
 	<icon>person</icon>
 	<defaultRole>false</defaultRole>
 	<anonymousRole>false</anonymousRole>

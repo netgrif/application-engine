@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.authorization.domain.params;
 
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
-import com.netgrif.application.engine.authorization.domain.constants.ActorConstants;
+import com.netgrif.application.engine.authorization.domain.constants.UserConstants;
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.workflow.domain.CaseParams;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
@@ -19,9 +19,9 @@ public class ActorParams implements CaseParams {
     public DataSet toDataSet() {
         DataSet dataSet = new DataSet();
 
-        dataSet.put(ActorConstants.EMAIL_FIELD_ID, this.email);
-        dataSet.put(ActorConstants.FIRSTNAME_FIELD_ID, this.firstname);
-        dataSet.put(ActorConstants.LASTNAME_FIELD_ID, this.lastname);
+        dataSet.put(UserConstants.EMAIL_FIELD_ID, this.email);
+        dataSet.put(UserConstants.FIRSTNAME_FIELD_ID, this.firstname);
+        dataSet.put(UserConstants.LASTNAME_FIELD_ID, this.lastname);
 
         return dataSet;
     }

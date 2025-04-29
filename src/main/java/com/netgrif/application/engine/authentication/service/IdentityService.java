@@ -6,7 +6,7 @@ import com.netgrif.application.engine.authentication.domain.LoggedIdentity;
 import com.netgrif.application.engine.authentication.domain.constants.IdentityConstants;
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
-import com.netgrif.application.engine.authorization.domain.Actor;
+import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.domain.params.ActorParams;
 import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSearchService;
@@ -244,9 +244,9 @@ public class IdentityService implements IIdentityService {
         throwIfInvalidParams(identityParams);
 
         ActorParams actorParams = ActorParams.fromIdentityParams(identityParams);
-        Actor defaultActor = actorService.create(actorParams);
+        User defaultUser = actorService.create(actorParams);
 
-        identityParams.setMainActor(CaseField.withValue(List.of(defaultActor.getStringId())));
+        identityParams.setMainActor(CaseField.withValue(List.of(defaultUser.getStringId())));
         return encodePasswordAndCreate(identityParams);
     }
 

@@ -4,7 +4,7 @@ import com.netgrif.application.engine.authentication.domain.Identity;
 import com.netgrif.application.engine.authentication.domain.constants.AnonymIdentityConstants;
 import com.netgrif.application.engine.authentication.domain.params.IdentityParams;
 import com.netgrif.application.engine.authentication.service.interfaces.IIdentityService;
-import com.netgrif.application.engine.authorization.domain.Actor;
+import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.domain.ApplicationRole;
 import com.netgrif.application.engine.authorization.domain.ProcessRole;
 import com.netgrif.application.engine.authorization.domain.params.ActorParams;
@@ -52,22 +52,22 @@ public class PublicBasicAuthenticationFilter extends PublicJwtAuthenticationFilt
             return anonymIdentityOpt.get();
         }
 
-        Optional<Actor> anonymActorOpt = actorService.findByEmail(AnonymIdentityConstants.usernameOf(USERNAME));
-        Actor anonymActor = anonymActorOpt.orElseGet(() -> actorService.create(ActorParams.with()
+        Optional<User> anonymActorOpt = actorService.findByEmail(AnonymIdentityConstants.usernameOf(USERNAME));
+        User anonymUser = anonymActorOpt.orElseGet(() -> actorService.create(ActorParams.with()
                 .email(new TextField(AnonymIdentityConstants.usernameOf(USERNAME)))
                 .firstname(new TextField(AnonymIdentityConstants.FIRSTNAME))
                 .lastname(new TextField(AnonymIdentityConstants.LASTNAME))
                 .build()));
 
         Set<String> roleIds = Set.of(anonymousAppRole.getStringId(), anonymousProcessRole.getStringId());
-        roleService.assignRolesToActor(anonymActor.getStringId(), roleIds);
+        roleService.assignRolesToActor(anonymUser.getStringId(), roleIds);
 
         return identityService.encodePasswordAndCreate(IdentityParams.with()
                 .username(new TextField(AnonymIdentityConstants.usernameOf(hash)))
                 .firstname(new TextField(AnonymIdentityConstants.FIRSTNAME))
                 .lastname(new TextField(AnonymIdentityConstants.LASTNAME))
                 .password(new TextField("n/a"))
-                .mainActor(CaseField.withValue(List.of(anonymActor.getStringId())))
+                .mainActor(CaseField.withValue(List.of(anonymUser.getStringId())))
                 .build());
     }
 }

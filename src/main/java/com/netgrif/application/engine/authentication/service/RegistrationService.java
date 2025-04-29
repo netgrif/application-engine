@@ -7,7 +7,7 @@ import com.netgrif.application.engine.authentication.service.interfaces.IIdentit
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest;
 import com.netgrif.application.engine.authentication.web.requestbodies.RegistrationRequest;
-import com.netgrif.application.engine.authorization.domain.Actor;
+import com.netgrif.application.engine.authorization.domain.User;
 import com.netgrif.application.engine.authorization.domain.Role;
 import com.netgrif.application.engine.authorization.domain.params.ActorParams;
 import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
@@ -129,7 +129,7 @@ public class RegistrationService implements IRegistrationService {
                 .build();
         identity = identityService.encodePasswordAndUpdate(identity, identityParams);
 
-        Optional<Actor> actorOpt = actorService.findById(identity.getMainActorId());
+        Optional<User> actorOpt = actorService.findById(identity.getMainActorId());
         if (actorOpt.isEmpty()) {
             throw new IllegalStateException(String.format("Identity [%s] has no default actor!", identity.getStringId()));
         }

@@ -315,7 +315,7 @@ public class RoleService implements IRoleService {
      * */
     @Override
     public List<Role> assignRolesToActor(String actorId, Set<String> roleIds, Map<String, String> params) {
-        Optional<Actor> actorOpt = actorService.findById(actorId);
+        Optional<User> actorOpt = actorService.findById(actorId);
         if (actorOpt.isEmpty()) {
             throw new IllegalArgumentException(String.format("Actor with id [%s] does not exist.", actorId));
         }
@@ -371,7 +371,7 @@ public class RoleService implements IRoleService {
             throw new NotAllRolesAssignedException(roles.size() - removedAssignments.size());
         }
         if (!removedAssignments.isEmpty()) {
-            Optional<Actor> actorOpt = actorService.findById(actorId);
+            Optional<User> actorOpt = actorService.findById(actorId);
             if (actorOpt.isPresent()) {
                 eventPublisher.publishEvent(new ActorRemoveRoleEvent(actorOpt.get(), roles));
             } else {

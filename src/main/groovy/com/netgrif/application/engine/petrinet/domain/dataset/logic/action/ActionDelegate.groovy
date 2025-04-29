@@ -10,9 +10,9 @@ import com.netgrif.application.engine.authentication.service.interfaces.IIdentit
 import com.netgrif.application.engine.authentication.service.interfaces.IRegistrationService
 
 import com.netgrif.application.engine.authentication.web.requestbodies.NewIdentityRequest
-import com.netgrif.application.engine.authorization.domain.Actor
 import com.netgrif.application.engine.authorization.domain.ProcessRole
 import com.netgrif.application.engine.authorization.domain.Role
+import com.netgrif.application.engine.authorization.domain.User
 import com.netgrif.application.engine.authorization.service.interfaces.IActorService
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService
 import com.netgrif.application.engine.configuration.PublicViewProperties
@@ -683,7 +683,7 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
             if (field instanceof ActorListField && (value instanceof String[] || value instanceof List)) {
                 LinkedHashSet<ActorFieldValue> actors = new LinkedHashSet<>()
                 value.each { id ->
-                    Optional<Actor> actorOpt = actorService.findById(id as String)
+                    Optional<User> actorOpt = actorService.findById(id as String)
                     ActorFieldValue actorFieldValue = actorOpt.isPresent() ? new ActorFieldValue(actorOpt.get()) : new ActorFieldValue()
                     actors.add(actorFieldValue)
                 }
@@ -1024,8 +1024,8 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         return MessageResource.successMessage("Done")
     }
 
-    Actor findActorByEmail(String email) {
-        Optional<Actor> actorOpt = actorService.findByEmail(email)
+    User findActorByEmail(String email) {
+        Optional<User> actorOpt = actorService.findByEmail(email)
         if (actorOpt.isEmpty()) {
             log.error("Cannot find actor with email [{}]", email)
             return null
@@ -1034,8 +1034,8 @@ class ActionDelegate /*TODO: release/8.0.0: implements ActionAPI*/ {
         }
     }
 
-    Actor findActorById(String id) {
-        Optional<Actor> actorOpt = actorService.findById(id)
+    User findActorById(String id) {
+        Optional<User> actorOpt = actorService.findById(id)
         if (actorOpt.isEmpty()) {
             log.error("Cannot find actor with id [{}]", id)
             return null
