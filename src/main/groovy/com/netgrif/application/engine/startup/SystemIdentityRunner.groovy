@@ -35,7 +35,7 @@ class SystemIdentityRunner extends AbstractOrderedCommandLineRunner {
                 .username(new TextField(SystemIdentityConstants.USERNAME))
                 .firstname(new TextField(SystemIdentityConstants.FIRSTNAME))
                 .lastname(new TextField(SystemIdentityConstants.LASTNAME))
-                .password(new TextField("n/a")) // todo 2058 test if login is denied
+                .password(new TextField("n/a"))
                 .build())
     }
 
