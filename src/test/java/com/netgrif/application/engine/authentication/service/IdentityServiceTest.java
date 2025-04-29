@@ -117,20 +117,17 @@ public class IdentityServiceTest {
 
     @Test
     void testFindByLoggedIdentity() {
-        Identity identity = createIdentity("username");
-        LoggedIdentity loggedIdentity = identity.toSession();
-        assert identityService.findByLoggedIdentity(loggedIdentity).isEmpty();
+        assert identityService.findByLoggedIdentity(null).isEmpty();
         assert identityService.findByLoggedIdentity(LoggedIdentity.with()
                 .username("username2")
-                        .password("password")
+                .password("password")
                 .identityId(new ObjectId().toString())
                 .build()).isEmpty();
 
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedIdentity,
-                loggedIdentity.getPassword(), loggedIdentity.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(token);
-        Optional<Identity> foundIdentityOpt = identityService.findByLoggedIdentity(loggedIdentity);
+        Identity identity = createIdentity("username");
+        LoggedIdentity loggedIdentity = identity.toSession();
 
+        Optional<Identity> foundIdentityOpt = identityService.findByLoggedIdentity(loggedIdentity);
         assert foundIdentityOpt.isPresent();
         assert foundIdentityOpt.get().getStringId().equals(identity.getStringId());
     }

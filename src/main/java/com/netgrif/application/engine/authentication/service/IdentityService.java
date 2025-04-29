@@ -59,7 +59,9 @@ public class IdentityService implements IIdentityService {
     }
 
     /**
-     * todo javadoc
+     * Gets currently logged identity
+     *
+     * @return Currently logged identity. Can be null if nobody is logged in.
      */
     @Override
     public LoggedIdentity getLoggedIdentity() {
@@ -70,7 +72,9 @@ public class IdentityService implements IIdentityService {
     }
 
     /**
-     * todo javadoc
+     * Gets logged system identity. However, this identity is not managed by session manager.
+     *
+     * @return Logged system identity. Cannot be null.
      */
     @Override
     public LoggedIdentity getLoggedSystemIdentity() {
@@ -78,7 +82,9 @@ public class IdentityService implements IIdentityService {
     }
 
     /**
-     * todo javadoc
+     * Gets id of currently selected actor of logged identity
+     *
+     * @return The id of the selected actor if any identity is logged in. Can be null.
      */
     @Override
     public String getActiveActorId() {
@@ -90,7 +96,11 @@ public class IdentityService implements IIdentityService {
     }
 
     /**
-     * todo javadoc
+     * Finds identity by id.
+     *
+     * @param id id of the identity. If provided null, empty optional is returned
+     *
+     * @return If the identity exists, it's returned. If not, an empty optional is returned
      */
     @Override
     public Optional<Identity> findById(String id) {
@@ -105,7 +115,11 @@ public class IdentityService implements IIdentityService {
     }
 
     /**
-     * todo javadoc
+     * Finds identity by username data field.
+     *
+     * @param username username of the identity. If provided null, empty optional is returned
+     *
+     * @return If the identity exists, it's returned. If not, an empty optional is returned
      * */
     @Override
     public Optional<Identity> findByUsername(String username) {
@@ -116,20 +130,32 @@ public class IdentityService implements IIdentityService {
     }
 
     /**
-     * todo javadoc
+     * Finds identity by provided {@link LoggedIdentity}
+     *
+     * @param loggedIdentity logged identity used to find the identity. If provided null, empty optional is returned
+     *
+     * @return If the identity exists, it's returned. If not, an empty optional is returned
      * */
     @Override
     public Optional<Identity> findByLoggedIdentity(LoggedIdentity loggedIdentity) {
-        if (!securityContextService.isAuthenticatedPrincipalLoggedIdentity()) {
+        if (loggedIdentity == null) {
             return Optional.empty();
         }
+
         Optional<Identity> identityOpt = findById(loggedIdentity.getIdentityId());
         if (identityOpt.isEmpty()) {
-            log.warn("Logged identity [{}] doesn't exist in database!", loggedIdentity.getUsername());
+            log.warn("Logged identity [{}] has no identity in database!", loggedIdentity.getUsername());
         }
         return identityOpt;
     }
 
+    /**
+     * Checks if the identity exists by username data field
+     *
+     * @param username username of the identity. If provided null, empty optional is returned
+     *
+     * @return True if the identity exists, else false.
+     * */
     @Override
     public boolean existsByUsername(String username) {
         if (username == null) {
@@ -139,7 +165,11 @@ public class IdentityService implements IIdentityService {
     }
 
     /**
-     * todo javadoc
+     * Finds all actor ids of the identity
+     *
+     * @param id The id of the identity. If provided null, empty set is returned
+     *
+     * @return Set of actor ids of the identity. Otherwise, an empty set is returned
      * */
     @Override
     public Set<String> findActorIds(String id) {
@@ -153,7 +183,13 @@ public class IdentityService implements IIdentityService {
     }
 
     /**
-     * todo javadoc
+     * Find all identities with matched state, that are expired.
+     *
+     * @param state state of the identity. If provided null, empty list is returned
+     * @param dateTime expiration date time threshold. The identity is considered expired if the expiration date is
+     *                 before this value. If provided null, empty list is returned
+     *
+     * @return List of all identities, that match the requirements. Otherwise, an empty list is returned.
      * */
     @Override
     public List<Identity> findAllByStateAndExpirationDateBefore(IdentityState state, LocalDateTime dateTime) {
@@ -166,7 +202,9 @@ public class IdentityService implements IIdentityService {
     }
 
     /**
-     * todo javadoc
+     * Finds all identities
+     *
+     * @return List of all identities. Cannot be null
      * */
     @Override
     public List<Identity> findAll() {
@@ -174,7 +212,13 @@ public class IdentityService implements IIdentityService {
     }
 
     /**
-     * todo javadoc
+     * Creates identity based on params. Password is not encoded. Actor is not created.
+     *
+     * @param params Parameters, that are used to create the identity. At least username must be provided.
+     *
+     * @return Created identity. Cannot be null
+     *
+     * @throws IllegalArgumentException if the input parameters are invalid
      * */
     @Override
     public Identity create(IdentityParams params) {
@@ -189,7 +233,11 @@ public class IdentityService implements IIdentityService {
     }
 
     /**
-     * todo javadoc
+     * Creates identity based on params. Password is encoded. Actor is created from the identity parameters.
+     *
+     * @param identityParams Parameters, that are used to create the identity. At least username must be provided.
+     *
+     * @return Created identity with the actor (as {@link Identity#getMainActorId()}). Cannot be null.
      * */
     @Override
     public Identity createWithDefaultActor(IdentityParams identityParams) {
