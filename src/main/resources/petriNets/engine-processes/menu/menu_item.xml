@@ -87,7 +87,7 @@
 			cases.each { refCase ->
 				def refTask = refCase.tasks.find { it.transition == "configuration" }.task
 				setData(refTask,[
-				        "menu_items_list": ["type": "text", "value": ""],
+				        "menu_items_list": ["type": "enumeration_map", "value": ""],
 						"menu_item_taskRef": ["type": "taskRef", "value": []]
 				])
 			}
