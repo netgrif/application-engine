@@ -56,32 +56,6 @@
         <jwt.version>0.11.5</jwt.version>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>oss.snapshots</id>
-            <name>OSSRH SNAPSHOT</name>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>mvnrepository1</id>
-            <url>https://maven.imagej.net/content/repositories/public/</url>
-        </repository>
-        <repository>
-            <id>mvnrepository2</id>
-            <url>https://repo.spring.io/plugins-release/</url>
-        </repository>
-        <repository>
-            <id>mulesoft</id>
-            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
-        </repository>
-    </repositories>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -564,13 +538,6 @@
     </dependencies>
 
     <build>
-        <extensions>
-            <extension>
-                <groupId>kr.motd.maven</groupId>
-                <artifactId>os-maven-plugin</artifactId>
-                <version>1.7.1</version>
-            </extension>
-        </extensions>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -587,24 +554,6 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>3.3.1</version>
-                    <executions>
-                        <execution>
-                            <id>attach-sources</id>
-                            <goals>
-                                <goal>jar-no-fork</goal>
-                            </goals>
-                            <phase>install</phase>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -692,45 +641,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>3.3.1</version>
-                <!--               <executions>-->
-                <!--                   <execution>-->
-                <!--                       <id>attach-sources</id>-->
-                <!--                       <goals>-->
-                <!--                           <goal>jar-no-fork</goal>-->
-                <!--                       </goals>-->
-                <!--                       <phase>install</phase>-->
-                <!--                   </execution>-->
-                <!--               </executions>-->
-            </plugin>
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-javadoc-plugin</artifactId>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>attach-javadocs</id>-->
-<!--                        <goals>-->
-<!--                            <goal>jar</goal>-->
-<!--                        </goals>-->
-<!--                        <phase>package</phase>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <configuration>-->
-<!--                    <source>21</source>-->
-<!--                    <doclint>none</doclint>-->
-<!--                    <detectJavaApiLink>false</detectJavaApiLink>-->
-<!--                    <failOnWarnings>false</failOnWarnings>-->
-<!--                    <quiet>true</quiet>-->
-<!--                    <sourcepath>src/main/java;target/generated-sources/groovy-stubs/main;target/generated-sources/java-->
-<!--                    </sourcepath>-->
-<!--                    <additionalOptions>-->
-<!--                        <additionalOption>-Xdoclint:none</additionalOption>-->
-<!--                    </additionalOptions>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxb2-maven-plugin</artifactId>
@@ -916,13 +826,6 @@
         </profile>
         <profile>
             <id>github-publish</id>
-            <distributionManagement>
-                <repository>
-                    <id>github</id>
-                    <name>GitHub Packages</name>
-                    <url>https://maven.pkg.github.com/netgrif/application-engine</url>
-                </repository>
-            </distributionManagement>
             <build>
                 <plugins>
                     <plugin>
@@ -945,40 +848,30 @@
         </profile>
         <profile>
             <id>ossrh-publish</id>
-            <distributionManagement>
-                <repository>
-                    <id>ossrh</id>
-                    <name>Central Repository OSSRH</name>
-                    <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-                </repository>
-                <snapshotRepository>
-                    <id>ossrh</id>
-                    <name>Central Repository OSSRG Snapshots</name>
-                    <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
-                </snapshotRepository>
-            </distributionManagement>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
+                                <id>repackage</id>
                                 <goals>
-                                    <goal>sign</goal>
+                                    <goal>repackage</goal>
                                 </goals>
+                                <configuration>
+                                    <skip>true</skip>
+                                </configuration>
                             </execution>
                         </executions>
-                        <configuration>
-                            <gpgArguments>
-                                <arg>--pinentry-mode</arg>
-                                <arg>loopback</arg>
-                            </gpgArguments>
-                        </configuration>
                     </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>netgrif-nexus-publish</id>
+            <build>
+                <plugins>
                     <plugin>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
