@@ -19,11 +19,11 @@ public class ActorEventListener {
 
     @EventListener
     public void onActorRoleChangeEvent(ActorAssignRoleEvent event) {
-        repository.save(new ActorAssignRoleEventLog(event.getActor().getEmail(), event.getRoles()));
+        repository.save(new ActorAssignRoleEventLog(event.getActor().getName(), event.getRoles()));
     }
 
     @EventListener
     public void onActorRoleChangeEvent(ActorRemoveRoleEvent event) {
-        repository.save(new ActorRemoveRoleEventLog(event.getActor().getEmail(), event.getRoles()));
+        repository.save(new ActorRemoveRoleEventLog(event.getActor().getName(), event.getRoles()));
     }
 }

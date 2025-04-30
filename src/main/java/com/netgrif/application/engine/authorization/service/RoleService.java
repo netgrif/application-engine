@@ -9,7 +9,7 @@ import com.netgrif.application.engine.authorization.domain.repositories.CaseRole
 import com.netgrif.application.engine.authorization.domain.repositories.ProcessRoleRepository;
 import com.netgrif.application.engine.authorization.domain.repositories.RoleRepository;
 import com.netgrif.application.engine.authorization.domain.throwable.NotAllRolesAssignedException;
-import com.netgrif.application.engine.authorization.service.interfaces.IUserService;
+import com.netgrif.application.engine.authorization.service.interfaces.IActorService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleAssignmentService;
 import com.netgrif.application.engine.authorization.service.interfaces.IRoleService;
 import com.netgrif.application.engine.event.events.authorization.ActorAssignRoleEvent;
@@ -48,9 +48,9 @@ public class RoleService implements IRoleService {
     private final IRoleAssignmentService roleAssignmentService;
     private final ActionRunner actionRunner;
     private final ApplicationEventPublisher eventPublisher;
+    private IActorService actorService;
     private ITaskService taskService;
     private IWorkflowService workflowService;
-    private IUserService userService;
 
     private ProcessRole defaultProcessRole;
     private ProcessRole anonymousProcessRole;
@@ -69,8 +69,8 @@ public class RoleService implements IRoleService {
 
     @Lazy
     @Autowired
-    public void setUserService(IUserService userService) {
-        this.userService = userService;
+    public void setActorService(IActorService actorService) {
+        this.actorService = actorService;
     }
 
     /**
@@ -315,8 +315,8 @@ public class RoleService implements IRoleService {
      * */
     @Override
     public List<Role> assignRolesToActor(String actorId, Set<String> roleIds, Map<String, String> params) {
-        Optional<User> userOpt = userService.findById(actorId);
-        if (userOpt.isEmpty()) {
+        Optional<Actor> actorOpt = actorService.findById(actorId);
+        if (actorOpt.isEmpty()) {
             throw new IllegalArgumentException(String.format("Actor with id [%s] does not exist.", actorId));
         }
 
@@ -335,7 +335,7 @@ public class RoleService implements IRoleService {
         if (roles.size() > newRoleAssignments.size()) {
             throw new NotAllRolesAssignedException(roles.size() - newRoleAssignments.size());
         }
-        eventPublisher.publishEvent(new ActorAssignRoleEvent(userOpt.get(), roles));
+        eventPublisher.publishEvent(new ActorAssignRoleEvent(actorOpt.get(), roles));
         runAllSuitableActionsOnRoles(roles, RoleEventType.ASSIGN, EventPhaseType.POST, params);
 
         return roles;
@@ -371,9 +371,9 @@ public class RoleService implements IRoleService {
             throw new NotAllRolesAssignedException(roles.size() - removedAssignments.size());
         }
         if (!removedAssignments.isEmpty()) {
-            Optional<User> userOpt = userService.findById(actorId);
-            if (userOpt.isPresent()) {
-                eventPublisher.publishEvent(new ActorRemoveRoleEvent(userOpt.get(), roles));
+            Optional<Actor> actorOpt = actorService.findById(actorId);
+            if (actorOpt.isPresent()) {
+                eventPublisher.publishEvent(new ActorRemoveRoleEvent(actorOpt.get(), roles));
             } else {
                 log.warn("Removed {} roles from non-existing actor with id [{}]", removedAssignments.size(), actorId);
             }

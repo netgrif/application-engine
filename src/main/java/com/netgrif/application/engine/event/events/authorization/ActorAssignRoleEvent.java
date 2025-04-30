@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.event.events.authorization;
 
-import com.netgrif.application.engine.authorization.domain.User;
+import com.netgrif.application.engine.authorization.domain.Actor;
 import com.netgrif.application.engine.authorization.domain.Role;
 import lombok.Getter;
 
@@ -11,7 +11,7 @@ public class ActorAssignRoleEvent extends ActorEvent {
 
     protected final Collection<Role> roles;
 
-    public ActorAssignRoleEvent(User actor, Collection<Role> roles) {
+    public ActorAssignRoleEvent(Actor actor, Collection<Role> roles) {
         super(actor);
         this.roles = roles;
     }
@@ -24,7 +24,7 @@ public class ActorAssignRoleEvent extends ActorEvent {
             sb.append(",");
         });
         sb.append(" assigned to actor ");
-        sb.append(actor.getEmail());
+        sb.append(actor.getName());
         return sb.toString();
     }
 }
