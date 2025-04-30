@@ -64,7 +64,7 @@ public class DashboardManagementBody {
         if (this.id != null) {
             outcome.putDataSetEntry(DashboardManagementConstants.FIELD_ID, FieldType.TEXT, this.id);
         }
-        if (this.id != null) {
+        if (this.name != null) {
             outcome.putDataSetEntry(DashboardManagementConstants.FIELD_NAME, FieldType.I18N, this.name);
         }
         if (this.logo != null) {
