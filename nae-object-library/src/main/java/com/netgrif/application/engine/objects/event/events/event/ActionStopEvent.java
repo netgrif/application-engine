@@ -17,15 +17,15 @@ public class ActionStopEvent extends ActionStartEvent {
         super(action);
         setPhase(RunPhase.STOP);
         this.success = success;
-        this.totalDuration = getTotalTime(startEvent.getTime());
+        this.totalDuration = calculateExecutionDuration(startEvent.getTime());
     }
 
     @Override
     public String getMessage() {
-        return "ActionEndEvent: " + getTrigger() + " [" + getId() + "] " + getPhase();
+        return String.format("ActionStopEvent: %s [%s] %s", getTrigger(), getId(), getPhase());
     }
 
-    private long getTotalTime(LocalDateTime start) {
+    private long calculateExecutionDuration(LocalDateTime start) {
         Duration duration = Duration.between(start, this.getTime());
         return duration.toMillis();
     }
