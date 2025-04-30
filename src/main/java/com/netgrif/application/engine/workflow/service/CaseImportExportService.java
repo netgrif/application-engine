@@ -26,6 +26,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -103,7 +104,7 @@ public class CaseImportExportService implements ICaseImportExportService {
         if (importedCases.isEmpty()) {
             return importedCases;
         }
-        return saveImportedObjects(importedCases, importer.getImportedTasksMap());
+        return saveImportedObjects(importedCases, importer.getImportedTasksMap()).values().stream().toList();
     }
 
     @Override
@@ -121,19 +122,22 @@ public class CaseImportExportService implements ICaseImportExportService {
         if (importedCases.isEmpty()) {
             return importedCases;
         }
-        importedCases = saveImportedObjects(importedCases, importer.getImportedTasksMap());
+        Map<String, Case> importedCasesMap = saveImportedObjects(importedCases, importer.getImportedTasksMap());
         List<String> caseFilesDirectories = Arrays.stream(Objects.requireNonNull(new File(directoryPath).list(DirectoryFileFilter.DIRECTORY)))
                 .map(caseDirectory -> directoryPath.concat(File.separator).concat(caseDirectory))
                 .toList();
-        saveFiles(caseFilesDirectories, importer.getImportedIdsMapping());
+        Map<String, Case> idsToCaseMapping = new HashMap<>();
+        importer.getImportedIdsMapping().forEach((oldCaseId, newCaseId) -> {
+            idsToCaseMapping.put(oldCaseId, importedCasesMap.get(newCaseId));
+        });
+        saveFiles(caseFilesDirectories, idsToCaseMapping);
         FileUtils.forceDelete(caseExportXmlFile.getParentFile());
         return importedCases;
     }
 
-    private void saveFiles(List<String> casesDirectories, Map<String, String> importedIdsMapping) throws IOException, StorageException {
+    private void saveFiles(List<String> casesDirectories, Map<String, Case> importedIdsMapping) throws IOException, StorageException {
         for (String caseDirectory : casesDirectories) {
-            String importedCaseId = importedIdsMapping.get(Paths.get(caseDirectory).getFileName().toString());
-            Case importedCase = workflowService.findOne(importedCaseId);
+            Case importedCase = importedIdsMapping.get(Paths.get(caseDirectory).getFileName().toString());
             List<String> fieldsOfCaseDirectories = Arrays.stream(Objects.requireNonNull(new File(caseDirectory).list(DirectoryFileFilter.DIRECTORY))).toList();
             for (String fieldDirectory : fieldsOfCaseDirectories) {
                 String fieldDirectoryPath = caseDirectory.concat(File.separator).concat(fieldDirectory);
@@ -150,11 +154,11 @@ public class CaseImportExportService implements ICaseImportExportService {
         }
     }
 
-    private List<Case> saveImportedObjects(List<Case> importedCases, Map<String, List<Task>> importedTasks) {
+    private Map<String, Case> saveImportedObjects(List<Case> importedCases, Map<String, List<Task>> importedTasks) {
         return importedCases.stream().map(importedCase -> {
             taskService.save(importedTasks.get(importedCase.getStringId()));
             return workflowService.save(importedCase);
-        }).toList();
+        }).collect(Collectors.toMap(Case::getStringId, c -> c));
     }
 
     private void exportCasesToFile(Collection<Case> casesToExport, OutputStream exportFile) {
