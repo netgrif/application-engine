@@ -14,8 +14,6 @@ import java.util.stream.Collectors;
 @Repository
 public interface ProcessRoleRepository extends MongoRepository<ProcessRole, String>, QuerydslPredicateExecutor<ProcessRole> {
 
-    ProcessRole findByImportId(String importId);
-
     Set<ProcessRole> findAllByProcessId(String netId);
 
     Set<ProcessRole> findAllByImportIdIn(Set<String> importIds);

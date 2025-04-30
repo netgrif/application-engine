@@ -12,7 +12,6 @@ import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetRefere
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.core.workflow.domain.Case;
 import com.netgrif.core.workflow.domain.ProcessResourceId;
-import com.netgrif.adapter.workflow.domain.QCase;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Ops;
@@ -55,10 +54,10 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     public Predicate buildQuery(Map<String, Object> requestQuery, LoggedUser user, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
-        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+//        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
 
         if (requestQuery.containsKey(PETRINET)) {
-            builder.and(petriNet(requestQuery.get(PETRINET), loggedOrImpersonated, locale));
+            builder.and(petriNet(requestQuery.get(PETRINET), user, locale));
         }
         if (requestQuery.containsKey(AUTHOR)) {
             builder.and(author(requestQuery.get(AUTHOR)));
@@ -82,17 +81,17 @@ public class CaseSearchService extends MongoSearchService<Case> {
             builder.and(caseId(requestQuery.get(CASE_ID)));
         }
         if (requestQuery.containsKey(GROUP)) {
-            Predicate groupPredicate = group(requestQuery.get(GROUP), loggedOrImpersonated, locale);
+            Predicate groupPredicate = group(requestQuery.get(GROUP), user, locale);
             if (groupPredicate != null) {
                 builder.and(groupPredicate);
             } else {
                 return null;
             }
         }
-        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.or(buildViewUserQueryConstraint(loggedOrImpersonated));
-        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(loggedOrImpersonated));
+        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(user));
+        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(user));
+        permissionConstraints.or(buildViewUserQueryConstraint(user));
+        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(user));
         builder.and(permissionConstraints);
         return builder;
     }
@@ -107,7 +106,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
-        Predicate roleConstraints = viewUserQuery(user.getId());
+        Predicate roleConstraints = viewUserQuery(user.getStringId());
         return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
     }
 
@@ -125,7 +124,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     protected Predicate buildNegativeViewUsersQueryConstraint(LoggedUser user) {
-        Predicate roleConstraints = negativeViewUserQuery(user.getId());
+        Predicate roleConstraints = negativeViewUserQuery(user.getStringId());
         return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
     }
 
@@ -352,7 +351,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (query instanceof List) {
             processQuery.setGroup((List<String>) query);
         } else if (query instanceof String) {
-            processQuery.setGroup(new ArrayList<String>(Arrays.asList((String) query)));
+            processQuery.setGroup(new ArrayList<>(Arrays.asList((String) query)));
         }
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
         if (groupProcesses.size() == 0)

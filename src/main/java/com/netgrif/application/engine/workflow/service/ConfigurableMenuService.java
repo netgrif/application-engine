@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.auth.service.UserService;
+import com.netgrif.core.auth.domain.AbstractUser;
 import com.netgrif.core.auth.domain.Author;
 import com.netgrif.core.auth.domain.Authority;
 import com.netgrif.core.auth.domain.IUser;
@@ -55,7 +56,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
      * @return an options map containing the identifiers and version of nets authored by the provided user as keys and their titles and versions as values
      */
     @Override
-    public Map<String, I18nString> getNetsByAuthorAsMapOptions(IUser author, Locale locale) {
+    public Map<String, I18nString> getNetsByAuthorAsMapOptions(AbstractUser author, Locale locale) {
         LoggedUser loggedAuthor = userService.transformToLoggedUser(author);
         PetriNetSearch requestQuery = new PetriNetSearch();
         Author authorQuery = new Author();

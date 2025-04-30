@@ -4,14 +4,15 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.ArcImportReference;
+import com.netgrif.core.auth.constants.SearchConstants;
+import com.netgrif.core.auth.domain.AbstractUser;
+import com.netgrif.core.auth.domain.ActorTransformer;
 import com.netgrif.core.auth.domain.Group;
-import com.netgrif.core.auth.domain.IUser;
 import com.netgrif.core.auth.domain.LoggedUser;
 import com.netgrif.auth.service.UserService;
 import com.netgrif.application.engine.configuration.properties.CacheProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
-import com.netgrif.core.auth.domain.User;
 import com.netgrif.core.event.events.Event;
 import com.netgrif.core.event.events.petrinet.ProcessDeleteEvent;
 import com.netgrif.core.event.events.petrinet.ProcessDeployEvent;
@@ -230,7 +231,7 @@ public class PetriNetService implements IPetriNetService {
             net.incrementVersion(releaseType);
         }
         processRoleService.saveAll(net.getRoles().values());
-        net.setAuthor(author.transformToAuthor());
+        net.setAuthor(ActorTransformer.toActorRef(author));
         functionCacheService.cachePetriNetFunctions(net);
         Path savedPath = getImporter().saveNetFile(net, new ByteArrayInputStream(xmlCopy.toByteArray()));
         xmlCopy.close();
@@ -465,8 +466,12 @@ public class PetriNetService implements IPetriNetService {
         Query query = new Query();
         Query queryTotal = new Query();
 
-        if (!user.getSelfOrImpersonated().isAdmin())
-            query.addCriteria(getProcessRolesCriteria(user.getSelfOrImpersonated()));
+        // TODO: resolve impersonation
+        if (!user.isAdmin()) {
+            query.addCriteria(getProcessRolesCriteria(user));
+        }
+//        if (!user.getSelfOrImpersonated().isAdmin())
+//            query.addCriteria(getProcessRolesCriteria(user.getSelfOrImpersonated()));
 
         if (criteriaClass.getIdentifier() != null) {
             this.addValueCriteria(query, queryTotal, Criteria.where("identifier").regex(criteriaClass.getIdentifier(), "i"));
@@ -482,11 +487,11 @@ public class PetriNetService implements IPetriNetService {
         }
         if (criteriaClass.getGroup() != null) {
             if (criteriaClass.getGroup().size() == 1) {
-                IUser owner = userService.findById(this.groupService.findById(criteriaClass.getGroup().getFirst()).getOwnerId(), null);
+                AbstractUser owner = userService.findById(this.groupService.findById(criteriaClass.getGroup().getFirst()).getOwnerId(), null);
                 this.addValueCriteria(query, queryTotal, Criteria.where("author.email").is(owner.getEmail()));
             } else {
-                List<IUser> owners = userService.findAllByIds(this.groupService.findAllByIds(new HashSet<>(criteriaClass.getGroup())).stream().map(Group::getOwnerId).collect(Collectors.toSet()), null);
-                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(owners.stream().map(IUser::getEmail).collect(Collectors.toSet())));
+                Set<AbstractUser> owners = userService.findAllByIds(this.groupService.findAllByIds(new HashSet<>(criteriaClass.getGroup()), Pageable.ofSize(SearchConstants.MAX_PAGE_SIZE)).stream().map(Group::getOwnerId).collect(Collectors.toSet()), null);
+                this.addValueCriteria(query, queryTotal, Criteria.where("author.email").in(owners.stream().map(AbstractUser::getEmail).collect(Collectors.toSet())));
             }
         }
         if (criteriaClass.getVersion() != null) {
