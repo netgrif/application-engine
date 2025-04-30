@@ -54,8 +54,12 @@ jobs:
           java-version: 21
           distribution: 'temurin'
           server-id: netgrif-nexus-snapshots
-          server-username: NEXUS_USERNAME
-          server-password: NEXUS_PASSWORD
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
 
       - name: Publish package
         run: mvn -DskipTests=true --batch-mode -P netgrif-nexus-publish deploy
+        env:
+          MAVEN_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+
