@@ -2,6 +2,7 @@ package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.auth.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.auth.repository.GroupRepository;
+import com.netgrif.application.engine.objects.auth.domain.Authority;
 import com.netgrif.application.engine.objects.auth.domain.Group;
 import com.netgrif.application.engine.objects.auth.domain.IUser;
 import com.netgrif.application.engine.objects.common.ResourceNotFoundException;
@@ -13,7 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,6 +27,8 @@ public class GroupServiceImpl implements GroupService {
     private UserService userService;
 
     private GroupRepository groupRepository;
+
+    private AuthorityService authorityService;
 
     private GroupConfigurationProperties groupConfigurationProperties;
 
@@ -43,6 +47,11 @@ public class GroupServiceImpl implements GroupService {
     @Autowired
     public void setUserService(UserService userService) {
         this.userService = userService;
+    }
+
+    @Autowired
+    public void setAuthorityService(AuthorityService authorityService) {
+        this.authorityService = authorityService;
     }
 
     @Override
@@ -69,15 +78,10 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Set<Group> findAllByIds(Set<String> ids) {
-        Set<Group> groups = groupRepository.findAllByIdIn(ids);
-        groups.forEach(this::populateMembers);
+    public Page<Group> findAllByIds(Set<String> ids, Pageable pageable) {
+        Page<Group> groups = groupRepository.findAllByIdIn(ids, pageable);
+        groups.getContent().forEach(this::populateMembers);
         return groups;
-    }
-
-    @Override
-    public Set<Group> findAll() {
-        return new HashSet<>(groupRepository.findAll());
     }
 
     @Override
@@ -174,7 +178,8 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void populateMembers(Group group) {
         group.getMemberIds().forEach(id -> {
-            group.getMembers().add(userService.findById(id, null));
+//            todo realmId rovnaké ako user realmId?
+            group.getMembers().add(userService.findById(id, group.getRealmId()));
         });
     }
 
@@ -191,5 +196,43 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Page<Group> findByPredicate(Predicate predicate, Pageable pageable) {
         return groupRepository.findAll(predicate, pageable);
+    }
+
+    @Override
+    public Page<Group> findAll(Pageable pageable) {
+        return groupRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Group> findAllFromRealm(String realmId, Pageable pageable) {
+        return groupRepository.findAllByRealmId(realmId, pageable);
+    }
+
+    @Override
+    public Group assignAuthority(String groupId, String authorityId) {
+        Group group = findById(groupId);
+        Authority authority = authorityService.getOne(authorityId);
+        group.addAuthority(authority);
+        authority.addGroup(group);
+        return save(group);
+    }
+
+    @Override
+    public List<Group> findByIds(Collection<String> ids) {
+        return groupRepository.findAllById(ids);
+    }
+
+    @Override
+    public Collection<String> getGroupsOwnerEmails(Collection<String> groupIds) {
+        return this.findByIds(groupIds).stream().map(this::getGroupOwnerEmail).toList();
+    }
+
+    @Override
+    public String getGroupOwnerEmail(String groupId) {
+        return this.getGroupOwnerEmail(findById(groupId));
+    }
+
+    protected String getGroupOwnerEmail(Group groupCase) {
+        return userService.findById(groupCase.getOwnerId(), groupCase.getRealmId()).getEmail();
     }
 }

@@ -34,6 +34,10 @@ public abstract class Authority implements Serializable {
     @Setter
     private Set<String> users;
 
+    @JsonIgnore
+    @Setter
+    private Set<String> groups;
+
     public Authority() {
     }
 
@@ -45,6 +49,7 @@ public abstract class Authority implements Serializable {
         this._id = authority.get_id();
         this.name = authority.getName();
         this.users = new HashSet<>(authority.getUsers());
+        this.groups = new HashSet<>(authority.getGroups());
     }
 
     public void addUser(IUser user) {
@@ -52,6 +57,13 @@ public abstract class Authority implements Serializable {
             users = new HashSet<>();
         }
         users.add(user.getStringId());
+    }
+
+    public void addGroup(Group group) {
+        if (groups == null) {
+            groups = new HashSet<>();
+        }
+        groups.add(group.getStringId());
     }
 
     public String getStringId() {

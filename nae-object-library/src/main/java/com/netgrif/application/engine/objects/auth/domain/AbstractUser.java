@@ -26,6 +26,8 @@ public abstract class AbstractUser implements IUser, Serializable {
 
     protected Set<ProcessRole> processRoles;
 
+    protected Set<ProcessRole> negativeProcessRoles;
+
     protected Set<String> groupIds;
 
     @BsonIgnore
@@ -39,6 +41,7 @@ public abstract class AbstractUser implements IUser, Serializable {
         groupIds = new HashSet<>();
         groups = new HashSet<>();
         processRoles = new HashSet<>();
+        negativeProcessRoles = new HashSet<>();
     }
 
     public void addAuthority(Authority authority) {
@@ -60,6 +63,16 @@ public abstract class AbstractUser implements IUser, Serializable {
 
     public void removeProcessRole(ProcessRole role) {
         processRoles.remove(role);
+    }
+
+    public void addNegativeProcessRole(ProcessRole role) {
+        if (negativeProcessRoles.stream().anyMatch(it -> it.getStringId().equals(role.getStringId())))
+            return;
+        negativeProcessRoles.add(role);
+    }
+
+    public void removeNegativeProcessRole(ProcessRole role) {
+        negativeProcessRoles.remove(role);
     }
 
     public void addGroup(Group group) {

@@ -1,7 +1,10 @@
 package com.netgrif.application.engine.objects.auth.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.objects.auth.domain.enums.UserState;
 
+import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 
 public interface IUser extends Actor {
@@ -50,8 +53,18 @@ public interface IUser extends Actor {
 
     boolean isImpersonating();
 
+    LocalDateTime getCreatedAt();
+
+    Map<String, Attribute<?>> getAttributes();
+
+    boolean isEnabled();
+
+    boolean isEmailVerified();
+
+    @JsonIgnore
     IUser getSelfOrImpersonated();
 
+    @JsonIgnore
     IUser getImpersonated();
 
     void setImpersonated(IUser user);
